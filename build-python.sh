@@ -118,7 +118,7 @@ if [ ! -e   ${PyQT_SRC_DIR}/.built ]; then
   cd ${PyQT_SRC_DIR}
   echo 'yes' | ${PYTHON} configure.py --qmake=${STAGING_DIR}/qt/${QT_VERSION}/bin/qmake 
   make -j 8
-  make install DESTDIR="${STAGING_DIR}"
+  make install 
   touch ${PyQT_SRC_DIR}/.built
 fi
 
