@@ -1,0 +1,34 @@
+RHEL 5 problems with offscreen
+See https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-rhel5-linux-centos-5-7/2
+
+--- build/qt-everywhere-opensource-src-5.2.1/qtbase/src/plugins/platforms/offscreen/qoffscreenintegration_x11.cpp.orig	2015-09-13 08:26:34.000000000 +0200
++++ build/qt-everywhere-opensource-src-5.2.1/qtbase/src/plugins/platforms/offscreen/qoffscreenintegration_x11.cpp	2015-09-13 08:29:57.000000000 +0200
+@@ -51,6 +51,7 @@
+ 
+ #include <qpa/qplatformsurface.h>
+ #include <qsurface.h>
++#include <stdio.h>
+ 
+ QT_BEGIN_NAMESPACE
+ 
+@@ -231,7 +232,9 @@
+ 
+ void (*QOffscreenX11GLXContext::getProcAddress(const QByteArray &procName)) ()
+ {
+-    return (void (*)())glXGetProcAddressARB(reinterpret_cast<const GLubyte *>(procName.constData()));
++//    return (void (*)())glXGetProcAddressARB(reinterpret_cast<const GLubyte *>(procName.constData()));
++  fprintf(stderr, "** QOffscreenX11GLXContext::getProcAddress() called, but no support compiled\n");
++  return NULL;
+ }
+ 
+ QSurfaceFormat QOffscreenX11GLXContext::format() const
+--- build/qt-everywhere-opensource-src-5.2.1/qtbase/src/plugins/platforms/offscreen/offscreen.pro.orig	2015-09-13 23:14:53.000000000 +0200
++++ build/qt-everywhere-opensource-src-5.2.1/qtbase/src/plugins/platforms/offscreen/offscreen.pro	2015-09-13 23:15:22.000000000 +0200
+@@ -20,6 +20,7 @@
+ contains(QT_CONFIG, xlib):contains(QT_CONFIG, opengl):!contains(QT_CONFIG, opengles2) {
+     SOURCES += qoffscreenintegration_x11.cpp
+     HEADERS += qoffscreenintegration_x11.h
++    LIBS += -lXrender
+     system(echo "Using X11 offscreen integration with GLX")
+ } else {
+     SOURCES += qoffscreenintegration_dummy.cpp
