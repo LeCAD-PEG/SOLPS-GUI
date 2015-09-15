@@ -1,0 +1,41 @@
+This patch solves problem on CentOS 5.x xkb rules
+Not needed for newer systems.
+Patch should be applied to qtbase/src/3rdparty/xkbcommon/src/xkbcomp/
+See http://lists.qt-project.org/pipermail/interest/2013-October/009303.html
+--- rules.c_bak	2013-10-15 15:29:33.000000000 +0200
++++ rules.c	2013-10-15 15:32:18.000000000 +0200
+@@ -265,6 +265,12 @@
+ 
+ #define lit(s, literal) str(s, literal, sizeof(literal) - 1)
+ 
++static int isgraph2(int c)
++{
++  if(c=='\\')return 0;
++  return isgraph(c);
++}
++
+ static enum rules_token
+ lex(struct scanner *s, union lvalue *val, struct location *loc)
+ {
+@@ -310,7 +316,7 @@
+     if (chr(s, '$')) {
+         val->string.start = s->s + s->pos;
+         val->string.len = 0;
+-        while (isgraph(peek(s))) {
++        while (isgraph2(peek(s))) {
+             next(s);
+             val->string.len++;
+         }
+@@ -323,10 +329,10 @@
+     }
+ 
+     /* Identifier. */
+-    if (isgraph(peek(s))) {
++    if (isgraph2(peek(s))) {
+         val->string.start = s->s + s->pos;
+         val->string.len = 0;
+-        while (isgraph(peek(s))) {
++        while (isgraph2(peek(s))) {
+             next(s);
+             val->string.len++;
+         }

@@ -5,7 +5,7 @@ PYTHON_VERSION=3.4.3
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
 CMAKE_VERSION=3.3.0
 CMAKE_MAINVERSION=${CMAKE_VERSION%.*}
-PyQT_VERSION=5.5
+PyQT_VERSION=5.2.1
 PyQT_MAINVERSION=${PyQT_VERSION%.*}
 QT_VERSION=5.2.1
 SIP_VERSION=4.16.9
@@ -46,12 +46,48 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   cd ${BUILD_DIR}
   tar xzf ${DOWNLOAD_DIR}/${PYTHON_SRC}
   cd ${PYTHON_SRC_DIR}
-  ./configure --prefix=${STAGING_DIR}
+  ./configure --prefix=${STAGING_DIR} --enable-shared
   make -j ${MAKE_JOBS}
   make install
   #make altinstall DESTDIR="${STAGING_DIR}"
   touch ${PYTHON_SRC_DIR}/.built
 fi
+
+#Build xcb for Qt5. See http://doc.qt.io/qt-5/linux-requirements.html
+configopt=()
+configopt['libxml2']="--without-python"
+install -d  ${BUILD_DIR}/xcb
+cd ${BUILD_DIR}/xcb
+for url in \
+http://xmlsoft.org/sources/libxml2-2.9.2.tar.gz \
+http://xorg.freedesktop.org/archive/individual/proto/xproto-7.0.28.tar.gz \
+http://xcb.freedesktop.org/dist/xcb-proto-1.11.tar.gz \
+http://xcb.freedesktop.org/dist/libpthread-stubs-0.3.tar.gz \
+http://xcb.freedesktop.org/dist/libxcb-1.11.1.tar.gz \
+http://xcb.freedesktop.org/dist/xcb-util-0.4.0.tar.gz \
+http://xcb.freedesktop.org/dist/xcb-util-image-0.4.0.tar.gz \
+http://xcb.freedesktop.org/dist/xcb-util-keysyms-0.4.0.tar.gz \
+http://xcb.freedesktop.org/dist/xcb-util-wm-0.4.1.tar.gz \
+http://xcb.freedesktop.org/dist/xcb-util-renderutil-0.3.9.tar.gz \
+http://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.2.tar.gz \
+; do
+   file=${url##*/}
+   test -f ${file} || wget ${url}
+   pkgdir=${file%.*.*}
+   test -e ${pkgdir}/.built && continue
+   rm -rf ${pkgdir}
+   tar xf ${file}
+   cd ${pkgdir}
+   PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig \
+       ./configure --prefix=${STAGING_DIR} ${configopt[${pkgdir%%-*}]} 
+   make
+   make install
+   touch .built
+   cd ..
+done
+
+
+cd ${BUILDROOT}
 
 #Install QT
 
@@ -74,8 +110,14 @@ if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
   
   cd ${QT_SOURCE_DIR}
   patch -p 2 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-no-offscreen.patch
-  ./configure --prefix=${STAGING_QT} -opensource -confirm-license \
-      -no-openssl -skip qtwebkit -skip qtwebkit-examples
+  patch -d  ${QT_SOURCE_DIR}/qtbase/src/3rdparty/xkbcommon/src/xkbcomp \
+      <  ${PATCH_DIR}/xkb_rules.diff
+  PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig \
+    ./configure -v --prefix=${STAGING_QT} -opensource -confirm-license \
+      -no-openssl -no-audio-backend -skip qtwebkit -skip qtwebkit-examples \
+      -xcb -xcb-xlib \
+      -I${STAGING_DIR}/include -I${STAGING_DIR}/include/libxml2 \
+      -L${STAGING_DIR}/lib
   make -j ${MAKE_JOBS}
   make install 
   touch ${QT_SOURCE_DIR}/.built
