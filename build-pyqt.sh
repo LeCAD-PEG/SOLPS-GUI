@@ -93,7 +93,7 @@ cd ${BUILDROOT}
 
 QT_MAJOR_VERSION=${QT_VERSION%.*}
 QT_TAR="qt-everywhere-opensource-src-${QT_VERSION}.tar.gz"
-QT_DOWNLOAD="http://download.qt.io/official_releases/qt/${QT_MAJOR_VERSION}/${QT_VERSION}/${QT_TAR}"
+QT_DOWNLOAD="http://download.qt.io/official_releases/qt/${QT_MAJOR_VERSION}/${QT_VERSION}/single/${QT_TAR}"
 #QT_DOWNLOAD="http://download.qt.io/development_releases/qt/${QT_MAJOR_VERSION}/${QT_VERSION}/single/${QT_TAR}"
 QT_SOURCE_DIR="${BUILD_DIR}/qt-everywhere-opensource-src-${QT_VERSION}"
 
