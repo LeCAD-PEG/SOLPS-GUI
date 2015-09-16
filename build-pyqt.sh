@@ -125,10 +125,12 @@ fi
 
 #Instal sip
 
+LD_LIBRARY_PATH="${STAGING_DIR}/lib:${LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH
 PYTHON=${STAGING_DIR}/bin/python${PYTHON_MAINVERSION}
 
 SIP_SRC="sip-${SIP_VERSION}.tar.gz"
-SIP_DOWNLOAD="http://sourceforge.net/projects/pyqt/files/sip/sip-${SIP_VERSION}/sip-${SIP_VERSION}.tar.gz"
+SIP_DOWNLOAD="http://sourceforge.net/projects/pyqt/files/sip/sip-${SIP_VERSION}/${SIP_SRC}"
 
 if [ ! -f ${DOWNLOAD_DIR}/${SIP_SRC} ]; then 
     wget  -O ${DOWNLOAD_DIR}/${SIP_SRC} ${SIP_DOWNLOAD}
