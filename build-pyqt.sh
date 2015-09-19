@@ -1,17 +1,17 @@
 #!/bin/sh -x
 
-MAKE_JOBS=4
+MAKE_JOBS=${MAKE_JOBS:-4}
 PYTHON_VERSION=3.4.3
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
 CMAKE_VERSION=3.3.0
 CMAKE_MAINVERSION=${CMAKE_VERSION%.*}
-PyQT_VERSION=5.2.1
+PyQT_VERSION=5.4.2
 PyQT_MAINVERSION=${PyQT_VERSION%.*}
-QT_VERSION=5.2.1
+QT_VERSION=5.4.2
 SIP_VERSION=4.16.9
 
-# for Qt5.5 build problems on RHEL5 see http://permalink.gmane.org/gmane.comp.lib.qt.user/15964
-# and  https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-rhel5-linux-centos-5-7
+# For Qt5.x build problems on RHEL5 see
+# https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-rhel5-linux-centos-5-7
 
 BUILDROOT=${PWD}
 BUILD_DIR=${BUILDROOT}/build
@@ -53,11 +53,12 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   touch ${PYTHON_SRC_DIR}/.built
 fi
 
-#Build xcb for Qt5. See http://doc.qt.io/qt-5/linux-requirements.html
-configopt=()
-configopt['libxml2']="--without-python"
+#Build xcb for Qt5 on RHEL5. See http://doc.qt.io/qt-5/linux-requirements.html
+if ! test -d /usr/include/xcb ; then
 install -d  ${BUILD_DIR}/xcb
 cd ${BUILD_DIR}/xcb
+configopt=()
+configopt['libxml2']="--without-python"
 for url in \
 http://xmlsoft.org/sources/libxml2-2.9.2.tar.gz \
 http://xorg.freedesktop.org/archive/individual/proto/xproto-7.0.28.tar.gz \
@@ -85,9 +86,11 @@ http://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.2.tar.gz \
    touch .built
    cd ..
 done
-
-
 cd ${BUILDROOT}
+fi
+
+LD_LIBRARY_PATH="${STAGING_DIR}/lib:${LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH
 
 #Install QT
 
@@ -104,14 +107,15 @@ fi
 
 if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
   #Building QT
-  rm -rf ${QT_SOURCE_DIR}
+  rm -rf ${QT_SOURCE_DIR} ${STAGING_QT} 
   cd ${BUILD_DIR}
   tar xzf ${DOWNLOAD_DIR}/${QT_TAR} 
   
   cd ${QT_SOURCE_DIR}
+  sed -i.orig -e 's/-Wno-error=return-type//' \
+    qtlocation/src/3rdparty/poly2tri/poly2tri.pro
   patch -p 2 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-no-offscreen.patch
-  patch -d  ${QT_SOURCE_DIR}/qtbase/src/3rdparty/xkbcommon/src/xkbcomp \
-      <  ${PATCH_DIR}/xkb_rules.diff
+  patch -p 1 -d  ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-fontconfig-ultrablack.patch
   PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig \
     ./configure -v --prefix=${STAGING_QT} -opensource -confirm-license \
       -no-openssl -no-audio-backend -skip qtwebkit -skip qtwebkit-examples \
@@ -119,14 +123,13 @@ if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
       -I${STAGING_DIR}/include -I${STAGING_DIR}/include/libxml2 \
       -L${STAGING_DIR}/lib
   make -j ${MAKE_JOBS}
-  make install 
+  make install
+  PATH="${STAGING_DIR}/bin:${PATH}" make docs install_docs 
   touch ${QT_SOURCE_DIR}/.built
 fi
 
-#Instal sip
+#Install sip
 
-LD_LIBRARY_PATH="${STAGING_DIR}/lib:${LD_LIBRARY_PATH}"
-export LD_LIBRARY_PATH
 PYTHON=${STAGING_DIR}/bin/python${PYTHON_MAINVERSION}
 
 SIP_SRC="sip-${SIP_VERSION}.tar.gz"
@@ -150,7 +153,7 @@ if [ ! -e   ${SIP_SRC_DIR}/.built ]; then
   touch ${SIP_SRC_DIR}/.built
 fi
 
-#Install pyQT
+#Install PyQT
 
 PYTHON=${STAGING_DIR}/bin/python${PYTHON_MAINVERSION}
 
