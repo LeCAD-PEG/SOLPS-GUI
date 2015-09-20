@@ -9,10 +9,10 @@ case $(hostname) in
 	module load cmake python/2.7/9
 	PYTHON_LIBRARY=/work/imas/opt/python/2.7/9/lib/libpython2.7.a
 	PYTHON_INCLUDE_DIR=/work/imas/opt/python/2.7/9/include/python2.7
-	MAKE_JOBS=4
+	MAKE_JOBS=${MAKE_JOBS:-4}
 	;;
   *)
-	MAKE_JOBS=8
+	MAKE_JOBS=${MAKE_JOBS:-8}
 	;;
 esac
 

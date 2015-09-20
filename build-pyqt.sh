@@ -115,19 +115,25 @@ if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
   cd ${QT_SOURCE_DIR}
   sed -i.orig -e 's/-Wno-error=return-type//' \
     qtlocation/src/3rdparty/poly2tri/poly2tri.pro
+  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-openssl.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-no-offscreen.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-fontconfig-ultrablack.patch
+#  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-fontconfig-ultrablack.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-forkfd.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
   PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig \
     ./configure -v --prefix=${STAGING_QT} -opensource -confirm-license \
-      -no-openssl -no-audio-backend -skip qtwebkit -skip qtwebkit-examples \
+      -shared -no-audio-backend -skip qtwebkit -skip qtwebkit-examples \
       -skip qt3d -xcb -xcb-xlib \
+      -qt-xkbcommon -xkb-config-root /usr/share/X11/xkb \
+      -D GLX_GLXEXT_LEGACY \
+      -D _X_INLINE=inline \
+      -D FC_WEIGHT_EXTRABLACK=215 \
+      -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK \
       -I${STAGING_DIR}/include -I${STAGING_DIR}/include/libxml2 \
       -L${STAGING_DIR}/lib
   make -j ${MAKE_JOBS}
   make install
-  PATH="${STAGING_DIR}/bin:${PATH}" make docs install_docs 
+  PATH="${STAGING_QT}/bin:${PATH}" make qmake_all docs install_docs 
   touch ${QT_SOURCE_DIR}/.built
 fi
 
@@ -175,17 +181,6 @@ if [ ! -e   ${PyQT_SRC_DIR}/.built ]; then
   cd ${BUILD_DIR}
   tar xzf ${DOWNLOAD_DIR}/${PyQT_SRC}
   cd ${PyQT_SRC_DIR}
-  # Disable QtMultimedia, widgets, QtNetwork, QtQml, QtQuick, 
-  # QtXmlPatterns due to missing http://www.openssl.org/
-  sed -i -e 's/QAudioDeviceInfo/QSslPreSharedKeyAuthenticator/' \
-    -e 's/QVideoWidget/QSslPreSharedKeyAuthenticator/' \
-    -e 's/QHostAddress/QSslPreSharedKeyAuthenticator/' \
-    -e 's/QJSEngine/QSslPreSharedKeyAuthenticator/' \
-    -e 's/QQuickWindow/QSslPreSharedKeyAuthenticator/' \
-    -e 's/QQuickWidget/QSslPreSharedKeyAuthenticator/' \
-    -e 's/QXmlName/QSslPreSharedKeyAuthenticator/' \
-    -e 's/QWebSocket/QSslPreSharedKeyAuthenticator/' \
-    configure.py 
   ${PYTHON} configure.py --confirm-license --verbose \
       --qmake=${STAGING_DIR}/qt/${QT_VERSION}/bin/qmake \
       --sip=${STAGING_DIR}/bin/sip

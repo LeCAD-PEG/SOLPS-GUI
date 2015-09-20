@@ -1,0 +1,36 @@
+--- qt-everywhere-opensource-src-5.5.0/qtbase/src/network/ssl/qsslcontext_openssl.cpp.orig	2015-09-20 11:04:49.000000000 +0200
++++ qt-everywhere-opensource-src-5.5.0/qtbase/src/network/ssl/qsslcontext_openssl.cpp	2015-09-20 11:06:17.000000000 +0200
+@@ -468,7 +468,7 @@
+             unsigned char *data = reinterpret_cast<unsigned char *>(m_sessionASN1.data());
+             if (!q_i2d_SSL_SESSION(session, &data))
+                 qCWarning(lcSsl, "could not store persistent version of SSL session");
+-            m_sessionTicketLifeTimeHint = session->tlsext_tick_lifetime_hint;
++            // m_sessionTicketLifeTimeHint = session->tlsext_tick_lifetime_hint;
+         }
+     }
+ 
+--- qt-everywhere-opensource-src-5.5.0/qtbase/src/network/ssl/qsslsocket_openssl.cpp.orig	2015-06-29 22:04:46.000000000 +0200
++++ qt-everywhere-opensource-src-5.5.0/qtbase/src/network/ssl/qsslsocket_openssl.cpp	2015-09-20 17:04:40.000000000 +0200
+@@ -393,8 +393,10 @@
+         if (!ace.isEmpty()
+             && !QHostAddress().setAddress(tlsHostName)
+             && !(configuration.sslOptions & QSsl::SslOptionDisableServerNameIndication)) {
++#ifdef SSL_CTRL_SET_TLSEXT_HOSTNAME          
+             if (!q_SSL_ctrl(ssl, SSL_CTRL_SET_TLSEXT_HOSTNAME, TLSEXT_NAMETYPE_host_name, ace.data()))
+                 qCWarning(lcSsl, "could not set SSL_CTRL_SET_TLSEXT_HOSTNAME, Server Name Indication disabled");
++#endif
+         }
+     }
+ 
+@@ -1577,9 +1579,10 @@
+     // if we have a max read buffer size, reset the plain socket's to match
+     if (readBufferMaxSize)
+         plainSocket->setReadBufferSize(readBufferMaxSize);
+-
++#ifdef SSL_CTRL_GET_SESSION_REUSED
+     if (q_SSL_ctrl((ssl), SSL_CTRL_GET_SESSION_REUSED, 0, NULL))
+         configuration.peerSessionShared = true;
++#endif    
+ 
+ #ifdef QT_DECRYPT_SSL_TRAFFIC
+     if (ssl->session && ssl->s3) {

@@ -5,8 +5,8 @@ SOLPS-ITER GUI
 
 Prepare Python 3, PyQt and ParaView with 
 
-    nice ./build-pyqt.sh
-    nice ./build-paraview.sh
+    nice MAKE_JOBS=4 ./build-pyqt.sh 
+    nice MAKE_JOBS=4 ./build-paraview.sh
 
 Source the setupenv.sh with
 
