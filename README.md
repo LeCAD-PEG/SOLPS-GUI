@@ -3,12 +3,9 @@ SOLPS-ITER GUI
 
 ## Build environment
 
-Prepare Python 3 and PyQt with 
+Prepare Python 3, PyQt and ParaView with 
 
     nice ./build-pyqt.sh
-
-ParaView build with
-
     nice ./build-paraview.sh
 
 Source the setupenv.sh with
@@ -17,6 +14,11 @@ Source the setupenv.sh with
  
 
 ## ITER specifics
+### CentOS 5.x and xcb
+Qt5.x on RHEL5 requires xcb library for X11 rendering instead 
+of Xlib and is built from sources and put into staging/lib. 
+Newer distros (e.g. RHEL6 on hpc-app1.iter.org) provide xcb.
+
 ### IMAS build environment
 IMAS is not required to build SOLPS-GUI
 

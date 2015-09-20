@@ -1,13 +1,13 @@
---- qt-everywhere-opensource-src-5.4.2/qtbase/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp.orig	2015-09-18 09:42:34.000000000 +0200
-+++ qt-everywhere-opensource-src-5.4.2/qtbase/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp	2015-09-18 09:43:20.000000000 +0200
-@@ -82,8 +82,8 @@
-         qtweight = QFont::DemiBold + ((fcweight - FC_WEIGHT_DEMIBOLD) * (QFont::Bold - QFont::DemiBold)) / (FC_WEIGHT_BOLD - FC_WEIGHT_DEMIBOLD);
-     else if (fcweight <= FC_WEIGHT_BLACK)
-         qtweight = QFont::Bold + ((fcweight - FC_WEIGHT_BOLD) * (QFont::Black - QFont::Bold)) / (FC_WEIGHT_BLACK - FC_WEIGHT_BOLD);
--    else if (fcweight <= FC_WEIGHT_ULTRABLACK)
--        qtweight = QFont::Black + ((fcweight - FC_WEIGHT_BLACK) * (maxWeight - QFont::Black)) / (FC_WEIGHT_ULTRABLACK - FC_WEIGHT_BLACK);
-+//    else if (fcweight <= FC_WEIGHT_ULTRABLACK)
-+//        qtweight = QFont::Black + ((fcweight - FC_WEIGHT_BLACK) * (maxWeight - QFont::Black)) / (FC_WEIGHT_ULTRABLACK - FC_WEIGHT_BLACK);
-     else
-         qtweight = maxWeight;
+--- qt-everywhere-opensource-src-5.5.0/qtbase/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp.orig	2015-06-29 22:04:38.000000000 +0200
++++ qt-everywhere-opensource-src-5.5.0/qtbase/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp	2015-09-19 18:33:49.000000000 +0200
+@@ -94,8 +94,8 @@
+         return mapToQtWeightForRange(fcweight, FC_WEIGHT_BOLD, FC_WEIGHT_ULTRABOLD, QFont::Bold, QFont::ExtraBold);
+     if (fcweight <= FC_WEIGHT_BLACK)
+         return mapToQtWeightForRange(fcweight, FC_WEIGHT_ULTRABOLD, FC_WEIGHT_BLACK, QFont::ExtraBold, QFont::Black);
+-    if (fcweight <= FC_WEIGHT_ULTRABLACK)
+-        return mapToQtWeightForRange(fcweight, FC_WEIGHT_BLACK, FC_WEIGHT_ULTRABLACK, QFont::Black, maxWeight);
++//    if (fcweight <= FC_WEIGHT_ULTRABLACK)
++//        return mapToQtWeightForRange(fcweight, FC_WEIGHT_BLACK, FC_WEIGHT_ULTRABLACK, QFont::Black, maxWeight);
+     return maxWeight;
+ }
  

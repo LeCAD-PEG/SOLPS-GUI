@@ -1,9 +1,19 @@
 RHEL 5 problems with offscreen
 See https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-rhel5-linux-centos-5-7/2
 
---- build/qt-everywhere-opensource-src-5.2.1/qtbase/src/plugins/platforms/offscreen/qoffscreenintegration_x11.cpp.orig	2015-09-13 08:26:34.000000000 +0200
-+++ build/qt-everywhere-opensource-src-5.2.1/qtbase/src/plugins/platforms/offscreen/qoffscreenintegration_x11.cpp	2015-09-13 08:29:57.000000000 +0200
-@@ -51,6 +51,7 @@
+--- qt-everywhere-opensource-src-5.2.1/qtbase/src/plugins/platforms/offscreen/offscreen.pro.orig	2015-09-13 23:14:53.000000000 +0200
++++ qt-everywhere-opensource-src-5.2.1/qtbase/src/plugins/platforms/offscreen/offscreen.pro	2015-09-13 23:15:22.000000000 +0200
+@@ -20,6 +20,7 @@
+ contains(QT_CONFIG, xlib):contains(QT_CONFIG, opengl):!contains(QT_CONFIG, opengles2) {
+     SOURCES += qoffscreenintegration_x11.cpp
+     HEADERS += qoffscreenintegration_x11.h
++    LIBS += -lXrender
+     system(echo "Using X11 offscreen integration with GLX")
+ } else {
+     SOURCES += qoffscreenintegration_dummy.cpp
+--- qt-everywhere-opensource-src-5.5.0/qtbase/src/plugins/platforms/offscreen/qoffscreenintegration_x11.cpp.orig	2015-06-29 22:04:45.000000000 +0200
++++ qt-everywhere-opensource-src-5.5.0/qtbase/src/plugins/platforms/offscreen/qoffscreenintegration_x11.cpp	2015-09-19 17:48:44.000000000 +0200
+@@ -43,6 +43,7 @@
  
  #include <qpa/qplatformsurface.h>
  #include <qsurface.h>
@@ -11,7 +21,7 @@ See https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-
  
  QT_BEGIN_NAMESPACE
  
-@@ -231,7 +232,9 @@
+@@ -223,7 +224,9 @@
  
  void (*QOffscreenX11GLXContext::getProcAddress(const QByteArray &procName)) ()
  {
@@ -22,13 +32,3 @@ See https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-
  }
  
  QSurfaceFormat QOffscreenX11GLXContext::format() const
---- build/qt-everywhere-opensource-src-5.2.1/qtbase/src/plugins/platforms/offscreen/offscreen.pro.orig	2015-09-13 23:14:53.000000000 +0200
-+++ build/qt-everywhere-opensource-src-5.2.1/qtbase/src/plugins/platforms/offscreen/offscreen.pro	2015-09-13 23:15:22.000000000 +0200
-@@ -20,6 +20,7 @@
- contains(QT_CONFIG, xlib):contains(QT_CONFIG, opengl):!contains(QT_CONFIG, opengles2) {
-     SOURCES += qoffscreenintegration_x11.cpp
-     HEADERS += qoffscreenintegration_x11.h
-+    LIBS += -lXrender
-     system(echo "Using X11 offscreen integration with GLX")
- } else {
-     SOURCES += qoffscreenintegration_dummy.cpp

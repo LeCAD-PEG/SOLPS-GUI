@@ -1,0 +1,12 @@
+Missing sys/signalfd.h on CentOS 5.5 with kernel .6.18-194.32.1.el5 and therefore we are disabling fbvthandler completely
+--- qt-everywhere-opensource-src-5.5.0/qtbase/src/platformsupport/fbconvenience/qfbvthandler.cpp.orig	2015-09-19 15:25:43.000000000 +0200
++++ qt-everywhere-opensource-src-5.5.0/qtbase/src/platformsupport/fbconvenience/qfbvthandler.cpp	2015-09-19 15:46:15.000000000 +0200
+@@ -33,7 +33,7 @@
+ 
+ #include "qfbvthandler_p.h"
+ #include <QtCore/QSocketNotifier>
+-
++#define QT_NO_EVDEV 
+ #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID) && (!defined(QT_NO_EVDEV) || !defined(QT_NO_LIBINPUT))
+ 
+ #define VTH_ENABLED
