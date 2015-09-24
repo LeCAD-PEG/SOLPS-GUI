@@ -58,8 +58,6 @@ fi
 if ! test -d /usr/include/xcb ; then
 install -d  ${BUILD_DIR}/xcb
 cd ${BUILD_DIR}/xcb
-configopt=()
-configopt['libxml2']="--without-python"
 for url in \
 http://xmlsoft.org/sources/libxml2-2.9.2.tar.gz \
 http://xorg.freedesktop.org/archive/individual/proto/xproto-7.0.28.tar.gz \
@@ -80,8 +78,11 @@ http://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.2.tar.gz \
    rm -rf ${pkgdir}
    tar xf ${file}
    cd ${pkgdir}
+   if [ "${pkgdir%%-*}" = "libxml2"]; then configopt="--without-python"
+   else configopt=
+   fi
    PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig \
-       ./configure --prefix=${STAGING_DIR} ${configopt[${pkgdir%%-*}]} 
+       ./configure --prefix=${STAGING_DIR} ${configopt} 
    make
    make install
    touch .built

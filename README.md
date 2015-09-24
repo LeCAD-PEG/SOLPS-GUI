@@ -5,8 +5,8 @@ SOLPS-ITER GUI
 
 Prepare Python 3, PyQt and ParaView with 
 
-    nice MAKE_JOBS=4 ./build-pyqt.sh 
-    nice MAKE_JOBS=4 ./build-paraview.sh
+    MAKE_JOBS=4 ./build-pyqt.sh 
+    MAKE_JOBS=4 ./build-paraview.sh
 
 Source the setupenv.sh with
 
@@ -24,6 +24,14 @@ IMAS is not required to build SOLPS-GUI
 
     module use /work/imas/etc/modulefiles
     module load imas
+
+## Ubuntu 14+ and other distros
+XCB development libraries are required for building Qt5.x
+
+    apt-cache search libxcb
+    sudo apt-get install libxcb.*-dev
+    sudo apt-get install libudev-dev libxi-dev
+
 
 ## Component tracker
 See https://jira.iter.org/projects/IMAS?selectedItem=com.atlassian.jira.jira-projects-plugin:components-page
