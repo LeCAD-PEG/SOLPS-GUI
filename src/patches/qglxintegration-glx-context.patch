@@ -1,0 +1,16 @@
+This patch was required on Debian distros missing 
+ #define GLX_CONTEXT_MAJOR_VERSION_ARB
+that is not included within GL/glx.h but rather within
+glxext.h, glxtokens.h, and glxew.h
+--- qt-everywhere-opensource-src-5.5.0/qtbase/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp.orig	2015-09-25 10:58:22.050935127 +0200
++++ qt-everywhere-opensource-src-5.5.0/qtbase/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp	2015-09-25 10:59:35.154170549 +0200
+@@ -40,6 +40,9 @@
+ #include <X11/Xlib.h>
+ #include <X11/Xutil.h>
+ #include <GL/glx.h>
++#if ! defined(GLX_CONTEXT_MAJOR_VERSION_ARB)
++#include <GL/glxext.h>
++#endif
+ 
+ #include <QtGui/QOpenGLContext>
+ #include <QtGui/QOffscreenSurface>

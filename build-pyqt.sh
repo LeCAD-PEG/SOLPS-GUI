@@ -121,6 +121,7 @@ if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
 #  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-fontconfig-ultrablack.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-forkfd.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
+  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qglxintegration-glx-context.patch
   PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig \
     ./configure -v --prefix=${STAGING_QT} -opensource -confirm-license \
       -shared -no-audio-backend -skip qtwebkit -skip qtwebkit-examples \
