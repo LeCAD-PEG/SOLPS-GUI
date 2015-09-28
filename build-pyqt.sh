@@ -125,7 +125,7 @@ if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
   PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig \
     ./configure -v --prefix=${STAGING_QT} -opensource -confirm-license \
       -shared -no-audio-backend -skip qtwebkit -skip qtwebkit-examples \
-      -skip qt3d -xcb -xcb-xlib \
+      -skip qt3d -xcb -xcb-xlib -qt-xcb \
       -qt-xkbcommon -xkb-config-root /usr/share/X11/xkb \
       -D GLX_GLXEXT_LEGACY \
       -D _X_INLINE=inline \
