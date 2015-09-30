@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>473</width>
-    <height>297</height>
+    <width>530</width>
+    <height>303</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -366,14 +366,14 @@
          </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QPushButton" name="pushButton_13">
+         <widget class="QPushButton" name="pushButtonRunFilter">
           <property name="text">
            <string>Filter</string>
           </property>
          </widget>
         </item>
         <item row="2" column="1">
-         <widget class="QComboBox" name="comboBox_4">
+         <widget class="QComboBox" name="comboBoxRunFilerType">
           <item>
            <property name="text">
             <string>Wildcard</string>
@@ -392,7 +392,7 @@
          </widget>
         </item>
         <item row="2" column="2" colspan="3">
-         <widget class="QLineEdit" name="lineEdit">
+         <widget class="QLineEdit" name="lineEditRunFilter">
           <property name="text">
            <string/>
           </property>
@@ -420,8 +420,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>473</width>
-     <height>19</height>
+     <width>530</width>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
