@@ -49,19 +49,33 @@ class SolpsImpl(QMainWindow):
         self.model.setRootPath('')
         self.treeViewRuns.setModel(self.model)
         self.model.setFilter(QDir.Dirs|QDir.NoDotAndDotDot)
-        self.model.setNameFilters(["b*"])
         self.model.setNameFilterDisables(0)
 
-        self.settings = QSettings("ITER", "SOLPS-GUI")
-        a = self.settings.value("geometry")
-        if a: self.restoreGeometry(a)
-        b = self.settings.value("windowState")
-        if b: self.restoreState(b)
+        settings = QSettings("ITER", "solps-gui")
+        settings.beginGroup("MainWindow")
+        geometry = settings.value("Geometry")
+        if geometry :  self.restoreGeometry(geometry)
+        state = settings.value("State")
+        if state : self.restoreState(state)
+        settings.endGroup()
+        
+        settings.beginGroup("TreeViewRuns")
+        geometry = settings.value("Geometry")
+        if state : self.treeViewRuns.restoreGeometry(geometry)
+        settings.endGroup()
 
     def closeEvent(self, event):
-        self.settings.setValue("geometry", self.saveGeometry())
-        self.settings.setValue("windowState", self.saveState())
+        settings = QSettings("ITER", "solps-gui")
+        settings.beginGroup("MainWindow")
+        settings.setValue("Geometry", self.saveGeometry())
+        settings.setValue("State", self.saveState())
+        settings.endGroup()
+
+        settings.beginGroup("TreeViewRuns")
+        settings.setValue("Geometry", self.treeViewRuns.saveGeometry())
+        settings.endGroup()
         QMainWindow.closeEvent(self, event)
+
     
     @pyqtSlot()
     def on_initializeRuns_clicked(self):
@@ -73,7 +87,6 @@ class SolpsImpl(QMainWindow):
 
     @pyqtSlot()
     def on_pushButtonRunFilter_clicked(self):
-        print(self.lineEditRunFilter.text())
         self.model.setNameFilters([self.lineEditRunFilter.text()])
 
     @pyqtSlot()
