@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 import sys
 
-#from PyQt5.QtGui import *
-from PyQt5.QtCore import pyqtSlot, QDir, QModelIndex, Qt
+from PyQt5.QtCore import pyqtSlot, QDir, QModelIndex, Qt, QSettings
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QTreeView, QFileSystemModel
 from PyQt5.uic import loadUi
 
-class ITERSystemModel(QFileSystemModel):
+class RUNSystemModel(QFileSystemModel):
 
     def columnCount(self, parent = QModelIndex()):
-        return super(ITERSystemModel, self).columnCount()+1
+        return super(RUNSystemModel, self).columnCount()+1
 
     def data(self, index, role):
         if index.column() == self.columnCount() - 1:
@@ -22,7 +21,7 @@ class ITERSystemModel(QFileSystemModel):
                 return "running"
             if role == Qt.TextAlignmentRole:
                 return Qt.AlignHCenter
-        return super(ITERSystemModel, self).data(index, role)
+        return super(RUNSystemModel, self).data(index, role)
 
     def headerData(self, section, orientation, role):
         if section == 1:
@@ -35,7 +34,7 @@ class ITERSystemModel(QFileSystemModel):
                  return "Comment"     
             if role == Qt.TextAlignmentRole:
                 return Qt.AlignLeft
-        return super(ITERSystemModel, self).headerData(section, orientation, role)
+        return super(RUNSystemModel, self).headerData(section, orientation, role)
 
 
 class SolpsImpl(QMainWindow):
@@ -46,12 +45,23 @@ class SolpsImpl(QMainWindow):
         self.actionAbout_Qt.triggered.connect(QApplication.instance().aboutQt)
         self.checkBoxParameterScan.toggled.connect(
             self.plainTextEditScript.setEnabled)
-        self.model = ITERSystemModel()
+        self.model = RUNSystemModel()
         self.model.setRootPath('')
         self.treeViewRuns.setModel(self.model)
         self.model.setFilter(QDir.Dirs|QDir.NoDotAndDotDot)
         self.model.setNameFilters(["b*"])
         self.model.setNameFilterDisables(0)
+
+        self.settings = QSettings("ITER", "SOLPS-GUI")
+        a = self.settings.value("geometry")
+        if a: self.restoreGeometry(a)
+        b = self.settings.value("windowState")
+        if b: self.restoreState(b)
+
+    def closeEvent(self, event):
+        self.settings.setValue("geometry", self.saveGeometry())
+        self.settings.setValue("windowState", self.saveState())
+        QMainWindow.closeEvent(self, event)
     
     @pyqtSlot()
     def on_initializeRuns_clicked(self):
