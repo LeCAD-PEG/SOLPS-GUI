@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 
-from PyQt5.QtCore import pyqtSlot, QDir, QModelIndex, Qt, QSettings
+from PyQt5.QtCore import pyqtSlot, QDir, QModelIndex, Qt, QSettings, QByteArray
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QTreeView, QFileSystemModel
 from PyQt5.uic import loadUi
 
@@ -45,6 +45,7 @@ class SolpsImpl(QMainWindow):
         self.actionAbout_Qt.triggered.connect(QApplication.instance().aboutQt)
         self.checkBoxParameterScan.toggled.connect(
             self.plainTextEditScript.setEnabled)
+        
         self.model = RUNSystemModel()
         self.model.setRootPath('')
         self.treeViewRuns.setModel(self.model)
@@ -52,28 +53,34 @@ class SolpsImpl(QMainWindow):
         self.model.setNameFilterDisables(0)
 
         settings = QSettings("ITER", "solps-gui")
+        
         settings.beginGroup("MainWindow")
         geometry = settings.value("Geometry")
         if geometry :  self.restoreGeometry(geometry)
         state = settings.value("State")
         if state : self.restoreState(state)
         settings.endGroup()
-        
+
+        column_array = QByteArray()
+
         settings.beginGroup("TreeViewRuns")
-        geometry = settings.value("Geometry")
-        if state : self.treeViewRuns.restoreGeometry(geometry)
+        treeview = settings.value("ColumnWidth")
+        if treeview : self.treeViewRuns.header().restoreState(treeview)
         settings.endGroup()
 
+        
     def closeEvent(self, event):
         settings = QSettings("ITER", "solps-gui")
+        
         settings.beginGroup("MainWindow")
         settings.setValue("Geometry", self.saveGeometry())
         settings.setValue("State", self.saveState())
         settings.endGroup()
 
         settings.beginGroup("TreeViewRuns")
-        settings.setValue("Geometry", self.treeViewRuns.saveGeometry())
+        settings.setValue("ColumnWidth", self.treeViewRuns.header().saveState())
         settings.endGroup()
+        
         QMainWindow.closeEvent(self, event)
 
     
