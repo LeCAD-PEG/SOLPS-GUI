@@ -78,7 +78,7 @@ http://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.2.tar.gz \
    rm -rf ${pkgdir}
    tar xf ${file}
    cd ${pkgdir}
-   if [ "${pkgdir%%-*}" = "libxml2"]; then configopt="--without-python"
+   if [ "${pkgdir%%-*}" = "libxml2" ]; then configopt="--without-python"
    else configopt=
    fi
    PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig \
@@ -107,21 +107,35 @@ if [ ! -f ${DOWNLOAD_DIR}/${QT_TAR} ]; then
   wget -P ${DOWNLOAD_DIR} ${QT_DOWNLOAD}
 fi
 
-if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
+if [ ! -e ${QT_SOURCE_DIR}/.built ]; then
   #Building QT
   rm -rf ${QT_SOURCE_DIR} ${STAGING_QT} 
   cd ${BUILD_DIR}
   tar xzf ${DOWNLOAD_DIR}/${QT_TAR} 
   
   cd ${QT_SOURCE_DIR}
-  sed -i.orig -e 's/-Wno-error=return-type//' \
-    qtlocation/src/3rdparty/poly2tri/poly2tri.pro
+  sed -i.orig -e 's/-Wno-error=return-type//' qtlocation/src/3rdparty/poly2tri/poly2tri.pro
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-openssl.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-no-offscreen.patch
 #  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-fontconfig-ultrablack.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-forkfd.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qglxintegration-glx-context.patch
+  EXTRA_X11_INCLUDE=
+  
+  if [ "`uname -s`" == "Darwin" ]; then
+    # apply few patches for OS X
+    if [ "`uname -r`" == "15.0.0" ]; then
+      # El Capitan
+      patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-osx_el-capitan.patch
+      patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-osx_el-capitan-2.patch
+    fi
+     
+    patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-osx_qtbug-47641.patch
+    patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-osx_qt5.5-qnsview-tooltip-cocoa.patch
+    EXTRA_X11_INCLUDE=-I/opt/X11/include
+  fi
+
   PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig \
     ./configure -v --prefix=${STAGING_QT} -opensource -confirm-license \
       -shared -no-audio-backend -skip qtwebkit -skip qtwebkit-examples \
@@ -131,7 +145,7 @@ if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
       -D _X_INLINE=inline \
       -D FC_WEIGHT_EXTRABLACK=215 \
       -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK \
-      -I${STAGING_DIR}/include -I${STAGING_DIR}/include/libxml2 \
+      -I${STAGING_DIR}/include ${EXTRA_X11_INCLUDE} -I${STAGING_DIR}/include/libxml2 \
       -L${STAGING_DIR}/lib
   make -j ${MAKE_JOBS}
   make install
