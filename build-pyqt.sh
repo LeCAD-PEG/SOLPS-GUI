@@ -133,7 +133,7 @@ if [ ! -e ${QT_SOURCE_DIR}/.built ]; then
      
     patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-osx_qtbug-47641.patch
     patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-osx_qt5.5-qnsview-tooltip-cocoa.patch
-    EXTRA_X11_INCLUDE=-I/opt/X11/include
+    EXTRA_X11_INCLUDE="-I/opt/X11/include -I/usr/X11/include/freetype2"
   fi
 
   PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig \
