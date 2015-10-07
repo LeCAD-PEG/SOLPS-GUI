@@ -72,7 +72,6 @@ class SIGStatusServer():
  
  
 if __name__ == '__main__':
-    import sys
 
     # start server and start listening     
     server = SIGStatusServer('127.0.0.1', 45100)
