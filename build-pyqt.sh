@@ -122,9 +122,10 @@ if [ ! -e ${QT_SOURCE_DIR}/.built ]; then
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qglxintegration-glx-context.patch
   EXTRA_X11_INCLUDE=
+  XCB_OPTS="-xcb -xcb-xlib -qt-xcb"
   
   if [ "`uname -s`" == "Darwin" ]; then
-    # apply few patches for OS X
+    # apply few patches and set options for OS X
     if [ "`uname -r`" == "15.0.0" ]; then
       # El Capitan
       patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-osx_el-capitan.patch
@@ -133,13 +134,14 @@ if [ ! -e ${QT_SOURCE_DIR}/.built ]; then
      
     patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-osx_qtbug-47641.patch
     patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-osx_qt5.5-qnsview-tooltip-cocoa.patch
-    EXTRA_X11_INCLUDE="-I/opt/X11/include -I/usr/X11/include/freetype2"
+	EXTRA_X11_INCLUDE="-I/opt/X11/include -I${QT_SOURCE_DIR}/qtwebengine/src/3rdparty/chromium/third_party/freetype2/src/include"
+	XCB_OPTS=-no-xcb
   fi
 
   PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig \
     ./configure -v --prefix=${STAGING_QT} -opensource -confirm-license \
       -shared -no-audio-backend -skip qtwebkit -skip qtwebkit-examples \
-      -skip qt3d -xcb -xcb-xlib -qt-xcb \
+      -skip qt3d ${XCB_OPTS} \
       -qt-xkbcommon -xkb-config-root /usr/share/X11/xkb \
       -D GLX_GLXEXT_LEGACY \
       -D _X_INLINE=inline \

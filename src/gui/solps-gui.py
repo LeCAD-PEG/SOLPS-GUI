@@ -4,9 +4,18 @@ import sys
 from PyQt5.QtCore import pyqtSlot, QDir, QModelIndex, Qt, QSettings, QByteArray
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QTreeView, QFileSystemModel
 from PyQt5.uic import loadUi
+import jobStatusServer
+from src.gui.jobStatusServer.server import SIGjobStatusServer
 
 class RUNSystemModel(QFileSystemModel):
 
+    def __init__(self):
+        super(RUNSystemModel, self).__init__()
+        # run job status server
+        self.jobStatusServer = SIGjobStatusServer('127.0.0.1', 45100)
+        
+        #self.jobStatusServer.
+        
     def columnCount(self, parent = QModelIndex()):
         return super(RUNSystemModel, self).columnCount()+1
 
@@ -37,14 +46,26 @@ class RUNSystemModel(QFileSystemModel):
         return super(RUNSystemModel, self).headerData(section, orientation, role)
 
 
+    """
+        Register method as slot (receiver) of signal when job status signal is emitted.
+        Method calls method to retrieve job status and other data from server.
+    """
+    @pyqtSlot(str, name='jobStatusChanged')
+    def jobStatusChanged(self, inJobID):
+        # get new data about job ID from server: new status, last change date, etc.
+        newData = self.jobStatusServer.getClientStatus(inJobID)
+        
+        printf("Status of job " + inJobID + " changed: " )
+        printf(newData)
+
+
 class SolpsImpl(QMainWindow):
     model = None
     def __init__(self, *args):
         super(SolpsImpl, self).__init__(*args)
         loadUi('solps-gui.ui', self)
         self.actionAbout_Qt.triggered.connect(QApplication.instance().aboutQt)
-        self.checkBoxParameterScan.toggled.connect(
-            self.plainTextEditScript.setEnabled)
+        self.checkBoxParameterScan.toggled.connect(self.plainTextEditScript.setEnabled)
         
         self.model = RUNSystemModel()
         self.model.setRootPath('')
@@ -52,6 +73,7 @@ class SolpsImpl(QMainWindow):
         self.model.setFilter(QDir.Dirs|QDir.NoDotAndDotDot)
         self.model.setNameFilterDisables(0)
 
+        # get GUI settings
         settings = QSettings("ITER", "solps-gui")
         
         settings.beginGroup("MainWindow")
@@ -105,8 +127,13 @@ class SolpsImpl(QMainWindow):
          "Input file builder will depend on it to correctly save input files "
          " for multiple parameter scan cases.")
 
+
+"""
+    Main method.
+"""
 app = QApplication(sys.argv)
 app.setStyle("motif")
 widget = SolpsImpl()
+
 widget.show()
 sys.exit(app.exec_())

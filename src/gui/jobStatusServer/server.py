@@ -1,17 +1,21 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import socket
 import sys
 import threading
 from datetime import datetime
+from PyQt5.QtCore import pyqtSlot, QDir, QModelIndex, Qt, QSettings, QByteArray
 
-class SIGStatusServer():
+class SIGjobStatusServer(QObject):
     # wait for clients or not
     retrieve = True
     # dict for storing client's status
     clientsStatus = {}
     
     def __init__(self, inIPaddress, inPort):
+        # This defines a signal called 'jobStatusChanged' that takes one string (jobID) arguments.
+        self.job_status_changed = pyqtSignal(str, name='jobStatusChanged')
+        # connect to UDP socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         # Bind socket to local host and port
@@ -27,7 +31,7 @@ class SIGStatusServer():
         while self.retrieve:
             # run until 
             data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-            t1 = threading.Thread(target=SIGStatusServer.saveClientStatus, args=(SIGStatusServer, data, addr))
+            t1 = threading.Thread(target=SIGjobStatusServer.processRetrievedClientStatus, args=(SIGjobStatusServer, data, addr))
             t1.start()
             #print( "num active threads:", threading.active_count() )
             #print("1:", self.clientsStatus)
@@ -35,7 +39,7 @@ class SIGStatusServer():
     """
         Save status from received data/string.
     """    
-    def saveClientStatus(self, inData, inIPaddr):
+    def processRetrievedClientStatus(self, inData, inIPaddr):
         #print( "received message: ", inData.decode('utf-8'), " from ", inIPaddr)
         # split data into 3 parts: jobID, status, message
         data = inData.decode('utf-8').split(";")
@@ -48,6 +52,8 @@ class SIGStatusServer():
         if len(data) == 3:
             # save data into 
             self.clientsStatus[data[0]] = {'status': data[1], 'last_message': data[2], 'last_change': str(datetime.now()) }
+            # emit signal that status of a job has changed
+            self.job_status_changed.emit_value()
             #print("Added status "+ data[1] + " from " + data[0] + ". Cargo: " + data[2])
             #print("2:", self.clientsStatus)
 
@@ -70,11 +76,16 @@ class SIGStatusServer():
         self.retrieve = False
         print("E:", self.clientsStatus)
  
+    """
+        Register method to call when status of client changes.
+    """
+    def registerStatusChange(self):
+        
  
 if __name__ == '__main__':
 
     # start server and start listening     
-    server = SIGStatusServer('127.0.0.1', 45100)
+    server = SIGjobStatusServer('127.0.0.1', 45100)
     sys.exit()
 
 
