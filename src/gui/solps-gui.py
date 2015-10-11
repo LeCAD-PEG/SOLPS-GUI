@@ -4,17 +4,22 @@ import sys
 from PyQt5.QtCore import pyqtSlot, QDir, QModelIndex, Qt, QSettings, QByteArray
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QTreeView, QFileSystemModel
 from PyQt5.uic import loadUi
-import jobStatusServer
-from src.gui.jobStatusServer.server import SIGjobStatusServer
+import multiprocessing
+
+#import jobStatusServer
+from jobStatusServer.SIGjobStatusServer import SIGjobStatusServer
 
 class RUNSystemModel(QFileSystemModel):
-
+    jobStatusServer = None
+    
     def __init__(self):
         super(RUNSystemModel, self).__init__()
-        # run job status server
-        self.jobStatusServer = SIGjobStatusServer('127.0.0.1', 45100)
-        
-        #self.jobStatusServer.
+        # run job status server in separate process, defined as daemon (it is automatically killed when main process exits)
+        self.p1 = multiprocessing.Process(target=self.runJobStatusServer)
+        self.p1.daemon = True
+        self.p1.start()
+        # connect status change signal to method
+        #connect(self.jobStatusChanged)
         
     def columnCount(self, parent = QModelIndex()):
         return super(RUNSystemModel, self).columnCount()+1
@@ -47,10 +52,19 @@ class RUNSystemModel(QFileSystemModel):
 
 
     """
+    Run job server
+    """
+    def runJobStatusServer(self):
+        self.jobStatusServer = SIGjobStatusServer('127.0.0.1', 45100)
+        self.jobStatusServer.jobStatusChange.connect(self.jobStatusChanged)
+        print(self.jobStatusServer.receivers('jobStatusChange'))
+
+
+    """
         Register method as slot (receiver) of signal when job status signal is emitted.
         Method calls method to retrieve job status and other data from server.
     """
-    @pyqtSlot(str, name='jobStatusChanged')
+    @pyqtSlot(str, name='jobStatusChnaged')
     def jobStatusChanged(self, inJobID):
         # get new data about job ID from server: new status, last change date, etc.
         newData = self.jobStatusServer.getClientStatus(inJobID)
@@ -61,6 +75,7 @@ class RUNSystemModel(QFileSystemModel):
 
 class SolpsImpl(QMainWindow):
     model = None
+    
     def __init__(self, *args):
         super(SolpsImpl, self).__init__(*args)
         loadUi('solps-gui.ui', self)
@@ -92,6 +107,8 @@ class SolpsImpl(QMainWindow):
 
         
     def closeEvent(self, event):
+        
+        # save settings
         settings = QSettings("ITER", "solps-gui")
         
         settings.beginGroup("MainWindow")

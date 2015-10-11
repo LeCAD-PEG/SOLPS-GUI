@@ -5,15 +5,19 @@ import sys
 import threading
 from datetime import datetime
 from PyQt5.QtCore import pyqtSlot, QDir, QModelIndex, Qt, QSettings, QByteArray, QObject, pyqtSignal
-from jobStatusServer.SIGclientStatus import SIGclientStatus
 
-class SIGjobStatusServer():
+
+class SIGjobStatusServer(QObject):
     # wait for clients or not
     retrieve = True
     # dict for storing client's status
     clientsStatus = {}
+    # signal for emitting status change
+    jobStatusChange = pyqtSignal(str, name='jobStatusChnaged')
     
     def __init__(self, inIPaddress, inPort):
+        super(SIGjobStatusServer, self).__init__()
+         
         # connect to UDP socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -51,24 +55,16 @@ class SIGjobStatusServer():
 
         if len(data) == 3:
             # save data into 
-            if data[0] not in self.clientsStatus:
-                # new client (not yet in array); create new client and add it to array
-                cl = SIGclientStatus()
-                self.clientsStatus[data[0]] = cl
-
-            # change client status
-            self.clientsStatus[data[0]].setStatus(data[1], data[2])
-            # emit client status change
-            self.clientsStatus[data[0]].jobStatusChange.emit(data[0])
-
-            #self.clientsStatus[data[0]] = {'status': data[1], 'last_message': data[2], 'last_change': str(datetime.now()) }
+            self.clientsStatus[data[0]] = {'status': data[1], 'last_message': data[2], 'last_change': str(datetime.now()) }
             # emit signal that status of a job has changed
-            #self.job_status_changed.emit(data[0], name='jobStatusChanged')
+            self.jobStatusChange.emit(data[0])
             #print("Added status "+ data[1] + " from " + data[0] + ". Cargo: " + data[2])
-            #print("2:", self.clientsStatus)
+            print("2:", self.clientsStatus)
+            #print(self.jobStatusChange.receivers('jobStatusChange'))
+            
 
     """
-    Return status for client with given ID. If client is not in 'status' dictionary, 
+    Return status for client with given ID. If client is not in 'status dictionary, 
     return {'status': 'unknown', 'last_message': 'client ID not known', 'last_change': '' }
     """
     def getClientStatus(self, inClientID):
@@ -85,11 +81,8 @@ class SIGjobStatusServer():
     def stop(self):
         self.retrieve = False
         print("E:", self.clientsStatus)
+
  
-    """
-    Register method to call when status of client changes.
-    """
-    #def registerStatusChange(self):
         
  
 if __name__ == '__main__':
