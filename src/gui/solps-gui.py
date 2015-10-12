@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import sys
 
-from PyQt5.QtCore import pyqtSlot, QDir, QModelIndex, Qt, QSettings, QByteArray, QDir
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QTreeView, QFileSystemModel
+from PyQt5.QtCore import (pyqtSlot, QDir, QModelIndex, Qt, QSettings,
+                          QByteArray)
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,
+                             QTreeView, QFileSystemModel)
 from PyQt5.uic import loadUi
 from os import environ
 import multiprocessing
@@ -15,7 +17,8 @@ class RUNSystemModel(QFileSystemModel):
     
     def __init__(self):
         super(RUNSystemModel, self).__init__()
-        # run job status server in separate process, defined as daemon (it is automatically killed when main process exits)
+        # run job status server in separate process, defined as daemon
+        # (it is automatically killed when main process exits)
         self.p1 = multiprocessing.Process(target=self.runJobStatusServer)
         self.p1.daemon = True
         self.p1.start()
@@ -49,7 +52,8 @@ class RUNSystemModel(QFileSystemModel):
                  return "Comment"     
             if role == Qt.TextAlignmentRole:
                 return Qt.AlignLeft
-        return super(RUNSystemModel, self).headerData(section, orientation, role)
+        return super(RUNSystemModel, self).headerData(section,
+                                                      orientation, role)
 
 
     """
@@ -59,15 +63,15 @@ class RUNSystemModel(QFileSystemModel):
         self.jobStatusServer = SIGjobStatusServer('127.0.0.1', 45100)
         self.jobStatusServer.jobStatusChange.connect(self.jobStatusChanged)
         print(self.jobStatusServer.receivers('jobStatusChange'))
-
-
     """
-        Register method as slot (receiver) of signal when job status signal is emitted.
+        Register method as slot (receiver) of signal when job status signal
+        is emitted.
         Method calls method to retrieve job status and other data from server.
     """
     @pyqtSlot(str, name='jobStatusChnaged')
     def jobStatusChanged(self, inJobID):
-        # get new data about job ID from server: new status, last change date, etc.
+        # get new data about job ID from server: new status, last change date,
+        # etc.
         newData = self.jobStatusServer.getClientStatus(inJobID)
         
         printf("Status of job " + inJobID + " changed: " )
@@ -81,18 +85,13 @@ class SolpsImpl(QMainWindow):
         super(SolpsImpl, self).__init__(*args)
         loadUi('solps-gui.ui', self)
         self.actionAbout_Qt.triggered.connect(QApplication.instance().aboutQt)
-        self.checkBoxParameterScan.toggled.connect(self.plainTextEditScript.setEnabled)
+        self.checkBoxParameterScan.toggled.connect(
+            self.plainTextEditScript.setEnabled)
         
         self.model = RUNSystemModel()
-        
-        home = environ.get("HOME")
-
-        root = self.model.setRootPath(home)
+        self.model.setRootPath('') # Disable folder watch for now
         self.treeViewRuns.setModel(self.model)
-        self.treeViewRuns.setRootIndex(root)
-#        self.treeViewRuns.setModel(self.model)
-#        self.treeViewRuns.setRootIndex()
-#        self.treeViewRuns.setRootIndex(self.model.index(environ.get("HOME")))
+        self.treeViewRuns.setRootIndex(self.model.index(environ.get("HOME")))
         self.model.setFilter(QDir.Dirs|QDir.NoDotAndDotDot)
         self.model.setNameFilterDisables(0)
 
@@ -125,7 +124,7 @@ class SolpsImpl(QMainWindow):
         settings.endGroup()
 
         settings.beginGroup("TreeViewRuns")
-        settings.setValue("ColumnWidth", self.treeViewRuns.header().saveState())
+        settings.setValue("ColumnWidth",self.treeViewRuns.header().saveState())
         settings.endGroup()
         
         QMainWindow.closeEvent(self, event)
