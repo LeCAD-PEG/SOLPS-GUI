@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import sys
 
-from PyQt5.QtCore import pyqtSlot, QDir, QModelIndex, Qt, QSettings, QByteArray
+from PyQt5.QtCore import pyqtSlot, QDir, QModelIndex, Qt, QSettings, QByteArray, QDir
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QTreeView, QFileSystemModel
 from PyQt5.uic import loadUi
+from os import environ
 import multiprocessing
 
 #import jobStatusServer
@@ -83,8 +84,15 @@ class SolpsImpl(QMainWindow):
         self.checkBoxParameterScan.toggled.connect(self.plainTextEditScript.setEnabled)
         
         self.model = RUNSystemModel()
-        self.model.setRootPath('')
+        
+        home = environ.get("HOME")
+
+        root = self.model.setRootPath(home)
         self.treeViewRuns.setModel(self.model)
+        self.treeViewRuns.setRootIndex(root)
+#        self.treeViewRuns.setModel(self.model)
+#        self.treeViewRuns.setRootIndex()
+#        self.treeViewRuns.setRootIndex(self.model.index(environ.get("HOME")))
         self.model.setFilter(QDir.Dirs|QDir.NoDotAndDotDot)
         self.model.setNameFilterDisables(0)
 
