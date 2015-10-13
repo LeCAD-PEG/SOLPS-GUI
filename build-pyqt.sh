@@ -10,6 +10,17 @@ PyQT_MAINVERSION=${PyQT_VERSION%.*}
 QT_VERSION=5.5.0
 SIP_VERSION=4.16.9
 
+case $(hostname) in
+  *.iter.org) 
+	module purge
+	unset CXX CC # we don't want ICC 11.1 to be selected
+	;;
+  *)
+	MAKE_JOBS=${MAKE_JOBS:-8}
+	;;
+esac
+
+
 # For Qt5.x build problems on RHEL5 see
 # https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-rhel5-linux-centos-5-7
 
