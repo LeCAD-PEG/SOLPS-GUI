@@ -5,10 +5,11 @@ QT_VERSION=4.8.7
 
 case $(hostname) in
   *.iter.org) 
-	module use /work/imas/etc/modulefiles
-	module load cmake python/2.7/9
-	PYTHON_LIBRARY=/work/imas/opt/python/2.7/9/lib/libpython2.7.a
-	PYTHON_INCLUDE_DIR=/work/imas/opt/python/2.7/9/include/python2.7
+	module use /work/imas/etc/modulefiles \
+	    /work/imas/opt/EasyBuild/modules/all
+	module load goolf binutils cmake python/2.7/10
+	PYTHON_LIBRARY=/work/imas/opt/python/2.7/10/lib/libpython2.7.a
+	PYTHON_INCLUDE_DIR=/work/imas/opt/python/2.7/10/include/python2.7
 	MAKE_JOBS=${MAKE_JOBS:-4}
 	;;
   *)
@@ -88,7 +89,7 @@ cmake -DCMAKE_BUILD_TYPE:STRING=Release \
                 -DPARAVIEW_INSTALL_DEVELOPMENT:BOOL=ON \
                 -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
                 -DBUILD_TESTING:BOOL=OFF \
-                -DPARAVIEW_ENABLE_PYTHON:BOOL=OFF \
+                -DPARAVIEW_ENABLE_PYTHON:BOOL=ON \
                 -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY} \
                 -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR} \
                 -DPARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES:BOOL=OFF \
