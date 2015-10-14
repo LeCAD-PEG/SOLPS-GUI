@@ -4,7 +4,8 @@ import socket
 import sys
 import threading
 from datetime import datetime
-from PyQt5.QtCore import pyqtSlot, QDir, QModelIndex, Qt, QSettings, QByteArray, QObject, pyqtSignal
+from PyQt5.QtCore import (pyqtSlot, QDir, QModelIndex, Qt, QSettings,
+                          QByteArray, QObject, pyqtSignal)
 
 
 class SIGjobStatusServer(QObject):
@@ -13,7 +14,7 @@ class SIGjobStatusServer(QObject):
     # dict for storing client's status
     clientsStatus = {}
     # signal for emitting status change
-    jobStatusChange = pyqtSignal(str, name='jobStatusChnaged')
+    jobStatusChange = pyqtSignal(str, name='jobStatusChanged')
     
     def __init__(self, inIPaddress, inPort):
         super(SIGjobStatusServer, self).__init__()
@@ -34,7 +35,9 @@ class SIGjobStatusServer(QObject):
         while self.retrieve:
             # run until 
             data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-            t1 = threading.Thread(target=SIGjobStatusServer.processRetrievedClientStatus, args=(self, data, addr))
+            t1 = threading.Thread(target=SIGjobStatusServer.
+                                  processRetrievedClientStatus,
+                                  args=(self, data, addr))
             t1.start()
             
             #print( "num active threads:", threading.active_count() )
@@ -55,7 +58,9 @@ class SIGjobStatusServer(QObject):
 
         if len(data) == 3:
             # save data into 
-            self.clientsStatus[data[0]] = {'status': data[1], 'last_message': data[2], 'last_change': str(datetime.now()) }
+            self.clientsStatus[data[0]] = {'status': data[1],
+                                           'last_message': data[2],
+                                           'last_change': str(datetime.now()) }
             # emit signal that status of a job has changed
             self.jobStatusChange.emit(data[0])
             #print("Added status "+ data[1] + " from " + data[0] + ". Cargo: " + data[2])
@@ -88,7 +93,7 @@ class SIGjobStatusServer(QObject):
 if __name__ == '__main__':
 
     # start server and start listening     
-    server = SIGjobStatusServer('127.0.0.1', 45100)
+    server = SIGjobStatusServer('127.0.0.1', 45102)
     sys.exit()
 
 
