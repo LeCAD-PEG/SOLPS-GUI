@@ -434,7 +434,7 @@
     <property name="title">
      <string>&amp;Settings</string>
     </property>
-    <addaction name="actionJob_collumns"/>
+    <addaction name="actionJob_list"/>
     <addaction name="actionGlobal"/>
     <addaction name="actionJob_submission"/>
    </widget>
@@ -457,9 +457,9 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="actionJob_collumns">
+  <action name="actionJob_list">
    <property name="text">
-    <string>&amp;Job columns</string>
+    <string>&amp;Job list</string>
    </property>
   </action>
   <action name="actionGlobal">

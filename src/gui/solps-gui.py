@@ -4,13 +4,71 @@ import sys
 from PyQt5.QtCore import (pyqtSlot, QDir, QModelIndex, Qt, QSettings,
                           QByteArray)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,
-                             QTreeView, QFileSystemModel)
+                             QFileSystemModel, QDialog, QFileDialog)
 from PyQt5.uic import loadUi
 from os import environ
+
 import multiprocessing
 
 #import jobStatusServer
 from jobStatusServer.SIGjobStatusServer import SIGjobStatusServer
+
+class RunSettings(QDialog):
+    file = None
+    file2 = None
+    file3 = None
+    def __init__(self):
+        super(RunSettings, self).__init__()
+        loadUi('runs.ui', self)
+        self.setWindowTitle("Monitored runs folder")
+
+        self.toolButtonView.clicked.connect(self.showdir)
+        self.toolButtonView2.clicked.connect(self.showdir2)
+        self.toolButtonView3.clicked.connect(self.showdir3)
+
+        self.pushButton_OK.clicked.connect(self.rundir_save)
+
+        # get GUI settings
+        settings = QSettings("ITER", "solps-gui")
+
+        settings.beginGroup("RunDirectories")
+
+        rundir1 = settings.value("runDir1")
+        if rundir1 : self.lineEdit_rundir.setText(rundir1)
+        rundir2 = settings.value("runDir2")
+        if rundir2 :  self.lineEdit_rundir2.setText(rundir2)
+        rundir3 = settings.value("runDir3")
+        if rundir3 :  self.lineEdit_rundir3.setText(rundir3)
+
+        settings.endGroup()
+
+    def rundir_save(self):
+
+        settings = QSettings("ITER", "solps-gui")
+        settings.beginGroup("RunDirectories")
+        if self.file : settings.setValue("runDir1",self.file)
+        if self.file2 : settings.setValue("runDir2",self.file2)
+        if self.file3 : settings.setValue("runDir3",self.file3)
+        settings.endGroup()
+
+    def showdir(self):
+        self.file = QFileDialog.getExistingDirectory\
+            (self, "Select Directory",'/work/projects/solps-iter',
+             QFileDialog.ShowDirsOnly|QFileDialog.DontResolveSymlinks)
+        self.lineEdit_rundir.setText(self.file)
+
+    def showdir2(self):
+        self.file2 = QFileDialog.getExistingDirectory\
+            (self, "Select Directory",'/work/projects/solps-iter',
+             QFileDialog.ShowDirsOnly|QFileDialog.DontResolveSymlinks)
+        self.lineEdit_rundir2.setText(self.file2)
+
+    def showdir3(self):
+        self.file3 = QFileDialog.getExistingDirectory\
+            (self, "Select Directory",'/work/projects/solps-iter',
+             QFileDialog.ShowDirsOnly|QFileDialog.DontResolveSymlinks)
+        self.lineEdit_rundir3.setText(self.file3)
+
 
 class RUNSystemModel(QFileSystemModel):
     jobStatusServer = None
@@ -28,7 +86,7 @@ class RUNSystemModel(QFileSystemModel):
     def columnCount(self, parent = QModelIndex()):
         return super(RUNSystemModel, self).columnCount()+1
 
-    def data(self, index, role):
+    def data(self, index, role=None):
         if index.column() == self.columnCount() - 1:
             if role == Qt.DisplayRole:
                 return "YourText" + str(index.row())
@@ -41,7 +99,7 @@ class RUNSystemModel(QFileSystemModel):
                 return Qt.AlignHCenter
         return super(RUNSystemModel, self).data(index, role)
 
-    def headerData(self, section, orientation, role):
+    def headerData(self, section, orientation, role=None):
         if section == 1:
             if role == Qt.DisplayRole:
                 return "Status"
@@ -54,7 +112,6 @@ class RUNSystemModel(QFileSystemModel):
                 return Qt.AlignLeft
         return super(RUNSystemModel, self).headerData(section,
                                                       orientation, role)
-
 
     """
     Run job server
@@ -112,12 +169,19 @@ class SolpsImpl(QMainWindow):
         if treeview : self.treeViewRuns.header().restoreState(treeview)
         settings.endGroup()
 
+        self.actionJob_list.triggered.connect(self.showdialog)
+
+    def showdialog(self):
+        dialog = RunSettings()
+        dialog.show()
+        dialog.exec_()
+
         
     def closeEvent(self, event):
         
         # save settings
         settings = QSettings("ITER", "solps-gui")
-        
+
         settings.beginGroup("MainWindow")
         settings.setValue("Geometry", self.saveGeometry())
         settings.setValue("State", self.saveState())
