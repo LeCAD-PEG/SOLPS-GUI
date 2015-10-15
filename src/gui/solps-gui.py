@@ -1,33 +1,93 @@
 #!/usr/bin/env python3
 
-import os, socket, sys
+import os
+import socket
+import sys
 from PyQt5.QtCore import (pyqtSlot, QDir, QModelIndex, Qt, QSettings,
                           QByteArray, pyqtSignal, QThread)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,
-                             QTreeView, QFileSystemModel)
+                             QFileSystemModel, QDialog, QFileDialog)
 from PyQt5.uic import loadUi
+from os import environ
 
 class RunStatusServer(QThread):
     sock = None
     retrieve = True
     jobStatusChange = pyqtSignal(str)
 
-    def bind(self, inIPaddress, inPort):
+    def bind(self, address, port):
         # connect to UDP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # Bind socket to local host and port
         try:
-            self.sock.bind((inIPaddress, inPort))
+            self.sock.bind((address, port))
         except socket.error: #, msg:
-            print('Bind to '+ inIPaddress +':'+ str(inPort) +' failed.')
+            print('Bind to', address, ':', str(port), ' failed.')
             sys.exit()
-        print('Server on ', inIPaddress, ':', inPort)
+        print('Server on', address, ':', port)
     def run(self):
         print("RunStatusServer started")
         while self.retrieve:
             data, addr = self.sock.recvfrom(1024) # wait for data
             print("Received packet from", addr[0], "data=", data.decode('utf-8'))
             self.jobStatusChange.emit(data.decode('utf-8'))
+
+class RunSettings(QDialog):
+    file = None
+    file2 = None
+    file3 = None
+    def __init__(self):
+        super(RunSettings, self).__init__()
+        loadUi('runs.ui', self)
+        self.setWindowTitle("Monitored runs folder")
+
+        self.toolButtonView.clicked.connect(self.showdir)
+        self.toolButtonView2.clicked.connect(self.showdir2)
+        self.toolButtonView3.clicked.connect(self.showdir3)
+
+        self.pushButton_OK.clicked.connect(self.rundir_save)
+
+        # get GUI settings
+        settings = QSettings("ITER", "solps-gui")
+
+        settings.beginGroup("RunDirectories")
+
+        rundir1 = settings.value("runDir1")
+        if rundir1 : self.lineEdit_rundir.setText(rundir1)
+        rundir2 = settings.value("runDir2")
+        if rundir2 :  self.lineEdit_rundir2.setText(rundir2)
+        rundir3 = settings.value("runDir3")
+        if rundir3 :  self.lineEdit_rundir3.setText(rundir3)
+
+        settings.endGroup()
+
+    def rundir_save(self):
+
+        settings = QSettings("ITER", "solps-gui")
+        settings.beginGroup("RunDirectories")
+        if self.file : settings.setValue("runDir1",self.file)
+        if self.file2 : settings.setValue("runDir2",self.file2)
+        if self.file3 : settings.setValue("runDir3",self.file3)
+        settings.endGroup()
+
+    def showdir(self):
+        self.file = QFileDialog.getExistingDirectory\
+            (self, "Select Directory",'/work/projects/solps-iter',
+             QFileDialog.ShowDirsOnly|QFileDialog.DontResolveSymlinks)
+        self.lineEdit_rundir.setText(self.file)
+
+    def showdir2(self):
+        self.file2 = QFileDialog.getExistingDirectory\
+            (self, "Select Directory",'/work/projects/solps-iter',
+             QFileDialog.ShowDirsOnly|QFileDialog.DontResolveSymlinks)
+        self.lineEdit_rundir2.setText(self.file2)
+
+    def showdir3(self):
+        self.file3 = QFileDialog.getExistingDirectory\
+            (self, "Select Directory",'/work/projects/solps-iter',
+             QFileDialog.ShowDirsOnly|QFileDialog.DontResolveSymlinks)
+        self.lineEdit_rundir3.setText(self.file3)
+
 
 class RUNSystemModel(QFileSystemModel):
     jobStatusServer = None
@@ -66,7 +126,6 @@ class RUNSystemModel(QFileSystemModel):
                 return Qt.AlignLeft
         return super(RUNSystemModel, self).headerData(section,
                                                       orientation, role)
-
 
     """ Run job server """
     def runJobStatusServer(self):
@@ -125,12 +184,19 @@ class SolpsImpl(QMainWindow):
         if treeview : self.treeViewRuns.header().restoreState(treeview)
         settings.endGroup()
 
+        self.actionJob_list.triggered.connect(self.showdialog)
+
+    def showdialog(self):
+        dialog = RunSettings()
+        dialog.show()
+        dialog.exec_()
+
         
     def closeEvent(self, event):
         
         # save settings
         settings = QSettings("ITER", "solps-gui")
-        
+
         settings.beginGroup("MainWindow")
         settings.setValue("Geometry", self.saveGeometry())
         settings.setValue("State", self.saveState())
