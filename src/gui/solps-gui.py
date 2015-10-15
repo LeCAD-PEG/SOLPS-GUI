@@ -117,7 +117,7 @@ class RUNSystemModel(QFileSystemModel):
     Run job server
     """
     def runJobStatusServer(self):
-        self.jobStatusServer = SIGjobStatusServer('127.0.0.1', 45100)
+        self.jobStatusServer = SIGjobStatusServer('0.0.0.0', 45102)
         self.jobStatusServer.jobStatusChange.connect(self.jobStatusChanged)
         print(self.jobStatusServer.receivers('jobStatusChange'))
     """
@@ -125,14 +125,14 @@ class RUNSystemModel(QFileSystemModel):
         is emitted.
         Method calls method to retrieve job status and other data from server.
     """
-    @pyqtSlot(str, name='jobStatusChnaged')
+    @pyqtSlot(str, name='jobStatusChanged')
     def jobStatusChanged(self, inJobID):
         # get new data about job ID from server: new status, last change date,
         # etc.
         newData = self.jobStatusServer.getClientStatus(inJobID)
         
-        printf("Status of job " + inJobID + " changed: " )
-        printf(newData)
+        print("Status of job " + inJobID + " changed: " )
+        print(newData)
 
 
 class SolpsImpl(QMainWindow):
