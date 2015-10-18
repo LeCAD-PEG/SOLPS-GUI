@@ -2,74 +2,85 @@
 import sys
 
 from PyQt5.QtCore import (pyqtSlot, QDir, QModelIndex, Qt, QSettings,
-                          QByteArray)
+                          QByteArray, QT_TR_NOOP)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,
                              QFileSystemModel, QDialog, QFileDialog)
 from PyQt5.uic import loadUi
 from os import environ
+from os.path import expanduser
 
 import multiprocessing
 
-#import jobStatusServer
+# import jobStatusServer
 from jobStatusServer.SIGjobStatusServer import SIGjobStatusServer
 
+# Settings->Job list
+
 class RunSettings(QDialog):
-    file = None
-    file2 = None
-    file3 = None
+
     def __init__(self):
         super(RunSettings, self).__init__()
         loadUi('runs.ui', self)
         self.setWindowTitle("Monitored runs folder")
 
-        self.toolButtonView.clicked.connect(self.showdir)
-        self.toolButtonView2.clicked.connect(self.showdir2)
-        self.toolButtonView3.clicked.connect(self.showdir3)
-
-        self.pushButton_OK.clicked.connect(self.rundir_save)
-
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
-
         settings.beginGroup("RunDirectories")
-
-        rundir1 = settings.value("runDir1")
-        if rundir1 : self.lineEdit_rundir.setText(rundir1)
-        rundir2 = settings.value("runDir2")
-        if rundir2 :  self.lineEdit_rundir2.setText(rundir2)
-        rundir3 = settings.value("runDir3")
-        if rundir3 :  self.lineEdit_rundir3.setText(rundir3)
-
+        rundir1 = settings.value("runDir1", expanduser("~"))
+        self.lineEdit_rundir1.setText(rundir1)
+        rundir2 = settings.value("runDir2", "")
+        self.lineEdit_rundir2.setText(rundir2)
+        rundir3 = settings.value("runDir3", "")
+        self.lineEdit_rundir3.setText(rundir3)
+        rundir4 = settings.value("runDir4", "")
+        self.lineEdit_rundir4.setText(rundir4)
+        rundir5 = settings.value("runDir5", "")
+        self.lineEdit_rundir5.setText(rundir5)
         settings.endGroup()
+        
+        self.toolButtonView1.clicked.connect(self.showdir1)
+        self.toolButtonView2.clicked.connect(self.showdir2)
+        self.toolButtonView3.clicked.connect(self.showdir3)
+        self.toolButtonView4.clicked.connect(self.showdir4)
+        self.toolButtonView5.clicked.connect(self.showdir5)
 
-    def rundir_save(self):
-
+    # save GUI settings
+    @pyqtSlot()
+    def on_pushButton_OK_clicked(self):
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
-        if self.file : settings.setValue("runDir1",self.file)
-        if self.file2 : settings.setValue("runDir2",self.file2)
-        if self.file3 : settings.setValue("runDir3",self.file3)
+        settings.setValue("runDir1", self.lineEdit_rundir1.text())
+        settings.setValue("runDir2", self.lineEdit_rundir2.text())
+        settings.setValue("runDir3", self.lineEdit_rundir3.text())
+        settings.setValue("runDir4", self.lineEdit_rundir4.text())
+        settings.setValue("runDir5", self.lineEdit_rundir5.text())
+        
         settings.endGroup()
 
-    def showdir(self):
-        self.file = QFileDialog.getExistingDirectory\
-            (self, "Select Directory",'/work/projects/solps-iter',
-             QFileDialog.ShowDirsOnly|QFileDialog.DontResolveSymlinks)
-        self.lineEdit_rundir.setText(self.file)
+    def update_dir(self, line_edit):
+        current_dir = line_edit.text()
+        if current_dir == "": current_dir = expanduser("~")
+        new_dir = QFileDialog.getExistingDirectory(self,
+          "Select Directory", current_dir, QFileDialog.ShowDirsOnly)
+        if new_dir: line_edit.setText(new_dir)
+ 
+    # Choose run directory
+    @pyqtSlot()
+    def showdir1(self): self.update_dir(self.lineEdit_rundir1)
 
-    def showdir2(self):
-        self.file2 = QFileDialog.getExistingDirectory\
-            (self, "Select Directory",'/work/projects/solps-iter',
-             QFileDialog.ShowDirsOnly|QFileDialog.DontResolveSymlinks)
-        self.lineEdit_rundir2.setText(self.file2)
+    @pyqtSlot()
+    def showdir2(self): self.update_dir(self.lineEdit_rundir2)
+                
+    @pyqtSlot()
+    def showdir3(self): self.update_dir(self.lineEdit_rundir3)
 
-    def showdir3(self):
-        self.file3 = QFileDialog.getExistingDirectory\
-            (self, "Select Directory",'/work/projects/solps-iter',
-             QFileDialog.ShowDirsOnly|QFileDialog.DontResolveSymlinks)
-        self.lineEdit_rundir3.setText(self.file3)
+    @pyqtSlot()
+    def showdir4(self): self.update_dir(self.lineEdit_rundir4)
 
-
+    @pyqtSlot()
+    def showdir5(self): self.update_dir(self.lineEdit_rundir5)
+    
+                
 class RUNSystemModel(QFileSystemModel):
     jobStatusServer = None
     
@@ -81,7 +92,7 @@ class RUNSystemModel(QFileSystemModel):
         self.p1.daemon = True
         self.p1.start()
         # connect status change signal to method
-        #connect(self.jobStatusChanged)
+        # connect(self.jobStatusChanged)
         
     def columnCount(self, parent = QModelIndex()):
         return super(RUNSystemModel, self).columnCount()+1
@@ -107,7 +118,7 @@ class RUNSystemModel(QFileSystemModel):
                 return Qt.AlignHCenter
         if section == self.columnCount() - 1:
             if role == Qt.DisplayRole:
-                 return "Comment"     
+                return "Comment"
             if role == Qt.TextAlignmentRole:
                 return Qt.AlignLeft
         return super(RUNSystemModel, self).headerData(section,
@@ -178,7 +189,6 @@ class SolpsImpl(QMainWindow):
 
         
     def closeEvent(self, event):
-        
         # save settings
         settings = QSettings("ITER", "solps-gui")
 
