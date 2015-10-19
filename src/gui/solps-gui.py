@@ -1,18 +1,38 @@
 #!/usr/bin/env python3
-import sys
 
+import os
+import socket
+import sys
 from PyQt5.QtCore import (pyqtSlot, QDir, QModelIndex, Qt, QSettings,
-                          QByteArray, QT_TR_NOOP)
+                          QByteArray, pyqtSignal, QThread)
+
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,
                              QFileSystemModel, QDialog, QFileDialog)
 from PyQt5.uic import loadUi
 from os import environ
 from os.path import expanduser
 
-import multiprocessing
+class RunStatusServer(QThread):
+    sock = None
+    retrieve = True
+    jobStatusChange = pyqtSignal(str)
 
-# import jobStatusServer
-from jobStatusServer.SIGjobStatusServer import SIGjobStatusServer
+    def bind(self, address, port):
+        # connect to UDP socket
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # Bind socket to local host and port
+        try:
+            self.sock.bind((address, port))
+        except socket.error: #, msg:
+            print('Bind to', address, ':', str(port), ' failed.')
+            sys.exit()
+        print('Server on', address, ':', port)
+    def run(self):
+        print("RunStatusServer started")
+        while self.retrieve:
+            data, addr = self.sock.recvfrom(1024) # wait for data
+            print("Received packet from", addr[0], "data=", data.decode('utf-8'))
+            self.jobStatusChange.emit(data.decode('utf-8'))
 
 # Settings->Job list
 
@@ -83,17 +103,12 @@ class RunSettings(QDialog):
                 
 class RUNSystemModel(QFileSystemModel):
     jobStatusServer = None
+    monitorThread = None
     
     def __init__(self):
         super(RUNSystemModel, self).__init__()
-        # run job status server in separate process, defined as daemon
-        # (it is automatically killed when main process exits)
-        self.p1 = multiprocessing.Process(target=self.runJobStatusServer)
-        self.p1.daemon = True
-        self.p1.start()
-        # connect status change signal to method
-        # connect(self.jobStatusChanged)
-        
+        self.runJobStatusServer()
+
     def columnCount(self, parent = QModelIndex()):
         return super(RUNSystemModel, self).columnCount()+1
 
@@ -124,26 +139,27 @@ class RUNSystemModel(QFileSystemModel):
         return super(RUNSystemModel, self).headerData(section,
                                                       orientation, role)
 
-    """
-    Run job server
-    """
+    """ Run job server """
     def runJobStatusServer(self):
-        self.jobStatusServer = SIGjobStatusServer('0.0.0.0', 45102)
-        self.jobStatusServer.jobStatusChange.connect(self.jobStatusChanged)
-        print(self.jobStatusServer.receivers('jobStatusChange'))
+        self.monitorThread = RunStatusServer()
+        self.monitorThread.bind('0.0.0.0', 49406)
+        #self.monitorThread.finished.connect(self.deleteLater) # TODO
+        self.monitorThread.jobStatusChange.connect(self.jobStatusChanged)
+        self.monitorThread.start()
+
     """
         Register method as slot (receiver) of signal when job status signal
         is emitted.
         Method calls method to retrieve job status and other data from server.
     """
-    @pyqtSlot(str, name='jobStatusChanged')
-    def jobStatusChanged(self, inJobID):
+    @pyqtSlot(str)
+    def jobStatusChanged(self, message):
         # get new data about job ID from server: new status, last change date,
         # etc.
-        newData = self.jobStatusServer.getClientStatus(inJobID)
+        #newData = self.jobStatusServer.getClientStatus(inJobID)
         
-        print("Status of job " + inJobID + " changed: " )
-        print(newData)
+        print("Status of job changed: ", message)
+        #print(newData)
 
 
 class SolpsImpl(QMainWindow):
@@ -159,7 +175,7 @@ class SolpsImpl(QMainWindow):
         self.model = RUNSystemModel()
         self.model.setRootPath('') # Disable folder watch for now
         self.treeViewRuns.setModel(self.model)
-        self.treeViewRuns.setRootIndex(self.model.index(environ.get("HOME")))
+        self.treeViewRuns.setRootIndex(self.model.index(os.environ.get("HOME")))
         self.model.setFilter(QDir.Dirs|QDir.NoDotAndDotDot)
         self.model.setNameFilterDisables(0)
 
@@ -198,7 +214,7 @@ class SolpsImpl(QMainWindow):
         settings.endGroup()
 
         settings.beginGroup("TreeViewRuns")
-        settings.setValue("ColumnWidth",self.treeViewRuns.header().saveState())
+        settings.setValue("ColumnWidth", self.treeViewRuns.header().saveState())
         settings.endGroup()
         
         QMainWindow.closeEvent(self, event)
