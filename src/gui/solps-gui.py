@@ -4,7 +4,7 @@ import os
 import socket
 import sys
 from PyQt5.QtCore import (pyqtSlot, QDir, QModelIndex, Qt, QSettings,
-                          QByteArray, pyqtSignal, QThread)
+                          QByteArray, pyqtSignal, QThread, QAbstractItemModel)
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,
                              QFileSystemModel, QDialog, QFileDialog)
@@ -99,7 +99,63 @@ class RunSettings(QDialog):
 
     @pyqtSlot()
     def showdir5(self): self.update_dir(self.lineEdit_rundir5)
-    
+
+class TreeItem(object):
+    def __init__(self, data, parent=None):
+        self.parentItem = parent
+        self.itemData = data
+        self.childItems = []
+
+    def appendChild(self, item):
+        self.childItems.append(item)
+
+    def child(self, row):
+        return self.childItems[row]
+
+    def childCount(self):
+        return len(self.childItems)
+
+    def columnCount(self):
+        return len(self.itemData)
+
+    def data(self, column):
+        try:
+            return self.itemData[column]
+        except IndexError:
+            return None
+
+    def parent(self):
+        return self.parentItem
+
+    def row(self):
+        if self.parentItem:
+            return self.parentItem.childItems.index(self)
+        return 0
+
+class RunsModel(QAbstractItemModel):
+
+    def __init__(self, parent=None):
+        super(RunsModel, self).__init__(parent)
+
+        self.rootItem = TreeItem(("Title", "Summary"))
+        #self.setupModelData(data.split('\n'), self.rootItem)
+
+    def columnCount(self, parent):
+        if parent.isValid():
+            return parent.internalPointer().columnCount()
+        else:
+            return self.rootItem.columnCount()
+
+    def data(self, index, role):
+        if not index.isValid():
+            return None
+
+        if role != Qt.DisplayRole:
+            return None
+
+        item = index.internalPointer()
+
+        return item.data(index.column())
                 
 class RUNSystemModel(QFileSystemModel):
     jobStatusServer = None
@@ -172,12 +228,12 @@ class SolpsImpl(QMainWindow):
         self.checkBoxParameterScan.toggled.connect(
             self.plainTextEditScript.setEnabled)
         
-        self.model = RUNSystemModel()
-        self.model.setRootPath('') # Disable folder watch for now
+        self.model = RunsModel()
+       # self.model.setRootPath('') # Disable folder watch for now
         self.treeViewRuns.setModel(self.model)
-        self.treeViewRuns.setRootIndex(self.model.index(os.environ.get("HOME")))
-        self.model.setFilter(QDir.Dirs|QDir.NoDotAndDotDot)
-        self.model.setNameFilterDisables(0)
+        #self.treeViewRuns.setRootIndex(self.model.index(os.environ.get("HOME")))
+        #self.model.setFilter(QDir.Dirs|QDir.NoDotAndDotDot)
+        #self.model.setNameFilterDisables(0)
 
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
