@@ -3,8 +3,8 @@
 import os
 import socket
 import sys
-from PyQt5.QtCore import (pyqtSlot, QDir, QModelIndex, Qt, QSettings,
-                          QByteArray, pyqtSignal, QThread, QAbstractItemModel)
+from PyQt5.QtCore import (pyqtSlot, QModelIndex, Qt, QSettings,
+                          pyqtSignal, QThread, QAbstractItemModel, QVariant)
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,
                              QFileSystemModel, QDialog, QFileDialog)
@@ -100,6 +100,8 @@ class RunSettings(QDialog):
     @pyqtSlot()
     def showdir5(self): self.update_dir(self.lineEdit_rundir5)
 
+
+
 class TreeItem(object):
     def __init__(self, data, parent=None):
         self.parentItem = parent
@@ -134,17 +136,23 @@ class TreeItem(object):
 
 class RunsModel(QAbstractItemModel):
 
-    def __init__(self, parent=None):
+    def __init__(self, data, parent=None):
         super(RunsModel, self).__init__(parent)
 
-        self.rootItem = TreeItem(("Title", "Summary"))
-        #self.setupModelData(data.split('\n'), self.rootItem)
+        self.headerdata = ["Run Directory", "Status", "Comment", "Last update",
+                        "User", "Device", "Shot number", "Run number"]
+        self.columns = 8
+
+        self.rootItem = TreeItem(self.headerdata)
+        self.setupModelData(data.split("\n"), self.rootItem)
 
     def columnCount(self, parent):
         if parent.isValid():
             return parent.internalPointer().columnCount()
         else:
             return self.rootItem.columnCount()
+
+    #    return self.columns
 
     def data(self, index, role):
         if not index.isValid():
@@ -156,7 +164,99 @@ class RunsModel(QAbstractItemModel):
         item = index.internalPointer()
 
         return item.data(index.column())
-                
+
+    def flags(self, index):
+        if not index.isValid():
+            return Qt.NoItemFlags
+
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+
+    def headerData(self, section, orientation, role = None):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return QVariant(self.headerdata[section])
+        if role == Qt.TextAlignmentRole:
+           # return Qt.AlignHCenter
+            return self.rootItem.data(section)
+        return super(RunsModel, self).headerData(section, orientation, role)
+
+    def index(self, row, column, parent):
+        if not self.hasIndex(row, column, parent):
+            return QModelIndex()
+
+        if not parent.isValid():
+            parentItem = self.rootItem
+        else:
+            parentItem = parent.internalPointer()
+
+        childItem = parentItem.child(row)
+        if childItem:
+            return self.createIndex(row, column, childItem)
+        else:
+            return QModelIndex()
+
+    def parent(self, index):
+        if not index.isValid():
+            return QModelIndex()
+
+        childItem = index.internalPointer()
+        parentItem = childItem.parent()
+
+        if parentItem == self.rootItem:
+            return QModelIndex()
+
+        return self.createIndex(parentItem.row(), 0, parentItem)
+
+    def rowCount(self, parent):
+        if parent.column() > 0:
+            return 0
+
+        if not parent.isValid():
+            parentItem = self.rootItem
+        else:
+            parentItem = parent.internalPointer()
+
+        return parentItem.childCount()
+
+    def setupModelData(self, lines, parent):
+        parents = [parent]
+        indentations = [0]
+
+        number = 0
+
+        while number < len(lines):
+            position = 0
+            while position < len(lines[number]):
+                if lines[number][position] != ' ':
+                    break
+                position += 1
+
+            print(lines)
+
+            lineData = lines[number][position:].strip()
+
+            if lineData:
+                # Read the column data from the rest of the line.
+                columnData = [s for s in lineData.split(' ') if s]
+
+                if position > indentations[-1]:
+                    # The last child of the current parent is now the new
+                    # parent unless the current parent has no children.
+
+                    if parents[-1].childCount() > 0:
+                        parents.append(parents[-1].child(parents[-1].childCount() - 1))
+                        indentations.append(position)
+
+                else:
+                    while position < indentations[-1] and len(parents) > 0:
+                        parents.pop()
+                        indentations.pop()
+
+                # Append a new item to the current parent's list of children.
+                parents[-1].appendChild(TreeItem(columnData, parents[-1]))
+
+            number += 1
+
+
 class RUNSystemModel(QFileSystemModel):
     jobStatusServer = None
     monitorThread = None
@@ -165,7 +265,7 @@ class RUNSystemModel(QFileSystemModel):
         super(RUNSystemModel, self).__init__()
         self.runJobStatusServer()
 
-    def columnCount(self, parent = QModelIndex()):
+    def columnCount(self, parent = None):
         return super(RUNSystemModel, self).columnCount()+1
 
     def data(self, index, role=None):
@@ -217,9 +317,20 @@ class RUNSystemModel(QFileSystemModel):
         print("Status of job changed: ", message)
         #print(newData)
 
-
 class SolpsImpl(QMainWindow):
     model = None
+    data = """AUG_16151_D machine * * * * * *
+    baserun ready comment1 1.1.2000 telentm ITER 1 10
+    run1 on-going comment2 2.1.1980 kosl Asdex-U 2 8
+    16151_1.6MW_2.0e19_D=0.4 finished/not_yet_converged comment3 5.5.2005 telentm ITER 3 6
+    run_after_conversion finished/not_yet_converged_not_doing_well comment4 2.5.2001 bonninx Textor 5 6
+ Tutorial machine * * * * * *
+    baserun ready comment5 1.1.2000 telentm ITER 1 10
+    tut1 on-going comment6 2.1.1980 kosl Asdex-U 2 8
+    tut2 finished/converged comment7 2.5.2001 bonninx Textor 5 6
+    remeshed finished/crashed comment8 5.5.2005 kosl ITER 3 4
+         baserun not_ready comment9 1.1.2000 telentm ITER 1 10
+    """
     
     def __init__(self, *args):
         super(SolpsImpl, self).__init__(*args)
@@ -227,13 +338,13 @@ class SolpsImpl(QMainWindow):
         self.actionAbout_Qt.triggered.connect(QApplication.instance().aboutQt)
         self.checkBoxParameterScan.toggled.connect(
             self.plainTextEditScript.setEnabled)
-        
-        self.model = RunsModel()
-       # self.model.setRootPath('') # Disable folder watch for now
+
+        self.model = RunsModel(self.data)
+        # self.model.setRootPath('') # Disable folder watch for now
         self.treeViewRuns.setModel(self.model)
-        #self.treeViewRuns.setRootIndex(self.model.index(os.environ.get("HOME")))
-        #self.model.setFilter(QDir.Dirs|QDir.NoDotAndDotDot)
-        #self.model.setNameFilterDisables(0)
+        #self.treeViewRuns.setRootIndex(self.model.index(expanduser("~")))
+        # self.model.setFilter(QDir.Dirs|QDir.NoDotAndDotDot)
+        # self.model.setNameFilterDisables(0)
 
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
@@ -244,8 +355,6 @@ class SolpsImpl(QMainWindow):
         state = settings.value("State")
         if state : self.restoreState(state)
         settings.endGroup()
-
-        column_array = QByteArray()
 
         settings.beginGroup("TreeViewRuns")
         treeview = settings.value("ColumnWidth")
@@ -259,7 +368,6 @@ class SolpsImpl(QMainWindow):
         dialog.show()
         dialog.exec_()
 
-        
     def closeEvent(self, event):
         # save settings
         settings = QSettings("ITER", "solps-gui")
@@ -275,7 +383,13 @@ class SolpsImpl(QMainWindow):
         
         QMainWindow.closeEvent(self, event)
 
-    
+    def expanded(self):
+        for column in range(self.model().columnCount(QModelIndex())):
+            self.resizeColumnToContents(column)
+    def change(self, topLeftIndex, bottomRightIndex):
+        self.update(topLeftIndex)
+        self.expandAll()
+        self.expanded()
     @pyqtSlot()
     def on_initializeRuns_clicked(self):
         if self.plainTextEditScript.isEnabled():
