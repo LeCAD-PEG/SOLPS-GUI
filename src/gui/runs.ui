@@ -6,38 +6,66 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>426</width>
-    <height>290</height>
+    <width>410</width>
+    <height>274</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
      <property name="text">
-      <string>Monitor port</string>
+      <string>Alias</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>
-   <item row="0" column="2" colspan="2">
+   <item row="0" column="3">
     <widget class="QLineEdit" name="lineEdit">
      <property name="text">
       <string>47100</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="QLabel" name="label_2">
-     <property name="maximumSize">
-      <size>
-       <width>200</width>
-       <height>30</height>
-      </size>
+   <item row="2" column="1" colspan="3">
+    <widget class="QLineEdit" name="lineEdit_rundir1">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>5</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
      <property name="text">
-      <string>Monitored directories</string>
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1" colspan="3">
+    <widget class="QLineEdit" name="lineEdit_rundir5"/>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Monitor port</string>
      </property>
     </widget>
    </item>
@@ -48,8 +76,115 @@
      </property>
     </widget>
    </item>
+   <item row="5" column="0">
+    <widget class="QLineEdit" name="lineEdit_alias4">
+     <property name="minimumSize">
+      <size>
+       <width>10</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>60</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>local_4</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
    <item row="3" column="4">
     <widget class="QToolButton" name="toolButtonView2">
+     <property name="text">
+      <string>...</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" colspan="3">
+    <widget class="QLineEdit" name="lineEdit_rundir2"/>
+   </item>
+   <item row="5" column="1" colspan="3">
+    <widget class="QLineEdit" name="lineEdit_rundir4"/>
+   </item>
+   <item row="7" column="3">
+    <widget class="QPushButton" name="pushButton_Cancel">
+     <property name="maximumSize">
+      <size>
+       <width>80</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" colspan="3">
+    <widget class="QLineEdit" name="lineEdit_rundir3"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLineEdit" name="lineEdit_alias2">
+     <property name="minimumSize">
+      <size>
+       <width>10</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>60</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>local_2</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLineEdit" name="lineEdit_alias1">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>10</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>60</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="baseSize">
+      <size>
+       <width>50</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>local_1</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="4">
+    <widget class="QToolButton" name="toolButtonView5">
      <property name="text">
       <string>...</string>
      </property>
@@ -62,6 +197,56 @@
      </property>
     </widget>
    </item>
+   <item row="4" column="0">
+    <widget class="QLineEdit" name="lineEdit_alias3">
+     <property name="minimumSize">
+      <size>
+       <width>10</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>60</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="baseSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>local_3</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLineEdit" name="lineEdit_alias5">
+     <property name="minimumSize">
+      <size>
+       <width>10</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>60</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>local_5</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
    <item row="5" column="4">
     <widget class="QToolButton" name="toolButtonView4">
      <property name="text">
@@ -69,49 +254,23 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="4">
-    <widget class="QToolButton" name="toolButtonView5">
-     <property name="text">
-      <string>...</string>
+   <item row="1" column="2">
+    <widget class="QLabel" name="label_2">
+     <property name="maximumSize">
+      <size>
+       <width>200</width>
+       <height>30</height>
+      </size>
      </property>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="4">
-    <widget class="QLineEdit" name="lineEdit_rundir2"/>
-   </item>
-   <item row="4" column="0" colspan="4">
-    <widget class="QLineEdit" name="lineEdit_rundir3"/>
-   </item>
-   <item row="5" column="0" colspan="4">
-    <widget class="QLineEdit" name="lineEdit_rundir4"/>
-   </item>
-   <item row="6" column="0" colspan="4">
-    <widget class="QLineEdit" name="lineEdit_rundir5"/>
-   </item>
-   <item row="7" column="1">
-    <widget class="QPushButton" name="pushButton_OK">
      <property name="text">
-      <string>OK</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="4">
-    <widget class="QLineEdit" name="lineEdit_rundir1">
-     <property name="text">
-      <string/>
+      <string>Monitored directories</string>
      </property>
     </widget>
    </item>
    <item row="7" column="2">
-    <widget class="QPushButton" name="pushButton_Cancel">
-     <property name="maximumSize">
-      <size>
-       <width>80</width>
-       <height>100</height>
-      </size>
-     </property>
+    <widget class="QPushButton" name="pushButton_OK">
      <property name="text">
-      <string>Cancel</string>
+      <string>OK</string>
      </property>
     </widget>
    </item>

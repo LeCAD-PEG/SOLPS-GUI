@@ -35,3 +35,9 @@ XCB development libraries are required for building Qt5.x
 
 ## Component tracker
 See https://jira.iter.org/projects/IMAS?selectedItem=com.atlassian.jira.jira-projects-plugin:components-page
+
+##Install on OSX with homebrew
+
+    brew install qt5
+    brew linkapps qt5
+    brew install PyQt5 --with-python3

@@ -56,6 +56,11 @@ class RunSettings(QDialog):
         self.lineEdit_rundir4.setText(rundir4)
         rundir5 = settings.value("runDir5", "")
         self.lineEdit_rundir5.setText(rundir5)
+        self.lineEdit_alias1.setText(settings.value("Alias1", "local_1"))
+        self.lineEdit_alias2.setText(settings.value("Alias2", "local_2"))
+        self.lineEdit_alias3.setText(settings.value("Alias3", "local_3"))
+        self.lineEdit_alias4.setText(settings.value("Alias4", "local_4"))
+        self.lineEdit_alias5.setText(settings.value("Alias5", "local_5"))
         settings.endGroup()
         
         self.toolButtonView1.clicked.connect(self.showdir1)
@@ -74,6 +79,11 @@ class RunSettings(QDialog):
         settings.setValue("runDir3", self.lineEdit_rundir3.text())
         settings.setValue("runDir4", self.lineEdit_rundir4.text())
         settings.setValue("runDir5", self.lineEdit_rundir5.text())
+        settings.setValue("Alias1", self.lineEdit_alias1.text())
+        settings.setValue("Alias2", self.lineEdit_alias2.text())
+        settings.setValue("Alias3", self.lineEdit_alias3.text())
+        settings.setValue("Alias4", self.lineEdit_alias4.text())
+        settings.setValue("Alias5", self.lineEdit_alias5.text())
         
         settings.endGroup()
 
@@ -230,7 +240,7 @@ class RunsModel(QAbstractItemModel):
                     break
                 position += 1
 
-            print(lines)
+           # print(lines)
 
             lineData = lines[number][position:].strip()
 
