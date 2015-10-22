@@ -1,28 +1,27 @@
 #!/bin/sh -x
 
 MAKE_JOBS=${MAKE_JOBS:-4}
-PYTHON_VERSION=3.4.3
+PYTHON_VERSION=3.5.0
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
 CMAKE_VERSION=3.3.0
 CMAKE_MAINVERSION=${CMAKE_VERSION%.*}
-PyQT_VERSION=5.5
-PyQT_MAINVERSION=${PyQT_VERSION%.*}
-QT_VERSION=5.5.0
+PyQT_VERSION=5.5.1-snapshot-13f9ece29d02
+QT_VERSION=5.5.1
 SIP_VERSION=4.16.9
+USE_QT_XCB=${USE_QT_XCB:-YES} # Use -qt-xcb for all except RHEL5 if possible
+BUILD_XCB=${BUILD_XCB:-NO} # YES if having problems with -qt-xcb
 
 case $(hostname) in
   *.iter.org) 
 	module purge
-	unset CXX CC # we don't want ICC 11.1 to be selected
+	BUILD_XCB="YES"
+	unset CXX CC # we don't want ICC 11.1 to be selected by chance
 	;;
   *)
 	MAKE_JOBS=${MAKE_JOBS:-8}
 	;;
 esac
 
-
-# For Qt5.x build problems on RHEL5 see
-# https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-rhel5-linux-centos-5-7
 
 BUILDROOT=${PWD}
 BUILD_DIR=${BUILDROOT}/build
@@ -40,7 +39,7 @@ install -d ${STAGING_DIR}
 install -d ${DOWNLOAD_DIR}
 
 
-#Install python
+## Install python
 
 PYTHON_SRC="Python-${PYTHON_VERSION}.tgz"
 PYTHON_DOWNLOAD="https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz"
@@ -64,12 +63,20 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   touch ${PYTHON_SRC_DIR}/.built
 fi
 
-#Build xcb for Qt5 on RHEL5. See http://doc.qt.io/qt-5/linux-requirements.html
-# and http://kate-editor.org/2014/12/22/qt-5-4-on-red-hat-enterprise-5/
-if ! test -d /usr/include/xcb ; then
-install -d  ${BUILD_DIR}/xcb
-cd ${BUILD_DIR}/xcb
-for url in \
+XCB_FLAGS="-xcb -xcb-xlib" # Mandatory default for Linux
+if [ "${USE_QT_XCB}" = "YES" ]; then # build QT with QT-prvided XCB libs
+  XCB_FLAGS="${XCB_FLAGS} -qt-xcb"
+fi
+
+## Build XCB and libXML for Qt5 locally instead of Qt provided XCB libs. 
+# For Qt5.x build problems on RHEL5 see
+# https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-rhel5-linux-centos-5-7
+#See http://kate-editor.org/2014/12/22/qt-5-4-on-red-hat-enterprise-5/
+if [ "${BUILD_XCB}" != "YES" ]
+    then
+    install -d  ${BUILD_DIR}/xcb
+    cd ${BUILD_DIR}/xcb
+    for url in \
 http://xmlsoft.org/sources/libxml2-2.9.2.tar.gz \
 http://xorg.freedesktop.org/archive/individual/proto/xproto-7.0.28.tar.gz \
 http://xcb.freedesktop.org/dist/xcb-proto-1.11.tar.gz \
@@ -81,25 +88,28 @@ http://xcb.freedesktop.org/dist/xcb-util-keysyms-0.4.0.tar.gz \
 http://xcb.freedesktop.org/dist/xcb-util-wm-0.4.1.tar.gz \
 http://xcb.freedesktop.org/dist/xcb-util-renderutil-0.3.9.tar.gz \
 http://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.2.tar.gz \
-; do
-   file=${url##*/}
-   test -f ${file} || wget ${url}
-   pkgdir=${file%.*.*}
-   test -e ${pkgdir}/.built && continue
-   rm -rf ${pkgdir}
-   tar xf ${file}
-   cd ${pkgdir}
-   if [ "${pkgdir%%-*}" = "libxml2" ]; then configopt="--without-python"
-   else configopt=
-   fi
-   PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig \
-       ./configure --prefix=${STAGING_DIR} ${configopt} 
-   make
-   make install
-   touch .built
-   cd ..
-done
-cd ${BUILDROOT}
+   ; do
+      file=${url##*/}
+      test -f ${file} || wget ${url}
+      pkgdir=${file%.*.*}
+      test -e ${pkgdir}/.built && continue
+      rm -rf ${pkgdir}
+      tar xf ${file}
+      cd ${pkgdir}
+      if [ "${pkgdir%%-*}" = "libxml2" ]; then configopt="--without-python"
+      else configopt=
+      fi
+      PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig \
+	  ./configure --prefix=${STAGING_DIR} ${configopt} 
+      make
+      make install
+      touch .built
+      cd ..
+    done
+    cd ${BUILDROOT}
+    XCB_INCLUDES="-I${STAGING_DIR}/include -I${STAGING_DIR}/include/libxml2"
+    XCB_LIBS="-L${STAGING_DIR}/lib"
+    XCB_FLAGS="${XCB_FLAGS} ${XCB_INCLUDES} ${XCB_LIBS}"
 fi
 
 LD_LIBRARY_PATH="${STAGING_DIR}/lib:${LD_LIBRARY_PATH}"
@@ -125,41 +135,23 @@ if [ ! -e ${QT_SOURCE_DIR}/.built ]; then
   tar xzf ${DOWNLOAD_DIR}/${QT_TAR} 
   
   cd ${QT_SOURCE_DIR}
-  sed -i.orig -e 's/-Wno-error=return-type//' qtlocation/src/3rdparty/poly2tri/poly2tri.pro
+  sed -i.orig -e 's/-Wno-error=return-type//' \
+      qtlocation/src/3rdparty/poly2tri/poly2tri.pro
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-openssl.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-no-offscreen.patch
-#  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-fontconfig-ultrablack.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-forkfd.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qglxintegration-glx-context.patch
-  EXTRA_X11_INCLUDE=
-  XCB_OPTS="-xcb -xcb-xlib -qt-xcb"
-  
-  if [ "`uname -s`" == "Darwin" ]; then
-    # apply few patches and set options for OS X
-    if [ "`uname -r`" == "15.0.0" ]; then
-      # El Capitan
-      patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-osx_el-capitan.patch
-      patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-osx_el-capitan-2.patch
-    fi
-     
-    patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-osx_qtbug-47641.patch
-    patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-osx_qt5.5-qnsview-tooltip-cocoa.patch
-	EXTRA_X11_INCLUDE="-I/opt/X11/include -I${QT_SOURCE_DIR}/qtwebengine/src/3rdparty/chromium/third_party/freetype2/src/include"
-	XCB_OPTS=-no-xcb
-  fi
+  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qxcbconnection.patch
 
   PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig \
     ./configure -v --prefix=${STAGING_QT} -opensource -confirm-license \
       -shared -no-audio-backend -skip qtwebkit -skip qtwebkit-examples \
-      -skip qt3d ${XCB_OPTS} \
+      -skip qt3d ${XCB_FLAGS} \
       -qt-xkbcommon -xkb-config-root /usr/share/X11/xkb \
       -D GLX_GLXEXT_LEGACY \
       -D _X_INLINE=inline \
       -D FC_WEIGHT_EXTRABLACK=215 \
-      -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK \
-      -I${STAGING_DIR}/include ${EXTRA_X11_INCLUDE} -I${STAGING_DIR}/include/libxml2 \
-      -L${STAGING_DIR}/lib
+      -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK
   make -j ${MAKE_JOBS}
   make install
   PATH="${STAGING_QT}/bin:${PATH}" make qmake_all docs install_docs 
@@ -196,7 +188,8 @@ fi
 PYTHON=${STAGING_DIR}/bin/python${PYTHON_MAINVERSION}
 
 PyQT_SRC="PyQt-gpl-${PyQT_VERSION}.tar.gz"
-PyQT_DOWNLOAD="http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-${PyQT_VERSION}/${PyQT_SRC}/download"
+#PyQT_DOWNLOAD="http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-${PyQT_VERSION}/${PyQT_SRC}/download"
+PyQT_DOWNLOAD="https://www.riverbankcomputing.com/static/Downloads/PyQt5/${PyQT_SRC}"
 
 if [ ! -f ${DOWNLOAD_DIR}/${PyQT_SRC} ]; then 
     wget  -O ${DOWNLOAD_DIR}/${PyQT_SRC} ${PyQT_DOWNLOAD}
