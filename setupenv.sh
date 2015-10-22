@@ -1,5 +1,5 @@
-# source this bash file for local setup environment
-export QTDIR="${PWD}/staging/qt/5.5.0"
+# source this bash file for local setup environment if PyQT is provided locally
+export QTDIR="${PWD}/staging/qt/5.5.1"
 export PATH="${PWD}/staging/bin:${QTDIR}/bin:${PATH}"
 export LD_LIBRARY_PATH="${PWD}/staging/lib:${QTDIR}/lib:${LD_LIBRARY_PATH}"
-export PKG_CONFIG_PATH="${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}"
+export PKG_CONFIG_PATH="${PWD}/staging/lib/pkgconfig:${PKG_CONFIG_PATH}"
