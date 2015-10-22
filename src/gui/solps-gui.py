@@ -61,6 +61,9 @@ class RunSettings(QDialog):
         self.lineEdit_alias3.setText(settings.value("Alias3", "local_3"))
         self.lineEdit_alias4.setText(settings.value("Alias4", "local_4"))
         self.lineEdit_alias5.setText(settings.value("Alias5", "local_5"))
+        self.lineEdit_monitor_interface.setText(settings.value("Monitor_interface", "interface #"))
+        self.lineEdit_monitor_port.setText(settings.value("Monitor_port", "port #"))        
+        
         settings.endGroup()
         
         self.toolButtonView1.clicked.connect(self.showdir1)
@@ -84,6 +87,8 @@ class RunSettings(QDialog):
         settings.setValue("Alias3", self.lineEdit_alias3.text())
         settings.setValue("Alias4", self.lineEdit_alias4.text())
         settings.setValue("Alias5", self.lineEdit_alias5.text())
+        settings.setValue("Monitor_interface", self.lineEdit_monitor_interface.text())
+        settings.setValue("Monitor_port", self.lineEdit_monitor_port.text())        
         
         settings.endGroup()
 
@@ -155,7 +160,33 @@ class RunsModel(QAbstractItemModel):
 
         self.rootItem = TreeItem(self.headerdata)
         self.setupModelData(data.split("\n"), self.rootItem)
+        
+        settings = QSettings("ITER", "solps-gui")
+        settings.beginGroup("RunDirectories")
+        rundir1 = settings.value("runDir1")
+        alias1 = settings.value("Alias1")
+        settings.endGroup()
+       # print (alias1)
+        self.file = open("Data.txt","w")
+        self.file.write("%s * * * * * *\n" % alias1)
+        self.dirTraverse(rundir1)
+        self.file.close()
+        
 
+    def dirTraverse(self, rundir):
+        rootDir = rundir
+        
+        for dir, subdirs, files in os.walk(rootDir):
+            path = dir.split('/')
+            print ((len(path) - 1) *'-' , os.path.basename(dir))
+            self.file.write(os.path.basename(dir) + "\n")
+            for file in files:
+                print ("Hello", file)
+                print (len(path)*'-', file)
+                self.file.write('   ' + file + "\n")
+            test = os.listdir(dir)
+
+           
     def columnCount(self, parent):
         if parent.isValid():
             return parent.internalPointer().columnCount()
@@ -239,8 +270,6 @@ class RunsModel(QAbstractItemModel):
                 if lines[number][position] != ' ':
                     break
                 position += 1
-
-           # print(lines)
 
             lineData = lines[number][position:].strip()
 
