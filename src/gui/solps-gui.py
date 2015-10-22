@@ -185,7 +185,7 @@ class RunsModel(QAbstractItemModel):
         for dir, subdirs, files in os.walk(rootDir):
             path = dir.split('/')
             r = len(path)-len(path_b)
-            self.file.write(" %s%s\n" % ( r*" ", os.path.basename(dir)))
+            #self.file.write(" %s%s\n" % ( r*" ", os.path.basename(dir)))
         self.file.close()
 
     def columnCount(self, parent):
