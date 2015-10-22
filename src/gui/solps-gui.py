@@ -63,7 +63,6 @@ class RunSettings(QDialog):
         self.lineEdit_alias5.setText(settings.value("Alias5", "local_5"))
         self.lineEdit_monitor_interface.setText(settings.value("Monitor_interface", "interface #"))
         self.lineEdit_monitor_port.setText(settings.value("Monitor_port", "port #"))        
-        
         settings.endGroup()
         
         self.toolButtonView1.clicked.connect(self.showdir1)
@@ -88,9 +87,13 @@ class RunSettings(QDialog):
         settings.setValue("Alias4", self.lineEdit_alias4.text())
         settings.setValue("Alias5", self.lineEdit_alias5.text())
         settings.setValue("Monitor_interface", self.lineEdit_monitor_interface.text())
-        settings.setValue("Monitor_port", self.lineEdit_monitor_port.text())        
-        
+        settings.setValue("Monitor_port", self.lineEdit_monitor_port.text())
         settings.endGroup()
+
+        file = open("Data.txt","r")
+        data = file.readlines()
+        travers_model = RunsModel(data)
+        travers_model.dirTraverse(settings.value("Alias1"), settings.value("runDir1", expanduser("~")))
 
     def update_dir(self, line_edit):
         current_dir = line_edit.text()
@@ -159,33 +162,30 @@ class RunsModel(QAbstractItemModel):
         self.columns = 8
 
         self.rootItem = TreeItem(self.headerdata)
-        self.setupModelData(data.split("\n"), self.rootItem)
+        self.setupModelData(data, self.rootItem)        
+       # self.setupModelData(data.split("\n"), self.rootItem)
         
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
-        rundir1 = settings.value("runDir1")
+        rundir1 = settings.value("runDir1", "/home/ITER/telentm/test")
         alias1 = settings.value("Alias1")
         settings.endGroup()
-       # print (alias1)
+       # self.file = open("Data.txt","w")
+       # self.file.write("%s * * * * * *\n" % alias1)
+        self.dirTraverse(alias1, rundir1)
+       # self.file.close()
+        
+    def dirTraverse(self, alias, rundir):
         self.file = open("Data.txt","w")
-        self.file.write("%s * * * * * *\n" % alias1)
-        self.dirTraverse(rundir1)
-        self.file.close()
-        
-
-    def dirTraverse(self, rundir):
+        self.file.write("%s * * * * * *\n" % alias)
         rootDir = rundir
-        
+        path_b = rootDir.split("/")
+       # b'C\xc3N'.decode('utf8','replace')
         for dir, subdirs, files in os.walk(rootDir):
             path = dir.split('/')
-            print ((len(path) - 1) *'-' , os.path.basename(dir))
-            self.file.write(os.path.basename(dir) + "\n")
-            for file in files:
-                print ("Hello", file)
-                print (len(path)*'-', file)
-                self.file.write('   ' + file + "\n")
-            test = os.listdir(dir)
-
+            r = len(path)-len(path_b)
+            self.file.write(" %s%s\n" % ( r*" ", os.path.basename(dir)))
+        self.file.close()
            
     def columnCount(self, parent):
         if parent.isValid():
@@ -358,7 +358,7 @@ class RUNSystemModel(QFileSystemModel):
 
 class SolpsImpl(QMainWindow):
     model = None
-    data = """AUG_16151_D machine * * * * * *
+    data1 = """AUG_16151_D machine * * * * * *
     baserun ready comment1 1.1.2000 telentm ITER 1 10
     run1 on-going comment2 2.1.1980 kosl Asdex-U 2 8
     16151_1.6MW_2.0e19_D=0.4 finished/not_yet_converged comment3 5.5.2005 telentm ITER 3 6
@@ -370,6 +370,8 @@ class SolpsImpl(QMainWindow):
     remeshed finished/crashed comment8 5.5.2005 kosl ITER 3 4
          baserun not_ready comment9 1.1.2000 telentm ITER 1 10
     """
+    file = open("Data.txt","r")
+    data = file.readlines()
     
     def __init__(self, *args):
         super(SolpsImpl, self).__init__(*args)
@@ -379,6 +381,7 @@ class SolpsImpl(QMainWindow):
             self.plainTextEditScript.setEnabled)
 
         self.model = RunsModel(self.data)
+        
         # self.model.setRootPath('') # Disable folder watch for now
         self.treeViewRuns.setModel(self.model)
         #self.treeViewRuns.setRootIndex(self.model.index(expanduser("~")))
@@ -429,6 +432,7 @@ class SolpsImpl(QMainWindow):
         self.update(topLeftIndex)
         self.expandAll()
         self.expanded()
+        
     @pyqtSlot()
     def on_initializeRuns_clicked(self):
         if self.plainTextEditScript.isEnabled():
