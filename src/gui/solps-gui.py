@@ -12,28 +12,6 @@ from PyQt5.uic import loadUi
 from os import environ
 from os.path import expanduser
 
-class RunStatusServer(QThread):
-    sock = None
-    retrieve = True
-    jobStatusChange = pyqtSignal(str)
-
-    def bind(self, address, port):
-        # connect to UDP socket
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # Bind socket to local host and port
-        try:
-            self.sock.bind((address, port))
-        except socket.error: #, msg:
-            print('Bind to', address, ':', str(port), ' failed.')
-            sys.exit()
-        print('Server on', address, ':', port)
-    def run(self):
-        print("RunStatusServer started")
-        while self.retrieve:
-            data, addr = self.sock.recvfrom(1024) # wait for data
-            print("Received packet from", addr[0], "data=", data.decode('utf-8'))
-            self.jobStatusChange.emit(data.decode('utf-8'))
-
 # Settings->Job list
 
 class RunSettings(QDialog):
@@ -111,6 +89,28 @@ class RunSettings(QDialog):
     def showdir5(self): self.update_dir(self.lineEdit_rundir5)
 
 
+class RunStatusServer(QThread):
+    sock = None
+    retrieve = True
+    jobStatusChanged = pyqtSignal(str)
+
+    def bind(self, address, port):
+        # connect to UDP socket
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # Bind socket to local host and port
+        try:
+            self.sock.bind((address, port))
+        except socket.error: #, msg:
+            print('Bind to', address, ':', str(port), ' failed.')
+            sys.exit()
+        print('Server on', address, ':', port)
+    def run(self):
+        print("RunStatusServer started")
+        while self.retrieve:
+            data, addr = self.sock.recvfrom(1024) # wait for data
+            print("Received packet from", addr[0], "data=", data.decode('utf-8'))
+            self.jobStatusChanged.emit(data.decode('utf-8'))
+
 
 class TreeItem(object):
     def __init__(self, data, parent=None):
@@ -145,6 +145,7 @@ class TreeItem(object):
         return 0
 
 class RunsModel(QAbstractItemModel):
+    monitorThread = None
 
     def __init__(self, data, parent=None):
         super(RunsModel, self).__init__(parent)
@@ -155,6 +156,7 @@ class RunsModel(QAbstractItemModel):
 
         self.rootItem = TreeItem(self.headerdata)
         self.setupModelData(data.split("\n"), self.rootItem)
+        self.runJobStatusServer()
 
     def columnCount(self, parent):
         if parent.isValid():
@@ -266,51 +268,12 @@ class RunsModel(QAbstractItemModel):
 
             number += 1
 
-
-class RUNSystemModel(QFileSystemModel):
-    jobStatusServer = None
-    monitorThread = None
-    
-    def __init__(self):
-        super(RUNSystemModel, self).__init__()
-        self.runJobStatusServer()
-
-    def columnCount(self, parent = None):
-        return super(RUNSystemModel, self).columnCount()+1
-
-    def data(self, index, role=None):
-        if index.column() == self.columnCount() - 1:
-            if role == Qt.DisplayRole:
-                return "YourText" + str(index.row())
-            if role == Qt.TextAlignmentRole:
-                return Qt.AlignLeft
-        if index.column() == 1:
-            if role == Qt.DisplayRole:
-                return "running"
-            if role == Qt.TextAlignmentRole:
-                return Qt.AlignHCenter
-        return super(RUNSystemModel, self).data(index, role)
-
-    def headerData(self, section, orientation, role=None):
-        if section == 1:
-            if role == Qt.DisplayRole:
-                return "Status"
-            if role == Qt.TextAlignmentRole:
-                return Qt.AlignHCenter
-        if section == self.columnCount() - 1:
-            if role == Qt.DisplayRole:
-                return "Comment"
-            if role == Qt.TextAlignmentRole:
-                return Qt.AlignLeft
-        return super(RUNSystemModel, self).headerData(section,
-                                                      orientation, role)
-
     """ Run job server """
     def runJobStatusServer(self):
         self.monitorThread = RunStatusServer()
         self.monitorThread.bind('0.0.0.0', 49406)
         #self.monitorThread.finished.connect(self.deleteLater) # TODO
-        self.monitorThread.jobStatusChange.connect(self.jobStatusChanged)
+        self.monitorThread.jobStatusChanged.connect(self.jobStatusChanged)
         self.monitorThread.start()
 
     """
@@ -323,7 +286,7 @@ class RUNSystemModel(QFileSystemModel):
         # get new data about job ID from server: new status, last change date,
         # etc.
         #newData = self.jobStatusServer.getClientStatus(inJobID)
-        
+
         print("Status of job changed: ", message)
         #print(newData)
 
