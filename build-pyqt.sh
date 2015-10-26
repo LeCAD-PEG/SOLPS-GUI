@@ -15,6 +15,7 @@ case $(hostname) in
   *.iter.org) 
 	module purge
 	BUILD_XCB="YES"
+	USE_QT_XCB="NO"
 	unset CXX CC # we don't want ICC 11.1 to be selected by chance
 	;;
   *)
@@ -72,7 +73,7 @@ fi
 # For Qt5.x build problems on RHEL5 see
 # https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-rhel5-linux-centos-5-7
 #See http://kate-editor.org/2014/12/22/qt-5-4-on-red-hat-enterprise-5/
-if [ "${BUILD_XCB}" != "YES" ]
+if [ "${BUILD_XCB}" = "YES" ]
     then
     install -d  ${BUILD_DIR}/xcb
     cd ${BUILD_DIR}/xcb
