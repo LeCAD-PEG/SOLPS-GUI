@@ -5,9 +5,9 @@ PYTHON_VERSION=3.5.0
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
 CMAKE_VERSION=3.3.0
 CMAKE_MAINVERSION=${CMAKE_VERSION%.*}
-PyQT_VERSION=5.5.1-snapshot-13f9ece29d02
+PyQT_VERSION=5.5.1
 QT_VERSION=5.5.1
-SIP_VERSION=4.16.9
+SIP_VERSION=4.17
 USE_QT_XCB=${USE_QT_XCB:-YES} # Use -qt-xcb for all except RHEL5 if possible
 BUILD_XCB=${BUILD_XCB:-NO} # YES if having problems with -qt-xcb
 
@@ -15,6 +15,7 @@ case $(hostname) in
   *.iter.org) 
 	module purge
 	BUILD_XCB="YES"
+	USE_QT_XCB="NO"
 	unset CXX CC # we don't want ICC 11.1 to be selected by chance
 	;;
   *)
@@ -72,7 +73,7 @@ fi
 # For Qt5.x build problems on RHEL5 see
 # https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-rhel5-linux-centos-5-7
 #See http://kate-editor.org/2014/12/22/qt-5-4-on-red-hat-enterprise-5/
-if [ "${BUILD_XCB}" != "YES" ]
+if [ "${BUILD_XCB}" = "YES" ]
     then
     install -d  ${BUILD_DIR}/xcb
     cd ${BUILD_DIR}/xcb
@@ -188,8 +189,8 @@ fi
 PYTHON=${STAGING_DIR}/bin/python${PYTHON_MAINVERSION}
 
 PyQT_SRC="PyQt-gpl-${PyQT_VERSION}.tar.gz"
-#PyQT_DOWNLOAD="http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-${PyQT_VERSION}/${PyQT_SRC}/download"
-PyQT_DOWNLOAD="https://www.riverbankcomputing.com/static/Downloads/PyQt5/${PyQT_SRC}"
+PyQT_DOWNLOAD="http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-${PyQT_VERSION}/${PyQT_SRC}/download"
+#PyQT_DOWNLOAD="https://www.riverbankcomputing.com/static/Downloads/PyQt5/${PyQT_SRC}"
 
 if [ ! -f ${DOWNLOAD_DIR}/${PyQT_SRC} ]; then 
     wget  -O ${DOWNLOAD_DIR}/${PyQT_SRC} ${PyQT_DOWNLOAD}
