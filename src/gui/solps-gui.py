@@ -4,17 +4,34 @@ import os
 import socket
 import sys
 from PyQt5.QtCore import (pyqtSlot, QModelIndex, Qt, QSettings,
-                          pyqtSignal, QThread, QAbstractItemModel, QVariant)
+                          pyqtSignal, QThread, QAbstractItemModel, QVariant, QObject)
 
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,
-                             QFileSystemModel, QDialog, QFileDialog)
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,QDialog, QFileDialog)
 from PyQt5.uic import loadUi
 from os import environ
 from os.path import expanduser
 
-# Settings->Job list
+class runDirSignal(QObject):
+
+    runDirsChanged = pyqtSignal()
+
+    def emitrunDirsChanged(self):
+
+        print ("Hello1")
+        self.runDirsChanged.connect(self.handle_signal)
+        #self.runDirsChanged.connect(RunsModel.print1)
+
+        self.runDirsChanged.emit()
+
+    def handle_signal(self):
+        print("Hello2")
+        runsmodel.refresh_dirs()
+        runsmodel.print1()
+
 
 class RunSettings(QDialog):
+
+    runDirsChanged = pyqtSignal()
 
     def __init__(self):
         super(RunSettings, self).__init__()
@@ -49,6 +66,17 @@ class RunSettings(QDialog):
         self.toolButtonView4.clicked.connect(self.showdir4)
         self.toolButtonView5.clicked.connect(self.showdir5)
 
+    #def emitrunDirsChanged(self):
+        #print ("Hello1")
+        #self.runDirsChanged.emit()
+
+    def update_dir(self, line_edit):
+        current_dir = line_edit.text()
+        if current_dir == "": current_dir = expanduser("~")
+        new_dir = QFileDialog.getExistingDirectory(self,
+          "Select Directory", current_dir, QFileDialog.ShowDirsOnly)
+        if new_dir: line_edit.setText(new_dir)
+
     # save GUI settings
     @pyqtSlot()
     def on_pushButton_OK_clicked(self):
@@ -68,18 +96,9 @@ class RunSettings(QDialog):
         settings.setValue("Monitor_port", self.lineEdit_monitor_port.text())
         settings.endGroup()
 
-        file = open("Data.txt","r")
-        data = file.readlines()
-        travers_model = RunsModel(data)
-        travers_model.dirTraverse(settings.value("Alias1"), settings.value("runDir1", expanduser("~")))
+        rundir = runDirSignal()
+        rundir.emitrunDirsChanged()
 
-    def update_dir(self, line_edit):
-        current_dir = line_edit.text()
-        if current_dir == "": current_dir = expanduser("~")
-        new_dir = QFileDialog.getExistingDirectory(self,
-          "Select Directory", current_dir, QFileDialog.ShowDirsOnly)
-        if new_dir: line_edit.setText(new_dir)
- 
     # Choose run directory
     @pyqtSlot()
     def showdir1(self): self.update_dir(self.lineEdit_rundir1)
@@ -153,40 +172,47 @@ class TreeItem(object):
         return 0
 
 class RunsModel(QAbstractItemModel):
+
     monitorThread = None
 
-    def __init__(self, data, parent=None):
+    def __init__(self, parent=None):
         super(RunsModel, self).__init__(parent)
         self.runJobStatusServer()
         self.headerdata = ["Run Directory", "Status", "Comment", "Last update",
                         "User", "Device", "Shot number", "Run number"]
         self.columns = 8
-
         self.rootItem = TreeItem(self.headerdata)
-        self.setupModelData(data, self.rootItem)
-       # self.setupModelData(data.split("\n"), self.rootItem)
-        
+        self.refresh_dirs()
+
+    @pyqtSlot()
+    def print1(self):
+        print("testing")
+
+    @pyqtSlot()
+    def refresh_dirs(self):
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
         rundir1 = settings.value("runDir1", "/home/ITER/telentm/test")
         alias1 = settings.value("Alias1")
         settings.endGroup()
-       # self.file = open("Data.txt","w")
-       # self.file.write("%s * * * * * *\n" % alias1)
-        self.dirTraverse(alias1, rundir1)
-       # self.file.close()
-        
+        datadir = self.dirTraverse(alias1, rundir1)
+        #self.setupModelData(datadir.split("\n"), self.rootItem)
+
+        self.setupModelData(datadir.split("\n"), self.rootItem)
+        print ("Hello")
+
+    # Reading file directories for given alias and root
     def dirTraverse(self, alias, rundir):
-        self.file = open("Data.txt","w")
-        self.file.write("%s * * * * * *\n" % alias)
+        data_string = alias + 6 * " *" + "\n"
+       # print (data_string)
         rootDir = rundir
         path_b = rootDir.split("/")
-       # b'C\xc3N'.decode('utf8','replace')
         for dir, subdirs, files in os.walk(rootDir):
             path = dir.split('/')
             r = len(path)-len(path_b)
-            #self.file.write(" %s%s\n" % ( r*" ", os.path.basename(dir)))
-        self.file.close()
+           # print (" %s%s\n" % ( r*" ", os.path.basename(dir)))
+            data_string += " %s%s\n" % ( r*" ", os.path.basename(dir))
+        return data_string
 
     def columnCount(self, parent):
         if parent.isValid():
@@ -195,7 +221,6 @@ class RunsModel(QAbstractItemModel):
             return self.rootItem.columnCount()
 
     #    return self.columns
-
     def data(self, index, role):
         if not index.isValid():
             return None
@@ -246,6 +271,7 @@ class RunsModel(QAbstractItemModel):
         if parentItem == self.rootItem:
             return QModelIndex()
 
+       # print("PARENT=", parentItem)
         return self.createIndex(parentItem.row(), 0, parentItem)
 
     def rowCount(self, parent):
@@ -319,7 +345,7 @@ class RunsModel(QAbstractItemModel):
         #print(newData)
 
 class SolpsImpl(QMainWindow):
-    model = None
+    #model = None
     data1 = """AUG_16151_D machine * * * * * *
     baserun ready comment1 1.1.2000 telentm ITER 1 10
     run1 on-going comment2 2.1.1980 kosl Asdex-U 2 8
@@ -332,20 +358,17 @@ class SolpsImpl(QMainWindow):
     remeshed finished/crashed comment8 5.5.2005 kosl ITER 3 4
          baserun not_ready comment9 1.1.2000 telentm ITER 1 10
     """
-    file = open("Data.txt","r")
-    data = file.readlines()
-    
-    def __init__(self, *args):
+
+    def __init__(self, runsmodel, *args):
         super(SolpsImpl, self).__init__(*args)
         loadUi('solps-gui.ui', self)
         self.actionAbout_Qt.triggered.connect(QApplication.instance().aboutQt)
-        self.checkBoxParameterScan.toggled.connect(
-            self.plainTextEditScript.setEnabled)
+        self.checkBoxParameterScan.toggled.connect(self.plainTextEditScript.setEnabled)
 
-        self.model = RunsModel(self.data)
-        
-        # self.model.setRootPath('') # Disable folder watch for now
+        self.model = runsmodel
         self.treeViewRuns.setModel(self.model)
+
+        # self.model.setRootPath('') # Disable folder watch for now
         #self.treeViewRuns.setRootIndex(self.model.index(expanduser("~")))
         # self.model.setFilter(QDir.Dirs|QDir.NoDotAndDotDot)
         # self.model.setNameFilterDisables(0)
@@ -369,6 +392,7 @@ class SolpsImpl(QMainWindow):
 
     def showdialog(self):
         dialog = RunSettings()
+        dialog.runDirsChanged.connect(self.treeViewRuns.repaint) #TODO
         dialog.show()
         dialog.exec_()
 
@@ -397,6 +421,7 @@ class SolpsImpl(QMainWindow):
         
     @pyqtSlot()
     def on_initializeRuns_clicked(self):
+
         if self.plainTextEditScript.isEnabled():
             script = self.plainTextEditScript.toPlainText()
             exec(script)
@@ -409,20 +434,20 @@ class SolpsImpl(QMainWindow):
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):
-        QMessageBox.about(self, "About SOLPS-ITER GUI",
+        QMessageBox.about(QMessageBox, "About SOLPS-ITER GUI",
          "GUI will enable users to monitor multiple simultaneously running "
          "cases, which requires defining the working directory (folder) for "
          "each case to be separated from each other. "
          "Input file builder will depend on it to correctly save input files "
          " for multiple parameter scan cases.")
 
-
 """
-    Main method.
+    Main method
 """
 app = QApplication(sys.argv)
 app.setStyle("motif")
-widget = SolpsImpl()
+runsmodel = RunsModel()
+widget = SolpsImpl(runsmodel)
 
 widget.show()
 sys.exit(app.exec_())
