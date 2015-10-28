@@ -9,17 +9,17 @@ from PyQt5.QtCore import (pyqtSlot, QModelIndex, Qt, QSettings,
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QFileDialog)
 from PyQt5.uic import loadUi
-from os import environ
 from os.path import expanduser
 
 class RunSettings(QDialog):
 
     runDirsChanged = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, runs_model):
         super(RunSettings, self).__init__()
         loadUi('runs.ui', self)
         self.setWindowTitle("Monitored runs folder")
+        self.runDirsChanged.connect(runs_model.refresh_dirs)
 
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
@@ -51,9 +51,6 @@ class RunSettings(QDialog):
         self.toolButtonView4.clicked.connect(self.showdir4)
         self.toolButtonView5.clicked.connect(self.showdir5)
 
-    #def emitrunDirsChanged(self):
-        #print ("Hello1")
-        #self.runDirsChanged.emit()
 
     def update_dir(self, line_edit):
         current_dir = line_edit.text()
@@ -200,7 +197,6 @@ class RunsModel(QAbstractItemModel):
     @pyqtSlot()
     def refresh_dirs(self):
         self.scanFileSystemThread.start()
-        print ("Hello")
 
     # Reading file directories for given alias and root
     def dirTraverse(self, alias, rundir):
@@ -380,8 +376,7 @@ class SolpsImpl(QMainWindow):
         self.statusbar.showMessage("Preparing Runs tree ...")
 
     def showdialog(self):
-        dialog = RunSettings()
-        dialog.runDirsChanged.connect(self.model.refresh_dirs) #TODO
+        dialog = RunSettings(self.model)
         dialog.show()
         dialog.exec_()
 
