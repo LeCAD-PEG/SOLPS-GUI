@@ -4,7 +4,7 @@ import os
 import socket
 import sys
 from PyQt5.QtCore import (pyqtSlot, QModelIndex, Qt, QSettings,
-                          pyqtSignal, QThread, QAbstractItemModel, QVariant, QObject)
+                          pyqtSignal, QThread, QAbstractItemModel, QVariant)
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,QDialog, QFileDialog)
 from PyQt5.uic import loadUi
@@ -92,7 +92,6 @@ class RunSettings(QDialog):
     @pyqtSlot()
     def showdir5(self): self.update_dir(self.lineEdit_rundir5)
 
-
 class RunStatusServer(QThread):
     sock = None
     retrieve = True
@@ -114,7 +113,6 @@ class RunStatusServer(QThread):
             data, addr = self.sock.recvfrom(1024) # wait for data
             print("Received packet from", addr[0], "data=", data.decode('utf-8'))
             self.jobStatusChanged.emit(data.decode('utf-8'))
-
 
 class TreeItem(object):
     def __init__(self, data, parent=None):
@@ -161,28 +159,28 @@ class RunsModel(QAbstractItemModel):
 
         self.refresh_dirs()
 
-    @pyqtSlot()
+    #@pyqtSlot()
     def refresh_dirs(self):
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
         rundir1 = settings.value("runDir1", "")
         alias1 = settings.value("Alias1", "local_1") #TODO threaded
         settings.endGroup()
-        datadir = self.dirTraverse(alias1, rundir1)
+
         self.rootItem = TreeItem(self.headerdata)
-        self.setupModelData(datadir.split("\n"), self.rootItem)
+
+        datadir = self.dirTraverse(alias1, rundir1)
+       # self.setupModelData(datadir.split("\n"), self.rootItem)
+        self.setupModelData2(alias1, rundir1, self.rootItem)
         self.modelReset.emit()
 
-    # Reading file directories for given alias and root
     def dirTraverse(self, alias, rundir):
         data_string = alias + 6 * " *" + "\n"
-       # print (data_string)
         rootDir = rundir
         path_b = rootDir.split("/")
         for dir, subdirs, files in os.walk(rootDir):
             path = dir.split('/')
             r = len(path)-len(path_b)
-           # print (" %s%s\n" % ( r*" ", os.path.basename(dir)))
             data_string += " %s%s\n" % ( r*" ", os.path.basename(dir))
         return data_string
 
@@ -191,7 +189,6 @@ class RunsModel(QAbstractItemModel):
             return parent.internalPointer().columnCount()
         else:
             return self.rootItem.columnCount()
-
     #    return self.columns
     def data(self, index, role):
         if not index.isValid():
@@ -257,6 +254,49 @@ class RunsModel(QAbstractItemModel):
 
         return parentItem.childCount()
 
+    def setupModelData2(self, alias, rootdir, parent):
+        parents = [parent]
+        indentations = [0]
+
+        for dir, subdirs, files in os.walk(rootdir):
+            print(os.path.basename(dir))
+            #if parents[-1].childCount() > 0:
+             #   parents.append(parents[-1].child(parents[-1].childCount()-1))
+               # indentations.append(position)
+            parents[-1].appendChild(TreeItem(os.path.basename(dir), parents[-1]))
+
+        """
+        while number < len(lines):
+            position = 0
+            while position < len(lines[number]):
+                if lines[number][position] != ' ':
+                    break
+                position += 1
+
+            lineData = lines[number][position:].strip()
+
+            if lineData:
+                # Read the column data from the rest of the line.
+                columnData = [s for s in lineData.split(' ') if s]
+
+                if position > indentations[-1]:
+                    # The last child of the current parent is now the new
+                    # parent unless the current parent has no children.
+
+                    if parents[-1].childCount() > 0:
+                        parents.append(parents[-1].child(parents[-1].childCount() - 1))
+                        indentations.append(position)
+
+                else:
+                    while position < indentations[-1] and len(parents) > 0:
+                        parents.pop()
+                        indentations.pop()
+
+                # Append a new item to the current parent's list of children.
+                parents[-1].appendChild(TreeItem(columnData, parents[-1]))
+
+            number += 1
+        """
     def setupModelData(self, lines, parent):
         parents = [parent]
         indentations = [0]
@@ -385,6 +425,7 @@ class SolpsImpl(QMainWindow):
     def expanded(self):
         for column in range(self.model().columnCount(QModelIndex())):
             self.resizeColumnToContents(column)
+
     def change(self, topLeftIndex, bottomRightIndex):
         self.update(topLeftIndex)
         self.expandAll()
