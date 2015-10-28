@@ -161,7 +161,7 @@ class RunsModel(QAbstractItemModel):
         self.headerdata = ["Run Directory", "Status", "Comment", "Last update",
                         "User", "Device", "Shot number", "Run number"]
         self.columns = 8
-        self.rootItem = TreeItem(self.headerdata)
+
         self.refresh_dirs()
 
     @pyqtSlot()
@@ -172,14 +172,13 @@ class RunsModel(QAbstractItemModel):
     def refresh_dirs(self):
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
-        rundir1 = settings.value("runDir1", expanduser("~"))
-        alias1 = settings.value("Alias1", "local_1")
+        rundir1 = settings.value("runDir1", "")
+        alias1 = settings.value("Alias1", "local_1") #TODO threaded
         settings.endGroup()
         datadir = self.dirTraverse(alias1, rundir1)
-        #self.setupModelData(datadir.split("\n"), self.rootItem)
-
+        self.rootItem = TreeItem(self.headerdata)
         self.setupModelData(datadir.split("\n"), self.rootItem)
-        #self.dataChanged.emit(self.rootItem, self.rootItem,()) #TODO
+        self.modelReset.emit()
         print ("Hello")
 
     # Reading file directories for given alias and root
