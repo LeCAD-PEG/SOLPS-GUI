@@ -11,24 +11,6 @@ from PyQt5.uic import loadUi
 from os import environ
 from os.path import expanduser
 
-class runDirSignal(QObject):
-
-    runDirsChanged = pyqtSignal()
-
-    def emitrunDirsChanged(self):
-
-        print ("Hello1")
-        self.runDirsChanged.connect(self.handle_signal)
-        #self.runDirsChanged.connect(RunsModel.print1)
-
-        self.runDirsChanged.emit()
-
-    def handle_signal(self):
-        print("Hello2")
-        runsmodel.refresh_dirs()
-        runsmodel.print1()
-
-
 class RunSettings(QDialog):
 
     runDirsChanged = pyqtSignal()
@@ -95,9 +77,7 @@ class RunSettings(QDialog):
         settings.setValue("Monitor_interface", self.lineEdit_monitor_interface.text())
         settings.setValue("Monitor_port", self.lineEdit_monitor_port.text())
         settings.endGroup()
-
-        rundir = runDirSignal()
-        rundir.emitrunDirsChanged()
+        self.runDirsChanged.emit()
 
     # Choose run directory
     @pyqtSlot()
@@ -192,13 +172,14 @@ class RunsModel(QAbstractItemModel):
     def refresh_dirs(self):
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
-        rundir1 = settings.value("runDir1", "/home/ITER/telentm/test")
-        alias1 = settings.value("Alias1")
+        rundir1 = settings.value("runDir1", expanduser("~"))
+        alias1 = settings.value("Alias1", "local_1")
         settings.endGroup()
         datadir = self.dirTraverse(alias1, rundir1)
         #self.setupModelData(datadir.split("\n"), self.rootItem)
 
         self.setupModelData(datadir.split("\n"), self.rootItem)
+        #self.dataChanged.emit(self.rootItem, self.rootItem,()) #TODO
         print ("Hello")
 
     # Reading file directories for given alias and root
@@ -359,13 +340,13 @@ class SolpsImpl(QMainWindow):
          baserun not_ready comment9 1.1.2000 telentm ITER 1 10
     """
 
-    def __init__(self, runsmodel, *args):
+    def __init__(self, *args):
         super(SolpsImpl, self).__init__(*args)
         loadUi('solps-gui.ui', self)
         self.actionAbout_Qt.triggered.connect(QApplication.instance().aboutQt)
         self.checkBoxParameterScan.toggled.connect(self.plainTextEditScript.setEnabled)
 
-        self.model = runsmodel
+        self.model = RunsModel()
         self.treeViewRuns.setModel(self.model)
 
         # self.model.setRootPath('') # Disable folder watch for now
@@ -392,7 +373,7 @@ class SolpsImpl(QMainWindow):
 
     def showdialog(self):
         dialog = RunSettings()
-        dialog.runDirsChanged.connect(self.treeViewRuns.repaint) #TODO
+        dialog.runDirsChanged.connect(self.model.refresh_dirs) #TODO
         dialog.show()
         dialog.exec_()
 
@@ -445,9 +426,7 @@ class SolpsImpl(QMainWindow):
     Main method
 """
 app = QApplication(sys.argv)
-app.setStyle("motif")
-runsmodel = RunsModel()
-widget = SolpsImpl(runsmodel)
-
+#app.setStyle("motif")
+widget = SolpsImpl()
 widget.show()
 sys.exit(app.exec_())
