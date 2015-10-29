@@ -45,3 +45,4 @@ See https://jira.iter.org/projects/IMAS?selectedItem=com.atlassian.jira.jira-pro
     brew install qt5
     brew linkapps qt5
     brew install PyQt5 --with-python3
+    pip3 install sphinx
