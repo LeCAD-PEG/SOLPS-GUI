@@ -135,10 +135,22 @@ class RunFileSystemScan(QThread):
         settings.beginGroup("RunDirectories")
         rundir1 = settings.value("runDir1", "")
         alias1 = settings.value("Alias1", "local_1") #TODO threaded
+        rundir2 = settings.value("runDir2", "")
+        alias2 = settings.value("Alias2", "local_2")
+        rundir3 = settings.value("runDir3", "")
+        alias3 = settings.value("Alias3", "local_3")
+        rundir4 = settings.value("runDir4", "")
+        alias4 = settings.value("Alias4", "local_4")
+        rundir5 = settings.value("runDir5", "")
+        alias5 = settings.value("Alias5", "local_5")
         settings.endGroup()
 
         self.model.rootItem = TreeItem(self.model.headerdata)
-        self.model.setupModelData(rundir1, self.model.rootItem)
+        self.model.setupModelData(rundir1, alias1, self.model.rootItem)
+        self.model.setupModelData(rundir2, alias2, self.model.rootItem)
+        self.model.setupModelData(rundir3, alias3, self.model.rootItem)
+        self.model.setupModelData(rundir4, alias4, self.model.rootItem)
+        self.model.setupModelData(rundir5, alias5, self.model.rootItem)
         self.completed.emit()
         self.scanStatus.emit(u'Ready')
 
@@ -281,9 +293,10 @@ class RunsModel(QAbstractItemModel):
 
         return parentItem.childCount()
 
-    def setupModelData(self, rootdir, parent):
+    def setupModelData(self, rootdir, alias, parent):
         parents = [parent]
-        rootdir_len = len(rootdir)
+        rootdir_len = len(rootdir)-1
+        parents[-1].appendChild(TreeItem([alias], parents[-1]))
         for dir, subdirs, files in os.walk(rootdir):
             dir_len = len(dir)
             if dir_len > rootdir_len:
@@ -297,11 +310,12 @@ class RunsModel(QAbstractItemModel):
             parents[-1].appendChild(TreeItem([dir, dir], parents[-1]))
 
 
-    def setupModelData2(self, rootdir, parent):
+    def setupModelData2(self, rootdir,alias, parent):
 
-        path = len(rootdir.split('/'))
+        path = len(rootdir.split('/'))-1
         indentations = [path]
         parents = [parent]
+        parents[-1].appendChild(TreeItem([alias], parents[-1]))
         for dir, subdirs, files in os.walk(rootdir):
             position = len(dir.split('/'))
 
