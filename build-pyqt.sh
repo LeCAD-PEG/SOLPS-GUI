@@ -39,6 +39,8 @@ install -d ${BUILD_DIR}
 install -d ${STAGING_DIR}
 install -d ${DOWNLOAD_DIR}
 
+LD_LIBRARY_PATH="${STAGING_DIR}/lib:${LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH
 
 ## Install python
 
@@ -57,10 +59,15 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   cd ${BUILD_DIR}
   tar xzf ${DOWNLOAD_DIR}/${PYTHON_SRC}
   cd ${PYTHON_SRC_DIR}
-  ./configure --prefix=${STAGING_DIR} --enable-shared
+  # LDFLAGS for OpenSSL static build see the following
+  # http://stackoverflow.com/questions/7307857/libssl-static-lib-compiling-issue-with-fpic
+  LDFLAGS="-Wl,-Bsymbolic" ./configure --prefix=${STAGING_DIR} --enable-shared
+  LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
   make -j ${MAKE_JOBS}
+  LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
   make install
-  #make altinstall DESTDIR="${STAGING_DIR}"
+  LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
+  ${STAGING_DIR}/bin/pip3 install sphinx
   touch ${PYTHON_SRC_DIR}/.built
 fi
 
@@ -113,8 +120,6 @@ http://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.2.tar.gz \
     XCB_FLAGS="${XCB_FLAGS} ${XCB_INCLUDES} ${XCB_LIBS}"
 fi
 
-LD_LIBRARY_PATH="${STAGING_DIR}/lib:${LD_LIBRARY_PATH}"
-export LD_LIBRARY_PATH
 
 #Install QT
 
