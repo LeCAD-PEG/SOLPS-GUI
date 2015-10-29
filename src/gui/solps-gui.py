@@ -265,7 +265,7 @@ class RunsModel(QAbstractItemModel):
         childItem = index.internalPointer()
         parentItem = childItem.parent()
 
-        if parentItem is None: #or parentItem == self.rootItem:
+        if parentItem is None or parentItem == self.rootItem:
             return QModelIndex()
 
         return self.createIndex(parentItem.row(), 0, parentItem)
@@ -295,6 +295,32 @@ class RunsModel(QAbstractItemModel):
                 rootdir = dir
                 rootdir_len = len(rootdir)
             parents[-1].appendChild(TreeItem([dir, dir], parents[-1]))
+
+
+    def setupModelData2(self, rootdir, parent):
+
+        path = len(rootdir.split('/'))
+        indentations = [path]
+        parents = [parent]
+        for dir, subdirs, files in os.walk(rootdir):
+            position = len(dir.split('/'))
+
+            if position > indentations[-1]:
+                    # The last child of the current parent is now the new
+                    # parent unless the current parent has no children.
+
+                if parents[-1].childCount() > 0:
+                    parents.append(parents[-1].child(parents[-1].childCount() - 1))
+                    indentations.append(position)
+
+            else:
+                while position < indentations[-1] and len(parents) > 0:
+                    parents.pop()
+                    indentations.pop()
+
+                # Append a new item to the current parent's list of children.
+            parents[-1].appendChild(TreeItem([os.path.basename(dir), dir], parents[-1]))
+
 
     """ Run job server """
     def runJobStatusServer(self):
@@ -327,6 +353,11 @@ class SolpsImpl(QMainWindow):
 
         self.model = RunsModel()
         self.treeViewRuns.setModel(self.model)
+
+        # self.model.setRootPath('') # Disable folder watch for now
+        #self.treeViewRuns.setRootIndex(self.model.index(expanduser("~")))
+        # self.model.setFilter(QDir.Dirs|QDir.NoDotAndDotDot)
+        # self.model.setNameFilterDisables(0)
 
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
