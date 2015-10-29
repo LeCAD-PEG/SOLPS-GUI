@@ -1,3 +1,7 @@
 download
 build
 staging
+*~
+src/gui/.idea
+.project
+.pydevproject
