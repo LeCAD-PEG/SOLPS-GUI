@@ -6,7 +6,8 @@ import sys
 from PyQt5.QtCore import (pyqtSlot, QModelIndex, Qt, QSettings,
                           pyqtSignal, QThread, QAbstractItemModel, QVariant)
 
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,QDialog, QFileDialog)
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
+                             QFileDialog)
 from PyQt5.uic import loadUi
 from os.path import expanduser
 
@@ -38,8 +39,10 @@ class RunSettings(QDialog):
         self.lineEdit_alias3.setText(settings.value("Alias3", "local_3"))
         self.lineEdit_alias4.setText(settings.value("Alias4", "local_4"))
         self.lineEdit_alias5.setText(settings.value("Alias5", "local_5"))
-        self.lineEdit_monitor_interface.setText(settings.value("Monitor_interface", "interface #"))
-        self.lineEdit_monitor_port.setText(settings.value("Monitor_port", "port #"))        
+        self.lineEdit_monitor_interface.setText(
+            settings.value("Monitor_interface", "interface #"))
+        self.lineEdit_monitor_port.setText(
+            settings.value("Monitor_port", "port #"))
         settings.endGroup()
         
         self.toolButtonView1.clicked.connect(self.showdir1)
@@ -71,7 +74,8 @@ class RunSettings(QDialog):
         settings.setValue("Alias3", self.lineEdit_alias3.text())
         settings.setValue("Alias4", self.lineEdit_alias4.text())
         settings.setValue("Alias5", self.lineEdit_alias5.text())
-        settings.setValue("Monitor_interface", self.lineEdit_monitor_interface.text())
+        settings.setValue("Monitor_interface",
+                          self.lineEdit_monitor_interface.text())
         settings.setValue("Monitor_port", self.lineEdit_monitor_port.text())
         settings.endGroup()
         self.runDirsChanged.emit()
@@ -114,10 +118,35 @@ class RunStatusServer(QThread):
             print("Received packet from", addr[0], "data=", data.decode('utf-8'))
             self.jobStatusChanged.emit(data.decode('utf-8'))
 
+
+class RunFileSystemScan(QThread):
+
+    completed = pyqtSignal()
+    scanStatus = pyqtSignal(str)
+
+    def __init__(self, runs_model, parent=None):
+        super(RunFileSystemScan, self).__init__(parent)
+        self.model = runs_model
+
+    def run(self):
+        self.scanStatus.emit(u"Filesystem scanning started...")
+        print("FileSystemScan started")
+        settings = QSettings("ITER", "solps-gui")
+        settings.beginGroup("RunDirectories")
+        rundir1 = settings.value("runDir1", "")
+        alias1 = settings.value("Alias1", "local_1") #TODO threaded
+        settings.endGroup()
+
+        self.model.rootItem = TreeItem(self.model.headerdata)
+        self.model.setupModelData(rundir1, self.model.rootItem)
+        self.completed.emit()
+        self.scanStatus.emit(u'Ready')
+
 class TreeItem(object):
     def __init__(self, data, parent=None):
         self.parentItem = parent
         self.itemData = data
+        self.basename = os.path.basename(data[0])
         self.childItems = []
 
     def appendChild(self, item):
@@ -134,6 +163,8 @@ class TreeItem(object):
 
     def data(self, column):
         try:
+            if column == 0:
+                return self.basename
             return self.itemData[column]
         except IndexError:
             return None
@@ -149,6 +180,7 @@ class TreeItem(object):
 class RunsModel(QAbstractItemModel):
 
     monitorThread = None
+    scanFileSystemThread = None
 
     def __init__(self, parent=None):
         super(RunsModel, self).__init__(parent)
@@ -156,23 +188,19 @@ class RunsModel(QAbstractItemModel):
         self.headerdata = ["Run Directory", "Status", "Comment", "Last update",
                         "User", "Device", "Shot number", "Run number"]
         self.columns = 8
-
-        self.refresh_dirs()
-
-    #@pyqtSlot()
-    def refresh_dirs(self):
-        settings = QSettings("ITER", "solps-gui")
-        settings.beginGroup("RunDirectories")
-        rundir1 = settings.value("runDir1", "")
-        alias1 = settings.value("Alias1", "local_1") #TODO threaded
-        settings.endGroup()
-
         self.rootItem = TreeItem(self.headerdata)
 
-        datadir = self.dirTraverse(alias1, rundir1)
-       # self.setupModelData(datadir.split("\n"), self.rootItem)
-        self.setupModelData2(alias1, rundir1, self.rootItem)
+        self.scanFileSystemThread = RunFileSystemScan(self)
+        self.scanFileSystemThread.completed.connect(self.tree_available)
+        self.scanFileSystemThread.start()
+
+    @pyqtSlot()
+    def tree_available(self):
         self.modelReset.emit()
+
+    @pyqtSlot()
+    def refresh_dirs(self):
+        self.scanFileSystemThread.start()
 
     def dirTraverse(self, alias, rundir):
         data_string = alias + 6 * " *" + "\n"
@@ -237,10 +265,9 @@ class RunsModel(QAbstractItemModel):
         childItem = index.internalPointer()
         parentItem = childItem.parent()
 
-        if parentItem == self.rootItem:
+        if parentItem is None: #or parentItem == self.rootItem:
             return QModelIndex()
 
-       # print("PARENT=", parentItem)
         return self.createIndex(parentItem.row(), 0, parentItem)
 
     def rowCount(self, parent):
@@ -254,85 +281,20 @@ class RunsModel(QAbstractItemModel):
 
         return parentItem.childCount()
 
-    def setupModelData2(self, alias, rootdir, parent):
+    def setupModelData(self, rootdir, parent):
         parents = [parent]
-        indentations = [0]
-
+        rootdir_len = len(rootdir)
         for dir, subdirs, files in os.walk(rootdir):
-            print(os.path.basename(dir))
-            #if parents[-1].childCount() > 0:
-             #   parents.append(parents[-1].child(parents[-1].childCount()-1))
-               # indentations.append(position)
-            parents[-1].appendChild(TreeItem(os.path.basename(dir), parents[-1]))
-
-        """
-        while number < len(lines):
-            position = 0
-            while position < len(lines[number]):
-                if lines[number][position] != ' ':
-                    break
-                position += 1
-
-            lineData = lines[number][position:].strip()
-
-            if lineData:
-                # Read the column data from the rest of the line.
-                columnData = [s for s in lineData.split(' ') if s]
-
-                if position > indentations[-1]:
-                    # The last child of the current parent is now the new
-                    # parent unless the current parent has no children.
-
-                    if parents[-1].childCount() > 0:
-                        parents.append(parents[-1].child(parents[-1].childCount() - 1))
-                        indentations.append(position)
-
-                else:
-                    while position < indentations[-1] and len(parents) > 0:
-                        parents.pop()
-                        indentations.pop()
-
-                # Append a new item to the current parent's list of children.
-                parents[-1].appendChild(TreeItem(columnData, parents[-1]))
-
-            number += 1
-        """
-    def setupModelData(self, lines, parent):
-        parents = [parent]
-        indentations = [0]
-
-        number = 0
-
-        while number < len(lines):
-            position = 0
-            while position < len(lines[number]):
-                if lines[number][position] != ' ':
-                    break
-                position += 1
-
-            lineData = lines[number][position:].strip()
-
-            if lineData:
-                # Read the column data from the rest of the line.
-                columnData = [s for s in lineData.split(' ') if s]
-
-                if position > indentations[-1]:
-                    # The last child of the current parent is now the new
-                    # parent unless the current parent has no children.
-
-                    if parents[-1].childCount() > 0:
-                        parents.append(parents[-1].child(parents[-1].childCount() - 1))
-                        indentations.append(position)
-
-                else:
-                    while position < indentations[-1] and len(parents) > 0:
-                        parents.pop()
-                        indentations.pop()
-
-                # Append a new item to the current parent's list of children.
-                parents[-1].appendChild(TreeItem(columnData, parents[-1]))
-
-            number += 1
+            dir_len = len(dir)
+            if dir_len > rootdir_len:
+                parents.append(parents[-1].child(parents[-1].childCount() - 1))
+                rootdir = dir
+                rootdir_len = len(rootdir)
+            elif dir_len < rootdir_len:
+                parents.pop()
+                rootdir = dir
+                rootdir_len = len(rootdir)
+            parents[-1].appendChild(TreeItem([dir, dir], parents[-1]))
 
     """ Run job server """
     def runJobStatusServer(self):
@@ -357,20 +319,6 @@ class RunsModel(QAbstractItemModel):
         #print(newData)
 
 class SolpsImpl(QMainWindow):
-    #model = None
-    data1 = """AUG_16151_D machine * * * * * *
-    baserun ready comment1 1.1.2000 telentm ITER 1 10
-    run1 on-going comment2 2.1.1980 kosl Asdex-U 2 8
-    16151_1.6MW_2.0e19_D=0.4 finished/not_yet_converged comment3 5.5.2005 telentm ITER 3 6
-    run_after_conversion finished/not_yet_converged_not_doing_well comment4 2.5.2001 bonninx Textor 5 6
- Tutorial machine * * * * * *
-    baserun ready comment5 1.1.2000 telentm ITER 1 10
-    tut1 on-going comment6 2.1.1980 kosl Asdex-U 2 8
-    tut2 finished/converged comment7 2.5.2001 bonninx Textor 5 6
-    remeshed finished/crashed comment8 5.5.2005 kosl ITER 3 4
-         baserun not_ready comment9 1.1.2000 telentm ITER 1 10
-    """
-
     def __init__(self, *args):
         super(SolpsImpl, self).__init__(*args)
         loadUi('solps-gui.ui', self)
@@ -379,11 +327,6 @@ class SolpsImpl(QMainWindow):
 
         self.model = RunsModel()
         self.treeViewRuns.setModel(self.model)
-
-        # self.model.setRootPath('') # Disable folder watch for now
-        #self.treeViewRuns.setRootIndex(self.model.index(expanduser("~")))
-        # self.model.setFilter(QDir.Dirs|QDir.NoDotAndDotDot)
-        # self.model.setNameFilterDisables(0)
 
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
@@ -401,6 +344,8 @@ class SolpsImpl(QMainWindow):
         settings.endGroup()
 
         self.actionJob_list.triggered.connect(self.showdialog)
+        self.model.scanFileSystemThread.scanStatus.connect(self.statusbar.showMessage)
+        self.statusbar.showMessage("Preparing Runs tree ...")
 
     def showdialog(self):
         dialog = RunSettings(self.model)
@@ -446,7 +391,7 @@ class SolpsImpl(QMainWindow):
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):
-        QMessageBox.about(QMessageBox, "About SOLPS-ITER GUI",
+        QMessageBox.about(self, "About SOLPS-ITER GUI",
          "GUI will enable users to monitor multiple simultaneously running "
          "cases, which requires defining the working directory (folder) for "
          "each case to be separated from each other. "
@@ -457,7 +402,7 @@ class SolpsImpl(QMainWindow):
     Main method
 """
 app = QApplication(sys.argv)
-#app.setStyle("motif")
+# app.setStyle("motif")
 widget = SolpsImpl()
 widget.show()
 sys.exit(app.exec_())
