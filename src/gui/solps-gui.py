@@ -4,9 +4,10 @@ import os
 import socket
 import sys
 from PyQt5.QtCore import (pyqtSlot, QModelIndex, Qt, QSettings,
-                          pyqtSignal, QThread, QAbstractItemModel, QVariant, QObject)
+                          pyqtSignal, QThread, QAbstractItemModel, QVariant)
 
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,QDialog, QFileDialog)
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
+                             QFileDialog)
 from PyQt5.uic import loadUi
 from os.path import expanduser
 
@@ -38,8 +39,10 @@ class RunSettings(QDialog):
         self.lineEdit_alias3.setText(settings.value("Alias3", "local_3"))
         self.lineEdit_alias4.setText(settings.value("Alias4", "local_4"))
         self.lineEdit_alias5.setText(settings.value("Alias5", "local_5"))
-        self.lineEdit_monitor_interface.setText(settings.value("Monitor_interface", "interface #"))
-        self.lineEdit_monitor_port.setText(settings.value("Monitor_port", "port #"))        
+        self.lineEdit_monitor_interface.setText(
+            settings.value("Monitor_interface", "interface #"))
+        self.lineEdit_monitor_port.setText(
+            settings.value("Monitor_port", "port #"))
         settings.endGroup()
         
         self.toolButtonView1.clicked.connect(self.showdir1)
@@ -71,7 +74,8 @@ class RunSettings(QDialog):
         settings.setValue("Alias3", self.lineEdit_alias3.text())
         settings.setValue("Alias4", self.lineEdit_alias4.text())
         settings.setValue("Alias5", self.lineEdit_alias5.text())
-        settings.setValue("Monitor_interface", self.lineEdit_monitor_interface.text())
+        settings.setValue("Monitor_interface",
+                          self.lineEdit_monitor_interface.text())
         settings.setValue("Monitor_port", self.lineEdit_monitor_port.text())
         settings.endGroup()
         self.runDirsChanged.emit()
@@ -91,7 +95,6 @@ class RunSettings(QDialog):
 
     @pyqtSlot()
     def showdir5(self): self.update_dir(self.lineEdit_rundir5)
-
 
 class RunStatusServer(QThread):
     sock = None
@@ -114,6 +117,29 @@ class RunStatusServer(QThread):
             data, addr = self.sock.recvfrom(1024) # wait for data
             print("Received packet from", addr[0], "data=", data.decode('utf-8'))
             self.jobStatusChanged.emit(data.decode('utf-8'))
+
+class RunFileSystemScan(QThread):
+
+    completed = pyqtSignal()
+    scanStatus = pyqtSignal(str)
+
+    def __init__(self, runs_model, parent=None):
+        super(RunFileSystemScan, self).__init__(parent)
+        self.model = runs_model
+
+    def run(self):
+        self.scanStatus.emit(u"Filesystem scanning started...")
+        print("FileSystemScan started")
+        settings = QSettings("ITER", "solps-gui")
+        settings.beginGroup("RunDirectories")
+        rundir1 = settings.value("runDir1", "")
+        alias1 = settings.value("Alias1", "local_1") #TODO threaded
+        settings.endGroup()
+        datadir = self.model.dirTraverse(alias1, rundir1)
+        self.model.rootItem = TreeItem(self.model.headerdata)
+        self.model.setupModelData(datadir.split("\n"), self.model.rootItem)
+        self.completed.emit()
+        self.scanStatus.emit(u'Ready')
 
 
 class TreeItem(object):
@@ -151,6 +177,7 @@ class TreeItem(object):
 class RunsModel(QAbstractItemModel):
 
     monitorThread = None
+    scanFileSystemThread = None
 
     def __init__(self, parent=None):
         super(RunsModel, self).__init__(parent)
@@ -158,20 +185,18 @@ class RunsModel(QAbstractItemModel):
         self.headerdata = ["Run Directory", "Status", "Comment", "Last update",
                         "User", "Device", "Shot number", "Run number"]
         self.columns = 8
+        self.rootItem = TreeItem(self.headerdata)
+        self.scanFileSystemThread = RunFileSystemScan(self)
+        self.scanFileSystemThread.completed.connect(self.tree_available)
+        self.scanFileSystemThread.start()
 
-        self.refresh_dirs()
+    @pyqtSlot()
+    def tree_available(self):
+        self.modelReset.emit()
 
     @pyqtSlot()
     def refresh_dirs(self):
-        settings = QSettings("ITER", "solps-gui")
-        settings.beginGroup("RunDirectories")
-        rundir1 = settings.value("runDir1", "")
-        alias1 = settings.value("Alias1", "local_1") #TODO threaded
-        settings.endGroup()
-        datadir = self.dirTraverse(alias1, rundir1)
-        self.rootItem = TreeItem(self.headerdata)
-        self.setupModelData(datadir.split("\n"), self.rootItem)
-        self.modelReset.emit()
+        self.scanFileSystemThread.start()
 
     # Reading file directories for given alias and root
     def dirTraverse(self, alias, rundir):
@@ -317,20 +342,6 @@ class RunsModel(QAbstractItemModel):
         #print(newData)
 
 class SolpsImpl(QMainWindow):
-    #model = None
-    data1 = """AUG_16151_D machine * * * * * *
-    baserun ready comment1 1.1.2000 telentm ITER 1 10
-    run1 on-going comment2 2.1.1980 kosl Asdex-U 2 8
-    16151_1.6MW_2.0e19_D=0.4 finished/not_yet_converged comment3 5.5.2005 telentm ITER 3 6
-    run_after_conversion finished/not_yet_converged_not_doing_well comment4 2.5.2001 bonninx Textor 5 6
- Tutorial machine * * * * * *
-    baserun ready comment5 1.1.2000 telentm ITER 1 10
-    tut1 on-going comment6 2.1.1980 kosl Asdex-U 2 8
-    tut2 finished/converged comment7 2.5.2001 bonninx Textor 5 6
-    remeshed finished/crashed comment8 5.5.2005 kosl ITER 3 4
-         baserun not_ready comment9 1.1.2000 telentm ITER 1 10
-    """
-
     def __init__(self, *args):
         super(SolpsImpl, self).__init__(*args)
         loadUi('solps-gui.ui', self)
@@ -361,6 +372,8 @@ class SolpsImpl(QMainWindow):
         settings.endGroup()
 
         self.actionJob_list.triggered.connect(self.showdialog)
+        self.model.scanFileSystemThread.scanStatus.connect(self.statusbar.showMessage)
+        self.statusbar.showMessage("Preparing Runs tree ...")
 
     def showdialog(self):
         dialog = RunSettings(self.model)
@@ -405,7 +418,7 @@ class SolpsImpl(QMainWindow):
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):
-        QMessageBox.about(QMessageBox, "About SOLPS-ITER GUI",
+        QMessageBox.about(self, "About SOLPS-ITER GUI",
          "GUI will enable users to monitor multiple simultaneously running "
          "cases, which requires defining the working directory (folder) for "
          "each case to be separated from each other. "
@@ -416,7 +429,7 @@ class SolpsImpl(QMainWindow):
     Main method
 """
 app = QApplication(sys.argv)
-#app.setStyle("motif")
+# app.setStyle("motif")
 widget = SolpsImpl()
 widget.show()
 sys.exit(app.exec_())
