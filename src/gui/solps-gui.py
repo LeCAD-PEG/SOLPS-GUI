@@ -155,11 +155,12 @@ class RunFileSystemScan(QThread):
         self.scanStatus.emit(u'Ready')
 
 class TreeItem(object):
-    def __init__(self, data, parent=None):
+    def __init__(self, data, alias,parent=None):
         self.parentItem = parent
         self.itemData = data
         self.basename = os.path.basename(data[0])
         self.childItems = []
+        self.alias = alias
 
     def appendChild(self, item):
         self.childItems.append(item)
@@ -176,7 +177,8 @@ class TreeItem(object):
     def data(self, column):
         try:
             if column == 0:
-                return self.basename
+                #return self.basename
+                return self.alias
             return self.itemData[column]
         except IndexError:
             return None
@@ -213,16 +215,6 @@ class RunsModel(QAbstractItemModel):
     @pyqtSlot()
     def refresh_dirs(self):
         self.scanFileSystemThread.start()
-
-    def dirTraverse(self, alias, rundir):
-        data_string = alias + 6 * " *" + "\n"
-        rootDir = rundir
-        path_b = rootDir.split("/")
-        for dir, subdirs, files in os.walk(rootDir):
-            path = dir.split('/')
-            r = len(path)-len(path_b)
-            data_string += " %s%s\n" % ( r*" ", os.path.basename(dir))
-        return data_string
 
     def columnCount(self, parent):
         if parent.isValid():
@@ -293,29 +285,13 @@ class RunsModel(QAbstractItemModel):
 
         return parentItem.childCount()
 
-    def setupModelData(self, rootdir, alias, parent):
-        parents = [parent]
-        rootdir_len = len(rootdir)-1
-        parents[-1].appendChild(TreeItem([alias], parents[-1]))
-        for dir, subdirs, files in os.walk(rootdir):
-            dir_len = len(dir)
-            if dir_len > rootdir_len:
-                parents.append(parents[-1].child(parents[-1].childCount() - 1))
-                rootdir = dir
-                rootdir_len = len(rootdir)
-            elif dir_len < rootdir_len:
-                parents.pop()
-                rootdir = dir
-                rootdir_len = len(rootdir)
-            parents[-1].appendChild(TreeItem([dir, dir], parents[-1]))
-
-
-    def setupModelData2(self, rootdir,alias, parent):
+    def setupModelData(self, rootdir,alias, parent):
 
         path = len(rootdir.split('/'))-1
         indentations = [path]
         parents = [parent]
-        parents[-1].appendChild(TreeItem([alias], parents[-1]))
+        if path != 0:
+            parents[-1].appendChild(TreeItem([alias], parents[-1]))
         for dir, subdirs, files in os.walk(rootdir):
             position = len(dir.split('/'))
 
@@ -333,7 +309,7 @@ class RunsModel(QAbstractItemModel):
                     indentations.pop()
 
                 # Append a new item to the current parent's list of children.
-            parents[-1].appendChild(TreeItem([os.path.basename(dir), dir], parents[-1]))
+            parents[-1].appendChild(TreeItem([os.path.basename(dir), dir], alias, parents[-1]))
 
 
     """ Run job server """
