@@ -40,9 +40,9 @@ class RunSettings(QDialog):
         self.lineEdit_alias4.setText(settings.value("Alias4", "local_4"))
         self.lineEdit_alias5.setText(settings.value("Alias5", "local_5"))
         self.lineEdit_monitor_interface.setText(
-            settings.value("Monitor_interface", "interface #"))
+            settings.value("Monitor_interface", "0.0.0.0"))
         self.lineEdit_monitor_port.setText(
-            settings.value("Monitor_port", "port #"))
+            settings.value("Monitor_port", "49406"))
         settings.endGroup()
 
         self.toolButtonView1.clicked.connect(self.showdir1)
@@ -53,7 +53,8 @@ class RunSettings(QDialog):
 
     def update_dir(self, line_edit):
         current_dir = line_edit.text()
-        if current_dir == "": current_dir = expanduser("~")
+        if current_dir == "":
+            current_dir = expanduser("~")
         new_dir = QFileDialog.getExistingDirectory(self,
                                                    "Select Directory",
                                                    current_dir,
@@ -116,8 +117,9 @@ class RunStatusServer(QThread):
             self.sock.bind((address, port))
         except socket.error:  # , msg:
             print('Bind to', address, ':', str(port), ' failed.')
-            sys.exit()
+            return False
         print('Server on', address, ':', port)
+        return True
 
     def run(self):
         print("RunStatusServer started")
@@ -279,6 +281,11 @@ class RunsModel(QAbstractItemModel):
 
         return self.createIndex(parentItem.row(), 0, parentItem)
 
+    def print_tree(self):
+        idx = self.index(0, 0, QModelIndex())
+        for row in range(self.rowCount(idx)):
+            print(row)
+
     def rowCount(self, parent):
         if parent.column() > 0:
             return 0
@@ -319,27 +326,40 @@ class RunsModel(QAbstractItemModel):
             parents[-1].appendChild(
                 TreeItem([os.path.basename(dir), dir], parents[-1]))
 
-    """ Run job server """
 
+    " Run job status server"
     def runJobStatusServer(self):
         self.monitorThread = RunStatusServer()
-        self.monitorThread.bind('0.0.0.0', 49406)
-        # self.monitorThread.finished.connect(self.deleteLater) # TODO
+        settings = QSettings("ITER", "solps-gui")
+        settings.beginGroup("RunDirectories")
+        address = settings.value("Monitor_interface", "0.0.0.0")
+        port = int(settings.value("Monitor_port", "49406"))
+        settings.endGroup()
+
+        status = self.monitorThread.bind(address, port)
+        if status :
+            self.monitorThread.start()
+        else:
+            ret = QMessageBox.warning(None, "SOLPS-GUI Status server",
+                "Failed to bind interface {0} to port {1}. "
+                "Job monitoring will not start unless you "
+                "setup free port and restart! "
+                "GUI will exit if you press Cancel.".format(address, port),
+                                      QMessageBox.Cancel | QMessageBox.Ok)
+            if ret == QMessageBox.Cancel:
+                sys.exit(1)
         self.monitorThread.jobStatusChanged.connect(self.jobStatusChanged)
-        self.monitorThread.start()
 
     """
         Register method as slot (receiver) of signal when job status signal
         is emitted.
         Method calls method to retrieve job status and other data from server.
     """
-
     @pyqtSlot(str)
     def jobStatusChanged(self, message):
         # get new data about job ID from server: new status, last change date,
         # etc.
-        # newData = self.jobStatusServer.getClientStatus(inJobID)
-
+        self.print_tree()
         print("Status of job changed: ", message)
         # print(newData)
 
@@ -354,11 +374,6 @@ class SolpsImpl(QMainWindow):
 
         self.model = RunsModel()
         self.treeViewRuns.setModel(self.model)
-
-        # self.model.setRootPath('') # Disable folder watch for now
-        # self.treeViewRuns.setRootIndex(self.model.index(expanduser("~")))
-        # self.model.setFilter(QDir.Dirs|QDir.NoDotAndDotDot)
-        # self.model.setNameFilterDisables(0)
 
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
