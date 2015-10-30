@@ -11,8 +11,8 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
 from PyQt5.uic import loadUi
 from os.path import expanduser
 
-class RunSettings(QDialog):
 
+class RunSettings(QDialog):
     runDirsChanged = pyqtSignal()
 
     def __init__(self, runs_model):
@@ -44,19 +44,20 @@ class RunSettings(QDialog):
         self.lineEdit_monitor_port.setText(
             settings.value("Monitor_port", "port #"))
         settings.endGroup()
-        
+
         self.toolButtonView1.clicked.connect(self.showdir1)
         self.toolButtonView2.clicked.connect(self.showdir2)
         self.toolButtonView3.clicked.connect(self.showdir3)
         self.toolButtonView4.clicked.connect(self.showdir4)
         self.toolButtonView5.clicked.connect(self.showdir5)
 
-
     def update_dir(self, line_edit):
         current_dir = line_edit.text()
         if current_dir == "": current_dir = expanduser("~")
         new_dir = QFileDialog.getExistingDirectory(self,
-          "Select Directory", current_dir, QFileDialog.ShowDirsOnly)
+                                                   "Select Directory",
+                                                   current_dir,
+                                                   QFileDialog.ShowDirsOnly)
         if new_dir: line_edit.setText(new_dir)
 
     # save GUI settings
@@ -82,19 +83,25 @@ class RunSettings(QDialog):
 
     # Choose run directory
     @pyqtSlot()
-    def showdir1(self): self.update_dir(self.lineEdit_rundir1)
+    def showdir1(self):
+        self.update_dir(self.lineEdit_rundir1)
 
     @pyqtSlot()
-    def showdir2(self): self.update_dir(self.lineEdit_rundir2)
-                
-    @pyqtSlot()
-    def showdir3(self): self.update_dir(self.lineEdit_rundir3)
+    def showdir2(self):
+        self.update_dir(self.lineEdit_rundir2)
 
     @pyqtSlot()
-    def showdir4(self): self.update_dir(self.lineEdit_rundir4)
+    def showdir3(self):
+        self.update_dir(self.lineEdit_rundir3)
 
     @pyqtSlot()
-    def showdir5(self): self.update_dir(self.lineEdit_rundir5)
+    def showdir4(self):
+        self.update_dir(self.lineEdit_rundir4)
+
+    @pyqtSlot()
+    def showdir5(self):
+        self.update_dir(self.lineEdit_rundir5)
+
 
 class RunStatusServer(QThread):
     sock = None
@@ -107,20 +114,21 @@ class RunStatusServer(QThread):
         # Bind socket to local host and port
         try:
             self.sock.bind((address, port))
-        except socket.error: #, msg:
+        except socket.error:  # , msg:
             print('Bind to', address, ':', str(port), ' failed.')
             sys.exit()
         print('Server on', address, ':', port)
+
     def run(self):
         print("RunStatusServer started")
         while self.retrieve:
-            data, addr = self.sock.recvfrom(1024) # wait for data
-            print("Received packet from", addr[0], "data=", data.decode('utf-8'))
+            data, addr = self.sock.recvfrom(1024)  # wait for data
+            print("Received packet from", addr[0], "data=",
+                  data.decode('utf-8'))
             self.jobStatusChanged.emit(data.decode('utf-8'))
 
 
 class RunFileSystemScan(QThread):
-
     completed = pyqtSignal()
     scanStatus = pyqtSignal(str)
 
@@ -134,7 +142,7 @@ class RunFileSystemScan(QThread):
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
         rundir1 = settings.value("runDir1", "")
-        alias1 = settings.value("Alias1", "local_1") #TODO threaded
+        alias1 = settings.value("Alias1", "local_1")
         rundir2 = settings.value("runDir2", "")
         alias2 = settings.value("Alias2", "local_2")
         rundir3 = settings.value("runDir3", "")
@@ -154,13 +162,12 @@ class RunFileSystemScan(QThread):
         self.completed.emit()
         self.scanStatus.emit(u'Ready')
 
+
 class TreeItem(object):
-    def __init__(self, data, alias,parent=None):
+    def __init__(self, data, parent = None):
         self.parentItem = parent
         self.itemData = data
-        self.basename = os.path.basename(data[0])
         self.childItems = []
-        self.alias = alias
 
     def appendChild(self, item):
         self.childItems.append(item)
@@ -176,9 +183,6 @@ class TreeItem(object):
 
     def data(self, column):
         try:
-            if column == 0:
-                #return self.basename
-                return self.alias
             return self.itemData[column]
         except IndexError:
             return None
@@ -191,16 +195,16 @@ class TreeItem(object):
             return self.parentItem.childItems.index(self)
         return 0
 
-class RunsModel(QAbstractItemModel):
 
+class RunsModel(QAbstractItemModel):
     monitorThread = None
     scanFileSystemThread = None
 
     def __init__(self, parent=None):
         super(RunsModel, self).__init__(parent)
         self.runJobStatusServer()
-        self.headerdata = ["Run Directory", "Status", "Comment", "Last update",
-                        "User", "Device", "Shot number", "Run number"]
+        self.headerdata = ["Name", "Path", "Status", "Comment", "Last update",
+                           "Device", "Shot number", "Run number"]
         self.columns = 8
         self.rootItem = TreeItem(self.headerdata)
 
@@ -221,7 +225,8 @@ class RunsModel(QAbstractItemModel):
             return parent.internalPointer().columnCount()
         else:
             return self.rootItem.columnCount()
-    #    return self.columns
+
+    # return self.columns
     def data(self, index, role):
         if not index.isValid():
             return None
@@ -239,11 +244,11 @@ class RunsModel(QAbstractItemModel):
 
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
-    def headerData(self, section, orientation, role = None):
+    def headerData(self, section, orientation, role=None):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return QVariant(self.headerdata[section])
         if role == Qt.TextAlignmentRole:
-           # return Qt.AlignHCenter
+            # return Qt.AlignHCenter
             return self.rootItem.data(section)
         return super(RunsModel, self).headerData(section, orientation, role)
 
@@ -285,38 +290,41 @@ class RunsModel(QAbstractItemModel):
 
         return parentItem.childCount()
 
-    def setupModelData(self, rootdir,alias, parent):
-
-        path = len(rootdir.split('/'))-1
-        indentations = [path]
+    def setupModelData(self, rootdir, alias, parent):
+        if rootdir is '': return
+        indentations = [len(rootdir.split('/'))]
         parents = [parent]
-        if path != 0:
-            parents[-1].appendChild(TreeItem([alias], parents[-1]))
+
         for dir, subdirs, files in os.walk(rootdir):
+            if dir == rootdir:
+                parents[0].appendChild(TreeItem([alias, dir], parent))
+                continue
+
             position = len(dir.split('/'))
 
             if position > indentations[-1]:
-                    # The last child of the current parent is now the new
-                    # parent unless the current parent has no children.
+                # The last child of the current parent is now the new
+                # parent unless the current parent has no children.
 
                 if parents[-1].childCount() > 0:
-                    parents.append(parents[-1].child(parents[-1].childCount() - 1))
+                    parents.append(
+                        parents[-1].child(parents[-1].childCount() - 1))
                     indentations.append(position)
 
             else:
                 while position < indentations[-1] and len(parents) > 0:
                     parents.pop()
                     indentations.pop()
-
-                # Append a new item to the current parent's list of children.
-            parents[-1].appendChild(TreeItem([os.path.basename(dir), dir], alias, parents[-1]))
-
+            # Append a new item to the current parent's list of children.
+            parents[-1].appendChild(
+                TreeItem([os.path.basename(dir), dir], parents[-1]))
 
     """ Run job server """
+
     def runJobStatusServer(self):
         self.monitorThread = RunStatusServer()
         self.monitorThread.bind('0.0.0.0', 49406)
-        #self.monitorThread.finished.connect(self.deleteLater) # TODO
+        # self.monitorThread.finished.connect(self.deleteLater) # TODO
         self.monitorThread.jobStatusChanged.connect(self.jobStatusChanged)
         self.monitorThread.start()
 
@@ -325,47 +333,51 @@ class RunsModel(QAbstractItemModel):
         is emitted.
         Method calls method to retrieve job status and other data from server.
     """
+
     @pyqtSlot(str)
     def jobStatusChanged(self, message):
         # get new data about job ID from server: new status, last change date,
         # etc.
-        #newData = self.jobStatusServer.getClientStatus(inJobID)
+        # newData = self.jobStatusServer.getClientStatus(inJobID)
 
         print("Status of job changed: ", message)
-        #print(newData)
+        # print(newData)
+
 
 class SolpsImpl(QMainWindow):
     def __init__(self, *args):
         super(SolpsImpl, self).__init__(*args)
         loadUi('solps-gui.ui', self)
         self.actionAbout_Qt.triggered.connect(QApplication.instance().aboutQt)
-        self.checkBoxParameterScan.toggled.connect(self.plainTextEditScript.setEnabled)
+        self.checkBoxParameterScan.toggled.connect(
+            self.plainTextEditScript.setEnabled)
 
         self.model = RunsModel()
         self.treeViewRuns.setModel(self.model)
 
         # self.model.setRootPath('') # Disable folder watch for now
-        #self.treeViewRuns.setRootIndex(self.model.index(expanduser("~")))
+        # self.treeViewRuns.setRootIndex(self.model.index(expanduser("~")))
         # self.model.setFilter(QDir.Dirs|QDir.NoDotAndDotDot)
         # self.model.setNameFilterDisables(0)
 
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
-        
+
         settings.beginGroup("MainWindow")
         geometry = settings.value("Geometry")
-        if geometry :  self.restoreGeometry(geometry)
+        if geometry:  self.restoreGeometry(geometry)
         state = settings.value("State")
-        if state : self.restoreState(state)
+        if state: self.restoreState(state)
         settings.endGroup()
 
         settings.beginGroup("TreeViewRuns")
         treeview = settings.value("ColumnWidth")
-        if treeview : self.treeViewRuns.header().restoreState(treeview)
+        if treeview: self.treeViewRuns.header().restoreState(treeview)
         settings.endGroup()
 
         self.actionJob_list.triggered.connect(self.showdialog)
-        self.model.scanFileSystemThread.scanStatus.connect(self.statusbar.showMessage)
+        self.model.scanFileSystemThread.scanStatus.connect(
+            self.statusbar.showMessage)
         self.statusbar.showMessage("Preparing Runs tree ...")
 
     def showdialog(self):
@@ -385,7 +397,7 @@ class SolpsImpl(QMainWindow):
         settings.beginGroup("TreeViewRuns")
         settings.setValue("ColumnWidth", self.treeViewRuns.header().saveState())
         settings.endGroup()
-        
+
         QMainWindow.closeEvent(self, event)
 
     def expanded(self):
@@ -396,7 +408,7 @@ class SolpsImpl(QMainWindow):
         self.update(topLeftIndex)
         self.expandAll()
         self.expanded()
-        
+
     @pyqtSlot()
     def on_initializeRuns_clicked(self):
 
@@ -413,15 +425,14 @@ class SolpsImpl(QMainWindow):
     @pyqtSlot()
     def on_actionAbout_triggered(self):
         QMessageBox.about(self, "About SOLPS-ITER GUI",
-         "GUI will enable users to monitor multiple simultaneously running "
-         "cases, which requires defining the working directory (folder) for "
-         "each case to be separated from each other. "
-         "Input file builder will depend on it to correctly save input files "
-         " for multiple parameter scan cases.")
+        "GUI will enable users to monitor multiple simultaneously running "
+        "cases, which requires defining the working directory (folder) for "
+        "each case to be separated from each other. "
+        "Input file builder will depend on it to correctly save input files "
+        " for multiple parameter scan cases.")
 
-"""
-    Main method
-"""
+
+"  Main method "
 app = QApplication(sys.argv)
 # app.setStyle("motif")
 widget = SolpsImpl()
