@@ -7,7 +7,8 @@ from PyQt5.QtCore import (pyqtSlot, QModelIndex, Qt, QSettings,
                           pyqtSignal, QThread, QAbstractItemModel, QVariant)
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
-                             QFileDialog)
+                             QFileDialog, QStyle)
+
 from PyQt5.uic import loadUi
 from os.path import expanduser
 
@@ -166,7 +167,7 @@ class RunFileSystemScan(QThread):
 
 
 class TreeItem(object):
-    def __init__(self, data, parent = None):
+    def __init__(self, data, parent=None):
         self.parentItem = parent
         self.itemData = data
         self.childItems = []
@@ -202,8 +203,9 @@ class RunsModel(QAbstractItemModel):
     monitorThread = None
     scanFileSystemThread = None
 
-    def __init__(self, parent=None):
+    def __init__(self, style, parent=None):
         super(RunsModel, self).__init__(parent)
+        self.style = style
         self.runJobStatusServer()
         self.headerdata = ["Name", "Path", "Status", "Comment", "Last update",
                            "Device", "Shot number", "Run number"]
@@ -232,6 +234,16 @@ class RunsModel(QAbstractItemModel):
     def data(self, index, role):
         if not index.isValid():
             return None
+
+        if role == Qt.DecorationRole:
+            if index.column() == 0:
+                if self.parent(index) == QModelIndex():
+                    return self.style.standardIcon(QStyle.SP_DialogOpenButton)
+                else:
+                    return self.style.standardIcon(QStyle.SP_DirHomeIcon)
+
+            if index.column() == 1:
+                return self.style.standardIcon(QStyle.SP_DirIcon)
 
         if role != Qt.DisplayRole:
             return None
@@ -340,11 +352,11 @@ class RunsModel(QAbstractItemModel):
         if status :
             self.monitorThread.start()
         else:
-            ret = QMessageBox.warning(None, "SOLPS-GUI Status server",
-                "Failed to bind interface {0} to port {1}. "
-                "Job monitoring will not start unless you "
-                "setup free port and restart! "
-                "GUI will exit if you press Cancel.".format(address, port),
+            msg = "Failed to bind interface {0} to port {1}. " \
+                  "Job monitoring will not start unless you " \
+                  "setup free port and restart! " \
+                  "GUI will exit if you press Cancel.".format(address, port)
+            ret = QMessageBox.warning(None, "SOLPS-GUI Status server", msg,
                                       QMessageBox.Cancel | QMessageBox.Ok)
             if ret == QMessageBox.Cancel:
                 sys.exit(1)
@@ -372,7 +384,7 @@ class SolpsImpl(QMainWindow):
         self.checkBoxParameterScan.toggled.connect(
             self.plainTextEditScript.setEnabled)
 
-        self.model = RunsModel()
+        self.model = RunsModel(self.style())
         self.treeViewRuns.setModel(self.model)
 
         # get GUI settings
@@ -394,6 +406,7 @@ class SolpsImpl(QMainWindow):
         self.model.scanFileSystemThread.scanStatus.connect(
             self.statusbar.showMessage)
         self.statusbar.showMessage("Preparing Runs tree ...")
+
 
     def showdialog(self):
         dialog = RunSettings(self.model)
@@ -439,12 +452,12 @@ class SolpsImpl(QMainWindow):
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):
-        QMessageBox.about(self, "About SOLPS-ITER GUI",
-        "GUI will enable users to monitor multiple simultaneously running "
-        "cases, which requires defining the working directory (folder) for "
-        "each case to be separated from each other. "
-        "Input file builder will depend on it to correctly save input files "
-        " for multiple parameter scan cases.")
+        msg = "GUI will enable users to monitor multiple simultaneously " \
+              "running cases, which requires defining the working directory " \
+              "(folder) for each case to be separated from each other. " \
+              "Input file builder will depend on it to correctly save input " \
+              "files for multiple parameter scan cases."
+        QMessageBox.about(self, 'About SOLPS-ITER GUI', msg)
 
 
 "  Main method "
