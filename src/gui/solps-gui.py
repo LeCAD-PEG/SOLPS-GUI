@@ -451,6 +451,9 @@ class SolpsImpl(QMainWindow):
         self.treeViewRuns.setSortingEnabled(True)
         #self.treeViewRuns.sortByColumn(Column.date, Qt.AscendingOrder)
 
+        self.lineEditRunFilter.returnPressed.connect(self.textFilterChanged)
+
+
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
 
