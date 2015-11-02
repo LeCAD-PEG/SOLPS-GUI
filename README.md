@@ -47,9 +47,25 @@ XCB development libraries are required for building Qt5.x
 ## Component tracker
 See https://jira.iter.org/projects/IMAS?selectedItem=com.atlassian.jira.jira-projects-plugin:components-page
 
-##Install on OSX with homebrew
+## Install on OS X with homebrew
 
     brew install qt5
     brew linkapps qt5
     brew install PyQt5 --with-python3
     pip3 install sphinx
+
+## User preferences
+Preferences of some widgets and settings are stored to allow users
+configure the GUI. Size and position of the Main window is saved
+when user closes the GUI. At the same time columns position and widths
+are stored too. In some cases one wants to start from scratch by
+clearing the preferences.
+### Clearing user preferences on Linux
+
+    rm ${HOME}/.config/ITER/solps-gui.conf
+   
+### Clearing user preferences on OS X
+
+    rm ${HOME}/Library/Preferences/com.iter.solps-gui.plist
+    killall -u $USER cfprefsd 
+
