@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import os
 import socket
 import sys
-from PyQt5.QtCore import (pyqtSlot, QModelIndex, Qt, QSettings,
+from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
                           pyqtSignal, QThread, QAbstractItemModel, QVariant)
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
@@ -11,6 +12,14 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
 
 from PyQt5.uic import loadUi
 from os.path import expanduser
+from enum import IntEnum
+
+"Runs columns definition"
+class Column(IntEnum):
+    name = 0
+    path = 1
+    date = 2
+    status = 3
 
 
 class RunSettings(QDialog):
@@ -126,8 +135,7 @@ class RunStatusServer(QThread):
         print("RunStatusServer started")
         while self.retrieve:
             data, addr = self.sock.recvfrom(1024)  # wait for data
-            print("Received packet from", addr[0], "data=",
-                  data.decode('utf-8'))
+            print("Message", data.decode('utf-8'), "from", addr[0])
             self.jobStatusChanged.emit(data.decode('utf-8'))
 
 
@@ -162,6 +170,7 @@ class RunFileSystemScan(QThread):
         self.model.setupModelData(rundir3, alias3, self.model.rootItem)
         self.model.setupModelData(rundir4, alias4, self.model.rootItem)
         self.model.setupModelData(rundir5, alias5, self.model.rootItem)
+        self.model.create_indexes_for_columns()
         self.completed.emit()
         self.scanStatus.emit(u'Ready')
 
@@ -207,9 +216,9 @@ class RunsModel(QAbstractItemModel):
         super(RunsModel, self).__init__(parent)
         self.style = style
         self.runJobStatusServer()
-        self.headerdata = ["Name", "Path", "Status", "Comment", "Last update",
+        self.headerdata = ["Name", "Path", "Date", "Status", "Comment",
                            "Device", "Shot number", "Run number"]
-        self.columns = 8
+        self.columns = len(self.headerdata)
         self.rootItem = TreeItem(self.headerdata)
 
         self.scanFileSystemThread = RunFileSystemScan(self)
@@ -262,8 +271,7 @@ class RunsModel(QAbstractItemModel):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return QVariant(self.headerdata[section])
         if role == Qt.TextAlignmentRole:
-            # return Qt.AlignHCenter
-            return self.rootItem.data(section)
+            return Qt.AlignHCenter
         return super(RunsModel, self).headerData(section, orientation, role)
 
     def index(self, row, column, parent):
@@ -276,6 +284,7 @@ class RunsModel(QAbstractItemModel):
             parentItem = parent.internalPointer()
 
         childItem = parentItem.child(row)
+
         if childItem:
             return self.createIndex(row, column, childItem)
         else:
@@ -288,15 +297,25 @@ class RunsModel(QAbstractItemModel):
         childItem = index.internalPointer()
         parentItem = childItem.parent()
 
-        if parentItem is None or parentItem == self.rootItem:
+        if parentItem == self.rootItem:
             return QModelIndex()
 
         return self.createIndex(parentItem.row(), 0, parentItem)
 
-    def print_tree(self):
-        idx = self.index(0, 0, QModelIndex())
-        for row in range(self.rowCount(idx)):
-            print(row)
+    def create_indexes_for_columns(self):
+        "Create hashed dictionary for updating columns specified by path"
+        self.column_index = dict()  # path : (itemData, status, date)
+        child_items = [self.rootItem.childItems]
+        while child_items:
+            items = child_items.pop(0)
+            for row, childItem in enumerate(items):
+                date_index = self.createIndex(row, Column.date, childItem)
+                status_index = self.createIndex(row, Column.status, childItem)
+                path = childItem.data(Column.path)
+                self.column_index[path] = (childItem.itemData,
+                                           date_index, status_index)
+                if childItem.childItems:
+                    child_items.append(childItem.childItems)
 
     def rowCount(self, parent):
         if parent.column() > 0:
@@ -315,8 +334,10 @@ class RunsModel(QAbstractItemModel):
         parents = [parent]
 
         for dir, subdirs, files in os.walk(rootdir):
-            if dir == rootdir:
-                parents[0].appendChild(TreeItem([alias, dir], parent))
+            if dir == rootdir:  # replace name with alias
+                date = QDateTime().fromTime_t(os.stat(dir).st_mtime)
+                data = [alias, dir, date, None]
+                parents[0].appendChild(TreeItem(data, parent))
                 continue
 
             position = len(dir.split('/'))
@@ -335,8 +356,9 @@ class RunsModel(QAbstractItemModel):
                     parents.pop()
                     indentations.pop()
             # Append a new item to the current parent's list of children.
-            parents[-1].appendChild(
-                TreeItem([os.path.basename(dir), dir], parents[-1]))
+            date = QDateTime().fromTime_t(os.stat(dir).st_mtime)
+            data = [os.path.basename(dir), dir, date, None]
+            parents[-1].appendChild(TreeItem(data, parents[-1]))
 
 
     " Run job status server"
@@ -402,6 +424,7 @@ class SolpsImpl(QMainWindow):
         if treeview: self.treeViewRuns.header().restoreState(treeview)
         settings.endGroup()
 
+
         self.actionJob_list.triggered.connect(self.showdialog)
         self.model.scanFileSystemThread.scanStatus.connect(
             self.statusbar.showMessage)
@@ -449,6 +472,18 @@ class SolpsImpl(QMainWindow):
     @pyqtSlot()
     def on_pushButtonRunFilter_clicked(self):
         self.model.setNameFilters([self.lineEditRunFilter.text()])
+
+    @pyqtSlot()
+    def on_pushButton_8_clicked(self):  # Testing only
+        settings = QSettings('ITER', 'solps-gui')
+        settings.beginGroup('RunDirectories')
+        path = settings.value('runDir1', '')
+        settings.endGroup()
+        (data, date, status) = self.model.column_index[path]
+        data[Column.status] = 'running'
+        data[Column.date] = QDateTime().currentDateTime()
+        self.model.dataChanged.emit(date, status)
+
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):
