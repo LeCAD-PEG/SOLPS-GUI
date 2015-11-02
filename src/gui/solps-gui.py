@@ -27,9 +27,24 @@ class MySortFilterProxyModel(QSortFilterProxyModel):
     def __init__(self, parent=None):
         super(MySortFilterProxyModel, self).__init__(parent)
 
+    " Parent of accepted children needs to be accepted too for treeviews. "
+    def has_accepted_children(self, source_index):
+        item = source_index.internalPointer()
+        items = item.childItems.copy()
+        while items:
+            child = items.pop()
+            items.extend(child.childItems)
+            data = child.data(Column.path)
+            if self.filterRegExp().indexIn(data) >= 0:
+                return True
+        return False
+
     def filterAcceptsRow(self, sourceRow, sourceParent):
-        index1 = self.sourceModel().index(sourceRow, 1, sourceParent)
-        return (self.filterRegExp().indexIn(self.sourceModel().data(index1)) >= 0)
+        index = self.sourceModel().index(sourceRow, Column.path, sourceParent)
+        if self.has_accepted_children(index):
+            return True
+        data = self.sourceModel().data(index, Qt.DisplayRole)
+        return (self.filterRegExp().indexIn(data) >= 0)
 
 class RunSettings(QDialog):
     runDirsChanged = pyqtSignal()
@@ -249,7 +264,7 @@ class RunsModel(QAbstractItemModel):
             return self.rootItem.columnCount()
 
     # return self.columns
-    def data(self, index, role = None): #Marijo
+    def data(self, index, role):
         if not index.isValid():
             return None
 
@@ -426,16 +441,15 @@ class SolpsImpl(QMainWindow):
         self.model = RunsModel(self.style())
 
         self.proxyModel = MySortFilterProxyModel()
-        self.proxyModel.setDynamicSortFilter(False)
+        self.proxyModel.setDynamicSortFilter(True)
+        self.proxyModel.setFilterKeyColumn(Column.path)
         self.proxyModel.setSourceModel(self.model)
         self.treeViewRuns.setModel(self.proxyModel)
 
         self.treeViewRuns.setRootIsDecorated(True)
         self.treeViewRuns.setAlternatingRowColors(True)
         self.treeViewRuns.setSortingEnabled(True)
-        self.treeViewRuns.sortByColumn(1, Qt.AscendingOrder)
-
-        self.textFilterChanged()
+        #self.treeViewRuns.sortByColumn(Column.date, Qt.AscendingOrder)
 
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
@@ -514,7 +528,7 @@ class SolpsImpl(QMainWindow):
     def on_pushButton_8_clicked(self):  # Testing only
         settings = QSettings('ITER', 'solps-gui')
         settings.beginGroup('RunDirectories')
-        path = settings.value('runDir1', '')
+        path = settings.value('runDir2', '')
         settings.endGroup()
         (data, date, status) = self.model.column_index[path]
         data[Column.status] = 'running'
