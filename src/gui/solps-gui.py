@@ -4,7 +4,8 @@ import os
 import socket
 import sys
 from PyQt5.QtCore import (pyqtSlot, QModelIndex, Qt, QSettings,
-                          pyqtSignal, QThread, QAbstractItemModel, QVariant)
+                          pyqtSignal, QThread, QAbstractItemModel, QVariant,
+                          QSortFilterProxyModel, QRegExp)
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QFileDialog, QStyle)
@@ -12,6 +13,13 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
 from PyQt5.uic import loadUi
 from os.path import expanduser
 
+class MySortFilterProxyModel(QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        super(MySortFilterProxyModel, self).__init__(parent)
+
+    def filterAcceptsRow(self, sourceRow, sourceParent):
+        index1 = self.sourceModel().index(sourceRow, 1, sourceParent)
+        return (self.filterRegExp().indexIn(self.sourceModel().data(index1)) >= 0)
 
 class RunSettings(QDialog):
     runDirsChanged = pyqtSignal()
@@ -231,7 +239,7 @@ class RunsModel(QAbstractItemModel):
             return self.rootItem.columnCount()
 
     # return self.columns
-    def data(self, index, role):
+    def data(self, index, role = None): #Marijo
         if not index.isValid():
             return None
 
@@ -338,14 +346,17 @@ class RunsModel(QAbstractItemModel):
             parents[-1].appendChild(
                 TreeItem([os.path.basename(dir), dir], parents[-1]))
 
-
     " Run job status server"
     def runJobStatusServer(self):
         self.monitorThread = RunStatusServer()
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
-        address = settings.value("Monitor_interface", "0.0.0.0")
-        port = int(settings.value("Monitor_port", "49406"))
+        try:
+            address = settings.value("Monitor_interface", "0.0.0.0")
+            port = int(settings.value("Monitor_port", "49406"))
+        except :
+            address = "0.0.0.0"
+            port = 49406
         settings.endGroup()
 
         status = self.monitorThread.bind(address, port)
@@ -361,7 +372,6 @@ class RunsModel(QAbstractItemModel):
             if ret == QMessageBox.Cancel:
                 sys.exit(1)
         self.monitorThread.jobStatusChanged.connect(self.jobStatusChanged)
-
     """
         Register method as slot (receiver) of signal when job status signal
         is emitted.
@@ -384,8 +394,25 @@ class SolpsImpl(QMainWindow):
         self.checkBoxParameterScan.toggled.connect(
             self.plainTextEditScript.setEnabled)
 
+        self.comboBoxRunFilerType.addItem("Regular expression", QRegExp.RegExp)
+        self.comboBoxRunFilerType.addItem("Wildcard", QRegExp.Wildcard)
+        self.comboBoxRunFilerType.addItem("Fixed string", QRegExp.FixedString)
+
+        self.filterCaseSensitivityCheckBox.setChecked(True)
+
         self.model = RunsModel(self.style())
-        self.treeViewRuns.setModel(self.model)
+
+        self.proxyModel = MySortFilterProxyModel()
+        self.proxyModel.setDynamicSortFilter(False)
+        self.proxyModel.setSourceModel(self.model)
+        self.treeViewRuns.setModel(self.proxyModel)
+
+        self.treeViewRuns.setRootIsDecorated(True)
+        self.treeViewRuns.setAlternatingRowColors(True)
+        self.treeViewRuns.setSortingEnabled(True)
+        self.treeViewRuns.sortByColumn(1, Qt.AscendingOrder)
+
+        self.textFilterChanged()
 
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
@@ -407,6 +434,15 @@ class SolpsImpl(QMainWindow):
             self.statusbar.showMessage)
         self.statusbar.showMessage("Preparing Runs tree ...")
 
+    def textFilterChanged(self):
+        print("Hello")
+        syntax = QRegExp.PatternSyntax(self.comboBoxRunFilerType.itemData(self.comboBoxRunFilerType.currentIndex()))
+        caseSensitivity = (self.filterCaseSensitivityCheckBox.isChecked()
+            and Qt.CaseSensitive or Qt.CaseInsensitive)
+
+        regExp = QRegExp(self.lineEditRunFilter.text(), caseSensitivity, syntax)
+        print(regExp)
+        self.proxyModel.setFilterRegExp(regExp)
 
     def showdialog(self):
         dialog = RunSettings(self.model)
@@ -448,7 +484,7 @@ class SolpsImpl(QMainWindow):
 
     @pyqtSlot()
     def on_pushButtonRunFilter_clicked(self):
-        self.model.setNameFilters([self.lineEditRunFilter.text()])
+        self.textFilterChanged()
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):

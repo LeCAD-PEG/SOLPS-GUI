@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>530</width>
-    <height>303</height>
+    <height>344</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -373,23 +373,7 @@
          </widget>
         </item>
         <item row="2" column="1">
-         <widget class="QComboBox" name="comboBoxRunFilerType">
-          <item>
-           <property name="text">
-            <string>Wildcard</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Regular expression</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>FIxed string</string>
-           </property>
-          </item>
-         </widget>
+         <widget class="QComboBox" name="comboBoxRunFilerType"/>
         </item>
         <item row="2" column="2" colspan="3">
          <widget class="QLineEdit" name="lineEditRunFilter">
@@ -412,6 +396,13 @@
       </widget>
      </widget>
     </item>
+    <item row="1" column="0">
+     <widget class="QCheckBox" name="filterCaseSensitivityCheckBox">
+      <property name="text">
+       <string>Case sensitive filter</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -421,7 +412,7 @@
      <x>0</x>
      <y>0</y>
      <width>530</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
