@@ -23,11 +23,10 @@ class Column(IntEnum):
     date = 2
     status = 3
 
-class MySortFilterProxyModel(QSortFilterProxyModel):
+class RunsSortFilterProxyModel(QSortFilterProxyModel):
     def __init__(self, parent=None):
-        super(MySortFilterProxyModel, self).__init__(parent)
+        super(RunsSortFilterProxyModel, self).__init__(parent)
 
-    " Parent of accepted children needs to be accepted too for treeviews. "
     def has_accepted_children(self, source_index):
         item = source_index.internalPointer()
         items = item.childItems.copy()
@@ -41,10 +40,10 @@ class MySortFilterProxyModel(QSortFilterProxyModel):
 
     def filterAcceptsRow(self, sourceRow, sourceParent):
         index = self.sourceModel().index(sourceRow, Column.path, sourceParent)
-        if self.has_accepted_children(index):
-            return True
         data = self.sourceModel().data(index, Qt.DisplayRole)
-        return (self.filterRegExp().indexIn(data) >= 0)
+        if self.filterRegExp().indexIn(data) >= 0:
+            return True
+        return self.has_accepted_children(index)
 
 class RunSettings(QDialog):
     runDirsChanged = pyqtSignal()
@@ -137,8 +136,7 @@ class RunSettings(QDialog):
     def showdir5(self):
         self.update_dir(self.lineEdit_rundir5)
 
-
-class RunStatusServer(QThread):
+class RunsStatusServer(QThread):
     sock = None
     retrieve = True
     jobStatusChanged = pyqtSignal(str)
@@ -149,30 +147,91 @@ class RunStatusServer(QThread):
         # Bind socket to local host and port
         try:
             self.sock.bind((address, port))
-        except socket.error:  # , msg:
+        except socket.error:
             print('Bind to', address, ':', str(port), ' failed.')
             return False
         print('Server on', address, ':', port)
         return True
 
     def run(self):
-        print("RunStatusServer started")
+        print("RunsStatusServer started")
         while self.retrieve:
             data, addr = self.sock.recvfrom(1024)  # wait for data
-            print("Message", data.decode('utf-8'), "from", addr[0])
+            # print("Message", data.decode('utf-8'), "from", addr[0])
             self.jobStatusChanged.emit(data.decode('utf-8'))
 
-
-class RunFileSystemScan(QThread):
+class UpdateRunsStatuses(QThread):
+    status = pyqtSignal(str)
+    progress = pyqtSignal(str)
     completed = pyqtSignal()
-    scanStatus = pyqtSignal(str)
+    statusChanged = pyqtSignal(QModelIndex, QModelIndex)
 
     def __init__(self, runs_model, parent=None):
-        super(RunFileSystemScan, self).__init__(parent)
+        super(UpdateRunsStatuses, self).__init__(parent)
         self.model = runs_model
+        print("UpdateRunsStatuses model", self.model)
 
     def run(self):
-        self.scanStatus.emit(u"Filesystem scanning started...")
+        import time
+        self.status.emit("Updating runs statuses started...")
+        time.sleep(5)
+        i = 0
+        for path in self.model.column_index:
+            i = i + 1
+            (data, date, status) = self.model.column_index[path]
+            data[Column.status] = 'status #{0}'.format(i)
+            data[Column.date] = QDateTime().currentDateTime()
+            time.sleep(0.1)
+            self.statusChanged.emit(date, status)
+            self.progress.emit(path)
+        self.status.emit("Updating runs statuses finished.")
+        self.completed.emit()
+
+
+class FileSytemScan(QThread):
+    completed = pyqtSignal()
+    status = pyqtSignal(str)
+
+    def __init__(self, runs_model, parent=None):
+        super(FileSytemScan, self).__init__(parent)
+        self.model = runs_model
+
+    def setupModelData(self, rootdir, alias, parent):
+        if rootdir is '':
+            return
+        self.status.emit("Scanning {0}...".format(alias))
+        indentations = [len(rootdir.split('/'))]
+        parents = [parent]
+
+        for dir, subdirs, files in os.walk(rootdir):
+            if dir == rootdir:  # replace name with alias
+                date = QDateTime().fromTime_t(os.stat(dir).st_mtime)
+                data = [alias, dir, date, None]
+                parents[0].appendChild(TreeItem(data, parent))
+                continue
+
+            position = len(dir.split('/'))
+
+            if position > indentations[-1]:
+                # The last child of the current parent is now the new
+                # parent unless the current parent has no children.
+
+                if parents[-1].childCount() > 0:
+                    parents.append(
+                        parents[-1].child(parents[-1].childCount() - 1))
+                    indentations.append(position)
+
+            else:
+                while position < indentations[-1] and len(parents) > 0:
+                    parents.pop()
+                    indentations.pop()
+            # Append a new item to the current parent's list of children.
+            date = QDateTime().fromTime_t(os.stat(dir).st_mtime)
+            data = [os.path.basename(dir), dir, date, None]
+            parents[-1].appendChild(TreeItem(data, parents[-1]))
+
+    def run(self):
+        self.status.emit("Filesystem scanning started...")
         print("FileSystemScan started")
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
@@ -189,14 +248,14 @@ class RunFileSystemScan(QThread):
         settings.endGroup()
 
         self.model.rootItem = TreeItem(self.model.headerdata)
-        self.model.setupModelData(rundir1, alias1, self.model.rootItem)
-        self.model.setupModelData(rundir2, alias2, self.model.rootItem)
-        self.model.setupModelData(rundir3, alias3, self.model.rootItem)
-        self.model.setupModelData(rundir4, alias4, self.model.rootItem)
-        self.model.setupModelData(rundir5, alias5, self.model.rootItem)
+        self.setupModelData(rundir1, alias1, self.model.rootItem)
+        self.setupModelData(rundir2, alias2, self.model.rootItem)
+        self.setupModelData(rundir3, alias3, self.model.rootItem)
+        self.setupModelData(rundir4, alias4, self.model.rootItem)
+        self.setupModelData(rundir5, alias5, self.model.rootItem)
         self.model.create_indexes_for_columns()
         self.completed.emit()
-        self.scanStatus.emit(u'Ready')
+        self.status.emit("Filesystem scanning finished.")
 
 
 class TreeItem(object):
@@ -233,25 +292,30 @@ class TreeItem(object):
 
 
 class RunsModel(QAbstractItemModel):
-    monitorThread = None
+    statusServerThread = None
     scanFileSystemThread = None
+    column_index = dict()
 
     def __init__(self, style, parent=None):
         super(RunsModel, self).__init__(parent)
         self.style = style
-        self.runJobStatusServer()
+        self.startRunsStatusServer()
         self.headerdata = ["Name", "Path", "Date", "Status", "Comment",
                            "Device", "Shot number", "Run number"]
         self.columns = len(self.headerdata)
         self.rootItem = TreeItem(self.headerdata)
 
-        self.scanFileSystemThread = RunFileSystemScan(self)
-        self.scanFileSystemThread.completed.connect(self.tree_available)
-        self.scanFileSystemThread.start()
+        self.scanFileSystemThread = FileSytemScan(self)
+        self.scanFileSystemThread.completed.connect(self.modelReset.emit)
 
-    @pyqtSlot()
-    def tree_available(self):
-        self.modelReset.emit()
+        self.updateRunsStatusesThread = UpdateRunsStatuses(self)
+        self.updateRunsStatusesThread.statusChanged.connect(
+            self.dataChanged.emit)
+        self.scanFileSystemThread.completed.connect(
+            self.updateRunsStatusesThread.start)
+
+    def startThreads(self):
+        self.scanFileSystemThread.start()
 
     @pyqtSlot()
     def refresh_dirs(self):
@@ -352,41 +416,9 @@ class RunsModel(QAbstractItemModel):
 
         return parentItem.childCount()
 
-    def setupModelData(self, rootdir, alias, parent):
-        if rootdir is '': return
-        indentations = [len(rootdir.split('/'))]
-        parents = [parent]
-
-        for dir, subdirs, files in os.walk(rootdir):
-            if dir == rootdir:  # replace name with alias
-                date = QDateTime().fromTime_t(os.stat(dir).st_mtime)
-                data = [alias, dir, date, None]
-                parents[0].appendChild(TreeItem(data, parent))
-                continue
-
-            position = len(dir.split('/'))
-
-            if position > indentations[-1]:
-                # The last child of the current parent is now the new
-                # parent unless the current parent has no children.
-
-                if parents[-1].childCount() > 0:
-                    parents.append(
-                        parents[-1].child(parents[-1].childCount() - 1))
-                    indentations.append(position)
-
-            else:
-                while position < indentations[-1] and len(parents) > 0:
-                    parents.pop()
-                    indentations.pop()
-            # Append a new item to the current parent's list of children.
-            date = QDateTime().fromTime_t(os.stat(dir).st_mtime)
-            data = [os.path.basename(dir), dir, date, None]
-            parents[-1].appendChild(TreeItem(data, parents[-1]))
-
     " Run job status server"
-    def runJobStatusServer(self):
-        self.monitorThread = RunStatusServer()
+    def startRunsStatusServer(self):
+        self.statusServerThread = RunsStatusServer()
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
         try:
@@ -397,9 +429,9 @@ class RunsModel(QAbstractItemModel):
             port = 49406
         settings.endGroup()
 
-        status = self.monitorThread.bind(address, port)
+        status = self.statusServerThread.bind(address, port)
         if status :
-            self.monitorThread.start()
+            self.statusServerThread.start()
         else:
             msg = "Failed to bind interface {0} to port {1}. " \
                   "Job monitoring will not start unless you " \
@@ -409,24 +441,28 @@ class RunsModel(QAbstractItemModel):
                                       QMessageBox.Cancel | QMessageBox.Ok)
             if ret == QMessageBox.Cancel:
                 sys.exit(1)
-        self.monitorThread.jobStatusChanged.connect(self.jobStatusChanged)
-    """
-        Register method as slot (receiver) of signal when job status signal
-        is emitted.
-        Method calls method to retrieve job status and other data from server.
-    """
+        self.statusServerThread.jobStatusChanged.connect(self.jobStatusChanged)
+
     @pyqtSlot(str)
     def jobStatusChanged(self, message):
-        # get new data about job ID from server: new status, last change date,
-        # etc.
-        self.print_tree()
-        print("Status of job changed: ", message)
-        # print(newData)
+        print("Received job status update: ", message)
+        try:
+            name, path, status = message.split()
+            try:
+                (itemData, date_index, status_index) = self.column_index[path]
+                itemData[Column.status] = status
+                itemData[Column.date] = QDateTime().currentDateTime()
+                self.dataChanged.emit(date_index, status_index)
+            except KeyError:  # TODO insert non monitored message anyway
+                print(path, "not monitored. Skipping status update.")
+        except ValueError:
+            print("Received invalid message:", message,
+                  "Message should be in <name> <path> <status> format.")
 
 
-class SolpsImpl(QMainWindow):
+class SOLPS_MainWindow(QMainWindow):
     def __init__(self, *args):
-        super(SolpsImpl, self).__init__(*args)
+        super(SOLPS_MainWindow, self).__init__(*args)
         loadUi('solps-gui.ui', self)
         self.actionAbout_Qt.triggered.connect(QApplication.instance().aboutQt)
         self.checkBoxParameterScan.toggled.connect(
@@ -439,12 +475,22 @@ class SolpsImpl(QMainWindow):
         self.filterCaseSensitivityCheckBox.setChecked(True)
 
         self.model = RunsModel(self.style())
+        self.model.scanFileSystemThread.status.connect(
+            self.statusbar.showMessage)
+        self.model.updateRunsStatusesThread.status.connect(
+            self.statusbar.showMessage)
+        self.model.startThreads()
 
-        self.proxyModel = MySortFilterProxyModel()
-        self.proxyModel.setDynamicSortFilter(True)
-        self.proxyModel.setFilterKeyColumn(Column.path)
-        self.proxyModel.setSourceModel(self.model)
-        self.treeViewRuns.setModel(self.proxyModel)
+        self.model.updateRunsStatusesThread.completed.connect(
+            self.treeViewRuns.update)
+        if True:  # use Filter if True
+            self.proxyModel = RunsSortFilterProxyModel()
+            self.proxyModel.setDynamicSortFilter(True)
+            self.proxyModel.setFilterKeyColumn(Column.path)
+            self.proxyModel.setSourceModel(self.model)
+            self.treeViewRuns.setModel(self.proxyModel)
+        else:
+            self.treeViewRuns.setModel(self.model)
 
         self.treeViewRuns.setRootIsDecorated(True)
         self.treeViewRuns.setAlternatingRowColors(True)
@@ -471,18 +517,14 @@ class SolpsImpl(QMainWindow):
 
 
         self.actionJob_list.triggered.connect(self.showdialog)
-        self.model.scanFileSystemThread.scanStatus.connect(
-            self.statusbar.showMessage)
-        self.statusbar.showMessage("Preparing Runs tree ...")
 
     def textFilterChanged(self):
-        print("Hello")
-        syntax = QRegExp.PatternSyntax(self.comboBoxRunFilerType.itemData(self.comboBoxRunFilerType.currentIndex()))
+        filter_index = self.comboBoxRunFilerType.currentIndex()
+        filter_syntax = self.comboBoxRunFilerType.itemData(filter_index)
+        syntax = QRegExp.PatternSyntax(filter_syntax)
         caseSensitivity = (self.filterCaseSensitivityCheckBox.isChecked()
             and Qt.CaseSensitive or Qt.CaseInsensitive)
-
         regExp = QRegExp(self.lineEditRunFilter.text(), caseSensitivity, syntax)
-        print(regExp)
         self.proxyModel.setFilterRegExp(regExp)
 
     def showdialog(self):
@@ -538,7 +580,6 @@ class SolpsImpl(QMainWindow):
         data[Column.date] = QDateTime().currentDateTime()
         self.model.dataChanged.emit(date, status)
 
-
     @pyqtSlot()
     def on_actionAbout_triggered(self):
         msg = "GUI will enable users to monitor multiple simultaneously " \
@@ -552,6 +593,6 @@ class SolpsImpl(QMainWindow):
 "  Main method "
 app = QApplication(sys.argv)
 # app.setStyle("motif")
-widget = SolpsImpl()
+widget = SOLPS_MainWindow()
 widget.show()
 sys.exit(app.exec_())
