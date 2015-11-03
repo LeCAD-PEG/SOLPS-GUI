@@ -48,12 +48,10 @@ class RunsSortFilterProxyModel(QSortFilterProxyModel):
 class RunSettings(QDialog):
     runDirsChanged = pyqtSignal()
 
-    def __init__(self, runs_model):
+    def __init__(self, parent=None):
         super(RunSettings, self).__init__()
         loadUi('runs.ui', self)
         self.setWindowTitle("Monitored runs folder")
-        self.runDirsChanged.connect(runs_model.refresh_dirs)
-
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
@@ -163,7 +161,6 @@ class RunsStatusServer(QThread):
 class UpdateRunsStatuses(QThread):
     status = pyqtSignal(str)
     progress = pyqtSignal(str)
-    completed = pyqtSignal()
     statusChanged = pyqtSignal(QModelIndex, QModelIndex)
 
     def __init__(self, runs_model, parent=None):
@@ -172,24 +169,24 @@ class UpdateRunsStatuses(QThread):
         print("UpdateRunsStatuses model", self.model)
 
     def run(self):
-        import time
-        self.status.emit("Updating runs statuses started...")
-        time.sleep(5)
+        self.status.emit("Updating runs statuses...")
+        #self.sleep(1)
         i = 0
         for path in self.model.column_index:
             i = i + 1
+            if self.isInterruptionRequested():
+                print("Status update interrupted!")
+                break
             (data, date, status) = self.model.column_index[path]
             data[Column.status] = 'status #{0}'.format(i)
             data[Column.date] = QDateTime().currentDateTime()
-            time.sleep(0.1)
+            #self.msleep(100)
             self.statusChanged.emit(date, status)
             self.progress.emit(path)
         self.status.emit("Updating runs statuses finished.")
-        self.completed.emit()
 
 
 class FileSytemScan(QThread):
-    completed = pyqtSignal()
     status = pyqtSignal(str)
 
     def __init__(self, runs_model, parent=None):
@@ -254,7 +251,6 @@ class FileSytemScan(QThread):
         self.setupModelData(rundir4, alias4, self.model.rootItem)
         self.setupModelData(rundir5, alias5, self.model.rootItem)
         self.model.create_indexes_for_columns()
-        self.completed.emit()
         self.status.emit("Filesystem scanning finished.")
 
 
@@ -306,19 +302,17 @@ class RunsModel(QAbstractItemModel):
         self.rootItem = TreeItem(self.headerdata)
 
         self.scanFileSystemThread = FileSytemScan(self)
-        self.scanFileSystemThread.completed.connect(self.modelReset.emit)
+        self.scanFileSystemThread.finished.connect(self.modelReset.emit)
 
         self.updateRunsStatusesThread = UpdateRunsStatuses(self)
         self.updateRunsStatusesThread.statusChanged.connect(
             self.dataChanged.emit)
-        self.scanFileSystemThread.completed.connect(
+        self.scanFileSystemThread.finished.connect(
             self.updateRunsStatusesThread.start)
+        self.updateRunsStatusesThread.finished.connect(self.endResetModel)
 
     def startThreads(self):
-        self.scanFileSystemThread.start()
-
-    @pyqtSlot()
-    def refresh_dirs(self):
+        self.beginResetModel()
         self.scanFileSystemThread.start()
 
     def columnCount(self, parent):
@@ -385,7 +379,7 @@ class RunsModel(QAbstractItemModel):
         childItem = index.internalPointer()
         parentItem = childItem.parent()
 
-        if parentItem == self.rootItem:
+        if parentItem == self.rootItem or parentItem is None:
             return QModelIndex()
 
         return self.createIndex(parentItem.row(), 0, parentItem)
@@ -481,7 +475,7 @@ class SOLPS_MainWindow(QMainWindow):
             self.statusbar.showMessage)
         self.model.startThreads()
 
-        self.model.updateRunsStatusesThread.completed.connect(
+        self.model.updateRunsStatusesThread.finished.connect(
             self.treeViewRuns.update)
         if True:  # use Filter if True
             self.proxyModel = RunsSortFilterProxyModel()
@@ -528,9 +522,19 @@ class SOLPS_MainWindow(QMainWindow):
         self.proxyModel.setFilterRegExp(regExp)
 
     def showdialog(self):
-        dialog = RunSettings(self.model)
-        dialog.show()
-        dialog.exec_()
+        dialog = RunSettings()
+        response = dialog.exec_()
+        if response:
+            if self.model.updateRunsStatusesThread.isRunning() or \
+                    self.model.scanFileSystemThread.isRunning():
+                msg = "Runs layout changed in the middle of the update." \
+                    "Directories cannot be changed. Try settings later."
+                QMessageBox.critical(self, "Restart required", msg)
+            else:
+                self.model.startThreads()
+            #self.model.updateRunsStatusesThread.quit()
+            #self.model.scanFileSystemThread.start()
+
 
     def closeEvent(self, event):
         # save settings
