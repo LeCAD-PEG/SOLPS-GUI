@@ -23,11 +23,10 @@ class Column(IntEnum):
     date = 2
     status = 3
 
-class MySortFilterProxyModel(QSortFilterProxyModel):
+class RunsSortFilterProxyModel(QSortFilterProxyModel):
     def __init__(self, parent=None):
-        super(MySortFilterProxyModel, self).__init__(parent)
+        super(RunsSortFilterProxyModel, self).__init__(parent)
 
-    " Parent of accepted children needs to be accepted too for treeviews. "
     def has_accepted_children(self, source_index):
         item = source_index.internalPointer()
         items = item.childItems.copy()
@@ -41,10 +40,12 @@ class MySortFilterProxyModel(QSortFilterProxyModel):
 
     def filterAcceptsRow(self, sourceRow, sourceParent):
         index = self.sourceModel().index(sourceRow, Column.path, sourceParent)
-        if self.has_accepted_children(index):
-            return True
         data = self.sourceModel().data(index, Qt.DisplayRole)
-        return (self.filterRegExp().indexIn(data) >= 0)
+        if self.filterRegExp().indexIn(data) >= 0:
+            return True
+        return self.has_accepted_children(index)
+
+
 
 class RunSettings(QDialog):
     runDirsChanged = pyqtSignal()
@@ -235,6 +236,7 @@ class TreeItem(object):
 class RunsModel(QAbstractItemModel):
     monitorThread = None
     scanFileSystemThread = None
+    column_index = dict()
 
     def __init__(self, style, parent=None):
         super(RunsModel, self).__init__(parent)
@@ -251,7 +253,7 @@ class RunsModel(QAbstractItemModel):
 
     @pyqtSlot()
     def tree_available(self):
-        self.modelReset.emit()
+        self.modelReset.emit()  # TODO connect signal directly
 
     @pyqtSlot()
     def refresh_dirs(self):
@@ -417,16 +419,24 @@ class RunsModel(QAbstractItemModel):
     """
     @pyqtSlot(str)
     def jobStatusChanged(self, message):
-        # get new data about job ID from server: new status, last change date,
-        # etc.
-        self.print_tree()
-        print("Status of job changed: ", message)
-        # print(newData)
+        print("Received job status update: ", message)
+        try:
+            name, path, status = message.split()
+            try:
+                (itemData, date_index, status_index) = self.column_index[path]
+                itemData[Column.status] = status
+                itemData[Column.date] = QDateTime().currentDateTime()
+                self.dataChanged.emit(date_index, status_index)
+            except KeyError:
+                print(path, "not monitored. Skipping status update.")
+        except ValueError:
+            print("Received invalid message:", message,
+                  "Message should be in <name> <path> <status> format.")
 
 
-class SolpsImpl(QMainWindow):
+class SOLPS_MainWindow(QMainWindow):
     def __init__(self, *args):
-        super(SolpsImpl, self).__init__(*args)
+        super(SOLPS_MainWindow, self).__init__(*args)
         loadUi('solps-gui.ui', self)
         self.actionAbout_Qt.triggered.connect(QApplication.instance().aboutQt)
         self.checkBoxParameterScan.toggled.connect(
@@ -440,7 +450,7 @@ class SolpsImpl(QMainWindow):
 
         self.model = RunsModel(self.style())
 
-        self.proxyModel = MySortFilterProxyModel()
+        self.proxyModel = RunsSortFilterProxyModel()
         self.proxyModel.setDynamicSortFilter(True)
         self.proxyModel.setFilterKeyColumn(Column.path)
         self.proxyModel.setSourceModel(self.model)
@@ -476,13 +486,12 @@ class SolpsImpl(QMainWindow):
         self.statusbar.showMessage("Preparing Runs tree ...")
 
     def textFilterChanged(self):
-        print("Hello")
-        syntax = QRegExp.PatternSyntax(self.comboBoxRunFilerType.itemData(self.comboBoxRunFilerType.currentIndex()))
+        filter_index = self.comboBoxRunFilerType.currentIndex()
+        filter_syntax = self.comboBoxRunFilerType.itemData(filter_index)
+        syntax = QRegExp.PatternSyntax(filter_syntax)
         caseSensitivity = (self.filterCaseSensitivityCheckBox.isChecked()
             and Qt.CaseSensitive or Qt.CaseInsensitive)
-
         regExp = QRegExp(self.lineEditRunFilter.text(), caseSensitivity, syntax)
-        print(regExp)
         self.proxyModel.setFilterRegExp(regExp)
 
     def showdialog(self):
@@ -552,6 +561,6 @@ class SolpsImpl(QMainWindow):
 "  Main method "
 app = QApplication(sys.argv)
 # app.setStyle("motif")
-widget = SolpsImpl()
+widget = SOLPS_MainWindow()
 widget.show()
 sys.exit(app.exec_())
