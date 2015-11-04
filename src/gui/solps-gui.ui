@@ -33,7 +33,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -352,7 +352,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QPushButton" name="pushButton_9">
+         <widget class="QPushButton" name="pushButton_archive">
           <property name="text">
            <string>Archive</string>
           </property>
@@ -373,7 +373,7 @@
          </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QComboBox" name="comboBoxRunFilerType"/>
+         <widget class="QComboBox" name="comboBoxRunFilterType"/>
         </item>
         <item row="2" column="4">
          <widget class="QPushButton" name="pushButtonRunFilter">
@@ -400,6 +400,11 @@
        <attribute name="title">
         <string>Ar&amp;chive</string>
        </attribute>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
+         <widget class="QTreeView" name="treeViewArchive"/>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
