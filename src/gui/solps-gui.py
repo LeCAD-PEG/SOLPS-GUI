@@ -250,7 +250,7 @@ class FileSytemScan(QThread):
         self.setupModelData(rundir3, alias3, self.model.rootItem)
         self.setupModelData(rundir4, alias4, self.model.rootItem)
         self.setupModelData(rundir5, alias5, self.model.rootItem)
-        self.model.create_indexes_for_columns()
+        self.model.create_indices_for_columns()
         self.status.emit("Filesystem scanning finished.")
 
 
@@ -384,7 +384,7 @@ class RunsModel(QAbstractItemModel):
 
         return self.createIndex(parentItem.row(), 0, parentItem)
 
-    def create_indexes_for_columns(self):
+    def create_indices_for_columns(self):
         "Create hashed dictionary for updating columns specified by path"
         self.column_index = dict()  # path : (itemData, status, date)
         child_items = [self.rootItem.childItems]
