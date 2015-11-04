@@ -7,11 +7,11 @@ import sys
 
 from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
                           pyqtSignal, QThread, QAbstractItemModel, QVariant,
-                          QSortFilterProxyModel, QRegExp)
+                          QSortFilterProxyModel, QRegExp, QItemSelectionModel)
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QFileDialog, QStyle)
-
+from PyQt5.QtGui import QStandardItemModel
 from PyQt5.uic import loadUi
 from os.path import expanduser
 from enum import IntEnum
@@ -26,6 +26,8 @@ class Column(IntEnum):
 class MySortFilterProxyModel(QSortFilterProxyModel):
     def __init__(self, parent=None):
         super(MySortFilterProxyModel, self).__init__(parent)
+
+
 
     " Parent of accepted children needs to be accepted too for treeviews. "
     def has_accepted_children(self, source_index):
@@ -205,6 +207,15 @@ class TreeItem(object):
         self.itemData = data
         self.childItems = []
 
+    def removeChildren(self, position, count):
+        if position < 0 or position + count > len(self.childItems):
+            return False
+
+        for row in range(count):
+            self.childItems.pop(position)
+
+        return True
+
     def appendChild(self, item):
         self.childItems.append(item)
 
@@ -262,6 +273,78 @@ class RunsModel(QAbstractItemModel):
             return parent.internalPointer().columnCount()
         else:
             return self.rootItem.columnCount()
+
+    def getItem(self, index):
+        if index.isValid():
+            item = index.internalPointer()
+            if item:
+                return item
+
+        return self.rootItem
+
+    def insertColumns(self, position, columns, parent=QModelIndex()):
+        self.beginInsertColumns(parent, position, position + columns - 1)
+        success = self.rootItem.insertColumns(position, columns)
+        self.endInsertColumns()
+
+        return success
+
+    def insertRows(self, position, rows, parent=QModelIndex()):
+        parentItem = self.getItem(parent)
+        self.beginInsertRows(parent, position, position + rows - 1)
+        success = parentItem.insertChildren(position, rows,
+                self.rootItem.columnCount())
+        self.endInsertRows()
+
+        return success
+
+    def parent(self, index):
+        if not index.isValid():
+            return QModelIndex()
+
+        childItem = self.getItem(index)
+        parentItem = childItem.parent()
+
+        if parentItem == self.rootItem:
+            return QModelIndex()
+
+        return self.createIndex(parentItem.childNumber(), 0, parentItem)
+
+    def removeColumns(self, position, columns, parent=QModelIndex()):
+        self.beginRemoveColumns(parent, position, position + columns - 1)
+        success = self.rootItem.removeColumns(position, columns)
+        self.endRemoveColumns()
+
+        if self.rootItem.columnCount() == 0:
+            self.removeRows(0, self.rowCount())
+
+        return success
+
+    def removeRows(self, position, rows, parent=QModelIndex()):
+        parentItem = self.getItem(parent)
+
+        self.beginRemoveRows(parent, position, position + rows - 1)
+        success = parentItem.removeChildren(position, rows)
+        self.endRemoveRows()
+
+        return success
+
+    def rowCount(self, parent=QModelIndex()):
+        parentItem = self.getItem(parent)
+
+        return parentItem.childCount()
+
+    def setData(self, index, value, role=Qt.EditRole):
+        if role != Qt.EditRole:
+            return False
+
+        item = self.getItem(index)
+        result = item.setData(index.column(), value)
+
+        if result:
+            self.dataChanged.emit(index, index)
+
+        return result
 
     # return self.columns
     def data(self, index, role):
@@ -423,7 +506,6 @@ class RunsModel(QAbstractItemModel):
         print("Status of job changed: ", message)
         # print(newData)
 
-
 class SolpsImpl(QMainWindow):
     def __init__(self, *args):
         super(SolpsImpl, self).__init__(*args)
@@ -432,14 +514,16 @@ class SolpsImpl(QMainWindow):
         self.checkBoxParameterScan.toggled.connect(
             self.plainTextEditScript.setEnabled)
 
-        self.comboBoxRunFilerType.addItem("Regular expression", QRegExp.RegExp)
-        self.comboBoxRunFilerType.addItem("Wildcard", QRegExp.Wildcard)
-        self.comboBoxRunFilerType.addItem("Fixed string", QRegExp.FixedString)
+        self.comboBoxRunFilterType.addItem("Regular expression", QRegExp.RegExp)
+        self.comboBoxRunFilterType.addItem("Wildcard", QRegExp.Wildcard)
+        self.comboBoxRunFilterType.addItem("Fixed string", QRegExp.FixedString)
 
         self.filterCaseSensitivityCheckBox.setChecked(True)
 
         self.model = RunsModel(self.style())
 
+
+        # Tree view for runs directories
         self.proxyModel = MySortFilterProxyModel()
         self.proxyModel.setDynamicSortFilter(True)
         self.proxyModel.setFilterKeyColumn(Column.path)
@@ -449,9 +533,18 @@ class SolpsImpl(QMainWindow):
         self.treeViewRuns.setRootIsDecorated(True)
         self.treeViewRuns.setAlternatingRowColors(True)
         self.treeViewRuns.setSortingEnabled(True)
-        #self.treeViewRuns.sortByColumn(Column.date, Qt.AscendingOrder)
+
+        self.treeViewRuns.selectionModel().selectionChanged.connect(self.updateActions)
 
         self.lineEditRunFilter.returnPressed.connect(self.textFilterChanged)
+
+        # Tree view for archived run directories
+
+        self.treeViewArchive.setModel(self.proxyModel)
+
+        self.treeViewArchive.setRootIsDecorated(True)
+        self.treeViewArchive.setAlternatingRowColors(True)
+        self.treeViewArchive.setSortingEnabled(True)
 
 
         # get GUI settings
@@ -469,15 +562,131 @@ class SolpsImpl(QMainWindow):
         if treeview: self.treeViewRuns.header().restoreState(treeview)
         settings.endGroup()
 
+        settings.beginGroup("Run tree rowa")
+        settings.beginWriteArray("rows")
+        for i in range(len(self.columns)):
+            settings.setArrayIndex(i)
+
+
+        #self.pushButton_archive.clicked.connect(self.insertRow)
+        #self.pushButton_archive.clicked.connect(self.insertColumn)
+        self.pushButton_archive.clicked.connect(self.removeRow)
+        #self.pushButton_archive.clicked.connect(self.removeColumn)
+        #self.pushButton_archive.clicked.connect(self.insertChild)
 
         self.actionJob_list.triggered.connect(self.showdialog)
         self.model.scanFileSystemThread.scanStatus.connect(
             self.statusbar.showMessage)
         self.statusbar.showMessage("Preparing Runs tree ...")
 
+        self.index_list = []
+        self.model_list = []
+
+
+
+    def insertChild(self):
+            index = self.treeViewRuns.selectionModel().currentIndex()
+            model = self.treeViewRuns.model()
+
+            if model.columnCount(index) == 0:
+                if not model.insertColumn(0, index):
+                    return
+
+            if not model.insertRow(0, index):
+                return
+
+            for column in range(model.columnCount(index)):
+                child = model.index(0, column, index)
+                model.setData(child, "[No data]", Qt.EditRole)
+                if model.headerData(column, Qt.Horizontal) is None:
+                    model.setHeaderData(column, Qt.Horizontal, "[No header]",
+                            Qt.EditRole)
+
+            self.treeViewArchive.selectionModel().setCurrentIndex(model.index(0, 0, index),
+                    QItemSelectionModel.ClearAndSelect)
+            self.updateActions()
+
+    def insertColumn(self):
+        model = self.treeViewArchive.model()
+        column = self.treeViewArchive.selectionModel().currentIndex().column()
+
+        changed = model.insertColumn(column + 1)
+        if changed:
+            model.setHeaderData(column + 1, Qt.Horizontal, "[No header]",
+                    Qt.EditRole)
+
+        self.updateActions()
+
+        return changed
+
+    def insertRow(self):
+        index = self.treeViewArchive.selectionModel().currentIndex()
+        model = self.treeViewArchive.model()
+
+        if not model.insertRow(index.row()+1, index.parent()):
+            return
+
+        self.updateActions()
+
+        for column in range(model.columnCount(index.parent())):
+            child = model.index(index.row()+1, column, index.parent())
+            model.setData(child, "[No data]", Qt.EditRole)
+
+    def removeColumn(self):
+        model = self.treeViewRuns.model()
+        column = self.treeViewRuns.selectionModel().currentIndex().column()
+
+        changed = model.removeColumn(column)
+        if changed:
+            self.updateActions()
+
+        return changed
+
+    @pyqtSlot()
+    def removeRow(self):
+        index = self.treeViewRuns.selectionModel().currentIndex()
+        model = self.treeViewRuns.model()
+
+        if (model.removeRow(index.row(), index.parent())):
+            self.updateActions()
+
+        self.index_list.append(index)
+        self.model_list.append(model)
+        print(self.index_list)
+        print(self.model_list)
+
+
+    def updateActions(self):
+        hasSelection = not self.treeViewRuns.selectionModel().selection().isEmpty()
+        self.pushButton_archive.setEnabled(hasSelection)
+        #self.pushButton_archive.setEnabled(hasSelection)
+
+        hasCurrent = self.treeViewRuns.selectionModel().currentIndex().isValid()
+        self.pushButton_archive.setEnabled(hasCurrent)
+        #self.pushButton_archive.setEnabled(hasCurrent)
+
+        """
+        if hasCurrent:
+            self.treeViewArchive.closePersistentEditor(self.treeViewRuns.selectionModel().currentIndex())
+
+            row = self.treeViewRuns.selectionModel().currentIndex().row()
+            column = self.treeViewRuns.selectionModel().currentIndex().column()
+            if self.treeViewRuns.selectionModel().currentIndex().parent().isValid():
+                self.statusBar().showMessage("Position: (%d,%d)" % (row, column))
+            else:
+                self.statusBar().showMessage("Position: (%d,%d) in top level" % (row, column))
+        """
+    def create_model(self):
+        model = QStandardItemModel()
+        self.headerdata = ["Name", "Path", "Date", "Status", "Comment",
+                           "Device", "Shot number", "Run number"]
+        self.columns = len(self.headerdata)
+        self.rootItem = TreeItem(self.headerdata)
+        return model
+
     def textFilterChanged(self):
         print("Hello")
-        syntax = QRegExp.PatternSyntax(self.comboBoxRunFilerType.itemData(self.comboBoxRunFilerType.currentIndex()))
+        syntax = QRegExp.PatternSyntax(self.comboBoxRunFilterType.itemData(self.comboBoxRunFilterType.currentIndex()))
         caseSensitivity = (self.filterCaseSensitivityCheckBox.isChecked()
             and Qt.CaseSensitive or Qt.CaseInsensitive)
 
