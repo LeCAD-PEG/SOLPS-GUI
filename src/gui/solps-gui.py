@@ -7,7 +7,7 @@ import sys
 
 from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
                           pyqtSignal, QThread, QAbstractItemModel, QVariant,
-                          QSortFilterProxyModel, QRegExp, QItemSelectionModel)
+                          QSortFilterProxyModel, QRegExp)
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QFileDialog, QStyle)
@@ -45,6 +45,29 @@ class RunsSortFilterProxyModel(QSortFilterProxyModel):
         if self.filterRegExp().indexIn(data) >= 0:
             return True
         return self.has_accepted_children(index)
+
+class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        super(ArchiveSortFilterProxyModel, self).__init__(parent)
+
+    def has_accepted_children(self, source_index):
+        item = source_index.internalPointer()
+        items = item.childItems.copy()
+        while items:
+            child = items.pop()
+            items.extend(child.childItems)
+            path = child.data(Column.path)
+            if path == "/Users/marijotelenta/Documents/solps-gui/staging":
+                return True
+        return False
+
+    def filterAcceptsRow(self, sourceRow, sourceParent):
+        index = self.sourceModel().index(sourceRow, Column.path, sourceParent)
+        path = self.sourceModel().data(index, Qt.DisplayRole)
+        if path == "/Users/marijotelenta/Documents/solps-gui/staging":
+            return True
+        return self.has_accepted_children(index)
+
 
 class RunSettings(QDialog):
     runDirsChanged = pyqtSignal()
@@ -296,6 +319,24 @@ class TreeItem(object):
             return self.parentItem.childItems.index(self)
         return 0
 
+    def insertChildren(self, position, count, columns):
+        if position < 0 or position > len(self.childItems):
+            return False
+
+        for row in range(count):
+            data = [None for v in range(columns)]
+            item = TreeItem(data, self)
+            self.childItems.insert(position, item)
+
+        return True
+
+    def setData(self, column, value):
+        if column < 0 or column >= len(self.itemData):
+            return False
+
+        self.itemData[column] = value
+
+        return True
 
 class RunsModel(QAbstractItemModel):
     statusServerThread = None
@@ -573,18 +614,20 @@ class SOLPS_MainWindow(QMainWindow):
         self.treeViewRuns.setAlternatingRowColors(True)
         self.treeViewRuns.setSortingEnabled(True)
 
-        self.treeViewRuns.selectionModel().selectionChanged.connect(self.updateActions)
+        self.treeViewRuns.selectionModel().selectionChanged.connect(
+            self.updateActions)
 
         self.lineEditRunFilter.returnPressed.connect(self.textFilterChanged)
 
         # Tree view for archived run directories
 
-        self.treeViewArchive.setModel(self.proxyModel)
-
-        self.treeViewArchive.setRootIsDecorated(True)
+        self.archiveProxyModel = ArchiveSortFilterProxyModel()
+        self.archiveProxyModel.setDynamicSortFilter(True)
+        self.archiveProxyModel.setFilterKeyColumn(Column.path)
+        self.archiveProxyModel.setSourceModel(self.model)
+        self.treeViewArchive.setModel(self.archiveProxyModel)
         self.treeViewArchive.setAlternatingRowColors(True)
         self.treeViewArchive.setSortingEnabled(True)
-
 
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
@@ -601,97 +644,43 @@ class SOLPS_MainWindow(QMainWindow):
         if treeview: self.treeViewRuns.header().restoreState(treeview)
         settings.endGroup()
 
+        settings.beginGroup("TreeViewArchive")
+        treeview_archive = settings.value("ColumnWidth")
+        if treeview_archive: self.treeViewArchive.header().restoreState(
+            treeview_archive)
+        settings.endGroup()
+
+
         """
-        settings.beginGroup("Run tree rowa")
+        settings.beginGroup("Run tree row")
         settings.beginWriteArray("rows")
         for i in range(len(self.columns)):
             settings.setArrayIndex(i)
         """
 
-        #self.pushButton_archive.clicked.connect(self.insertRow)
-        #self.pushButton_archive.clicked.connect(self.insertColumn)
         self.pushButton_archive.clicked.connect(self.removeRow)
-        #self.pushButton_archive.clicked.connect(self.removeColumn)
-        #self.pushButton_archive.clicked.connect(self.insertChild)
 
         self.actionJob_list.triggered.connect(self.showdialog)
-
-        self.index_list = []
-        self.model_list = []
-
-
-
-    def insertChild(self):
-            index = self.treeViewRuns.selectionModel().currentIndex()
-            model = self.treeViewRuns.model()
-
-            if model.columnCount(index) == 0:
-                if not model.insertColumn(0, index):
-                    return
-
-            if not model.insertRow(0, index):
-                return
-
-            for column in range(model.columnCount(index)):
-                child = model.index(0, column, index)
-                model.setData(child, "[No data]", Qt.EditRole)
-                if model.headerData(column, Qt.Horizontal) is None:
-                    model.setHeaderData(column, Qt.Horizontal, "[No header]",
-                            Qt.EditRole)
-
-            self.treeViewArchive.selectionModel().setCurrentIndex(model.index(0, 0, index),
-                    QItemSelectionModel.ClearAndSelect)
-            self.updateActions()
-
-    def insertColumn(self):
-        model = self.treeViewArchive.model()
-        column = self.treeViewArchive.selectionModel().currentIndex().column()
-
-        changed = model.insertColumn(column + 1)
-        if changed:
-            model.setHeaderData(column + 1, Qt.Horizontal, "[No header]",
-                    Qt.EditRole)
-
-        self.updateActions()
-
-        return changed
-
-    def insertRow(self):
-        index = self.treeViewArchive.selectionModel().currentIndex()
-        model = self.treeViewArchive.model()
-
-        if not model.insertRow(index.row()+1, index.parent()):
-            return
-
-        self.updateActions()
-
-        for column in range(model.columnCount(index.parent())):
-            child = model.index(index.row()+1, column, index.parent())
-            model.setData(child, "[No data]", Qt.EditRole)
-
-    def removeColumn(self):
-        model = self.treeViewRuns.model()
-        column = self.treeViewRuns.selectionModel().currentIndex().column()
-
-        changed = model.removeColumn(column)
-        if changed:
-            self.updateActions()
-
-        return changed
 
     @pyqtSlot()
     def removeRow(self):
         index = self.treeViewRuns.selectionModel().currentIndex()
+        row = self.treeViewRuns.selectionModel().currentIndex().row()
+        column = self.treeViewRuns.selectionModel().currentIndex().column()
         model = self.treeViewRuns.model()
+        index_remove = model.index(row, Column.path, index.parent())
+        """
+        item = index.internalPointer()
+        items = item.childItems.copy()
+        data = items.data(row,1).text()
+        """
+        path = model.data(index_remove, Qt.DisplayRole)
 
         if (model.removeRow(index.row(), index.parent())):
             self.updateActions()
 
-        self.index_list.append(index)
-        self.model_list.append(model)
-        print(self.index_list)
-        print(self.model_list)
-
+        #print(index)
+        print(path)
 
     def updateActions(self):
         hasSelection = not self.treeViewRuns.selectionModel().selection().isEmpty()
@@ -702,10 +691,9 @@ class SOLPS_MainWindow(QMainWindow):
         self.pushButton_archive.setEnabled(hasCurrent)
         #self.pushButton_archive.setEnabled(hasCurrent)
 
-        """
         if hasCurrent:
             self.treeViewArchive.closePersistentEditor(self.treeViewRuns.selectionModel().currentIndex())
-
+        """
             row = self.treeViewRuns.selectionModel().currentIndex().row()
             column = self.treeViewRuns.selectionModel().currentIndex().column()
             if self.treeViewRuns.selectionModel().currentIndex().parent().isValid():
@@ -746,7 +734,7 @@ class SOLPS_MainWindow(QMainWindow):
 
 
     def closeEvent(self, event):
-        # save settings
+        # save GUI settings
         settings = QSettings("ITER", "solps-gui")
 
         settings.beginGroup("MainWindow")
@@ -757,6 +745,11 @@ class SOLPS_MainWindow(QMainWindow):
         settings.beginGroup("TreeViewRuns")
         settings.setValue("ColumnWidth", self.treeViewRuns.header().saveState())
         settings.endGroup()
+
+        settings.beginGroup("TreeViewArchive")
+        settings.setValue("ColumnWidth", self.treeViewArchive.header().saveState())
+        settings.endGroup()
+
 
         QMainWindow.closeEvent(self, event)
 
