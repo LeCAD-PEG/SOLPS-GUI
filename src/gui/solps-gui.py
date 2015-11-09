@@ -24,8 +24,31 @@ class Column(IntEnum):
     status = 3
 
 class RunsSortFilterProxyModel(QSortFilterProxyModel):
+    list_path = None
     def __init__(self, parent=None):
         super(RunsSortFilterProxyModel, self).__init__(parent)
+        self.list_path = list()
+        settings = QSettings("ITER", "solps-gui")
+        settings.beginGroup("Archive")
+        size = settings.beginReadArray("dirs")
+        for i in range(size):
+            settings.setArrayIndex(i)
+            dir = settings.value("dir")
+            self.list_path.append(dir)
+        settings.endArray()
+        settings.endGroup()
+
+    def append_to_archive(self, path):
+        self.list_path.append(path)
+        settings = QSettings("ITER", "solps-gui")
+        settings.beginGroup("Archive")
+        settings.beginWriteArray("dirs")
+        for i, dir in enumerate(self.list_path):
+            settings.setArrayIndex(i)
+            settings.setValue("dir", dir)
+        settings.endArray()
+        settings.endGroup()
+
 
     " Parent of accepted children needs to be accepted too for treeviews. "
     def has_accepted_children(self, source_index):
@@ -34,21 +57,35 @@ class RunsSortFilterProxyModel(QSortFilterProxyModel):
         while items:
             child = items.pop()
             items.extend(child.childItems)
-            data = child.data(Column.path)
-            if self.filterRegExp().indexIn(data) >= 0:
+            path = child.data(Column.path)
+            if self.filterRegExp().indexIn(path) >= 0 \
+                    and path not in self.list_path:
                 return True
         return False
 
     def filterAcceptsRow(self, sourceRow, sourceParent):
         index = self.sourceModel().index(sourceRow, Column.path, sourceParent)
-        data = self.sourceModel().data(index, Qt.DisplayRole)
-        if self.filterRegExp().indexIn(data) >= 0:
+        path = self.sourceModel().data(index, Qt.DisplayRole)
+        if self.filterRegExp().indexIn(path) >= 0 \
+                and path not in self.list_path:
             return True
         return self.has_accepted_children(index)
 
 class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
     def __init__(self, parent=None):
         super(ArchiveSortFilterProxyModel, self).__init__(parent)
+
+        self.list_path = list()
+        settings = QSettings("ITER", "solps-gui")
+        settings.beginGroup("Archive")
+        size = settings.beginReadArray("dirs")
+        for i in range(size):
+            settings.setArrayIndex(i)
+            dir = settings.value("dir")
+            self.list_path.append(dir)
+        print(self.list_path)
+        settings.endArray()
+        settings.endGroup()
 
     def has_accepted_children(self, source_index):
         item = source_index.internalPointer()
@@ -57,14 +94,14 @@ class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
             child = items.pop()
             items.extend(child.childItems)
             path = child.data(Column.path)
-            if path == "/Users/marijotelenta/Documents/solps-gui/staging":
+            if path in self.list_path:
                 return True
         return False
 
     def filterAcceptsRow(self, sourceRow, sourceParent):
         index = self.sourceModel().index(sourceRow, Column.path, sourceParent)
         path = self.sourceModel().data(index, Qt.DisplayRole)
-        if path == "/Users/marijotelenta/Documents/solps-gui/staging":
+        if path in self.list_path:
             return True
         return self.has_accepted_children(index)
 
@@ -630,33 +667,25 @@ class SOLPS_MainWindow(QMainWindow):
         self.treeViewArchive.setSortingEnabled(True)
 
         # get GUI settings
-        settings = QSettings("ITER", "solps-gui")
+        self.settings = QSettings("ITER", "solps-gui")
 
-        settings.beginGroup("MainWindow")
-        geometry = settings.value("Geometry")
+        self.settings.beginGroup("MainWindow")
+        geometry = self.settings.value("Geometry")
         if geometry:  self.restoreGeometry(geometry)
-        state = settings.value("State")
+        state = self.settings.value("State")
         if state: self.restoreState(state)
-        settings.endGroup()
+        self.settings.endGroup()
 
-        settings.beginGroup("TreeViewRuns")
-        treeview = settings.value("ColumnWidth")
+        self.settings.beginGroup("TreeViewRuns")
+        treeview = self.settings.value("ColumnWidth")
         if treeview: self.treeViewRuns.header().restoreState(treeview)
-        settings.endGroup()
+        self.settings.endGroup()
 
-        settings.beginGroup("TreeViewArchive")
-        treeview_archive = settings.value("ColumnWidth")
+        self.settings.beginGroup("TreeViewArchive")
+        treeview_archive = self.settings.value("ColumnWidth")
         if treeview_archive: self.treeViewArchive.header().restoreState(
             treeview_archive)
-        settings.endGroup()
-
-
-        """
-        settings.beginGroup("Run tree row")
-        settings.beginWriteArray("rows")
-        for i in range(len(self.columns)):
-            settings.setArrayIndex(i)
-        """
+        self.settings.endGroup()
 
         self.pushButton_archive.clicked.connect(self.removeRow)
 
@@ -669,18 +698,15 @@ class SOLPS_MainWindow(QMainWindow):
         column = self.treeViewRuns.selectionModel().currentIndex().column()
         model = self.treeViewRuns.model()
         index_remove = model.index(row, Column.path, index.parent())
-        """
-        item = index.internalPointer()
-        items = item.childItems.copy()
-        data = items.data(row,1).text()
-        """
+
         path = model.data(index_remove, Qt.DisplayRole)
 
         if (model.removeRow(index.row(), index.parent())):
             self.updateActions()
 
-        #print(index)
-        print(path)
+        self.proxyModel.append_to_archive(path)
+
+
 
     def updateActions(self):
         hasSelection = not self.treeViewRuns.selectionModel().selection().isEmpty()
@@ -750,8 +776,9 @@ class SOLPS_MainWindow(QMainWindow):
         settings.setValue("ColumnWidth", self.treeViewArchive.header().saveState())
         settings.endGroup()
 
-
         QMainWindow.closeEvent(self, event)
+
+
 
     def expanded(self):
         for column in range(self.model().columnCount(QModelIndex())):
@@ -761,6 +788,9 @@ class SOLPS_MainWindow(QMainWindow):
         self.update(topLeftIndex)
         self.expandAll()
         self.expanded()
+
+
+
 
     @pyqtSlot()
     def on_initializeRuns_clicked(self):
