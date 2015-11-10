@@ -66,8 +66,9 @@ class RunsSortFilterProxyModel(QSortFilterProxyModel):
     def filterAcceptsRow(self, sourceRow, sourceParent):
         index = self.sourceModel().index(sourceRow, Column.path, sourceParent)
         path = self.sourceModel().data(index, Qt.DisplayRole)
-        if self.filterRegExp().indexIn(path) >= 0 \
-                and path not in self.list_path:
+        if path in self.list_path:
+            return False
+        if self.filterRegExp().indexIn(path) >= 0:
             return True
         return self.has_accepted_children(index)
 
@@ -87,6 +88,12 @@ class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
         settings.endArray()
         settings.endGroup()
 
+    def data(self, index, role):
+        if role == Qt.DecorationRole:
+            return None
+        return super(ArchiveSortFilterProxyModel, self).data(index, role)
+
+    " Parent of accepted children needs to be accepted too for treeviews. "
     def has_accepted_children(self, source_index):
         item = source_index.internalPointer()
         items = item.childItems.copy()
@@ -103,8 +110,10 @@ class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
         path = self.sourceModel().data(index, Qt.DisplayRole)
         if path in self.list_path:
             return True
+        for dir in self.list_path:
+            if path.find(dir) >= 0:
+                return True
         return self.has_accepted_children(index)
-
 
 class RunSettings(QDialog):
     runDirsChanged = pyqtSignal()
@@ -828,7 +837,7 @@ class SOLPS_MainWindow(QMainWindow):
 
 "  Main method "
 app = QApplication(sys.argv)
-# app.setStyle("motif")
+#app.setStyle("windows")
 widget = SOLPS_MainWindow()
 widget.show()
 sys.exit(app.exec_())
