@@ -73,9 +73,10 @@ class RunsSortFilterProxyModel(QSortFilterProxyModel):
         return self.has_accepted_children(index)
 
 class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
-    def __init__(self, parent=None):
+    def __init__(self, style, parent=None):
         super(ArchiveSortFilterProxyModel, self).__init__(parent)
 
+        self.style = style
         self.list_path = list()
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("Archive")
@@ -90,7 +91,14 @@ class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
 
     def data(self, index, role):
         if role == Qt.DecorationRole:
-            return None
+            if index.column() == Column.name:
+                index_display = self.index(index.row(),
+                                           Column.path, index.parent())
+                for path in self.list_path:
+                    if path == self.data(index_display, Qt.DisplayRole):
+                        return self.style.standardIcon(
+                            QStyle.SP_DialogOpenButton)
+                return None
         return super(ArchiveSortFilterProxyModel, self).data(index, role)
 
     " Parent of accepted children needs to be accepted too for treeviews. "
@@ -667,7 +675,7 @@ class SOLPS_MainWindow(QMainWindow):
 
         # Tree view for archived run directories
 
-        self.archiveProxyModel = ArchiveSortFilterProxyModel()
+        self.archiveProxyModel = ArchiveSortFilterProxyModel(self.style())
         self.archiveProxyModel.setDynamicSortFilter(True)
         self.archiveProxyModel.setFilterKeyColumn(Column.path)
         self.archiveProxyModel.setSourceModel(self.model)
@@ -714,6 +722,8 @@ class SOLPS_MainWindow(QMainWindow):
             self.updateActions()
 
         self.proxyModel.append_to_archive(path)
+
+
 
 
 
