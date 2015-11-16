@@ -24,31 +24,9 @@ class Column(IntEnum):
     status = 3
 
 class RunsSortFilterProxyModel(QSortFilterProxyModel):
-    list_path = None
-    def __init__(self, parent=None):
+    def __init__(self, archive_dirs, parent=None):
         super(RunsSortFilterProxyModel, self).__init__(parent)
-        self.list_path = list()
-        settings = QSettings("ITER", "solps-gui")
-        settings.beginGroup("Archive")
-        size = settings.beginReadArray("dirs")
-        for i in range(size):
-            settings.setArrayIndex(i)
-            dir = settings.value("dir")
-            self.list_path.append(dir)
-        settings.endArray()
-        settings.endGroup()
-
-    def append_to_archive(self, path):
-        self.list_path.append(path)
-        settings = QSettings("ITER", "solps-gui")
-        settings.beginGroup("Archive")
-        settings.beginWriteArray("dirs")
-        for i, dir in enumerate(self.list_path):
-            settings.setArrayIndex(i)
-            settings.setValue("dir", dir)
-        settings.endArray()
-        settings.endGroup()
-
+        self.archive_dirs = archive_dirs
 
     " Parent of accepted children needs to be accepted too for treeviews. "
     def has_accepted_children(self, source_index):
@@ -59,43 +37,32 @@ class RunsSortFilterProxyModel(QSortFilterProxyModel):
             items.extend(child.childItems)
             path = child.data(Column.path)
             if self.filterRegExp().indexIn(path) >= 0 \
-                    and path not in self.list_path:
+                    and path not in self.archive_dirs:
                 return True
         return False
 
     def filterAcceptsRow(self, sourceRow, sourceParent):
         index = self.sourceModel().index(sourceRow, Column.path, sourceParent)
         path = self.sourceModel().data(index, Qt.DisplayRole)
-        if path in self.list_path:
+        if path in self.archive_dirs:
             return False
         if self.filterRegExp().indexIn(path) >= 0:
             return True
         return self.has_accepted_children(index)
 
 class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
-    def __init__(self, style, parent=None):
+    def __init__(self, archive_dirs, style, parent=None):
         super(ArchiveSortFilterProxyModel, self).__init__(parent)
-
+        self.archive_dirs = archive_dirs
         self.style = style
-        self.list_path = list()
-        settings = QSettings("ITER", "solps-gui")
-        settings.beginGroup("Archive")
-        size = settings.beginReadArray("dirs")
-        for i in range(size):
-            settings.setArrayIndex(i)
-            dir = settings.value("dir")
-            self.list_path.append(dir)
-        print(self.list_path)
-        settings.endArray()
-        settings.endGroup()
 
     def data(self, index, role):
         if role == Qt.DecorationRole:
             if index.column() == Column.name:
                 index_display = self.index(index.row(),
                                            Column.path, index.parent())
-                for path in self.list_path:
-                    if path == self.data(index_display, Qt.DisplayRole):
+                path = self.data(index_display, Qt.DisplayRole)
+                if path in self.archive_dirs:
                         return self.style.standardIcon(
                             QStyle.SP_DialogOpenButton)
                 return None
@@ -109,16 +76,16 @@ class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
             child = items.pop()
             items.extend(child.childItems)
             path = child.data(Column.path)
-            if path in self.list_path:
+            if path in self.archive_dirs:
                 return True
         return False
 
     def filterAcceptsRow(self, sourceRow, sourceParent):
         index = self.sourceModel().index(sourceRow, Column.path, sourceParent)
         path = self.sourceModel().data(index, Qt.DisplayRole)
-        if path in self.list_path:
+        if path in self.archive_dirs:
             return True
-        for dir in self.list_path:
+        for dir in self.archive_dirs:
             if path.find(dir) >= 0:
                 return True
         return self.has_accepted_children(index)
@@ -636,6 +603,38 @@ class SOLPS_MainWindow(QMainWindow):
     def __init__(self, *args):
         super(SOLPS_MainWindow, self).__init__(*args)
         loadUi('solps-gui.ui', self)
+
+        # get GUI settings
+        settings = QSettings("ITER", "solps-gui")
+
+        settings.beginGroup("MainWindow")
+        geometry = settings.value("Geometry")
+        if geometry:  self.restoreGeometry(geometry)
+        state = settings.value("State")
+        if state: self.restoreState(state)
+        settings.endGroup()
+
+        settings.beginGroup("TreeViewRuns")
+        treeview = settings.value("ColumnWidth")
+        if treeview: self.treeViewRuns.header().restoreState(treeview)
+        settings.endGroup()
+
+        settings.beginGroup("TreeViewArchive")
+        treeview_archive = settings.value("ColumnWidth")
+        if treeview_archive: self.treeViewArchive.header().restoreState(
+            treeview_archive)
+        settings.endGroup()
+
+        settings.beginGroup("Archive")
+        size = settings.beginReadArray("dirs")
+        self.archive_dirs = set()
+        for i in range(size):
+            settings.setArrayIndex(i)
+            dir = settings.value("dir")
+            self.archive_dirs.add(dir)
+        settings.endArray()
+        settings.endGroup()
+
         self.actionAbout_Qt.triggered.connect(QApplication.instance().aboutQt)
         self.checkBoxParameterScan.toggled.connect(
             self.plainTextEditScript.setEnabled)
@@ -656,7 +655,7 @@ class SOLPS_MainWindow(QMainWindow):
         self.model.updateRunsStatusesThread.finished.connect(
             self.treeViewRuns.update)
         if True:  # use Filter if True
-            self.proxyModel = RunsSortFilterProxyModel()
+            self.proxyModel = RunsSortFilterProxyModel(self.archive_dirs)
             self.proxyModel.setDynamicSortFilter(True)
             self.proxyModel.setFilterKeyColumn(Column.path)
             self.proxyModel.setSourceModel(self.model)
@@ -675,34 +674,14 @@ class SOLPS_MainWindow(QMainWindow):
 
         # Tree view for archived run directories
 
-        self.archiveProxyModel = ArchiveSortFilterProxyModel(self.style())
+        self.archiveProxyModel = \
+            ArchiveSortFilterProxyModel(self.archive_dirs, self.style())
         self.archiveProxyModel.setDynamicSortFilter(True)
         self.archiveProxyModel.setFilterKeyColumn(Column.path)
         self.archiveProxyModel.setSourceModel(self.model)
         self.treeViewArchive.setModel(self.archiveProxyModel)
         self.treeViewArchive.setAlternatingRowColors(True)
         self.treeViewArchive.setSortingEnabled(True)
-
-        # get GUI settings
-        self.settings = QSettings("ITER", "solps-gui")
-
-        self.settings.beginGroup("MainWindow")
-        geometry = self.settings.value("Geometry")
-        if geometry:  self.restoreGeometry(geometry)
-        state = self.settings.value("State")
-        if state: self.restoreState(state)
-        self.settings.endGroup()
-
-        self.settings.beginGroup("TreeViewRuns")
-        treeview = self.settings.value("ColumnWidth")
-        if treeview: self.treeViewRuns.header().restoreState(treeview)
-        self.settings.endGroup()
-
-        self.settings.beginGroup("TreeViewArchive")
-        treeview_archive = self.settings.value("ColumnWidth")
-        if treeview_archive: self.treeViewArchive.header().restoreState(
-            treeview_archive)
-        self.settings.endGroup()
 
         self.pushButton_archive.clicked.connect(self.removeRow)
 
@@ -717,15 +696,18 @@ class SOLPS_MainWindow(QMainWindow):
         index_remove = model.index(row, Column.path, index.parent())
 
         path = model.data(index_remove, Qt.DisplayRole)
+        self.archive_dirs.add(path)
+        settings = QSettings("ITER", "solps-gui")
+        settings.beginGroup("Archive")
+        settings.beginWriteArray("dirs")
+        for i, dir in enumerate(self.archive_dirs):
+            settings.setArrayIndex(i)
+            settings.setValue("dir", dir)
+        settings.endArray()
+        settings.endGroup()
 
         if (model.removeRow(index.row(), index.parent())):
             self.updateActions()
-
-        self.proxyModel.append_to_archive(path)
-
-
-
-
 
     def updateActions(self):
         hasSelection = not self.treeViewRuns.selectionModel().selection().isEmpty()
