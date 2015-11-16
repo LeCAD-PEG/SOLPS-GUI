@@ -667,8 +667,6 @@ class SOLPS_MainWindow(QMainWindow):
         self.treeViewRuns.setAlternatingRowColors(True)
         self.treeViewRuns.setSortingEnabled(True)
 
-        self.treeViewRuns.selectionModel().selectionChanged.connect(
-            self.updateActions)
 
         self.lineEditRunFilter.returnPressed.connect(self.textFilterChanged)
 
@@ -683,20 +681,24 @@ class SOLPS_MainWindow(QMainWindow):
         self.treeViewArchive.setAlternatingRowColors(True)
         self.treeViewArchive.setSortingEnabled(True)
 
-        self.pushButton_archive.clicked.connect(self.removeRow)
-
         self.actionJob_list.triggered.connect(self.showdialog)
+        self.treeViewRuns.selectionModel().selectionChanged.connect(
+            self.enable_archive_button)
+        self.treeViewArchive.selectionModel().selectionChanged.connect(
+            self.enable_restore_button)
+
 
     @pyqtSlot()
-    def removeRow(self):
+    def on_pushButton_Archive_clicked(self):
         index = self.treeViewRuns.selectionModel().currentIndex()
-        row = self.treeViewRuns.selectionModel().currentIndex().row()
-        column = self.treeViewRuns.selectionModel().currentIndex().column()
-        model = self.treeViewRuns.model()
-        index_remove = model.index(row, Column.path, index.parent())
+        model = self.proxyModel
+        index_path = model.index(index.row(), Column.path, index.parent())
+        path = model.data(index_path, Qt.DisplayRole)
 
-        path = model.data(index_remove, Qt.DisplayRole)
         self.archive_dirs.add(path)
+        self.proxyModel.invalidateFilter()
+        self.archiveProxyModel.invalidateFilter()
+
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("Archive")
         settings.beginWriteArray("dirs")
@@ -706,28 +708,40 @@ class SOLPS_MainWindow(QMainWindow):
         settings.endArray()
         settings.endGroup()
 
-        if (model.removeRow(index.row(), index.parent())):
-            self.updateActions()
+    @pyqtSlot()
+    def on_pushButton_Restore_clicked(self):
+        index = self.treeViewArchive.selectionModel().currentIndex()
+        model = self.archiveProxyModel
+        index_path = model.index(index.row(), Column.path, index.parent())
+        path = model.data(index_path, Qt.DisplayRole)
 
-    def updateActions(self):
-        hasSelection = not self.treeViewRuns.selectionModel().selection().isEmpty()
-        self.pushButton_archive.setEnabled(hasSelection)
-        #self.pushButton_archive.setEnabled(hasSelection)
+        if path in self.archive_dirs:
+            self.archive_dirs.remove(path)
+            self.proxyModel.invalidateFilter()
+            self.archiveProxyModel.invalidateFilter()
 
-        hasCurrent = self.treeViewRuns.selectionModel().currentIndex().isValid()
-        self.pushButton_archive.setEnabled(hasCurrent)
-        #self.pushButton_archive.setEnabled(hasCurrent)
+            settings = QSettings("ITER", "solps-gui")
+            settings.beginGroup("Archive")
+            settings.beginWriteArray("dirs")
+            for i, dir in enumerate(self.archive_dirs):
+                settings.setArrayIndex(i)
+                settings.setValue("dir", dir)
+            settings.endArray()
+            settings.endGroup()
+        else:
+            msg = "Can only remove archived directories marked with icons!"
+            QMessageBox.warning(self, 'Invalid action', msg)
 
-        if hasCurrent:
-            self.treeViewArchive.closePersistentEditor(self.treeViewRuns.selectionModel().currentIndex())
-        """
-            row = self.treeViewRuns.selectionModel().currentIndex().row()
-            column = self.treeViewRuns.selectionModel().currentIndex().column()
-            if self.treeViewRuns.selectionModel().currentIndex().parent().isValid():
-                self.statusBar().showMessage("Position: (%d,%d)" % (row, column))
-            else:
-                self.statusBar().showMessage("Position: (%d,%d) in top level" % (row, column))
-        """
+    @pyqtSlot()
+    def enable_archive_button(self):
+        valid = self.treeViewRuns.selectionModel().currentIndex().isValid()
+        self.pushButton_Archive.setEnabled(valid)
+
+    @pyqtSlot()
+    def enable_restore_button(self):
+        valid = self.treeViewArchive.selectionModel().currentIndex().isValid()
+        self.pushButton_Restore.setEnabled(valid)
+
     def create_model(self):
         model = QStandardItemModel()
         self.headerdata = ["Name", "Path", "Date", "Status", "Comment",

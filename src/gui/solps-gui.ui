@@ -352,7 +352,10 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QPushButton" name="pushButton_archive">
+         <widget class="QPushButton" name="pushButton_Archive">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Archive</string>
           </property>
@@ -401,7 +404,30 @@
         <string>Ar&amp;chive</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="1">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
         <item row="0" column="0">
+         <widget class="QPushButton" name="pushButton_Restore">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Restore</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
          <widget class="QTreeView" name="treeViewArchive"/>
         </item>
        </layout>
@@ -417,7 +443,7 @@
      <x>0</x>
      <y>0</y>
      <width>536</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
