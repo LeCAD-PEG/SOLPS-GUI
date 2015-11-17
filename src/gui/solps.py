@@ -654,10 +654,10 @@ class QPlainTextEditLogger(logging.Handler):
         pass
 
 class SOLPS_MainWindow(QMainWindow):
-
+    """Main window of the GUI"""
     def __init__(self, *args):
         super(SOLPS_MainWindow, self).__init__(*args)
-        loadUi('solps-gui.ui', self)
+        loadUi('solps.ui', self)
 
         log_handler = QPlainTextEditLogger(self.plainTextEdit_Log)
         logging.getLogger().addHandler(log_handler)
@@ -749,6 +749,9 @@ class SOLPS_MainWindow(QMainWindow):
 
     @pyqtSlot()
     def on_pushButton_Archive_clicked(self):
+        """ Selecting directory and pressing Archive will add
+        selected directory to filtered set and will not be shown in Runs.
+        """
         index = self.treeViewRuns.selectionModel().currentIndex()
         model = self.proxyModel
         index_path = model.index(index.row(), Column.path, index.parent())
@@ -897,10 +900,10 @@ class SOLPS_MainWindow(QMainWindow):
               "files for multiple parameter scan cases."
         QMessageBox.about(self, 'About SOLPS-ITER GUI', msg)
 
-
-"  Main method "
-app = QApplication(sys.argv)
-#app.setStyle("windows")
-widget = SOLPS_MainWindow()
-widget.show()
-sys.exit(app.exec_())
+if __name__ == '__main__':
+    "  Main method "
+    app = QApplication(sys.argv)
+    #app.setStyle("windows")
+    widget = SOLPS_MainWindow()
+    widget.show()
+    sys.exit(app.exec_())
