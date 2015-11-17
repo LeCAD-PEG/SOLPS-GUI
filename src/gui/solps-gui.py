@@ -219,12 +219,14 @@ class UpdateRunsStatuses(QThread):
             try:
                 with open(path) as file:
                     lines = file.read().splitlines()
-                    file.close()
-                #print(path, lines[-1])
                 return mtime, lines[-1]
             except OSError:
                 return mtime, '.status unknown'
-        return QDateTime().currentDateTime(), ''
+        try:
+            mtime = QDateTime.fromTime_t(os.path.getmtime(dir))
+            return mtime, ''
+        except:
+            return QDateTime().currentDateTime(), 'no access'
 
     def run(self):
         self.status.emit("Updating runs statuses...")
