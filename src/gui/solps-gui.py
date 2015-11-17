@@ -213,6 +213,7 @@ class UpdateRunsStatuses(QThread):
         self.model = runs_model
 
     def retrieve_folder_stats(self, dir):
+        # Show last line of .status
         path = dir + '/.status'
         if os.path.exists(path):
             mtime = QDateTime.fromTime_t(os.path.getmtime(path))
@@ -222,6 +223,29 @@ class UpdateRunsStatuses(QThread):
                 return mtime, lines[-1]
             except OSError:
                 return mtime, '.status unknown'
+        # Parse run.log
+        path = dir + '/run.log'
+        if os.path.exists(path):
+            mtime = QDateTime.fromTime_t(os.path.getmtime(path))
+            try:
+                fsize = os.path.getsize(path)
+                with open(path) as f:
+                    #f.seek (0, 2)           # Seek @ EOF
+                    #fsize = f.tell()        # Get Size
+                    f.seek(max(fsize-8192, 0), 0) # Set pos @ last 100 lines
+                    lines = f.read().splitlines()  # Read to end
+                for line in lines:
+                    if 'stopping because' in line \
+                            or  'failed' in line \
+                            or 'ERROR' in line \
+                            or 'UNABLE' in line:
+                        return mtime, line
+                print(path)
+                return mtime, 'run.log without status'
+            except OSError as e:
+                return mtime, 'run.log permission denied'
+
+        # Try to return at least directory date as last status
         try:
             mtime = QDateTime.fromTime_t(os.path.getmtime(dir))
             return mtime, ''
