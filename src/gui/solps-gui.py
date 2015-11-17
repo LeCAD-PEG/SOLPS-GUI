@@ -4,13 +4,14 @@
 import os
 import socket
 import sys
+import logging
 
 from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
                           pyqtSignal, QThread, QAbstractItemModel, QVariant,
                           QSortFilterProxyModel, QRegExp)
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
-                             QFileDialog, QStyle)
+                             QFileDialog, QStyle, QPlainTextEdit)
 from PyQt5.QtGui import QStandardItemModel
 from PyQt5.uic import loadUi
 from os.path import expanduser
@@ -96,7 +97,6 @@ class RunSettings(QDialog):
     def __init__(self, parent=None):
         super(RunSettings, self).__init__()
         loadUi('runs.ui', self)
-        self.setWindowTitle("Monitored runs folder")
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
@@ -230,8 +230,6 @@ class UpdateRunsStatuses(QThread):
             try:
                 fsize = os.path.getsize(path)
                 with open(path) as f:
-                    #f.seek (0, 2)           # Seek @ EOF
-                    #fsize = f.tell()        # Get Size
                     f.seek(max(fsize-8192, 0), 0) # Set pos @ last 100 lines
                     lines = f.read().splitlines()  # Read to end
                 for line in lines:
@@ -240,16 +238,15 @@ class UpdateRunsStatuses(QThread):
                             or 'ERROR' in line \
                             or 'UNABLE' in line:
                         return mtime, line
-                print(path)
+                logging.warning("No status found in " + path)
                 return mtime, 'run.log without status'
-            except OSError as e:
+            except OSError:
                 return mtime, 'run.log permission denied'
-
         # Try to return at least directory date as last status
         try:
             mtime = QDateTime.fromTime_t(os.path.getmtime(dir))
             return mtime, ''
-        except:
+        except OSError:
             return QDateTime().currentDateTime(), 'no access'
 
     def run(self):
@@ -636,12 +633,35 @@ class RunsModel(QAbstractItemModel):
             print("Received invalid message:", message,
                   "Message should be in <name> <path> <status> format.")
 
+class QPlainTextEditLogger(logging.Handler):
+    def __init__(self, parent):
+        super(QPlainTextEditLogger, self).__init__()
+        self.widget = parent
+        self.widget.setReadOnly(True)
+
+    def emit(self, record):
+        msg = self.format(record)
+        if record.levelno == logging.WARNING:
+            self.widget.appendHtml('<font color="orange">'+msg+'</font>')
+        elif record.levelno == logging.ERROR:
+            self.widget.appendHtml('<font color="red">'+msg+'</font>')
+        else:
+            self.widget.appendText(msg)
+        self.widget.verticalScrollBar().setValue(
+            self.widget.verticalScrollBar().maximum())
+
+    def write(self, m):
+        pass
 
 class SOLPS_MainWindow(QMainWindow):
 
     def __init__(self, *args):
         super(SOLPS_MainWindow, self).__init__(*args)
         loadUi('solps-gui.ui', self)
+
+        log_handler = QPlainTextEditLogger(self.plainTextEdit_Log)
+        logging.getLogger().addHandler(log_handler)
+        logging.info('Logging started...')
 
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
@@ -720,7 +740,7 @@ class SOLPS_MainWindow(QMainWindow):
         self.treeViewArchive.setAlternatingRowColors(True)
         self.treeViewArchive.setSortingEnabled(True)
 
-        self.actionJob_list.triggered.connect(self.showdialog)
+        self.actionRuns_dirs.triggered.connect(self.show_runs_dirs_dialog)
         self.treeViewRuns.selectionModel().selectionChanged.connect(
             self.enable_archive_button)
         self.treeViewArchive.selectionModel().selectionChanged.connect(
@@ -798,7 +818,8 @@ class SOLPS_MainWindow(QMainWindow):
         regExp = QRegExp(self.lineEditRunFilter.text(), caseSensitivity, syntax)
         self.proxyModel.setFilterRegExp(regExp)
 
-    def showdialog(self):
+    @pyqtSlot()
+    def show_runs_dirs_dialog(self):
         dialog = RunSettings()
         response = dialog.exec_()
         if response:
@@ -842,9 +863,6 @@ class SOLPS_MainWindow(QMainWindow):
         self.update(topLeftIndex)
         self.expandAll()
         self.expanded()
-
-
-
 
     @pyqtSlot()
     def on_initializeRuns_clicked(self):

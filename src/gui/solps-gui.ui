@@ -432,6 +432,32 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_6">
+       <attribute name="title">
+        <string>Log</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="0">
+         <widget class="QPlainTextEdit" name="plainTextEdit_Log">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="acceptDrops">
+           <bool>false</bool>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="lineWrapMode">
+           <enum>QPlainTextEdit::WidgetWidth</enum>
+          </property>
+          <property name="placeholderText">
+           <string notr="true"/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -456,7 +482,7 @@
     <property name="title">
      <string>&amp;Settings</string>
     </property>
-    <addaction name="actionJob_list"/>
+    <addaction name="actionRuns_dirs"/>
     <addaction name="actionGlobal"/>
     <addaction name="actionJob_submission"/>
    </widget>
@@ -479,9 +505,9 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="actionJob_list">
+  <action name="actionRuns_dirs">
    <property name="text">
-    <string>&amp;Job list</string>
+    <string>&amp;Runs directories</string>
    </property>
   </action>
   <action name="actionGlobal">
