@@ -211,7 +211,20 @@ class UpdateRunsStatuses(QThread):
     def __init__(self, runs_model, parent=None):
         super(UpdateRunsStatuses, self).__init__(parent)
         self.model = runs_model
-        print("UpdateRunsStatuses model", self.model)
+
+    def retrieve_folder_stats(self, dir):
+        path = dir + '/.status'
+        if os.path.exists(path):
+            mtime = QDateTime.fromTime_t(os.path.getmtime(path))
+            try:
+                with open(path) as file:
+                    lines = file.read().splitlines()
+                    file.close()
+                #print(path, lines[-1])
+                return mtime, lines[-1]
+            except OSError:
+                return mtime, '.status unknown'
+        return QDateTime().currentDateTime(), ''
 
     def run(self):
         self.status.emit("Updating runs statuses...")
@@ -222,11 +235,11 @@ class UpdateRunsStatuses(QThread):
             if self.isInterruptionRequested():
                 print("Status update interrupted!")
                 break
-            (data, date, status) = self.model.column_index[path]
-            data[Column.status] = 'status #{0}'.format(i)
-            data[Column.date] = QDateTime().currentDateTime()
+            (data, date_index, status_index) = self.model.column_index[path]
+            data[Column.date], data[Column.status] = \
+                self.retrieve_folder_stats(path)
             #self.msleep(100)
-            self.statusChanged.emit(date, status)
+            self.statusChanged.emit(date_index, status_index)
             self.progress.emit(path)
         self.status.emit("Updating runs statuses finished.")
 
