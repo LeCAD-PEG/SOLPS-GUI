@@ -8,7 +8,7 @@ import logging
 
 from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
                           pyqtSignal, QThread, QAbstractItemModel, QVariant,
-                          QSortFilterProxyModel, QRegExp)
+                          QSortFilterProxyModel, QRegExp, QObject)
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QFileDialog, QStyle, QPlainTextEdit)
@@ -650,8 +650,51 @@ class QPlainTextEditLogger(logging.Handler):
         self.widget.verticalScrollBar().setValue(
             self.widget.verticalScrollBar().maximum())
 
-    def write(self, m):
+class XStream(QObject):
+    _stdout = None
+    _stderr = None
+    _stdlog = None
+    messageWritten = pyqtSignal(str)
+
+    def flush( self ):
         pass
+
+    def fileno( self ):
+        return -1
+
+    def write( self, msg ):
+        if not self.signalsBlocked() :
+            self.messageWritten.emit(msg)
+
+    @staticmethod
+    def stdlog():
+        if not XStream._stdlog:
+            XStream._stdlog = XStream()
+        return XStream._stdlog
+
+    @staticmethod
+    def stdout():
+        if not XStream._stdout:
+            XStream._stdout = XStream()
+            sys.stdout = XStream._stdout
+        return XStream._stdout
+
+    @staticmethod
+    def stderr():
+        if not XStream._stderr:
+            XStream._stderr = XStream()
+            sys.stderr = XStream._stderr
+        return XStream._stderr
+
+class LogHandler(logging.Handler):
+    def __init__(self):
+        super(LogHandler, self).__init__()
+
+    def emit(self, record):
+        record = self.format(record)
+        if record:
+            XStream.stdlog().write('<font color="orange">%s</font>'%record)
+
 
 class SOLPS_MainWindow(QMainWindow):
     """Main window of the GUI"""
@@ -659,9 +702,27 @@ class SOLPS_MainWindow(QMainWindow):
         super(SOLPS_MainWindow, self).__init__(*args)
         loadUi('solps.ui', self)
 
-        log_handler = QPlainTextEditLogger(self.plainTextEdit_Log)
-        logging.getLogger().addHandler(log_handler)
-        logging.info('Logging started...')
+        #log_handler = QPlainTextEditLogger(self.plainTextEdit_Log)
+        #logging.getLogger().addHandler(log_handler)
+        #logging.info('Logging started...')
+        #log_widget = QPlainTextEditLog(self.plainTextEdit_Log)
+        #self.plainTextEdit_Log.appendPlainText('Hi')
+        logger = logging.getLogger()
+        log_handler = LogHandler()
+        log_handler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
+        logger.addHandler(log_handler)
+        #logger.setLevel(logging.DEBUG)
+
+        XStream.stdout().messageWritten.connect(
+            self.plainTextEdit_Log.insertPlainText)
+        XStream.stderr().messageWritten.connect(
+            self.plainTextEdit_Log.insertPlainText)
+        XStream.stdlog().messageWritten.connect(
+            self.plainTextEdit_Log.appendHtml)
+
+        address, port = '0.01.', 123423
+        print('Server on', address, ':', port, file=sys.stderr)
+        #print("Hello, world")
 
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")

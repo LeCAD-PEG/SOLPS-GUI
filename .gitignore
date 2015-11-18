@@ -4,5 +4,6 @@ staging
 *~
 .idea
 src/gui/.idea
+src/gui/__pycache__
 .project
 .pydevproject
