@@ -10,14 +10,24 @@ Prepare Python 3, PyQt and ParaView with
 
 Source the setupenv.[c]sh for locally built PyQt with
 
-    source setupenv.sh 
+    $ source setupenv.sh
 
 or 
 
-    source setupenv.csh
- 
+    $ source setupenv.csh
 
-## ITER specifics
+## Running UI
+
+    $ src/gui/solps.py
+
+## Buiding documentation
+
+    $ cd doc
+    $ make html
+    $ make latexpdf PAPER=a4
+
+
+## ITER cluster specifics
 ### CentOS 5.x and xcb
 Qt5.x requires XCB library for X11 rendering instead of Xlib.
 On RHEL5 XCB is built from sources and put into staging/lib. 

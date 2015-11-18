@@ -1,9 +1,38 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+""" SOLPS GUI aims controlling SOLPS-ITER code suite with a framework
+consisting of various tools aiming at improving the user’s experience,
+to accelerate and simplify run input set-up, and to increase the scientific
+us ability of the B2.5-Eirene  simulation results. GUI allows a large set of
+runs  to be scanned, identifying the state they are in, and providing a
+framework for in-line analysis and run re-launch, including input file editing
+beforehand.
+
+Example:
+  Running the GUI requires Python3 and PyQt5 to be installed::
+
+    $ python3 solps.py
+
+  or::
+
+    $ ./solps.py
+
+Notes:
+    Listed Runs can receive status updates from network with single line
+    UDP message with netcat utility or from the client that can broadcast
+    to multiple IP destinations at once.
+
+.. _Google Python Style Guide:
+   http://google-styleguide.googlecode.com/svn/trunk/pyguide.html
+   http://sphinx-doc.org/ext/example_google.html#example-google
+   http://sphinx-doc.org/ext/napoleon.html#module-sphinx.ext.napoleon
+   Author: Leon Kos, University of Ljubljana
+"""
 
 import os
 import socket
 import sys
+import queue
 import logging
 
 from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
@@ -17,8 +46,19 @@ from PyQt5.uic import loadUi
 from os.path import expanduser
 from enum import IntEnum
 
-"Runs columns definition"
+REDIRECT_STDOUT_TO_LOG = False
+
 class Column(IntEnum):
+    """Column enumeration for Runs treeview.
+
+        First column `name` cannot be moved and is short name.
+
+    Attributes:
+        name : Basename of the directory
+        path : Full path to the directory
+        date : Last status update of the directory
+        status: Status retrieved from log files or via network update
+    """
     name = 0
     path = 1
     date = 2
@@ -96,7 +136,8 @@ class RunSettings(QDialog):
 
     def __init__(self, parent=None):
         super(RunSettings, self).__init__()
-        loadUi('runs.ui', self)
+        prefix = os.path.dirname(os.path.abspath(__file__))
+        loadUi(prefix + '/runs.ui', self)
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
@@ -266,7 +307,6 @@ class UpdateRunsStatuses(QThread):
             self.progress.emit(path)
         self.status.emit("Updating runs statuses finished.")
 
-
 class FileSytemScan(QThread):
     status = pyqtSignal(str)
 
@@ -333,7 +373,6 @@ class FileSytemScan(QThread):
         self.setupModelData(rundir5, alias5, self.model.rootItem)
         self.model.create_indices_for_columns()
         self.status.emit("Filesystem scanning finished.")
-
 
 class TreeItem(object):
     def __init__(self, data, parent=None):
@@ -633,28 +672,33 @@ class RunsModel(QAbstractItemModel):
             print("Received invalid message:", message,
                   "Message should be in <name> <path> <status> format.")
 
-class QPlainTextEditLogger(logging.Handler):
-    def __init__(self, parent):
-        super(QPlainTextEditLogger, self).__init__()
-        self.widget = parent
-        self.widget.setReadOnly(True)
+class LoggingHandler(logging.Handler):
+    def __init__(self, stream):
+        super(LoggingHandler, self).__init__()
+        self.stream = stream
 
     def emit(self, record):
         msg = self.format(record)
-        if record.levelno == logging.WARNING:
-            self.widget.appendHtml('<font color="orange">'+msg+'</font>')
+        if record.levelno == logging.DEBUG:
+            self.stream.write('<font color="blue">' + msg + '</font>')
+        elif record.levelno == logging.INFO:
+            self.stream.write('<font color="orange">' + msg + '</font>')
+        elif record.levelno == logging.WARNING:
+            self.stream.write('<font color="blue">' + msg + '</font>')
         elif record.levelno == logging.ERROR:
-            self.widget.appendHtml('<font color="red">'+msg+'</font>')
-        else:
-            self.widget.appendText(msg)
-        self.widget.verticalScrollBar().setValue(
-            self.widget.verticalScrollBar().maximum())
+            self.stream.write('<font color="red">' + msg + '</font>')
+        else: # logging.CRITICAL
+            self.stream.write('<font color="magenta">' + msg + '</font>')
 
-class XStream(QObject):
-    _stdout = None
-    _stderr = None
-    _stdlog = None
-    messageWritten = pyqtSignal(str)
+class WriteStream(object):
+    """ The new Stream Object which replaces the default stream associated with
+    sys.stdout and sys.stderr. This object just puts data in a queue!
+
+    Args:
+        queue(queue.Queue) : thread safe queue created for the stream
+    """
+    def __init__(self, queue):
+        self.queue = queue
 
     def flush( self ):
         pass
@@ -662,67 +706,72 @@ class XStream(QObject):
     def fileno( self ):
         return -1
 
-    def write( self, msg ):
-        if not self.signalsBlocked() :
-            self.messageWritten.emit(msg)
+    def write(self, text):
+        self.queue.put(text)
 
-    @staticmethod
-    def stdlog():
-        if not XStream._stdlog:
-            XStream._stdlog = XStream()
-        return XStream._stdlog
+class LogReceiver(QObject):
+    """ Receives log messages from Logging and sys.stdout.
 
-    @staticmethod
-    def stdout():
-        if not XStream._stdout:
-            XStream._stdout = XStream()
-            sys.stdout = XStream._stdout
-        return XStream._stdout
+    A QObject (to be run in a QThread) which sits waiting for data to come
+    through a queue.Queue(). It blocks until data is available, and one it
+    has got something from the queue, it sends it to the "MainThread"
+    by emitting a Qt Signal.
+    """
+    log_signal = pyqtSignal(str)
 
-    @staticmethod
-    def stderr():
-        if not XStream._stderr:
-            XStream._stderr = XStream()
-            sys.stderr = XStream._stderr
-        return XStream._stderr
+    def __init__(self, queue, *args, **kwargs):
+        QObject.__init__(self, *args, **kwargs)
+        self.queue = queue
 
-class LogHandler(logging.Handler):
-    def __init__(self):
-        super(LogHandler, self).__init__()
-
-    def emit(self, record):
-        record = self.format(record)
-        if record:
-            XStream.stdlog().write('<font color="orange">%s</font>'%record)
-
+    @pyqtSlot()
+    def run(self):
+        while True:
+            text = self.queue.get()
+            self.log_signal.emit(text)
 
 class SOLPS_MainWindow(QMainWindow):
-    """Main window of the GUI"""
+    """Main window of the SOLPS GUI
+
+    Attributes:
+        log_thread(QThread) : Thread for Logging facility in Log tab.
+        log_receiver(LogReceiver) : Receiving messages from logging thread.
+        stdout_thread(QThread) : Redirected sys.stdout to Log tab.
+        stdout_receiver(LogReceiver): Receiver for stdout thread.
+    """
     def __init__(self, *args):
         super(SOLPS_MainWindow, self).__init__(*args)
-        loadUi('solps.ui', self)
+        prefix = os.path.dirname(os.path.abspath(__file__))
+        loadUi(prefix + '/solps.ui', self)
 
-        #log_handler = QPlainTextEditLogger(self.plainTextEdit_Log)
-        #logging.getLogger().addHandler(log_handler)
-        #logging.info('Logging started...')
-        #log_widget = QPlainTextEditLog(self.plainTextEdit_Log)
-        #self.plainTextEdit_Log.appendPlainText('Hi')
-        logger = logging.getLogger()
-        log_handler = LogHandler()
-        log_handler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
-        logger.addHandler(log_handler)
-        #logger.setLevel(logging.DEBUG)
-
-        XStream.stdout().messageWritten.connect(
-            self.plainTextEdit_Log.insertPlainText)
-        XStream.stderr().messageWritten.connect(
-            self.plainTextEdit_Log.insertPlainText)
-        XStream.stdlog().messageWritten.connect(
+        # Create thread-safe Queue and redirect logging it
+        log_queue = queue.Queue()
+        log_stream = WriteStream(log_queue)
+        self.log_thread = QThread()
+        self.log_receiver = LogReceiver(log_queue)
+        self.log_receiver.log_signal.connect(
             self.plainTextEdit_Log.appendHtml)
+        self.log_receiver.moveToThread(self.log_thread)
+        self.log_thread.started.connect(self.log_receiver.run)
+        self.log_thread.start()
+        log_handler = LoggingHandler(log_stream)
+        log_format = "%(asctime)s %(levelname)s: %(message)s"
+        log_handler.setFormatter(logging.Formatter(log_format))
+        logging.getLogger().addHandler(log_handler)
+        logging.getLogger().setLevel(logging.DEBUG)
+        #logging.error('Logging started...')
+        #logging.debug('INFO message')
 
-        address, port = '0.01.', 123423
-        print('Server on', address, ':', port, file=sys.stderr)
-        #print("Hello, world")
+        if REDIRECT_STDOUT_TO_LOG:
+            # Create thread-safe Queue and redirect sys.stdout to it
+            stdout_queue = queue.Queue()
+            sys.stdout = WriteStream(stdout_queue)
+            self.stdout_thread = QThread()
+            self.stdout_receiver = LogReceiver(stdout_queue)
+            self.stdout_receiver.log_signal.connect(
+                self.plainTextEdit_Log.insertPlainText)
+            self.stdout_receiver.moveToThread(self.stdout_thread)
+            self.stdout_thread.started.connect(self.stdout_receiver.run)
+            self.stdout_thread.start()
 
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
@@ -899,7 +948,10 @@ class SOLPS_MainWindow(QMainWindow):
 
 
     def closeEvent(self, event):
-        # save GUI settings
+        """ Save GUI state at exit.
+        Position, size of the main windows and treview columns configuration
+        is saved.
+        """
         settings = QSettings("ITER", "solps-gui")
 
         settings.beginGroup("MainWindow")
@@ -940,17 +992,6 @@ class SOLPS_MainWindow(QMainWindow):
     @pyqtSlot()
     def on_pushButtonRunFilter_clicked(self):
         self.textFilterChanged()
-
-    @pyqtSlot()
-    def on_pushButton_8_clicked(self):  # Testing only
-        settings = QSettings('ITER', 'solps-gui')
-        settings.beginGroup('RunDirectories')
-        path = settings.value('runDir2', '')
-        settings.endGroup()
-        (data, date, status) = self.model.column_index[path]
-        data[Column.status] = 'running'
-        data[Column.date] = QDateTime().currentDateTime()
-        self.model.dataChanged.emit(date, status)
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):

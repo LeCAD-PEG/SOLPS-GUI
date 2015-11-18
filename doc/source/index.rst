@@ -1,15 +1,16 @@
 
-Welcome to SOLPS GUI's documentation!
-=====================================
+SOLPS GUI
+=========
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
-.. module:: solps
-.. autoclass:: SOLPS_MainWindow
+
+.. automodule:: solps
    :members:
+
 
 
 Indices and tables
