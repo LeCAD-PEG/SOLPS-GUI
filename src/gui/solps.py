@@ -227,40 +227,76 @@ class RunSettings(QDialog):
 
 
 class RunsStatusServer(QThread):
-    sock = None
+    """Networking UDP listener for receiving job status updates.
+
+    Receives datagrams in single line and emits decoded one line updates sent
+    by each job to notify the GUI that status changed.
+
+    Attributes:
+        retrieve (Bool) : Gracefully stop the thread on next packet.
+    """
     retrieve = True
     jobStatusChanged = pyqtSignal(str)
 
     def bind(self, address, port):
         # connect to UDP socket
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # Bind socket to local host and port
         try:
-            self.sock.bind((address, port))
+            self._sock.bind((address, port))
         except socket.error:
-            print('Bind to', address, ':', str(port), ' failed.')
+            logging.error('Bind to' + address + ':' + str(port) + ' failed.')
             return False
-        print('Server on', address, ':', port)
+        logging.info('Server listening on ' + address + ':' + str(port))
         return True
 
     def run(self):
-        print("RunsStatusServer started")
+        logging.info("RunsStatusServer started.")
         while self.retrieve:
-            data, addr = self.sock.recvfrom(1024)  # wait for data
+            data, addr = self._sock.recvfrom(1024)  # wait for data
             # print("Message", data.decode('utf-8'), "from", addr[0])
             self.jobStatusChanged.emit(data.decode('utf-8'))
+            # TODO Graceful exit from blocking recvfrom() by setting retrieve
+            # TODO and sending UDP packet to ourselves.
 
 
-class UpdateRunsStatuses(QThread):
+class RetrieveRunsFolderInfo(QThread):
+    """ Scans filesystem and retrieves state of each run.
+
+    Several status and LOG files are probed and searched to get the state
+    and other info for Runs table view.
+
+    Args:
+        runs_model (RunsModel): Model that holds Runs
+
+    Attributes:
+        status (pyqtSignal(str)): Emits start/stop notices for status bar.
+        progress (pyqtSignal(str)): Directory that is being processed
+        statusChanged (pyqtSignal(QModelIndex, QModelIndex)) :
+            Changed index range for table view update
+
+    """
     status = pyqtSignal(str)
     progress = pyqtSignal(str)
     statusChanged = pyqtSignal(QModelIndex, QModelIndex)
 
     def __init__(self, runs_model, parent=None):
-        super(UpdateRunsStatuses, self).__init__(parent)
+        super(RetrieveRunsFolderInfo, self).__init__(parent)
         self.model = runs_model
 
-    def retrieve_folder_stats(self, dir):
+    def retrieve_folder_state(self, dir):
+        """ Scans directory for existance of status and log files.
+
+        .status and run.log are scanned for status and errors.
+
+        Args:
+            dir (str): Directory to scan
+        Returns:
+            time, status (str, str) : Tuple that is at least directory
+                time and empty string. Otherwise it returns extracted string
+                and modification time of the file that string was retrieved
+                from.
+        """
         # Show last line of .status
         path = dir + '/.status'
         if os.path.exists(path):
@@ -298,30 +334,47 @@ class UpdateRunsStatuses(QThread):
             return QDateTime().currentDateTime(), 'no access'
 
     def run(self):
-        self.status.emit("Updating runs statuses...")
+        """ Thread scans each listed directory of the Runs model.
+          
+        In principle this operation should be thread safe when changing model
+        data. However, one should not restart the scan if this thread is
+        not finished yet with scan!
+        """
+        msg = "Updating runs statuses..."
+        logging.info(msg)
+        self.status.emit(msg)
         i = 0
         for path in self.model.column_index:
-            i = i + 1
             if self.isInterruptionRequested():
-                print("Status update interrupted!")
+                logging.warning("Status update interrupted!")
                 break
             (data, date_index, status_index) = self.model.column_index[path]
             data[Column.date], data[Column.status] = \
-                self.retrieve_folder_stats(path)
+                self.retrieve_folder_state(path)
             # Simulate delays with self.msleep(100)
             self.statusChanged.emit(date_index, status_index)
             self.progress.emit(path)
-        self.status.emit("Updating runs statuses finished.")
+        msg = "Updating runs statuses finished."
+        logging.info(msg)
+        self.status.emit(msg)
 
 
-class FileSytemScan(QThread):
+class FileSystemScan(QThread):
+    """ Creates initial list of directory tree hierarchy of all aliased Runs.
+
+    This is quick scan for of all directories to be quickly shown in the
+    tree view and shortly after updated with longer run in separate thread
+    with `RetrieveRunsFolderInfo` operation. Nevertheless, this is done in
+    a thread to give immediate response (GUI) to the user after its start.
+    Tree view is shown empty until this scan finished and model is reset.
+    """
     status = pyqtSignal(str)
 
     def __init__(self, runs_model, parent=None):
-        super(FileSytemScan, self).__init__(parent)
+        super(FileSystemScan, self).__init__(parent)
         self.model = runs_model
 
-    def setupModelData(self, rootdir, alias, parent):
+    def setup_model_data(self, rootdir, alias, parent):
         if rootdir is '':
             return
         self.status.emit("Scanning {0}...".format(alias))
@@ -356,8 +409,9 @@ class FileSytemScan(QThread):
             parents[-1].appendChild(TreeItem(data, parents[-1]))
 
     def run(self):
-        self.status.emit("Filesystem scanning started...")
-        print("FileSystemScan started")
+        msg = "Filesystem scanning started..."
+        self.status.emit(msg)
+        logging.info(msg)
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
         rundir1 = settings.value("runDir1", "")
@@ -373,16 +427,26 @@ class FileSytemScan(QThread):
         settings.endGroup()
 
         self.model.rootItem = TreeItem(self.model.headerdata)
-        self.setupModelData(rundir1, alias1, self.model.rootItem)
-        self.setupModelData(rundir2, alias2, self.model.rootItem)
-        self.setupModelData(rundir3, alias3, self.model.rootItem)
-        self.setupModelData(rundir4, alias4, self.model.rootItem)
-        self.setupModelData(rundir5, alias5, self.model.rootItem)
+        self.setup_model_data(rundir1, alias1, self.model.rootItem)
+        self.setup_model_data(rundir2, alias2, self.model.rootItem)
+        self.setup_model_data(rundir3, alias3, self.model.rootItem)
+        self.setup_model_data(rundir4, alias4, self.model.rootItem)
+        self.setup_model_data(rundir5, alias5, self.model.rootItem)
+
         self.model.create_indices_for_columns()
-        self.status.emit("Filesystem scanning finished.")
+
+        msg = "Filesystem scanning finished."
+        logging.info(msg)
+        self.status.emit(msg)
 
 
 class TreeItem(object):
+    """ Each item in Runs tree view is itemized into parent, data and childs.
+    Attributes:
+        parentItem (TreeItem) : Pointer to parent.
+        itemData (list) : Column data for tree view. First is always name (str)
+        childItems (list) : Rows of child items references.
+    """
     def __init__(self, data, parent=None):
         self.parentItem = parent
         self.itemData = data
@@ -444,6 +508,20 @@ class TreeItem(object):
 
 
 class RunsModel(QAbstractItemModel):
+    """ Model for the Runs and Archive tree views.
+
+    Data in columns that is presents directories in a hierarchical way.
+
+    Args:
+        style (QStyle) : Widget decoration style used to retrieve builtin
+                         icons.
+
+    Attributes:
+        column_index (path : data, date_index, status_index) : Dictionary
+            of data pointer and model indexes for cell update
+            with `FileSystemScan` or via network.
+            Keys are paths to "unique" directories.
+    """
     statusServerThread = None
     scanFileSystemThread = None
     column_index = dict()
@@ -457,15 +535,15 @@ class RunsModel(QAbstractItemModel):
         self.columns = len(self.headerdata)
         self.rootItem = TreeItem(self.headerdata)
 
-        self.scanFileSystemThread = FileSytemScan(self)
+        self.scanFileSystemThread = FileSystemScan(self)
         self.scanFileSystemThread.finished.connect(self.modelReset.emit)
 
-        self.updateRunsStatusesThread = UpdateRunsStatuses(self)
-        self.updateRunsStatusesThread.statusChanged.connect(
+        self.RetrieveRunsFolderInfoThread = RetrieveRunsFolderInfo(self)
+        self.RetrieveRunsFolderInfoThread.statusChanged.connect(
             self.dataChanged.emit)
         self.scanFileSystemThread.finished.connect(
-            self.updateRunsStatusesThread.start)
-        self.updateRunsStatusesThread.finished.connect(self.endResetModel)
+            self.RetrieveRunsFolderInfoThread.start)
+        self.RetrieveRunsFolderInfoThread.finished.connect(self.endResetModel)
 
     def startThreads(self):
         self.beginResetModel()
@@ -833,11 +911,11 @@ class SOLPS_MainWindow(QMainWindow):
         self.model = RunsModel(self.style())
         self.model.scanFileSystemThread.status.connect(
             self.statusbar.showMessage)
-        self.model.updateRunsStatusesThread.status.connect(
+        self.model.RetrieveRunsFolderInfoThread.status.connect(
             self.statusbar.showMessage)
         self.model.startThreads()
 
-        self.model.updateRunsStatusesThread.finished.connect(
+        self.model.RetrieveRunsFolderInfoThread.finished.connect(
             self.treeViewRuns.update)
         if True:  # use Filter if True
             self.proxyModel = RunsSortFilterProxyModel(self.archive_dirs)
@@ -950,14 +1028,14 @@ class SOLPS_MainWindow(QMainWindow):
         dialog = RunSettings()
         response = dialog.exec_()
         if response:
-            if self.model.updateRunsStatusesThread.isRunning() or \
+            if self.model.RetrieveRunsFolderInfoThread.isRunning() or \
                     self.model.scanFileSystemThread.isRunning():
                 msg = "Runs layout changed in the middle of the update." \
                     "Directories cannot be changed. Try settings later."
                 QMessageBox.critical(self, "Restart required", msg)
             else:
                 self.model.startThreads()
-            # TODO(kosl) self.model.updateRunsStatusesThread.quit()
+            # TODO(kosl) self.model.RetrieveRunsFolderInfoThread.quit()
             # self.model.scanFileSystemThread.start()
 
     def closeEvent(self, event):

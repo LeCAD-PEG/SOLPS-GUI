@@ -7,6 +7,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+GUI Python code description:
 
 .. automodule:: solps
    :members:
