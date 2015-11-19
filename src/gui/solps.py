@@ -48,6 +48,7 @@ from enum import IntEnum
 
 REDIRECT_STDOUT_TO_LOG = False
 
+
 class Column(IntEnum):
     """Column enumeration for Runs treeview.
 
@@ -63,6 +64,7 @@ class Column(IntEnum):
     path = 1
     date = 2
     status = 3
+
 
 class RunsSortFilterProxyModel(QSortFilterProxyModel):
     def __init__(self, archive_dirs, parent=None):
@@ -90,6 +92,7 @@ class RunsSortFilterProxyModel(QSortFilterProxyModel):
         if self.filterRegExp().indexIn(path) >= 0:
             return True
         return self.has_accepted_children(index)
+
 
 class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
     def __init__(self, archive_dirs, style, parent=None):
@@ -130,6 +133,7 @@ class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
             if path.find(dir) >= 0:
                 return True
         return self.has_accepted_children(index)
+
 
 class RunSettings(QDialog):
     runDirsChanged = pyqtSignal()
@@ -176,7 +180,8 @@ class RunSettings(QDialog):
                                                    "Select Directory",
                                                    current_dir,
                                                    QFileDialog.ShowDirsOnly)
-        if new_dir: line_edit.setText(new_dir)
+        if new_dir:
+            line_edit.setText(new_dir)
 
     # save GUI settings
     @pyqtSlot()
@@ -220,6 +225,7 @@ class RunSettings(QDialog):
     def showdir5(self):
         self.update_dir(self.lineEdit_rundir5)
 
+
 class RunsStatusServer(QThread):
     sock = None
     retrieve = True
@@ -243,6 +249,7 @@ class RunsStatusServer(QThread):
             data, addr = self.sock.recvfrom(1024)  # wait for data
             # print("Message", data.decode('utf-8'), "from", addr[0])
             self.jobStatusChanged.emit(data.decode('utf-8'))
+
 
 class UpdateRunsStatuses(QThread):
     status = pyqtSignal(str)
@@ -271,11 +278,11 @@ class UpdateRunsStatuses(QThread):
             try:
                 fsize = os.path.getsize(path)
                 with open(path) as f:
-                    f.seek(max(fsize-8192, 0), 0) # Set pos @ last 100 lines
+                    f.seek(max(fsize-8192, 0), 0)  # Set pos @ last 100 lines
                     lines = f.read().splitlines()  # Read to end
                 for line in lines:
                     if 'stopping because' in line \
-                            or  'failed' in line \
+                            or 'failed' in line \
                             or 'ERROR' in line \
                             or 'UNABLE' in line:
                         return mtime, line
@@ -292,7 +299,6 @@ class UpdateRunsStatuses(QThread):
 
     def run(self):
         self.status.emit("Updating runs statuses...")
-        #self.sleep(1)
         i = 0
         for path in self.model.column_index:
             i = i + 1
@@ -302,10 +308,11 @@ class UpdateRunsStatuses(QThread):
             (data, date_index, status_index) = self.model.column_index[path]
             data[Column.date], data[Column.status] = \
                 self.retrieve_folder_stats(path)
-            #self.msleep(100)
+            # Simulate delays with self.msleep(100)
             self.statusChanged.emit(date_index, status_index)
             self.progress.emit(path)
         self.status.emit("Updating runs statuses finished.")
+
 
 class FileSytemScan(QThread):
     status = pyqtSignal(str)
@@ -374,6 +381,7 @@ class FileSytemScan(QThread):
         self.model.create_indices_for_columns()
         self.status.emit("Filesystem scanning finished.")
 
+
 class TreeItem(object):
     def __init__(self, data, parent=None):
         self.parentItem = parent
@@ -434,6 +442,7 @@ class TreeItem(object):
 
         return True
 
+
 class RunsModel(QAbstractItemModel):
     statusServerThread = None
     scanFileSystemThread = None
@@ -486,10 +495,9 @@ class RunsModel(QAbstractItemModel):
     def insertRows(self, position, rows, parent=QModelIndex()):
         parentItem = self.getItem(parent)
         self.beginInsertRows(parent, position, position + rows - 1)
-        success = parentItem.insertChildren(position, rows,
-                self.rootItem.columnCount())
+        columns = self.rootItem.columnCount()
+        success = parentItem.insertChildren(position, rows, columns)
         self.endInsertRows()
-
         return success
 
     def parent(self, index):
@@ -637,13 +645,13 @@ class RunsModel(QAbstractItemModel):
         try:
             address = settings.value("Monitor_interface", "0.0.0.0")
             port = int(settings.value("Monitor_port", "49406"))
-        except :
+        except:
             address = "0.0.0.0"
             port = 49406
         settings.endGroup()
 
         status = self.statusServerThread.bind(address, port)
-        if status :
+        if status:
             self.statusServerThread.start()
         else:
             msg = "Failed to bind interface {0} to port {1}. " \
@@ -672,6 +680,7 @@ class RunsModel(QAbstractItemModel):
             print("Received invalid message:", message,
                   "Message should be in <name> <path> <status> format.")
 
+
 class LoggingHandler(logging.Handler):
     def __init__(self, stream):
         super(LoggingHandler, self).__init__()
@@ -687,8 +696,9 @@ class LoggingHandler(logging.Handler):
             self.stream.write('<font color="blue">' + msg + '</font>')
         elif record.levelno == logging.ERROR:
             self.stream.write('<font color="red">' + msg + '</font>')
-        else: # logging.CRITICAL
+        else:  # logging.CRITICAL
             self.stream.write('<font color="magenta">' + msg + '</font>')
+
 
 class WriteStream(object):
     """ The new Stream Object which replaces the default stream associated with
@@ -700,14 +710,15 @@ class WriteStream(object):
     def __init__(self, queue):
         self.queue = queue
 
-    def flush( self ):
+    def flush(self):
         pass
 
-    def fileno( self ):
+    def fileno(self):
         return -1
 
     def write(self, text):
         self.queue.put(text)
+
 
 class LogReceiver(QObject):
     """ Receives log messages from Logging and sys.stdout.
@@ -728,6 +739,7 @@ class LogReceiver(QObject):
         while True:
             text = self.queue.get()
             self.log_signal.emit(text)
+
 
 class SOLPS_MainWindow(QMainWindow):
     """Main window of the SOLPS GUI
@@ -758,8 +770,8 @@ class SOLPS_MainWindow(QMainWindow):
         log_handler.setFormatter(logging.Formatter(log_format))
         logging.getLogger().addHandler(log_handler)
         logging.getLogger().setLevel(logging.DEBUG)
-        #logging.error('Logging started...')
-        #logging.debug('INFO message')
+        #  logging.error('Logging started...')
+        #  logging.debug('INFO message')
 
         if REDIRECT_STDOUT_TO_LOG:
             # Create thread-safe Queue and redirect sys.stdout to it
@@ -778,20 +790,23 @@ class SOLPS_MainWindow(QMainWindow):
 
         settings.beginGroup("MainWindow")
         geometry = settings.value("Geometry")
-        if geometry:  self.restoreGeometry(geometry)
+        if geometry:
+            self.restoreGeometry(geometry)
         state = settings.value("State")
-        if state: self.restoreState(state)
+        if state:
+            self.restoreState(state)
         settings.endGroup()
 
         settings.beginGroup("TreeViewRuns")
         treeview = settings.value("ColumnWidth")
-        if treeview: self.treeViewRuns.header().restoreState(treeview)
+        if treeview:
+            self.treeViewRuns.header().restoreState(treeview)
         settings.endGroup()
 
         settings.beginGroup("TreeViewArchive")
         treeview_archive = settings.value("ColumnWidth")
-        if treeview_archive: self.treeViewArchive.header().restoreState(
-            treeview_archive)
+        if treeview_archive:
+            self.treeViewArchive.header().restoreState(treeview_archive)
         settings.endGroup()
 
         settings.beginGroup("Archive")
@@ -808,7 +823,8 @@ class SOLPS_MainWindow(QMainWindow):
         self.checkBoxParameterScan.toggled.connect(
             self.plainTextEditScript.setEnabled)
 
-        self.comboBoxRunFilterType.addItem("Regular expression", QRegExp.RegExp)
+        self.comboBoxRunFilterType.addItem("Regular expression",
+                                           QRegExp.RegExp)
         self.comboBoxRunFilterType.addItem("Wildcard", QRegExp.Wildcard)
         self.comboBoxRunFilterType.addItem("Fixed string", QRegExp.FixedString)
 
@@ -836,7 +852,6 @@ class SOLPS_MainWindow(QMainWindow):
         self.treeViewRuns.setAlternatingRowColors(True)
         self.treeViewRuns.setSortingEnabled(True)
 
-
         self.lineEditRunFilter.returnPressed.connect(self.textFilterChanged)
 
         # Tree view for archived run directories
@@ -855,7 +870,6 @@ class SOLPS_MainWindow(QMainWindow):
             self.enable_archive_button)
         self.treeViewArchive.selectionModel().selectionChanged.connect(
             self.enable_restore_button)
-
 
     @pyqtSlot()
     def on_pushButton_Archive_clicked(self):
@@ -926,9 +940,9 @@ class SOLPS_MainWindow(QMainWindow):
         filter_index = self.comboBoxRunFilerType.currentIndex()
         filter_syntax = self.comboBoxRunFilerType.itemData(filter_index)
         syntax = QRegExp.PatternSyntax(filter_syntax)
-        caseSensitivity = (self.filterCaseSensitivityCheckBox.isChecked()
-            and Qt.CaseSensitive or Qt.CaseInsensitive)
-        regExp = QRegExp(self.lineEditRunFilter.text(), caseSensitivity, syntax)
+        case_sense = (self.filterCaseSensitivityCheckBox.isChecked() and
+                      Qt.CaseSensitive or Qt.CaseInsensitive)
+        regExp = QRegExp(self.lineEditRunFilter.text(), case_sense, syntax)
         self.proxyModel.setFilterRegExp(regExp)
 
     @pyqtSlot()
@@ -943,9 +957,8 @@ class SOLPS_MainWindow(QMainWindow):
                 QMessageBox.critical(self, "Restart required", msg)
             else:
                 self.model.startThreads()
-            #self.model.updateRunsStatusesThread.quit()
-            #self.model.scanFileSystemThread.start()
-
+            # TODO(kosl) self.model.updateRunsStatusesThread.quit()
+            # self.model.scanFileSystemThread.start()
 
     def closeEvent(self, event):
         """ Save GUI state at exit.
@@ -960,16 +973,16 @@ class SOLPS_MainWindow(QMainWindow):
         settings.endGroup()
 
         settings.beginGroup("TreeViewRuns")
-        settings.setValue("ColumnWidth", self.treeViewRuns.header().saveState())
+        settings.setValue("ColumnWidth",
+                          self.treeViewRuns.header().saveState())
         settings.endGroup()
 
         settings.beginGroup("TreeViewArchive")
-        settings.setValue("ColumnWidth", self.treeViewArchive.header().saveState())
+        settings.setValue("ColumnWidth",
+                          self.treeViewArchive.header().saveState())
         settings.endGroup()
 
         QMainWindow.closeEvent(self, event)
-
-
 
     def expanded(self):
         for column in range(self.model().columnCount(QModelIndex())):
@@ -1002,10 +1015,11 @@ class SOLPS_MainWindow(QMainWindow):
               "files for multiple parameter scan cases."
         QMessageBox.about(self, 'About SOLPS-ITER GUI', msg)
 
+
 if __name__ == '__main__':
     "  Main method "
     app = QApplication(sys.argv)
-    #app.setStyle("windows")
+    # app.setStyle("windows")
     widget = SOLPS_MainWindow()
     widget.show()
     sys.exit(app.exec_())
