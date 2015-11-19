@@ -58,12 +58,10 @@ class Column(IntEnum):
         name : Basename of the directory
         path : Full path to the directory
         date : Last status update of the directory
-        status: Status retrieved from log files or via network update
+        status : Status retrieved from status & log files or via network update
+        label : One line description of the run from b2mn.dat
     """
-    name = 0
-    path = 1
-    date = 2
-    status = 3
+    name, path, date, status, label = range(5)
 
 
 class RunsSortFilterProxyModel(QSortFilterProxyModel):
@@ -292,11 +290,28 @@ class RetrieveRunsFolderInfo(QThread):
         Args:
             dir (str): Directory to scan
         Returns:
-            time, status (str, str) : Tuple that is at least directory
-                time and empty string. Otherwise it returns extracted string
-                and modification time of the file that string was retrieved
-                from.
+            time, status (str, str), static_data : Tuple that is at
+                least directory time and empty string. Otherwise it returns
+                extracted status string and modification time of the file
+                that string was retrieved from and other static data from
+                various files.
         """
+        # Firstly try to extract label from b2mn.dat
+        path = dir + '/b2mn.dat'
+        label = ''
+        if os.path.exists(path):
+            try:
+                with open(path) as file:
+                    lines = file.read().splitlines()
+                for i, line in enumerate(lines):
+                    if 'label' in line:
+                        label = lines[i+1]
+                        break
+            except OSError:
+                label = 'unreadable'
+
+        static_data = ( label )
+
         # Show last line of .status
         path = dir + '/.status'
         if os.path.exists(path):
@@ -304,9 +319,9 @@ class RetrieveRunsFolderInfo(QThread):
             try:
                 with open(path) as file:
                     lines = file.read().splitlines()
-                return mtime, lines[-1]
+                return mtime, lines[-1], label
             except OSError:
-                return mtime, '.status unknown'
+                return mtime, '.status unknown', static_data
         # Parse run.log
         path = dir + '/run.log'
         if os.path.exists(path):
@@ -321,17 +336,17 @@ class RetrieveRunsFolderInfo(QThread):
                             or 'failed' in line \
                             or 'ERROR' in line \
                             or 'UNABLE' in line:
-                        return mtime, line
+                        return mtime, line, static_data
                 logging.warning("No status found in " + path)
-                return mtime, 'run.log without status'
+                return mtime, 'run.log without status', static_data
             except OSError:
                 return mtime, 'run.log permission denied'
         # Try to return at least directory date as last status
         try:
             mtime = QDateTime.fromTime_t(os.path.getmtime(dir))
-            return mtime, ''
+            return mtime, '', static_data
         except OSError:
-            return QDateTime().currentDateTime(), 'no access'
+            return QDateTime().currentDateTime(), 'no access', static_data
 
     def run(self):
         """ Thread scans each listed directory of the Runs model.
@@ -348,11 +363,15 @@ class RetrieveRunsFolderInfo(QThread):
             if self.isInterruptionRequested():
                 logging.warning("Status update interrupted!")
                 break
-            (data, date_index, status_index) = self.model.column_index[path]
-            data[Column.date], data[Column.status] = \
+            (data, date_index, status_index, label_index) = \
+                self.model.column_index[path]
+            data[Column.date], data[Column.status], static_data = \
                 self.retrieve_folder_state(path)
             # Simulate delays with self.msleep(100)
-            self.statusChanged.emit(date_index, status_index)
+            # Fill in static data into the columns that follow
+            data[Column.label] = static_data
+            # Emit the range of columns that changed in the model
+            self.statusChanged.emit(date_index, label_index)
             self.progress.emit(path)
         msg = "Updating runs statuses finished."
         logging.info(msg)
@@ -384,7 +403,7 @@ class FileSystemScan(QThread):
         for dir, subdirs, files in os.walk(rootdir):
             if dir == rootdir:  # replace name with alias
                 date = QDateTime().fromTime_t(os.stat(dir).st_mtime)
-                data = [alias, dir, date, None]
+                data = [alias, dir, date, None, None]  # TODO number of columns
                 parents[0].appendChild(TreeItem(data, parent))
                 continue
 
@@ -405,7 +424,8 @@ class FileSystemScan(QThread):
                     indentations.pop()
             # Append a new item to the current parent's list of children.
             date = QDateTime().fromTime_t(os.stat(dir).st_mtime)
-            data = [os.path.basename(dir), dir, date, None]
+            # TODO Size data to number of columns in use
+            data = [os.path.basename(dir), dir, date, None, None]
             parents[-1].appendChild(TreeItem(data, parents[-1]))
 
     def run(self):
@@ -530,8 +550,8 @@ class RunsModel(QAbstractItemModel):
         super(RunsModel, self).__init__(parent)
         self.style = style
         self.startRunsStatusServer()
-        self.headerdata = ["Name", "Path", "Date", "Status", "Comment",
-                           "Device", "Shot number", "Run number"]
+        self.headerdata = ['Name', 'Path', 'Date', 'Status', 'Label',
+                           'Comment', 'Device', 'Shot', 'Run']
         self.columns = len(self.headerdata)
         self.rootItem = TreeItem(self.headerdata)
 
@@ -691,16 +711,17 @@ class RunsModel(QAbstractItemModel):
 
     def create_indices_for_columns(self):
         "Create hashed dictionary for updating columns specified by path"
-        self.column_index = dict()  # path : (itemData, status, date)
+        self.column_index = dict()  # path : (itemData, status, date, label)
         child_items = [self.rootItem.childItems]
         while child_items:
             items = child_items.pop(0)
             for row, childItem in enumerate(items):
                 date_index = self.createIndex(row, Column.date, childItem)
                 status_index = self.createIndex(row, Column.status, childItem)
+                label_index = self.createIndex(row, Column.label, childItem)
                 path = childItem.data(Column.path)
-                self.column_index[path] = (childItem.itemData,
-                                           date_index, status_index)
+                self.column_index[path] = (childItem.itemData,  date_index,
+                                           status_index, label_index)
                 if childItem.childItems:
                     child_items.append(childItem.childItems)
 
@@ -1015,8 +1036,8 @@ class SOLPS_MainWindow(QMainWindow):
         return model
 
     def textFilterChanged(self):
-        filter_index = self.comboBoxRunFilerType.currentIndex()
-        filter_syntax = self.comboBoxRunFilerType.itemData(filter_index)
+        filter_index = self.comboBoxRunFilterType.currentIndex()
+        filter_syntax = self.comboBoxRunFilterType.itemData(filter_index)
         syntax = QRegExp.PatternSyntax(filter_syntax)
         case_sense = (self.filterCaseSensitivityCheckBox.isChecked() and
                       Qt.CaseSensitive or Qt.CaseInsensitive)
