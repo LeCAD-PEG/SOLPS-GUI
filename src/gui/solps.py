@@ -40,7 +40,7 @@ from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
                           QSortFilterProxyModel, QRegExp, QObject)
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
-                             QFileDialog, QStyle, QPlainTextEdit)
+                             QFileDialog, QStyle)
 from PyQt5.QtGui import QStandardItemModel
 from PyQt5.uic import loadUi
 from os.path import expanduser
@@ -57,7 +57,7 @@ class Column(IntEnum):
     Attributes:
         name : Basename of the directory
         path : Full path to the directory
-        date : Last status update of the directory
+        date : Last status update of the directory. Uses LC_TIME environment.
         status : Status retrieved from status & log files or via network update
         label : One line description of the run from b2mn.dat
     """
@@ -268,8 +268,8 @@ class RetrieveRunsFolderInfo(QThread):
         runs_model (RunsModel): Model that holds Runs
 
     Attributes:
-        status (pyqtSignal(str)): Emits start/stop notices for status bar.
-        progress (pyqtSignal(str)): Directory that is being processed
+        status(pyqtSignal(str)): Emits start/stop notices for status bar.
+        progress(pyqtSignal(str)): Directory that is being processed
         statusChanged (pyqtSignal(QModelIndex, QModelIndex)) :
             Changed index range for table view update
 
@@ -282,13 +282,13 @@ class RetrieveRunsFolderInfo(QThread):
         super(RetrieveRunsFolderInfo, self).__init__(parent)
         self.model = runs_model
 
-    def retrieve_folder_state(self, dir):
+    def retrieve_folder_state(self, directory):
         """ Scans directory for existance of status and log files.
 
         .status and run.log are scanned for status and errors.
 
         Args:
-            dir (str): Directory to scan
+            directory (str): Directory to scan
         Returns:
             time, status (str, str), static_data : Tuple that is at
                 least directory time and empty string. Otherwise it returns
@@ -297,7 +297,7 @@ class RetrieveRunsFolderInfo(QThread):
                 various files.
         """
         # Firstly try to extract label from b2mn.dat
-        path = dir + '/b2mn.dat'
+        path = directory + '/b2mn.dat'
         label = ''
         if os.path.exists(path):
             try:
@@ -310,20 +310,20 @@ class RetrieveRunsFolderInfo(QThread):
             except OSError:
                 label = 'unreadable'
 
-        static_data = ( label )
+        static_data = label
 
         # Show last line of .status
-        path = dir + '/.status'
+        path = directory + '/.status'
         if os.path.exists(path):
             mtime = QDateTime.fromTime_t(os.path.getmtime(path))
             try:
                 with open(path) as file:
                     lines = file.read().splitlines()
-                return mtime, lines[-1], label
+                return mtime, lines[-1], static_data
             except OSError:
                 return mtime, '.status unknown', static_data
         # Parse run.log
-        path = dir + '/run.log'
+        path = directory + '/run.log'
         if os.path.exists(path):
             mtime = QDateTime.fromTime_t(os.path.getmtime(path))
             try:
@@ -343,7 +343,7 @@ class RetrieveRunsFolderInfo(QThread):
                 return mtime, 'run.log permission denied', static_data
         # Try to return at least directory date as last status
         try:
-            mtime = QDateTime.fromTime_t(os.path.getmtime(dir))
+            mtime = QDateTime.fromTime_t(os.path.getmtime(directory))
             return mtime, '', static_data
         except OSError:
             return QDateTime().currentDateTime(), 'no access', static_data
@@ -1008,9 +1008,9 @@ class SOLPS_MainWindow(QMainWindow):
             settings = QSettings("ITER", "solps-gui")
             settings.beginGroup("Archive")
             settings.beginWriteArray("dirs")
-            for i, dir in enumerate(self.archive_dirs):
+            for i, directory in enumerate(self.archive_dirs):
                 settings.setArrayIndex(i)
-                settings.setValue("dir", dir)
+                settings.setValue("dir", directory)
             settings.endArray()
             settings.endGroup()
         else:
