@@ -305,7 +305,7 @@ class RetrieveRunsFolderInfo(QThread):
                     lines = file.read().splitlines()
                 for i, line in enumerate(lines):
                     if 'label' in line:
-                        label = lines[i+1]
+                        label = lines[i+1].strip("' ")
                         break
             except OSError:
                 label = 'unreadable'
@@ -340,7 +340,7 @@ class RetrieveRunsFolderInfo(QThread):
                 logging.warning("No status found in " + path)
                 return mtime, 'run.log without status', static_data
             except OSError:
-                return mtime, 'run.log permission denied'
+                return mtime, 'run.log permission denied', static_data
         # Try to return at least directory date as last status
         try:
             mtime = QDateTime.fromTime_t(os.path.getmtime(dir))
