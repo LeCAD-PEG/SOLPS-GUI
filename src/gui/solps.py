@@ -765,7 +765,6 @@ class RunsModel(QAbstractItemModel):
 
     @pyqtSlot(str)
     def jobStatusChanged(self, message):
-        print("Received job status update: ", message)
         try:
             name, path, status = message.split()
             try:
@@ -773,10 +772,12 @@ class RunsModel(QAbstractItemModel):
                 itemData[Column.status] = status
                 itemData[Column.date] = QDateTime().currentDateTime()
                 self.dataChanged.emit(date_index, status_index)
+                logging.info("Received job status update: " + message)
             except KeyError:  # TODO insert non monitored message anyway
-                print(path, "not monitored. Skipping status update.")
+                msg = path + " not monitored. Skipping status update."
+                logging.warning(msg)
         except ValueError:
-            print("Received invalid message:", message,
+            logging.error("Received invalid message: " + message +
                   "Message should be in <name> <path> <status> format.")
 
 
