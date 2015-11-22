@@ -7,6 +7,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   howto/index.rst
+
 GUI Python code description:
 
 .. automodule:: solps

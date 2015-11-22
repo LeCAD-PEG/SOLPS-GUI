@@ -43,7 +43,6 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QFileDialog, QStyle)
 from PyQt5.QtGui import QStandardItemModel
 from PyQt5.uic import loadUi
-from os.path import expanduser
 from enum import IntEnum
 
 REDIRECT_STDOUT_TO_LOG = False
@@ -143,7 +142,7 @@ class RunSettings(QDialog):
         # get GUI settings
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
-        rundir1 = settings.value("runDir1", expanduser("~"))
+        rundir1 = settings.value("runDir1", os.path.expanduser("~"))
         self.lineEdit_rundir1.setText(rundir1)
         rundir2 = settings.value("runDir2", "")
         self.lineEdit_rundir2.setText(rundir2)
@@ -173,7 +172,7 @@ class RunSettings(QDialog):
     def update_dir(self, line_edit):
         current_dir = line_edit.text()
         if current_dir == "":
-            current_dir = expanduser("~")
+            current_dir = os.path.expanduser("~")
         new_dir = QFileDialog.getExistingDirectory(self,
                                                    "Select Directory",
                                                    current_dir,
