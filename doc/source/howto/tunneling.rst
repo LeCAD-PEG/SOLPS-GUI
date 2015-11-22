@@ -1,12 +1,12 @@
-.. _socket-howto:
+.. _tunneling-howto:
+
+.. highlight:: csh
 
 *************************
 SOLPS-GUI Tunneling HOWTO
 *************************
 
 :Author: Leon Kos
-
-.. topic:: Abstract
 
 GUI is designed to run in a graphical environment on a local workstation or
 on a cluster with X11 environment. However, some cluster don't provide X11
@@ -32,11 +32,9 @@ Tunnelling Run status updates to local machine
 
 On your local machine (local), connect to the distant machine
 (hpc-login4.iter.org) by SSH, with the additional -R option so that
-SSH will TCP port-forward in reverse way as the server :
+SSH will TCP port-forward in reverse way as the server::
 
-.. code-block:: bash
-
-   local$ ssh -R 6667:localhost:6667 kosl@hpc-login4.iter.org
+    local$ ssh -R 6667:localhost:6667 kosl@hpc-login4.iter.org
 
 This will allow TCP connections on the port number 6666 on remote login node
 to be forwarded to the port number 6666 on the local machine through
@@ -47,32 +45,25 @@ But first, we need to create a fifo. The fifo is necessary to have two-way
 communication between the two channels. A simple shell pipe would only
 communicate left process' standard output to right process' standard input.
 Fifo makes this process cyclic. To prevent tunnel dropping after UDP client
-disconnection ``-k`` switch is needed.
-
-.. code-block:: bash
+disconnection ``-k`` switch is needed.::
 
    local$ mkfifo /tmp/fifo.${USER}
    local$ nc -v -k -l 6667 < /tmp/fifo.${USER} |
-   nc -u -v localhost 49406 > /tmp/fifo.${USER}
+      nc -u -v localhost 49406 > /tmp/fifo.${USER}
 
 On a cluster login node we just need to redirect UDP packets that we listen
 on port 49406 to port 6667 so that can be forwarded to our server. As UDP
-has no notion of :abbr:`EOT (End of Transfer)` *on a socket.* it is necessary
-with ``-w0`` to break the connection after the received packet has been
+has no notion of :abbr:`EOT (End of Transfer)` *on a socket* it is necessary
+that with ``-w0`` to break the connection after the received packet has been
 forwarded. If the connection has *not* been broken, you may wait on a ``recv``
 forever, because the socket will *not* tell you that there's nothing more to
-read (for now).
-
-.. code-block:: bash
+read (for now).::
 
    [kosl@hpc-login4 ~]$ mkfifo /tmp/fifo.${USER}
    [kosl@hpc-login4 ~]$ nc -v localhost 6667 < /tmp/fifo.${USER} |
    nc -v -w0 -k -l 49406 -u > /tmp/fifo.${USER}
 
-
-Finally, one can test the status update tunnel in SOLPS-GUI Log after issuing
-
-.. code-block:: bash
+Finally, one can test the status update tunnel in SOLPS-GUI Log after issuing::
 
    [kosl@hpc-login4 ~]$ echo ${USER} ${PWD} status | nc -w0 -u localhost 49406
 
@@ -94,13 +85,11 @@ Sending Run status updates from compute nodes
 On many clusters network access from compute nodes to login node is not
 blocked and one can simply use netcat or provided client ``update_run_status``
 that is simple replacement for netcat with the following example usage within
-the batch submission script:
-
-.. code-block:: csh
+the batch submission script::
 
    echo ${USER} ${PWD} status | ./update_run_status 10.153.0.16 49406
 
-where ``10.153.0.16`` is the IP of the hpc-login4 node.
+where ``10.153.0.16`` is the IP of the *hpc-login4* node.
 
 On clusters that block backward connections from compute nodes to login node
 unprivileged ports even though these are usually internal networks is
@@ -111,19 +100,18 @@ submission channels used by :abbr:`MPI (Message Passing Interface)`. Most
 commonly this means that ``ssh`` connection from the compute node to the
 login node is possible. To be enable remote execution from the clients
 one needs to have SSH keypair generated without password on the login node
-and add it to known hosts by
-
-.. code-block:: csh
+and add it to known hosts by::
 
    [kosl@hpc-login4 ~]$ ssh-keygen -t rsa
    [kosl@hpc-login4 ~]$ test -z `ssh-keygen -F ${HOSTNAME}` \
-   && ssh-keyscan -t rsa -H ${HOSTNAME} >> ~/.ssh/known_hosts
+        && ssh-keyscan -t rsa -H ${HOSTNAME} >> ~/.ssh/known_hosts
    [kosl@hpc-login4 ~]$ ssh localhost ls
 
 After SSH keys verification, one can then test the batch submission update
-inside the script with
-
-.. code-block:: csh
+inside the script with::
 
    ssh hpc-login4 "echo ${USER} ${PWD} status | nc -w0 -u localhost 49406"
+
+Double quotes within the command mean that ``${USER} ${PWD}`` is replaced
+at the compute node before actual ssh command is executed on login node.
 

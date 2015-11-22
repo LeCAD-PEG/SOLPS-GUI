@@ -13,5 +13,6 @@ Currently, the HOWTOs are:
 .. toctree::
    :maxdepth: 1
 
-   sockets.rst
+   tunneling.rst
+   style.rst
 

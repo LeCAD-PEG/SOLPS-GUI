@@ -8,18 +8,12 @@ Contents:
    :maxdepth: 2
 
    howto/index.rst
-
-GUI Python code description:
-
-.. automodule:: solps
-   :members:
-
+   code/index.rst
 
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
 
