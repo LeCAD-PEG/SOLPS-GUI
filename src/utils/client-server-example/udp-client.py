@@ -5,8 +5,6 @@ import socket
 import sys
 
 class SIGSendStatus():
-#    ipAddr = ''
-#    port = ''
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     
     def __init__(self, msg, inIPaddress, inPort):
@@ -15,23 +13,28 @@ class SIGSendStatus():
         
         # create dgram udp socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        print('Connected to ', ipAddr, ':', port)
+        print('Sending UDP message to', ipAddr, ':', port)
         sock.sendto(bytes(msg, 'utf-8'), (ipAddr, port))
 
 if __name__ == '__main__':
 
     import sys
     msg = ''
-    num = len(sys.argv)
-    print("num: ", num)
+    argc = len(sys.argv)
 
-    if num >= 4:
+    if argc == 4:
         # all parameters given; send the message
-        SIGSendStatus(sys.argv[num-3], sys.argv[num-2], int(sys.argv[num-1]))
+        address = sys.argv[1]
+        port = int(sys.argv[2])
+        message = sys.argv[3]
+        SIGSendStatus(message, address, port)
     else:
         # ask usr for message
+        print("Example command line usage: python3 " + argv[0] +
+              " 127.0.0.1 45100 test")
+
         while (msg != 'quit'):
-            msg = input('Enter message to send :')           
+            msg = input('Enter message to send to 127.0.0.1:45100')           
             SIGSendStatus(msg, '127.0.0.1', 45100)
  
     sys.exit()

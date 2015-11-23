@@ -1,0 +1,17 @@
+--- qt-everywhere-opensource-src-5.5.0/qtbase/src/sql/drivers/mysql/qsql_mysql.cpp	2015-09-25 13:25:27.086425646 +0200
++++ qt-everywhere-opensource-src-5.5.0/qtbase/src/sql/drivers/mysql/qsql_mysql.cpp.orig	2015-09-25 13:24:45.086263000 +0200
+@@ -1276,11 +1276,11 @@
+     if ((d->mysql = mysql_init((MYSQL*) 0))) {
+ #if MYSQL_VERSION_ID >= 50000
+         if (connectTimeout != 0)
+-            mysql_options(d->mysql, MYSQL_OPT_CONNECT_TIMEOUT, (const char *)&connectTimeout);
++            mysql_options(d->mysql, MYSQL_OPT_CONNECT_TIMEOUT, &connectTimeout);
+         if (readTimeout != 0)
+-            mysql_options(d->mysql, MYSQL_OPT_READ_TIMEOUT, (const char *)&readTimeout);
++            mysql_options(d->mysql, MYSQL_OPT_READ_TIMEOUT, &readTimeout);
+         if (writeTimeout != 0)
+-            mysql_options(d->mysql, MYSQL_OPT_WRITE_TIMEOUT, (const char *)&writeTimeout);
++            mysql_options(d->mysql, MYSQL_OPT_WRITE_TIMEOUT, &writeTimeout);
+ #endif
+         if (mysql_real_connect(d->mysql,
+                                host.isNull() ? static_cast<const char *>(0)
