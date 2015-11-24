@@ -7,11 +7,12 @@
 
 .. toctree::
    :maxdepth: 2
-   :numbered:
 
-..   intro.rst
+   runstatus.rst
 
-   GUI Python code description:
+***********************
+Python code description
+***********************
 
 .. automodule:: solps
    :members:

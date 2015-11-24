@@ -32,6 +32,7 @@ Notes:
 import os
 import socket
 import sys
+import time
 import queue
 import logging
 
@@ -307,9 +308,18 @@ class RetrieveRunsFolderInfo(QThread):
                         label = lines[i+1].strip("' ")
                         break
             except OSError:
-                label = 'unreadable'
+                label = 'b2mn.dat unreadable'
 
         static_data = label
+
+        # Is there B2 running directory?
+        path = directory + '/b2mn.exe.dir'
+        if os.path.exists(path):
+            mtime = os.path.getmtime(path)
+            if time.time() - mtime > 60:  # Is it fresh enough in seconds?
+                return QDateTime.fromTime_t(mtime), 'CRASHED', static_data
+            else:
+                return QDateTime.fromTime_t(mtime), 'running', static_data
 
         # Show last line of .status
         path = directory + '/.status'
@@ -346,6 +356,8 @@ class RetrieveRunsFolderInfo(QThread):
             return mtime, '', static_data
         except OSError:
             return QDateTime().currentDateTime(), 'no access', static_data
+
+
 
     def run(self):
         """ Thread scans each listed directory of the Runs model.

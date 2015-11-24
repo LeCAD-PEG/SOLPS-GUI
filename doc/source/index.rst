@@ -6,6 +6,7 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
+   :numbered:
 
    howto/index.rst
    code/index.rst

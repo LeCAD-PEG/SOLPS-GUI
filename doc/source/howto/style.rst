@@ -1,4 +1,4 @@
-.. _tunneling-howto:
+.. _style-howto:
 
 .. highlight:: csh
 
@@ -29,7 +29,7 @@ Stylesheet can be be passed as a command line parameter as::
 
 where gnome.qss specifies
 
-..  code-block:: xml
+..  code-block:: css
 
     QTreeView
     {
