@@ -10,7 +10,7 @@ Contents:
 
    howto/index.rst
    code/index.rst
-
+   faq/index.rst
 
 Indices and tables
 ==================
