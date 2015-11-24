@@ -312,29 +312,11 @@ class RetrieveRunsFolderInfo(QThread):
 
         static_data = label
 
-        # Is there B2 running directory?
-        path = directory + '/b2mn.exe.dir'
-        if os.path.exists(path):
-            mtime = os.path.getmtime(path)
-            if time.time() - mtime > 60:  # Is it fresh enough in seconds?
-                return QDateTime.fromTime_t(mtime), 'CRASHED', static_data
-            else:
-                return QDateTime.fromTime_t(mtime), 'running', static_data
-
-        # Show last line of .status
-        path = directory + '/.status'
-        if os.path.exists(path):
-            mtime = QDateTime.fromTime_t(os.path.getmtime(path))
-            try:
-                with open(path) as file:
-                    lines = file.read().splitlines()
-                return mtime, lines[-1], static_data
-            except OSError:
-                return mtime, '.status unknown', static_data
         # Parse run.log
         path = directory + '/run.log'
         if os.path.exists(path):
-            mtime = QDateTime.fromTime_t(os.path.getmtime(path))
+            mtime = os.path.getmtime(path)
+            qtime = QDateTime.fromTime_t(mtime)
             try:
                 fsize = os.path.getsize(path)
                 with open(path) as f:
@@ -346,16 +328,37 @@ class RetrieveRunsFolderInfo(QThread):
                             or 'ERROR' in line \
                             or 'UNABLE' in line:
                         return mtime, line, static_data
+                # Is there B2 running directory?
+                b2mn_exe_dir = directory + '/b2mn.exe.dir'
+                if os.path.exists(b2mn_exe_dir):
+                    if time.time() - mtime > 60: # Is run.log fresh enough?
+                        return qtime, 'CRASHED', static_data
+                    else:
+                        return qtime, 'running', static_data
                 logging.warning("No status found in " + path)
+
                 return mtime, 'run.log without status', static_data
             except OSError:
                 return mtime, 'run.log permission denied', static_data
+
+        # Show last line of .status
+        path = directory + '/.status'
+        if os.path.exists(path):
+            mtime = QDateTime.fromTime_t(os.path.getmtime(path))
+            try:
+                with open(path) as file:
+                    lines = file.read().splitlines()
+                return mtime, lines[-1], static_data
+            except OSError:
+                return mtime, '.status unknown', static_data
+
         # Try to return at least directory date as last status
         try:
             mtime = QDateTime.fromTime_t(os.path.getmtime(directory))
             return mtime, '', static_data
         except OSError:
             return QDateTime().currentDateTime(), 'no access', static_data
+
 
 
 
@@ -575,6 +578,9 @@ class RunsModel(QAbstractItemModel):
         self.scanFileSystemThread.finished.connect(
             self.RetrieveRunsFolderInfoThread.start)
         self.RetrieveRunsFolderInfoThread.finished.connect(self.endResetModel)
+
+        # TODO text ElideLeft for the 'Name' column
+        # TODO editTriggers
 
     def startThreads(self):
         self.beginResetModel()
@@ -960,7 +966,6 @@ class SOLPS_MainWindow(QMainWindow):
             self.treeViewRuns.setModel(self.model)
 
         self.treeViewRuns.setRootIsDecorated(True)
-        self.treeViewRuns.setAlternatingRowColors(True)
         self.treeViewRuns.setSortingEnabled(True)
 
         self.lineEditRunFilter.returnPressed.connect(self.textFilterChanged)
@@ -1031,6 +1036,12 @@ class SOLPS_MainWindow(QMainWindow):
 
     @pyqtSlot()
     def enable_archive_button(self):
+        index = self.treeViewRuns.selectionModel().currentIndex()
+        model = self.proxyModel
+        index_path = model.index(index.row(), Column.path, index.parent())
+        path = model.data(index_path, Qt.DisplayRole)
+        self.lineEditRunFilter.setText(path)
+
         valid = self.treeViewRuns.selectionModel().currentIndex().isValid()
         self.pushButton_Archive.setEnabled(valid)
 
