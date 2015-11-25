@@ -316,7 +316,7 @@ class RetrieveRunsFolderInfo(QThread):
         path = directory + '/run.log'
         if os.path.exists(path):
             mtime = os.path.getmtime(path)
-            qtime = QDateTime.fromTime_t(mtime)
+            qtime = QDateTime.fromTime_t(mtime)  # Qt formatted datetime
             try:
                 fsize = os.path.getsize(path)
                 with open(path) as f:
@@ -327,7 +327,7 @@ class RetrieveRunsFolderInfo(QThread):
                             or 'failed' in line \
                             or 'ERROR' in line \
                             or 'UNABLE' in line:
-                        return mtime, line, static_data
+                        return qtime, line, static_data
                 # Is there B2 running directory?
                 b2mn_exe_dir = directory + '/b2mn.exe.dir'
                 if os.path.exists(b2mn_exe_dir):
@@ -337,25 +337,25 @@ class RetrieveRunsFolderInfo(QThread):
                         return qtime, 'running', static_data
                 logging.warning("No status found in " + path)
 
-                return mtime, 'run.log without status', static_data
+                return qtime, 'run.log without status', static_data
             except OSError:
-                return mtime, 'run.log permission denied', static_data
+                return qtime, 'run.log permission denied', static_data
 
         # Show last line of .status
         path = directory + '/.status'
         if os.path.exists(path):
-            mtime = QDateTime.fromTime_t(os.path.getmtime(path))
+            qtime = QDateTime.fromTime_t(os.path.getmtime(path))
             try:
                 with open(path) as file:
                     lines = file.read().splitlines()
-                return mtime, lines[-1], static_data
+                return qtime, lines[-1], static_data
             except OSError:
-                return mtime, '.status unknown', static_data
+                return qtime, '.status unknown', static_data
 
         # Try to return at least directory date as last status
         try:
-            mtime = QDateTime.fromTime_t(os.path.getmtime(directory))
-            return mtime, '', static_data
+            qtime = QDateTime.fromTime_t(os.path.getmtime(directory))
+            return qtime, '', static_data
         except OSError:
             return QDateTime().currentDateTime(), 'no access', static_data
 
