@@ -312,6 +312,7 @@ class RetrieveRunsFolderInfo(QThread):
 
         static_data = label
 
+
         # Parse run.log
         path = directory + '/run.log'
         if os.path.exists(path):
@@ -328,29 +329,34 @@ class RetrieveRunsFolderInfo(QThread):
                             or 'ERROR' in line \
                             or 'UNABLE' in line:
                         return qtime, line, static_data
+
                 # Is there B2 running directory?
                 b2mn_exe_dir = directory + '/b2mn.exe.dir'
                 if os.path.exists(b2mn_exe_dir):
                     if time.time() - mtime > 60: # Is run.log fresh enough?
-                        return qtime, 'CRASHED', static_data
+                        return qtime, 'CRASHED in b2mn.exe.dir', static_data
                     else:
-                        return qtime, 'running', static_data
+                        return qtime, 'Running', static_data
                 logging.warning("No status found in " + path)
-
                 return qtime, 'run.log without status', static_data
             except OSError:
                 return qtime, 'run.log permission denied', static_data
 
-        # Show last line of .status
+        # Retrieve last line of .status
         path = directory + '/.status'
         if os.path.exists(path):
-            qtime = QDateTime.fromTime_t(os.path.getmtime(path))
+            mtime = os.path.getmtime(path)
+            qtime = QDateTime.fromTime_t(mtime)
             try:
                 with open(path) as file:
                     lines = file.read().splitlines()
-                return qtime, lines[-1], static_data
+                last_status_line = lines[-1]
+                if time.time() - mtime > 60 and 'Started' in last_status_line:
+                    return qtime, 'CRASHED? ' + last_status_line, static_data
+                else:
+                    return qtime, last_status_line, static_data
             except OSError:
-                return qtime, '.status unknown', static_data
+                return qtime, '.status permission denied', static_data
 
         # Try to return at least directory date as last status
         try:
