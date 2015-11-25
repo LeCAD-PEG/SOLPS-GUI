@@ -48,9 +48,9 @@ and pressing :guilabel:`Stop` button.
 Starting the run
 ----------------
 
-Running locally is usually executed in command line with::
+Running locally is usually executed in ``csh`` command line with::
 
-   $ b2run b2mn < input.dat > run.log
+   $ b2run b2mn < input.dat >& run.log
 
 The same effect is done by selecting the run in Runs tree view
 and pressing :guilabel:`Start` button.

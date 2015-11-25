@@ -351,6 +351,7 @@ class RetrieveRunsFolderInfo(QThread):
                 with open(path) as file:
                     lines = file.read().splitlines()
                 last_status_line = lines[-1]
+                # detect crashed that 'Started' without run.log present
                 if time.time() - mtime > 60 and 'Started' in last_status_line:
                     return qtime, 'CRASHED? ' + last_status_line, static_data
                 else:
@@ -1131,8 +1132,21 @@ class SOLPS_MainWindow(QMainWindow):
             print("Creating %s" % self.lineEditSequenceName.text())
 
     @pyqtSlot()
-    def on_pushButtonRunFilter_clicked(self):
+    def on_pushButton_Filter_clicked(self):
         self.textFilterChanged()
+
+    @pyqtSlot()
+    def on_pushButton_Stop_clicked(self):
+        index = self.treeViewRuns.selectionModel().currentIndex()
+        model = self.proxyModel
+        index_path = model.index(index.row(), Column.path, index.parent())
+        index_status = model.index(index.row(), Column.status, index.parent())
+        path = model.data(index_path, Qt.DisplayRole)
+        model.setData(index_status, 'Stopping...')
+        # TODO touch .quit
+
+
+
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):
