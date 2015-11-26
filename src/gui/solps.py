@@ -662,6 +662,15 @@ class RunsModel(QAbstractItemModel):
         if role != Qt.EditRole:
             return False
 
+        if index.column() == Column.path or index.column() == Column.date \
+                or index.column() == Column.status:
+            return False
+
+        # disalow changing name except for aliased names (not saved)
+        if index.column() == Column.name and \
+                not self.parent(index) == QModelIndex():
+            return False
+
         item = self.getItem(index)
         result = item.setData(index.column(), value)
 
@@ -685,7 +694,7 @@ class RunsModel(QAbstractItemModel):
             if index.column() == 1:
                 return self.style.standardIcon(QStyle.SP_DirIcon)
 
-        if role != Qt.DisplayRole:
+        if role != Qt.DisplayRole and role != Qt.EditRole:
             return None
 
         item = index.internalPointer()
@@ -696,7 +705,7 @@ class RunsModel(QAbstractItemModel):
         if not index.isValid():
             return Qt.NoItemFlags
 
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
 
     def headerData(self, section, orientation, role=None):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
@@ -1043,12 +1052,6 @@ class SOLPS_MainWindow(QMainWindow):
 
     @pyqtSlot()
     def enable_archive_button(self):
-        index = self.treeViewRuns.selectionModel().currentIndex()
-        model = self.proxyModel
-        index_path = model.index(index.row(), Column.path, index.parent())
-        path = model.data(index_path, Qt.DisplayRole)
-        self.lineEditRunFilter.setText(path)
-
         valid = self.treeViewRuns.selectionModel().currentIndex().isValid()
         self.pushButton_Archive.setEnabled(valid)
 
