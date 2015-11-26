@@ -394,7 +394,8 @@ class RetrieveRunsFolderInfo(QThread):
             # Emit the range of columns that changed in the model
             self.statusChanged.emit(date_index, label_index)
             self.progress.emit(path)
-        msg = "Updating runs statuses finished."
+        msg = "Updating run statuses finished. " \
+                + str(len(self.model.column_index)) + " directories scanned."
         logging.info(msg)
         self.status.emit(msg)
 
