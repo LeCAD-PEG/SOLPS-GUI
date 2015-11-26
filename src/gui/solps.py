@@ -1146,7 +1146,7 @@ class SOLPS_MainWindow(QMainWindow):
         index_status = model.index(index.row(), Column.status, index.parent())
         path = model.data(index_path, Qt.DisplayRole)
         model.setData(index_status, 'Stopping...')
-        # TODO touch .quit
+        # TODO touch b2mn.exe.dir/.quit
 
 
 

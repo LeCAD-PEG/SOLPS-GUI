@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>536</width>
-    <height>344</height>
+    <height>303</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -174,7 +174,7 @@
           <widget class="QPushButton" name="pushButton_2">
            <property name="geometry">
             <rect>
-             <x>60</x>
+             <x>70</x>
              <y>30</y>
              <width>111</width>
              <height>31</height>
@@ -227,7 +227,7 @@
           <widget class="QPushButton" name="pushButton_3">
            <property name="geometry">
             <rect>
-             <x>10</x>
+             <x>20</x>
              <y>30</y>
              <width>81</width>
              <height>31</height>
@@ -343,12 +343,6 @@
         </item>
         <item row="3" column="0" colspan="5">
          <widget class="QTreeView" name="treeViewRuns">
-          <property name="editTriggers">
-           <set>QAbstractItemView::DoubleClicked</set>
-          </property>
-          <property name="showDropIndicator" stdset="0">
-           <bool>false</bool>
-          </property>
           <property name="dragEnabled">
            <bool>false</bool>
           </property>
@@ -357,12 +351,6 @@
           </property>
           <property name="textElideMode">
            <enum>Qt::ElideRight</enum>
-          </property>
-          <property name="allColumnsShowFocus">
-           <bool>true</bool>
-          </property>
-          <property name="expandsOnDoubleClick">
-           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -494,7 +482,7 @@
      <x>0</x>
      <y>0</y>
      <width>536</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -509,7 +497,7 @@
     </property>
     <addaction name="actionRuns_dirs"/>
     <addaction name="actionGlobal"/>
-    <addaction name="actionJob_submission"/>
+    <addaction name="actionRun_submission"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
@@ -550,9 +538,9 @@
     <string>About Qt</string>
    </property>
   </action>
-  <action name="actionJob_submission">
+  <action name="actionRun_submission">
    <property name="text">
-    <string>Job submission</string>
+    <string>Run submission</string>
    </property>
   </action>
  </widget>

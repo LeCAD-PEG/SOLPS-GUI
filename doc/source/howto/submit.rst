@@ -47,4 +47,11 @@ Scripts that ease submission are site dependent:
  * sgesubmit
 
 and they all look for ``QSUB.*`` templates that should resist in
-``${SOLPSTOP}/runs`` directories.
+``${SOLPSTOP}/runs`` directories. Different runs can have additional
+job submission options but ideally, single submit command in the directory
+should be sufficient for a submission script to figure out run type such as:
+  * standalone
+  * coulped with EIRENE
+  * compressed logs
+
+  
