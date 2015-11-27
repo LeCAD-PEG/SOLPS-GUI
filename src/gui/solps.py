@@ -296,13 +296,13 @@ class RetrieveRunsFolderInfo(QThread):
                 that string was retrieved from and other static data from
                 various files.
         """
-        # Firstly try to extract label from b2mn.dat
+        # Firstly try to extract label from the beginning of b2mn.dat
         path = directory + '/b2mn.dat'
         label = ''
         if os.path.exists(path):
             try:
                 with open(path) as file:
-                    lines = file.read().splitlines()
+                    lines = file.read(512).splitlines()  # just one sector
                 for i, line in enumerate(lines):
                     if 'label' in line:
                         label = lines[i+1].strip("' ")
@@ -663,13 +663,13 @@ class RunsModel(QAbstractItemModel):
         if role != Qt.EditRole:
             return False
 
-        if index.column() == Column.path or index.column() == Column.date \
-                or index.column() == Column.status:
+        column = index.column()
+
+        if  column == Column.path or column == Column.date:
             return False
 
-        # disalow changing name except for aliased names (not saved)
-        if index.column() == Column.name and \
-                not self.parent(index) == QModelIndex():
+        # disalow changing 'name' except for aliased names (not saved)
+        if column == Column.name and self.parent(index) != QModelIndex():
             return False
 
         item = self.getItem(index)
@@ -677,7 +677,21 @@ class RunsModel(QAbstractItemModel):
 
         if result:
             self.dataChanged.emit(index, index)
-
+            if column == Column.label:  # set the label in b2mn.dat
+                directory = item.data(Column.path)
+                path = directory + '/b2mn.dat'
+                try:
+                    with open(path) as file:
+                        lines = file.read().splitlines()  # whole file
+                    for i, line in enumerate(lines):
+                        if '*label' in line:
+                            lines[i+1] = " '" + value + "'"
+                            with open(path, 'w') as f:
+                                f.write('\n'.join(lines))
+                            break
+                except OSError:
+                    QMessageBox.warning(None, "Permission problem",
+                                        "Can't update " + path)
         return result
 
     # return self.columns
@@ -1141,16 +1155,28 @@ class SOLPS_MainWindow(QMainWindow):
 
     @pyqtSlot()
     def on_pushButton_Stop_clicked(self):
+        "Signal garceful stop "
         index = self.treeViewRuns.selectionModel().currentIndex()
         model = self.proxyModel
         index_path = model.index(index.row(), Column.path, index.parent())
-        index_status = model.index(index.row(), Column.status, index.parent())
-        path = model.data(index_path, Qt.DisplayRole)
-        model.setData(index_status, 'Stopping...')
-        # TODO touch b2mn.exe.dir/.quit
-
-
-
+        directory = model.data(index_path, Qt.DisplayRole)
+        # Is there B2 running directory?
+        try:
+            b2mn_exe_dir = directory + '/b2mn.exe.dir'
+            if os.path.exists(b2mn_exe_dir):
+                path = b2mn_exe_dir + '/.quit'
+                msg = "Graceful stop requested on " + time.ctime()
+                with open(path, 'w') as f:
+                    f.write(msg + '\n')
+                index_status = model.index(index.row(), Column.status,
+                                           index.parent())
+                model.setData(index_status, msg)
+            else:
+                QMessageBox.warning(None, "Invalid stop request",
+                                    "No b2mn.dir.exe for graceful stop!")
+        except OSError:
+            QMessageBox.warning(None, "Permission problem",
+                                        "Can't create " + path)
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):
