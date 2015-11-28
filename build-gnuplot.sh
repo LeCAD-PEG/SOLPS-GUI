@@ -1,7 +1,8 @@
 #!/bin/sh -x
 
 MAKE_JOBS=${MAKE_JOBS:-4}
-GNUPLOT_VERSION=4.6.7
+GNUPLOT_VERSION=5.0.1
+QT_VERSION=5.5.1
 
 BUILDROOT=${PWD}
 BUILD_DIR=${BUILDROOT}/build
@@ -20,8 +21,8 @@ install -d ${DOWNLOAD_DIR}
 
 LD_LIBRARY_PATH="${STAGING_DIR}/lib:${LD_LIBRARY_PATH}"
 export LD_LIBRARY_PATH
-
-## Install python
+PKG_CONFIG_PATH="${STAGING_DIR}/qt/${QT_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}"
+export PKG_CONFIG_PATH
 
 GNUPLOT_SRC="gnuplot-${GNUPLOT_VERSION}.tar.gz"
 GNUPLOT_SITE="http://sourceforge.net/projects/gnuplot/files/gnuplot"
@@ -39,7 +40,7 @@ if [ ! -e   ${GNUPLOT_SRC_DIR}/.built ]; then
   cd ${BUILD_DIR}
   tar xzf ${DOWNLOAD_DIR}/${GNUPLOT_SRC}
   cd ${GNUPLOT_SRC_DIR}
-  ./configure --prefix=${STAGING_DIR}
+  ./configure --enable-qt --without-cairo --prefix=${STAGING_DIR}
   make -j ${MAKE_JOBS}
   make install 
   touch ${GNUPLOT_SRC_DIR}/.built
