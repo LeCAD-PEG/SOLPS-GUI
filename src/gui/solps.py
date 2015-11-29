@@ -38,11 +38,11 @@ import logging
 
 from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
                           pyqtSignal, QThread, QAbstractItemModel, QVariant,
-                          QSortFilterProxyModel, QRegExp, QObject)
+                          QSortFilterProxyModel, QRegExp, QObject, QRect)
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
-                             QFileDialog, QStyle)
-from PyQt5.QtGui import QStandardItemModel
+                             QFileDialog, QStyle, QStyledItemDelegate, QStyleOptionViewItem)
+from PyQt5.QtGui import (QStandardItemModel, QFontMetrics, QPainter, QPen, QPixmap, QIcon)
 from PyQt5.uic import loadUi
 from enum import IntEnum
 
@@ -547,6 +547,53 @@ class TreeItem(object):
 
         return True
 
+class TextElideLeftDelegate(QStyledItemDelegate):
+    def __init__(self, parent=None, *args):
+        #QStyledItemDelegate.__init__(self, parent, *args)
+        super(TextElideLeftDelegate, self).__init__(parent)
+
+    def paint(self, painter, option, index):
+
+        painter.save()
+        # Elide column.name
+        if index.column() == 0:
+
+            painter.setPen(QPen(Qt.black))
+            value = index.data(Qt.DisplayRole)
+            icon = index.data(Qt.DecorationRole)
+            metrics = QFontMetrics(painter.font())
+            elided = metrics.elidedText(value,0,80,0)
+            elided = "       " + elided
+            if isinstance(value,str):
+                icon.paint(painter,option.rect,Qt.AlignLeft)
+                painter.drawText(option.rect, Qt.AlignLeft, elided)
+        else:
+            QStyledItemDelegate.paint(self,painter, option, index)
+
+        # Elide column.path
+        '''
+        else:
+
+            if index.column() == 1:
+
+                painter.setPen(QPen(Qt.black))
+                value = index.data(Qt.DisplayRole)
+                icon = index.data(Qt.DecorationRole)
+                metrics = QFontMetrics(painter.font())
+                elided = metrics.elidedText(value,0,200,0)
+                elided = "       " + elided
+                if isinstance(value,str):
+                    icon.paint(painter,option.rect,Qt.AlignLeft)
+                    painter.drawText(option.rect, Qt.AlignLeft, elided)
+
+            else:
+                QStyledItemDelegate.paint(self,painter, option, index)
+        '''
+
+        painter.restore()
+
+
+
 
 class RunsModel(QAbstractItemModel):
     """ Model for the Runs and Archive tree views.
@@ -570,24 +617,26 @@ class RunsModel(QAbstractItemModel):
     def __init__(self, style, parent=None):
         super(RunsModel, self).__init__(parent)
         self.style = style
+
         self.startRunsStatusServer()
+
         self.headerdata = ['Name', 'Path', 'Date', 'Status', 'Label',
                            'Comment', 'Device', 'Shot', 'Run']
         self.columns = len(self.headerdata)
         self.rootItem = TreeItem(self.headerdata)
-
         self.scanFileSystemThread = FileSystemScan(self)
         self.scanFileSystemThread.finished.connect(self.modelReset.emit)
-
         self.RetrieveRunsFolderInfoThread = RetrieveRunsFolderInfo(self)
-        self.RetrieveRunsFolderInfoThread.statusChanged.connect(
-            self.dataChanged.emit)
-        self.scanFileSystemThread.finished.connect(
-            self.RetrieveRunsFolderInfoThread.start)
+        self.RetrieveRunsFolderInfoThread.statusChanged.connect(self.dataChanged.emit)
+        self.scanFileSystemThread.finished.connect(self.RetrieveRunsFolderInfoThread.start)
         self.RetrieveRunsFolderInfoThread.finished.connect(self.endResetModel)
+
+
 
         # TODO text ElideLeft for the 'Name' column
         # TODO editTriggers
+
+
 
     def startThreads(self):
         self.beginResetModel()
@@ -814,6 +863,7 @@ class RunsModel(QAbstractItemModel):
                   "Message should be in <name> <path> <status> format.")
 
 
+
 class LoggingHandler(logging.Handler):
     def __init__(self, stream):
         super(LoggingHandler, self).__init__()
@@ -983,6 +1033,8 @@ class SOLPS_MainWindow(QMainWindow):
 
         self.treeViewRuns.setRootIsDecorated(True)
         self.treeViewRuns.setSortingEnabled(True)
+        ElideLeft = TextElideLeftDelegate(self,QStyledItemDelegate)
+        self.treeViewRuns.setItemDelegate(ElideLeft)
 
         self.lineEditRunFilter.returnPressed.connect(self.textFilterChanged)
 
