@@ -1,0 +1,6 @@
+Makefile
+sip*
+*.pro
+*.api
+*.so
+*.dylib
