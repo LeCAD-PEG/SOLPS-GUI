@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from PyQt5.QtCore import Qt, QProcess
+from PyQt5.QtCore import Qt, QProcess, pyqtSlot
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QLabel
 
@@ -8,29 +8,34 @@ class PyGnuplot(QLabel):
     def __init__(self, parent = None):
         super(PyGnuplot, self).__init__(parent)
         self.setAlignment(Qt.AlignCenter)
-        
+        self.process = QProcess()
+        self.process.finished.connect(self.show_plot)
+        self.process.error.connect(self.show_error)
+
     def plot(self, plot_command):
-        self.gnuplot = QProcess()
         cmd = 'set terminal gif size ' \
             + str(self.width()) + ', ' + str(self.height()) + '; ' \
-            + 'pause 3; ' + plot_command
-        self.gnuplot.start("gnuplot", ['-e', cmd])
-        if not self.gnuplot.waitForStarted():
-            self.setText("Error: gnuplot not started!")
-            return False
-        if not self.gnuplot.waitForFinished():
-            self.setText("Error: gnuplot not finished")
-            return False
-        data = self.gnuplot.readAll()
-        image = QImage()
-        image.loadFromData(data)
-        self.setPixmap(QPixmap.fromImage(image))
-        return True
+            + plot_command  + '; pause 3'  # artificial processing
+        self.process.start("../../staging/bin/gnuplot", ['-e', cmd])
 
+    @pyqtSlot(QProcess.ProcessError)
+    def show_error(self, error):
+        msg = ['Failed to Start', 'Crashed', 'Timedout', 'WriteError',
+            'ReadError', 'UnknownError']
+        self.setText('ProcessError: ' + msg[error])
+
+    @pyqtSlot(int)
+    def show_plot(self, exit_status):
+        if exit_status == 0:
+            data = self.process.readAll()
+            image = QImage()
+            image.loadFromData(data)
+            self.setPixmap(QPixmap.fromImage(image))
+        else:
+            self.setText('exit status = ' + str(exit_status))
 
 
 if __name__ == '__main__':
-
     import sys
     from PyQt5.QtWidgets import QApplication
 
@@ -38,5 +43,6 @@ if __name__ == '__main__':
     gnuplot = PyGnuplot()
     gnuplot.resize(451, 322)
     gnuplot.plot('plot sin(2*x)/x')
+    gnuplot.setText("Waiting for gnuplot to finish...")
     gnuplot.show()
     sys.exit(app.exec_())
