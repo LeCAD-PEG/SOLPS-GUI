@@ -38,11 +38,11 @@ import logging
 
 from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
                           pyqtSignal, QThread, QAbstractItemModel, QVariant,
-                          QSortFilterProxyModel, QRegExp, QObject)
-
+                          QSortFilterProxyModel, QRegExp, QObject, QRect,
+                          QSize)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
-                             QFileDialog, QStyle)
-from PyQt5.QtGui import QStandardItemModel
+                             QFileDialog, QStyle, QStyledItemDelegate)
+from PyQt5.QtGui import (QStandardItemModel, QFontMetrics, QPen)
 from PyQt5.uic import loadUi
 from enum import IntEnum
 
@@ -548,6 +548,36 @@ class TreeItem(object):
 
         return True
 
+class TextElideLeftDelegate(QStyledItemDelegate):
+    """ Elide text of the first column to the left (... at start).
+    This allows long folder names to be shown right aligned when they are too
+    long to fit int the column width as usually the folder name changes at the
+    end of the Run name (e.g. with sequence or parameter).
+    """
+    def __init__(self, parent=None):
+        super(TextElideLeftDelegate, self).__init__(parent)
+
+    def paint(self, painter, option, index):
+        painter.save()
+        if index.column() == Column.name:  # Elide text on the left
+            painter.setPen(QPen(Qt.black))
+            value = index.data(Qt.DisplayRole)
+            icon = index.data(Qt.DecorationRole)
+            rect_size = QSize(option.rect.width(), option.rect.height())
+            icon_width = icon.actualSize(rect_size).width() + 4  # spacer too
+            text_width = option.rect.width() - icon_width
+            metrics = QFontMetrics(painter.font())
+            elided_text = metrics.elidedText(value, 0, text_width, 0)
+            if isinstance(value, str):
+                icon.paint(painter, option.rect, Qt.AlignLeft)
+                x, y, width, height = option.rect.getCoords()
+                text_rect = QRect(x + icon_width, y,
+                                  width - icon_width, height)
+                painter.drawText(text_rect, Qt.AlignLeft, elided_text)
+        else:
+            QStyledItemDelegate.paint(self, painter, option, index)
+        painter.restore()
+
 
 class RunsModel(QAbstractItemModel):
     """ Model for the Runs and Archive tree views.
@@ -571,24 +601,21 @@ class RunsModel(QAbstractItemModel):
     def __init__(self, style, parent=None):
         super(RunsModel, self).__init__(parent)
         self.style = style
+
         self.startRunsStatusServer()
+
         self.headerdata = ['Name', 'Path', 'Date', 'Status', 'Label',
                            'Comment', 'Device', 'Shot', 'Run']
         self.columns = len(self.headerdata)
         self.rootItem = TreeItem(self.headerdata)
-
         self.scanFileSystemThread = FileSystemScan(self)
         self.scanFileSystemThread.finished.connect(self.modelReset.emit)
-
         self.RetrieveRunsFolderInfoThread = RetrieveRunsFolderInfo(self)
         self.RetrieveRunsFolderInfoThread.statusChanged.connect(
             self.dataChanged.emit)
         self.scanFileSystemThread.finished.connect(
             self.RetrieveRunsFolderInfoThread.start)
         self.RetrieveRunsFolderInfoThread.finished.connect(self.endResetModel)
-
-        # TODO text ElideLeft for the 'Name' column
-        # TODO editTriggers
 
     def startThreads(self):
         self.beginResetModel()
@@ -829,6 +856,7 @@ class RunsModel(QAbstractItemModel):
                   "Message should be in <name> <path> <status> format.")
 
 
+
 class LoggingHandler(logging.Handler):
     def __init__(self, stream):
         super(LoggingHandler, self).__init__()
@@ -998,6 +1026,10 @@ class SOLPS_MainWindow(QMainWindow):
 
         self.treeViewRuns.setRootIsDecorated(True)
         self.treeViewRuns.setSortingEnabled(True)
+
+        # Create a delegate for first column to elide text to the left
+        elide_left_delegate = TextElideLeftDelegate(self.treeViewRuns)
+        self.treeViewRuns.setItemDelegate(elide_left_delegate)
 
         self.lineEditRunFilter.returnPressed.connect(self.textFilterChanged)
 
