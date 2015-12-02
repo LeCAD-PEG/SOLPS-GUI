@@ -69,11 +69,17 @@ properties. Therefore, usually two directories are created:
  * ``widgets`` with custom widget code, and
  * ``python`` Qt Designer code that describe each widget. Directory containing
    these .py files is pointed with ``PYQTDESIGNERPATH`` environment variable
-   for Python designer loader to load them at startup.
+   for Python designer loader to load them at startup. Plugin loader requires
+   that the name of plugin must glob to ``py*plugin.py``. For example:
+   ``pygnuplotplugin.py``.
 
 Custom widget code needs to be visible to Qt Designer too by installing them
 into ``site-packages`` or with the usual ``PYTHONPATH`` environment variable.
 
+.. note::
+   On *OS X* plugin loader needs to be re-compiled with absolute path specified
+   for ``PYTHON_LIB`` define in ``Makefile`` to load Python interpreter
+   correctly.
 
 C++ binding for PyQt
 ====================
