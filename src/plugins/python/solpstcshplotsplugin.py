@@ -2,18 +2,18 @@
 
 """
 
-A SOLPS scripts combobox widget custom widget plugin for Qt Designer.
+A SOLPS Plots ComboBox custom widget plugin for Qt Designer.
 
 """
 
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
 
-from solpscomboscripts import SolpsComboScripts
+from solpstcshplots import SolpsTcshPlots
 
 
-class SolpsComboScriptsPlugin(QPyDesignerCustomWidgetPlugin):
-    """SolpsComboScriptsPlugin(QPyDesignerCustomWidgetPlugin)
+class SolpsTcshPlotsPlugin(QPyDesignerCustomWidgetPlugin):
+    """SolpsTcshPlotsPlugin(QPyDesignerCustomWidgetPlugin)
     
     Provides a Python custom plugin for Qt Designer by implementing the
     QDesignerCustomWidgetPlugin via a PyQt-specific custom plugin class.
@@ -23,7 +23,7 @@ class SolpsComboScriptsPlugin(QPyDesignerCustomWidgetPlugin):
     # initialized variable.
     def __init__(self, parent=None):
     
-        super(SolpsComboScriptsPlugin, self).__init__(parent)
+        super(SolpsTcshPlotsPlugin, self).__init__(parent)
 
         self.initialized = False
 
@@ -44,12 +44,12 @@ class SolpsComboScriptsPlugin(QPyDesignerCustomWidgetPlugin):
     # This factory method creates new instances of our custom widget with the
     # appropriate parent.
     def createWidget(self, parent):
-        return SolpsComboScripts(parent)
+        return SolpsTcshPlots(parent)
 
     # This method returns the name of the custom widget class that is provided
     # by this plugin.
     def name(self):
-        return "SolpsComboScripts"
+        return "SolpsTcshPlots"
 
     # Returns the name of the group in Qt Designer's widget box that this
     # widget belongs to.
@@ -81,12 +81,12 @@ class SolpsComboScriptsPlugin(QPyDesignerCustomWidgetPlugin):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="SolpsComboScripts" name="SolpsComboScripts" />\n'
+        return '<widget class="SolpsTcshPlots" name="SolpsTcshPlots" />\n'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.
     def includeFile(self):
-        return "solpscomboscripts"
+        return "solpstcshplots"
 
 
 # Define the image used for the icon.

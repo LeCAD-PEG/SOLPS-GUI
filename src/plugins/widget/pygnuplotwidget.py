@@ -3,7 +3,7 @@
 """
 pygnuplotwidget.py
 
-A PyQt custom widget example for Qt Designer.
+A PyQt custom http://www.gnuplot.info/ widget for Qt Designer.
 
 """
 
@@ -20,8 +20,8 @@ class PyGnuplotWidget(QLabel):
     """
     
     def __init__(self, parent=None):
-    
         super(PyGnuplotWidget, self).__init__(parent)
+        self._gnuplot_path = "/usr/bin/gnuplot"
         self.setAlignment(Qt.AlignCenter)
         self.setFrameStyle(QFrame.StyledPanel)
         self.setMinimumSize(QSize(180, 100))
@@ -29,6 +29,7 @@ class PyGnuplotWidget(QLabel):
         self.process = QProcess()
         self.process.finished.connect(self.show_plot)
         self.process.started.connect(self.started)
+        #self.process.stateChanged.connect(self.stateChanged)
         self.process.error.connect(self.show_error)
 
 
@@ -44,46 +45,67 @@ class PyGnuplotWidget(QLabel):
     def started(self):
         self.setText("Gnuplot process started.")
 
+    @pyqtSlot(QProcess.ProcessState)
+    def stateChanged(self, newState):
+        states = ['Not Running', 'Starting', 'Running']
+        msg = 'Process state changed: ' + states[newState]
+        print(msg)
+        self.setText(msg)
+
     @pyqtSlot(str)
     def plot(self, plot_command):
-        """ Start gnuplot and write commands in standard input.
-            Executable requires absolute path. No ${PATH} possible!
-            Pause command demonstrates artificial processing and
-            can be removed for production.
+        """ Starts gnuplot process and sends plot commands through the
+            standard input. Everything after # is truncated
         """
+        if self.process.state() != QProcess.NotRunning:
+            self.setText("Process still running. Command ignored!")
+            self.process.terminate()
+            return
+
         cmd = 'set terminal gif size ' \
-            + str(self.width()) + ', ' + str(self.height()) + '; ' \
-            + plot_command  + '; quit;\n'
-        print(cmd)
-        self.process.start("/usr/bin/gnuplot")  # Check this path
-        self.process.writeData(bytearray(cmd, 'utf8'))
+            + str(self.width()) + ', ' + str(self.height()) + '\n' \
+            + 'plot ' + plot_command.split('#', 1)[0]  + '\nquit\n'
+        # print(cmd)
+        self.process.start(self._gnuplot_path)
+        chars_written = self.process.write(bytearray(cmd, 'utf8'))
+        assert(chars_written >= 0)
 
     @pyqtSlot(QProcess.ProcessError)
     def show_error(self, error):
-        msg = ['Failed to Start', 'Crashed', 'Timedout', 'WriteError',
+        errors = ['Failed to Start', 'Crashed', 'Timedout', 'WriteError',
             'ReadError', 'UnknownError']
-        self.setText('ProcessError: ' + msg[error])
+        msg = 'ProcessError: ' + errors[error]
+        print(msg)
+        self.setText(msg)
 
     @pyqtSlot(int)
     def show_plot(self, exit_status):
-        print("Plot finished")
         if exit_status == 0:
             data = self.process.readAll()
             image = QImage()
             image.loadFromData(data)
             self.setPixmap(QPixmap.fromImage(image))
         else:
-            self.setText('exit status = ' + str(exit_status))
+            msg = 'Process finished unexpectedly!\nExit status = '
+            if exit_status == 1:
+                msg += ' 1 [EXIT_FAILURE]'
+            else:
+                msg += str(exit_status)
+            self.setText(msg)
 
 
 
-    # The setAngle() setter method is also a slot.
+
     @pyqtSlot(int)
-    def setAngle(self, angle):
-        self._angle = min(max(0, angle), 360)
-        self.update()
-    
-    #angle = pyqtProperty(int, getAngle, setAngle)
+    def setGnuplotPath(self, gnuplot_path):
+        """ Executable requires absolute path. No ${PATH} possible!
+        """
+        self._gnuplot_path = gnuplot_path
+
+    def getGnuplotPath(self):
+        return self._gnuplot_path
+
+    gnuplotPath = pyqtProperty(str, getGnuplotPath, setGnuplotPath)
 
     """
     # The innerRadius property is implemented using the getInnerRadius() and

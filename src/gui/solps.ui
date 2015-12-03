@@ -411,37 +411,38 @@
        <widget class="PyGnuplotWidget" name="gnuplot1">
         <property name="geometry">
          <rect>
-          <x>20</x>
+          <x>10</x>
           <y>10</y>
           <width>241</width>
-          <height>161</height>
+          <height>141</height>
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="comboBox_4">
+       <widget class="QPushButton" name="pushButton_9">
         <property name="geometry">
          <rect>
-          <x>20</x>
-          <y>180</y>
-          <width>241</width>
+          <x>300</x>
+          <y>160</y>
+          <width>80</width>
           <height>23</height>
          </rect>
         </property>
-        <item>
-         <property name="text">
-          <string extracomment="Energy analysis">energy_analysis</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>energy_analysis_fht</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>resall_D</string>
-         </property>
-        </item>
+        <property name="text">
+         <string>PushButton</string>
+        </property>
+       </widget>
+       <widget class="SolpsTcshPlots" name="SolpsTcshPlots">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>160</y>
+          <width>238</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_5">
@@ -585,6 +586,11 @@
    <extends>QLabel</extends>
    <header>pygnuplotwidget</header>
   </customwidget>
+  <customwidget>
+   <class>SolpsTcshPlots</class>
+   <extends>QComboBox</extends>
+   <header>solpstcshplots</header>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections>
@@ -601,6 +607,38 @@
     <hint type="destinationlabel">
      <x>299</x>
      <y>186</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_9</sender>
+   <signal>clicked()</signal>
+   <receiver>SolpsTcshPlots</receiver>
+   <slot>triggerTextChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>339</x>
+     <y>231</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>224</x>
+     <y>227</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SolpsTcshPlots</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>gnuplot1</receiver>
+   <slot>plot(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>90</x>
+     <y>224</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>101</x>
+     <y>164</y>
     </hint>
    </hints>
   </connection>

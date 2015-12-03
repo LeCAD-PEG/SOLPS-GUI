@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 """
-Polygonwidgetplugin.py
+pygnuplotplugin.py
 
-A gnuplot widget custom widget plugin for Qt Designer.
+A gnuplot http://www.gnuplot.info/ custom widget plugin for Qt Designer.
 
 """
 

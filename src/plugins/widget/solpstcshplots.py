@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-SolpsComboScripts.py
+solpstcshplots.py
 
 A PyQt custom widget example for Qt Designer.
 
@@ -12,20 +12,32 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QComboBox
 
 
-class SolpsComboScripts(QComboBox):
-    """SolpsComboScripts(QWidget)
+class SolpsTcshPlots(QComboBox):
+    """SolpsTcshPlots(QComboBox)
     
-    Provides a custom widget to display a gnuplot with properties and slots
-    that can be used to customize its appearance.
+    Provides a custom widget that holds all SOLPS Gnuplot script names
+    for combining them with
     """
     
     def __init__(self, parent=None):
-        super(SolpsComboScripts, self).__init__(parent)
-        self.addItems(_solps_scripts)
+        super(SolpsTcshPlots, self).__init__(parent)
+        self.setEditable(True)
+        self.addItems(_tcsh_solps_scripts)
 
-# grep -H plot * | grep -v .py |  sed 's/\([a-zA-Z0-9_+-]*\):.*/    \"\1 # \",/'|sort|uniq
-_solps_scripts = [
-    "plot sin(x)",
+    @pyqtSlot()
+    def triggerTextChanged(self):
+        """ Connector that receives a signal and re-emits the current text.
+        """
+        self.editTextChanged.emit(self.currentText())
+        self.currentTextChanged.emit(self.currentText())
+
+# List of TCSH plot scripts in solps-iter/scripts obtained by
+# grep -H plot * | grep -v .py | \
+#  sed 's/\([a-zA-Z0-9_+-]*\):.*/    \"\1 # \",/' | sort | uniq
+# TODO(mprotic): Add plot description after each # by looking into solps.pdf
+_tcsh_solps_scripts = [
+    "sin(x)",
+    "sin(3*x)/x",
     "2d # ",
     "2da # ",
     "2d_plots # ",
@@ -205,7 +217,7 @@ if __name__ == "__main__":
     from PyQt5.QtWidgets import QApplication
 
     app = QApplication(sys.argv)
-    window = SolpsComboScripts()
+    window = SolpsTcshPlots()
     window.show()
     sys.exit(app.exec_())
 
