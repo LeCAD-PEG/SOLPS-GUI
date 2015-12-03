@@ -21,7 +21,7 @@ import shlex
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../../src/gui'))
-sys.path.insert(0, os.path.abspath('../../src/plugins/widget'))
+sys.path.insert(0, os.path.abspath('../../src/plugins/widgets'))
 sys.path.insert(0, os.path.abspath('../../src/plugins/python'))
 
 # -- General configuration ------------------------------------------------
