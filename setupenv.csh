@@ -16,7 +16,7 @@ endif
 
 setenv PYQTDESIGNERPATH "${PWD}/src/plugins/python"
 if !($?PYTHONPATH) then
-    setenv PYTHONPATH "${PWD}/src/plugins/widget"
+    setenv PYTHONPATH "${PWD}/src/plugins/widgets"
 else
-    setenv PYTHONPATH "${PWD}/src/plugins/widget:${PYTHONPATH}"
+    setenv PYTHONPATH "${PWD}/src/plugins/widgets:${PYTHONPATH}"
 endif
