@@ -44,6 +44,7 @@ class PyGnuplotWidget(QLabel):
     def started(self):
         self.setText("Gnuplot process started.")
 
+    @pyqtSlot(str)
     def plot(self, plot_command):
         """ Start gnuplot and write commands in standard input.
             Executable requires absolute path. No ${PATH} possible!
