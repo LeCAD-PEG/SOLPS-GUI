@@ -13,10 +13,17 @@ class PyGnuplot(QLabel):
         self.process.error.connect(self.show_error)
 
     def plot(self, plot_command):
+        """ Start gnuplot and write commands in standard input.
+            Executable requires absolute path. No ${PATH} possible!
+            Pause command demonstrates artificial processing and
+            can be removed for production.
+        """
         cmd = 'set terminal gif size ' \
             + str(self.width()) + ', ' + str(self.height()) + '; ' \
-            + plot_command  + '; pause 3'  # artificial processing
-        self.process.start("../../staging/bin/gnuplot", ['-e', cmd])
+            + plot_command  + '; pause 3; quit;\n' 
+        print(cmd)
+        self.process.start("/usr/bin/gnuplot")  # Check this path
+        self.process.writeData(bytearray(cmd, 'utf8'))
 
     @pyqtSlot(QProcess.ProcessError)
     def show_error(self, error):

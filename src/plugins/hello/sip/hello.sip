@@ -2,6 +2,7 @@
 
 %Module hello
 
+%Import QtGui/QtGuimod.sip
 %Import QtWidgets/QtWidgetsmod.sip
 
 

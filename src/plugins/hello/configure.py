@@ -60,7 +60,7 @@ class ModuleConfiguration(object):
 
     # The version of the module as a string.  Set it to None if you don't
     # provide version information.
-    version = '5.5.1'
+    version = None
 
     # Set if a configuration script is provided that handles versions of PyQt4
     # prior to v4.10 (i.e. versions where the pyqtconfig.py module is
@@ -92,7 +92,7 @@ class ModuleConfiguration(object):
     # The name (without the .api extension) of the name of the hello API
     # file to be generated.  If it is None or an empty string then an API file
     # is not generated.
-    hello_api_file = 'hello'
+    hello_api_file = None
 
     # The email address that will be included when an error in the script is
     # detected.  Leave it blank if you don't want to include an address.
@@ -116,11 +116,11 @@ class ModuleConfiguration(object):
         configuration.
         """
 
-        target_configuration.hello_version = None
-        target_configuration.hello_inc_dir = None
-        target_configuration.hello_lib_dir = None
+        target_configuration.hello_version = '.'
+        target_configuration.hello_inc_dir = '.'
+        target_configuration.hello_lib_dir = '.'
         target_configuration.hello_is_dll = (target_configuration.py_platform == 'win32')
-        target_configuration.hello_sip_dir = None
+        target_configuration.hello_sip_dir = 'sip'
 
     def init_optparser(self, optparser, target_configuration):
         """ Perform any module specific initialisation of the command line
@@ -177,7 +177,7 @@ class ModuleConfiguration(object):
             target_configuration.hello_sip_dir = target_configuration.pyqt_sip_dir
 
         if options.hello_no_sip_files:
-            target_configuration.hello_sip_dir = ''
+            target_configuration.hello_sip_dir = 'sip'
 
     def check_module(self, target_configuration):
         """ Perform any module specific checks now that the target
@@ -193,34 +193,37 @@ class ModuleConfiguration(object):
         target_configuration.hello_version = hello_version
 
 
-        """
-        sciglobal = os.path.join(inc_dir, 'hello', 'helloglobal.h')
+        
+        sciglobal = os.path.join(inc_dir, '.', 'hello.h')
 
         if not os.access(sciglobal, os.F_OK):
             error(
-                    "hello/helloglobal.h could not be found in %s. If "
+                    "hello.h could not be found in %s. If "
                     "hello is installed then use the --hello-incdir "
                     "argument to explicitly specify the correct "
                     "directory." % inc_dir)
 
+        """
         # Get the hello version string.
         hello_version = read_define(sciglobal, 'hello_VERSION_STR')
         if hello_version is None:
             error(
                     "The hello version number could not be determined by "
                     "reading %s." % sciglobal)
-
+        """
+        
         lib_dir = target_configuration.hello_lib_dir
         if lib_dir is None:
             lib_dir = target_configuration.qt_lib_dir
 
-        if not glob.glob(os.path.join(lib_dir, '*hello2*')):
+
+        """
+        if not glob.glob(os.path.join(lib_dir, '*hello*')):
             error(
                     "The hello library could not be found in %s. If "
                     "hello is installed then use the --hello-libdir "
                     "argument to explicitly specify the correct "
                     "directory." % lib_dir)
-
         # Because we include the Python bindings with the C++ code we can
         # reasonably force the same version to be used and not bother about
         # versioning in the .sip files.
@@ -263,7 +266,7 @@ class ModuleConfiguration(object):
         the target configuration.
         """
 
-        return 'hello.sip' 
+        return 'sip/hello.sip' 
 
     def get_sip_installs(self, target_configuration):
         """ Return a tuple of the installation directory of the module's .sip

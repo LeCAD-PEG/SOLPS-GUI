@@ -1017,6 +1017,10 @@ class SOLPS_MainWindow(QMainWindow):
             self.enable_archive_button)
         self.treeViewArchive.selectionModel().selectionChanged.connect(
             self.enable_restore_button)
+        self.gnuplot1.plot("plot sin(x)")
+        self.gnuplot1.setText("Started")
+        print(self.gnuplot1.process.state())
+        #self.gnuplot1.process.finished.connect(self.gnuplot1.show_plot)
 
     @pyqtSlot()
     def on_pushButton_Archive_clicked(self):

@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>536</width>
+    <width>528</width>
     <height>303</height>
    </rect>
   </property>
@@ -33,7 +33,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -408,6 +408,41 @@
        <attribute name="title">
         <string>&amp;Dashboard</string>
        </attribute>
+       <widget class="PyGnuplotWidget" name="gnuplot1">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>10</y>
+          <width>241</width>
+          <height>161</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="comboBox_4">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>180</y>
+          <width>241</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <item>
+         <property name="text">
+          <string extracomment="Energy analysis">energy_analysis</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>energy_analysis_fht</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>resall_D</string>
+         </property>
+        </item>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_5">
        <attribute name="title">
@@ -481,7 +516,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>536</width>
+     <width>528</width>
      <height>20</height>
     </rect>
    </property>
@@ -544,6 +579,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PyGnuplotWidget</class>
+   <extends>QLabel</extends>
+   <header>pygnuplotwidget</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

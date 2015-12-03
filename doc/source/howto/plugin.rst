@@ -110,13 +110,14 @@ Minimal C++ to PyQt example
 
 The following *Hello, SOLPS* example can be used to describe previous steps
 with files and a resulting test in Python. The example from SIP tutorial [5]_
-for PyQt4  is upgraded here for PyQt5 and has the follwoing directory
+for PyQt4  is upgraded here for PyQt5 and has the following directory
 structure::
 
  hello -+
-        +- widget
-        +- sip
-        +- test
+        +- hello.h
+        +- hello.cpp
+        +- configure.py
+        +- hello_test.py
 
 
 Building widget
@@ -168,28 +169,6 @@ Building widget
         return *this;
     }
 
-.. code-block:: make
-   :caption: hello-widget.pro
-
-    QT       += core widgets
-
-    TARGET = hello
-
-    TEMPLATE = lib
-
-    SOURCES += hello.cpp
-    HEADERS  += hello.h
-
-By isssuing::
-
-    $ qmake  hello-widget.pro
-    $ make
-
-shared libraries are created.
-
-Python bindings for Hello with SIP
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 .. code-block:: guess
    :caption: hello.sip
 
@@ -214,15 +193,18 @@ Python bindings for Hello with SIP
 
 To prepare build files ``configure.py`` needs to be edited and run with::
 
-    $ python3 configure.py --verbose --hello-incdir=../widget \
-     --hello-libdir=../widget \
-     --pyqt-sipdir=/usr/local/Cellar/pyqt5/5.5_2/share/sip/Qt5  \
-     --sip-incdir=/usr/local/Cellar/sip/4.16.9/include
+    $ python3 configure.py --verbose
     $ make
     $ make install
 
 For complete options usual ``python3 configure --help | less`` can be used.
 Installed widget is placed under Python's ``site-packages/PyQt5`` directory.
+To verify if the module hello.so has all shared libraries referenced issue::
+
+    $ ldd -r hello.so
+
+Undefined symbols may be fixed by adding missing library with ``-l`` in
+the ``Makefile`` generated.
 
 .. rubric:: References
 

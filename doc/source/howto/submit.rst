@@ -53,5 +53,3 @@ should be sufficient for a submission script to figure out run type such as:
   * standalone
   * coulped with EIRENE
   * compressed logs
-
-  
