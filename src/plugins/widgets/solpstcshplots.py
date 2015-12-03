@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
 """
-solpstcshplots.py
 
-A PyQt custom widget example for Qt Designer.
+A PyQt custom widget with embedded list of SOLPS scripts.
 
 """
 

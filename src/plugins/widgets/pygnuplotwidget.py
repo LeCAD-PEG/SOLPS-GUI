@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-
-"""
-pygnuplotwidget.py
-
-A PyQt custom http://www.gnuplot.info/ widget for Qt Designer.
-
+""" A PyQt custom http://www.gnuplot.info/ widget for Qt Designer.
 """
 
 from PyQt5.QtCore import Qt, QProcess, QSize, pyqtSlot, pyqtProperty
@@ -13,10 +8,10 @@ from PyQt5.QtWidgets import QLabel, QFrame
 
 
 class PyGnuplotWidget(QLabel):
-    """PyGnuplotWidget(QWidget)
+    """ PyGnuplotWidget(QWidget)
     
-    Provides a custom widget to display a gnuplot with properties and slots
-    that can be used to customize its appearance.
+        Provides a custom widget to display a gnuplot with properties and slots
+        that can be used to customize its appearance.
     """
     
     def __init__(self, parent=None):
@@ -31,8 +26,6 @@ class PyGnuplotWidget(QLabel):
         self.process.started.connect(self.started)
         #self.process.stateChanged.connect(self.stateChanged)
         self.process.error.connect(self.show_error)
-
-
 
     def sizeHint(self):
     
@@ -93,9 +86,6 @@ class PyGnuplotWidget(QLabel):
                 msg += str(exit_status)
             self.setText(msg)
 
-
-
-
     @pyqtSlot(int)
     def setGnuplotPath(self, gnuplot_path):
         """ Executable requires absolute path. No ${PATH} possible!
@@ -106,78 +96,6 @@ class PyGnuplotWidget(QLabel):
         return self._gnuplot_path
 
     gnuplotPath = pyqtProperty(str, getGnuplotPath, setGnuplotPath)
-
-    """
-    # The innerRadius property is implemented using the getInnerRadius() and
-    # setInnerRadius() methods.
-
-    # The setInnerRadius() setter method is also a slot.
-    @pyqtSlot(int)
-    def setInnerRadius(self, radius):
-        self._innerRadius = radius
-        self.createPath()
-        self.createGradient()
-        self.update()
-    
-    innerRadius = pyqtProperty(int, getInnerRadius, setInnerRadius)
-    
-    # The outerRadius property is implemented using the getOuterRadius() and
-    # setOuterRadius() methods.
-    
-    def getOuterRadius(self):
-        return self._outerRadius
-    
-    # The setOuterRadius() setter method is also a slot.
-    @pyqtSlot(int)
-    def setOuterRadius(self, radius):
-        self._outerRadius = radius
-        self.createPath()
-        self.createGradient()
-        self.update()
-    
-    outerRadius = pyqtProperty(int, getOuterRadius, setOuterRadius)
-    
-    # The numberOfSides property is implemented using the getNumberOfSides()
-    # and setNumberOfSides() methods.
-    
-    def getNumberOfSides(self):
-        return self._sides
-    
-    # The setNumberOfSides() setter method is also a slot.
-    @pyqtSlot(int)
-    def setNumberOfSides(self, sides):
-        self._sides = max(3, sides)
-        self.createPath()
-        self.update()
-    
-    numberOfSides = pyqtProperty(int, getNumberOfSides, setNumberOfSides)
-    
-    # The innerColor property is implemented using the getInnerColor() and
-    # setInnerColor() methods.
-    
-    def getInnerColor(self):
-        return self._innerColor
-    
-    def setInnerColor(self, color):
-        self._innerColor = max(3, color)
-        self.createGradient()
-        self.update()
-    
-    innerColor = pyqtProperty(QColor, getInnerColor, setInnerColor)
-    
-    # The outerColor property is implemented using the getOuterColor() and
-    # setOuterColor() methods.
-    
-    def getOuterColor(self):
-        return self._outerColor
-    
-    def setOuterColor(self, color):
-        self._outerColor = color
-        self.createGradient()
-        self.update()
-    
-    outerColor = pyqtProperty(QColor, getOuterColor, setOuterColor)
-    """
 
 if __name__ == "__main__":
 
