@@ -16,16 +16,22 @@ class PyGnuplotWidget(QLabel):
     
     def __init__(self, parent=None):
         super(PyGnuplotWidget, self).__init__(parent)
-        self._gnuplot_path = "/usr/bin/gnuplot"
+        self.gnuplot_path = "/usr/bin/gnuplot"
+        self.tcsh_path = '/bin/tcsh'
+        self.solps_top = None
+
         self.setAlignment(Qt.AlignCenter)
         self.setFrameStyle(QFrame.StyledPanel)
         self.setMinimumSize(QSize(180, 100))
         self.setText("Gnuplot widget for SOLPS")
-        self.process = QProcess()
-        self.process.finished.connect(self.show_plot)
-        self.process.started.connect(self.write_commands_to_gnuplot)
-        #self.process.stateChanged.connect(self.stateChanged)
-        self.process.error.connect(self.show_error)
+
+        self.gnuplot = QProcess()
+        self.tcsh = QProcess()
+
+        self.gnuplot.finished.connect(self.show_plot)
+        self.gnuplot.started.connect(self.write_commands_to_gnuplot)
+        #self.gnuplot.stateChanged.connect(self.stateChanged)
+        self.gnuplot.error.connect(self.show_error)
 
     def sizeHint(self):
         return QSize(320, 200)
@@ -42,28 +48,31 @@ class PyGnuplotWidget(QLabel):
         """ Starts gnuplot process and sends plot commands through the
             standard input. Everything after # is truncated
         """
-        if self.process.state() != QProcess.NotRunning:
-            self.setText("Process still running. Command ignored!")
-            self.process.terminate()
+        if self.gnuplot.state() != QProcess.NotRunning:
+            print("Gnuplot process still running. Command ignored!")
+            #  self.process.terminate()
             return
 
-        self._gnuplot_cmd = 'set terminal gif size ' \
+        self.gnuplot_cmd = 'set terminal gif size ' \
             + str(self.width()) + ', ' + str(self.height()) + '\n' \
             + 'plot ' + plot_command.split('#', 1)[0]  + '\nquit\n'
-        #print(self._gnuplot_cmd)
-        self.process.start(self._gnuplot_path)
+        #  print(self.gnuplot_cmd)
+        self.gnuplot.start(self.gnuplot_path)
 
     @pyqtSlot()
     def write_commands_to_gnuplot(self):
         """ After gnuplot process has started send the commands to the pipe.
             We rather wait to start than immediately write the pipe.
         """
-        print("Gnuplot process started.")
-        chars = self.process.write(bytearray(self._gnuplot_cmd, 'utf8'))
+        # print("Gnuplot process started.")
+        chars = self.gnuplot.write(bytearray(self.gnuplot_cmd, 'utf8'))
         assert(chars >= 0)
 
     @pyqtSlot(QProcess.ProcessError)
     def show_error(self, error):
+        """ Writes an error to the widget in case that the process failed
+            to start.
+        """
         errors = ['Failed to Start', 'Crashed', 'Timedout', 'WriteError',
             'ReadError', 'UnknownError']
         msg = 'ProcessError: ' + errors[error]
@@ -73,7 +82,7 @@ class PyGnuplotWidget(QLabel):
     @pyqtSlot(int)
     def show_plot(self, exit_status):
         if exit_status == 0:
-            data = self.process.readAll()
+            data = self.gnuplot.readAll()
             image = QImage()
             image.loadFromData(data)
             self.setPixmap(QPixmap.fromImage(image))
@@ -89,12 +98,30 @@ class PyGnuplotWidget(QLabel):
     def setGnuplotPath(self, gnuplot_path):
         """ Executable requires absolute path. No ${PATH} possible!
         """
-        self._gnuplot_path = gnuplot_path
+        self.gnuplot_path = gnuplot_path
 
     def getGnuplotPath(self):
-        return self._gnuplot_path
+        return self.gnuplot_path
 
     gnuplotPath = pyqtProperty(str, getGnuplotPath, setGnuplotPath)
+
+    @pyqtSlot(str)
+    def setSolpsTop(self, directory):
+        """
+        Args:
+             directory (str): Absolute path to SOLPS directory where setup.csh
+                              should reside. (Re)starts the TCSH environment
+        """
+        self.solps_top = directory
+        self.tcsh.start(self.tcsh_path)
+        self.tcsh.setWorkingDirectory(directory)
+        cmd = "cd " + directory + '\nsource setup.csh\necho TCSH READY\n'
+
+    def getSolpsTop(self):
+        return self.solps_top
+
+    solpsTop = pyqtProperty(str, getSolpsTop, setSolpsTop)
+
 
 if __name__ == "__main__":
 

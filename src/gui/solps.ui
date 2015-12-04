@@ -434,7 +434,7 @@
        <widget class="SolpsTcshPlots" name="SolpsTcshPlots">
         <property name="geometry">
          <rect>
-          <x>20</x>
+          <x>10</x>
           <y>160</y>
           <width>238</width>
           <height>23</height>
@@ -628,17 +628,17 @@
   </connection>
   <connection>
    <sender>SolpsTcshPlots</sender>
-   <signal>currentTextChanged(QString)</signal>
+   <signal>plotCommand(QString)</signal>
    <receiver>gnuplot1</receiver>
    <slot>plot(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>90</x>
-     <y>224</y>
+     <x>126</x>
+     <y>222</y>
     </hint>
     <hint type="destinationlabel">
-     <x>101</x>
-     <y>164</y>
+     <x>126</x>
+     <y>163</y>
     </hint>
    </hints>
   </connection>

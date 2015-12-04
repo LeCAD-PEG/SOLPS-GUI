@@ -6,7 +6,8 @@ A PyQt custom widget with embedded list of SOLPS scripts.
 
 """
 
-from PyQt5.QtCore import Qt, QProcess, QSize, pyqtSlot, pyqtProperty
+from PyQt5.QtCore import (Qt, QProcess, QSize, pyqtProperty,
+                          pyqtSignal, pyqtSlot)
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QComboBox
 
@@ -17,9 +18,14 @@ class SolpsTcshPlots(QComboBox):
     Provides a custom widget that holds all SOLPS Gnuplot script names
     for combining them with
     """
+
+    tcshLog = pyqtSignal(str)
+    plotCommand = pyqtSignal(str)
     
     def __init__(self, parent=None):
         super(SolpsTcshPlots, self).__init__(parent)
+
+        self.process = QProcess()
         self.setEditable(True)
         self.addItems(_tcsh_solps_scripts)
 
@@ -27,8 +33,17 @@ class SolpsTcshPlots(QComboBox):
     def triggerTextChanged(self):
         """ Connector that receives a signal and re-emits the current text.
         """
-        self.editTextChanged.emit(self.currentText())
-        self.currentTextChanged.emit(self.currentText())
+        current_text = self.currentText()
+        self.plotCommand.emit(current_text)
+        self.editTextChanged.emit(current_text)
+        self.currentTextChanged.emit(current_text)
+
+    def keyPressEvent(self, event):
+        """ Catch each key and emit plot command when Return is pressed.
+        """
+        super(SolpsTcshPlots, self).keyPressEvent(event)
+        if event.key() == Qt.Key_Return:
+            self.plotCommand.emit(self.currentText())
 
 # List of TCSH plot scripts in solps-iter/scripts obtained by
 # grep -H plot * | grep -v .py | \
