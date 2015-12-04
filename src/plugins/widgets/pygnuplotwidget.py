@@ -23,20 +23,12 @@ class PyGnuplotWidget(QLabel):
         self.setText("Gnuplot widget for SOLPS")
         self.process = QProcess()
         self.process.finished.connect(self.show_plot)
-        self.process.started.connect(self.started)
+        self.process.started.connect(self.write_commands_to_gnuplot)
         #self.process.stateChanged.connect(self.stateChanged)
         self.process.error.connect(self.show_error)
 
     def sizeHint(self):
-    
         return QSize(320, 200)
-
-    #def paintEvent(self, event):
-    #    self.setText("Repaing requested")
-
-    @pyqtSlot()
-    def started(self):
-        self.setText("Gnuplot process started.")
 
     @pyqtSlot(QProcess.ProcessState)
     def stateChanged(self, newState):
@@ -55,13 +47,20 @@ class PyGnuplotWidget(QLabel):
             self.process.terminate()
             return
 
-        cmd = 'set terminal gif size ' \
+        self._gnuplot_cmd = 'set terminal gif size ' \
             + str(self.width()) + ', ' + str(self.height()) + '\n' \
             + 'plot ' + plot_command.split('#', 1)[0]  + '\nquit\n'
-        # print(cmd)
+        #print(self._gnuplot_cmd)
         self.process.start(self._gnuplot_path)
-        chars_written = self.process.write(bytearray(cmd, 'utf8'))
-        assert(chars_written >= 0)
+
+    @pyqtSlot()
+    def write_commands_to_gnuplot(self):
+        """ After gnuplot process has started send the commands to the pipe.
+            We rather wait to start than immediately write the pipe.
+        """
+        print("Gnuplot process started.")
+        chars = self.process.write(bytearray(self._gnuplot_cmd, 'utf8'))
+        assert(chars >= 0)
 
     @pyqtSlot(QProcess.ProcessError)
     def show_error(self, error):
@@ -100,6 +99,7 @@ class PyGnuplotWidget(QLabel):
 if __name__ == "__main__":
 
     import sys
+    from PyQt5.QtWidgets import QApplication
 
     app = QApplication(sys.argv)
     window = PyGnuplotWidget()
