@@ -112,15 +112,13 @@ class Tcsh(QPlainTextEdit):
     @pyqtSlot()
     def executeTcshCommand(self):
         if self.tcsh.state() != QProcess.Running:
-            print("Starting tcsh")
-            self.tcsh.start(self.tcsh_path, ['-l'])
             self.tcsh.setWorkingDirectory(self.solps_top)
+            self.tcsh.start(self.tcsh_path, ['-l'])
             cmd = "cd " + self.solps_top \
                   + '\nsource setup.csh\necho TCSH READY\n'
             env = QProcessEnvironment.systemEnvironment()
             self.tcsh.setProcessEnvironment(env)
             self.tcsh.write(bytearray(cmd, 'utf8'))
-            self.tcsh_plot_command_executed = False
             self.solpsTopChanged.emit(self.solps_top)
 
 

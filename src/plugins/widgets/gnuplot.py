@@ -25,7 +25,7 @@ class Gnuplot(QLabel):
         self.solps_top = None
         self.solps_top_changed = False
         self.rundir = None
-        self.tcsh_plot_command = None
+        self.solps_plot_command = None
 
         self.setAlignment(Qt.AlignCenter)
         self.setFrameStyle(QFrame.StyledPanel)
@@ -39,6 +39,8 @@ class Gnuplot(QLabel):
         self.gnuplot.started.connect(self.write_commands_to_gnuplot)
         #self.gnuplot.stateChanged.connect(self.stateChanged)
         self.gnuplot.error.connect(self.show_error)
+        self.tcsh.readyReadStandardOutput.connect(self.read_tcsh_stdout)
+        self.tcsh.readyReadStandardError.connect(self.print_tcsh_stderr)
 
     def sizeHint(self):
         return QSize(320, 200)
@@ -82,7 +84,7 @@ class Gnuplot(QLabel):
         """
         errors = ['Failed to Start', 'Crashed', 'Timedout', 'WriteError',
             'ReadError', 'UnknownError']
-        msg = 'ProcessError: ' + errors[error]
+        msg = 'Gnuplot process: ' + errors[error]
         print(msg)
         self.setText(msg)
 
@@ -116,26 +118,40 @@ class Gnuplot(QLabel):
     def setRundir(self, directory):
         """
         Args:
-             directory (str): Absolute path to SOLPS directory where setup.csh
-                              should reside. (Re)starts the TCSH environment
+             directory (str): Absolute path to SOLPS directory with run data.
+
         """
-        self.run = directory
+        self.rundir = directory
 
     def getRundir(self):
         return self.rundir
 
-    solpsTop = pyqtProperty(str, getRundir, setRundir)
+    runDir = pyqtProperty(str, getRundir, setRundir)
 
     @pyqtSlot(str)
-    def setTcshPlotCommand(self, command):
-        self.tcsh_plot_command = command
+    def setSolpsPlotCommand(self, command):
+        self.solps_plot_command = command
 
-    def get_tcsh_pltcmd(self):
-        return self.tcsh_plot_command
+    def get_solps_pltcmd(self):
+        return self.solps_plot_command
 
-    tcshPlotCommand = pyqtProperty(str, get_tcsh_pltcmd, setTcshPlotCommand)
+    solpsPlotCommand = pyqtProperty(str, get_solps_pltcmd, setSolpsPlotCommand)
 
-    def find_solps_top(directory):
+    @pyqtSlot()
+    def print_tcsh_stderr(self):
+        error_data=self.tcsh.readAllStandardError()
+        error_text=bytearray(error_data).decode('utf8')
+        self.gnuplot.setText(str(error_text))
+
+    @pyqtSlot()
+    def read_tcsh_stdout(self):
+        data = self.tcsh.readAll()
+        text = str(bytearray(data).decode('utf8'))
+        if 'PLOT FINISHED' in text:
+            print("TODO Gnuplot should plot this")
+            self.plot('load')
+
+    def find_solps_top(self, directory):
         """ Searches for setup.csh or SOLPSTOP file in the directory hierarchy.
             Arguments:
                 run_directory (str): run_directory
@@ -145,10 +161,10 @@ class Gnuplot(QLabel):
         solps_top = directory
 
         while(solps_top):
-            path = solps_top[0] + '/setup.csh'
+            path = solps_top + '/setup.csh'
             if os.path.exists(path):
-                return solps_top[0]
-            path = solps_top[0] + 'SOLPSTOP'
+                return solps_top
+            path = solps_top + '/SOLPSTOP'
             if os.path.exists(path):
                 with open(path) as file:
                     return file.readline()
@@ -156,22 +172,45 @@ class Gnuplot(QLabel):
         return None
 
     @pyqtSlot()
-    def executeTcshPlotCommand(self):
-        if self.tcsh.state() != QProcess.Running:
-            if not self.solps_top:
-                self.solps_top = self.find_solps_top(self.rundir)
-            if not self.solps_top:
+    def executeSolpsPlotCommand(self):
+        """ Opens TCSH login shell and runs SOLPS plot command
+            previously defined and under the runsDir.
+
+            TCSH enviromnent is searched sourced from 'setup.csh' or pointed
+            with SOLPSTOP file. SOLPSTOP is probed for runDir changes and
+            if necessary resourced within a new shell.
+
+            SOLPS plot is executed in GNUPLOT_BATCH mode.
+        """
+        rundir_solps_top = self.find_solps_top(self.rundir)
+        if not rundir_solps_top:
+            if not self.rundir:
+                logging.error("Empty Gnuplot runDir! Bailing out.")
+            else:
                 logging.error("Could not find SOLPSTOP for " + self.rundir)
-                return
-            self.tcsh.start(self.tcsh_path)
+            return
+
+        if rundir_solps_top != self.solps_top:  # we have new SOLPSTOP
+            self.tcsh.kill()
+            self.solps_top = rundir_solps_top
+
+        cmd = ''
+        if self.tcsh.state() != QProcess.Running:
             self.tcsh.setWorkingDirectory(self.solps_top)
-            cmd = "cd " + self.solps_top \
-                  + '\nsource setup.csh\necho TCSH READY\n'
             env = QProcessEnvironment.systemEnvironment()
             env.insert('GNUPLOT_BATCH', 'true')
             self.tcsh.setProcessEnvironment(env)
-
-        self.tcsh.write(bytearray(self.tcsh_command+'\n', 'utf8'))
+            self.tcsh.start(self.tcsh_path)
+            logging.info("Guplot TCSH started in " + self.solps_top)
+            cmd += "cd " + self.solps_top \
+                  + '\nsource setup.csh\necho TCSH READY\n'
+        if self.solps_plot_command and self.rundir:
+            cmd += 'cd ' + self.rundir + '\n'
+            cmd += self.solps_plot_command + '\n'
+            cmd += 'echo PLOT FINISHED\n'
+            self.tcsh.write(bytearray(cmd, 'utf8'))
+        else:
+            logging.warning("No plot command or run directory")
 
 
 if __name__ == "__main__":
