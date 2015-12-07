@@ -2,7 +2,8 @@
 """ A PyQt custom http://www.gnuplot.info/ widget for Qt Designer.
 """
 
-from PyQt5.QtCore import Qt, QProcess, QSize, pyqtSlot, pyqtProperty
+from PyQt5.QtCore import (Qt, QProcess, QProcessEnvironment, QSize, pyqtSignal,
+                          pyqtSlot, pyqtProperty)
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QLabel, QFrame
 
@@ -19,6 +20,7 @@ class PyGnuplotWidget(QLabel):
         self.gnuplot_path = "/usr/bin/gnuplot"
         self.tcsh_path = '/bin/tcsh'
         self.solps_top = None
+        self.tcsh_plot_command = None
 
         self.setAlignment(Qt.AlignCenter)
         self.setFrameStyle(QFrame.StyledPanel)
@@ -113,14 +115,34 @@ class PyGnuplotWidget(QLabel):
                               should reside. (Re)starts the TCSH environment
         """
         self.solps_top = directory
-        self.tcsh.start(self.tcsh_path)
-        self.tcsh.setWorkingDirectory(directory)
-        cmd = "cd " + directory + '\nsource setup.csh\necho TCSH READY\n'
 
     def getSolpsTop(self):
         return self.solps_top
 
     solpsTop = pyqtProperty(str, getSolpsTop, setSolpsTop)
+
+    @pyqtSlot(str)
+    def setTcshPlotCommand(self, command):
+        self.tcsh_plot_command = command
+
+    def get_tcsh_pltcmd(self):
+        return self.tcsh_plot_command
+
+    tcshPlotCommand = pyqtProperty(str, get_tcsh_pltcmd, setTcshPlotCommand)
+
+    @pyqtSlot()
+    def executeTcshPlotCommand(self):
+        if self.tcsh.state() != QProcess.Running:
+            self.tcsh.start(self.tcsh_path)
+            self.tcsh.setWorkingDirectory(self.solps_top)
+            cmd = "cd " + self.solps_top \
+                  + '\nsource setup.csh\necho TCSH READY\n'
+            env = QProcessEnvironment.systemEnvironment()
+            env.insert('GNUPLOT_BATCH', 'true')
+            self.tcsh.setProcessEnvironment(env)
+
+
+            self.tcsh_plot_command_executed = False
 
 
 if __name__ == "__main__":
