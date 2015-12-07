@@ -408,27 +408,61 @@
        <attribute name="title">
         <string>&amp;Dashboard</string>
        </attribute>
-       <widget class="PyGnuplotWidget" name="gnuplot1">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>241</width>
-          <height>141</height>
-         </rect>
-        </property>
-       </widget>
        <widget class="QPushButton" name="pushButton_9">
         <property name="geometry">
          <rect>
-          <x>300</x>
-          <y>160</y>
+          <x>10</x>
+          <y>190</y>
           <width>80</width>
           <height>23</height>
          </rect>
         </property>
         <property name="text">
          <string>PushButton</string>
+        </property>
+       </widget>
+       <widget class="Tcsh" name="tcsh">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>10</y>
+          <width>211</width>
+          <height>121</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>7</pointsize>
+         </font>
+        </property>
+        <property name="solpsTop">
+         <string>/home/ITER/kosl/solps-iter</string>
+        </property>
+        <property name="tcshPlotCommand" stdset="0">
+         <string>ls</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton_10">
+        <property name="geometry">
+         <rect>
+          <x>410</x>
+          <y>180</y>
+          <width>80</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Run tcsh</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>180</y>
+          <width>113</width>
+          <height>23</height>
+         </rect>
         </property>
        </widget>
        <widget class="SolpsTcshPlots" name="SolpsTcshPlots">
@@ -440,8 +474,31 @@
           <height>23</height>
          </rect>
         </property>
-        <property name="currentIndex">
-         <number>1</number>
+       </widget>
+       <widget class="QLabel" name="label_7">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>130</y>
+          <width>201</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="Gnuplot" name="gnuplot">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>241</width>
+          <height>141</height>
+         </rect>
         </property>
        </widget>
       </widget>
@@ -582,14 +639,19 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PyGnuplotWidget</class>
+   <class>Gnuplot</class>
    <extends>QLabel</extends>
-   <header>pygnuplotwidget</header>
+   <header>gnuplot</header>
   </customwidget>
   <customwidget>
    <class>SolpsTcshPlots</class>
    <extends>QComboBox</extends>
    <header>solpstcshplots</header>
+  </customwidget>
+  <customwidget>
+   <class>Tcsh</class>
+   <extends>QPlainTextEdit</extends>
+   <header>tcsh</header>
   </customwidget>
  </customwidgets>
  <resources/>
@@ -611,34 +673,50 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_9</sender>
+   <sender>pushButton_10</sender>
    <signal>clicked()</signal>
-   <receiver>SolpsTcshPlots</receiver>
-   <slot>triggerTextChanged()</slot>
+   <receiver>tcsh</receiver>
+   <slot>executeTcshCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>339</x>
-     <y>231</y>
+     <x>461</x>
+     <y>228</y>
     </hint>
     <hint type="destinationlabel">
-     <x>224</x>
-     <y>227</y>
+     <x>416</x>
+     <y>142</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>SolpsTcshPlots</sender>
-   <signal>plotCommand(QString)</signal>
-   <receiver>gnuplot1</receiver>
-   <slot>plot(QString)</slot>
+   <sender>lineEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>tcsh</receiver>
+   <slot>setTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>126</x>
-     <y>222</y>
+     <x>413</x>
+     <y>238</y>
     </hint>
     <hint type="destinationlabel">
-     <x>126</x>
-     <y>163</y>
+     <x>382</x>
+     <y>158</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tcsh</sender>
+   <signal>solpsTopChanged(QString)</signal>
+   <receiver>label_7</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>288</x>
+     <y>148</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>337</x>
+     <y>205</y>
     </hint>
    </hints>
   </connection>

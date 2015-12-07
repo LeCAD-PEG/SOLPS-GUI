@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" A PyQt custom http://www.gnuplot.info/ widget for Qt Designer.
+""" A PyQt custom TCSH widget.
 """
 
 from PyQt5.QtCore import (Qt, QProcess, QProcessEnvironment, QSize, pyqtSignal,
@@ -8,15 +8,15 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QLabel, QFrame
 
 
-class PyGnuplotWidget(QLabel):
-    """ PyGnuplotWidget(QWidget)
+class TcshWidget(QLabel):
+    """ TcshWidget(QWidget)
     
         Provides a custom widget to display a gnuplot with properties and slots
         that can be used to customize its appearance.
     """
     
     def __init__(self, parent=None):
-        super(PyGnuplotWidget, self).__init__(parent)
+        super(TcshWidget, self).__init__(parent)
         self.gnuplot_path = "/usr/bin/gnuplot"
         self.tcsh_path = '/bin/tcsh'
         self.solps_top = None
@@ -151,6 +151,6 @@ if __name__ == "__main__":
     from PyQt5.QtWidgets import QApplication
 
     app = QApplication(sys.argv)
-    window = PyGnuplotWidget()
+    window = TcshWidget()
     window.show()
     sys.exit(app.exec_())

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-pygnuplotplugin.py
+gnuplotplugin.py
 
 A gnuplot http://www.gnuplot.info/ custom widget plugin for Qt Designer.
 
@@ -10,11 +10,11 @@ A gnuplot http://www.gnuplot.info/ custom widget plugin for Qt Designer.
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
 
-from pygnuplotwidget import PyGnuplotWidget
+from gnuplot import Gnuplot
 
 
-class PyGnuplotWidgetPlugin(QPyDesignerCustomWidgetPlugin):
-    """PyGnuplotWidgetPlugin(QPyDesignerCustomWidgetPlugin)
+class GnuplotPlugin(QPyDesignerCustomWidgetPlugin):
+    """GnuplotPlugin(QPyDesignerCustomWidgetPlugin)
     
     Provides a Python custom plugin for Qt Designer by implementing the
     QDesignerCustomWidgetPlugin via a PyQt-specific custom plugin class.
@@ -24,7 +24,7 @@ class PyGnuplotWidgetPlugin(QPyDesignerCustomWidgetPlugin):
     # initialized variable.
     def __init__(self, parent=None):
     
-        super(PyGnuplotWidgetPlugin, self).__init__(parent)
+        super(GnuplotPlugin, self).__init__(parent)
 
         self.initialized = False
 
@@ -45,12 +45,12 @@ class PyGnuplotWidgetPlugin(QPyDesignerCustomWidgetPlugin):
     # This factory method creates new instances of our custom widget with the
     # appropriate parent.
     def createWidget(self, parent):
-        return PyGnuplotWidget(parent)
+        return Gnuplot(parent)
 
     # This method returns the name of the custom widget class that is provided
     # by this plugin.
     def name(self):
-        return "PyGnuplotWidget"
+        return "Gnuplot"
 
     # Returns the name of the group in Qt Designer's widget box that this
     # widget belongs to.
@@ -82,48 +82,48 @@ class PyGnuplotWidgetPlugin(QPyDesignerCustomWidgetPlugin):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="PyGnuplotWidget" name="PyGnuplotWidget" />\n'
+        return '<widget class="Gnuplot" name="gnuplot" />\n'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.
     def includeFile(self):
-        return "pygnuplotwidget"
+        return "gnuplot"
 
 
 # Define the image used for the icon.
 _logo_16x16_xpm = [
     "16 16 16 1",
-    "  c #000100",
-    ". c #5F53C8",
-    "X c #5A60C6",
-    "o c #867BD3",
-    "O c #229AD8",
-    "+ c #7C88D5",
-    "@ c #A3A0DA",
-    "# c #63BAB4",
-    "$ c #80B8DD",
-    "% c #A9BCD5",
-    "& c #C4C2EC",
-    "* c #C5C8E5",
-    "= c #DEDAEC",
-    "- c #E9EAF9",
-    "; c #FAFBFF",
-    ": c #FDFFFC",
-    "::::;:::::: : ::",
-    ":::=@*:;:::: : :",
-    "::-o..&:;:::::::",
-    "::@o::+=:::: :::",
-    ":;o-;;:@::: : ::",
-    ":=o:;:;-*::    :",
-    ":*@:::;;*:::::::",
-    ":&@:::;;*::::: :",
-    ":&@:::;;*::    :",
-    ":*@:;::&-:::::::",
-    ":-+;;:-@::::  ::",
-    ":;+&:-+:;:: :: :",
-    ":;$.oX=;::::  ::",
-    ":;;OX&::::::::::",
-    "::%#$&::::: : ::",
-    "::::;;:::::: : :"]
+    "       c #000100",
+    ".      c #4C56A4",
+    "+      c #66757B",
+    "@      c #32AD88",
+    "#      c #A0A55D",
+    "$      c #D083EF",
+    "%      c #B7B8B7",
+    "&      c #ABCE69",
+    "*      c #CBAED3",
+    "=      c #DFBBF0",
+    "-      c #B4E2D2",
+    ";      c #E8D3D6",
+    ">      c #DEDFDA",
+    ",      c #FFEC8D",
+    "'      c #EBECEA",
+    ")      c #FDFFFB",
+    "))))))))))))))))",
+    "  )) )))) ))   )",
+    " ) ) ))) ) )) ))",
+    " ) ) ))) ) )) ))",
+    "  )) ))) ) )) ))",
+    " )))   )) ))) ))",
+    "'>'>'>'>'>'>'>'>",
+    ")'';>;>%>;>))))'",
+    "''-''''''-)))))'",
+    ">')>'>'''@)))))'",
+    ")';'''''-@'))))'",
+    "''))))))-@-,)))'",
+    "''))))''@@&,,))'",
+    "'');=$$$.+#,,,)'",
+    ");=====*%*%*;>>'",
+    "%%%%%%%%%%%%%%%%"]
 
 _logo_pixmap = QPixmap(_logo_16x16_xpm)

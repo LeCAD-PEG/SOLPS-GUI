@@ -45,7 +45,6 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
 from PyQt5.QtGui import QStandardItemModel
 from PyQt5.uic import loadUi
 from enum import IntEnum
-import pygnuplotwidget
 
 REDIRECT_STDOUT_TO_LOG = False
 
@@ -63,6 +62,27 @@ class Column(IntEnum):
         label : One line description of the run from b2mn.dat
     """
     name, path, date, status, label = range(5)
+
+
+def find_solps_top(directory):
+    """ Searches for setup.csh or SOLPSTOP file in the directory hierarchy.
+        Arguments:
+            run_directory (str): run_directory
+        Returns:
+            solps_top(str): if found stup.csh or SOLPSTOP file. Else None
+    """
+    solps_top = directory
+
+    while(solps_top):
+        path = solps_top[0] + '/setup.csh'
+        if os.path.exists(path):
+            return solps_top[0]
+        path = solps_top[0] + 'SOLPSTOP'
+        if os.path.exists(path):
+            with open(path) as file:
+                return file.readline()
+        solps_top = solps_top.rsplit('/', 1)[0]
+    return None
 
 
 class RunsSortFilterProxyModel(QSortFilterProxyModel):
@@ -899,6 +919,9 @@ class SOLPS_MainWindow(QMainWindow):
         stdout_thread(QThread) : Redirected sys.stdout to Log tab.
         stdout_receiver(LogReceiver): Receiver for stdout thread.
     """
+
+    runSelected = pyqtSignal(str)
+
     def __init__(self, *args):
         super(SOLPS_MainWindow, self).__init__(*args)
         prefix = os.path.dirname(os.path.abspath(__file__))
@@ -1015,12 +1038,13 @@ class SOLPS_MainWindow(QMainWindow):
 
         self.actionRuns_dirs.triggered.connect(self.show_runs_dirs_dialog)
         self.treeViewRuns.selectionModel().selectionChanged.connect(
-            self.enable_archive_button)
+            self.run_selected)
         self.treeViewArchive.selectionModel().selectionChanged.connect(
             self.enable_restore_button)
-        self.gnuplot1.plot("sin(x)")
-        #  self.gnuplot1.setText("Started")
-        #  print(self.gnuplot1.process.state())
+        self.gnuplot.plot("sin(x)")
+        self.runSelected.connect(self.label_7.setText)
+        #  self.gnuplot.setText("Started")
+        #  print(self.gnuplot.process.state())
         #  self.gnuplot1.process.finished.connect(self.gnuplot1.show_plot)
 
     @pyqtSlot()
@@ -1071,9 +1095,20 @@ class SOLPS_MainWindow(QMainWindow):
             QMessageBox.warning(self, 'Invalid action', msg)
 
     @pyqtSlot()
-    def enable_archive_button(self):
+    def run_selected(self):
+        """ Whenever an item in Runs is selected this function is run.
+
+            Archive button is enabled and directory is emited.
+        """
         valid = self.treeViewRuns.selectionModel().currentIndex().isValid()
         self.pushButton_Archive.setEnabled(valid)
+
+        if valid:
+            index = self.treeViewRuns.selectionModel().currentIndex()
+            model = self.proxyModel
+            index_path = model.index(index.row(), Column.path, index.parent())
+            path = model.data(index_path, Qt.DisplayRole)
+            self.runSelected.emit(path)
 
     @pyqtSlot()
     def enable_restore_button(self):
@@ -1192,11 +1227,10 @@ class SOLPS_MainWindow(QMainWindow):
               "files for multiple parameter scan cases."
         QMessageBox.about(self, 'About SOLPS-ITER GUI', msg)
 
-
 if __name__ == '__main__':
     "  Main method "
     app = QApplication(sys.argv)
     # app.setStyle("windows")
-    widget = SOLPS_MainWindow()
-    widget.show()
+    main_window = SOLPS_MainWindow()
+    main_window.show()
     sys.exit(app.exec_())
