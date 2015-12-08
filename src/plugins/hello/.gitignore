@@ -1,0 +1,7 @@
+Makefile
+*.exp
+*.pro
+sipAPI*.h
+sip*.cpp
+*.so
+*.dylib

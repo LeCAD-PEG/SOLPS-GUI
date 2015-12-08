@@ -16,4 +16,5 @@ Currently, the HOWTOs are:
    tunneling.rst
    style.rst
    submit.rst
+   plugin.rst
 
