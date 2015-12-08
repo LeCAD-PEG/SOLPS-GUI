@@ -599,7 +599,6 @@
     </property>
     <addaction name="actionRuns_dirs"/>
     <addaction name="actionGlobal"/>
-    <addaction name="actionRun_submission"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">

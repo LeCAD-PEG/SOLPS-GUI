@@ -318,7 +318,7 @@
     </widget>
    </item>
    <item row="2" column="1" colspan="6">
-    <widget class="QComboBox" name="comboBox">
+    <widget class="QComboBox" name="comboBox_submit_script">
      <property name="editable">
       <bool>true</bool>
      </property>
@@ -355,7 +355,7 @@
     </widget>
    </item>
    <item row="1" column="1" colspan="6">
-    <widget class="QLineEdit" name="lineEdit">
+    <widget class="QLineEdit" name="lineEdit_tcsh_path">
      <property name="text">
       <string>/bin/tcsh</string>
      </property>

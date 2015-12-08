@@ -48,7 +48,6 @@ from enum import IntEnum
 
 REDIRECT_STDOUT_TO_LOG = False
 
-
 class Column:
     """Column enumeration for Runs treeview.
 
@@ -185,6 +184,17 @@ class RunSettings(QDialog):
             settings.value("Monitor_port", "49406"))
         settings.endGroup()
 
+        tcsh_path_default = self.lineEdit_tcsh_path.text()
+        if len(tcsh_path_default) == 0:
+            tcsh_path_default = '/bin/tcsh'
+        tcsh_path = settings.value("tcsh_path", tcsh_path_default)
+        self.lineEdit_tcsh_path.setText(tcsh_path)
+
+        default = self.comboBox_submit_script.currentText()
+        comboBox_submit_script = settings.value('submit_script', default)
+        self.comboBox_submit_script.setCurrentText(comboBox_submit_script)
+
+
         self.toolButtonView1.clicked.connect(self.showdir1)
         self.toolButtonView2.clicked.connect(self.showdir2)
         self.toolButtonView3.clicked.connect(self.showdir3)
@@ -221,6 +231,9 @@ class RunSettings(QDialog):
                           self.lineEdit_monitor_interface.text())
         settings.setValue("Monitor_port", self.lineEdit_monitor_port.text())
         settings.endGroup()
+        settings.setValue('tcsh_path', self.lineEdit_tcsh_path.text())
+        settings.setValue('submit_script',
+                          self.comboBox_submit_script.currentText())
         self.runDirsChanged.emit()
 
     # Choose run directory
