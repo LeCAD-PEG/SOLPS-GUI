@@ -7,9 +7,10 @@ from PyQt5.QtCore import (Qt, QProcess, QProcessEnvironment, QSize, pyqtSignal,
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QLabel, QFrame
 
-import os
-import logging
 
+import logging
+import os
+import tempfile
 
 class Gnuplot(QLabel):
     """ Gnuplot(QWidget)
@@ -17,6 +18,8 @@ class Gnuplot(QLabel):
         Provides a custom widget to display a gnuplot with properties and slots
         that can be used to customize its appearance.
     """
+
+    stderrOutput = pyqtSignal(str)
     
     def __init__(self, parent=None):
         super(Gnuplot, self).__init__(parent)
@@ -26,6 +29,8 @@ class Gnuplot(QLabel):
         self.solps_top_changed = False
         self.rundir = None
         self.solps_plot_command = None
+        self.gnuplot_cmdfile = None
+        self.gnuplot_datafile = None
 
         self.setAlignment(Qt.AlignCenter)
         self.setFrameStyle(QFrame.StyledPanel)
@@ -37,7 +42,6 @@ class Gnuplot(QLabel):
 
         self.gnuplot.finished.connect(self.show_plot)
         self.gnuplot.started.connect(self.write_commands_to_gnuplot)
-        #self.gnuplot.stateChanged.connect(self.stateChanged)
         self.gnuplot.error.connect(self.show_error)
         self.tcsh.readyReadStandardOutput.connect(self.read_tcsh_stdout)
         self.tcsh.readyReadStandardError.connect(self.print_tcsh_stderr)
@@ -45,27 +49,20 @@ class Gnuplot(QLabel):
     def sizeHint(self):
         return QSize(320, 200)
 
-    @pyqtSlot(QProcess.ProcessState)
-    def stateChanged(self, newState):
-        states = ['Not Running', 'Starting', 'Running']
-        msg = 'Process state changed: ' + states[newState]
-        print(msg)
-        self.setText(msg)
-
     @pyqtSlot(str)
     def plot(self, plot_command):
         """ Starts gnuplot process and sends plot commands through the
             standard input. Everything after # is truncated
         """
         if self.gnuplot.state() != QProcess.NotRunning:
-            print("Gnuplot process still running. Command ignored!")
+            logging.warning("Gnuplot process still running. Command ignored!")
             #  self.process.terminate()
             return
 
         self.gnuplot_cmd = 'set terminal gif size ' \
             + str(self.width()) + ', ' + str(self.height()) + '\n' \
             + 'plot ' + plot_command.split('#', 1)[0]  + '\nquit\n'
-        #  print(self.gnuplot_cmd)
+        # print(self.gnuplot_cmd)
         self.gnuplot.start(self.gnuplot_path)
 
     @pyqtSlot()
@@ -85,7 +82,7 @@ class Gnuplot(QLabel):
         errors = ['Failed to Start', 'Crashed', 'Timedout', 'WriteError',
             'ReadError', 'UnknownError']
         msg = 'Gnuplot process: ' + errors[error]
-        print(msg)
+        logging.error(msg)
         self.setText(msg)
 
     @pyqtSlot(int)
@@ -102,6 +99,11 @@ class Gnuplot(QLabel):
             else:
                 msg += str(exit_status)
             self.setText(msg)
+        # Tempfiles cleanup
+        if self.gnuplot_cmdfile and os.path.exists(self.gnuplot_cmdfile):
+            os.unlink(self.gnuplot_cmdfile)
+        if self.gnuplot_datafile and os.path.exists(self.gnuplot_datafile):
+            os.unlink(self.gnuplot_datafile)
 
     @pyqtSlot(int)
     def setGnuplotPath(self, gnuplot_path):
@@ -141,15 +143,19 @@ class Gnuplot(QLabel):
     def print_tcsh_stderr(self):
         error_data=self.tcsh.readAllStandardError()
         error_text=bytearray(error_data).decode('utf8')
-        self.gnuplot.setText(str(error_text))
+        self.stderrOutput.emit(str(error_text))
 
     @pyqtSlot()
     def read_tcsh_stdout(self):
         data = self.tcsh.readAll()
         text = str(bytearray(data).decode('utf8'))
         if 'PLOT FINISHED' in text:
-            print("TODO Gnuplot should plot this")
-            self.plot('load')
+            self.gnuplot_cmd = 'cd "' + self.runDir + '"\n' \
+                'set terminal gif size ' \
+                + str(self.width()) + ', ' + str(self.height()) + '\n' \
+                + 'load "' + self.gnuplot_cmdfile + '"\nquit\n'
+            #print(self.gnuplot_cmd)
+            self.gnuplot.start(self.gnuplot_path)
 
     def find_solps_top(self, directory):
         """ Searches for setup.csh or SOLPSTOP file in the directory hierarchy.
@@ -200,12 +206,18 @@ class Gnuplot(QLabel):
             env = QProcessEnvironment.systemEnvironment()
             env.insert('GNUPLOT_BATCH', 'true')
             self.tcsh.setProcessEnvironment(env)
-            self.tcsh.start(self.tcsh_path)
+            self.tcsh.start(self.tcsh_path, ['-l'])
             logging.info("Guplot TCSH started in " + self.solps_top)
             cmd += "cd " + self.solps_top \
                   + '\nsource setup.csh\necho TCSH READY\n'
         if self.solps_plot_command and self.rundir:
+            fd, self.gnuplot_cmdfile = tempfile.mkstemp('.cmd', 'gnuplot')
+            os.close(fd)
+            fd, self.gnuplot_datafile = tempfile.mkstemp('.dat', 'gnuplot')
+            os.close(fd)
             cmd += 'cd ' + self.rundir + '\n'
+            cmd += 'setenv GNUPLOT_CMD ' + self.gnuplot_cmdfile + '\n'
+            cmd += 'setenv GNUPLOT_DATA ' + self.gnuplot_datafile + '\n'
             cmd += self.solps_plot_command + '\n'
             cmd += 'echo PLOT FINISHED\n'
             self.tcsh.write(bytearray(cmd, 'utf8'))

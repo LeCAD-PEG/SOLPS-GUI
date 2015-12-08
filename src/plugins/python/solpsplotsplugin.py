@@ -9,11 +9,11 @@ A SOLPS Plots ComboBox custom widget plugin for Qt Designer.
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
 
-from solpstcshplots import SolpsTcshPlots
+from solpsplots import SolpsPlots
 
 
-class SolpsTcshPlotsPlugin(QPyDesignerCustomWidgetPlugin):
-    """SolpsTcshPlotsPlugin(QPyDesignerCustomWidgetPlugin)
+class SolpsPlotsPlugin(QPyDesignerCustomWidgetPlugin):
+    """SolpsPlotsPlugin(QPyDesignerCustomWidgetPlugin)
     
     Provides a Python custom plugin for Qt Designer by implementing the
     QDesignerCustomWidgetPlugin via a PyQt-specific custom plugin class.
@@ -23,7 +23,7 @@ class SolpsTcshPlotsPlugin(QPyDesignerCustomWidgetPlugin):
     # initialized variable.
     def __init__(self, parent=None):
     
-        super(SolpsTcshPlotsPlugin, self).__init__(parent)
+        super(SolpsPlotsPlugin, self).__init__(parent)
 
         self.initialized = False
 
@@ -44,12 +44,12 @@ class SolpsTcshPlotsPlugin(QPyDesignerCustomWidgetPlugin):
     # This factory method creates new instances of our custom widget with the
     # appropriate parent.
     def createWidget(self, parent):
-        return SolpsTcshPlots(parent)
+        return SolpsPlots(parent)
 
     # This method returns the name of the custom widget class that is provided
     # by this plugin.
     def name(self):
-        return "SolpsTcshPlots"
+        return "SolpsPlots"
 
     # Returns the name of the group in Qt Designer's widget box that this
     # widget belongs to.
@@ -81,12 +81,12 @@ class SolpsTcshPlotsPlugin(QPyDesignerCustomWidgetPlugin):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="SolpsTcshPlots" name="SolpsTcshPlots" />\n'
+        return '<widget class="SolpsPlots" name="solpsplots" />\n'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.
     def includeFile(self):
-        return "solpstcshplots"
+        return "solpsplots"
 
 
 # Define the image used for the icon.

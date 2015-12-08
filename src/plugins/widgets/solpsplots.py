@@ -12,18 +12,17 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QComboBox
 
 
-class SolpsTcshPlots(QComboBox):
-    """SolpsTcshPlots(QComboBox)
+class SolpsPlots(QComboBox):
+    """SolpsPlots(QComboBox)
     
     Provides a custom widget that holds all SOLPS Gnuplot script names
     for combining them with
     """
 
-    tcshLog = pyqtSignal(str)
-    plotCommand = pyqtSignal(str)
+    returnPressed = pyqtSignal()
     
     def __init__(self, parent=None):
-        super(SolpsTcshPlots, self).__init__(parent)
+        super(SolpsPlots, self).__init__(parent)
 
         self.process = QProcess()
         self.setEditable(True)
@@ -41,17 +40,15 @@ class SolpsTcshPlots(QComboBox):
     def keyPressEvent(self, event):
         """ Catch each key and emit plot command when Return is pressed.
         """
-        super(SolpsTcshPlots, self).keyPressEvent(event)
+        super(SolpsPlots, self).keyPressEvent(event)
         if event.key() == Qt.Key_Return:
-            self.plotCommand.emit(self.currentText())
+            self.returnPressed.emit()
 
 # List of TCSH plot scripts in solps-iter/scripts obtained by
 # grep -H plot * | grep -v .py | \
 #  sed 's/\([a-zA-Z0-9_+-]*\):.*/    \"\1 # \",/' | sort | uniq
 # TODO(mprotic): Add plot description after each # by looking into solps.pdf
 _tcsh_solps_scripts = [
-    "sin(x)",
-    "sin(3*x)/x",
     "2d # ",
     "2da # ",
     "2d_plots # ",
@@ -231,7 +228,7 @@ if __name__ == "__main__":
     from PyQt5.QtWidgets import QApplication
 
     app = QApplication(sys.argv)
-    window = SolpsTcshPlots()
+    window = SolpsPlots()
     window.show()
     sys.exit(app.exec_())
 

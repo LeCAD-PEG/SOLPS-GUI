@@ -49,7 +49,7 @@ from enum import IntEnum
 REDIRECT_STDOUT_TO_LOG = False
 
 
-class Column(IntEnum):
+class Column:
     """Column enumeration for Runs treeview.
 
         First column `name` cannot be moved and is short name.
@@ -1036,13 +1036,17 @@ class SOLPS_MainWindow(QMainWindow):
         self.treeViewArchive.setAlternatingRowColors(True)
         self.treeViewArchive.setSortingEnabled(True)
 
+        # Configure Dashboard
         self.actionRuns_dirs.triggered.connect(self.show_runs_dirs_dialog)
         self.treeViewRuns.selectionModel().selectionChanged.connect(
             self.run_selected)
         self.treeViewArchive.selectionModel().selectionChanged.connect(
             self.enable_restore_button)
-        self.gnuplot.plot("sin(x)")
+        self.gnuplot.plot("sin(3*x)/x")
         self.runSelected.connect(self.label_7.setText)
+        self.runSelected.connect(self.gnuplot.setRundir)
+        self.runSelected.connect(self.tcsh.setRundir)
+        self.tcsh.setTcshCommand(self.lineEdit.text())
         #  self.gnuplot.setText("Started")
         #  print(self.gnuplot.process.state())
         #  self.gnuplot1.process.finished.connect(self.gnuplot1.show_plot)

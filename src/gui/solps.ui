@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>528</width>
-    <height>303</height>
+    <width>553</width>
+    <height>329</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -411,22 +411,22 @@
        <widget class="QPushButton" name="pushButton_9">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>190</y>
+          <x>250</x>
+          <y>200</y>
           <width>80</width>
           <height>23</height>
          </rect>
         </property>
         <property name="text">
-         <string>PushButton</string>
+         <string>Plot</string>
         </property>
        </widget>
        <widget class="Tcsh" name="tcsh">
         <property name="geometry">
          <rect>
-          <x>270</x>
+          <x>340</x>
           <y>10</y>
-          <width>211</width>
+          <width>180</width>
           <height>121</height>
          </rect>
         </property>
@@ -435,18 +435,15 @@
           <pointsize>7</pointsize>
          </font>
         </property>
-        <property name="solpsTop">
-         <string>/home/ITER/kosl/solps-iter</string>
-        </property>
-        <property name="tcshPlotCommand" stdset="0">
-         <string>ls</string>
+        <property name="solpsTop" stdset="0">
+         <string/>
         </property>
        </widget>
        <widget class="QPushButton" name="pushButton_10">
         <property name="geometry">
          <rect>
-          <x>410</x>
-          <y>180</y>
+          <x>440</x>
+          <y>140</y>
           <width>80</width>
           <height>23</height>
          </rect>
@@ -458,34 +455,27 @@
        <widget class="QLineEdit" name="lineEdit">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>180</y>
-          <width>113</width>
+          <x>340</x>
+          <y>140</y>
+          <width>91</width>
           <height>23</height>
          </rect>
         </property>
-       </widget>
-       <widget class="SolpsTcshPlots" name="SolpsTcshPlots">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>160</y>
-          <width>238</width>
-          <height>23</height>
-         </rect>
+        <property name="text">
+         <string>itersubmit</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_7">
         <property name="geometry">
          <rect>
-          <x>270</x>
-          <y>130</y>
-          <width>201</width>
+          <x>340</x>
+          <y>170</y>
+          <width>161</width>
           <height>41</height>
          </rect>
         </property>
         <property name="text">
-         <string>TextLabel</string>
+         <string>Please select current run in Runs tab.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -496,9 +486,28 @@
          <rect>
           <x>10</x>
           <y>10</y>
-          <width>241</width>
-          <height>141</height>
+          <width>321</width>
+          <height>181</height>
          </rect>
+        </property>
+        <property name="runDir" stdset="0">
+         <string>/home/ITER/kosl/solps-iter/runs/AUG_16151_D/run1</string>
+        </property>
+        <property name="solpsPlotCommand">
+         <string>energy_analysis</string>
+        </property>
+       </widget>
+       <widget class="SolpsPlots" name="solpsplots">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>200</y>
+          <width>238</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="currentIndex">
+         <number>40</number>
         </property>
        </widget>
       </widget>
@@ -574,7 +583,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>528</width>
+     <width>553</width>
      <height>20</height>
     </rect>
    </property>
@@ -644,9 +653,9 @@
    <header>gnuplot</header>
   </customwidget>
   <customwidget>
-   <class>SolpsTcshPlots</class>
+   <class>SolpsPlots</class>
    <extends>QComboBox</extends>
-   <header>solpstcshplots</header>
+   <header>solpsplots</header>
   </customwidget>
   <customwidget>
    <class>Tcsh</class>
@@ -679,8 +688,8 @@
    <slot>executeTcshCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>461</x>
-     <y>228</y>
+     <x>472</x>
+     <y>258</y>
     </hint>
     <hint type="destinationlabel">
      <x>416</x>
@@ -695,8 +704,8 @@
    <slot>setTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>413</x>
-     <y>238</y>
+     <x>403</x>
+     <y>258</y>
     </hint>
     <hint type="destinationlabel">
      <x>382</x>
@@ -717,6 +726,54 @@
     <hint type="destinationlabel">
      <x>337</x>
      <y>205</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_9</sender>
+   <signal>clicked()</signal>
+   <receiver>gnuplot</receiver>
+   <slot>executeSolpsPlotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>87</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>110</x>
+     <y>162</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>solpsplots</sender>
+   <signal>editTextChanged(QString)</signal>
+   <receiver>gnuplot</receiver>
+   <slot>setSolpsPlotCommand(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>170</x>
+     <y>228</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>181</x>
+     <y>158</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>solpsplots</sender>
+   <signal>returnPressed()</signal>
+   <receiver>gnuplot</receiver>
+   <slot>executeSolpsPlotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>214</x>
+     <y>228</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>216</x>
+     <y>159</y>
     </hint>
    </hints>
   </connection>

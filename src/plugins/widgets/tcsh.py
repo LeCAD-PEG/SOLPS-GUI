@@ -7,6 +7,8 @@ from PyQt5.QtCore import (Qt, QProcess, QProcessEnvironment, QSize, pyqtSignal,
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QPlainTextEdit, QFrame
 
+import logging
+import os
 
 class Tcsh(QPlainTextEdit):
     """ Tcsh(QWidget)
@@ -22,6 +24,7 @@ class Tcsh(QPlainTextEdit):
         super(Tcsh, self).__init__(parent)
         self.tcsh_path = '/bin/tcsh'
         self.solps_top = None
+        self.rundir = None
         self.tcsh_command = None
 
         #self.setAlignment(Qt.AlignCenter)
@@ -86,19 +89,18 @@ class Tcsh(QPlainTextEdit):
     tcshPath = pyqtProperty(str, getTcshPath, setTcshPath)
 
     @pyqtSlot(str)
-    def setSolpsTop(self, directory):
+    def setRundir(self, directory):
         """
         Args:
-             directory (str): Absolute path to SOLPS directory where setup.csh
-                              should reside. (Re)starts the TCSH environment
+             directory (str): Absolute path to SOLPS directory with run data.
+
         """
-        self.solps_top = directory
+        self.rundir = directory
 
+    def getRundir(self):
+        return self.rundir
 
-    def getSolpsTop(self):
-        return self.solps_top
-
-    solpsTop = pyqtProperty(str, getSolpsTop, setSolpsTop)
+    runDir = pyqtProperty(str, getRundir, setRundir)
 
     @pyqtSlot(str)
     def setTcshCommand(self, command):
@@ -107,22 +109,63 @@ class Tcsh(QPlainTextEdit):
     def get_tcsh_command(self):
         return self.tcsh_command
 
-    tcshPlotCommand = pyqtProperty(str, get_tcsh_command, setTcshCommand)
+    tcshCommand = pyqtProperty(str, get_tcsh_command, setTcshCommand)
+
+    def find_solps_top(self, directory):
+        """ Searches for setup.csh or SOLPSTOP file in the directory hierarchy.
+            Arguments:
+                run_directory (str): run_directory
+            Returns:
+                solps_top(str): if found stup.csh or SOLPSTOP file. Else None
+        """
+        solps_top = directory
+
+        while(solps_top):
+            path = solps_top + '/setup.csh'
+            if os.path.exists(path):
+                return solps_top
+            path = solps_top + '/SOLPSTOP'
+            if os.path.exists(path):
+                with open(path) as file:
+                    return file.readline()
+            solps_top = solps_top.rsplit('/', 1)[0]
+        return None
 
     @pyqtSlot()
     def executeTcshCommand(self):
+        """ Opens TCSH login shell and runs SOLPS plot command
+            previously defined and under the runsDir.
+
+            TCSH enviromnent is searched sourced from 'setup.csh' or pointed
+            with SOLPSTOP file. SOLPSTOP is probed for runDir changes and
+            if necessary resourced within a new shell.
+        """
+        rundir_solps_top = self.find_solps_top(self.rundir)
+        if not rundir_solps_top:
+            if not self.rundir:
+                logging.error("Empty TCSH runDir! Bailing out.")
+            else:
+                logging.error("Could not find SOLPSTOP for " + self.rundir)
+            return
+
+        if rundir_solps_top != self.solps_top:  # we have new SOLPSTOP
+            self.tcsh.kill()
+            self.solps_top = rundir_solps_top
+
+        cmd = ''
         if self.tcsh.state() != QProcess.Running:
             self.tcsh.setWorkingDirectory(self.solps_top)
             self.tcsh.start(self.tcsh_path, ['-l'])
-            cmd = "cd " + self.solps_top \
-                  + '\nsource setup.csh\necho TCSH READY\n'
-            env = QProcessEnvironment.systemEnvironment()
-            self.tcsh.setProcessEnvironment(env)
+            logging.info("TCSH started in " + self.solps_top)
+            cmd +=  "cd " + self.solps_top \
+                    + '\nsource setup.csh\necho TCSH READY\n' \
+                    + 'cd ' + self.rundir + '\n'
+
+        if self.tcsh_command and self.rundir:
+            cmd += self.tcsh_command + '\n'
             self.tcsh.write(bytearray(cmd, 'utf8'))
-            self.solpsTopChanged.emit(self.solps_top)
-
-
-        self.tcsh.write(bytearray(self.tcsh_command+'\n', 'utf8'))
+        else:
+            logging.warning("Empty command or no run directory for TCSH")
 
 
 
