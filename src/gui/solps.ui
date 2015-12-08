@@ -411,9 +411,9 @@
        <widget class="QPushButton" name="pushButton_9">
         <property name="geometry">
          <rect>
-          <x>250</x>
+          <x>10</x>
           <y>200</y>
-          <width>80</width>
+          <width>81</width>
           <height>23</height>
          </rect>
         </property>
@@ -468,8 +468,8 @@
        <widget class="QLabel" name="label_7">
         <property name="geometry">
          <rect>
-          <x>340</x>
-          <y>170</y>
+          <x>350</x>
+          <y>160</y>
           <width>161</width>
           <height>41</height>
          </rect>
@@ -500,9 +500,9 @@
        <widget class="SolpsPlots" name="solpsplots">
         <property name="geometry">
          <rect>
-          <x>10</x>
+          <x>100</x>
           <y>200</y>
-          <width>238</width>
+          <width>421</width>
           <height>23</height>
          </rect>
         </property>
