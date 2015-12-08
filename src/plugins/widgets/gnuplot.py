@@ -3,7 +3,7 @@
 """
 
 from PyQt5.QtCore import (Qt, QProcess, QProcessEnvironment, QSize, pyqtSignal,
-                          pyqtSlot, pyqtProperty)
+                          QSettings, pyqtSlot, pyqtProperty)
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QLabel, QFrame
 
@@ -23,8 +23,9 @@ class Gnuplot(QLabel):
     
     def __init__(self, parent=None):
         super(Gnuplot, self).__init__(parent)
+        settings = QSettings('ITER', 'solps-gui')
+        self.tcsh_path = settings.value("tcsh_path", '/bin/tcsh')
         self.gnuplot_path = "/usr/bin/gnuplot"
-        self.tcsh_path = '/bin/tcsh'
         self.solps_top = None
         self.solps_top_changed = False
         self.rundir = None

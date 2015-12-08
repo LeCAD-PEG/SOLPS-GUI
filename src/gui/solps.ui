@@ -329,6 +329,9 @@
        <layout class="QGridLayout" name="gridLayout_4">
         <item row="0" column="3">
          <widget class="QPushButton" name="pushButton_Stop">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Stop</string>
           </property>
@@ -336,6 +339,9 @@
         </item>
         <item row="0" column="4">
          <widget class="QPushButton" name="pushButton_12">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Edit</string>
           </property>
@@ -373,6 +379,9 @@
         </item>
         <item row="0" column="2">
          <widget class="QPushButton" name="pushButton_Run">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Run</string>
           </property>
@@ -687,8 +696,8 @@
    <slot>executeTcshCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>472</x>
-     <y>258</y>
+     <x>483</x>
+     <y>218</y>
     </hint>
     <hint type="destinationlabel">
      <x>416</x>
@@ -703,8 +712,8 @@
    <slot>setTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>403</x>
-     <y>258</y>
+     <x>414</x>
+     <y>218</y>
     </hint>
     <hint type="destinationlabel">
      <x>382</x>
@@ -719,12 +728,12 @@
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>288</x>
-     <y>148</y>
+     <x>351</x>
+     <y>186</y>
     </hint>
     <hint type="destinationlabel">
-     <x>337</x>
-     <y>205</y>
+     <x>361</x>
+     <y>251</y>
     </hint>
    </hints>
   </connection>
@@ -751,8 +760,8 @@
    <slot>setSolpsPlotCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>170</x>
-     <y>228</y>
+     <x>271</x>
+     <y>278</y>
     </hint>
     <hint type="destinationlabel">
      <x>181</x>
@@ -767,8 +776,8 @@
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>214</x>
-     <y>228</y>
+     <x>315</x>
+     <y>278</y>
     </hint>
     <hint type="destinationlabel">
      <x>216</x>

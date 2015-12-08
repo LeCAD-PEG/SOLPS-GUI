@@ -1,10 +1,9 @@
-#!/usr/bin/env python3
+   #!/usr/bin/env python3
 """ A PyQt custom TCSH widget.
 """
 
-from PyQt5.QtCore import (Qt, QProcess, QProcessEnvironment, QSize, pyqtSignal,
-                          pyqtSlot, pyqtProperty, QByteArray)
-from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtCore import (QProcess, QSize, pyqtSignal, QSettings,
+                          pyqtSlot, pyqtProperty)
 from PyQt5.QtWidgets import QPlainTextEdit, QFrame
 
 import logging
@@ -22,7 +21,8 @@ class Tcsh(QPlainTextEdit):
     
     def __init__(self, parent=None):
         super(Tcsh, self).__init__(parent)
-        self.tcsh_path = '/bin/tcsh'
+        settings = QSettings('ITER', 'solps-gui')
+        self.tcsh_path = settings.value("tcsh_path", '/bin/tcsh')
         self.solps_top = None
         self.rundir = None
         self.tcsh_command = None
@@ -36,11 +36,6 @@ class Tcsh(QPlainTextEdit):
         self.tcsh = QProcess()
         self.tcsh.readyReadStandardOutput.connect(self.print_stdout)
         self.tcsh.readyReadStandardError.connect(self.print_stderr)
-
-        #self.gnuplot.finished.connect(self.show_plot)
-        #self.gnuplot.started.connect(self.write_commands_to_gnuplot)
-        #self.gnuplot.stateChanged.connect(self.stateChanged)
-        #self.gnuplot.error.connect(self.show_error)
 
     def sizeHint(self):
         return QSize(320, 100)
@@ -116,11 +111,11 @@ class Tcsh(QPlainTextEdit):
             Arguments:
                 run_directory (str): run_directory
             Returns:
-                solps_top(str): if found stup.csh or SOLPSTOP file. Else None
+                solps_top(str): if found setup.csh or SOLPSTOP file. Else None
         """
         solps_top = directory
 
-        while(solps_top):
+        while solps_top:
             path = solps_top + '/setup.csh'
             if os.path.exists(path):
                 return solps_top
@@ -136,7 +131,7 @@ class Tcsh(QPlainTextEdit):
         """ Opens TCSH login shell and runs SOLPS plot command
             previously defined and under the runsDir.
 
-            TCSH enviromnent is searched sourced from 'setup.csh' or pointed
+            TCSH environment is searched sourced from 'setup.csh' or pointed
             with SOLPSTOP file. SOLPSTOP is probed for runDir changes and
             if necessary resourced within a new shell.
         """
@@ -157,7 +152,7 @@ class Tcsh(QPlainTextEdit):
             self.tcsh.setWorkingDirectory(self.solps_top)
             self.tcsh.start(self.tcsh_path, ['-l'])
             logging.info("TCSH started in " + self.solps_top)
-            cmd +=  "cd " + self.solps_top \
+            cmd +=  'cd ' + self.solps_top \
                     + '\nsource setup.csh\necho TCSH READY\n' \
                     + 'cd ' + self.rundir + '\n'
 
@@ -177,7 +172,8 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     tcsh_widget = Tcsh()
     tcsh_widget.show()
-    tcsh_widget.setSolpsTop(os.path.expanduser("~")+'/solps-iter')
+    tcsh_widget.setRundir(os.path.expanduser("~")+
+                          '/solps-iter/runs/AUG_16151_D/run1')
     tcsh_widget.setTcshCommand('ls')
     tcsh_widget.executeTcshCommand()
     tcsh_widget.setTcshCommand('ls -l')

@@ -39,7 +39,7 @@ import logging
 from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
                           pyqtSignal, QThread, QAbstractItemModel, QVariant,
                           QSortFilterProxyModel, QRegExp, QObject, QRect,
-                          QSize)
+                          QSize, QProcess)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QFileDialog, QStyle, QStyledItemDelegate)
 from PyQt5.QtGui import (QStandardItemModel, QFontMetrics, QPen)
@@ -63,25 +63,6 @@ class Column:
     name, path, date, status, label = range(5)
 
 
-def find_solps_top(directory):
-    """ Searches for setup.csh or SOLPSTOP file in the directory hierarchy.
-        Arguments:
-            run_directory (str): run_directory
-        Returns:
-            solps_top(str): if found stup.csh or SOLPSTOP file. Else None
-    """
-    solps_top = directory
-
-    while(solps_top):
-        path = solps_top[0] + '/setup.csh'
-        if os.path.exists(path):
-            return solps_top[0]
-        path = solps_top[0] + 'SOLPSTOP'
-        if os.path.exists(path):
-            with open(path) as file:
-                return file.readline()
-        solps_top = solps_top.rsplit('/', 1)[0]
-    return None
 
 
 class RunsSortFilterProxyModel(QSortFilterProxyModel):
@@ -187,7 +168,7 @@ class RunSettings(QDialog):
         tcsh_path_default = self.lineEdit_tcsh_path.text()
         if len(tcsh_path_default) == 0:
             tcsh_path_default = '/bin/tcsh'
-        tcsh_path = settings.value("tcsh_path", tcsh_path_default)
+        tcsh_path = settings.value('tcsh_path', tcsh_path_default)
         self.lineEdit_tcsh_path.setText(tcsh_path)
 
         default = self.comboBox_submit_script.currentText()
@@ -231,6 +212,7 @@ class RunSettings(QDialog):
                           self.lineEdit_monitor_interface.text())
         settings.setValue("Monitor_port", self.lineEdit_monitor_port.text())
         settings.endGroup()
+
         settings.setValue('tcsh_path', self.lineEdit_tcsh_path.text())
         settings.setValue('submit_script',
                           self.comboBox_submit_script.currentText())
@@ -968,6 +950,9 @@ class SOLPS_MainWindow(QMainWindow):
         prefix = os.path.dirname(os.path.abspath(__file__))
         loadUi(prefix + '/solps.ui', self)
 
+        self.main_tcsh = QProcess()  # for job sumbission and scripting
+        self.solps_top = None  # Current active ${SOLPSTOP} for tcsh
+
         # Create thread-safe Queue and redirect logging it
         log_queue = queue.Queue()
         log_stream = WriteStream(log_queue)
@@ -1151,6 +1136,8 @@ class SOLPS_MainWindow(QMainWindow):
         """
         valid = self.treeViewRuns.selectionModel().currentIndex().isValid()
         self.pushButton_Archive.setEnabled(valid)
+        self.pushButton_Run.setEnabled(valid)
+        self.pushButton_Stop.setEnabled(valid)
 
         if valid:
             index = self.treeViewRuns.selectionModel().currentIndex()
@@ -1266,6 +1253,78 @@ class SOLPS_MainWindow(QMainWindow):
         except OSError:
             QMessageBox.warning(None, "Permission problem",
                                         "Can't create " + path)
+
+    @pyqtSlot()
+    def on_pushButton_Run_clicked(self):
+        "Submits the selected Run"
+        index = self.treeViewRuns.selectionModel().currentIndex()
+        model = self.proxyModel
+        index_path = model.index(index.row(), Column.path, index.parent())
+        rundir = model.data(index_path, Qt.DisplayRole)
+        self.submit(rundir)
+
+    def find_solps_top(self, directory):
+        """ Searches for setup.csh or SOLPSTOP file in the directory hierarchy.
+            Arguments:
+                run_directory (str): run_directory
+            Returns:
+                solps_top(str): if found setup.csh or SOLPSTOP file. Else None
+        """
+        solps_top = directory
+
+        while solps_top:
+            print(solps_top)
+            path = solps_top + '/setup.csh'
+            if os.path.exists(path):
+                return solps_top
+            path = solps_top + '/SOLPSTOP'
+            if os.path.exists(path):
+                with open(path) as file:
+                    return file.readline()
+            solps_top = solps_top.rsplit('/', 1)[0]
+        return None
+
+    def submit(self, rundir):
+        """ Submits the job in the rundir under its $SOLPSTOP environment
+
+            TCSH environment is searched sourced from 'setup.csh' or pointed
+            with SOLPSTOP file. SOLPSTOP is probed for runDir changes and
+            if necessary resourced within a new shell.
+
+        Arguments:
+             rundir (str): prepared run directory
+        """
+        settings = QSettings('ITER', 'solps-gui')
+        tcsh_path = settings.value("tcsh_path", '/bin/tcsh')
+        submit_command = settings.value("submit_script", 'localsubmit')
+
+        rundir_solps_top = self.find_solps_top(rundir)
+        if not rundir_solps_top:
+            if not rundir:
+                logging.error("Empty TCSH runDir! Bailing out.")
+            else:
+                logging.error("Could not find SOLPSTOP for " + rundir)
+            return
+
+        if rundir_solps_top != self.solps_top:  # we have new SOLPSTOP
+            self.main_tcsh.kill()
+            self.solps_top = rundir_solps_top
+
+        cmd = ''
+        if self.main_tcsh.state() != QProcess.Running:
+            self.main_tcsh.setWorkingDirectory(self.solps_top)
+            self.main_tcsh.start(tcsh_path, ['-l'])
+            logging.info("MAIN TCSH started in " + self.solps_top)
+            cmd +=  'cd ' + self.solps_top \
+                    + '\nsource setup.csh\necho TCSH READY\n' \
+                    + 'cd ' + rundir + '\n'
+
+        if submit_command and rundir:
+            cmd += submit_command + '\n'
+            self.main_tcsh.write(bytearray(cmd, 'utf8'))
+            logging.info(submit_command + ' in ' + rundir)
+        else:
+            logging.warning("Empty command or no run directory for MAIN TCSH")
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):
