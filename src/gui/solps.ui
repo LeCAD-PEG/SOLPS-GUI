@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>553</width>
-    <height>329</height>
+    <height>326</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -24,7 +24,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
+    <item row="1" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -33,7 +33,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -322,7 +322,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_3">
+      <widget class="QWidget" name="tab_Runs">
        <attribute name="title">
         <string>&amp;Runs</string>
        </attribute>
@@ -338,7 +338,7 @@
          </widget>
         </item>
         <item row="0" column="4">
-         <widget class="QPushButton" name="pushButton_12">
+         <widget class="QPushButton" name="pushButton_Edit">
           <property name="enabled">
            <bool>false</bool>
           </property>
@@ -410,6 +410,16 @@
            <string>Case sensitive filter</string>
           </property>
          </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_Input">
+       <attribute name="title">
+        <string>I&amp;nput</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_7">
+        <item row="0" column="0">
+         <widget class="SolpsEdit" name="solpsedit"/>
         </item>
        </layout>
       </widget>
@@ -659,6 +669,11 @@
    <class>Gnuplot</class>
    <extends>QLabel</extends>
    <header>gnuplot</header>
+  </customwidget>
+  <customwidget>
+   <class>SolpsEdit</class>
+   <extends>QTabWidget</extends>
+   <header>solpsedit</header>
   </customwidget>
   <customwidget>
    <class>SolpsPlots</class>

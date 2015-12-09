@@ -950,8 +950,12 @@ class SOLPS_MainWindow(QMainWindow):
         prefix = os.path.dirname(os.path.abspath(__file__))
         loadUi(prefix + '/solps.ui', self)
 
+
         self.main_tcsh = QProcess()  # for job sumbission and scripting
         self.solps_top = None  # Current active ${SOLPSTOP} for tcsh
+
+        self.previous_tab_index = None   # For auto saving of Edit tab
+        self.input_tab_index = self.tabWidget.indexOf(self.tab_Input)
 
         # Create thread-safe Queue and redirect logging it
         log_queue = queue.Queue()
@@ -1104,6 +1108,33 @@ class SOLPS_MainWindow(QMainWindow):
         settings.endArray()
         settings.endGroup()
 
+    @pyqtSlot(int)
+    def on_tabWidget_currentChanged(self, tab_index):
+        """ Signal is received when tab on main window is changed.
+            We check if the Edit tab lost its focus and save modified files.
+
+            Arguments:
+                 tab_index (int): current tab index selected
+        """
+        if tab_index != self.input_tab_index \
+                and self.previous_tab_index == self.input_tab_index:
+            self.solpsedit.save_modified_input_files()
+        self.previous_tab_index = tab_index
+
+    @pyqtSlot()
+    def on_pushButton_Edit_clicked(self):
+        """ For selected run and Edit button pressed Input tab is focused
+            with all SOLPS input files modifiable with simple text editor.
+        """
+        self.tabWidget.setCurrentIndex(self.input_tab_index)
+        index = self.treeViewRuns.selectionModel().currentIndex()
+        model = self.proxyModel
+        index_path = model.index(index.row(), Column.path, index.parent())
+        path = model.data(index_path, Qt.DisplayRole)
+        self.statusbar.showMessage('Editing ' + path)
+        self.solpsedit.setRundir(path)
+        self.solpsedit.read_input_files()
+
     @pyqtSlot()
     def on_pushButton_Restore_clicked(self):
         index = self.treeViewArchive.selectionModel().currentIndex()
@@ -1138,6 +1169,7 @@ class SOLPS_MainWindow(QMainWindow):
         self.pushButton_Archive.setEnabled(valid)
         self.pushButton_Run.setEnabled(valid)
         self.pushButton_Stop.setEnabled(valid)
+        self.pushButton_Edit.setEnabled(valid)
 
         if valid:
             index = self.treeViewRuns.selectionModel().currentIndex()
@@ -1150,14 +1182,6 @@ class SOLPS_MainWindow(QMainWindow):
     def enable_restore_button(self):
         valid = self.treeViewArchive.selectionModel().currentIndex().isValid()
         self.pushButton_Restore.setEnabled(valid)
-
-    def create_model(self):
-        model = QStandardItemModel()
-        self.headerdata = ["Name", "Path", "Date", "Status", "Comment",
-                           "Device", "Shot number", "Run number"]
-        self.columns = len(self.headerdata)
-        self.rootItem = TreeItem(self.headerdata)
-        return model
 
     def textFilterChanged(self):
         filter_index = self.comboBoxRunFilterType.currentIndex()

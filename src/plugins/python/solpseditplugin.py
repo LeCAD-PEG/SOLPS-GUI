@@ -2,18 +2,23 @@
 
 """
 
-A TCSH custom widget plugin for Qt Designer.
+A SOLPS Edit custom widget plugin for Qt Designer.
 
 """
 
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
+from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin, QPyDesignerContainerExtension
 
-from tcsh import Tcsh
+from solpsedit import SolpsEdit
+
+Q_TYPEID = {'QPyDesignerContainerExtension':     'com.trolltech.Qt.Designer.Container',
+            'QPyDesignerPropertySheetExtension': 'com.trolltech.Qt.Designer.PropertySheet',
+            'QPyDesignerTaskMenuExtension':      'com.trolltech.Qt.Designer.TaskMenu',
+            'QPyDesignerMemberSheetExtension':   'com.trolltech.Qt.Designer.MemberSheet'}
 
 
-class TcshWidgetPlugin(QPyDesignerCustomWidgetPlugin):
-    """TcshWidgetPlugin(QPyDesignerCustomWidgetPlugin)
+class SolpsEditPlugin(QPyDesignerCustomWidgetPlugin):
+    """SolpsEditPlugin(QPyDesignerCustomWidgetPlugin)
     
     Provides a Python custom plugin for Qt Designer by implementing the
     QDesignerCustomWidgetPlugin via a PyQt-specific custom plugin class.
@@ -23,8 +28,7 @@ class TcshWidgetPlugin(QPyDesignerCustomWidgetPlugin):
     # initialized variable.
     def __init__(self, parent=None):
     
-        super(TcshWidgetPlugin, self).__init__(parent)
-
+        super(SolpsEditPlugin, self).__init__(parent)
         self.initialized = False
 
     # The initialize() and isInitialized() methods allow the plugin to set up
@@ -44,12 +48,12 @@ class TcshWidgetPlugin(QPyDesignerCustomWidgetPlugin):
     # This factory method creates new instances of our custom widget with the
     # appropriate parent.
     def createWidget(self, parent):
-        return Tcsh(parent)
+        return SolpsEdit(parent)
 
     # This method returns the name of the custom widget class that is provided
     # by this plugin.
     def name(self):
-        return "Tcsh"
+        return "SolpsEdit"
 
     # Returns the name of the group in Qt Designer's widget box that this
     # widget belongs to.
@@ -63,12 +67,12 @@ class TcshWidgetPlugin(QPyDesignerCustomWidgetPlugin):
 
     # Returns a short description of the custom widget for use in a tool tip.
     def toolTip(self):
-        return ""
+        return "Tabed editor for SOLPS input configuration files."
 
     # Returns a short description of the custom widget for use in a "What's
     # This?" help message for the widget.
     def whatsThis(self):
-        return "TCSH shell with SOLPSTOP environment"
+        return ""
 
     # Returns True if the custom widget acts as a container for other widgets;
     # otherwise returns False. Note that plugins for custom containers also
@@ -81,48 +85,46 @@ class TcshWidgetPlugin(QPyDesignerCustomWidgetPlugin):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="Tcsh" name="tcsh" />\n'
+        return ('<widget class="SolpsEdit" name="solpsedit">'
+                #  ' <widget class="QPlainTextEdit" name="input_file" />'
+                '</widget>')
 
     # Returns the module containing the custom widget class. It may include
     # a module path.
     def includeFile(self):
-        return "tcsh"
+        return "solpsedit"
 
 
 # Define the image used for the icon.
 _logo_16x16_xpm = [
-    "16 16 16 1",
-    "  c #000100",
-    ". c #5F53C8",
-    "X c #5A60C6",
-    "o c #867BD3",
-    "O c #229AD8",
-    "+ c #7C88D5",
-    "@ c #A3A0DA",
-    "# c #63BAB4",
-    "$ c #80B8DD",
-    "% c #A9BCD5",
-    "& c #C4C2EC",
-    "* c #C5C8E5",
-    "= c #DEDAEC",
-    "- c #E9EAF9",
-    "; c #FAFBFF",
-    ": c #FDFFFC",
-    "::::;:::::: : ::",
-    ":::=@*:;:::: : :",
-    "::-o..&:;:::::::",
-    "::@o::+=:::: :::",
-    ":;o-;;:@::: : ::",
-    ":=o:;:;-*::    :",
-    ":*@:::;;*:::::::",
-    ":&@:::;;*::::: :",
-    ":&@:::;;*::    :",
-    ":*@:;::&-:::::::",
-    ":-+;;:-@::::  ::",
-    ":;+&:-+:;:: :: :",
-    ":;$.oX=;::::  ::",
-    ":;;OX&::::::::::",
-    "::%#$&::::: : ::",
-    "::::;;:::::: : :"]
+    "16 16 12 1",
+    "  c gray100",
+    ". c #FF3333",
+    "X c #CCFFFF",
+    "o c #99CCFF",
+    "O c #66CCFF",
+    "+ c #CCCCFF",
+    "@ c #CCFF33",
+    "# c #99FFFF",
+    "$ c #CCFFCC",
+    "% c #99CCCC",
+    "& c #FFCC66",
+    "* c #66CCCC",
+    "   XX      . .  ",
+    "  OOoOX     . . ",
+    " Xo   oX        ",
+    " O     o    .   ",
+    " o      X  . .  ",
+    " o      X  .... ",
+    " o      X       ",
+    " o      X     . ",
+    " o      X  .... ",
+    " o     X        ",
+    " X+    X    ..  ",
+    "  O   o    .  . ",
+    "  O++oX     ..  ",
+    "  #*o%          ",
+    "  $@&      . .  ",
+    "            . . "]
 
 _logo_pixmap = QPixmap(_logo_16x16_xpm)

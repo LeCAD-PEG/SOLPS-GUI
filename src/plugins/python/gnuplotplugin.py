@@ -64,7 +64,7 @@ class GnuplotPlugin(QPyDesignerCustomWidgetPlugin):
 
     # Returns a short description of the custom widget for use in a tool tip.
     def toolTip(self):
-        return ""
+        return "Gluplot plugin with TCSH for SOLPS plots"
 
     # Returns a short description of the custom widget for use in a "What's
     # This?" help message for the widget.

@@ -63,7 +63,7 @@ class SolpsPlotsPlugin(QPyDesignerCustomWidgetPlugin):
 
     # Returns a short description of the custom widget for use in a tool tip.
     def toolTip(self):
-        return ""
+        return "Combo box with a list of all SOLPS plot scripts"
 
     # Returns a short description of the custom widget for use in a "What's
     # This?" help message for the widget.
