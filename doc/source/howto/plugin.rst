@@ -134,8 +134,8 @@ structure::
         +- hello_test.py
 
 
-Building widget
-^^^^^^^^^^^^^^^
+Building the widget
+^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: c++
    :caption: hello.h

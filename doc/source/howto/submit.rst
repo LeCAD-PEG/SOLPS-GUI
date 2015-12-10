@@ -53,3 +53,26 @@ should be sufficient for a submission script to figure out run type such as:
   * standalone
   * coulped with EIRENE
   * compressed logs
+
+
+For single workstation ``localsubmit`` can be as easy as::
+
+    #!/usr/bin/env tcsh
+    setenv SHELL `which tcsh` # needed for batch and atd
+    cat << __EOF__ | batch
+    echo ${USER} ${PWD} Started localy at `date` | \
+        nc -u -w 0 -v ${SOLPS_GUI_ADDRESS} ${SOLPS_GUI_PORT}
+    if (-e input.dat) then
+        time b2run ${USE_MPI} b2mn < input.dat >! run.log
+    else
+        time b2run -s ${USE_MPI} b2mn >! run.log
+    endif
+    echo ${USER} ${PWD} Finished | \
+        nc -u -w 0 -v ${SOLPS_GUI_ADDRESS} ${SOLPS_GUI_PORT}
+    update_solps_run_status "Finished on `hostname` at `date`"
+    __EOF__
+
+Described script uses ``batch`` command that submits the job to local ``atd``.
+Make sure that you increase default 0.8 load average when configuring
+``atd -l <load>`` to <load> = n-1 cores of your system. Otherwise,
+just one job will start at the moment.
