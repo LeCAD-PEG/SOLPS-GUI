@@ -1070,7 +1070,12 @@ class SOLPS_MainWindow(QMainWindow):
         self.treeViewArchive.setAlternatingRowColors(True)
         self.treeViewArchive.setSortingEnabled(True)
 
+        # Setup input tabs
+        self.solpsinput.setup_tabs()
+        self.tab_Input.setEnabled(False)
+
         # Configure Dashboard
+
         self.actionRuns_dirs.triggered.connect(self.show_runs_dirs_dialog)
         self.treeViewRuns.selectionModel().selectionChanged.connect(
             self.run_selected)
@@ -1118,7 +1123,7 @@ class SOLPS_MainWindow(QMainWindow):
         """
         if tab_index != self.input_tab_index \
                 and self.previous_tab_index == self.input_tab_index:
-            self.solpsedit.save_modified_input_files()
+            self.solpsinput.save_modified_input_files()
         self.previous_tab_index = tab_index
 
     @pyqtSlot()
@@ -1132,8 +1137,9 @@ class SOLPS_MainWindow(QMainWindow):
         index_path = model.index(index.row(), Column.path, index.parent())
         path = model.data(index_path, Qt.DisplayRole)
         self.statusbar.showMessage('Editing ' + path)
-        self.solpsedit.setRundir(path)
-        self.solpsedit.read_input_files()
+        self.solpsinput.setRundir(path)
+        self.solpsinput.read_input_files()
+        self.tab_Input.setEnabled(True)
 
     @pyqtSlot()
     def on_pushButton_Restore_clicked(self):

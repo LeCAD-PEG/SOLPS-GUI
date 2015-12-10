@@ -14,9 +14,9 @@ else
     setenv PKG_CONFIG_PATH "${PWD}/staging/lib/pkgconfig:${PKG_CONFIG_PATH}"
 endif
 
-setenv PYQTDESIGNERPATH "${PWD}/src/plugins/python"
+setenv PYQTDESIGNERPATH "${PWD}/src/plugins/designer"
 if !($?PYTHONPATH) then
-    setenv PYTHONPATH "${PWD}/src/plugins/widgets"
+    setenv PYTHONPATH "${PWD}/src/widgets"
 else
-    setenv PYTHONPATH "${PWD}/src/plugins/widgets:${PYTHONPATH}"
+    setenv PYTHONPATH "${PWD}/src/widgets:${PYTHONPATH}"
 endif

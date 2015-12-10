@@ -9,16 +9,11 @@ A SOLPS Edit custom widget plugin for Qt Designer.
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin, QPyDesignerContainerExtension
 
-from solpsedit import SolpsEdit
-
-Q_TYPEID = {'QPyDesignerContainerExtension':     'com.trolltech.Qt.Designer.Container',
-            'QPyDesignerPropertySheetExtension': 'com.trolltech.Qt.Designer.PropertySheet',
-            'QPyDesignerTaskMenuExtension':      'com.trolltech.Qt.Designer.TaskMenu',
-            'QPyDesignerMemberSheetExtension':   'com.trolltech.Qt.Designer.MemberSheet'}
+from solpsinput import SolpsInput
 
 
-class SolpsEditPlugin(QPyDesignerCustomWidgetPlugin):
-    """SolpsEditPlugin(QPyDesignerCustomWidgetPlugin)
+class SolpsInputPlugin(QPyDesignerCustomWidgetPlugin):
+    """SolpsInputPlugin(QPyDesignerCustomWidgetPlugin)
     
     Provides a Python custom plugin for Qt Designer by implementing the
     QDesignerCustomWidgetPlugin via a PyQt-specific custom plugin class.
@@ -28,7 +23,7 @@ class SolpsEditPlugin(QPyDesignerCustomWidgetPlugin):
     # initialized variable.
     def __init__(self, parent=None):
     
-        super(SolpsEditPlugin, self).__init__(parent)
+        super(SolpsInputPlugin, self).__init__(parent)
         self.initialized = False
 
     # The initialize() and isInitialized() methods allow the plugin to set up
@@ -48,12 +43,12 @@ class SolpsEditPlugin(QPyDesignerCustomWidgetPlugin):
     # This factory method creates new instances of our custom widget with the
     # appropriate parent.
     def createWidget(self, parent):
-        return SolpsEdit(parent)
+        return SolpsInput(parent)
 
     # This method returns the name of the custom widget class that is provided
     # by this plugin.
     def name(self):
-        return "SolpsEdit"
+        return "SolpsInput"
 
     # Returns the name of the group in Qt Designer's widget box that this
     # widget belongs to.
@@ -85,14 +80,14 @@ class SolpsEditPlugin(QPyDesignerCustomWidgetPlugin):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return ('<widget class="SolpsEdit" name="solpsedit">'
+        return ('<widget class="SolpsInput" name="solpsinput">'
                 #  ' <widget class="QPlainTextEdit" name="input_file" />'
                 '</widget>')
 
     # Returns the module containing the custom widget class. It may include
     # a module path.
     def includeFile(self):
-        return "solpsedit"
+        return "solpsinput"
 
 
 # Define the image used for the icon.

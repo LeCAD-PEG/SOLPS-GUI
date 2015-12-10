@@ -66,15 +66,23 @@ accompanying Qt Designer plugin that follows requirements for inclusion and
 provide information such as *widget group*, *icon*, *default values* for its
 properties. Therefore, usually two directories are created:
 
- * ``widgets`` with custom widget code, and
- * ``python`` Qt Designer code that describe each widget. Directory containing
-   these .py files is pointed with ``PYQTDESIGNERPATH`` environment variable
-   for Python designer loader to load them at startup. Plugin loader requires
-   that the name of plugin must glob to ``py*plugin.py``. For example:
-   ``pygnuplotplugin.py``.
+ * ``widgets`` with custom widgets code, and
+ * ``plugins/designer`` Qt Designer code that describe each widget.
+   Directory containing these .py files is pointed with ``PYQTDESIGNERPATH``
+   environment variable for Python designer loader to load them at startup.
+   Plugin loader requires that the name of plugin must glob to ``*plugin.py``.
+   For example: ``gnuplotplugin.py``.
 
 Custom widget code needs to be visible to Qt Designer too by installing them
 into ``site-packages`` or with the usual ``PYTHONPATH`` environment variable.
+The same ``PYTHONPATH`` is needed by the GUI to import the widgets on
+Dashboard where users are supposed to configure layout of these widgets.
+
+When creating container plugin that includes other widgets one needs to create
+designer extension that is somewhat more complex. However, this is usually not
+needed and custom widget can be developed by inheriting top most widget
+(eg. QTabWidget for input files editing) and do the widget initialisation on
+runtime by calling setup routine or signaling usual operation.
 
 .. note::
    On *OS X* plugin loader needs to be re-compiled with absolute path specified

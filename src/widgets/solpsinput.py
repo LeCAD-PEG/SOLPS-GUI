@@ -14,19 +14,33 @@ import os
 import logging
 
 
-class SolpsEdit(QTabWidget):
-    """SolpsEdit(QDialog)
+class SolpsInput(QTabWidget):
+    """SolpsInput(QDialog)
     
     Provides a custom widget that holds all SOLPS Gnuplot script names
     for combining them with
     """
     
     def __init__(self, parent=None):
-        super(SolpsEdit, self).__init__(parent)
+        super(SolpsInput, self).__init__(parent)
         self.setWindowTitle('SOLPS input file editor')
         self.setMovable(True)
         self.rundir = None
         self.editors = list()
+
+    @pyqtSlot()
+    def setup_tabs(self):
+        font = QFont()
+        font.setFamily("Monospace")
+        for filename, tooltip in solps_input_files:
+            plainTextEdit = QPlainTextEdit(self)
+            plainTextEdit.setObjectName(filename)
+            plainTextEdit.setFont(font)
+            plainTextEdit.setLineWrapMode(QPlainTextEdit.NoWrap)
+            tab_index = self.addTab(plainTextEdit, filename)
+            self.setTabToolTip(tab_index, tooltip)
+            self.editors.append((filename, plainTextEdit))
+
 
     @pyqtSlot()
     def read_input_files(self):
@@ -40,16 +54,8 @@ class SolpsEdit(QTabWidget):
             return
 
         if len(self.editors) == 0:  # Setup tabs on the fly
-            font = QFont()
-            font.setFamily("Monospace")
-            for filename, tooltip in solps_input_files:
-                plainTextEdit = QPlainTextEdit(self)
-                plainTextEdit.setObjectName(filename)
-                plainTextEdit.setFont(font)
-                plainTextEdit.setLineWrapMode(QPlainTextEdit.NoWrap)
-                tab_index = self.addTab(plainTextEdit, filename)
-                self.setTabToolTip(tab_index, tooltip)
-                self.editors.append((filename, plainTextEdit))
+            self.setup_tabs()
+
 
         for filename, plainTextEdit in self.editors:
             if not os.access(self.rundir, os.W_OK):
@@ -91,7 +97,7 @@ class SolpsEdit(QTabWidget):
     if __name__ == "__main__":
         def closeEvent(self, event):
             self.save_modified_input_files()
-            super(SolpsEdit, self).closeEvent(event)
+            super(SolpsInput, self).closeEvent(event)
 
     def sizeHint(self):
         return QSize(320, 200)
@@ -151,7 +157,7 @@ if __name__ == "__main__":
     from PyQt5.QtWidgets import QApplication
 
     app = QApplication(sys.argv)
-    window = SolpsEdit()
+    window = SolpsInput()
     window.setRundir(os.path.expanduser("~")+
                      '/solps-iter/runs/AUG_16151_D/run1')
     window.read_input_files()

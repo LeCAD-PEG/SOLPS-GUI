@@ -419,7 +419,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_7">
         <item row="0" column="0">
-         <widget class="SolpsEdit" name="solpsedit"/>
+         <widget class="SolpsInput" name="solpsinput"/>
         </item>
        </layout>
       </widget>
@@ -487,14 +487,14 @@
        <widget class="QLabel" name="label_7">
         <property name="geometry">
          <rect>
-          <x>350</x>
+          <x>340</x>
           <y>160</y>
-          <width>161</width>
+          <width>181</width>
           <height>41</height>
          </rect>
         </property>
         <property name="text">
-         <string>Please select current run in Runs tab.</string>
+         <string>Please select current run in the Runs tab.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -671,9 +671,9 @@
    <header>gnuplot</header>
   </customwidget>
   <customwidget>
-   <class>SolpsEdit</class>
+   <class>SolpsInput</class>
    <extends>QTabWidget</extends>
-   <header>solpsedit</header>
+   <header>solpsinput</header>
   </customwidget>
   <customwidget>
    <class>SolpsPlots</class>

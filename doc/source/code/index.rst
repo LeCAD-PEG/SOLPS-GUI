@@ -28,12 +28,19 @@ of the Dashboard by graphical programming by users.
 Gnuplot
 -------
 
-.. automodule:: pygnuplotwidget
+.. automodule:: gnuplot
    :members:
 
 ------------
 Tcsh scripts
 ------------
 
-.. automodule:: solpstcshplots
+.. automodule:: solpsplots
+   :members:
+
+----------------
+Input file editor
+----------------
+
+.. automodule:: solpsinput
    :members:
