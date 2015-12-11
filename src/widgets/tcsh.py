@@ -5,9 +5,9 @@
 from PyQt5.QtCore import (QProcess, QSize, pyqtSignal, QSettings,
                           pyqtSlot, pyqtProperty)
 from PyQt5.QtWidgets import QPlainTextEdit, QFrame
+from PyQt5.QtGui import QFont
 
 import logging
-import os
 
 class Tcsh(QPlainTextEdit):
     """ Tcsh(QWidget)
@@ -31,7 +31,9 @@ class Tcsh(QPlainTextEdit):
         self.setFrameStyle(QFrame.StyledPanel)
         self.setMinimumSize(QSize(180, 50))
         self.setPlaceholderText("TCSH widget for SOLPS")
-        #self.setEnabled(False)
+        font = QFont()
+        font.setFamily('Monospace')
+        self.setFont(font)
 
         self.tcsh = QProcess()
         self.tcsh.readyReadStandardOutput.connect(self.print_stdout)

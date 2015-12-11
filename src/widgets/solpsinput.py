@@ -6,19 +6,19 @@ A PyQt custom widget with embedded SOLPS configuration editor.
 
 """
 
-from PyQt5.QtCore import (QSize, Qt, pyqtProperty,  pyqtSignal, pyqtSlot)
+from PyQt5.QtCore import (QSize, pyqtProperty,  pyqtSignal, pyqtSlot)
 from PyQt5.QtWidgets import (QTabWidget, QPlainTextEdit)
-from PyQt5.QtGui import QFont, QTextCursor
+from PyQt5.QtGui import QFont
 
 import os
 import logging
 
 
 class SolpsInput(QTabWidget):
-    """SolpsInput(QDialog)
+    """SolpsInput(QTabWidget)
     
-    Provides a custom widget that holds all SOLPS Gnuplot script names
-    for combining them with
+    Provides a custom widget that holds all SOLPS input files available for
+    editing before starting the run.
     """
     
     def __init__(self, parent=None):
@@ -31,7 +31,7 @@ class SolpsInput(QTabWidget):
     @pyqtSlot()
     def setup_tabs(self):
         font = QFont()
-        font.setFamily("Monospace")
+        font.setFamily('Monospace')
         for filename, tooltip in solps_input_files:
             plainTextEdit = QPlainTextEdit(self)
             plainTextEdit.setObjectName(filename)
@@ -120,6 +120,8 @@ solps_input_files = [ # filename and its description for tooltip
     ('b2mn.dat',
      "Input file to the b2mn main B2.5 program containing the run switches\n"
      "and eventually overriding parameters to those specified in b2ah.dat"),
+    ('input.dat',
+     "Eirene input file"),
     ('b2ag.dat',
      "Input file to the b2ag B2.5 pre-processor that builds the geometry\n"
      "file b2fgmtry in the B2.5 format from the *.geo CARRE grid file."),
@@ -135,6 +137,8 @@ solps_input_files = [ # filename and its description for tooltip
      "Input file to the b2ar B2.5 pre-processor that builds\n"
      "the atomic physics rates file b2frates containing\n"
      "the look-up tables to be used by B2.5"),
+    ('b2md.dat', "Contains data useful for cataloguing the run\n"
+     "(done from 'save_mds' and resave_mds' scripts"), # TODO(bonninx) check
     ('b2.boundary.parameters',
      "Input files containing the namelists used by b2mn,\n"
      "which complete the input provided  by  the b2??.dat files"),
@@ -150,6 +154,8 @@ solps_input_files = [ # filename and its description for tooltip
     ('b2.wall_save.parameters',
      "Input files containing the namelists used by b2mn,\n"
      "which complete the input provided  by  the b2??.dat files"),
+    ('untitled',
+     'You will be asked for a file name once you start typing.')
 ]
 
 if __name__ == "__main__":
