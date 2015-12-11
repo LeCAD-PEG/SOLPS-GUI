@@ -55,24 +55,28 @@ should be sufficient for a submission script to figure out run type such as:
   * compressed logs
 
 
-For single workstation ``localsubmit`` can be as easy as::
+For single workstation ``localsubmit`` can be::
 
     #!/usr/bin/env tcsh
     setenv SHELL `which tcsh` # needed for batch and atd
     cat << __EOF__ | batch
-    echo ${USER} ${PWD} Started localy at `date` | \
-        nc -u -w 0 -v ${SOLPS_GUI_ADDRESS} ${SOLPS_GUI_PORT}
+    setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}"
+    set msg="Started on `hostname` at `date`"
+    update_solps_run_status \${msg}
+    echo ${USER} ${PWD} \${msg} | nc -u -v -w 0 ${SOLPS_GUI_IP} ${SOLPS_GUI_PORT}
     if (-e input.dat) then
-        time b2run ${USE_MPI} b2mn < input.dat >! run.log
+       time b2run ${argv} b2mn < input.dat >! run.log
     else
-        time b2run -s ${USE_MPI} b2mn >! run.log
+       time b2run ${argv} -s  b2mn >! run.log
     endif
-    echo ${USER} ${PWD} Finished | \
-        nc -u -w 0 -v ${SOLPS_GUI_ADDRESS} ${SOLPS_GUI_PORT}
-    update_solps_run_status "Finished on `hostname` at `date`"
+    set msg="Finished on `hostname` at `date`"
+    echo ${USER} ${PWD} \${msg} | nc -u -v -w 0 ${SOLPS_GUI_IP} ${SOLPS_GUI_PORT}
+    update_solps_run_status \${msg}
     __EOF__
 
 Described script uses ``batch`` command that submits the job to local ``atd``.
 Make sure that you increase default 0.8 load average when configuring
 ``atd -l <load>`` to <load> = n-1 cores of your system. Otherwise,
-just one job will start at the moment.
+just one job will start at the moment. Two environment variables,
+``${SOLPS_GUI_IP}`` and ``${SOLPS_GUI_PORT}`` from *Settings* are injected
+before job is submitted to ``batch``.

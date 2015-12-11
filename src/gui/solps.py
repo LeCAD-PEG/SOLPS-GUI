@@ -280,7 +280,7 @@ class Preferences(QDialog):
         logging.getLogger().setLevel(log_level)
 
 class RunsStatusServer(QThread):
-    """Networking UDP listener for receiving job status updates.
+    """ Networking UDP listener for receiving job status updates.
 
     Receives datagrams in single line and emits decoded one line updates sent
     by each job to notify the GUI that status changed.
@@ -308,7 +308,7 @@ class RunsStatusServer(QThread):
         while self.retrieve:
             data, addr = self._sock.recvfrom(1024)  # wait for data
             # print("Message", data.decode('utf-8'), "from", addr[0])
-            self.jobStatusChanged.emit(data.decode('utf-8'))
+            self.jobStatusChanged.emit(data.decode('utf-8').rstrip('\n'))
             # TODO Graceful exit from blocking recvfrom() by setting retrieve
             # TODO and sending UDP packet to ourselves.
 
@@ -644,8 +644,8 @@ class RunsModel(QAbstractItemModel):
                          icons.
 
     Attributes:
-        column_index (path : data, date_index, status_index) : Dictionary
-            of data pointer and model indexes for cell update
+        column_index (path : data, date_index, status_index, label_index) :
+            Dictionary of data pointer and model indexes for cell update
             with `FileSystemScan` or via network.
             Keys are paths to "unique" directories.
     """
@@ -866,11 +866,16 @@ class RunsModel(QAbstractItemModel):
 
         return parentItem.childCount()
 
-    " Run job status server"
+
     def startRunsStatusServer(self):
+        """ Run networking job status server for status updates.
+
+            Status server listens on all (0.0.0.0) or specified network
+            interface. UDP messages should be send in format: name path status
+        """
         self.statusServerThread = RunsStatusServer()
         settings = QSettings("ITER", "solps-gui")
-        try:
+        try:  # TODO Assign default port number by looking at system UID range
             address = settings.value("SOLPS_GUI_BIND", "0.0.0.0")
             port = int(settings.value("SOLPS_GUI_PORT", "49406"))
         except:
@@ -894,20 +899,23 @@ class RunsModel(QAbstractItemModel):
     @pyqtSlot(str)
     def jobStatusChanged(self, message):
         try:
-            name, path, status = message.split()
+            name, path, status = message.split(maxsplit=2)
             try:
-                (itemData, date_index, status_index) = self.column_index[path]
+                itemData, date_index, status_index, label_index = \
+                    self.column_index[path]
                 itemData[Column.status] = status
                 itemData[Column.date] = QDateTime().currentDateTime()
                 self.dataChanged.emit(date_index, status_index)
                 logging.info("Received job status update: " + message)
             except KeyError:  # TODO insert non monitored message anyway
-                msg = path + " not monitored. Skipping status update."
+                msg = name + ':' + path + " not monitored "
+                msg += 'Skipping "' + status + '" update.'
                 logging.warning(msg)
-        except ValueError:
-            logging.error("Received invalid message: " + message +
-                  "Message should be in <name> <path> <status> format.")
-
+            except ValueError:
+                assert(len(self.column_index[path]) == 4)  # indexing changed
+        except ValueError as e:
+            logging.error(str(e) + " Received essage: '" + message +
+                  "' should be in 'name path status' format.")
 
 
 class LoggingHandler(logging.Handler):
@@ -1404,7 +1412,7 @@ class SOLPS_MainWindow(QMainWindow):
                     + 'setenv SOLPS_GUI_IP ' + solps_gui_ip + '\n' \
                     + 'setenv SOLPS_GUI_PORT ' + solps_gui_port + '\n'
 
-        if submit_command and rundir:
+        if submit_command:
             opts = ''
             if int(settings.value('use_mpi', '0')):
                 opts += ' -m "' + settings.value('MPI_OPTS', '-n 16') + '"'
@@ -1416,9 +1424,14 @@ class SOLPS_MainWindow(QMainWindow):
                 opts += ' -n'
             cmd += 'cd ' + rundir + '\n' + submit_command + opts + '\n'
             self.main_tcsh.write(bytearray(cmd, 'utf8'))  # TODO flush stdout
-            logging.info(submit_command + opts + ' in ' + rundir)
+            msg = 'batch ' + rundir + ' ' + submit_command + opts
+            logging.info(msg)
+            self.model.jobStatusChanged(msg)
         else:
-            logging.warning("Empty command or no run directory for  MAIN TCSH")
+            msg = 'batch ' + rundir + ' Not submitted!'
+            msg += "Empty command or no run directory for MAIN TCSH"
+            self.model.jobStatusChanged(msg)
+            logging.warning(msg)
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):
