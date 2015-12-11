@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>553</width>
+    <width>576</width>
     <height>326</height>
    </rect>
   </property>
@@ -23,8 +23,8 @@
    <string>SOLPS-ITER</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="0">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -262,7 +262,7 @@
             <rect>
              <x>110</x>
              <y>40</y>
-             <width>81</width>
+             <width>101</width>
              <height>22</height>
             </rect>
            </property>
@@ -602,8 +602,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>553</width>
-     <height>20</height>
+     <width>576</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -616,8 +616,8 @@
     <property name="title">
      <string>&amp;Settings</string>
     </property>
-    <addaction name="actionRuns_dirs"/>
-    <addaction name="actionGlobal"/>
+    <addaction name="actionRuns"/>
+    <addaction name="actionPreferences"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
@@ -638,14 +638,9 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="actionRuns_dirs">
+  <action name="actionRuns">
    <property name="text">
-    <string>&amp;Runs directories</string>
-   </property>
-  </action>
-  <action name="actionGlobal">
-   <property name="text">
-    <string>Global</string>
+    <string>&amp;Runs</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -658,9 +653,9 @@
     <string>About Qt</string>
    </property>
   </action>
-  <action name="actionRun_submission">
+  <action name="actionPreferences">
    <property name="text">
-    <string>Run submission</string>
+    <string>Preferences</string>
    </property>
   </action>
  </widget>
@@ -711,8 +706,8 @@
    <slot>executeTcshCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>483</x>
-     <y>218</y>
+     <x>498</x>
+     <y>216</y>
     </hint>
     <hint type="destinationlabel">
      <x>416</x>
@@ -727,8 +722,8 @@
    <slot>setTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>414</x>
-     <y>218</y>
+     <x>429</x>
+     <y>216</y>
     </hint>
     <hint type="destinationlabel">
      <x>382</x>
@@ -743,8 +738,8 @@
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>351</x>
-     <y>186</y>
+     <x>366</x>
+     <y>184</y>
     </hint>
     <hint type="destinationlabel">
      <x>361</x>
@@ -775,8 +770,8 @@
    <slot>setSolpsPlotCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>278</y>
+     <x>286</x>
+     <y>276</y>
     </hint>
     <hint type="destinationlabel">
      <x>181</x>
@@ -791,8 +786,8 @@
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>315</x>
-     <y>278</y>
+     <x>330</x>
+     <y>276</y>
     </hint>
     <hint type="destinationlabel">
      <x>216</x>

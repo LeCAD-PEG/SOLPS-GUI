@@ -134,11 +134,16 @@ class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
         return self.has_accepted_children(index)
 
 
-class RunSettings(QDialog):
+class RunsSettings(QDialog):
+    """ Runs settings dialog described in runs.ui configures several
+        directories with SOLPS "runs". Each directory may have its own
+        SOLPSTOP environment and can also be from other users that one
+        wants to explore or monitor.
+    """
     runDirsChanged = pyqtSignal()
 
     def __init__(self, parent=None):
-        super(RunSettings, self).__init__()
+        super(RunsSettings, self).__init__()
         prefix = os.path.dirname(os.path.abspath(__file__))
         loadUi(prefix + '/runs.ui', self)
         # get GUI settings
@@ -159,21 +164,8 @@ class RunSettings(QDialog):
         self.lineEdit_alias3.setText(settings.value("Alias3", "local_3"))
         self.lineEdit_alias4.setText(settings.value("Alias4", "local_4"))
         self.lineEdit_alias5.setText(settings.value("Alias5", "local_5"))
-        self.lineEdit_monitor_interface.setText(
-            settings.value("Monitor_interface", "0.0.0.0"))
-        self.lineEdit_monitor_port.setText(
-            settings.value("Monitor_port", "49406"))
         settings.endGroup()
 
-        tcsh_path_default = self.lineEdit_tcsh_path.text()
-        if len(tcsh_path_default) == 0:
-            tcsh_path_default = '/bin/tcsh'
-        tcsh_path = settings.value('tcsh_path', tcsh_path_default)
-        self.lineEdit_tcsh_path.setText(tcsh_path)
-
-        default = self.comboBox_submit_script.currentText()
-        comboBox_submit_script = settings.value('submit_script', default)
-        self.comboBox_submit_script.setCurrentText(comboBox_submit_script)
 
 
         self.toolButtonView1.clicked.connect(self.showdir1)
@@ -193,9 +185,10 @@ class RunSettings(QDialog):
         if new_dir:
             line_edit.setText(new_dir)
 
-    # save GUI settings
-    @pyqtSlot()
-    def on_pushButton_OK_clicked(self):
+    def setRunsSettings(self):
+        """ Save Runs directories into settings and emits that the directories
+            were changed and are needed to be completely rescanned.
+        """
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
         settings.setValue("runDir1", self.lineEdit_rundir1.text())
@@ -208,14 +201,7 @@ class RunSettings(QDialog):
         settings.setValue("Alias3", self.lineEdit_alias3.text())
         settings.setValue("Alias4", self.lineEdit_alias4.text())
         settings.setValue("Alias5", self.lineEdit_alias5.text())
-        settings.setValue("Monitor_interface",
-                          self.lineEdit_monitor_interface.text())
-        settings.setValue("Monitor_port", self.lineEdit_monitor_port.text())
         settings.endGroup()
-
-        settings.setValue('tcsh_path', self.lineEdit_tcsh_path.text())
-        settings.setValue('submit_script',
-                          self.comboBox_submit_script.currentText())
         self.runDirsChanged.emit()
 
     # Choose run directory
@@ -239,6 +225,59 @@ class RunSettings(QDialog):
     def showdir5(self):
         self.update_dir(self.lineEdit_rundir5)
 
+class Preferences(QDialog):
+    def __init__(self, parent=None):
+        super(Preferences, self).__init__()
+        prefix = os.path.dirname(os.path.abspath(__file__))
+        loadUi(prefix + '/preferences.ui', self)
+        # get GUI settings
+        settings = QSettings('ITER', 'solps-gui')
+        self.lineEdit_monitor_interface.setText(settings.value(
+            'SOLPS_GUI_BIND', self.lineEdit_monitor_interface.text()))
+        self.lineEdit_monitor_port.setText(settings.value(
+            'SOLPS_GUI_PORT', self.lineEdit_monitor_port.text()))
+        self.lineEdit_monitor_ip.setText(settings.value(
+            'SOLPS_GUI_IP', self.lineEdit_monitor_ip.text()))
+        self.lineEdit_tcsh_path.setText(settings.value(
+            'tcsh_path', self.lineEdit_tcsh_path.text()))
+        self.lineEdit_gnuplot_path.setText(settings.value(
+            'gnuplot_path', self.lineEdit_gnuplot_path.text()))
+        self.comboBox_log_level.setCurrentIndex(settings.value(
+            'log_level', self.comboBox_log_level.currentIndex()))
+        self.comboBox_submit_script.setCurrentText(settings.value(
+            'submit_script', self.comboBox_submit_script.currentText()))
+        self.checkBox_use_mpi.setCheckState(settings.value(
+            'use_mpi', self.checkBox_use_mpi.checkState()))
+        self.lineEdit_mpi_options.setText(settings.value(
+            'MPI_OPTS', self.lineEdit_mpi_options.text()))
+        self.checkBox_use_debugger.setCheckState(settings.value(
+            'use_debugger', self.checkBox_use_debugger.checkState()))
+        self.lineEdit_debugger.setText(settings.value(
+            'debugger', self.lineEdit_debugger.text()))
+        self.checkBox_compress_log.setCheckState(settings.value(
+            'compress_log', self.checkBox_compress_log.checkState()))
+        self.checkBox_dry_run.setCheckState(settings.value(
+            'dry_run', self.checkBox_dry_run.checkState()))
+
+    def setPreferences(self):
+        s = QSettings('ITER', 'solps-gui')
+        s.setValue('SOLPS_GUI_BIND',  self.lineEdit_monitor_interface.text())
+        s.setValue('SOLPS_GUI_PORT', self.lineEdit_monitor_port.text())
+        s.setValue('SOLPS_GUI_IP', self.lineEdit_monitor_ip.text())
+        s.setValue('tcsh_path', self.lineEdit_tcsh_path.text())
+        s.setValue('gnuplot_path', self.lineEdit_gnuplot_path.text())
+        s.setValue('log_level', self.comboBox_log_level.currentIndex())
+        s.setValue('submit_script', self.comboBox_submit_script.currentText())
+        s.setValue('use_mpi', self.checkBox_use_mpi.checkState())
+        s.setValue('MPI_OPTS', self.lineEdit_mpi_options.text())
+        s.setValue('use_debugger', self.checkBox_use_debugger.checkState())
+        s.setValue('debugger', self.lineEdit_debugger.text())
+        s.setValue('compress_log', self.checkBox_compress_log.checkState())
+        s.setValue('dry_run', self.checkBox_dry_run.checkState())
+        log_levels = [logging.DEBUG, logging.INFO, logging.WARNING,
+                      logging.ERROR, logging.CRITICAL]
+        log_level = log_levels[self.comboBox_log_level.currentIndex()]
+        logging.getLogger().setLevel(log_level)
 
 class RunsStatusServer(QThread):
     """Networking UDP listener for receiving job status updates.
@@ -831,14 +870,12 @@ class RunsModel(QAbstractItemModel):
     def startRunsStatusServer(self):
         self.statusServerThread = RunsStatusServer()
         settings = QSettings("ITER", "solps-gui")
-        settings.beginGroup("RunDirectories")
         try:
-            address = settings.value("Monitor_interface", "0.0.0.0")
-            port = int(settings.value("Monitor_port", "49406"))
+            address = settings.value("SOLPS_GUI_BIND", "0.0.0.0")
+            port = int(settings.value("SOLPS_GUI_PORT", "49406"))
         except:
             address = "0.0.0.0"
             port = 49406
-        settings.endGroup()
 
         status = self.statusServerThread.bind(address, port)
         if status:
@@ -971,9 +1008,12 @@ class SOLPS_MainWindow(QMainWindow):
         log_format = "%(asctime)s %(levelname)s: %(message)s"
         log_handler.setFormatter(logging.Formatter(log_format))
         logging.getLogger().addHandler(log_handler)
-        logging.getLogger().setLevel(logging.DEBUG)
-        #  logging.error('Logging started...')
-        #  logging.debug('INFO message')
+        # get GUI settings
+        settings = QSettings("ITER", "solps-gui")
+        log_levels = [logging.DEBUG, logging.INFO, logging.WARNING,
+                      logging.ERROR, logging.CRITICAL]
+        log_level = log_levels[int(settings.value('log_level', '1'))]
+        logging.getLogger().setLevel(log_level)
 
         if REDIRECT_STDOUT_TO_LOG:
             # Create thread-safe Queue and redirect sys.stdout to it
@@ -987,8 +1027,7 @@ class SOLPS_MainWindow(QMainWindow):
             self.stdout_thread.started.connect(self.stdout_receiver.run)
             self.stdout_thread.start()
 
-        # get GUI settings
-        settings = QSettings("ITER", "solps-gui")
+
 
         settings.beginGroup("MainWindow")
         geometry = settings.value("Geometry")
@@ -1074,13 +1113,16 @@ class SOLPS_MainWindow(QMainWindow):
         self.solpsinput.setup_tabs()
         self.tab_Input.setEnabled(False)
 
-        # Configure Dashboard
 
-        self.actionRuns_dirs.triggered.connect(self.show_runs_dirs_dialog)
+        self.actionRuns.triggered.connect(self.show_runs_dialog)
+        self.actionPreferences.triggered.connect(self.show_preferences_dialog)
         self.treeViewRuns.selectionModel().selectionChanged.connect(
             self.run_selected)
         self.treeViewArchive.selectionModel().selectionChanged.connect(
             self.enable_restore_button)
+
+        # Configure Dashboard
+
         self.gnuplot.plot("sin(3*x)/x")
         self.runSelected.connect(self.label_7.setText)
         self.runSelected.connect(self.gnuplot.setRundir)
@@ -1199,10 +1241,10 @@ class SOLPS_MainWindow(QMainWindow):
         self.proxyModel.setFilterRegExp(regExp)
 
     @pyqtSlot()
-    def show_runs_dirs_dialog(self):
-        dialog = RunSettings()
-        response = dialog.exec_()
-        if response:
+    def show_runs_dialog(self):
+        dialog = RunsSettings()
+        if dialog.exec_():
+            dialog.setRunsSettings()
             if self.model.RetrieveRunsFolderInfoThread.isRunning() or \
                     self.model.scanFileSystemThread.isRunning():
                 msg = "Runs layout changed in the middle of the update." \
@@ -1212,6 +1254,12 @@ class SOLPS_MainWindow(QMainWindow):
                 self.model.startThreads()
             # TODO(kosl) self.model.RetrieveRunsFolderInfoThread.quit()
             # self.model.scanFileSystemThread.start()
+
+    @pyqtSlot()
+    def show_preferences_dialog(self):
+        dialog = Preferences()
+        if dialog.exec_():
+            dialog.setPreferences()
 
     def closeEvent(self, event):
         """ Save GUI state at exit.
@@ -1303,7 +1351,6 @@ class SOLPS_MainWindow(QMainWindow):
         solps_top = directory
 
         while solps_top:
-            print(solps_top)
             path = solps_top + '/setup.csh'
             if os.path.exists(path):
                 return solps_top
@@ -1319,7 +1366,12 @@ class SOLPS_MainWindow(QMainWindow):
 
             TCSH environment is searched sourced from 'setup.csh' or pointed
             with SOLPSTOP file. SOLPSTOP is probed for runDir changes and
-            if necessary resourced within a new shell.
+            if necessary resourced within a new shell. The following
+            environment variables are injected for use by scripts::
+
+            setenv SOLPS_GUI_IP <IP address of the SOLPS GUI monitor>
+            setenv SOLPS_GUI_PORT <listening port>
+
 
         Arguments:
              rundir (str): prepared run directory
@@ -1327,6 +1379,8 @@ class SOLPS_MainWindow(QMainWindow):
         settings = QSettings('ITER', 'solps-gui')
         tcsh_path = settings.value("tcsh_path", '/bin/tcsh')
         submit_command = settings.value("submit_script", 'localsubmit')
+        solps_gui_ip = settings.value('SOLPS_GUI_IP', '127.0.0.1')
+        solps_gui_port = settings.value('SOLPS_GUI_PORT', '49406')
 
         rundir_solps_top = self.find_solps_top(rundir)
         if not rundir_solps_top:
@@ -1343,18 +1397,28 @@ class SOLPS_MainWindow(QMainWindow):
         cmd = ''
         if self.main_tcsh.state() != QProcess.Running:
             self.main_tcsh.setWorkingDirectory(self.solps_top)
-            self.main_tcsh.start(tcsh_path, ['-l'])
+            self.main_tcsh.start(tcsh_path, ['-l'])  # TODO settings for -l
             logging.info("MAIN TCSH started in " + self.solps_top)
             cmd +=  'cd ' + self.solps_top \
                     + '\nsource setup.csh\necho TCSH READY\n' \
-                    + 'cd ' + rundir + '\n'
+                    + 'setenv SOLPS_GUI_IP ' + solps_gui_ip + '\n' \
+                    + 'setenv SOLPS_GUI_PORT ' + solps_gui_port + '\n'
 
         if submit_command and rundir:
-            cmd += submit_command + '\n'
-            self.main_tcsh.write(bytearray(cmd, 'utf8'))
-            logging.info(submit_command + ' in ' + rundir)
+            opts = ''
+            if int(settings.value('use_mpi', '0')):
+                opts += ' -m "' + settings.value('MPI_OPTS', '-n 16') + '"'
+            if int(settings.value('use_debugger', '0')):
+                opts += ' -d "' + settings.value('debugger', 'totalview') + '"'
+            if int(settings.value('compress_log', '0')):
+                opts += ' -z'
+            if int(settings.value('dry_run', '0')):
+                opts += ' -n'
+            cmd += 'cd ' + rundir + '\n' + submit_command + opts + '\n'
+            self.main_tcsh.write(bytearray(cmd, 'utf8'))  # TODO flush stdout
+            logging.info(submit_command + opts + ' in ' + rundir)
         else:
-            logging.warning("Empty command or no run directory for MAIN TCSH")
+            logging.warning("Empty command or no run directory for  MAIN TCSH")
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):
