@@ -242,22 +242,22 @@ class Preferences(QDialog):
             'tcsh_path', self.lineEdit_tcsh_path.text()))
         self.lineEdit_gnuplot_path.setText(settings.value(
             'gnuplot_path', self.lineEdit_gnuplot_path.text()))
-        self.comboBox_log_level.setCurrentIndex(settings.value(
-            'log_level', self.comboBox_log_level.currentIndex()))
+        self.comboBox_log_level.setCurrentIndex(int(settings.value(
+            'log_level', self.comboBox_log_level.currentIndex())))
         self.comboBox_submit_script.setCurrentText(settings.value(
             'submit_script', self.comboBox_submit_script.currentText()))
-        self.checkBox_use_mpi.setCheckState(settings.value(
-            'use_mpi', self.checkBox_use_mpi.checkState()))
+        self.checkBox_use_mpi.setCheckState(int(settings.value(
+            'use_mpi', self.checkBox_use_mpi.checkState())))
         self.lineEdit_mpi_options.setText(settings.value(
             'MPI_OPTS', self.lineEdit_mpi_options.text()))
-        self.checkBox_use_debugger.setCheckState(settings.value(
-            'use_debugger', self.checkBox_use_debugger.checkState()))
+        self.checkBox_use_debugger.setCheckState(int(settings.value(
+            'use_debugger', self.checkBox_use_debugger.checkState())))
         self.lineEdit_debugger.setText(settings.value(
             'debugger', self.lineEdit_debugger.text()))
-        self.checkBox_compress_log.setCheckState(settings.value(
-            'compress_log', self.checkBox_compress_log.checkState()))
-        self.checkBox_dry_run.setCheckState(settings.value(
-            'dry_run', self.checkBox_dry_run.checkState()))
+        self.checkBox_compress_log.setCheckState(int(settings.value(
+            'compress_log', self.checkBox_compress_log.checkState())))
+        self.checkBox_dry_run.setCheckState(int(settings.value(
+            'dry_run', self.checkBox_dry_run.checkState())))
 
     def setPreferences(self):
         s = QSettings('ITER', 'solps-gui')
@@ -266,7 +266,7 @@ class Preferences(QDialog):
         s.setValue('SOLPS_GUI_IP', self.lineEdit_monitor_ip.text())
         s.setValue('tcsh_path', self.lineEdit_tcsh_path.text())
         s.setValue('gnuplot_path', self.lineEdit_gnuplot_path.text())
-        s.setValue('log_level', self.comboBox_log_level.currentIndex())
+        s.setValue('log_level', str(self.comboBox_log_level.currentIndex()))
         s.setValue('submit_script', self.comboBox_submit_script.currentText())
         s.setValue('use_mpi', self.checkBox_use_mpi.checkState())
         s.setValue('MPI_OPTS', self.lineEdit_mpi_options.text())
