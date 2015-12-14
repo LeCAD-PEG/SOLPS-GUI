@@ -1131,11 +1131,11 @@ class SOLPS_MainWindow(QMainWindow):
 
         # Configure Dashboard
 
-        self.gnuplot.plot("sin(3*x)/x")
-        self.runSelected.connect(self.label_7.setText)
-        self.runSelected.connect(self.gnuplot.setRundir)
-        self.runSelected.connect(self.tcsh.setRundir)
-        self.tcsh.setTcshCommand(self.lineEdit.text())
+        #self.gnuplot.plot("sin(3*x)/x")
+        #self.runSelected.connect(self.label_7.setText)
+        self.runSelected.connect(self.director.setRundir)
+        #self.runSelected.connect(self.tcsh.setRundir)
+        #self.tcsh.setTcshCommand(self.lineEdit.text())
         #  self.gnuplot.setText("Started")
         #  print(self.gnuplot.process.state())
         #  self.gnuplot1.process.finished.connect(self.gnuplot1.show_plot)

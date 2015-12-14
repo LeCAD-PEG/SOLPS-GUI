@@ -26,6 +26,7 @@ class SolpsPlots(QComboBox):
 
         self.process = QProcess()
         self.setEditable(True)
+        self.setMaximumWidth(400)
         self.addItems(_tcsh_solps_scripts)
 
     @pyqtSlot()
@@ -224,7 +225,7 @@ _tcsh_solps_scripts = [
     'sputter_chemical # Shows chemical sputtering particle fluxes (for B2.5 standalone runs).',
     'sputter_chemical_energy # Shows chemical sputtering energy fluxes (for B2.5 standalone runs).',
     'sputter_physical # Shows physical sputtering particle fluxes (for B2.5 standalone runs).",',
-    'sputter_physical # energy Shows physical sputtering energy fluxes (for B2.5 standalone runs).',
+    'sputter_physical_energy # Shows physical sputtering energy fluxes (for B2.5 standalone runs).',
     'thermal_evaporation # Shows thermal evaporation particle fluxes (for B2.5 standalone runs).',
     'thermal_evaporation_energy # Shows thermal evaporation energy fluxes (for B2.5 standalone runs).',
     'tereg # Shows averaged electron temperature per region.',

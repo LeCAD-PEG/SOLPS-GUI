@@ -81,7 +81,9 @@ class SolpsPlotsPlugin(QPyDesignerCustomWidgetPlugin):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="SolpsPlots" name="solpsplots" />\n'
+        return '<widget class="SolpsPlots" name="solpsplots">\n' \
+        '<property name="maximumWidth">400</property>\n' \
+        '</widget>'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.

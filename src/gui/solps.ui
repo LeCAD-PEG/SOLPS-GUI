@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>576</width>
-    <height>326</height>
+    <width>579</width>
+    <height>323</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -430,10 +430,10 @@
        <widget class="QPushButton" name="pushButton_9">
         <property name="geometry">
          <rect>
-          <x>10</x>
+          <x>80</x>
           <y>200</y>
           <width>81</width>
-          <height>23</height>
+          <height>31</height>
          </rect>
         </property>
         <property name="text">
@@ -519,14 +519,33 @@
        <widget class="SolpsPlots" name="solpsplots">
         <property name="geometry">
          <rect>
-          <x>100</x>
+          <x>160</x>
           <y>200</y>
-          <width>421</width>
-          <height>23</height>
+          <width>381</width>
+          <height>21</height>
          </rect>
         </property>
         <property name="currentIndex">
          <number>40</number>
+        </property>
+       </widget>
+       <widget class="Director" name="director">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>200</y>
+          <width>74</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Director for emiting selected run</string>
+        </property>
+        <property name="whatsThis">
+         <string>This widget receives a selected run and directs    it further in various ways depending on the Check state.   </string>
+        </property>
+        <property name="text">
+         <string>Director</string>
         </property>
        </widget>
       </widget>
@@ -602,7 +621,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>576</width>
+     <width>579</width>
      <height>22</height>
     </rect>
    </property>
@@ -660,6 +679,11 @@
   </action>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>Director</class>
+   <extends>QCheckBox</extends>
+   <header>director</header>
+  </customwidget>
   <customwidget>
    <class>Gnuplot</class>
    <extends>QLabel</extends>
@@ -754,8 +778,8 @@
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>87</x>
-     <y>260</y>
+     <x>172</x>
+     <y>284</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -770,8 +794,8 @@
    <slot>setSolpsPlotCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>286</x>
-     <y>276</y>
+     <x>361</x>
+     <y>274</y>
     </hint>
     <hint type="destinationlabel">
      <x>181</x>
@@ -786,12 +810,60 @@
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>330</x>
-     <y>276</y>
+     <x>405</x>
+     <y>274</y>
     </hint>
     <hint type="destinationlabel">
      <x>216</x>
      <y>159</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>gnuplot</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>64</x>
+     <y>267</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>80</x>
+     <y>214</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>tcsh</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>39</x>
+     <y>266</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>491</x>
+     <y>141</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_checktrigger()</signal>
+   <receiver>solpsplots</receiver>
+   <slot>triggerTextChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>90</x>
+     <y>280</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>266</x>
+     <y>261</y>
     </hint>
    </hints>
   </connection>

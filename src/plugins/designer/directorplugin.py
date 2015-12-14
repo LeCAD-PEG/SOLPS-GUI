@@ -1,36 +1,19 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
-pythonconsoleplugin.py
+directorplugin.py
 
-A Python console custom widget plugin for Qt Designer.
-
-Copyright (C) 2006 David Boddie <david@boddie.org.uk>
-Copyright (C) 2005-2006 Trolltech ASA. All rights reserved.
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+A Director custom widget plugin for Qt Designer.
 """
 
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
 
-from pythonconsolewidget import PythonConsoleWidget
+from director import Director
 
 
-class PythonConsolePlugin(QPyDesignerCustomWidgetPlugin):
-    """PythonConsolePlugin(QPyDesignerCustomWidgetPlugin)
+class DirectorPlugin(QPyDesignerCustomWidgetPlugin):
+    """DirectorPlugin(QPyDesignerCustomWidgetPlugin)
     
     Provides a Python custom plugin for Qt Designer by implementing the
     QDesignerCustomWidgetPlugin via a PyQt-specific custom plugin class.
@@ -40,7 +23,7 @@ class PythonConsolePlugin(QPyDesignerCustomWidgetPlugin):
     # initialized variable.
     def __init__(self, parent=None):
     
-        super(PythonConsolePlugin, self).__init__(parent)
+        super(DirectorPlugin, self).__init__(parent)
 
         self.initialized = False
 
@@ -61,12 +44,12 @@ class PythonConsolePlugin(QPyDesignerCustomWidgetPlugin):
     # This factory method creates new instances of our custom widget with the
     # appropriate parent.
     def createWidget(self, parent):
-        return PythonConsoleWidget(parent)
+        return Director(parent)
 
     # This method returns the name of the custom widget class that is provided
     # by this plugin.
     def name(self):
-        return "PythonConsoleWidget"
+        return "Director"
 
     # Returns the name of the group in Qt Designer's widget box that this
     # widget belongs to.
@@ -98,20 +81,22 @@ class PythonConsolePlugin(QPyDesignerCustomWidgetPlugin):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="PythonConsoleWidget" name="consoleWidget">\n' \
+        return '<widget class="Director" name="director">\n' \
                ' <property name="toolTip" >\n' \
-               '  <string>Python console</string>\n' \
+               '  <string>Director for emiting selected run</string>\n' \
                ' </property>\n' \
                ' <property name="whatsThis" >\n' \
-               '  <string>The Python console widget can be used to explore ' \
-               'Qt Designer.</string>\n' \
+               '  <string>This widget receives a selected run and directs' \
+               '    it further in various ways depending on the Check state.' \
+               '   </string>' \
                ' </property>\n' \
+               ' <property name="text"><string>Director</string></property>' \
                '</widget>\n'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.
     def includeFile(self):
-        return "pythonconsolewidget"
+        return "director"
 
 
 # Define the image used for the icon.
