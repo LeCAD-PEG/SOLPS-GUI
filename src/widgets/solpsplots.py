@@ -178,8 +178,9 @@ _tcsh_solps_scripts = [
     'delta # Plots the maximum fractional change of the primary variables per B2.5 timestep.',
     'density # Plots the time evolution of the density in a B2.5 run.',
     'display # tallies Displays the B2.5 tallies in an easy-to-read format (argument ”H” gives the first instance and ”L” the last instance)',
-    'energy_analysis # Plots the energy flows across certain important surfaces in B2.5.',
-    'energy_analysis # fht Plots the total energy flows across certain important surfaces in B2.5.',
+    'energy_analysis # Plots the energy flows across certain\n'
+    '   important surfaces in B2.5.',
+    'energy_analysis_fht # Plots the total energy flows across certain important surfaces in B2.5.',
     'energy_analysis_total # Plots the total energy flows across certain important surfaces in B2.5.',
     'energy_balance # Plots the energy balance.',
     'energy_balance_core # Plots the energy balance for the core plasma.',

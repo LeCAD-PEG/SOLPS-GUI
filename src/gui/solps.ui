@@ -430,10 +430,10 @@
        <widget class="QPushButton" name="pushButton_9">
         <property name="geometry">
          <rect>
-          <x>80</x>
+          <x>90</x>
           <y>200</y>
-          <width>81</width>
-          <height>31</height>
+          <width>71</width>
+          <height>21</height>
          </rect>
         </property>
         <property name="text">
@@ -489,7 +489,7 @@
          <rect>
           <x>340</x>
           <y>160</y>
-          <width>181</width>
+          <width>201</width>
           <height>41</height>
          </rect>
         </property>
@@ -519,14 +519,14 @@
        <widget class="SolpsPlots" name="solpsplots">
         <property name="geometry">
          <rect>
-          <x>160</x>
+          <x>170</x>
           <y>200</y>
           <width>381</width>
           <height>21</height>
          </rect>
         </property>
         <property name="currentIndex">
-         <number>40</number>
+         <number>128</number>
         </property>
        </widget>
        <widget class="Director" name="director">
@@ -534,8 +534,8 @@
          <rect>
           <x>10</x>
           <y>200</y>
-          <width>74</width>
-          <height>31</height>
+          <width>71</width>
+          <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
@@ -622,7 +622,7 @@
      <x>0</x>
      <y>0</y>
      <width>579</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -778,8 +778,8 @@
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>172</x>
-     <y>284</y>
+     <x>171</x>
+     <y>276</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -858,12 +858,28 @@
    <slot>triggerTextChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>90</x>
-     <y>280</y>
+     <x>91</x>
+     <y>276</y>
     </hint>
     <hint type="destinationlabel">
      <x>266</x>
      <y>261</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>label_7</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>68</x>
+     <y>275</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>531</x>
+     <y>233</y>
     </hint>
    </hints>
   </connection>

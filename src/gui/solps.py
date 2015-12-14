@@ -875,12 +875,15 @@ class RunsModel(QAbstractItemModel):
         """
         self.statusServerThread = RunsStatusServer()
         settings = QSettings("ITER", "solps-gui")
+        default_port = 51966 + os.getuid() % 8192
         try:  # TODO Assign default port number by looking at system UID range
             address = settings.value("SOLPS_GUI_BIND", "0.0.0.0")
-            port = int(settings.value("SOLPS_GUI_PORT", "49406"))
+            port = int(settings.value("SOLPS_GUI_PORT", str(default_port)))
         except:
             address = "0.0.0.0"
-            port = 49406
+            port = default_port
+            settings.setValue('SOLPS_GUI_BIND', address)
+            settings.setValue('SOLPS_GUI_PORT', str(port))
 
         status = self.statusServerThread.bind(address, port)
         if status:

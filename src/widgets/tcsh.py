@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QPlainTextEdit, QFrame
 from PyQt5.QtGui import QFont
 
 import logging
+import os
 
 class Tcsh(QPlainTextEdit):
     """ Tcsh(QWidget)
@@ -168,7 +169,7 @@ class Tcsh(QPlainTextEdit):
 
 if __name__ == "__main__":
 
-    import sys, os
+    import sys
     from PyQt5.QtWidgets import QApplication
 
     app = QApplication(sys.argv)

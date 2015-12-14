@@ -161,7 +161,7 @@
      <string>${SOLPS_GUI_PORT} in scripts</string>
     </property>
     <property name="text">
-     <string>49406</string>
+     <string>51966</string>
     </property>
     <property name="clearButtonEnabled">
      <bool>false</bool>
