@@ -35,21 +35,21 @@ import sys
 import time
 import queue
 import logging
+import getopt
 
 from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
                           pyqtSignal, QThread, QAbstractItemModel, QVariant,
-                          QSortFilterProxyModel, QRegExp, QObject, QRect)
-
+                          QSortFilterProxyModel, QRegExp, QObject, QRect,
+                          QSize, QProcess)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
-                             QFileDialog, QStyle, QStyledItemDelegate, QStyleOptionViewItem)
-from PyQt5.QtGui import (QStandardItemModel, QFontMetrics, QPainter, QPen, QPixmap, QIcon)
+                             QFileDialog, QStyle, QStyledItemDelegate)
+from PyQt5.QtGui import (QStandardItemModel, QFontMetrics, QPen)
 from PyQt5.uic import loadUi
 from enum import IntEnum
 
 REDIRECT_STDOUT_TO_LOG = False
 
-
-class Column(IntEnum):
+class Column:
     """Column enumeration for Runs treeview.
 
         First column `name` cannot be moved and is short name.
@@ -62,6 +62,8 @@ class Column(IntEnum):
         label : One line description of the run from b2mn.dat
     """
     name, path, date, status, label = range(5)
+
+
 
 
 class RunsSortFilterProxyModel(QSortFilterProxyModel):
@@ -133,11 +135,16 @@ class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
         return self.has_accepted_children(index)
 
 
-class RunSettings(QDialog):
+class RunsSettings(QDialog):
+    """ Runs settings dialog described in runs.ui configures several
+        directories with SOLPS "runs". Each directory may have its own
+        SOLPSTOP environment and can also be from other users that one
+        wants to explore or monitor.
+    """
     runDirsChanged = pyqtSignal()
 
     def __init__(self, parent=None):
-        super(RunSettings, self).__init__()
+        super(RunsSettings, self).__init__()
         prefix = os.path.dirname(os.path.abspath(__file__))
         loadUi(prefix + '/runs.ui', self)
         # get GUI settings
@@ -158,11 +165,9 @@ class RunSettings(QDialog):
         self.lineEdit_alias3.setText(settings.value("Alias3", "local_3"))
         self.lineEdit_alias4.setText(settings.value("Alias4", "local_4"))
         self.lineEdit_alias5.setText(settings.value("Alias5", "local_5"))
-        self.lineEdit_monitor_interface.setText(
-            settings.value("Monitor_interface", "0.0.0.0"))
-        self.lineEdit_monitor_port.setText(
-            settings.value("Monitor_port", "49406"))
         settings.endGroup()
+
+
 
         self.toolButtonView1.clicked.connect(self.showdir1)
         self.toolButtonView2.clicked.connect(self.showdir2)
@@ -181,9 +186,10 @@ class RunSettings(QDialog):
         if new_dir:
             line_edit.setText(new_dir)
 
-    # save GUI settings
-    @pyqtSlot()
-    def on_pushButton_OK_clicked(self):
+    def setRunsSettings(self):
+        """ Save Runs directories into settings and emits that the directories
+            were changed and are needed to be completely rescanned.
+        """
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
         settings.setValue("runDir1", self.lineEdit_rundir1.text())
@@ -196,9 +202,6 @@ class RunSettings(QDialog):
         settings.setValue("Alias3", self.lineEdit_alias3.text())
         settings.setValue("Alias4", self.lineEdit_alias4.text())
         settings.setValue("Alias5", self.lineEdit_alias5.text())
-        settings.setValue("Monitor_interface",
-                          self.lineEdit_monitor_interface.text())
-        settings.setValue("Monitor_port", self.lineEdit_monitor_port.text())
         settings.endGroup()
         self.runDirsChanged.emit()
 
@@ -223,9 +226,62 @@ class RunSettings(QDialog):
     def showdir5(self):
         self.update_dir(self.lineEdit_rundir5)
 
+class Preferences(QDialog):
+    def __init__(self, parent=None):
+        super(Preferences, self).__init__()
+        prefix = os.path.dirname(os.path.abspath(__file__))
+        loadUi(prefix + '/preferences.ui', self)
+        # get GUI settings
+        settings = QSettings('ITER', 'solps-gui')
+        self.lineEdit_monitor_interface.setText(settings.value(
+            'SOLPS_GUI_BIND', self.lineEdit_monitor_interface.text()))
+        self.lineEdit_monitor_port.setText(settings.value(
+            'SOLPS_GUI_PORT', self.lineEdit_monitor_port.text()))
+        self.lineEdit_monitor_ip.setText(settings.value(
+            'SOLPS_GUI_IP', self.lineEdit_monitor_ip.text()))
+        self.lineEdit_tcsh_path.setText(settings.value(
+            'tcsh_path', self.lineEdit_tcsh_path.text()))
+        self.lineEdit_gnuplot_path.setText(settings.value(
+            'gnuplot_path', self.lineEdit_gnuplot_path.text()))
+        self.comboBox_log_level.setCurrentIndex(int(settings.value(
+            'log_level', self.comboBox_log_level.currentIndex())))
+        self.comboBox_submit_script.setCurrentText(settings.value(
+            'submit_script', self.comboBox_submit_script.currentText()))
+        self.checkBox_use_mpi.setCheckState(int(settings.value(
+            'use_mpi', self.checkBox_use_mpi.checkState())))
+        self.lineEdit_mpi_options.setText(settings.value(
+            'MPI_OPTS', self.lineEdit_mpi_options.text()))
+        self.checkBox_use_debugger.setCheckState(int(settings.value(
+            'use_debugger', self.checkBox_use_debugger.checkState())))
+        self.lineEdit_debugger.setText(settings.value(
+            'debugger', self.lineEdit_debugger.text()))
+        self.checkBox_compress_log.setCheckState(int(settings.value(
+            'compress_log', self.checkBox_compress_log.checkState())))
+        self.checkBox_dry_run.setCheckState(int(settings.value(
+            'dry_run', self.checkBox_dry_run.checkState())))
+
+    def setPreferences(self):
+        s = QSettings('ITER', 'solps-gui')
+        s.setValue('SOLPS_GUI_BIND',  self.lineEdit_monitor_interface.text())
+        s.setValue('SOLPS_GUI_PORT', self.lineEdit_monitor_port.text())
+        s.setValue('SOLPS_GUI_IP', self.lineEdit_monitor_ip.text())
+        s.setValue('tcsh_path', self.lineEdit_tcsh_path.text())
+        s.setValue('gnuplot_path', self.lineEdit_gnuplot_path.text())
+        s.setValue('log_level', str(self.comboBox_log_level.currentIndex()))
+        s.setValue('submit_script', self.comboBox_submit_script.currentText())
+        s.setValue('use_mpi', self.checkBox_use_mpi.checkState())
+        s.setValue('MPI_OPTS', self.lineEdit_mpi_options.text())
+        s.setValue('use_debugger', self.checkBox_use_debugger.checkState())
+        s.setValue('debugger', self.lineEdit_debugger.text())
+        s.setValue('compress_log', self.checkBox_compress_log.checkState())
+        s.setValue('dry_run', self.checkBox_dry_run.checkState())
+        log_levels = [logging.DEBUG, logging.INFO, logging.WARNING,
+                      logging.ERROR, logging.CRITICAL]
+        log_level = log_levels[self.comboBox_log_level.currentIndex()]
+        logging.getLogger().setLevel(log_level)
 
 class RunsStatusServer(QThread):
-    """Networking UDP listener for receiving job status updates.
+    """ Networking UDP listener for receiving job status updates.
 
     Receives datagrams in single line and emits decoded one line updates sent
     by each job to notify the GUI that status changed.
@@ -253,7 +309,7 @@ class RunsStatusServer(QThread):
         while self.retrieve:
             data, addr = self._sock.recvfrom(1024)  # wait for data
             # print("Message", data.decode('utf-8'), "from", addr[0])
-            self.jobStatusChanged.emit(data.decode('utf-8'))
+            self.jobStatusChanged.emit(data.decode('utf-8').rstrip('\n'))
             # TODO Graceful exit from blocking recvfrom() by setting retrieve
             # TODO and sending UDP packet to ourselves.
 
@@ -296,13 +352,13 @@ class RetrieveRunsFolderInfo(QThread):
                 that string was retrieved from and other static data from
                 various files.
         """
-        # Firstly try to extract label from b2mn.dat
+        # Firstly try to extract label from the beginning of b2mn.dat
         path = directory + '/b2mn.dat'
         label = ''
         if os.path.exists(path):
             try:
                 with open(path) as file:
-                    lines = file.read().splitlines()
+                    lines = file.read(512).splitlines()  # just one sector
                 for i, line in enumerate(lines):
                     if 'label' in line:
                         label = lines[i+1].strip("' ")
@@ -394,7 +450,8 @@ class RetrieveRunsFolderInfo(QThread):
             # Emit the range of columns that changed in the model
             self.statusChanged.emit(date_index, label_index)
             self.progress.emit(path)
-        msg = "Updating runs statuses finished."
+        msg = "Updating run statuses finished. " \
+                + str(len(self.model.column_index)) + " directories scanned."
         logging.info(msg)
         self.status.emit(msg)
 
@@ -548,51 +605,34 @@ class TreeItem(object):
         return True
 
 class TextElideLeftDelegate(QStyledItemDelegate):
-    def __init__(self, parent=None, *args):
-        #QStyledItemDelegate.__init__(self, parent, *args)
+    """ Elide text of the first column to the left (... at start).
+    This allows long folder names to be shown right aligned when they are too
+    long to fit int the column width as usually the folder name changes at the
+    end of the Run name (e.g. with sequence or parameter).
+    """
+    def __init__(self, parent=None):
         super(TextElideLeftDelegate, self).__init__(parent)
 
     def paint(self, painter, option, index):
-
         painter.save()
-        # Elide column.name
-        if index.column() == 0:
-
+        if index.column() == Column.name:  # Elide text on the left
             painter.setPen(QPen(Qt.black))
             value = index.data(Qt.DisplayRole)
             icon = index.data(Qt.DecorationRole)
+            rect_size = QSize(option.rect.width(), option.rect.height())
+            icon_width = icon.actualSize(rect_size).width() + 4  # spacer too
+            text_width = option.rect.width() - icon_width
             metrics = QFontMetrics(painter.font())
-            elided = metrics.elidedText(value,0,80,0)
-            elided = "       " + elided
-            if isinstance(value,str):
-                icon.paint(painter,option.rect,Qt.AlignLeft)
-                painter.drawText(option.rect, Qt.AlignLeft, elided)
+            elided_text = metrics.elidedText(value, 0, text_width, 0)
+            if isinstance(value, str):
+                icon.paint(painter, option.rect, Qt.AlignLeft)
+                x, y, width, height = option.rect.getCoords()
+                text_rect = QRect(x + icon_width, y,
+                                  width - icon_width, height)
+                painter.drawText(text_rect, Qt.AlignLeft, elided_text)
         else:
-            QStyledItemDelegate.paint(self,painter, option, index)
-
-        # Elide column.path
-        '''
-        else:
-
-            if index.column() == 1:
-
-                painter.setPen(QPen(Qt.black))
-                value = index.data(Qt.DisplayRole)
-                icon = index.data(Qt.DecorationRole)
-                metrics = QFontMetrics(painter.font())
-                elided = metrics.elidedText(value,0,200,0)
-                elided = "       " + elided
-                if isinstance(value,str):
-                    icon.paint(painter,option.rect,Qt.AlignLeft)
-                    painter.drawText(option.rect, Qt.AlignLeft, elided)
-
-            else:
-                QStyledItemDelegate.paint(self,painter, option, index)
-        '''
-
+            QStyledItemDelegate.paint(self, painter, option, index)
         painter.restore()
-
-
 
 
 class RunsModel(QAbstractItemModel):
@@ -605,8 +645,8 @@ class RunsModel(QAbstractItemModel):
                          icons.
 
     Attributes:
-        column_index (path : data, date_index, status_index) : Dictionary
-            of data pointer and model indexes for cell update
+        column_index (path : data, date_index, status_index, label_index) :
+            Dictionary of data pointer and model indexes for cell update
             with `FileSystemScan` or via network.
             Keys are paths to "unique" directories.
     """
@@ -627,16 +667,11 @@ class RunsModel(QAbstractItemModel):
         self.scanFileSystemThread = FileSystemScan(self)
         self.scanFileSystemThread.finished.connect(self.modelReset.emit)
         self.RetrieveRunsFolderInfoThread = RetrieveRunsFolderInfo(self)
-        self.RetrieveRunsFolderInfoThread.statusChanged.connect(self.dataChanged.emit)
-        self.scanFileSystemThread.finished.connect(self.RetrieveRunsFolderInfoThread.start)
+        self.RetrieveRunsFolderInfoThread.statusChanged.connect(
+            self.dataChanged.emit)
+        self.scanFileSystemThread.finished.connect(
+            self.RetrieveRunsFolderInfoThread.start)
         self.RetrieveRunsFolderInfoThread.finished.connect(self.endResetModel)
-
-
-
-        # TODO text ElideLeft for the 'Name' column
-        # TODO editTriggers
-
-
 
     def startThreads(self):
         self.beginResetModel()
@@ -711,13 +746,13 @@ class RunsModel(QAbstractItemModel):
         if role != Qt.EditRole:
             return False
 
-        if index.column() == Column.path or index.column() == Column.date \
-                or index.column() == Column.status:
+        column = index.column()
+
+        if  column == Column.path or column == Column.date:
             return False
 
-        # disalow changing name except for aliased names (not saved)
-        if index.column() == Column.name and \
-                not self.parent(index) == QModelIndex():
+        # disalow changing 'name' except for aliased names (not saved)
+        if column == Column.name and self.parent(index) != QModelIndex():
             return False
 
         item = self.getItem(index)
@@ -725,7 +760,21 @@ class RunsModel(QAbstractItemModel):
 
         if result:
             self.dataChanged.emit(index, index)
-
+            if column == Column.label:  # set the label in b2mn.dat
+                directory = item.data(Column.path)
+                path = directory + '/b2mn.dat'
+                try:
+                    with open(path) as file:
+                        lines = file.read().splitlines()  # whole file
+                    for i, line in enumerate(lines):
+                        if '*label' in line:
+                            lines[i+1] = " '" + value + "'"
+                            with open(path, 'w') as f:
+                                f.write('\n'.join(lines))
+                            break
+                except OSError:
+                    QMessageBox.warning(None, "Permission problem",
+                                        "Can't update " + path)
         return result
 
     # return self.columns
@@ -818,18 +867,24 @@ class RunsModel(QAbstractItemModel):
 
         return parentItem.childCount()
 
-    " Run job status server"
+
     def startRunsStatusServer(self):
+        """ Run networking job status server for status updates.
+
+            Status server listens on all (0.0.0.0) or specified network
+            interface. UDP messages should be send in format: name path status
+        """
         self.statusServerThread = RunsStatusServer()
         settings = QSettings("ITER", "solps-gui")
-        settings.beginGroup("RunDirectories")
-        try:
-            address = settings.value("Monitor_interface", "0.0.0.0")
-            port = int(settings.value("Monitor_port", "49406"))
+        default_port = 51966 + os.getuid() % 8192
+        try:  # TODO Assign default port number by looking at system UID range
+            address = settings.value("SOLPS_GUI_BIND", "0.0.0.0")
+            port = int(settings.value("SOLPS_GUI_PORT", str(default_port)))
         except:
             address = "0.0.0.0"
-            port = 49406
-        settings.endGroup()
+            port = default_port
+            settings.setValue('SOLPS_GUI_BIND', address)
+            settings.setValue('SOLPS_GUI_PORT', str(port))
 
         status = self.statusServerThread.bind(address, port)
         if status:
@@ -848,20 +903,23 @@ class RunsModel(QAbstractItemModel):
     @pyqtSlot(str)
     def jobStatusChanged(self, message):
         try:
-            name, path, status = message.split()
+            name, path, status = message.split(maxsplit=2)
             try:
-                (itemData, date_index, status_index) = self.column_index[path]
+                itemData, date_index, status_index, label_index = \
+                    self.column_index[path]
                 itemData[Column.status] = status
                 itemData[Column.date] = QDateTime().currentDateTime()
                 self.dataChanged.emit(date_index, status_index)
                 logging.info("Received job status update: " + message)
             except KeyError:  # TODO insert non monitored message anyway
-                msg = path + " not monitored. Skipping status update."
+                msg = name + ':' + path + " not monitored "
+                msg += 'Skipping "' + status + '" update.'
                 logging.warning(msg)
-        except ValueError:
-            logging.error("Received invalid message: " + message +
-                  "Message should be in <name> <path> <status> format.")
-
+            except ValueError:
+                assert(len(self.column_index[path]) == 4)  # indexing changed
+        except ValueError as e:
+            logging.error(str(e) + " Received essage: '" + message +
+                  "' should be in 'name path status' format.")
 
 
 class LoggingHandler(logging.Handler):
@@ -933,10 +991,42 @@ class SOLPS_MainWindow(QMainWindow):
         stdout_thread(QThread) : Redirected sys.stdout to Log tab.
         stdout_receiver(LogReceiver): Receiver for stdout thread.
     """
+
+    runSelected = pyqtSignal(str)
+
     def __init__(self, *args):
         super(SOLPS_MainWindow, self).__init__(*args)
         prefix = os.path.dirname(os.path.abspath(__file__))
-        loadUi(prefix + '/solps.ui', self)
+        defaultUI = '/solps.ui'
+        try:
+            opts, args = getopt.getopt(app.arguments()[1:],"hu:d",["help","ui=","default"])
+            #print(opts, args)
+            if not opts:
+                print ('No options supplied!')
+                print ('For help: solps.py [-h / --help]')
+                sys.exit(2)
+        except getopt.GetoptError:
+            print ('Supplied option not recognized!')
+            print ('For help: solps.py -h')
+            sys.exit(2)
+        for opt, arg in opts:
+            if opt in ('-h', "--help"):
+                print ('Load default user interface : solps.py [-d / --default]')
+                print ('Load custom user interface : solps.py [-u / --ui] <UIfile.ui>')
+                sys.exit()
+            elif opt in ("-d", "--default"):
+                customUI= defaultUI
+            elif opt in ("-u", "--ui"):
+                customUI = '/' + arg
+
+        loadUi(prefix + customUI , self)
+
+
+        self.main_tcsh = QProcess()  # for job sumbission and scripting
+        self.solps_top = None  # Current active ${SOLPSTOP} for tcsh
+
+        self.previous_tab_index = None   # For auto saving of Edit tab
+        self.input_tab_index = self.tabWidget.indexOf(self.tab_Input)
 
         # Create thread-safe Queue and redirect logging it
         log_queue = queue.Queue()
@@ -952,9 +1042,12 @@ class SOLPS_MainWindow(QMainWindow):
         log_format = "%(asctime)s %(levelname)s: %(message)s"
         log_handler.setFormatter(logging.Formatter(log_format))
         logging.getLogger().addHandler(log_handler)
-        logging.getLogger().setLevel(logging.DEBUG)
-        #  logging.error('Logging started...')
-        #  logging.debug('INFO message')
+        # get GUI settings
+        settings = QSettings("ITER", "solps-gui")
+        log_levels = [logging.DEBUG, logging.INFO, logging.WARNING,
+                      logging.ERROR, logging.CRITICAL]
+        log_level = log_levels[int(settings.value('log_level', '1'))]
+        logging.getLogger().setLevel(log_level)
 
         if REDIRECT_STDOUT_TO_LOG:
             # Create thread-safe Queue and redirect sys.stdout to it
@@ -968,8 +1061,7 @@ class SOLPS_MainWindow(QMainWindow):
             self.stdout_thread.started.connect(self.stdout_receiver.run)
             self.stdout_thread.start()
 
-        # get GUI settings
-        settings = QSettings("ITER", "solps-gui")
+
 
         settings.beginGroup("MainWindow")
         geometry = settings.value("Geometry")
@@ -1033,8 +1125,10 @@ class SOLPS_MainWindow(QMainWindow):
 
         self.treeViewRuns.setRootIsDecorated(True)
         self.treeViewRuns.setSortingEnabled(True)
-        ElideLeft = TextElideLeftDelegate(self,QStyledItemDelegate)
-        self.treeViewRuns.setItemDelegate(ElideLeft)
+
+        # Create a delegate for first column to elide text to the left
+        elide_left_delegate = TextElideLeftDelegate(self.treeViewRuns)
+        self.treeViewRuns.setItemDelegate(elide_left_delegate)
 
         self.lineEditRunFilter.returnPressed.connect(self.textFilterChanged)
 
@@ -1049,11 +1143,28 @@ class SOLPS_MainWindow(QMainWindow):
         self.treeViewArchive.setAlternatingRowColors(True)
         self.treeViewArchive.setSortingEnabled(True)
 
-        self.actionRuns_dirs.triggered.connect(self.show_runs_dirs_dialog)
+        # Setup input tabs
+        self.solpsinput.setup_tabs()
+        self.tab_Input.setEnabled(False)
+
+
+        self.actionRuns.triggered.connect(self.show_runs_dialog)
+        self.actionPreferences.triggered.connect(self.show_preferences_dialog)
         self.treeViewRuns.selectionModel().selectionChanged.connect(
-            self.enable_archive_button)
+            self.run_selected)
         self.treeViewArchive.selectionModel().selectionChanged.connect(
             self.enable_restore_button)
+
+        # Configure Dashboard
+
+        #self.gnuplot.plot("sin(3*x)/x")
+        #self.runSelected.connect(self.label_7.setText)
+        self.runSelected.connect(self.director.setRundir)
+        #self.runSelected.connect(self.tcsh.setRundir)
+        #self.tcsh.setTcshCommand(self.lineEdit.text())
+        #  self.gnuplot.setText("Started")
+        #  print(self.gnuplot.process.state())
+        #  self.gnuplot1.process.finished.connect(self.gnuplot1.show_plot)
 
     @pyqtSlot()
     def on_pushButton_Archive_clicked(self):
@@ -1077,6 +1188,34 @@ class SOLPS_MainWindow(QMainWindow):
             settings.setValue("dir", dir)
         settings.endArray()
         settings.endGroup()
+
+    @pyqtSlot(int)
+    def on_tabWidget_currentChanged(self, tab_index):
+        """ Signal is received when tab on main window is changed.
+            We check if the Edit tab lost its focus and save modified files.
+
+            Arguments:
+                 tab_index (int): current tab index selected
+        """
+        if tab_index != self.input_tab_index \
+                and self.previous_tab_index == self.input_tab_index:
+            self.solpsinput.save_modified_input_files()
+        self.previous_tab_index = tab_index
+
+    @pyqtSlot()
+    def on_pushButton_Edit_clicked(self):
+        """ For selected run and Edit button pressed Input tab is focused
+            with all SOLPS input files modifiable with simple text editor.
+        """
+        self.tabWidget.setCurrentIndex(self.input_tab_index)
+        index = self.treeViewRuns.selectionModel().currentIndex()
+        model = self.proxyModel
+        index_path = model.index(index.row(), Column.path, index.parent())
+        path = model.data(index_path, Qt.DisplayRole)
+        self.statusbar.showMessage('Editing ' + path)
+        self.solpsinput.setRundir(path)
+        self.solpsinput.read_input_files()
+        self.tab_Input.setEnabled(True)
 
     @pyqtSlot()
     def on_pushButton_Restore_clicked(self):
@@ -1103,22 +1242,28 @@ class SOLPS_MainWindow(QMainWindow):
             QMessageBox.warning(self, 'Invalid action', msg)
 
     @pyqtSlot()
-    def enable_archive_button(self):
+    def run_selected(self):
+        """ Whenever an item in Runs is selected this function is run.
+
+            Archive button is enabled and directory is emited.
+        """
         valid = self.treeViewRuns.selectionModel().currentIndex().isValid()
         self.pushButton_Archive.setEnabled(valid)
+        self.pushButton_Run.setEnabled(valid)
+        self.pushButton_Stop.setEnabled(valid)
+        self.pushButton_Edit.setEnabled(valid)
+
+        if valid:
+            index = self.treeViewRuns.selectionModel().currentIndex()
+            model = self.proxyModel
+            index_path = model.index(index.row(), Column.path, index.parent())
+            path = model.data(index_path, Qt.DisplayRole)
+            self.runSelected.emit(path)
 
     @pyqtSlot()
     def enable_restore_button(self):
         valid = self.treeViewArchive.selectionModel().currentIndex().isValid()
         self.pushButton_Restore.setEnabled(valid)
-
-    def create_model(self):
-        model = QStandardItemModel()
-        self.headerdata = ["Name", "Path", "Date", "Status", "Comment",
-                           "Device", "Shot number", "Run number"]
-        self.columns = len(self.headerdata)
-        self.rootItem = TreeItem(self.headerdata)
-        return model
 
     def textFilterChanged(self):
         filter_index = self.comboBoxRunFilterType.currentIndex()
@@ -1130,10 +1275,10 @@ class SOLPS_MainWindow(QMainWindow):
         self.proxyModel.setFilterRegExp(regExp)
 
     @pyqtSlot()
-    def show_runs_dirs_dialog(self):
-        dialog = RunSettings()
-        response = dialog.exec_()
-        if response:
+    def show_runs_dialog(self):
+        dialog = RunsSettings()
+        if dialog.exec_():
+            dialog.setRunsSettings()
             if self.model.RetrieveRunsFolderInfoThread.isRunning() or \
                     self.model.scanFileSystemThread.isRunning():
                 msg = "Runs layout changed in the middle of the update." \
@@ -1143,6 +1288,12 @@ class SOLPS_MainWindow(QMainWindow):
                 self.model.startThreads()
             # TODO(kosl) self.model.RetrieveRunsFolderInfoThread.quit()
             # self.model.scanFileSystemThread.start()
+
+    @pyqtSlot()
+    def show_preferences_dialog(self):
+        dialog = Preferences()
+        if dialog.exec_():
+            dialog.setPreferences()
 
     def closeEvent(self, event):
         """ Save GUI state at exit.
@@ -1192,16 +1343,121 @@ class SOLPS_MainWindow(QMainWindow):
 
     @pyqtSlot()
     def on_pushButton_Stop_clicked(self):
+        "Signal garceful stop "
         index = self.treeViewRuns.selectionModel().currentIndex()
         model = self.proxyModel
         index_path = model.index(index.row(), Column.path, index.parent())
-        index_status = model.index(index.row(), Column.status, index.parent())
-        path = model.data(index_path, Qt.DisplayRole)
-        model.setData(index_status, 'Stopping...')
-        # TODO touch b2mn.exe.dir/.quit
+        directory = model.data(index_path, Qt.DisplayRole)
+        # Is there B2 running directory?
+        try:
+            b2mn_exe_dir = directory + '/b2mn.exe.dir'
+            if os.path.exists(b2mn_exe_dir):
+                path = b2mn_exe_dir + '/.quit'
+                msg = "Graceful stop requested on " + time.ctime()
+                with open(path, 'w') as f:
+                    f.write(msg + '\n')
+                index_status = model.index(index.row(), Column.status,
+                                           index.parent())
+                model.setData(index_status, msg)
+            else:
+                QMessageBox.warning(None, "Invalid stop request",
+                                    "No b2mn.dir.exe for graceful stop!")
+        except OSError:
+            QMessageBox.warning(None, "Permission problem",
+                                        "Can't create " + path)
+
+    @pyqtSlot()
+    def on_pushButton_Run_clicked(self):
+        "Submits the selected Run"
+        index = self.treeViewRuns.selectionModel().currentIndex()
+        model = self.proxyModel
+        index_path = model.index(index.row(), Column.path, index.parent())
+        rundir = model.data(index_path, Qt.DisplayRole)
+        self.submit(rundir)
+
+    def find_solps_top(self, directory):
+        """ Searches for setup.csh or SOLPSTOP file in the directory hierarchy.
+            Arguments:
+                run_directory (str): run_directory
+            Returns:
+                solps_top(str): if found setup.csh or SOLPSTOP file. Else None
+        """
+        solps_top = directory
+
+        while solps_top:
+            path = solps_top + '/setup.csh'
+            if os.path.exists(path):
+                return solps_top
+            path = solps_top + '/SOLPSTOP'
+            if os.path.exists(path):
+                with open(path) as file:
+                    return file.readline()
+            solps_top = solps_top.rsplit('/', 1)[0]
+        return None
+
+    def submit(self, rundir):
+        """ Submits the job in the rundir under its $SOLPSTOP environment
+
+            TCSH environment is searched sourced from 'setup.csh' or pointed
+            with SOLPSTOP file. SOLPSTOP is probed for runDir changes and
+            if necessary resourced within a new shell. The following
+            environment variables are injected for use by scripts::
+
+            setenv SOLPS_GUI_IP <IP address of the SOLPS GUI monitor>
+            setenv SOLPS_GUI_PORT <listening port>
 
 
+        Arguments:
+             rundir (str): prepared run directory
+        """
+        settings = QSettings('ITER', 'solps-gui')
+        tcsh_path = settings.value("tcsh_path", '/bin/tcsh')
+        submit_command = settings.value("submit_script", 'localsubmit')
+        solps_gui_ip = settings.value('SOLPS_GUI_IP', '127.0.0.1')
+        solps_gui_port = settings.value('SOLPS_GUI_PORT', '49406')
 
+        rundir_solps_top = self.find_solps_top(rundir)
+        if not rundir_solps_top:
+            if not rundir:
+                logging.error("Empty TCSH runDir! Bailing out.")
+            else:
+                logging.error("Could not find SOLPSTOP for " + rundir)
+            return
+
+        if rundir_solps_top != self.solps_top:  # we have new SOLPSTOP
+            self.main_tcsh.kill()
+            self.solps_top = rundir_solps_top
+
+        cmd = ''
+        if self.main_tcsh.state() != QProcess.Running:
+            self.main_tcsh.setWorkingDirectory(self.solps_top)
+            self.main_tcsh.start(tcsh_path, ['-l'])  # TODO settings for -l
+            logging.info("MAIN TCSH started in " + self.solps_top)
+            cmd +=  'cd ' + self.solps_top \
+                    + '\nsource setup.csh\necho TCSH READY\n' \
+                    + 'setenv SOLPS_GUI_IP ' + solps_gui_ip + '\n' \
+                    + 'setenv SOLPS_GUI_PORT ' + solps_gui_port + '\n'
+
+        if submit_command:
+            opts = ''
+            if int(settings.value('use_mpi', '0')):
+                opts += ' -m "' + settings.value('MPI_OPTS', '-n 16') + '"'
+            if int(settings.value('use_debugger', '0')):
+                opts += ' -d "' + settings.value('debugger', 'totalview') + '"'
+            if int(settings.value('compress_log', '0')):
+                opts += ' -z'
+            if int(settings.value('dry_run', '0')):
+                opts += ' -n'
+            cmd += 'cd ' + rundir + '\n' + submit_command + opts + '\n'
+            self.main_tcsh.write(bytearray(cmd, 'utf8'))  # TODO flush stdout
+            msg = 'batch ' + rundir + ' ' + submit_command + opts
+            logging.info(msg)
+            self.model.jobStatusChanged(msg)
+        else:
+            msg = 'batch ' + rundir + ' Not submitted!'
+            msg += "Empty command or no run directory for MAIN TCSH"
+            self.model.jobStatusChanged(msg)
+            logging.warning(msg)
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):
@@ -1212,11 +1468,10 @@ class SOLPS_MainWindow(QMainWindow):
               "files for multiple parameter scan cases."
         QMessageBox.about(self, 'About SOLPS-ITER GUI', msg)
 
-
 if __name__ == '__main__':
     "  Main method "
     app = QApplication(sys.argv)
     # app.setStyle("windows")
-    widget = SOLPS_MainWindow()
-    widget.show()
+    main_window = SOLPS_MainWindow()
+    main_window.show()
     sys.exit(app.exec_())

@@ -2,8 +2,8 @@ download
 build
 staging
 *~
-.idea
-src/gui/.idea
-src/gui/__pycache__
+*.idea
+*__pycache__
 .project
 .pydevproject
+localsetup.*sh

@@ -1,0 +1,48 @@
+#!/bin/sh -x
+
+MAKE_JOBS=${MAKE_JOBS:-4}
+GNUPLOT_VERSION=5.0.1
+QT_VERSION=5.5.1
+
+BUILDROOT=${PWD}
+BUILD_DIR=${BUILDROOT}/build
+PATCH_DIR=${BUILDROOT}/src/patches
+DOWNLOAD_DIR=${BUILDROOT}/download
+STAGING_DIR=${BUILDROOT}/staging
+STAGING_QT=${STAGING_DIR}/qt/${QT_VERSION}
+
+set -e
+
+#Initialize directories
+
+install -d ${BUILD_DIR}
+install -d ${STAGING_DIR}
+install -d ${DOWNLOAD_DIR}
+
+LD_LIBRARY_PATH="${STAGING_DIR}/lib:${LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH
+PKG_CONFIG_PATH="${STAGING_DIR}/qt/${QT_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}"
+export PKG_CONFIG_PATH
+
+GNUPLOT_SRC="gnuplot-${GNUPLOT_VERSION}.tar.gz"
+GNUPLOT_SITE="http://sourceforge.net/projects/gnuplot/files/gnuplot"
+GNUPLOT_DOWNLOAD="${GNUPLOT_SITE}/${GNUPLOT_VERSION}/${GNUPLOT_SRC}/download"
+
+if [ ! -f ${DOWNLOAD_DIR}/${GNUPLOT_SRC} ]; then 
+    wget  -O ${DOWNLOAD_DIR}/${GNUPLOT_SRC} ${GNUPLOT_DOWNLOAD}
+fi
+
+GNUPLOT_SRC_DIR="${BUILD_DIR}/gnuplot-${GNUPLOT_VERSION}"
+GNUPLOT_INSTALL_DIR="${STAGING_DIR}"
+
+if [ ! -e   ${GNUPLOT_SRC_DIR}/.built ]; then
+  rm -rf ${GNUPLOT_SRC_DIR}
+  cd ${BUILD_DIR}
+  tar xzf ${DOWNLOAD_DIR}/${GNUPLOT_SRC}
+  cd ${GNUPLOT_SRC_DIR}
+  ./configure --enable-qt --without-cairo --prefix=${STAGING_DIR}
+  make -j ${MAKE_JOBS}
+  make install 
+  touch ${GNUPLOT_SRC_DIR}/.built
+fi
+
