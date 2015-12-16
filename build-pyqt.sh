@@ -76,6 +76,7 @@ if [ "${USE_QT_XCB}" = "YES" ]; then # build QT with QT-prvided XCB libs
   XCB_FLAGS="${XCB_FLAGS} -qt-xcb"
 fi
 
+export PYTHON=${STAGING_DIR}/bin/python3
 ## Build XCB and libXML for Qt5 locally instead of Qt provided XCB libs. 
 # For Qt5.x build problems on RHEL5 see
 # https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-rhel5-linux-centos-5-7
