@@ -6,8 +6,8 @@ A PyQt custom widget with embedded SOLPS configuration editor.
 
 """
 
-from PyQt5.QtCore import (QSize, pyqtProperty,  pyqtSignal, pyqtSlot)
-from PyQt5.QtWidgets import (QTabWidget, QPlainTextEdit)
+from PyQt5.QtCore import (QSize, pyqtProperty,  pyqtSignal, pyqtSlot, QSettings)
+from PyQt5.QtWidgets import (QTabWidget, QPlainTextEdit, QTabBar)
 from PyQt5.QtGui import QFont
 
 import os
@@ -27,6 +27,30 @@ class SolpsInput(QTabWidget):
         self.setMovable(True)
         self.rundir = None
         self.editors = list()
+
+    def read_tab_positions(self):
+        # get Tab settings
+        settings = QSettings("ITER", "solps-gui")
+        settings.beginGroup("SolpsInputTabPosition")
+        for i in range(self.count()):
+            settings.value("%s" % self.tabText(i), i)
+            tab_text = settings.value("%s" % self.tabText(i), "")
+            #print(i, tab_text)
+            #self.tabBar = QTabBar()
+            #self.tabBar.moveTab(i, int(tab_text))
+            self.tabBar().moveTab(i, int(tab_text))
+            #if i != int(tab_text):
+             #   self.removeTab(i)
+                #self.addTab(int(tab_text))
+
+        settings.endGroup()
+
+    def save_tabs_position(self):
+        settings = QSettings("ITER", "solps-gui")
+        settings.beginGroup("SolpsInputTabPosition")
+        for i in range(self.count()):
+            settings.setValue("%s" % self.tabText(i), i)
+        settings.endGroup()
 
     @pyqtSlot()
     def setup_tabs(self):
@@ -97,6 +121,7 @@ class SolpsInput(QTabWidget):
     if __name__ == "__main__":
         def closeEvent(self, event):
             self.save_modified_input_files()
+            self.save_tabs_position()
             super(SolpsInput, self).closeEvent(event)
 
     def sizeHint(self):
@@ -167,7 +192,8 @@ if __name__ == "__main__":
     window.setRundir(os.path.expanduser("~")+
                      '/solps-iter/runs/AUG_16151_D/run1')
     window.read_input_files()
-    window.read_input_files()
+    window.read_tab_positions()
+    #window.read_input_files()
     window.show()
 
     sys.exit(app.exec_())
