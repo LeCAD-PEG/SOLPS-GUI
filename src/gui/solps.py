@@ -1002,20 +1002,21 @@ class SOLPS_MainWindow(QMainWindow):
             opts, args = getopt.getopt(app.arguments()[1:],"hu:d",["help","ui=","default"])
             #print(opts, args)
             if not opts:
-                print ('No options supplied!')
-                print ('For help: solps.py [-h / --help]')
-                sys.exit(2)
+                #print ('No options supplied!')
+                #print ('For help: solps.py [-h / --help]')
+                #sys.exit(2)
+                customUI= defaultUI
         except getopt.GetoptError:
             print ('Supplied option not recognized!')
-            print ('For help: solps.py -h')
+            print ('For help: solps.py -h / --help')
             sys.exit(2)
         for opt, arg in opts:
             if opt in ('-h', "--help"):
-                print ('Load default user interface : solps.py [-d / --default]')
+                print ('Load default user interface : solps.py')
                 print ('Load custom user interface : solps.py [-u / --ui] <UIfile.ui>')
-                sys.exit()
-            elif opt in ("-d", "--default"):
-                customUI= defaultUI
+                sys.exit(2)
+            #elif opt in ("-d", "--default"):
+                #customUI= defaultUI
             elif opt in ("-u", "--ui"):
                 customUI = '/' + arg
 
