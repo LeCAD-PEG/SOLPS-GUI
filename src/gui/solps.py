@@ -1001,15 +1001,10 @@ class SOLPS_MainWindow(QMainWindow):
     def __init__(self, *args):
         super(SOLPS_MainWindow, self).__init__(*args)
         prefix = os.path.dirname(os.path.abspath(__file__))
-        defaultUI = '/solps.ui'
+        ui_path = prefix + '/solps.ui'
         try:
-            opts, args = getopt.getopt(app.arguments()[1:],"hu:d",["help","ui=","default"])
-            #print(opts, args)
-            if not opts:
-                #print ('No options supplied!')
-                #print ('For help: solps.py [-h / --help]')
-                #sys.exit(2)
-                customUI= defaultUI
+            opts, args = getopt.getopt(app.arguments()[1:],
+                                       "hu:d",["help","ui=","default"])
         except getopt.GetoptError:
             print ('Supplied option not recognized!')
             print ('For help: solps.py -h / --help')
@@ -1017,14 +1012,22 @@ class SOLPS_MainWindow(QMainWindow):
         for opt, arg in opts:
             if opt in ('-h', "--help"):
                 print ('Load default user interface : solps.py')
-                print ('Load custom user interface : solps.py [-u / --ui] <UIfile.ui>')
+                print ('Load custom user interface : solps.py '
+                       '[-u / --ui] <UIfile.ui>')
                 sys.exit(2)
-            #elif opt in ("-d", "--default"):
-                #customUI= defaultUI
             elif opt in ("-u", "--ui"):
-                customUI = '/' + arg
+                ui_path =  os.path.abspath(arg)
 
-        loadUi(prefix + customUI , self)
+        if os.path.exists(ui_path):
+            ui_filename, ui_extension = os.path.splitext(ui_path)
+            if ui_extension == '.ui':
+                loadUi(ui_path, self)
+            else:
+                print(ui_path + ' shoud have .ui extension')
+                sys.exit(2)
+        else:
+            print(ui_path + ' not found')
+            sys.exit(2)
 
 
         self.main_tcsh = QProcess()  # for job sumbission and scripting
