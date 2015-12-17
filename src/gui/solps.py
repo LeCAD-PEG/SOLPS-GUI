@@ -1475,6 +1475,9 @@ class SOLPS_MainWindow(QMainWindow):
     def submit(self, rundir):
         """ Submits the job in the rundir under its $SOLPSTOP environment
 
+        All *.prt files are removed befor submission command from Preferences
+        is issued.
+
         Arguments:
              rundir (str): prepared run directory
         """
@@ -1492,7 +1495,7 @@ class SOLPS_MainWindow(QMainWindow):
                 opts += ' -z'
             if int(settings.value('dry_run', '0')):
                 opts += ' -n'
-            cmd +=  submit_command + opts
+            cmd +=  'rm -f *.prt\n' + submit_command + opts
             self.execute_tcsh_command_in_rundir(cmd, rundir)
             msg = 'batch ' + rundir + ' ' + submit_command + opts
             logging.info(msg)
@@ -1538,11 +1541,11 @@ class SOLPS_MainWindow(QMainWindow):
                     self.execute_tcsh_command_in_rundir(
                         'correct_baserun_timestamps', directory)
                     logging.info("Imported baserun for " + directory)
-                if os.path.exists(directory + '/input.dat') \
+                if os.path.exists(directory + '/b2fstati') \
                         and os.path.basename(directory) != 'baserun':
                     self.execute_tcsh_command_in_rundir(
                         'setup_baserun_eirene_links', directory)
-                    logging.info("Corrected Eirene links to baserun for "
+                    logging.info("B2 and Eirene links set to baserun for "
                                  + directory)
 
 
