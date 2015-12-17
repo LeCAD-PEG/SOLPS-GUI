@@ -328,7 +328,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
-         <widget class="QPushButton" name="pushButton_8">
+         <widget class="QPushButton" name="pushButton_Import">
           <property name="enabled">
            <bool>false</bool>
           </property>

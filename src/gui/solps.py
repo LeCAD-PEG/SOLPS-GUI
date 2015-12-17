@@ -1256,6 +1256,7 @@ class SOLPS_MainWindow(QMainWindow):
         self.pushButton_Archive.setEnabled(valid)
         self.pushButton_Continue.setEnabled(valid)
         self.pushButton_Edit.setEnabled(valid)
+        self.pushButton_Import.setEnabled(valid)
         self.pushButton_Run.setEnabled(valid)
         self.pushButton_Stop.setEnabled(valid)
 
@@ -1373,7 +1374,6 @@ class SOLPS_MainWindow(QMainWindow):
         except OSError:
             QMessageBox.warning(None, "Permission problem",
                                         "Can't create " + path)
-
     @pyqtSlot()
     def on_pushButton_Run_clicked(self):
         """ Submits the selected Run
@@ -1422,8 +1422,8 @@ class SOLPS_MainWindow(QMainWindow):
             solps_top = solps_top.rsplit('/', 1)[0]
         return None
 
-    def submit(self, rundir):
-        """ Submits the job in the rundir under its $SOLPSTOP environment
+    def execute_tcsh_command_in_rundir(self, tcsh_command, rundir):
+        """" Executes TCSH comand in run directory (e.g. submit)
 
             TCSH environment is searched sourced from 'setup.csh' or pointed
             with SOLPSTOP file. SOLPSTOP is probed for runDir changes and
@@ -1433,17 +1433,20 @@ class SOLPS_MainWindow(QMainWindow):
             setenv SOLPS_GUI_IP <IP address of the SOLPS GUI monitor>
             setenv SOLPS_GUI_PORT <listening port>
 
+            Arguments:
+                tcsh_command (str) : command or series of commands separated
+                    with '\n'.
+                rundir (str): prepared run directory
 
-        Arguments:
-             rundir (str): prepared run directory
         """
         settings = QSettings('ITER', 'solps-gui')
         tcsh_path = settings.value("tcsh_path", '/bin/tcsh')
-        submit_command = settings.value("submit_script", 'localsubmit')
         solps_gui_ip = settings.value('SOLPS_GUI_IP', '127.0.0.1')
-        solps_gui_port = settings.value('SOLPS_GUI_PORT', '49406')
+        default_port = 51966 + os.getuid() % 8192
+        solps_gui_port = settings.value('SOLPS_GUI_PORT', str(default_port))
 
         rundir_solps_top = self.find_solps_top(rundir)
+
         if not rundir_solps_top:
             if not rundir:
                 logging.error("Empty TCSH runDir! Bailing out.")
@@ -1464,7 +1467,21 @@ class SOLPS_MainWindow(QMainWindow):
                     + '\nsource setup.csh\necho TCSH READY\n' \
                     + 'setenv SOLPS_GUI_IP ' + solps_gui_ip + '\n' \
                     + 'setenv SOLPS_GUI_PORT ' + solps_gui_port + '\n'
+        cmd += 'cd ' + rundir + '\n'
+        cmd += tcsh_command + '\n'
+        self.main_tcsh.write(bytearray(cmd, 'utf8'))  # TODO flush stdout
 
+
+    def submit(self, rundir):
+        """ Submits the job in the rundir under its $SOLPSTOP environment
+
+        Arguments:
+             rundir (str): prepared run directory
+        """
+        settings = QSettings('ITER', 'solps-gui')
+        submit_command = settings.value("submit_script", 'localsubmit')
+
+        cmd = ''
         if submit_command:
             opts = ''
             if int(settings.value('use_mpi', '0')):
@@ -1475,8 +1492,8 @@ class SOLPS_MainWindow(QMainWindow):
                 opts += ' -z'
             if int(settings.value('dry_run', '0')):
                 opts += ' -n'
-            cmd += 'cd ' + rundir + '\n' + submit_command + opts + '\n'
-            self.main_tcsh.write(bytearray(cmd, 'utf8'))  # TODO flush stdout
+            cmd +=  submit_command + opts
+            self.execute_tcsh_command_in_rundir(cmd, rundir)
             msg = 'batch ' + rundir + ' ' + submit_command + opts
             logging.info(msg)
             self.model.jobStatusChanged(msg)
@@ -1485,6 +1502,53 @@ class SOLPS_MainWindow(QMainWindow):
             msg += "Empty command or no run directory for MAIN TCSH"
             self.model.jobStatusChanged(msg)
             logging.warning(msg)
+
+
+    @pyqtSlot()
+    def on_pushButton_Import_clicked(self):
+        """ Imports the run or a tree of runs from somewhere into
+            the selected tree position. If baserun is imported
+            then 'correct_baserun_timestamps' is run under it.
+
+            We need to rescan the whole model as user could possibly renamed
+            or deleted some directories by right-click in file-manager.
+        """
+        if self.treeViewRuns.selectionModel().currentIndex().isValid():
+            index = self.treeViewRuns.selectionModel().currentIndex()
+            model = self.proxyModel
+            index_path = model.index(index.row(), Column.path, index.parent())
+            destination_dir = model.data(index_path, Qt.DisplayRole)
+            selected_dir = QFileDialog.getExistingDirectory(self,
+                                                    "Select Directory",
+                                                    destination_dir,
+                                                   QFileDialog.ShowDirsOnly)
+            if selected_dir == '':
+                return
+            destination_dir += '/' + os.path.basename(selected_dir)
+            try:
+                shutil.copytree(selected_dir, destination_dir, symlinks=True)
+            except IOError as error:
+                QMessageBox.warning(self, 'Problem copying selected run tree!',
+                                    str(error))
+                return
+
+
+            for directory, subdirs, files in os.walk(destination_dir):
+                if os.path.exists(directory + '/baserun'):
+                    self.execute_tcsh_command_in_rundir(
+                        'correct_baserun_timestamps', directory)
+                    logging.info("Imported baserun for " + directory)
+                if os.path.exists(directory + '/input.dat') \
+                        and os.path.basename(directory) != 'baserun':
+                    self.execute_tcsh_command_in_rundir(
+                        'setup_baserun_eirene_links', directory)
+                    logging.info("Corrected Eirene links to baserun for "
+                                 + directory)
+
+
+
+            self.model.scanFileSystemThread.start()
+
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):
