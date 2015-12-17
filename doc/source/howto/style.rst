@@ -2,9 +2,9 @@
 
 .. highlight:: csh
 
-*****************
+=================
 SOLPS-GUI Styling
-*****************
+=================
 
 :Author: Leon Kos
 

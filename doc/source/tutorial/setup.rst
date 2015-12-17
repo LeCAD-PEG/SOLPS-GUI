@@ -49,8 +49,9 @@ Further instructions (optional)::
     $ less README.md
     $ cd doc
     $ make html
-    $ module load texlive # if you don't have system PDF latex
+    $ module load texlive # if you don't have system pdflatex
     $ make latexpdf
+    $ evince build/latex/SOLPS-GUI.pdf
 
 Updating to the latest version of GUI::
 
