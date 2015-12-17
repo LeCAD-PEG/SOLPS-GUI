@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>593</width>
-    <height>324</height>
+    <width>594</width>
+    <height>325</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -326,42 +326,15 @@
        <attribute name="title">
         <string>&amp;Runs</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="3">
-         <widget class="QPushButton" name="pushButton_Stop">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Stop</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="4">
-         <widget class="QPushButton" name="pushButton_Edit">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Edit</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="5">
-         <widget class="QTreeView" name="treeViewRuns">
-          <property name="dragEnabled">
-           <bool>false</bool>
-          </property>
-          <property name="alternatingRowColors">
-           <bool>true</bool>
-          </property>
-          <property name="textElideMode">
-           <enum>Qt::ElideRight</enum>
-          </property>
-         </widget>
-        </item>
+       <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
          <widget class="QPushButton" name="pushButton_8">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Imports existing run from elsewhere (with possible conversion) and puts it under selected tree.</string>
+          </property>
           <property name="text">
            <string>Import</string>
           </property>
@@ -371,6 +344,9 @@
          <widget class="QPushButton" name="pushButton_Archive">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Moves the selected tree into Archive</string>
           </property>
           <property name="text">
            <string>Archive</string>
@@ -382,32 +358,86 @@
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="toolTip">
+           <string>Starts the run with the method selected in Preferences</string>
+          </property>
           <property name="text">
            <string>Run</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="2" colspan="2">
+        <item row="0" column="3">
+         <widget class="QPushButton" name="pushButton_Stop">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Creates b2mn.exe.dir/.quit that
+should eventually stop the run.</string>
+          </property>
+          <property name="text">
+           <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4">
+         <widget class="QPushButton" name="pushButton_Continue">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Copies b2fstate to b2fstatei
+and starts the run</string>
+          </property>
+          <property name="text">
+           <string>Continue</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <widget class="QPushButton" name="pushButton_Edit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Edit</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QComboBox" name="comboBoxRunFilterType"/>
+        </item>
+        <item row="1" column="1" colspan="2">
+         <widget class="QCheckBox" name="filterCaseSensitivityCheckBox">
+          <property name="text">
+           <string>Case sensitive filter</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3" colspan="2">
          <widget class="QLineEdit" name="lineEditRunFilter">
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QComboBox" name="comboBoxRunFilterType"/>
-        </item>
-        <item row="2" column="4">
+        <item row="1" column="5">
          <widget class="QPushButton" name="pushButton_Filter">
           <property name="text">
            <string>Filter</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QCheckBox" name="filterCaseSensitivityCheckBox">
-          <property name="text">
-           <string>Case sensitive filter</string>
+        <item row="2" column="0" colspan="6">
+         <widget class="QTreeView" name="treeViewRuns">
+          <property name="dragEnabled">
+           <bool>false</bool>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="textElideMode">
+           <enum>Qt::ElideRight</enum>
           </property>
          </widget>
         </item>
@@ -627,7 +657,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>593</width>
+     <width>594</width>
      <height>20</height>
     </rect>
    </property>

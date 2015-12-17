@@ -29,13 +29,17 @@ Notes:
    Author: Leon Kos, University of Ljubljana
 """
 
+import getopt
+import logging
 import os
+import shutil
 import socket
 import sys
-import time
 import queue
-import logging
-import getopt
+import time
+
+
+
 
 from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
                           pyqtSignal, QThread, QAbstractItemModel, QVariant,
@@ -1250,9 +1254,11 @@ class SOLPS_MainWindow(QMainWindow):
         """
         valid = self.treeViewRuns.selectionModel().currentIndex().isValid()
         self.pushButton_Archive.setEnabled(valid)
+        self.pushButton_Continue.setEnabled(valid)
+        self.pushButton_Edit.setEnabled(valid)
         self.pushButton_Run.setEnabled(valid)
         self.pushButton_Stop.setEnabled(valid)
-        self.pushButton_Edit.setEnabled(valid)
+
 
         if valid:
             index = self.treeViewRuns.selectionModel().currentIndex()
@@ -1344,7 +1350,8 @@ class SOLPS_MainWindow(QMainWindow):
 
     @pyqtSlot()
     def on_pushButton_Stop_clicked(self):
-        "Signal garceful stop "
+        """ Signals garceful stop inside b2mn.exe.dir with .quit file.
+        """
         index = self.treeViewRuns.selectionModel().currentIndex()
         model = self.proxyModel
         index_path = model.index(index.row(), Column.path, index.parent())
@@ -1369,12 +1376,31 @@ class SOLPS_MainWindow(QMainWindow):
 
     @pyqtSlot()
     def on_pushButton_Run_clicked(self):
-        "Submits the selected Run"
+        """ Submits the selected Run
+        """
         index = self.treeViewRuns.selectionModel().currentIndex()
         model = self.proxyModel
         index_path = model.index(index.row(), Column.path, index.parent())
         rundir = model.data(index_path, Qt.DisplayRole)
-        self.submit(rundir)
+        self.submit(rundir)  # TODO check b2fstate_OK before you submit
+
+    @pyqtSlot()
+    def on_pushButton_Continue_clicked(self):
+        """ Continues the run by firstly copying the the plasma state output
+            to input (b2fstate->b2fstati)
+        """
+        if self.treeViewRuns.selectionModel().currentIndex().isValid():
+            index = self.treeViewRuns.selectionModel().currentIndex()
+            model = self.proxyModel
+            index_path = model.index(index.row(), Column.path, index.parent())
+            path = model.data(index_path, Qt.DisplayRole)
+            try:
+                shutil.copyfile(path + '/b2fstate', path + '/b2fstati')
+                self.on_pushButton_Run_clicked()
+            except IOError:
+                QMessageBox.warning(self, 'Problem copying B2 state file!',
+                                    path + '/b2fstati' + " read/write error")
+
 
     def find_solps_top(self, directory):
         """ Searches for setup.csh or SOLPSTOP file in the directory hierarchy.
