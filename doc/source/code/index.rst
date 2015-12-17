@@ -31,16 +31,25 @@ Gnuplot
 .. automodule:: gnuplot
    :members:
 
-------------
-Tcsh scripts
-------------
+-----------
+SOLPS Plots
+-----------
 
 .. automodule:: solpsplots
    :members:
 
-----------------
+------------
+Tcsh scripts
+------------
+
+.. automodule:: tcsh
+   :members:
+
+-----------------
 Input file editor
-----------------
+-----------------
 
 .. automodule:: solpsinput
    :members:
+
+

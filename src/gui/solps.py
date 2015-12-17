@@ -1430,14 +1430,13 @@ class SOLPS_MainWindow(QMainWindow):
             if necessary resourced within a new shell. The following
             environment variables are injected for use by scripts::
 
-            setenv SOLPS_GUI_IP <IP address of the SOLPS GUI monitor>
-            setenv SOLPS_GUI_PORT <listening port>
+                setenv SOLPS_GUI_IP <IP address of the SOLPS GUI monitor>
+                setenv SOLPS_GUI_PORT <listening port>
 
             Arguments:
                 tcsh_command (str) : command or series of commands separated
-                    with '\n'.
+                    with newline.
                 rundir (str): prepared run directory
-
         """
         settings = QSettings('ITER', 'solps-gui')
         tcsh_path = settings.value("tcsh_path", '/bin/tcsh')
@@ -1475,8 +1474,8 @@ class SOLPS_MainWindow(QMainWindow):
     def submit(self, rundir):
         """ Submits the job in the rundir under its $SOLPSTOP environment
 
-        All *.prt files are removed befor submission command from Preferences
-        is issued.
+        All ``*.prt`` files are removed befor submission command from
+        Preferences is issued.
 
         Arguments:
              rundir (str): prepared run directory
