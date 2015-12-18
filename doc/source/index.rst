@@ -2,7 +2,7 @@
 SOLPS GUI
 =========
 
-Contents:
+.. Contents
 
 .. toctree::
    :maxdepth: 2

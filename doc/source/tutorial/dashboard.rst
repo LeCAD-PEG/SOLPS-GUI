@@ -1,5 +1,6 @@
+.. _dashboard:
 
-=====================
-Configuring Dashboard
-=====================
+===================
+Designing Dashboard
+===================
 

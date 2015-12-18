@@ -2,10 +2,10 @@
  Tutorials
 ***********
 
-Currently, the Tutorials are:
+.. Currently, the Tutorials are:
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    setup.rst
    runs.rst

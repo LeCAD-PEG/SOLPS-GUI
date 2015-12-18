@@ -19,6 +19,7 @@ Changing the style::
 
 Other styles can be dependend on the platform availability at the time of
 compilation:
+
  * motif
  * cleanlooks
  * plastique

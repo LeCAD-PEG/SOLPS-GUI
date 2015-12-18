@@ -26,7 +26,7 @@ Tha latest version of the GUI is available by::
 
    $ module use /work/imas/etc/modulefiles
    $ module load solps-gui
-   $ solps #  and "solps -h" should work if BASH is used
+   $ solps #  and "solps -h" should work
 
 Personal use
 ============
@@ -57,3 +57,13 @@ Updating to the latest version of GUI::
 
     $ cd solps-gui
     $ git pull
+
+Submission scripts
+==================
+
+If submission scripts are not yet available or adapted for running on
+target cluster one may revise already available scriptes. Basic
+``localsubmit`` may be copied from ``solps-gui/src/examples` to
+``solps-iter/scripts`` from home directory with::
+
+    $ cp solps-gui/src/examples/localsubmit solps-iter/scripts/

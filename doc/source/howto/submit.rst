@@ -1,6 +1,6 @@
-.. _submission-howto:
-
 .. highlight:: csh
+
+.. _submission-howto:
 
 ====================
 Run Submission HOWTO
