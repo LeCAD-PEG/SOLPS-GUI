@@ -27,6 +27,7 @@ Tha latest version of the GUI is available by::
    $ module use /work/imas/etc/modulefiles
    $ module load solps-gui
    $ solps #  and "solps -h" should work
+   $ solps_doc # for the lastest HTML documentation in a browser
 
 Personal use
 ============

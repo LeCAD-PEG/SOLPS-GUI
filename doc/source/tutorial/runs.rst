@@ -240,3 +240,19 @@ moving to directories quickly.
 
 How to customize the *Dashboard* is described in the :ref:`dashboard`
 tutorial.
+
+ITER case 2171
+--------------
+
+ITER 2171 case located under ``/work/projects/solps-iter/bonninx/ITER``
+is larger than the default case, so you need to redimension your arrays
+and recompile SOLPS-ITER. This is done in the
+``$SOLPSTOP/modules/B2.5/src/include/DIMENSIONS.F`` file, which should
+be copied to ``$SOLPSTOP/modules/B2.5/src/include.local/DIMENSIONS.F``,
+then you would need to increase ``DEF_NATM`` to at least 4, ``DEF_NFL``
+to at least 21, and ``DEF_NPLS`` to at least 17. Then::
+
+  cd $SOLPSTOP ; gmake depend ; gmake
+
+
+Other steps may be the same as in AUG case.

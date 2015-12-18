@@ -1546,9 +1546,11 @@ class SOLPS_MainWindow(QMainWindow):
                 if os.path.exists(directory + '/b2fstati') \
                         and os.path.basename(directory) != 'baserun':
                     self.execute_tcsh_command_in_rundir(
-                        'setup_baserun_eirene_links', directory)
+                        'setup_baserun_eirene_links\ntouch b2fstati\n',
+                        directory)
                     logging.info("B2 and Eirene links set to baserun for "
                                  + directory)
+
 
 
 
