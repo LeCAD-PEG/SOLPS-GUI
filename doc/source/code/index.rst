@@ -45,6 +45,14 @@ Tcsh scripts
 .. automodule:: tcsh
    :members:
 
+--------
+Director
+--------
+
+.. automodule:: director
+   :members:
+
+
 -----------------
 Input file editor
 -----------------
