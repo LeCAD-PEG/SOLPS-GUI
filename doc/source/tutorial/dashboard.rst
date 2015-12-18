@@ -15,7 +15,7 @@ as an XML file with the ``.ui`` extension. We will create a new Dashboard
 from scratch and save our UI (``mysolps.ui``) in our home directory or
 elsewhere.
 
-To start designing wit h*Qt Designer* from default (system provided)
+To start designing with *Qt Designer* from default (system provided)
 ``solps.ui`` that should be at the same location (`$SOLPSGUI`) as ``solps.py``
 enter the following::
 

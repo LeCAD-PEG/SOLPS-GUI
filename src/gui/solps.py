@@ -1515,6 +1515,9 @@ class SOLPS_MainWindow(QMainWindow):
             the selected tree position. If baserun is imported
             then 'correct_baserun_timestamps' is run under it.
 
+            Files with pattern ``*.log, *.prt, .status*`` and some other
+            log files are not imported.
+
             We need to rescan the whole model as user could possibly renamed
             or deleted some directories by right-click in file-manager.
         """
@@ -1531,10 +1534,12 @@ class SOLPS_MainWindow(QMainWindow):
                 return
             destination_dir += '/' + os.path.basename(selected_dir)
             try:
-                shutil.copytree(selected_dir, destination_dir, symlinks=True)
-            except IOError as error:
+                shutil.copytree(selected_dir, destination_dir, symlinks=True,
+                    ignore=shutil.ignore_patterns('*.o[0-9]*', '*.log',
+                            '*.e[0-9]*', '*.prt', '.status*'))
+            except IOError as err:
                 QMessageBox.warning(self, 'Problem copying selected run tree!',
-                                    str(error))
+                    "I/O error {0}".format(err.args))  # TODO Properly format
                 return
 
 
@@ -1551,10 +1556,7 @@ class SOLPS_MainWindow(QMainWindow):
                     logging.info("B2 and Eirene links set to baserun for "
                                  + directory)
 
-
-
-
-            self.model.scanFileSystemThread.start()
+            self.model.startThreads()
 
 
     @pyqtSlot()

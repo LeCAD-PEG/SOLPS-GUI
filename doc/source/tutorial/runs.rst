@@ -244,7 +244,7 @@ tutorial.
 ITER case 2171
 --------------
 
-ITER 2171 case located under ``/work/projects/solps-iter/bonninx/ITER``
+The ITER 2171 case located under ``/work/projects/solps-iter/bonninx/ITER``
 is larger than the default case, so you need to redimension your arrays
 and recompile SOLPS-ITER. This is done in the
 ``$SOLPSTOP/modules/B2.5/src/include/DIMENSIONS.F`` file, which should
@@ -254,5 +254,23 @@ to at least 21, and ``DEF_NPLS`` to at least 17. Then::
 
   cd $SOLPSTOP ; gmake depend ; gmake
 
+The following ``diff`` output between original (<) and inceased (>) values
+describes necessary changes to
+``$SOLPSTOP/modules/B2.5/src/include.local/DIMENSIONS.F``.
+
+.. code-block:: diff
+
+   19,21c19,21
+   < #define DEF_NFL 9
+   < #define DEF_NPLS 9
+   < #define DEF_NATM 3
+   ---
+   > #define DEF_NFL 21
+   > #define DEF_NPLS 17
+   > #define DEF_NATM 5
+   35c35
+   < #define DEF_NSRFS 2
+   ---
+   > #define DEF_NSRFS 4
 
 Other steps may be the same as in AUG case.
