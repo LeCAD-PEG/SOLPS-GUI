@@ -38,6 +38,13 @@ SOLPS Plots
 .. automodule:: solpsplots
    :members:
 
+----------
+Line input
+----------
+
+.. automodule:: lineinput
+   :members:
+
 ------------
 Tcsh scripts
 ------------
