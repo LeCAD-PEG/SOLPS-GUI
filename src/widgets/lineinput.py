@@ -32,7 +32,6 @@ class LineInput(QComboBox):
         """ Connector that receives a signal and re-emits the current text.
         """
         current_text = self.currentText()
-        self.plotCommand.emit(current_text)
         self.editTextChanged.emit(current_text)
         self.currentTextChanged.emit(current_text)
 
