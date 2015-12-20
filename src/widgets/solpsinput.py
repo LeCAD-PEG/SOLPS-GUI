@@ -141,7 +141,7 @@ class SolpsInput(QTabWidget):
 
     runDir = pyqtProperty(str, getRundir, setRundir)
 
-solps_input_files = [ # filename and its description for tooltip
+solps_input_files = [ # filename and its description for a tooltip [b2cdcn.F]
     ('b2mn.dat',
      "Input file to the b2mn main B2.5 program containing the run switches\n"
      "and eventually overriding parameters to those specified in b2ah.dat"),
@@ -163,9 +163,10 @@ solps_input_files = [ # filename and its description for tooltip
      "the atomic physics rates file b2frates containing\n"
      "the look-up tables to be used by B2.5"),
     ('b2md.dat', "Contains data useful for cataloguing the run\n"
-     "(done from 'save_mds' and resave_mds' scripts"), # TODO(bonninx) check
+     "(done from 'save_mds' and resave_mds' scripts"),
     ('b2.boundary.parameters',
-     "Input files containing the namelists used by b2mn,\n"
+     "Contains data used to specify the boundary conditions.\n"
+     "Input file containing the namelists used by b2mn,\n"
      "which complete the input provided  by  the b2??.dat files"),
     ('b2.neutrals.parameters',
      "Input files containing the namelists used by b2mn,\n"
@@ -174,11 +175,27 @@ solps_input_files = [ # filename and its description for tooltip
      "Input files containing the namelists used by b2mn,\n"
      "which complete the input provided  by  the b2??.dat files"),
     ('b2.transport.parameters',
+     "Allows user to choose between different anomalous transport models.\n"
+     "Read if ’b2mod_transport_namelist’ is set to 1.\n"
      "Input files containing the namelists used by b2mn,\n"
      "which complete the input provided  by  the b2??.dat files"),
     ('b2.wall_save.parameters',
      "Input files containing the namelists used by b2mn,\n"
      "which complete the input provided  by  the b2??.dat files"),
+    ('b2.feedback_control.parameters',
+     "Allows for more complex feedback schemes."),
+    ('b2.sources.profile',
+     "Allows the user to set external sources to use within the code,\n"
+     "Unless specifying a divertor heat source, the source will be\n"
+     "located in the core and main SOL regions only."),
+    ('b2.transport.inputfile',
+     "Allows the user to set transport coefficients profiles.\n"
+     "Only used if ’b2tqna_inputfile’ is set to 1."),
+    ('b2.user.parameters',
+     "Contains additional data for user-specific diagnostics."),
+    ('b2.atomic_physics_rescale.parameters',
+     "Read if ’b2mndr_atomic_physics_rescale’ is set to 1.\n"
+     "Contains rescaling multipliers for atomic physics rates."),
     ('untitled',
      'You will be asked for a file name once you start typing.')
 ]
