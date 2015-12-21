@@ -880,7 +880,7 @@ class RunsModel(QAbstractItemModel):
         """
         self.statusServerThread = RunsStatusServer()
         settings = QSettings("ITER", "solps-gui")
-        default_port = 51966 + os.getuid() % 8192
+        default_port = 0xCAFE + os.getuid() % 8192
         try:  # TODO Assign default port number by looking at system UID range
             address = settings.value("SOLPS_GUI_BIND", "0.0.0.0")
             port = int(settings.value("SOLPS_GUI_PORT", str(default_port)))
@@ -1444,8 +1444,10 @@ class SOLPS_MainWindow(QMainWindow):
         settings = QSettings('ITER', 'solps-gui')
         tcsh_path = settings.value("tcsh_path", '/bin/tcsh')
         solps_gui_ip = settings.value('SOLPS_GUI_IP', '127.0.0.1')
-        default_port = 51966 + os.getuid() % 8192
-        solps_gui_port = settings.value('SOLPS_GUI_PORT', str(default_port))
+        default_port = str(0xCAFE + os.getuid() % 8192)
+        solps_gui_port = settings.value('SOLPS_GUI_PORT', default_port)
+        settings.setValue('SOLPS_GUI_PORT', default_port)
+
 
         rundir_solps_top = self.find_solps_top(rundir)
 
