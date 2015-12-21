@@ -431,7 +431,7 @@ class RetrieveRunsFolderInfo(QThread):
 
     def run(self):
         """ Thread scans each listed directory of the Runs model.
-          
+
         In principle this operation should be thread safe when changing model
         data. However, one should not restart the scan if this thread is
         not finished yet with scan!
@@ -880,15 +880,16 @@ class RunsModel(QAbstractItemModel):
         """
         self.statusServerThread = RunsStatusServer()
         settings = QSettings("ITER", "solps-gui")
-        default_port = 0xCAFE + os.getuid() % 8192
-        try:  # TODO Assign default port number by looking at system UID range
+        default_port = 0xCAFE + os.getuid() % 13566
+        try:
             address = settings.value("SOLPS_GUI_BIND", "0.0.0.0")
             port = int(settings.value("SOLPS_GUI_PORT", str(default_port)))
         except:
             address = "0.0.0.0"
             port = default_port
-            settings.setValue('SOLPS_GUI_BIND', address)
-            settings.setValue('SOLPS_GUI_PORT', str(port))
+
+        settings.setValue('SOLPS_GUI_BIND', address)
+        settings.setValue('SOLPS_GUI_PORT', str(port))
 
         status = self.statusServerThread.bind(address, port)
         if status:
@@ -1444,7 +1445,7 @@ class SOLPS_MainWindow(QMainWindow):
         settings = QSettings('ITER', 'solps-gui')
         tcsh_path = settings.value("tcsh_path", '/bin/tcsh')
         solps_gui_ip = settings.value('SOLPS_GUI_IP', '127.0.0.1')
-        default_port = str(0xCAFE + os.getuid() % 8192)
+        default_port = str(0xCAFE + os.getuid() % 13566)
         solps_gui_port = settings.value('SOLPS_GUI_PORT', default_port)
         settings.setValue('SOLPS_GUI_PORT', default_port)
 
