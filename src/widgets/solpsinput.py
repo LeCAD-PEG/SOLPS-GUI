@@ -7,11 +7,13 @@ A PyQt custom widget with embedded SOLPS configuration editor.
 """
 
 from PyQt5.QtCore import (QSize, pyqtProperty,  pyqtSignal, pyqtSlot, QSettings)
-from PyQt5.QtWidgets import (QTabWidget, QPlainTextEdit, QTabBar)
+from PyQt5.QtWidgets import (QTabWidget, QPlainTextEdit, QSizePolicy,
+                             QGridLayout)
 from PyQt5.QtGui import QFont
 
 import os
 import logging
+import gzip
 
 
 class SolpsInput(QTabWidget):
@@ -23,10 +25,11 @@ class SolpsInput(QTabWidget):
     
     def __init__(self, parent=None):
         super(SolpsInput, self).__init__(parent)
-        self.setWindowTitle('SOLPS input file editor')
+        self.setWindowTitle('SOLPS input file editor and viewer')
         self.setMovable(True)
         self.rundir = None
-        self.editors = list()
+        self.currently_viewing = None
+        self.editors = dict()
 
     def read_tab_positions(self):
         # get Tab settings
@@ -53,7 +56,7 @@ class SolpsInput(QTabWidget):
         settings.endGroup()
 
     @pyqtSlot()
-    def setup_tabs(self):
+    def setup_input_tabs(self):
         font = QFont()
         font.setFamily('Monospace')
         for filename, tooltip in solps_input_files:
@@ -63,8 +66,63 @@ class SolpsInput(QTabWidget):
             plainTextEdit.setLineWrapMode(QPlainTextEdit.NoWrap)
             tab_index = self.addTab(plainTextEdit, filename)
             self.setTabToolTip(tab_index, tooltip)
-            self.editors.append((filename, plainTextEdit))
+            self.editors[filename] = plainTextEdit
 
+    @pyqtSlot(int)
+    def view_files(self, tab_index):
+        """ Adds QPlainTextEdit widget inside the tabs that are not yet
+            in dictionary of editors. Tabs need to exist and should be created
+            by Qt Designer. Files are read only if the widget is visible
+            and ``runDir`` is set. Signal currentIndexChanged should be
+            connected here. If file is ending with .gz then gzip decompression
+            is applied to read the file.
+        """
+
+        if not self.isVisible():
+            return
+
+        if not self.rundir:
+            logging.debug("Run directory not prescribed to view view files.")
+            return
+
+        if self.currently_viewing == self.rundir:
+            return
+
+        font = QFont()
+        font.setFamily('Monospace')
+        for i in range(self.count()):
+            filename = self.tabText(i)
+            if not filename in self.editors:
+                tab = self.widget(i)
+                layout = QGridLayout(tab)
+                tab.setLayout(layout)
+                plainTextEdit = QPlainTextEdit(tab)
+                plainTextEdit.setObjectName(filename)
+                plainTextEdit.setFont(font)
+                plainTextEdit.setLineWrapMode(QPlainTextEdit.NoWrap)
+                layout.addWidget(plainTextEdit)
+                self.editors[filename] = plainTextEdit
+
+            plainTextEdit = self.editors[filename]
+            plainTextEdit.setReadOnly(True)
+            path = self.rundir + '/' + filename
+            if os.path.exists(path):
+                try:
+                    _dummy, file_extension = os.path.splitext(filename)
+                    if file_extension == '.gz':
+                        with gzip.open(path, 'rb') as file:
+                            text_content = file.read().decode("utf-8")
+                            plainTextEdit.setPlainText(text_content)
+                    else:
+                        with open(path) as file:
+                            plainTextEdit.setPlainText(file.read())
+                except PermissionError as error:
+                    plainTextEdit.setPlainText(str(error))
+                    plainTextEdit.setEnabled(False)
+            else:
+                msg = filename + " does not exist in " + self.rundir
+                plainTextEdit.setPlaceholderText(msg)
+        self.currently_viewing = self.rundir
 
     @pyqtSlot()
     def read_input_files(self):
@@ -74,14 +132,15 @@ class SolpsInput(QTabWidget):
             then editing is not alowed.
         """
         if not self.rundir:
-            logging.error("Run directory not prescribed for input edits.")
+            logging.warning("Run directory not prescribed for input edits.")
             return
 
         if len(self.editors) == 0:  # Setup tabs on the fly
             self.setup_tabs()
 
 
-        for filename, plainTextEdit in self.editors:
+        for filename in self.editors:
+            plainTextEdit = self.editors[filename]
             if not os.access(self.rundir, os.W_OK):
                     plainTextEdit.setReadOnly(True)
             path = self.rundir + '/' + filename
@@ -108,7 +167,8 @@ class SolpsInput(QTabWidget):
         """ Saves modified input files.
         """
         if self.rundir:
-            for filename, plainTextEdit in self.editors:
+            for filename in self.editors:
+                plainTextEdit = self.editors[filename]
                 if plainTextEdit.document().isModified():
                     try:
                         path = self.rundir + '/' + filename

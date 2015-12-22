@@ -1153,7 +1153,7 @@ class SOLPS_MainWindow(QMainWindow):
         self.treeViewArchive.setSortingEnabled(True)
 
         # Setup input tabs
-        self.solpsinput.setup_tabs()
+        self.solpsinput.setup_input_tabs()
         self.tab_Input.setEnabled(False)
 
 

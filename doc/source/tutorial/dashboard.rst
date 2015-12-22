@@ -128,12 +128,74 @@ design cycle.
   12. After selecting run in guilabel:`Runs` tree-view one can the press the
       PushButton and get the desired plot.
 
+
+Adding a new tab with file view
+-------------------------------
+
+With this tutorial we will be extending the GUI with new a new tab that will
+insted of :guilabel:`Input` show user defined files in the ``SolpsInput``
+widget.
+
+1. We start with the default ``solps.ui`` and at :guilabel:`Dashboard` tab
+   right-click and  :menuselection:`Insert Page --> After Current page`. Rename
+   the tab :menuselection:`Property editor --> Property -->  currentTabText``
+   from ``Page`` to ``View``
+2. Drop :menuselection:`Widget Box --> Buttons --> SolpsInput` widget in the
+   empty area under the tab. Name this widget for easier reference with
+   :menuselection:`Property editor --> Property -->  QObject --> objectName`
+   to ``solpsview`` instead of default ``solpsinput_2``.
+
+3. Select tab :guilabel:`View` and in the empty area right-click and then
+   adjust :menuselection:`Lay out --> Lay Out in a Grid` (:kbd:`Control+5`)
+   You should see the following auto-expanding lay-out:
+
+   .. image:: dashboard_7.png
+        :scale: 80
+        :align: center
+
+   You can notice that the size policy for the ``QTabWidget`` is now
+   ``Expanding`` in horizontal and vertical direction.
+
+4. We will now add several filenames we wish to see in the tabs
+   of the ``SolpsInput`` widget. By right-click on the widget
+   :guilabel:`Insert Page`. Rename it to ``run.log`` in the same way as in
+   step 1. You may optionally add "currentTabTooltip" as
+   ``Log file of selected run``. Repeat the same procedure by adding more files
+   to view (e.g. ``run.log.gz`, ``b2.log``, ```b2fstati``, ``b2fstate``, ...)
+5. We will now add the signal from  :guilabel:`Director` "manually" by using
+   :menuselection:`View --> Signal/Slot editor`. Press :guilabel:`+` button
+   there and adjust new line just added in the following way:
+
+   +---------+------------------------------+-----------+---------------------+
+   | Sender  | Signal                       | Receiver  | Slot                |
+   +=========+==============================+===========+=====================+
+   |director | rundir_passthrough (QString) | solpsview | setRundir (QString) |
+   +---------+------------------------------+-----------+---------------------+
+
+   Note that setting the *run directory* is light operation as it does not
+   trigger any processing except instructing the ``SolpsInput`` widget where
+   to look for the files when it comes the time.
+6. Finally, we need to trigger the view when the tab *is visible*. We can do
+   that by dragging from the ``tabWidget`` our solpsview widget with graphical
+   signal/slot editor (:kbd:`F4`) and get:
+
+   .. image:: dashboard_8.png
+        :scale: 80
+        :align: center
+
+   that is visible as in :
+
+   +----------+---------------------+-----------+---------------------+
+   | Sender   | Signal              | Receiver  | Slot                |
+   +==========+=====================+===========+=====================+
+   | tabWidget| currentChanged(int) | solpsview | view_files(int)     |
+   +----------+---------------------+-----------+---------------------+
+7. Testing of newly designed custom widget can be done as usual by saving
+   ``mysolps.ui`` and using it with ``solps --ui mysolps.ui``.
+
 Extended example
 ----------------
 We can create a large dashboard layout with many different plots by repeating
 steps 3-8 for each new plot.
 :menuselection:`Widget Box --> SOLPS --> LineInput` widget can be used to
 signal desired plots in between of Director and the Gnuplot widget.
-
-
-

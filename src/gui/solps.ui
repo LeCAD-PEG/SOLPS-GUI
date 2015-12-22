@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>594</width>
-    <height>325</height>
+    <width>614</width>
+    <height>310</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -23,8 +23,8 @@
    <string>SOLPS-ITER</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
+   <layout class="QGridLayout" name="gridLayout_8">
+    <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -551,7 +551,7 @@ and starts the run</string>
          <rect>
           <x>160</x>
           <y>200</y>
-          <width>400</width>
+          <width>231</width>
           <height>21</height>
          </rect>
         </property>
@@ -583,7 +583,47 @@ and starts the run</string>
         <property name="text">
          <string>Director</string>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="tristate">
+         <bool>false</bool>
+        </property>
        </widget>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>View</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="SolpsInput" name="solpsview">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="tab_7">
+           <attribute name="title">
+            <string>run.log</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_10">
+           <attribute name="title">
+            <string>run.log.gz</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_8">
+           <attribute name="title">
+            <string>b2fstatei</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_9">
+           <attribute name="title">
+            <string>b2fstate</string>
+           </attribute>
+          </widget>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_5">
        <attribute name="title">
@@ -657,7 +697,7 @@ and starts the run</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>594</width>
+     <width>614</width>
      <height>20</height>
     </rect>
    </property>
@@ -814,7 +854,7 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>171</x>
+     <x>161</x>
      <y>276</y>
     </hint>
     <hint type="destinationlabel">
@@ -846,8 +886,8 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>405</x>
-     <y>274</y>
+     <x>401</x>
+     <y>276</y>
     </hint>
     <hint type="destinationlabel">
      <x>216</x>
@@ -916,6 +956,38 @@ and starts the run</string>
     <hint type="destinationlabel">
      <x>531</x>
      <y>233</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>solpsview</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>56</x>
+     <y>266</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>296</x>
+     <y>162</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tabWidget</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>solpsview</receiver>
+   <slot>view_files(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>409</x>
+     <y>45</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>485</x>
+     <y>100</y>
     </hint>
    </hints>
   </connection>

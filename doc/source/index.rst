@@ -8,6 +8,7 @@ SOLPS GUI
    :maxdepth: 2
    :numbered:
 
+   introduction.rst
    tutorial/index.rst
    howto/index.rst
    code/index.rst
