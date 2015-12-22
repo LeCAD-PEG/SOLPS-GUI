@@ -1551,15 +1551,16 @@ class SOLPS_MainWindow(QMainWindow):
                     self.execute_tcsh_command_in_rundir(
                         'correct_baserun_timestamps', directory)
                     logging.info("Imported baserun for " + directory)
-                if os.path.exists(directory + '/b2fstati') \
-                        and os.path.basename(directory) != 'baserun':
-                    self.execute_tcsh_command_in_rundir(
-                        'setup_baserun_eirene_links\ntouch b2fstati\n',
-                        directory)
-                    logging.info("B2 and Eirene links set to baserun for "
+                if os.path.basename(directory) != 'baserun':
+                    if os.path.exists(directory + '/input.dat'):
+                        cmd =  'setup_baserun_eirene_links'
+                        self.execute_tcsh_command_in_rundir(cmd, directory)
+                        logging.info("B2 and Eirene links set to baserun for "
                                  + directory)
-
-            self.model.startThreads()
+                    if os.path.exists(directory + '/b2fstati'):
+                        cmd = 'touch b2fstati\n'
+                        self.execute_tcsh_command_in_rundir(cmd, directory)
+            self.model.startThreads()  # rescan the model
 
 
     @pyqtSlot()
