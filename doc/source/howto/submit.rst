@@ -36,6 +36,8 @@ should be sufficient for a submission script to figure out run type such as:
   * coulped with EIRENE
   * compressed logs
 
+Local submission
+^^^^^^^^^^^^^^^^
 
 For a single workstation ``localsubmit`` can be::
 
@@ -88,4 +90,81 @@ for variables that are used inside the script at the time of execution
    another batch system, such as
    `GNU Parallel <http://www.gnu.org/software/parallel/>`_.
 
+Submission on a cluster
+^^^^^^^^^^^^^^^^^^^^^^^
+Various submission scripts can be created due to large veriety of cluster
+configurations and job schedulers. Essentially, one needs to send UDP message
+to the GUI run status server from compute node. For a start let's show required
+update of sample ``itersubmit`` script that is actually executed at the
+login node and may serve a as first check of network monitoring functionallity:
 
+.. code-block:: diff
+   :caption: QSUB.iter_coupled.orig QSUB.iter_coupled
+
+   79c79,84
+   < update_solps_run_status -n "Submitted at `date`"
+   ---
+   > set msg="Submitted at `date`"
+   > update_solps_run_status -n ${msg}
+   > if ($?SOLPS_GUI_IP) then
+   >   echo ${USER} ${PWD} ${msg} \
+   >       | nc -u -v -w 0 ${SOLPS_GUI_IP} ${SOLPS_GUI_PORT}
+   > endif
+
+When "the job" will start we need to receive UDP packet from the compute node
+too. It is assumed and usually *environment variables* are preserved when the
+job stars. Therefore *netcat* command is no different that with above
+``itersubmit`` upgrade.
+
+However, one may found out that the netcat command ``nc`` is not available
+on the compute nodes. Furthermore access to *non-privileged ports*
+on *login node* may be blocked by firewall of some kind.
+To remedy the proble with *netcat* unavailability one may use
+``solps-gui/src/utils/jobs_status/update_run_status`` netcat equivalent that
+allows multiple destinations (broadcast for multiuser monitoring).
+
+When the firewall blocks access from compute nodes to login node where
+SOLPS GUI resides one may try to ssh back to login node by upgrading the
+submitted script with:
+
+.. code-block:: diff
+
+   50c50,55
+   < update_solps_run_status "Started on `hostname` at `date`"
+   ---
+   > set msg="Started on `hostname` at `date`"
+   > update_solps_run_status ${msg}
+   > if ($?SOLPS_GUI_IP) then
+   >   ssh -o ConnectTimeout=10 ${USER}@${SOLPS_GUI_IP} \
+   >   "echo ${USER} ${PWD} ${msg}|nc -u -v -w 0 ${SOLPS_GUI_IP} ${SOLPS_GUI_PORT}"
+   > endif
+   58c63,68
+   < update_solps_run_status "Finished on `hostname` at `date`"
+   ---
+   > set msg="Finished on `hostname` at `date`"
+   > update_solps_run_status ${msg}
+   > if ($?SOLPS_GUI_IP) then
+   >   ssh -o ConnectTimeout=10 ${USER}@${SOLPS_GUI_IP} \
+   >   "echo ${USER} ${PWD} ${msg}|nc -u -v -w 0 ${SOLPS_GUI_IP} ${SOLPS_GUI_PORT}"
+   > endif
+
+This will usually work if key-only ssh access is enabled by the user. One may
+even use more "secure" GUI server by using 127.0.0.1 localhost with ``nc``
+update and bind GUI listening interface to 127.0.0.1 only.
+
+To add login node to the list of know hosts users may need to run once::
+
+    $ ssh-keygen -t rsa
+    $ sh -c 'SOLPS_GUI_IP=$(hostname -i) \
+    && SSH_KEY=$(ssh-keygen -F ${SOLPS_GUI_IP}) \
+    && test -z "${SSH_KEY}" \
+    && ssh-keyscan -t rsa -H ${SOLPS_GUI_IP} >> ~/.ssh/known_hosts'
+
+Of course, recommended way of notifying the GUI is by direct update from
+compute nodes by using *netcat* or ``update_run_status`` without remote
+execution through secure shell.
+
+For single users landing on a new cluster it is probably easier to update
+just ``update_solps_run_status`` with the above script samples. Care is
+needed that the updates are not then sent twice. That's why this shortcut
+is not listed here. As usual, :abbr:`YMMV (your mileage may vary)`.
