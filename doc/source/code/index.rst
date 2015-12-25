@@ -60,9 +60,9 @@ Director
    :members:
 
 
------------------
-Input file editor
------------------
+----------------------------
+Input file editor and viewer
+----------------------------
 
 .. automodule:: solpsinput
    :members:
