@@ -16,6 +16,15 @@ reference case: ASDEX-Upgrade, D-only, B2.5 stand-alone, 1000 iterations
 that resides in ``/work/projects/solps-iter/bonninx/AUG_16151_D``.
 Normally this case runs about 5 minutes to finish.
 
+.. note::
+
+   For running ``AUG_16151_D`` case you will need a compiled standalone
+   version of the SOLPS-ITER which is non-default. To get B2.5 compiled you
+   need to::
+
+   $ make b25 # or
+   $ make all # as the default is "make solps"
+
 First start
 -----------
 
@@ -90,7 +99,7 @@ Each user on the system should have it's own port number in the range
 of *unprivileged* ports (1024-65535). GUI acts as a server receiving status
 updates over network from runs running in the background. If there is a
 clash of these port numbers, then they should make an agreement. However,
-default heuristics hashes 8192 users in a range starting with 51966 (0xCAFE)
+default heuristics hashes 13566 users in a range starting with 51966 (0xCAFE)
 and should not cause a problem unless some wierd UID assigments policy is
 used on the system. In that case users are advised to use next available
 port for their local server.
@@ -240,3 +249,83 @@ moving to directories quickly.
 
 How to customize the *Dashboard* is described in the :ref:`dashboard`
 tutorial.
+
+ITER case 2171
+--------------
+
+The ITER 2171 case located under ``/work/projects/solps-iter/bonninx/ITER``
+is larger than the default case, so you need to redimension your arrays
+and recompile SOLPS-ITER. This is done in the
+``$SOLPSTOP/modules/B2.5/src/include/DIMENSIONS.F`` file, which should
+be copied to ``$SOLPSTOP/modules/B2.5/src/include.local/DIMENSIONS.F``,
+then you would need to increase ``DEF_NATM`` to at least 4, ``DEF_NFL``
+to at least 21, and ``DEF_NPLS`` to at least 17. Then::
+
+  cd $SOLPSTOP ; gmake depend ; gmake
+
+The following ``diff`` output between original (<) and inceased (>) values
+describes necessary changes to
+``$SOLPSTOP/modules/B2.5/src/include.local/DIMENSIONS.F``.
+
+.. code-block:: diff
+
+   19,21c19,21
+   < #define DEF_NFL 9
+   < #define DEF_NPLS 9
+   < #define DEF_NATM 3
+   ---
+   > #define DEF_NFL 21
+   > #define DEF_NPLS 17
+   > #define DEF_NATM 5
+   35c35
+   < #define DEF_NSRFS 2
+   ---
+   > #define DEF_NSRFS 4
+
+For running the case:
+
+1. :guilabel:`Import` the ``/work/projects/solps-iter/bonninx/ITER/2171``
+    case.
+
+2. Select the case and press :guilabel:`Edit` to change:
+    a) ``b2mn.dat`` :
+
+      .. code-block:: diff
+
+         45c45
+         > 'b2stbc_feedback'     '0'
+         ---
+         < 'b2stbc_feedback'     '1'
+
+    b) and in ``b2.boundary.parameters``:
+
+      .. code-block:: diff
+
+         18c18
+         <  BCCON(0, 6)=  10,   9,  10,   9,   9,  10,   9,   9,   9,   9,  11,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,
+         ---
+         >  BCCON(0, 6)=  10,   9,  10,   9,   9,  10,   9,   9,   9,   9,   8,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,
+         42c42
+         <  LBNDUSR=F, LFEEDBACK=T,
+         ---
+         >  LBNDUSR=F, LFEEDBACK=F,
+
+3. Open :menuselection:`Settings --> Preferences` and
+
+   a) change submission script from ``localsubmit`` to ``intersubmit``.
+   b) Change IP address of the GUI from localhost ``127.0.0.1`` to
+      ``hostname -i`` IP address from where you are submitting the jobs
+      (monitoring).
+      For example: Use 10.153.0.52 if you are submitting from
+      *hpc-app1.iter.org* and 10.153.0.16 for GUI running at
+      *hpc-login4.iter.org*.
+
+4. Press :guilabel:`Run` and observe if the case will run for 4 minutes. You
+   may use ``qstat`` or equvalent job scheduler command to observe your job
+   placement in the cluster. At start and end you should receive job status
+   updates directly to the GUI running runs status server at the port
+   specified. Finally, you should receive status:
+
+.. image:: runs_10.png
+   :scale: 80
+   :align: center

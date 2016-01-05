@@ -431,7 +431,7 @@ class RetrieveRunsFolderInfo(QThread):
 
     def run(self):
         """ Thread scans each listed directory of the Runs model.
-          
+
         In principle this operation should be thread safe when changing model
         data. However, one should not restart the scan if this thread is
         not finished yet with scan!
@@ -880,15 +880,16 @@ class RunsModel(QAbstractItemModel):
         """
         self.statusServerThread = RunsStatusServer()
         settings = QSettings("ITER", "solps-gui")
-        default_port = 51966 + os.getuid() % 8192
-        try:  # TODO Assign default port number by looking at system UID range
+        default_port = 0xCAFE + os.getuid() % 13566
+        try:
             address = settings.value("SOLPS_GUI_BIND", "0.0.0.0")
             port = int(settings.value("SOLPS_GUI_PORT", str(default_port)))
         except:
             address = "0.0.0.0"
             port = default_port
-            settings.setValue('SOLPS_GUI_BIND', address)
-            settings.setValue('SOLPS_GUI_PORT', str(port))
+
+        settings.setValue('SOLPS_GUI_BIND', address)
+        settings.setValue('SOLPS_GUI_PORT', str(port))
 
         status = self.statusServerThread.bind(address, port)
         if status:
@@ -1152,7 +1153,7 @@ class SOLPS_MainWindow(QMainWindow):
         self.treeViewArchive.setSortingEnabled(True)
 
         # Setup input tabs
-        self.solpsinput.setup_tabs()
+        self.solpsinput.setup_input_tabs()
         self.tab_Input.setEnabled(False)
 
 
@@ -1444,8 +1445,10 @@ class SOLPS_MainWindow(QMainWindow):
         settings = QSettings('ITER', 'solps-gui')
         tcsh_path = settings.value("tcsh_path", '/bin/tcsh')
         solps_gui_ip = settings.value('SOLPS_GUI_IP', '127.0.0.1')
-        default_port = 51966 + os.getuid() % 8192
-        solps_gui_port = settings.value('SOLPS_GUI_PORT', str(default_port))
+        default_port = str(0xCAFE + os.getuid() % 13566)
+        solps_gui_port = settings.value('SOLPS_GUI_PORT', default_port)
+        settings.setValue('SOLPS_GUI_PORT', default_port)
+
 
         rundir_solps_top = self.find_solps_top(rundir)
 
@@ -1515,6 +1518,9 @@ class SOLPS_MainWindow(QMainWindow):
             the selected tree position. If baserun is imported
             then 'correct_baserun_timestamps' is run under it.
 
+            Files with pattern ``*.log, *.prt, .status*`` and some other
+            log files are not imported.
+
             We need to rescan the whole model as user could possibly renamed
             or deleted some directories by right-click in file-manager.
         """
@@ -1531,10 +1537,12 @@ class SOLPS_MainWindow(QMainWindow):
                 return
             destination_dir += '/' + os.path.basename(selected_dir)
             try:
-                shutil.copytree(selected_dir, destination_dir, symlinks=True)
-            except IOError as error:
+                shutil.copytree(selected_dir, destination_dir, symlinks=True,
+                    ignore=shutil.ignore_patterns('*.o[0-9]*', '*.log',
+                            '*.e[0-9]*', '*.prt', '.status*'))
+            except IOError as err:
                 QMessageBox.warning(self, 'Problem copying selected run tree!',
-                                    str(error))
+                    "I/O error {0}".format(err.args))  # TODO Properly format
                 return
 
 
@@ -1543,16 +1551,16 @@ class SOLPS_MainWindow(QMainWindow):
                     self.execute_tcsh_command_in_rundir(
                         'correct_baserun_timestamps', directory)
                     logging.info("Imported baserun for " + directory)
-                if os.path.exists(directory + '/b2fstati') \
-                        and os.path.basename(directory) != 'baserun':
-                    self.execute_tcsh_command_in_rundir(
-                        'setup_baserun_eirene_links', directory)
-                    logging.info("B2 and Eirene links set to baserun for "
+                if os.path.basename(directory) != 'baserun':
+                    if os.path.exists(directory + '/input.dat'):
+                        cmd =  'setup_baserun_eirene_links'
+                        self.execute_tcsh_command_in_rundir(cmd, directory)
+                        logging.info("B2 and Eirene links set to baserun for "
                                  + directory)
-
-
-
-            self.model.scanFileSystemThread.start()
+                    if os.path.exists(directory + '/b2fstati'):
+                        cmd = 'touch b2fstati\n'
+                        self.execute_tcsh_command_in_rundir(cmd, directory)
+            self.model.startThreads()  # rescan the model
 
 
     @pyqtSlot()

@@ -1,0 +1,23 @@
+#%Module1.0#####################################################################
+##
+## $name modulefile
+##
+set ver [lrange [split [ module-info name ] / ] 1 1 ]
+set name [lrange [split [ module-info name ] / ] 0 0 ]
+#set imas_home $::env(IMAS_HOME)
+set imas_home /work/imas
+set loading [module-info mode load]
+set desc [join [read [ open "$imas_home/etc/modulefiles/$name/.desc" ] ] ]
+proc ModulesHelp { } {
+puts stderr "\tThis module sets the environment for $name v$ver"
+}
+conflict $name
+module-whatis "$desc (v$ver)"
+
+setenv QTDIR $imas_home/opt/$name/$ver/qt/5.5.1
+
+prepend-path PATH $imas_home/opt/$name/$ver/bin:$::env(QTDIR)/bin
+prepend-path CPATH $imas_home/opt/$name/$ver/include:$::env(QTDIR)/include
+prepend-path LD_LIBRARY_PATH $imas_home/opt/$name/$ver/lib:$::env(QTDIR)/lib
+prepend-path PKG_CONFIG_PATH $imas_home/opt/$name/$ver/lib/pkgconfig:$::env(QTDIR)/lib/pkgconfig
+prepend-path MANPATH $imas_home/opt/$name/$ver/share/man

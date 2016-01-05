@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
+ <author>Leon Kos</author>
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="enabled">
@@ -9,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>594</width>
-    <height>325</height>
+    <width>612</width>
+    <height>304</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -23,8 +24,8 @@
    <string>SOLPS-ITER</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
+   <layout class="QGridLayout" name="gridLayout_8">
+    <item row="0" column="1">
      <widget class="QTabWidget" name="tabWidget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -33,7 +34,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -457,133 +458,166 @@ and starts the run</string>
        <attribute name="title">
         <string>&amp;Dashboard</string>
        </attribute>
-       <widget class="QPushButton" name="pushButton_9">
-        <property name="geometry">
-         <rect>
-          <x>80</x>
-          <y>200</y>
-          <width>71</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Plot</string>
-        </property>
-       </widget>
-       <widget class="Tcsh" name="tcsh">
-        <property name="geometry">
-         <rect>
-          <x>340</x>
-          <y>10</y>
-          <width>221</width>
-          <height>121</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>7</pointsize>
-         </font>
-        </property>
-        <property name="solpsTop" stdset="0">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton_10">
-        <property name="geometry">
-         <rect>
-          <x>480</x>
-          <y>140</y>
-          <width>80</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Run tcsh</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="lineEdit">
-        <property name="geometry">
-         <rect>
-          <x>340</x>
-          <y>140</y>
-          <width>131</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>itersubmit</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_7">
-        <property name="geometry">
-         <rect>
-          <x>340</x>
-          <y>160</y>
-          <width>221</width>
-          <height>41</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Please select current run in the Runs tab.</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="Gnuplot" name="gnuplot">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>321</width>
-          <height>181</height>
-         </rect>
-        </property>
-        <property name="runDir" stdset="0">
-         <string>/home/ITER/kosl/solps-iter/runs/AUG_16151_D/run1</string>
-        </property>
-        <property name="solpsPlotCommand">
-         <string>energy_analysis</string>
-        </property>
-       </widget>
-       <widget class="SolpsPlots" name="solpsplots">
-        <property name="geometry">
-         <rect>
-          <x>160</x>
-          <y>200</y>
-          <width>400</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="inputMethodHints">
-         <set>Qt::ImhNone</set>
-        </property>
-        <property name="currentIndex">
-         <number>128</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="Director" name="director">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>200</y>
-          <width>71</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Director for emiting selected run</string>
-        </property>
-        <property name="whatsThis">
-         <string>This widget receives a selected run and directs    it further in various ways depending on the Check state.   </string>
-        </property>
-        <property name="text">
-         <string>Director</string>
-        </property>
-       </widget>
+       <layout class="QGridLayout" name="gridLayout_9">
+        <item row="0" column="0" colspan="3">
+         <widget class="Tcsh" name="tcsh">
+          <property name="maximumSize">
+           <size>
+            <width>300</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>7</pointsize>
+           </font>
+          </property>
+          <property name="solpsTop" stdset="0">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3" rowspan="2">
+         <layout class="QGridLayout" name="gridLayout_10">
+          <item row="1" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="SolpsPlots" name="solpsplots">
+              <property name="inputMethodHints">
+               <set>Qt::ImhNone</set>
+              </property>
+              <property name="currentIndex">
+               <number>128</number>
+              </property>
+              <property name="frame">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_9">
+              <property name="maximumSize">
+               <size>
+                <width>100</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Plot</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="1">
+           <widget class="Gnuplot" name="gnuplot">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="runDir" stdset="0">
+             <string>/home/ITER/kosl/solps-iter/runs/AUG_16151_D/run1</string>
+            </property>
+            <property name="solpsPlotCommand">
+             <string>energy_analysis</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLineEdit" name="lineEdit">
+          <property name="maximumSize">
+           <size>
+            <width>202</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>tail run.log</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="pushButton_10">
+          <property name="text">
+           <string>Run tcsh</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="Director" name="director">
+          <property name="toolTip">
+           <string>Director for emiting selected run</string>
+          </property>
+          <property name="whatsThis">
+           <string>This widget receives a selected run and directs    it further in various ways depending on the Check state.   </string>
+          </property>
+          <property name="text">
+           <string>Director</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <property name="tristate">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" colspan="3">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Please select current run in the Runs tab.</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+       <zorder>label_7</zorder>
+       <zorder>director</zorder>
+       <zorder>gridLayoutWidget</zorder>
+       <zorder>gnuplot</zorder>
+       <zorder>tcsh</zorder>
+       <zorder>pushButton_10</zorder>
+       <zorder>lineEdit</zorder>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>View</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="SolpsInput" name="solpsview">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="tab_7">
+           <attribute name="title">
+            <string>run.log</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_10">
+           <attribute name="title">
+            <string>run.log.gz</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_8">
+           <attribute name="title">
+            <string>b2fstatei</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_9">
+           <attribute name="title">
+            <string>b2fstate</string>
+           </attribute>
+          </widget>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_5">
        <attribute name="title">
@@ -657,7 +691,7 @@ and starts the run</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>594</width>
+     <width>612</width>
      <height>20</height>
     </rect>
    </property>
@@ -814,7 +848,7 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>171</x>
+     <x>161</x>
      <y>276</y>
     </hint>
     <hint type="destinationlabel">
@@ -846,8 +880,8 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>405</x>
-     <y>274</y>
+     <x>401</x>
+     <y>276</y>
     </hint>
     <hint type="destinationlabel">
      <x>216</x>
@@ -919,5 +953,54 @@ and starts the run</string>
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>solpsview</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>56</x>
+     <y>266</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>296</x>
+     <y>162</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tabWidget</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>solpsview</receiver>
+   <slot>view_files(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>409</x>
+     <y>45</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>485</x>
+     <y>100</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <designerdata>
+  <property name="gridDeltaX">
+   <number>10</number>
+  </property>
+  <property name="gridDeltaY">
+   <number>10</number>
+  </property>
+  <property name="gridSnapX">
+   <bool>true</bool>
+  </property>
+  <property name="gridSnapY">
+   <bool>true</bool>
+  </property>
+  <property name="gridVisible">
+   <bool>true</bool>
+  </property>
+ </designerdata>
 </ui>

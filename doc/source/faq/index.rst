@@ -1,4 +1,4 @@
-. _faq-index:
+.. _faq-index:
 
 *****************************
   Frequently Asked Questions
