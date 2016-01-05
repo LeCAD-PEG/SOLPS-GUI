@@ -38,7 +38,8 @@ class SolpsInput(QTabWidget):
             #print(i, tab_text)
             #self.tabBar = QTabBar()
             #self.tabBar.moveTab(i, int(tab_text))
-            self.tabBar().moveTab(i, int(tab_text))
+            if tab_text != "":
+                self.tabBar().moveTab(i, int(tab_text))
             #if i != int(tab_text):
              #   self.removeTab(i)
                 #self.addTab(int(tab_text))
