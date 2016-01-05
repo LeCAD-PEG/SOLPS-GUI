@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 """
-
-A PyQt custom widget with embedded SOLPS configuration editor.
-
+A PyQt custom widget with embedded SOLPS configuration editor and viewer
+for files if tabs with filenames are added to it and then ``view_files``
+is called though selected tab index signal.
 """
 
 from PyQt5.QtCore import (QSize, pyqtProperty,  pyqtSignal, pyqtSlot, QSettings)
@@ -31,25 +31,21 @@ class SolpsInput(QTabWidget):
         self.currently_viewing = None
         self.editors = dict()
 
-    def read_tab_positions(self):
-        # get Tab settings
+    def restore_tab_positions(self):
+        """ Get tabs ordering from settings and restore the to saved position.
+        """
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("SolpsInputTabPosition")
         for i in range(self.count()):
             settings.value("%s" % self.tabText(i), i)
             tab_text = settings.value("%s" % self.tabText(i), "")
-            #print(i, tab_text)
-            #self.tabBar = QTabBar()
-            #self.tabBar.moveTab(i, int(tab_text))
             if tab_text != "":
                 self.tabBar().moveTab(i, int(tab_text))
-            #if i != int(tab_text):
-             #   self.removeTab(i)
-                #self.addTab(int(tab_text))
-
         settings.endGroup()
 
-    def save_tabs_position(self):
+    def store_tabs_position(self):
+        """ Tabs arrangement is saved into settings.
+        """
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("SolpsInputTabPosition")
         for i in range(self.count()):
@@ -58,6 +54,9 @@ class SolpsInput(QTabWidget):
 
     @pyqtSlot()
     def setup_input_tabs(self):
+        """ Setups tabs for input and restores last saved position of the
+            tabs from the settings.
+        """
         font = QFont()
         font.setFamily('Monospace')
         for filename, tooltip in solps_input_files:
@@ -68,6 +67,7 @@ class SolpsInput(QTabWidget):
             tab_index = self.addTab(plainTextEdit, filename)
             self.setTabToolTip(tab_index, tooltip)
             self.editors[filename] = plainTextEdit
+        self.restore_tab_positions()
 
     @pyqtSlot(int)
     def view_files(self, tab_index):
@@ -139,7 +139,6 @@ class SolpsInput(QTabWidget):
         if len(self.editors) == 0:  # Setup tabs on the fly
             self.setup_tabs()
 
-
         for filename in self.editors:
             plainTextEdit = self.editors[filename]
             if not os.access(self.rundir, os.W_OK):
@@ -161,13 +160,14 @@ class SolpsInput(QTabWidget):
                     msg = "File cannot be saved in " + self.rundir
                 plainTextEdit.setPlaceholderText(msg)
 
-
-
     @pyqtSlot()
     def save_modified_input_files(self):
-        """ Saves modified input files.
+        """ Saves modified input files when Input tab losts its focus.
+            At the same time it saves arrangement of the tabs that can be
+            freely moved by the user.
         """
         if self.rundir:
+            self.store_tabs_position()
             for filename in self.editors:
                 plainTextEdit = self.editors[filename]
                 if plainTextEdit.document().isModified():
@@ -182,7 +182,7 @@ class SolpsInput(QTabWidget):
     if __name__ == "__main__":
         def closeEvent(self, event):
             self.save_modified_input_files()
-            self.save_tabs_position()
+            self.store_tabs_position()
             super(SolpsInput, self).closeEvent(event)
 
     def sizeHint(self):
@@ -270,10 +270,7 @@ if __name__ == "__main__":
     window.setRundir(os.path.expanduser("~")+
                      '/solps-iter/runs/AUG_16151_D/run1')
     window.read_input_files()
-    window.read_tab_positions()
-    #window.read_input_files()
+    #window.read_input_files()  # should be resistant to multiple calls
     window.show()
 
     sys.exit(app.exec_())
-
-
