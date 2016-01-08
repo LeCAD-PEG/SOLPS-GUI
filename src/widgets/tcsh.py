@@ -159,11 +159,14 @@ class Tcsh(QPlainTextEdit):
                     + '\nsource setup.csh\necho TCSH READY\n' \
                     + 'cd ' + self.rundir + '\n'
 
-        if self.tcsh_command and self.rundir:
-            cmd += self.tcsh_command + '\n'
+        if self.rundir:
+            if self.tcsh_command:
+                cmd += self.tcsh_command + '\n'
+            else:
+                logging.warning("Empty command for TCSH")
             self.tcsh.write(bytearray(cmd, 'utf8'))
         else:
-            logging.warning("Empty command or no run directory for TCSH")
+            logging.warning("No run directory for TCSH")
 
 
 
