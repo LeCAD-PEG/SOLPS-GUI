@@ -24,14 +24,20 @@ case $(hostname) in
         MAKE_JOBS=${MAKE_JOBS:-8}
 	USE_QT_XCB="NO"
 	BUILD_XCB="YES"
+	BUILD_XLIB="YES"
         QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:--no-sql-mysql \
-                        -skip qtcanvas3d -skip qtquick1}
+	                -D GLX_GLXEXT_LEGACY \
+                        -D _X_INLINE=inline \
+	                -D FC_WEIGHT_EXTRABLACK=215 \
+                        -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK \
+                        -skip qtcanvas3d }
 	;;
 esac
 
-MAKE_JOBS=${MAKE_JOBS:-4} # safe default nowadays
+MAKE_JOBS=${MAKE_JOBS:-4}    # Safe default nowadays
 USE_QT_XCB=${USE_QT_XCB:-NO} # Use -qt-xcb for all except RHEL5 if possible
-BUILD_XCB=${BUILD_XCB:-NO} # YES if having problems with -qt-xcb
+BUILD_XCB=${BUILD_XCB:-NO}   # YES if having problems with -qt-xcb
+BUILD_XLIB=${BUILD_XLIB:-NO} # If having libX11-xcb < 1.3.2
 
 BUILDROOT=${PWD}
 BUILD_DIR=${BUILDROOT}/build
@@ -90,47 +96,50 @@ PYTHON="${STAGING_DIR}/bin/python${PYTHON_MAINVERSION}"
 # For Qt5.x build problems on RHEL5 see
 # https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-rhel5-linux-centos-5-7
 # See http://kate-editor.org/2014/12/22/qt-5-4-on-red-hat-enterprise-5/
-if [ "${BUILD_XCB}" = "YES" ]
-    then
-    install -d  ${BUILD_DIR}/xcb
-    cd ${BUILD_DIR}/xcb
-    for url in \
-http://xmlsoft.org/sources/libxml2-2.9.3.tar.gz \
-http://xorg.freedesktop.org/archive/individual/proto/xproto-7.0.28.tar.gz \
-http://xcb.freedesktop.org/dist/xcb-proto-1.11.tar.gz \
-http://xcb.freedesktop.org/dist/libpthread-stubs-0.3.tar.gz \
-http://xcb.freedesktop.org/dist/libxcb-1.11.1.tar.gz \
-http://xcb.freedesktop.org/dist/xcb-util-0.4.0.tar.gz \
-http://xcb.freedesktop.org/dist/xcb-util-image-0.4.0.tar.gz \
-http://xcb.freedesktop.org/dist/xcb-util-keysyms-0.4.0.tar.gz \
-http://xcb.freedesktop.org/dist/xcb-util-wm-0.4.1.tar.gz \
-http://xcb.freedesktop.org/dist/xcb-util-renderutil-0.3.9.tar.gz \
-http://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.2.tar.gz \
-http://www.x.org/releases/X11R7.7/src/lib/libX11-1.5.0.tar.gz \
-   ; do
-      file=${url##*/}
-      test -f ${file} || wget ${url}
-      pkgdir=${file%.*.*}
-      test -e ${pkgdir}/.built && continue
-      rm -rf ${pkgdir}
-      tar xf ${file}
-      cd ${pkgdir}
-      if [ "${pkgdir%%-*}" = "libxml2" ]; then configopt="--without-python"
-      else configopt=
-      fi
-      PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH} \
-      PYTHON=${PYTHON} ./configure --prefix=${STAGING_DIR} ${configopt}
-      make -j ${MAKE_JOBS}
-      make install
-      touch .built
-      cd ..
-    done
-    cd ${BUILDROOT}
-    XCB_INCLUDES="-I${STAGING_DIR}/include -I${STAGING_DIR}/include/libxml2"
-    XCB_LIBS="-L${STAGING_DIR}/lib"
-    XCB_FLAGS="${XCB_FLAGS} ${XCB_INCLUDES} ${XCB_LIBS}"
+
+URLS="http://xmlsoft.org/sources/libxml2-2.9.3.tar.gz"
+
+if [ "${BUILD_XCB}" = "YES" ]; then
+  URLS="${URLS} \
+  http://xorg.freedesktop.org/archive/individual/proto/xproto-7.0.28.tar.gz\
+  http://xcb.freedesktop.org/dist/xcb-proto-1.11.tar.gz \
+  http://xcb.freedesktop.org/dist/libpthread-stubs-0.3.tar.gz \
+  http://xcb.freedesktop.org/dist/libxcb-1.11.1.tar.gz \
+  http://xcb.freedesktop.org/dist/xcb-util-0.4.0.tar.gz \
+  http://xcb.freedesktop.org/dist/xcb-util-image-0.4.0.tar.gz \
+  http://xcb.freedesktop.org/dist/xcb-util-keysyms-0.4.0.tar.gz \
+  http://xcb.freedesktop.org/dist/xcb-util-wm-0.4.1.tar.gz \
+  http://xcb.freedesktop.org/dist/xcb-util-renderutil-0.3.9.tar.gz \
+  http://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.2.tar.gz"
+  XCB_INCLUDES="-I${STAGING_DIR}/include -I${STAGING_DIR}/include/libxml2"
+  XCB_LIBS="-L${STAGING_DIR}/lib"
+  XCB_FLAGS="${XCB_FLAGS} ${XCB_INCLUDES} ${XCB_LIBS}"
 fi
 
+if [ "${BUILD_XLIB}" = "YES" ] ; then 
+  URLS="${URLS} http://www.x.org/releases/X11R7.7/src/lib/libX11-1.5.0.tar.gz"
+fi
+
+install -d  ${BUILD_DIR}/libs
+cd ${BUILD_DIR}/libs
+for url in ${URLS}; do
+  file=${url##*/}
+  test -f ${DOWNLOAD_DIR}/${file} || wget -O ${DOWNLOAD_DIR}/${file} ${url}
+  pkgdir=${file%.*.*}
+  test -e ${pkgdir}/.built && continue
+  rm -rf ${pkgdir}
+  tar xf ${DOWNLOAD_DIR}/${file}
+  cd ${pkgdir}
+  if [ "${pkgdir%%-*}" = "libxml2" ]; then configopt="--without-python"
+  else configopt=
+  fi
+  PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH} \
+  PYTHON=${PYTHON} ./configure --prefix=${STAGING_DIR} ${configopt}
+  make -j ${MAKE_JOBS}
+  make install
+  touch .built
+  cd ..
+done
 
 ## Install QT
 
@@ -146,7 +155,7 @@ if [ ! -f ${DOWNLOAD_DIR}/${QT_TAR} ]; then
   wget -P ${DOWNLOAD_DIR} ${QT_DOWNLOAD}
 fi
 
-export LD_LIBRARY_PATH="${STAGING_DIR}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export LD_RUN_PATH="${STAGING_DIR}/lib${LD_RUN_PATH:+:$LD_RUN_PATH}"
 
 if [ ! -e ${QT_SOURCE_DIR}/.configured ]; then # Configuring Qt
   rm -rf ${QT_SOURCE_DIR} ${STAGING_QT} 
@@ -158,7 +167,7 @@ if [ ! -e ${QT_SOURCE_DIR}/.configured ]; then # Configuring Qt
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-openssl.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-no-offscreen.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qglxintegration-glx-context.patch
+  patch -p 1 -d ${QT_SOURCE_DIR}<${PATCH_DIR}/qglxintegration-glx-context.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qxcbconnection.patch
   sed -i -e '/auto/d' qtdeclarative/tests/tests.pro \
                       qtmultimedia/tests/tests.pro \
