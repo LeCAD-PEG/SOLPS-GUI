@@ -1,10 +1,13 @@
---- qt-everywhere-opensource-src-5.5.1/qtbase/src/plugins/platforms/xcb/qxcbconnection.cpp.orig	2015-10-21 14:14:01.000000000 +0200
-+++ qt-everywhere-opensource-src-5.5.1/qtbase/src/plugins/platforms/xcb/qxcbconnection.cpp	2015-10-21 14:14:41.000000000 +0200
-@@ -77,7 +77,7 @@
+--- qt-everywhere-opensource-src-5.5.1/qtbase/src/plugins/platforms/xcb/qxcbconnection.cpp.orig	2016-01-26 11:18:15.424704000 +0100
++++ qt-everywhere-opensource-src-5.5.1/qtbase/src/plugins/platforms/xcb/qxcbconnection.cpp	2016-01-26 11:20:38.730228405 +0100
+@@ -77,7 +77,10 @@
  #endif
  
  #if defined(Q_CC_GNU) && defined(Q_OF_ELF)
 -static xcb_generic_event_t *local_xcb_poll_for_queued_event(xcb_connection_t *c)
++#  if __GNUC_MINOR__ != 1
++   static 
++#  endif
 +xcb_generic_event_t *local_xcb_poll_for_queued_event(xcb_connection_t *c)
      __attribute__((weakref("xcb_poll_for_queued_event")));
  
