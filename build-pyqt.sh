@@ -21,16 +21,12 @@ case $(hostname) in
                         -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK}
 	;;
   g0[1234]*) # SLES 11.4 WPCD Gateway (incompatible XCB, Xlib and GL libraries)
-        MAKE_JOBS=${MAKE_JOBS:-8}
+        MAKE_JOBS=${MAKE_JOBS:-16}
 	USE_QT_XCB="NO"
 	BUILD_XCB="YES"
 	BUILD_XLIB="YES"
-        QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:--no-sql-mysql \
-	                -D GLX_GLXEXT_LEGACY \
-                        -D _X_INLINE=inline \
-	                -D FC_WEIGHT_EXTRABLACK=215 \
-                        -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK \
-                        -skip qtcanvas3d }
+        QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:--no-sql-mysql -no-opengl \
+			                 -skip qtcanvas3d -skip qtquick1}
 	;;
 esac
 
@@ -43,8 +39,8 @@ BUILDROOT=${PWD}
 BUILD_DIR=${BUILDROOT}/build
 PATCH_DIR=${BUILDROOT}/src/patches
 DOWNLOAD_DIR=${BUILDROOT}/download
-STAGING_DIR=${BUILDROOT}/staging
-STAGING_QT=${STAGING_DIR}/qt/${QT_VERSION}
+STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
+STAGING_QT=${STAGING_QT:-${STAGING_DIR}/qt/${QT_VERSION}}
 
 set -e
 
@@ -85,8 +81,8 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   touch ${PYTHON_SRC_DIR}/.built
 fi
 
-XCB_FLAGS="-xcb -xcb-xlib" # Mandatory default for Linux
-if [ "${USE_QT_XCB}" = "YES" ]; then # build QT with QT-prvided XCB libs
+XCB_FLAGS="-xcb -no-xcb-xlib" # XCB is mandatory for Linux 
+if [ "${USE_QT_XCB}" = "YES" ]; then # build QT with QT-provided XCB libs
   XCB_FLAGS="${XCB_FLAGS} -qt-xcb"
 fi
 
@@ -155,7 +151,6 @@ if [ ! -f ${DOWNLOAD_DIR}/${QT_TAR} ]; then
   wget -P ${DOWNLOAD_DIR} ${QT_DOWNLOAD}
 fi
 
-export LD_RUN_PATH="${STAGING_DIR}/lib${LD_RUN_PATH:+:$LD_RUN_PATH}"
 
 if [ ! -e ${QT_SOURCE_DIR}/.configured ]; then # Configuring Qt
   rm -rf ${QT_SOURCE_DIR} ${STAGING_QT} 
