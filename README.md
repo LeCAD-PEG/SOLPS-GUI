@@ -5,8 +5,15 @@ SOLPS-ITER GUI
 
 Prepare Python 3, PyQt and ParaView with 
 
-    MAKE_JOBS=4 ./build-pyqt.sh 
-    MAKE_JOBS=4 ./build-paraview.sh
+    ./build-pyqt.sh 
+    ./build-paraview.sh
+
+One can modify the following environment variables to change
+default build procedure:
+
+ - MAKE_JOBS  number of parallel jobs to make
+ - STAGING_PREFIX installation destination
+ - USE_QT_XCB for newer distros lacking full XCB support 
 
 Source the setupenv.[c]sh for locally built PyQt with
 
@@ -31,7 +38,6 @@ or
 ### CentOS 5.x and xcb
 Qt5.x requires XCB library for X11 rendering instead of Xlib.
 On RHEL5 XCB is built from sources and put into staging/lib. 
-Newer distros (e.g. RHEL6 on hpc-app1.iter.org) provide XCB.
 
 ### Documentation building with sphinx
 Due to the problems with the installed OpenSSL libraries the following
@@ -79,3 +85,8 @@ clearing the preferences.
     rm ${HOME}/Library/Preferences/com.iter.solps-gui.plist
     killall -u $USER cfprefsd 
 
+## Building on RHEL6 clusters
+Some RHEL7 clusters lack full XCB devel support ant for that we recommend the 
+following option to building pyqt:
+
+    USE_QT_XCB=YES ./build-pyqt.sh
