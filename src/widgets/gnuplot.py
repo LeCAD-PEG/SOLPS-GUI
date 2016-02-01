@@ -169,10 +169,10 @@ class Gnuplot(QLabel):
 
         while(solps_top):
             path = solps_top + '/setup.csh'
-            if os.path.exists(path):
+            if os.path.exists(path) and os.access(path, os.R_OK):
                 return solps_top
             path = solps_top + '/SOLPSTOP'
-            if os.path.exists(path):
+            if os.path.exists(path) and os.access(path, os.R_OK):
                 with open(path) as file:
                     return file.readline()
             solps_top = solps_top.rsplit('/', 1)[0]
@@ -192,9 +192,12 @@ class Gnuplot(QLabel):
         rundir_solps_top = self.find_solps_top(self.rundir)
         if not rundir_solps_top:
             if not self.rundir:
-                logging.error("Empty Gnuplot runDir! Bailing out.")
+                msg = "Empty Gnuplot runDir! Bailing out."
+                logging.error(msg)
             else:
-                logging.error("Could not find SOLPSTOP for " + self.rundir)
+                msg = "Could not find readable SOLPSTOP for run"
+                logging.error(msg)
+            self.setText(msg)
             return
 
         if rundir_solps_top != self.solps_top:  # we have new SOLPSTOP
@@ -208,7 +211,7 @@ class Gnuplot(QLabel):
             env.insert('GNUPLOT_BATCH', 'true')
             self.tcsh.setProcessEnvironment(env)
             self.tcsh.start(self.tcsh_path, ['-l'])
-            logging.info("Guplot TCSH started in " + self.solps_top)
+            logging.info("Gnuplot TCSH started in " + self.solps_top)
             cmd += "cd " + self.solps_top \
                   + '\nsource setup.csh\necho TCSH READY\n'
         if self.solps_plot_command and self.rundir:

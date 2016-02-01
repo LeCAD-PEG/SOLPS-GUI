@@ -1420,7 +1420,7 @@ class SOLPS_MainWindow(QMainWindow):
             if os.path.exists(path):
                 return solps_top
             path = solps_top + '/SOLPSTOP'
-            if os.path.exists(path):
+            if os.path.exists(path) and os.access(path, os.R_OK):
                 with open(path) as file:
                     return file.readline()
             solps_top = solps_top.rsplit('/', 1)[0]
