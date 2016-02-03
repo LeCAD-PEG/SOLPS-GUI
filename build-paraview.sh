@@ -1,31 +1,30 @@
 #!/bin/sh -x
 
-PARAVIEW_VERSION=4.4.0
+PARAVIEW_VERSION=5.0.0
 QT_VERSION=4.8.7
 
 case $(hostname) in
   *.iter.org) 
 	module use /work/imas/etc/modulefiles \
 	    /work/imas/opt/EasyBuild/modules/all
-	module load goolf binutils cmake python/2.7/10
-	PYTHON_LIBRARY=/work/imas/opt/python/2.7/10/lib/libpython2.7.a
-	PYTHON_INCLUDE_DIR=/work/imas/opt/python/2.7/10/include/python2.7
-	unset CC CXX # we don't want ICC 11.1 to be selected
-	MAKE_JOBS=${MAKE_JOBS:-4}
+	module load cmake GCC/4.8.3 binutils 
+	export CC=gcc
+	export CXX=g++
+	MAKE_JOBS=${MAKE_JOBS:-8}
 	;;
   *)
-	MAKE_JOBS=${MAKE_JOBS:-8}
 	;;
 esac
 
+MAKE_JOBS=${MAKE_JOBS:-4}
 
 BUILDROOT=${PWD}
 BUILD_DIR=${BUILDROOT}/build
-DOWNLOAD_DIR=${BUILDROOT}/download
-STAGING_DIR=${BUILDROOT}/staging
+DOWNLOAD_DIR=${DOWNLOAD_DIR:-${BUILDROOT}/download}
+STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 #STAGING_DIR=/work/imas/project
-STAGING_QT=${STAGING_DIR}/qt/${QT_VERSION}
-STAGING_PARAVIEW=${STAGING_DIR}/paraview/${PARAVIEW_VERSION}
+STAGING_QT=${STAGING_QT:-${STAGING_DIR}/qt/${QT_VERSION}}
+STAGING_PARAVIEW=${STAGING_PARAVIEW:-$STAGING_DIR/paraview/$PARAVIEW_VERSION}
 
 #Initialize directories
 
@@ -85,21 +84,16 @@ cd ${PARAVIEW_BUILD}
 install -d ${STAGING_PARAVIEW}
 cmake -DCMAKE_BUILD_TYPE:STRING=Release \
                 -DBUILD_SHARED_LIBS:BOOL=ON  \
-                -DVTK_USE_RPATH:BOOL=OFF \
                 -DVTK_USE_TK:BOOL=OFF \
-                -DPARAVIEW_INSTALL_DEVELOPMENT:BOOL=ON \
                 -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
                 -DBUILD_TESTING:BOOL=OFF \
-                -DPARAVIEW_ENABLE_PYTHON:BOOL=ON \
-                -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY} \
-                -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR} \
-                -DPARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES:BOOL=OFF \
+                -DPARAVIEW_ENABLE_PYTHON:BOOL=OFF \
                 -DPARAVIEW_USE_MPI:BOOL=OFF \
                 -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
                 -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_QT}/bin/qmake \
                 -DCMAKE_EXE_LINKER_FLAGS:String="-L${STAGING_QT}/lib" \
                 -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
-                -DPQWIDGETS_DISABLE_QTWEBKIT:BOOL=ON \
-		-DVTK_QT_USE_WEBKIT:BOOL=OFF  ${PARAVIEW_SOURCE_DIR}
+		 ${PARAVIEW_SOURCE_DIR}
 make -j ${MAKE_JOBS}
 make install
+touch .built
