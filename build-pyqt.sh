@@ -76,8 +76,8 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   make -j ${MAKE_JOBS}
   LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
   make install
-  LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
-  ${STAGING_DIR}/bin/pip3 install sphinx
+  PYTHONPATH= LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
+  ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade sphinx
   touch ${PYTHON_SRC_DIR}/.built
 fi
 
