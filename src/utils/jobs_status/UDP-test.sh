@@ -6,12 +6,12 @@
 # It should print "Hello from compute node". Otherwise may wait forever.
 #
 
-PORT=44354 # non-privileded port numbers are from 1024 to 65535
+PORT=${PORT:-44352} # non-privileded port numbers are from 1024 to 65535
 LOGIN_NODE_IP=$(hostname -i)
 SYSTEM_NC=$(which nc)
 
 cp  ${SYSTEM_NC} ${HOME}
-${HOME}/nc -lvu ${LOGIN_NODE_IP} ${PORT} & 
+${HOME}/nc -lvuw0 ${LOGIN_NODE_IP} ${PORT} & 
 echo "Hello from login node" | ${HOME}/nc -uvw0 ${LOGIN_NODE_IP} ${PORT}
 sleep 5
 
@@ -23,5 +23,4 @@ echo "You should receive hello on ${LOGIN_NODE_IP} ${PORT}"
 EOF
 
 echo "Waiting for UDP message from compute node..."
-${HOME}/nc -lvu ${LOGIN_NODE_IP} ${PORT}
-
+${HOME}/nc -lvuw0 ${LOGIN_NODE_IP} ${PORT}
