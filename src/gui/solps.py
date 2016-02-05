@@ -1031,7 +1031,7 @@ class SOLPS_MainWindow(QMainWindow):
             sys.exit(2)
 
 
-        self.main_tcsh = QProcess()  # for job sumbission and scripting
+        self.main_tcsh = QProcess()  # for job submission and scripting
         self.solps_top = None  # Current active ${SOLPSTOP} for tcsh
 
         self.previous_tab_index = None   # For auto saving of Edit tab

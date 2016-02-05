@@ -25,13 +25,15 @@ or
 
 ## Running UI
 
-    $ src/gui/solps.py
+    $ src/gui/solps.py # or simply type "solps" alias
 
 ## Buiding documentation
 
     $ cd doc
-    $ make html
-    $ make latexpdf PAPER=a4
+    $ make html # for solps_doc alias within browser
+    $ make qthelp # for solps_help alias with assistant
+    $ qcollectiongenerator build/qthelp/SOLPSGUI.qhcp
+    $ make latexpdf PAPER=a4 # for PDF with TexLive
 
 
 ## ITER cluster specifics
@@ -41,7 +43,7 @@ On RHEL5 XCB is built from sources and put into staging/lib.
 
 ### Documentation building with sphinx
 Due to the problems with the installed OpenSSL libraries the following
-preloads arerequired to install sphinx (or other PyPI packages):
+preloads are required to install sphinx (or other PyPI packages):
 
     LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
     pip3 install sphinx
@@ -86,7 +88,7 @@ clearing the preferences.
     killall -u $USER cfprefsd 
 
 ## Building on RHEL6 clusters
-Some RHEL7 clusters lack full XCB devel support ant for that we recommend the 
+Some RHEL7 clusters lack full XCB devel support and for that we recommend the 
 following option to building pyqt:
 
     USE_QT_XCB=YES ./build-pyqt.sh

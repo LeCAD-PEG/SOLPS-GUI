@@ -265,7 +265,7 @@
      </rect>
     </property>
     <property name="toolTip">
-     <string>-z will be added to sumbission script</string>
+     <string>-z will be added to submission script</string>
     </property>
     <property name="text">
      <string>Compress log</string>
@@ -297,7 +297,7 @@
      </rect>
     </property>
     <property name="toolTip">
-     <string>-d &lt;debugger&gt; will be added to sumbission script</string>
+     <string>-d &lt;debugger&gt; will be added to submission script</string>
     </property>
     <property name="text">
      <string>Use debugger</string>

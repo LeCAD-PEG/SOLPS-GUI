@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>612</width>
-    <height>304</height>
+    <width>950</width>
+    <height>491</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -34,7 +34,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -110,7 +110,7 @@
         </item>
         <item row="0" column="1" colspan="2">
          <widget class="QComboBox" name="comboBox">
-          <property name="currentText">
+          <property name="currentText" stdset="0">
            <string>ITER</string>
           </property>
           <item>
@@ -387,7 +387,7 @@ should eventually stop the run.</string>
            <bool>false</bool>
           </property>
           <property name="toolTip">
-           <string>Copies b2fstate to b2fstatei
+           <string>Copies b2fstate to b2fstati
 and starts the run</string>
           </property>
           <property name="text">
@@ -459,27 +459,6 @@ and starts the run</string>
         <string>&amp;Dashboard</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_9">
-        <item row="0" column="0" colspan="3">
-         <widget class="Tcsh" name="tcsh">
-          <property name="maximumSize">
-           <size>
-            <width>300</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>7</pointsize>
-           </font>
-          </property>
-          <property name="tcshCommand">
-           <string>b2fstate_OK</string>
-          </property>
-          <property name="solpsTop" stdset="0">
-           <string/>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="3" rowspan="2">
          <layout class="QGridLayout" name="gridLayout_10">
           <item row="1" column="1">
@@ -490,7 +469,7 @@ and starts the run</string>
                <set>Qt::ImhNone</set>
               </property>
               <property name="currentIndex">
-               <number>128</number>
+               <number>-1</number>
               </property>
               <property name="frame">
                <bool>false</bool>
@@ -523,30 +502,20 @@ and starts the run</string>
             <property name="runDir" stdset="0">
              <string>/home/ITER/kosl/solps-iter/runs/AUG_16151_D/run1</string>
             </property>
-            <property name="solpsPlotCommand">
+            <property name="solpsPlotCommand" stdset="0">
              <string>energy_analysis</string>
             </property>
            </widget>
           </item>
          </layout>
         </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QLineEdit" name="lineEdit">
-          <property name="maximumSize">
-           <size>
-            <width>202</width>
-            <height>16777215</height>
-           </size>
-          </property>
+        <item row="2" column="1" colspan="3">
+         <widget class="QLabel" name="label_7">
           <property name="text">
-           <string>b2fstate_OK</string>
+           <string>Please select current run in the Runs tab.</string>
           </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QPushButton" name="pushButton_10">
-          <property name="text">
-           <string>Run tcsh</string>
+          <property name="wordWrap">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -569,22 +538,48 @@ and starts the run</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1" colspan="3">
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>Please select current run in the Runs tab.</string>
+        <item row="0" column="0" colspan="3">
+         <widget class="Tcsh" name="tcsh">
+          <property name="maximumSize">
+           <size>
+            <width>300</width>
+            <height>16777215</height>
+           </size>
           </property>
-          <property name="wordWrap">
-           <bool>true</bool>
+          <property name="font">
+           <font>
+            <pointsize>7</pointsize>
+           </font>
+          </property>
+          <property name="tcshCommand" stdset="0">
+           <string>b2fstate_OK</string>
+          </property>
+          <property name="solpsTop" stdset="0">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="pushButton_10">
+          <property name="text">
+           <string>Run tcsh</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLineEdit" name="lineEdit">
+          <property name="maximumSize">
+           <size>
+            <width>202</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>b2fstate_OK</string>
           </property>
          </widget>
         </item>
        </layout>
-       <zorder>label_7</zorder>
-       <zorder>director</zorder>
-       <zorder>tcsh</zorder>
-       <zorder>pushButton_10</zorder>
-       <zorder>lineEdit</zorder>
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
@@ -596,6 +591,11 @@ and starts the run</string>
           <property name="currentIndex">
            <number>0</number>
           </property>
+          <widget class="QWidget" name="tab_14">
+           <attribute name="title">
+            <string>b2mn.prt</string>
+           </attribute>
+          </widget>
           <widget class="QWidget" name="tab_7">
            <attribute name="title">
             <string>run.log</string>
@@ -606,9 +606,24 @@ and starts the run</string>
             <string>run.log.gz</string>
            </attribute>
           </widget>
+          <widget class="QWidget" name="tab_11">
+           <attribute name="title">
+            <string>b2fgmtry</string>
+           </attribute>
+          </widget>
           <widget class="QWidget" name="tab_8">
            <attribute name="title">
             <string>b2fstati</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_13">
+           <attribute name="title">
+            <string>b2fpardf</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_12">
+           <attribute name="title">
+            <string>b2frates</string>
            </attribute>
           </widget>
           <widget class="QWidget" name="tab_9">
@@ -675,7 +690,7 @@ and starts the run</string>
           <property name="readOnly">
            <bool>true</bool>
           </property>
-          <property name="placeholderText">
+          <property name="placeholderText" stdset="0">
            <string notr="true"/>
           </property>
          </widget>
@@ -692,8 +707,8 @@ and starts the run</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>612</width>
-     <height>20</height>
+     <width>950</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -764,6 +779,7 @@ and starts the run</string>
    <class>SolpsInput</class>
    <extends>QTabWidget</extends>
    <header>solpsinput</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>SolpsPlots</class>
