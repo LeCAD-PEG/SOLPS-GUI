@@ -17,7 +17,7 @@ Changing the style::
 
     $ src/gui/solps.py -style windows
 
-Other styles can be dependend on the platform availability at the time of
+Other styles can be dependent on the platform availability at the time of
 compilation:
 
  * motif
@@ -37,5 +37,5 @@ where gnome.qss specifies
       font: 12px;
     }
 
-Further details on styleshets are explainded in
+Further details on stylesheets are explained in
 http://doc.qt.io/qt-5.5/stylesheet.html
