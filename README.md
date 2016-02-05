@@ -32,6 +32,7 @@ or
     $ cd doc
     $ make html # for solps_doc alias within browser
     $ make qthelp # for solps_help alias with assistant
+    $ qcollectiongenerator build/qthelp/SOLPSGUI.qhcp
     $ make latexpdf PAPER=a4 # for PDF with TexLive
 
 
