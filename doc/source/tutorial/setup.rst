@@ -63,7 +63,7 @@ Submission scripts
 ==================
 
 If submission scripts are not yet available or adapted for running on
-target cluster one may revise already available scriptes. Basic
+target cluster one may revise already available scripts. Basic
 ``localsubmit`` may be copied from ``solps-gui/src/examples` to
 ``solps-iter/scripts`` from home directory with::
 

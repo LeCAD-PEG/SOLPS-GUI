@@ -7,7 +7,7 @@
 Designing Dashboard
 ===================
 
-With this tutorial we'll show the ease of graphical programing of the SOLPS-GUI
+With this tutorial we'll show the ease of graphical programming of the SOLPS-GUI
 Dashboard with a set of custom PyQt widgets and standard Qt widgets.
 
 We will start from existing user SOLPS-GUI interface description (UI) saved
@@ -30,7 +30,7 @@ the *Dashboard* tab.
 
 On the left widget box should appear. When folding nearly all of the Qt
 widget groups *SOLPS* widget-group should appear at the bottom. These are
-custom widgets that can were created with built-in "intelligence" for easy
+custom widgets that were created with built-in "intelligence" for easy
 creation.
 
 Using custom UI
@@ -90,8 +90,8 @@ design cycle.
 
   6. Now we just need to redistribute the signals and we're done. For that
      we'll use graphical signal editor that is started by pressing :kbd:`F4`
-     or by :menuselection:`File --> Edit Signals Slots` . If you hoover over
-     the widgets the get highligted red. Click ad drag the arrow of the signal
+     or by :menuselection:`File --> Edit Signals Slots` . If you hover over
+     the widgets the get highligted red. Click and drag the arrow of the signal
      from the push button to the *gnuplot* widget. Dialog window with the
      possible signals/slots will open.
 
