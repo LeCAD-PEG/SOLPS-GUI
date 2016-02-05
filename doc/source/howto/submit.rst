@@ -17,7 +17,7 @@ The following SOLPS-ITER environments are available as of December 2015:
  * ASIPP, CCFE,  default, ENEA, FZJ, GA, IFERC, IN-DA, IPP, IPR, ITER,
    ITM, JET, KEIO, KSTAR, LEUVEN, ORNL, PPPL, SWIP, UNKNOWN WM
 
-Different **job sumbission** methods (:abbr:`LSF (Load Sharing Facility)`,
+Different **job submission** methods (:abbr:`LSF (Load Sharing Facility)`,
 :abbr:`SGE (Son of Grid Engine)`, PBS, TORQUE, ...), are available depending
 on the cluster where the code is being run.
 

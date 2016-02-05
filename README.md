@@ -43,7 +43,7 @@ On RHEL5 XCB is built from sources and put into staging/lib.
 
 ### Documentation building with sphinx
 Due to the problems with the installed OpenSSL libraries the following
-preloads arerequired to install sphinx (or other PyPI packages):
+preloads are required to install sphinx (or other PyPI packages):
 
     LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
     pip3 install sphinx
@@ -88,7 +88,7 @@ clearing the preferences.
     killall -u $USER cfprefsd 
 
 ## Building on RHEL6 clusters
-Some RHEL7 clusters lack full XCB devel support ant for that we recommend the 
+Some RHEL7 clusters lack full XCB devel support and for that we recommend the 
 following option to building pyqt:
 
     USE_QT_XCB=YES ./build-pyqt.sh
