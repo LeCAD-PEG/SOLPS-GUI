@@ -61,7 +61,9 @@ For a single workstation ``localsubmit`` can be::
 Described script uses ``batch`` command that submits the job to local ``atd``.
 Make sure that you increase default 0.8 load average when configuring
 ``atd -l <load>`` to <load> = n-1 cores of your system. Otherwise,
-just one job will start at the moment. Although ``localsubmit`` is primarily
+just one job will start at the moment. Instead of piping commands to ``batch``
+one can replace with ``at now`` and simply ignore the ``atd`` limit and
+maintain the system load manually. Although ``localsubmit`` is primarily
 intended for single users, it can handle multi-users without significantly
 impact regular work as it will not go over the "system" specified load.
 Results of the ``localsubmit`` diadnostic output can be read by system
