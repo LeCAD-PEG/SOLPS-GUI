@@ -25,13 +25,14 @@ or
 
 ## Running UI
 
-    $ src/gui/solps.py
+    $ src/gui/solps.py # or simply type "solps" alias
 
 ## Buiding documentation
 
     $ cd doc
-    $ make html
-    $ make latexpdf PAPER=a4
+    $ make html # for solps_doc alias within browser
+    $ make qthelp # for solps_help alias with assistant
+    $ make latexpdf PAPER=a4 # for PDF with TexLive
 
 
 ## ITER cluster specifics

@@ -20,3 +20,7 @@ if !($?PYTHONPATH) then
 else
     setenv PYTHONPATH "${PWD}/src/widgets:${PYTHONPATH}"
 endif
+alias solps "${PWD}/staging/bin/python3 ${PWD}/src/gui/solps.py"
+alias solps_doc xdg-open "${PWD}/doc/build/html/index.html"
+alias solps_help assistant -collectionFile "${PWD}/doc/build/qthelp/SOLPSGUI.qhc"
+
