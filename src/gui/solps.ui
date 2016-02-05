@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>950</width>
-    <height>491</height>
+    <width>651</width>
+    <height>354</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -34,7 +34,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -110,7 +110,7 @@
         </item>
         <item row="0" column="1" colspan="2">
          <widget class="QComboBox" name="comboBox">
-          <property name="currentText" stdset="0">
+          <property name="currentText">
            <string>ITER</string>
           </property>
           <item>
@@ -502,7 +502,7 @@ and starts the run</string>
             <property name="runDir" stdset="0">
              <string>/home/ITER/kosl/solps-iter/runs/AUG_16151_D/run1</string>
             </property>
-            <property name="solpsPlotCommand" stdset="0">
+            <property name="solpsPlotCommand">
              <string>energy_analysis</string>
             </property>
            </widget>
@@ -538,6 +538,13 @@ and starts the run</string>
           </property>
          </widget>
         </item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="pushButton_10">
+          <property name="text">
+           <string>Run tcsh</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0" colspan="3">
          <widget class="Tcsh" name="tcsh">
           <property name="maximumSize">
@@ -551,18 +558,11 @@ and starts the run</string>
             <pointsize>7</pointsize>
            </font>
           </property>
-          <property name="tcshCommand" stdset="0">
+          <property name="tcshCommand">
            <string>b2fstate_OK</string>
           </property>
           <property name="solpsTop" stdset="0">
            <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QPushButton" name="pushButton_10">
-          <property name="text">
-           <string>Run tcsh</string>
           </property>
          </widget>
         </item>
@@ -690,7 +690,7 @@ and starts the run</string>
           <property name="readOnly">
            <bool>true</bool>
           </property>
-          <property name="placeholderText" stdset="0">
+          <property name="placeholderText">
            <string notr="true"/>
           </property>
          </widget>
@@ -707,8 +707,8 @@ and starts the run</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>950</width>
-     <height>26</height>
+     <width>651</width>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
