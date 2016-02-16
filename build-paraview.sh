@@ -89,7 +89,6 @@ cmake -DCMAKE_BUILD_TYPE:STRING=Release \
                 -DBUILD_TESTING:BOOL=OFF \
                 -DPARAVIEW_ENABLE_PYTHON:BOOL=OFF \
                 -DPARAVIEW_USE_MPI:BOOL=OFF \
-                -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
                 -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_QT}/bin/qmake \
                 -DCMAKE_EXE_LINKER_FLAGS:String="-L${STAGING_QT}/lib" \
                 -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
