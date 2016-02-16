@@ -41,7 +41,7 @@ Configure the runs directories
 
  1. From the menu bar select :menuselection:`Settings --> Runs`.
     A new dialog window for *Runs settings* will open.
- 2. Select top-right elipsis button :guilabel:`...` and
+ 2. Select top-right ellipsis button :guilabel:`...` and
     :guilabel:`Choose` your ``runs`` folder that can be found under your
     SOLPS top (i.e. ``~/solps-iter``) installation.
  3. Optionally you may rename default alias ``local_1`` to this *runs* tree
@@ -50,7 +50,7 @@ Configure the runs directories
  4. Optionally you may add up to four such Runs trees and name it. These
     trees may be available under other SOLPSTOP trees or provided by other
     users or project trees if you have at least read access.
- 5. Press OK. Trees will be rescaned for status.
+ 5. Press OK. Trees will be rescanned for status.
 
 .. image:: runs_2.png
    :scale: 80
@@ -95,7 +95,7 @@ in the following :menuselection:`Settings --> Preferences`:
    :align: center
 
 The only difference among users should be default network monitoring port.
-Each user on the system should have it's own port number in the range
+Each user on the system should have its own port number in the range
 of *unprivileged* ports (1024-65535). GUI acts as a server receiving status
 updates over network from runs running in the background. If there is a
 clash of these port numbers, then they should make an agreement. However,
@@ -150,14 +150,14 @@ Starting the run
 ----------------
 
 As ``AUG_16151_D/run_for_GUI_demo`` is ready to run case one can simply
-select it by clicking on tree-view as highlihted in the following image
+select it by clicking on tree-view as highlighted in the following image
 and then pressing the :guilabel:`Run` button.
 
 .. image:: runs_8.png
    :scale: 80
    :align: center
 
-Imediatelly, in the *status* column there should appear submission command
+Immediately, in the *status* column there should appear submission command
 which is ``localsubmit`` in this case. If there is no *batch* queue GUI
 should receive from background task over the network to the localhost
 (127.0.0.1) notification ``Started on ...`` with timestamp in status.
@@ -207,7 +207,7 @@ Log
 Log tab collects messages that may appear on the status bar and messages
 from several processes and runs during the operation. User may, depending
 on the log level selected in :menuselection:`Settings --> Preferences`.
-Different levels are colored for easier spotting of hiher importance
+Different levels are colored for easier spotting of higher importance
 messages.
 
 
@@ -217,14 +217,14 @@ Analysis with the Dashboard
 Many SOLPS plots are available from the command line and shoud be issued
 under each directory. SOLPS GUI provides plots available for gnuplot within
 the dashboard that user can design to its own interest and create a custom
-dashboart without programming in Python.  Simple *dashboard* in the
+dashboard without programming in Python.  Simple *dashboard* in the
 follwing image shows composition of several widgets.
 
 .. image:: runs_7.png
    :scale: 70
    :align: center
 
-The philosophy of dasboard operation relies on signal/slot communication
+The philosophy of dashboard operation relies on signal/slot communication
 among the widgets. Similarly to scientific workflow engines such as
 `Kepler <https://kepler-project.org>`_ there is a *Director* that
 redistributes selected run to controlled widgets. Signal flow can here
