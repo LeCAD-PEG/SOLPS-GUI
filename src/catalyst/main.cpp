@@ -5,6 +5,7 @@
 int main(int argc, char *argv[]){
 	if (argc < 2){
 		std::cout << "Pass paths to files with data as argument!\n";
+		std::cout << "Usage: " << argv[0] << " b2fgmtry b2fstati\n";
 		return 1;
 	}
 	FileReader reader(argc, argv);

@@ -25,7 +25,7 @@ void VtkBuilder::createPointsAndGrid(std::vector<double>& point_x, std::vector<d
 	const int numCellsY = obj.allData[0][1] + 2;
 	const int numCellsX = obj.allData[0][0] + 2;
 	const int numPtsInCell = 4;
-	int gridOfPoints[38][98][4]; //...array can not be allocated at runtime - fix that...
+	int gridOfPoints[numCellsY][numCellsX][numPtsInCell]; //...array can not be allocated at runtime - fix that...
 	int pointId = 0;
 	for (int j = 0; j < numCellsY; ++j){
 		for (int i = 0; i < numCellsX; ++i)
