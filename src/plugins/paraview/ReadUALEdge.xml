@@ -1,0 +1,163 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+  <SourceProxy name="UAL Edge" class="ReadUALEdge" label="UAL Edge">
+      <Documentation
+         long_help="Read an Edge CPO"
+         short_help="Read an Edge CPO">
+      </Documentation>
+
+      <IntVectorProperty
+         name="Shot"
+         command="SetShot"
+         number_of_elements="1"
+         default_values="16151"
+         panel_visibility="default" >
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          The values of this property sets the Shot number.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="Run"
+         command="SetRun"
+         number_of_elements="1"
+         default_values="1000"
+         panel_visibility="default" >
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          The values of this property sets the run number.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="RefRun"
+         command="SetRefRun"
+         number_of_elements="1"
+         default_values="0"
+         panel_visibility="default" >
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          The values of this property set the corresponding Z axis direction.
+        </Documentation>
+      </IntVectorProperty>
+
+      
+     <StringVectorProperty
+       name="User"
+       label="User"
+       command="SetUser"
+       number_of_elements="1"
+       default_values="kosl"
+       panel_visibility="default">
+        <Documentation>
+          This property specifies the user for the UAL Database. 
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+       name="Tokamak"
+       label="Tokamak"
+       command="SetTokamak"
+       number_of_elements="1"
+       default_values="aug"
+       panel_visibility="default">
+        <Documentation>
+          This property specifies the tokamak on the UAL Database. 
+        </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+         name="CPOLoad"
+         label="Load CPOs"
+         command="SetCPOLoad"
+         number_of_elements="1"
+         default_values="0"
+         panel_visibility="default" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This loads the CPO.
+        </Documentation>
+      </IntVectorProperty>
+         
+     <StringVectorProperty
+       name="CPOListStatus"
+       label="CPO List"
+       command="SetCPOListArrayStatus"
+       number_of_elements="0"
+       number_of_elements_per_command="2"
+       element_types="2 0"
+       repeat_command="1"
+        information_property="CPOListArrayStatus"
+       panel_visibility="default">
+       <ArraySelectionDomain name="array_list">
+	<RequiredProperties>
+	<Property function="ArrayList"
+		name="CPOListArrayStatus"/>
+	</RequiredProperties>
+ 	</ArraySelectionDomain> 
+        <Documentation>
+          This property specifies the CPO on the UAL Database. 
+        </Documentation>
+        <Hints>
+              <WidgetHeight number_of_rows="12" />
+              <PropertyWidgetDecorator type="my_decorator"/>
+        </Hints>
+     </StringVectorProperty>
+
+
+     <StringVectorProperty
+       name="CPOListArrayStatus"
+       information_only="1">
+        <ArraySelectionInformationHelper attribute_name="CPOList"/>
+     </StringVectorProperty>
+      
+      <IntVectorProperty
+         name="FieldLoadStatus"
+         command="SetFieldLoadStatus"
+         number_of_elements="1"
+         default_values="0"
+         panel_visibility="default" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          The values of this property sets the run number.
+        </Documentation>
+        <Hints>
+		<PropertyWidgetDecorator type="field_decorator"/>
+	</Hints>
+      </IntVectorProperty>
+
+      <StringVectorProperty
+       name="FieldListStatus"
+       label="Fields"
+       command="SetFieldListArrayStatus"
+       number_of_elements="0"
+       number_of_elements_per_command="2"
+       element_types="2 0"
+       repeat_command="1"
+        information_property="FieldListArrayStatus"
+       panel_visibility="default">
+       <ArraySelectionDomain name="array_list">
+	<RequiredProperties>
+	<Property function="ArrayList"
+		name="FieldListArrayStatus"/>
+	</RequiredProperties>
+ 	</ArraySelectionDomain> 
+        <Documentation>
+          This property specifies the CPO on the UAL Database. 
+        </Documentation>
+        <Hints>
+              <PropertyWidgetDecorator type="field_list_decorator"/>
+        </Hints>
+     </StringVectorProperty>
+
+
+     <StringVectorProperty
+       name="FieldListArrayStatus"
+       information_only="1">
+        <ArraySelectionInformationHelper attribute_name="FieldList"/>
+     </StringVectorProperty>
+
+     </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
