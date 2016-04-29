@@ -24,6 +24,8 @@
 #include <vtkLine.h>
 #include <vtkVertex.h>
 
+#define IMAS
+
 // From itmggd/c/src/constants/itm_grid_coordinates.h
 #define COORDTYPE_X              1  // X [m]
 #define COORDTYPE_Y              2  // Y [m]
@@ -64,6 +66,182 @@ int ReadUALEdge::RequestData(
             outInfo->Get(vtkMultiBlockDataSet::DATA_OBJECT()));
 
   std::clog << "Shot:" << this->Shot << " Run:" << this->Run << std::endl;
+#ifdef IMAS
+  std::clog << "TEST" << std::endl;
+  using namespace IdsNs;
+  IDS db(this->Shot,this->Run,this->Shot,this->RefRun);
+  //IDS db(16151,1000,16151,1000);
+  //db.openEnv(this->User, this->Tokamak, this->Version);
+  db.open();
+  std::clog << "User: "<<this->User<<" Tokamak:"<<this->Tokamak<< std::endl;
+  //IDS::edge_profiles edge;
+  db._edge_profiles.get();
+  //edge.get();
+  
+  #if 0
+  // Example: Printing IMAS/IDS database data to .txt file
+  //db._edge_profiles.getSlice(time, INTERPOLATION);
+  db._edge_profiles.getSlice(1,1);
+  ofstream myfile;
+  myfile.open ("log_edge_profiles.txt");
+  myfile << db._edge_profiles;
+  myfile.close();
+  //std::cout << db._edge_profiles << std::endl;
+  #endif
+  
+  int num_slices = db._edge_profiles.ggd.extent(0);
+  std::clog << "slices:" << num_slices << std::endl;
+  if (num_slices == 0)
+    return 0;
+  
+  class IDS::edge_profiles & edge = db._edge_profiles;
+  class IDS::edge_profiles::ggd & ggd = edge.ggd(0);
+  class IDS::edge_profiles::ggd::grid & grid = ggd.grid;
+  class IDS::edge_profiles::ggd::grid::space & space = grid.space(0);
+  class IDS::edge_profiles::ggd::grid::space::objects_per_dimension & objects_per_dimension = space.objects_per_dimension(0);
+  class IDS::edge_profiles::ggd::grid::space::objects_per_dimension::object & nodes = objects_per_dimension.object(0);
+  class IDS::edge_profiles::ggd::grid::space::objects_per_dimension::object & edges = objects_per_dimension.object(1);
+  class IDS::edge_profiles::ggd::grid::space::objects_per_dimension::object & cells = objects_per_dimension.object(2);
+  
+  int num_nodes = nodes.nodes.extent(0);
+  int num_geo = nodes.geometry.extent(0);
+  int num_edges = edges.boundary(0).neighbours.extent(0)/2;
+  int num_cells = cells.boundary(0).neighbours.extent(0)/4;
+  
+  std::clog << "num_nodes: " << num_nodes << std::endl;
+  std::clog << "num_geo: " << num_geo << std::endl;
+  std::clog << "num_edges: " << num_edges << std::endl;
+  std::clog << "num_cells: " << num_cells << std::endl;
+  
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+  
+  double all_cells[num_cells][4]; 
+  for (int i = 0; i < num_cells; ++i) {
+  int node_idx[4]; // Resulting node indices for a cell
+  int free_edge[3]; // list of edges that are free to search for node
+  int last_idx; // last node index 
+  int edge_idx = cells.boundary(0).neighbours(i*4) - 1;
+  free_edge[0] = cells.boundary(0).neighbours((i*4)+1) - 1;
+  free_edge[1] = cells.boundary(0).neighbours((i*4)+2) - 1;
+  free_edge[2] = cells.boundary(0).neighbours((i*4)+3) - 1;
+  
+  node_idx[0] = edges.boundary(0).neighbours(edge_idx*2) - 1;
+  node_idx[last_idx=1] = edges.boundary(0).neighbours((edge_idx*2)+1) - 1;
+    for(int loop_count = 0; last_idx < 3 && loop_count < 4; ++loop_count){
+      for(int j = 0; j < 3 ; ++j) { // free_edge
+	edge_idx = free_edge[j];
+	if(edge_idx < 0)
+	  continue;
+	int node1 =  edges.boundary(0).neighbours(edge_idx*2) - 1;
+	int node2 =  edges.boundary(0).neighbours((edge_idx*2)+1) - 1;
+
+	if (node_idx[last_idx] == node1) {
+	  free_edge[j] = -1;
+	  node_idx[++last_idx] = node2;
+	  break;
+	}
+	if (node_idx[last_idx] == node2) {
+	  free_edge[j] = -1;
+	  node_idx[++last_idx] = node1;
+	  break;
+	}
+      }
+      assert(loop_count < 3);
+    }
+  all_cells[i][0] = node_idx[0];
+  all_cells[i][1] = node_idx[1];
+  all_cells[i][2] = node_idx[2];
+  all_cells[i][3] = node_idx[3];
+  
+  } 
+  
+  for(int i=0; i < num_nodes; i++)
+  {
+   points->InsertNextPoint(nodes.geometry(i*2), nodes.geometry((i*2)+1), 0.0); 
+  }
+  
+  vtkSmartPointer<vtkQuad> Quad =  vtkSmartPointer<vtkQuad>::New();
+  vtkSmartPointer<vtkCellArray> cellArray = vtkSmartPointer<vtkCellArray>::New();
+  
+  //ELECTRON DENSITY and ELECTRON TEMPERATURE creating array + cells assembly
+  vtkSmartPointer<vtkDoubleArray> electronDensityArray = vtkSmartPointer<vtkDoubleArray>::New();
+  electronDensityArray->SetNumberOfComponents(1);
+  electronDensityArray->SetNumberOfTuples(num_cells);
+  electronDensityArray->SetName("Electron density"); 
+  
+  vtkSmartPointer<vtkDoubleArray> electronTemperatureArray = vtkSmartPointer<vtkDoubleArray>::New();
+  electronTemperatureArray->SetNumberOfComponents(1);
+  electronTemperatureArray->SetNumberOfTuples(num_cells);
+  electronTemperatureArray->SetName("Electron temperature"); 
+  
+  for(int i = 0; i < num_cells; i++)
+  {
+    Quad->GetPointIds()->SetId(0,all_cells[i][0]);
+    Quad->GetPointIds()->SetId(1,all_cells[i][1]);
+    Quad->GetPointIds()->SetId(2,all_cells[i][2]);
+    Quad->GetPointIds()->SetId(3,all_cells[i][3]);
+    cellArray->InsertNextCell(Quad);
+    
+    electronDensityArray->SetComponent(i, 0, ggd.electrons.density(0).values(i)); 
+    electronTemperatureArray->SetComponent(i, 0, ggd.electrons.temperature(0).values(i));
+  }
+  
+  vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
+  
+  ug->SetPoints(points);
+  ug->SetCells(VTK_QUAD, cellArray);
+  
+  ug->GetCellData()->AddArray(electronDensityArray);
+  ug->GetCellData()->AddArray(electronTemperatureArray);
+  
+  //ION DENSITY and ION TEMPERATURE creating array and allocatin scalars
+  int num_ion_species = ggd.ion.extent(0);
+  std::clog << "num_ion_species: " << num_ion_species << std::endl;
+  int num_ni_species = num_ion_species;
+  int num_ti_species = 1; //In database there are currently 2 ion density arrays but only one ion temperature array.
+  int size = num_cells; //Later, when the code will work with subgrids, the "size" variable will hold the size (number of cells) of the subgrid.
+  for(int k = 0; k < num_ni_species; k++)
+  {
+    
+    vtkSmartPointer<vtkDoubleArray> ionDensityArray = vtkSmartPointer<vtkDoubleArray>::New();
+    ionDensityArray->SetNumberOfComponents(1);
+    ionDensityArray->SetNumberOfTuples(size);
+    std::string set_name = "Ion Density ";
+    set_name = set_name + SSTR(k+1);
+    ionDensityArray->SetName(set_name.c_str());
+    for(int j = 0; j < size; j++)
+    {
+      ionDensityArray->SetComponent(j, 0, ggd.ion(k).density(0).values(j)); // .density(i) -> i stands for subset. 
+									    //Subgrid "0" is the main grid / the main subset. i = 0;
+    }
+    ug->GetCellData()->AddArray(ionDensityArray);
+  }
+  for(int k = 0; k < num_ti_species; k++)
+  {
+    
+    vtkSmartPointer<vtkDoubleArray> ionTemperatureArray = vtkSmartPointer<vtkDoubleArray>::New();
+    ionTemperatureArray->SetNumberOfComponents(1);
+    ionTemperatureArray->SetNumberOfTuples(size);
+    std::string set_name = "Ion Temperature ";
+    set_name = set_name + SSTR(k+1);
+    ionTemperatureArray->SetName(set_name.c_str());
+    for(int j = 0; j < size; j++)
+    {
+      ionTemperatureArray->SetComponent(j, 0, ggd.ion(k).temperature(0).values(j)); 
+    }
+    ug->GetCellData()->AddArray(ionTemperatureArray);
+    
+  }
+
+  vtkSmartPointer<vtkMultiBlockDataSet> MainMB = vtkSmartPointer<vtkMultiBlockDataSet>::New();
+  MainMB->SetBlock(0, ug);
+  MainMB->GetMetaData((unsigned int) 0)->Set(vtkCompositeDataSet::NAME(), "Cells");
+  output->ShallowCopy(MainMB);
+  
+  db.close();
+  
+  
+#else
   ItmNs::Itm itm(this->Shot,this->Run,this->Shot,this->RefRun);
 
   if (!this->Version)
@@ -531,7 +709,8 @@ int ReadUALEdge::RequestData(
       mainMB->GetMetaData((unsigned int) num_blocks)->Set(vtkCompositeDataSet::NAME(), subgridName[i].c_str());
     }
   } 
-  output->ShallowCopy(mainMB); 
+  output->ShallowCopy(mainMB);
+#endif // IMAS
   return 1;
 }
 

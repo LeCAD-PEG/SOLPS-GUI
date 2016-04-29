@@ -17,7 +17,7 @@ cmake -DCMAKE_BUILD_TYPE:STRING=Debug \
     -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
     -DParaView_DIR:PATH=${STAGING_PARAVIEW} \
     ${BUILDROOT}/src/plugins/paraview 
-make -j 8 all
+make -j 8 VERBOSE=1 all
 install -d ${STAGING_PLUGINS}
 install ${BUILD_DIR}/Plugins-ReadUAL${name}/libReadUAL${name}.so \
 	${STAGING_PLUGINS}
