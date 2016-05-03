@@ -1,15 +1,26 @@
 cmake_minimum_required(VERSION 2.8)
 
-#SET(GCC_COVERAGE_COMPILE_FLAGS "-D_REENTRANT=true -lUALCPPInterface -lblitz -lUALLowLevel")
-#SET(GCC_COVERAGE_LINK_FLAGS    "-D_REENTRANT=true -lUALCPPInterface -lblitz -lUALLowLevel")
-
-SET(GCC_COVERAGE_COMPILE_FLAGS "-fPIC -pthread -D_REENTRANT=true")
-SET(GCC_COVERAGE_LINK_FLAGS    "-limas-cpp -limas -lTreeShr -lTdiShr -lMdsShr -lMdsIpShr -lXTreeShr -lblitz")
-
+SET(GCC_COVERAGE_COMPILE_FLAGS "-fPIC -D_REENTRANT=true")
 
 SET( CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}" )
 SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}" )
 SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}" )
+
+site_name(site)
+
+message("Building for ${site}")
+
+if ( site MATCHES ".*iter.org" )
+   find_package(PkgConfig REQUIRED)
+   pkg_search_module(BLITZ REQUIRED blitz)   
+   pkg_search_module(IMASCPP REQUIRED imas-cpp)
+   pkg_search_module(IMASLL REQUIRED imas-lowlevel)
+   
+   link_directories(${IMASCPP_LIBRARY_DIRS})
+   link_directories(${IMASLL_LIBRARY_DIRS})
+   link_directories($ENV{MDSPLUS_DIR}/lib)
+
+else()
 
 #include_directories(/afs/ipp/itm/switm/ual/4.10a.4_R2.1.0/include)
 include_directories(/afs/ipp/itm/switm/blitz/0.10/include)
@@ -21,6 +32,8 @@ link_directories(/afs/ipp/itm/switm/mdsplus/5.2_itm_v1/lib)
 link_directories(/u/dkaljun/imas/core/imas/develop/3/ual/develop/lib)
 link_directories(/afs/ipp/itm/switm/blitz/0.10/lib)
 link_directories(/afs/ipp/itm/switm/lib/hdf5/1.8.10)
+#
+endif()
 
 
 FIND_PACKAGE(ParaView REQUIRED)
@@ -52,6 +65,7 @@ if (PARAVIEW_BUILD_QT_GUI)
     TYPE "my_decorator"
     CLASS_NAME pqMyPropertyWidgetDecorator)
 
+
    #Now, create the plugin.
   add_paraview_plugin(ReadUALEdge "1.0"
                       SERVER_MANAGER_XML ReadUALEdge.xml
@@ -66,7 +80,12 @@ if (PARAVIEW_BUILD_QT_GUI)
 			       pqFieldPropertyWidgetDecorator.cxx
                                pqMyPropertyWidgetDecorator.cxx
 			       pqFieldListPropertyWidgetDecorator.cxx)
-target_link_libraries(ReadUALEdge imas-cpp imas TreeShr TdiShr MdsShr MdsIpShr XTreeShr blitz) 
+target_include_directories(ReadUALEdge PUBLIC ${IMASCPP_INCLUDE_DIRS})
+target_include_directories(ReadUALEdge PUBLIC ${IMASLL_INCLUDE_DIRS})
+target_include_directories(ReadUALEdge PUBLIC ${MDSPLUS_INCLUDE_DIRS})
+target_link_libraries(ReadUALEdge PRIVATE imas-cpp imas TreeShr TdiShr MdsShr MdsIpShr XTreeShr blitz) 
+
+#   target_link_libraries(ReadUALEdge ${IMASCPP_LIBRARIES} ${IMASLL_LIBRARIES})
 
 endif()
 

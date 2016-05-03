@@ -88,7 +88,7 @@ clearing the preferences.
     killall -u $USER cfprefsd 
 
 ## Building on RHEL6 clusters
-Some RHEL7 clusters lack full XCB devel support and for that we recommend the 
+Some RHEL6 clusters lack full XCB devel support and for that we recommend the 
 following option to building pyqt:
 
     USE_QT_XCB=YES ./build-pyqt.sh
