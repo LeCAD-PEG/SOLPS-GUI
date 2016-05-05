@@ -67,12 +67,12 @@ int ReadUALEdge::RequestData(
 
   std::clog << "Shot:" << this->Shot << " Run:" << this->Run << std::endl;
 #ifdef IMAS
-  std::clog << "TEST" << std::endl;
   using namespace IdsNs;
   IDS db(this->Shot,this->Run,this->Shot,this->RefRun);
-  //IDS db(16151,1000,16151,1000);
-  //db.openEnv(this->User, this->Tokamak, this->Version);
+  if (!this->Version)
+    this->Version = strdup("4.10a");
   db.open();
+  db.openEnv(this->User, this->Tokamak, this->Version);
   std::clog << "User: "<<this->User<<" Tokamak:"<<this->Tokamak<< std::endl;
   //IDS::edge_profiles edge;
   db._edge_profiles.get();
@@ -197,9 +197,47 @@ int ReadUALEdge::RequestData(
   //ION DENSITY and ION TEMPERATURE creating array and allocatin scalars
   int num_ion_species = ggd.ion.extent(0);
   std::clog << "num_ion_species: " << num_ion_species << std::endl;
-  int num_ni_species = num_ion_species;
-  int num_ti_species = 1; //In database there are currently 2 ion density arrays but only one ion temperature array.
+  //int num_ni_species = num_ion_species;
+  //int num_ti_species = 1; //In 16151/1000/kosl/aug database there are currently num_ion_species=2 ion density arrays but only one ion temperature array.
   int size = num_cells; //Later, when the code will work with subgrids, the "size" variable will hold the size (number of cells) of the subgrid.
+  
+  for(int k = 0; k < num_ion_species; k++)
+  {
+    int num_ni_subsets = ggd.ion(k).density.extent(0);
+    int num_ti_subsets = ggd.ion(k).temperature.extent(0);   
+    
+    if(num_ni_subsets > 0) //currently there is no "for loop" for subgrids, because storing subgrid data for nodes,edges and cells has not been implemented yet.
+			    //we use only the "first", main subgrid (index = 0). Same for ion temperature.
+    {
+      vtkSmartPointer<vtkDoubleArray> ionDensityArray = vtkSmartPointer<vtkDoubleArray>::New();
+      ionDensityArray->SetNumberOfComponents(1);
+      ionDensityArray->SetNumberOfTuples(size);
+      std::string set_name = "Ion Density ";
+      set_name = set_name + SSTR(k+1);
+      ionDensityArray->SetName(set_name.c_str());
+      for(int j = 0; j < size; j++)
+      {
+	ionDensityArray->SetComponent(j, 0, ggd.ion(k).density(0).values(j)); // .density(i) -> i stands for subset. 
+									      //Subgrid "0" is the main grid / the main subset. i = 0;
+      }
+    ug->GetCellData()->AddArray(ionDensityArray);
+    }
+    if(num_ti_subsets > 0) 
+    {
+      vtkSmartPointer<vtkDoubleArray> ionTemperatureArray = vtkSmartPointer<vtkDoubleArray>::New();
+      ionTemperatureArray->SetNumberOfComponents(1);
+      ionTemperatureArray->SetNumberOfTuples(size);
+      std::string set_name = "Ion Temperature ";
+      set_name = set_name + SSTR(k+1);
+      ionTemperatureArray->SetName(set_name.c_str());
+      for(int j = 0; j < size; j++)
+      {
+	ionTemperatureArray->SetComponent(j, 0, ggd.ion(k).temperature(0).values(j)); 
+      }
+    ug->GetCellData()->AddArray(ionTemperatureArray);
+    }
+  }
+  #if 0
   for(int k = 0; k < num_ni_species; k++)
   {
     
@@ -232,7 +270,7 @@ int ReadUALEdge::RequestData(
     ug->GetCellData()->AddArray(ionTemperatureArray);
     
   }
-
+  #endif 
   vtkSmartPointer<vtkMultiBlockDataSet> MainMB = vtkSmartPointer<vtkMultiBlockDataSet>::New();
   MainMB->SetBlock(0, ug);
   MainMB->GetMetaData((unsigned int) 0)->Set(vtkCompositeDataSet::NAME(), "Cells");
