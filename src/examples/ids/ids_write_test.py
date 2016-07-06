@@ -9,8 +9,10 @@ import pwd
 def write_ids():
     time = 1
     interp = 1
+    treeName = 'ids'
 
     imas_obj = imas.ids(shot, run, shot, run)
+
 
     #imas_obj.create() #Create the data entry
     imas_obj.create_env(user, tokamak, version)
