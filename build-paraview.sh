@@ -6,10 +6,10 @@ CMAKE_VERSION=3.6.1
 case $(hostname) in
   *.iter.org) 
 	module use /work/imas/opt/EasyBuild/modules/all
-	module load GCC/4.9.2 binutils/2.25 
+	module load GCC/4.9.2 binutils/2.25 python/2.7/11
 	export CC=gcc
 	export CXX=g++
-	MAKE_JOBS=${MAKE_JOBS:-1}
+	MAKE_JOBS=${MAKE_JOBS:-8}
 	;;
   *)
 	;;
@@ -115,7 +115,7 @@ ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Release \
                 -DBUILD_SHARED_LIBS:BOOL=ON  \
                 -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
                 -DBUILD_TESTING:BOOL=OFF \
-                -DPARAVIEW_ENABLE_PYTHON:BOOL=OFF \
+                -DPARAVIEW_ENABLE_PYTHON:BOOL=ON \
                 -DPARAVIEW_USE_MPI:BOOL=OFF \
                 -DPARAVIEW_QT_VERSION:STRING=4 \
                 -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_QT}/bin/qmake \
@@ -129,4 +129,3 @@ make -j ${MAKE_JOBS}
 make install
 touch .built
 
-#                -DVTK_USE_TK:BOOL=OFF \
