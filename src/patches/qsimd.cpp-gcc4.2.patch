@@ -1,0 +1,11 @@
+--- qt-everywhere-opensource-src-5.6.1/qtbase/src/corelib/tools/qsimd.cpp.orig	2016-07-18 18:12:40.000000000 +0200
++++ qt-everywhere-opensource-src-5.6.1/qtbase/src/corelib/tools/qsimd.cpp	2016-07-18 18:12:48.000000000 +0200
+@@ -666,7 +666,7 @@
+     // contains all the features that the code required. Qt 4 ran for years
+     // like that, so it shouldn't be a problem.
+ 
+-    qt_cpu_features.store(minFeature | quint32(QSimdInitialized));
++    qt_cpu_features[0].store(minFeature | quint32(QSimdInitialized));
+     return;
+ # endif
+ #endif

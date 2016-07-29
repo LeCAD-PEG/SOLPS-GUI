@@ -1,11 +1,11 @@
 #!/bin/sh -x
 ## Building PyQt with Python3 and Qt5
  
-PYTHON_VERSION=3.5.1
+PYTHON_VERSION=3.5.2
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
-QT_VERSION=5.5.1
-PyQT_VERSION=5.5.1 # should be the same as Qt 
-SIP_VERSION=4.17
+QT_VERSION=5.6.1
+PyQT_VERSION=5.6 # should be the same as Qt 
+SIP_VERSION=4.18
 
 # Site specific defaults
 case $(hostname) in
@@ -164,12 +164,16 @@ if [ ! -e ${QT_SOURCE_DIR}/.configured ]; then # Configuring Qt
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
   patch -p 1 -d ${QT_SOURCE_DIR}<${PATCH_DIR}/qglxintegration-glx-context.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qxcbconnection.patch
+  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qsimd.cpp-gcc4.2.patch
   sed -i -e '/auto/d' qtdeclarative/tests/tests.pro \
                       qtmultimedia/tests/tests.pro \
                       qtgraphicaleffects/tests/tests.pro
   PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH} \
     ./configure -v --prefix=${STAGING_QT} -opensource -confirm-license \
-      -shared -no-audio-backend -skip qtwebkit -skip qtwebkit-examples \
+      -shared -no-audio-backend -skip qtwebchannel \
+      -skip qtwebengine \
+      -skip qtwebsockets \
+      -skip qtwebview \
       -skip qt3d ${XCB_FLAGS} ${QT_EXTRA_FLAGS} \
       -qt-xkbcommon -xkb-config-root /usr/share/X11/xkb
   touch ${QT_SOURCE_DIR}/.configured
@@ -180,8 +184,8 @@ if [ ! -e ${QT_SOURCE_DIR}/.built ]; then  ## Building Qt and docs
   make -j ${MAKE_JOBS}
   make install
   # Building Qt documentation
-  PATH="${STAGING_QT}/bin:${PATH}" make -C qtbase/src sub-qdoc
-  PATH="${STAGING_QT}/bin:${PATH}" make -C qttools
+  PATH="${STAGING_QT}/bin:${PATH}" make -C qttools/src sub-qdoc
+  PATH="${STAGING_QT}/bin:${PATH}" make -C qtbase/src html_docs
   PATH="${STAGING_QT}/bin:${PATH}" make qmake_all
   PATH="${STAGING_QT}/bin:${PATH}" make -j ${MAKE_JOBS} docs install_docs
   touch ${QT_SOURCE_DIR}/.built
@@ -191,10 +195,11 @@ fi # building Qt
 
 SIP_SRC="sip-${SIP_VERSION}.tar.gz"
 SIP_SITE="http://sourceforge.net/projects/pyqt/files/sip"
-SIP_DOWNLOAD="${SIP_SITE}/sip-${SIP_VERSION}/${SIP_SRC}"
+SIP_DOWNLOAD="${SIP_SITE}/sip-${SIP_VERSION}/${SIP_SRC}/download"
 
 if [ ! -f ${DOWNLOAD_DIR}/${SIP_SRC} ]; then 
-    wget  -O ${DOWNLOAD_DIR}/${SIP_SRC} ${SIP_DOWNLOAD}
+    wget -O ${DOWNLOAD_DIR}/${SIP_SRC} --no-check-certificate \
+          ${SIP_DOWNLOAD}
 fi
 
 SIP_SRC_DIR="${BUILD_DIR}/sip-${SIP_VERSION}"
@@ -213,17 +218,18 @@ fi
 
 ## Install PyQT
 
-PyQT_SRC="PyQt-gpl-${PyQT_VERSION}.tar.gz"
+PyQT_SRC="PyQt5_gpl-${PyQT_VERSION}.tar.gz"
 PyQT_SITE="http://sourceforge.net/projects/pyqt/files/PyQt5"
 #PyQT_SITE="https://www.riverbankcomputing.com/static/Downloads/PyQt5}"
 PyQT_DOWNLOAD="${PyQT_SITE}/PyQt-${PyQT_VERSION}/${PyQT_SRC}/download"
 
 
 if [ ! -f ${DOWNLOAD_DIR}/${PyQT_SRC} ]; then 
-    wget  -O ${DOWNLOAD_DIR}/${PyQT_SRC} ${PyQT_DOWNLOAD}
+    wget  -O ${DOWNLOAD_DIR}/${PyQT_SRC} --no-check-certificate \
+        ${PyQT_DOWNLOAD}
 fi
 
-PyQT_SRC_DIR="${BUILD_DIR}/PyQt-gpl-${PyQT_VERSION}"
+PyQT_SRC_DIR="${BUILD_DIR}/PyQt5_gpl-${PyQT_VERSION}"
 PyQT_INSTALL_DIR="${STAGING_DIR}"
 
 if [ ! -e   ${PyQT_SRC_DIR}/.built ]; then

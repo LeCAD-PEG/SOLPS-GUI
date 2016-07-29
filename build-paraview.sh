@@ -1,16 +1,15 @@
 #!/bin/sh -x
 
-PARAVIEW_VERSION=5.0.0
-QT_VERSION=4.8.7
-
+PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.1.0}
+QT_VERSION=${QT_VERSION:-4.8.7}
+CMAKE_VERSION=3.6.1
 case $(hostname) in
   *.iter.org) 
-	module use /work/imas/etc/modulefiles \
-	    /work/imas/opt/EasyBuild/modules/all
-	module load cmake GCC/4.8.3 binutils 
+	module use /work/imas/opt/EasyBuild/modules/all
+	module load GCC/4.9.2 binutils/2.25 
 	export CC=gcc
 	export CXX=g++
-	MAKE_JOBS=${MAKE_JOBS:-8}
+	MAKE_JOBS=${MAKE_JOBS:-1}
 	;;
   *)
 	;;
@@ -33,6 +32,35 @@ install -d ${DOWNLOAD_DIR}
 install -d ${STAGING_DIR}
 
 set -e
+
+# We need recent CMAKE for building ParaView 5.1
+if [ $(cmake --version | sed 's/[^0-9]//g;s/^\(.\{2\}\).*/\1/' ) -ge 35 ]
+ then CMAKE=cmake
+ else CMAKE=${STAGING_DIR}/bin/cmake
+fi
+
+# Install cmake as needed
+CMAKE_SRC_DIR="${BUILD_DIR}/cmake-${CMAKE_VERSION}"
+CMAKE_INSTALL_DIR="${STAGING_DIR}"
+if [ ${CMAKE} != cmake -a  ! -e  ${CMAKE_SRC_DIR}/.built ]; then
+  CMAKE_SRC="cmake-${CMAKE_VERSION}.tar.gz"
+  CMAKE_MAIN_VERSION=${CMAKE_VERSION%.*}
+  CMAKE_SITE="https://cmake.org/files/v${CMAKE_MAIN_VERSION}"
+  CMAKE_DOWNLOAD="${CMAKE_SITE}/cmake-${CMAKE_VERSION}.tar.gz"
+  if [ ! -f ${DOWNLOAD_DIR}/${CMAKE_SRC} ]; then
+     wget  -O ${DOWNLOAD_DIR}/${CMAKE_SRC} --no-check-certificate \
+	 ${CMAKE_DOWNLOAD}
+  fi
+  rm -rf ${CMAKE_SRC_DIR}
+  cd ${BUILD_DIR}
+  tar xzf ${DOWNLOAD_DIR}/${CMAKE_SRC}
+  cd ${CMAKE_SRC_DIR}
+  ./bootstrap --prefix=${STAGING_DIR}
+  make -j ${MAKE_JOBS}
+  make install
+  touch ${CMAKE_SRC_DIR}/.built
+fi
+
 
 #Install QT
 QT_MAJOR_VERSION=${QT_VERSION%.*}
@@ -59,12 +87,12 @@ if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
   touch ${QT_SOURCE_DIR}/.built
 fi
 
-PARAVIEW_BUILD="${BUILD_DIR}/paraview"
-PARAVIEW_SOURCE_DIR="${BUILD_DIR}/ParaView-v${PARAVIEW_VERSION}-source"
+PARAVIEW_BUILD="/tmp/${USER}/paraview"
+PARAVIEW_SOURCE_DIR="${BUILD_DIR}/ParaView-v${PARAVIEW_VERSION}"
 #Download Paraview
 PARAVIEW_MAJOR_VERSION=${PARAVIEW_VERSION%.*}
-PARAVIEW_SOURCE="ParaView-v${PARAVIEW_VERSION}-source.tar.gz"
-PARAVIEW_DOWNLOAD="download.php?submit=Download&version=v${PARAVIEW_MAJOR_VERSION}&type=source&os=all&downloadFile=ParaView-v${PARAVIEW_VERSION}-source.tar.gz"
+PARAVIEW_SOURCE="ParaView-v${PARAVIEW_VERSION}.tar.gz"
+PARAVIEW_DOWNLOAD="download.php?submit=Download&version=v${PARAVIEW_MAJOR_VERSION}&type=source&os=all&downloadFile=${PARAVIEW_SOURCE}"
 
 cd ${DOWNLOAD_DIR}
 if [ ! -f ${PARAVIEW_SOURCE} ]; then
@@ -81,18 +109,24 @@ fi
 rm -rf ${PARAVIEW_BUILD}
 install -d ${PARAVIEW_BUILD}
 cd ${PARAVIEW_BUILD}
+
 install -d ${STAGING_PARAVIEW}
-cmake -DCMAKE_BUILD_TYPE:STRING=Release \
+${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Release \
                 -DBUILD_SHARED_LIBS:BOOL=ON  \
-                -DVTK_USE_TK:BOOL=OFF \
                 -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
                 -DBUILD_TESTING:BOOL=OFF \
                 -DPARAVIEW_ENABLE_PYTHON:BOOL=OFF \
                 -DPARAVIEW_USE_MPI:BOOL=OFF \
+                -DPARAVIEW_QT_VERSION:STRING=4 \
                 -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_QT}/bin/qmake \
-                -DCMAKE_EXE_LINKER_FLAGS:String="-L${STAGING_QT}/lib" \
+                -DCMAKE_EXE_LINKER_FLAGS:STRING="-L${STAGING_QT}/lib" \
                 -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
 		 ${PARAVIEW_SOURCE_DIR}
+find .  -name link.txt -exec \
+    sed -i -e "s|-lQt|-L${STAGING_QT}/lib -lQt|" \
+           -e "s|-L${STAGING_QT}/lib|-L${STAGING_QT}/lib -lQtCore -lQtGui|" {} \; 
 make -j ${MAKE_JOBS}
 make install
 touch .built
+
+#                -DVTK_USE_TK:BOOL=OFF \
