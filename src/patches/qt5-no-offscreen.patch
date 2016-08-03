@@ -1,19 +1,6 @@
-RHEL 5 problems with offscreen
-See https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-rhel5-linux-centos-5-7/2
-
---- qt-everywhere-opensource-src-5.2.1/qtbase/src/plugins/platforms/offscreen/offscreen.pro.orig	2015-09-13 23:14:53.000000000 +0200
-+++ qt-everywhere-opensource-src-5.2.1/qtbase/src/plugins/platforms/offscreen/offscreen.pro	2015-09-13 23:15:22.000000000 +0200
-@@ -20,6 +20,7 @@
- contains(QT_CONFIG, xlib):contains(QT_CONFIG, opengl):!contains(QT_CONFIG, opengles2) {
-     SOURCES += qoffscreenintegration_x11.cpp
-     HEADERS += qoffscreenintegration_x11.h
-+    LIBS += -lXrender
-     system(echo "Using X11 offscreen integration with GLX")
- } else {
-     SOURCES += qoffscreenintegration_dummy.cpp
---- qt-everywhere-opensource-src-5.5.0/qtbase/src/plugins/platforms/offscreen/qoffscreenintegration_x11.cpp.orig	2015-06-29 22:04:45.000000000 +0200
-+++ qt-everywhere-opensource-src-5.5.0/qtbase/src/plugins/platforms/offscreen/qoffscreenintegration_x11.cpp	2015-09-19 17:48:44.000000000 +0200
-@@ -43,6 +43,7 @@
+--- qt-everywhere-opensource-src-5.7.0/qtbase/src/plugins/platforms/offscreen/qoffscreenintegration_x11.cpp.orig	2016-06-10 08:48:56.000000000 +0200
++++ qt-everywhere-opensource-src-5.7.0/qtbase/src/plugins/platforms/offscreen/qoffscreenintegration_x11.cpp	2016-08-01 11:33:54.000000000 +0200
+@@ -49,6 +49,7 @@
  
  #include <qpa/qplatformsurface.h>
  #include <qsurface.h>
@@ -21,12 +8,12 @@ See https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-
  
  QT_BEGIN_NAMESPACE
  
-@@ -223,7 +224,9 @@
+@@ -229,7 +230,9 @@
  
- void (*QOffscreenX11GLXContext::getProcAddress(const QByteArray &procName)) ()
+ QFunctionPointer QOffscreenX11GLXContext::getProcAddress(const char *procName)
  {
--    return (void (*)())glXGetProcAddressARB(reinterpret_cast<const GLubyte *>(procName.constData()));
-+//    return (void (*)())glXGetProcAddressARB(reinterpret_cast<const GLubyte *>(procName.constData()));
+-    return (QFunctionPointer)glXGetProcAddressARB(reinterpret_cast<const GLubyte *>(procName));
++  //return (QFunctionPointer)glXGetProcAddressARB(reinterpret_cast<const GLubyte *>(procName));
 +  fprintf(stderr, "** QOffscreenX11GLXContext::getProcAddress() called, but no support compiled\n");
 +  return NULL;
  }

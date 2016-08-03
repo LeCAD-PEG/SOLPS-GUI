@@ -1,0 +1,22 @@
+See http://lists.qt-project.org/pipermail/interest/2015-February/015412.html
+--- qt-everywhere-opensource-src-5.7.0/qtbase/src/testlib/qbenchmarkperfevents.cpp.orig	2016-08-02 19:57:32.000000000 +0200
++++ qt-everywhere-opensource-src-5.7.0/qtbase/src/testlib/qbenchmarkperfevents.cpp	2016-08-02 20:29:10.000000000 +0200
+@@ -36,7 +36,6 @@
+ ** $QT_END_LICENSE$
+ **
+ ****************************************************************************/
+-
+ #include "qbenchmarkperfevents_p.h"
+ #include "qbenchmarkmetric.h"
+ #include "qbenchmark_p.h"
+@@ -56,6 +55,10 @@
+ #include <sys/syscall.h>
+ #include <sys/ioctl.h>
+ 
++#include <linux/types.h>
++typedef __u64 __bitwise __le64;
++typedef __u64 __bitwise __be64;
++
+ #include "3rdparty/linux_perf_event_p.h"
+ 
+ // for PERF_TYPE_HW_CACHE, the config is a bitmask
