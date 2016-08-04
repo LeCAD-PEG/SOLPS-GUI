@@ -3,14 +3,16 @@
  
 PYTHON_VERSION=3.5.2
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
-QT_VERSION=5.6.1
-PyQT_VERSION=5.6 # should be the same as Qt 
+QT_VERSION=5.7.0
+PyQT_VERSION=5.7 # should be the same as Qt 
 SIP_VERSION=4.18
 
 # Site specific defaults
 case $(hostname) in
-  *.iter.org) # RHEL5.11 with GCC 4.1
+  *.iter.org) # RHEL5.11 with GCC 4.2
 	module purge
+	module use /work/imas/opt/EasyBuild/modules/all
+	module load GCC/4.8.3 binutils/2.25 python/2.7/11 gperf
 	USE_QT_XCB="NO"
 	BUILD_XCB="YES"
 	unset CXX CC # Remove ICC to be selected by chance
@@ -77,6 +79,7 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
   make install
   PYTHONPATH= LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
+  LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} \
   ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade sphinx
   touch ${PYTHON_SRC_DIR}/.built
 fi
@@ -94,7 +97,6 @@ PYTHON="${STAGING_DIR}/bin/python${PYTHON_MAINVERSION}"
 # See http://kate-editor.org/2014/12/22/qt-5-4-on-red-hat-enterprise-5/
 
 URLS="http://xmlsoft.org/sources/libxml2-2.9.3.tar.gz"
-
 if [ "${BUILD_XCB}" = "YES" ]; then
   URLS="${URLS} \
   http://xorg.freedesktop.org/archive/individual/proto/xproto-7.0.28.tar.gz\
@@ -106,7 +108,7 @@ if [ "${BUILD_XCB}" = "YES" ]; then
   http://xcb.freedesktop.org/dist/xcb-util-keysyms-0.4.0.tar.gz \
   http://xcb.freedesktop.org/dist/xcb-util-wm-0.4.1.tar.gz \
   http://xcb.freedesktop.org/dist/xcb-util-renderutil-0.3.9.tar.gz \
-  http://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.2.tar.gz"
+  http://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.3.tar.gz"
   XCB_INCLUDES="-I${STAGING_DIR}/include -I${STAGING_DIR}/include/libxml2"
   XCB_LIBS="-L${STAGING_DIR}/lib"
   XCB_FLAGS="${XCB_FLAGS} ${XCB_INCLUDES} ${XCB_LIBS}"
@@ -120,7 +122,8 @@ install -d  ${BUILD_DIR}/libs
 cd ${BUILD_DIR}/libs
 for url in ${URLS}; do
   file=${url##*/}
-  test -f ${DOWNLOAD_DIR}/${file} || wget -O ${DOWNLOAD_DIR}/${file} ${url}
+  test -f ${DOWNLOAD_DIR}/${file} || wget --no-check-certificate \
+      -O ${DOWNLOAD_DIR}/${file} ${url}
   pkgdir=${file%.*.*}
   test -e ${pkgdir}/.built && continue
   rm -rf ${pkgdir}
@@ -164,13 +167,16 @@ if [ ! -e ${QT_SOURCE_DIR}/.configured ]; then # Configuring Qt
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
   patch -p 1 -d ${QT_SOURCE_DIR}<${PATCH_DIR}/qglxintegration-glx-context.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qxcbconnection.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qsimd.cpp-gcc4.2.patch
+  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qbenchmarkperfevents.patch
+  #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qsimd.cpp-gcc4.2.patch
   sed -i -e '/auto/d' qtdeclarative/tests/tests.pro \
                       qtmultimedia/tests/tests.pro \
                       qtgraphicaleffects/tests/tests.pro
   PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH} \
     ./configure -v --prefix=${STAGING_QT} -opensource -confirm-license \
-      -shared -no-audio-backend -skip qtwebchannel \
+      -shared -no-audio-backend \
+      -skip qtgamepad \
+      -skip qtwebchannel \
       -skip qtwebengine \
       -skip qtwebsockets \
       -skip qtwebview \

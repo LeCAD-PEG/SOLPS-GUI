@@ -1,5 +1,5 @@
 # source this csh file for local setup environment if PyQT is provided locally
-setenv QTDIR "${PWD}/staging/qt/5.6.1"
+setenv QTDIR "${PWD}/staging/qt/5.7.0"
 setenv PATH "${PWD}/staging/bin:${QTDIR}/bin:${PATH}"
 
 if !($?LD_LIBRARY_PATH) then
