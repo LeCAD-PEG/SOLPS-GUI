@@ -6,7 +6,7 @@ CMAKE_VERSION=3.6.1
 case $(hostname) in
   *.iter.org) 
 	module use /work/imas/opt/EasyBuild/modules/all
-	module load GCC/4.8.3 binutils/2.25 python/2.7/11
+	module load GCC/4.8.3 binutils/2.25 python/2.7/11 intel/12.0.2
 	export CC=gcc
 	export CXX=g++
 	MAKE_JOBS=${MAKE_JOBS:-8}
@@ -87,7 +87,7 @@ if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
   touch ${QT_SOURCE_DIR}/.built
 fi
 
-PARAVIEW_BUILD="/tmp/${USER}/paraview"
+PARAVIEW_BUILD="${BUILD_DIR}/paraview"
 PARAVIEW_SOURCE_DIR="${BUILD_DIR}/ParaView-v${PARAVIEW_VERSION}"
 #Download Paraview
 PARAVIEW_MAJOR_VERSION=${PARAVIEW_VERSION%.*}
@@ -116,6 +116,7 @@ ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Release \
                 -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
                 -DBUILD_TESTING:BOOL=OFF \
                 -DPARAVIEW_ENABLE_PYTHON:BOOL=ON \
+                -DCMAKE_Fortran_COMPILER=ifort \
                 -DPARAVIEW_USE_MPI:BOOL=OFF \
                 -DPARAVIEW_QT_VERSION:STRING=4 \
                 -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_QT}/bin/qmake \
