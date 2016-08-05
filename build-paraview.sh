@@ -125,7 +125,8 @@ ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Release \
 		 ${PARAVIEW_SOURCE_DIR}
 find .  -name link.txt -exec \
     sed -i -e "s|-lQt|-L${STAGING_QT}/lib -lQt|" \
-           -e "s|-L${STAGING_QT}/lib|-L${STAGING_QT}/lib -lQtCore -lQtGui|" {} \; 
+           -e "s|-L${STAGING_QT}/lib|-L${STAGING_QT}/lib -lQtCore -lQtGui|" {} \;
+LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} \ 
 make -j ${MAKE_JOBS}
 make install
 touch .built
