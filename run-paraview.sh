@@ -1,12 +1,12 @@
 #!/bin/sh -x
 
-PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.1.0}
+PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.1.2}
 QT_VERSION=${QT_VERSION:-4.8.7}
 
 case $(hostname) in
   *.iter.org) 
-	module use /work/imas/opt/EasyBuild/modules/all
-	module load GCC/4.8.3  python/2.7/11
+	module purge
+	module load MVAPICH2/2.2b-GCC-4.9.3-2.25  python/2.7/11
 
 	;;
   *)

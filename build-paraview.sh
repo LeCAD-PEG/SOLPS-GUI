@@ -1,12 +1,13 @@
 #!/bin/sh -x
 
-PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.1.0}
+PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.1.2}
 QT_VERSION=${QT_VERSION:-4.8.7}
 CMAKE_VERSION=3.6.1
 case $(hostname) in
   *.iter.org) 
-	module use /work/imas/opt/EasyBuild/modules/all
-	module load GCC/4.8.3 binutils/2.25 python/2.7/11 intel/12.0.2
+	module purge
+	module load MVAPICH2/2.2b-GCC-4.9.3-2.25
+	module load python/2.7/11 intel/12.0.2 
 	export CC=gcc
 	export CXX=g++
 	MAKE_JOBS=${MAKE_JOBS:-8}
@@ -103,6 +104,8 @@ if [ ! -f ${PARAVIEW_SOURCE} ]; then
 # See https://github.com/OpenFOAM/ThirdParty-dev/blob/master/README.org
     patch -p2 -d ${PARAVIEW_SOURCE_DIR} < \
         ${BUILDROOT}/src/patches/paraview-ui_pqExportStateWizard.patch
+    patch -p1 -d ${PARAVIEW_SOURCE_DIR} < \
+        ${BUILDROOT}/src/patches/paraview-vtk-storage-mkostemp.patch
 fi
 
 #Configure and build paraview
@@ -116,9 +119,8 @@ ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Release \
                 -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
                 -DBUILD_TESTING:BOOL=OFF \
                 -DPARAVIEW_ENABLE_PYTHON:BOOL=ON \
-                -DCMAKE_Fortran_COMPILER=ifort \
-                -DPARAVIEW_USE_MPI:BOOL=OFF \
-                -DPARAVIEW_QT_VERSION:STRING=4 \
+                -DCMAKE_Fortran_COMPILER:STRING=ifort \
+                -DPARAVIEW_USE_MPI:BOOL=ON \
                 -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_QT}/bin/qmake \
                 -DCMAKE_EXE_LINKER_FLAGS:STRING="-L${STAGING_QT}/lib" \
                 -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
@@ -126,8 +128,10 @@ ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Release \
 find .  -name link.txt -exec \
     sed -i -e "s|-lQt|-L${STAGING_QT}/lib -lQt|" \
            -e "s|-L${STAGING_QT}/lib|-L${STAGING_QT}/lib -lQtCore -lQtGui|" {} \;
-LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} \ 
-make -j ${MAKE_JOBS}
+
+LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} \
+make -j ${MAKE_JOBS} VERBOSE=1
 make install
+
 touch .built
 

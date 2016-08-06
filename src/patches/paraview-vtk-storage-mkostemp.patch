@@ -1,0 +1,19 @@
+--- ParaView-v5.1.2/VTK/ThirdParty/diy2/vtkdiy2/include/vtkdiy/storage.hpp.orig	2016-08-06 13:49:53.000000000 +0200
++++ ParaView-v5.1.2/VTK/ThirdParty/diy2/vtkdiy2/include/vtkdiy/storage.hpp	2016-08-06 13:54:02.000000000 +0200
+@@ -6,6 +6,7 @@
+ #include <fstream>
+ 
+ #include <unistd.h>     // mkstemp() on Mac
++#define _GNU_SOURCE
+ #include <cstdlib>      // mkstemp() on Linux
+ #include <cstdio>       // remove()
+ #include <fcntl.h>
+@@ -174,7 +175,7 @@
+         // TODO: figure out how to open with O_SYNC
+         int fh = mkstemp(const_cast<char*>(filename.c_str()));
+ #else
+-        int fh = mkostemp(const_cast<char*>(filename.c_str()), O_WRONLY | O_SYNC);
++        int fh = mkstemp(const_cast<char*>(filename.c_str()));
+ #endif
+ 
+         return fh;
