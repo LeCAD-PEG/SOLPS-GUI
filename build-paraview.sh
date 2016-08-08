@@ -6,7 +6,8 @@ CMAKE_VERSION=3.6.1
 case $(hostname) in
   *.iter.org) 
 	module purge
-	module load MVAPICH2/2.2b-GCC-4.9.3-2.25
+#	module load MVAPICH2/2.2b-GCC-4.9.3-2.25
+	module load GCC/4.8.3 binutils/2.25
 	module load python/2.7/11 intel/12.0.2 
 	export CC=gcc
 	export CXX=g++
@@ -120,7 +121,7 @@ ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Release \
                 -DBUILD_TESTING:BOOL=OFF \
                 -DPARAVIEW_ENABLE_PYTHON:BOOL=ON \
                 -DCMAKE_Fortran_COMPILER:STRING=ifort \
-                -DPARAVIEW_USE_MPI:BOOL=ON \
+                -DPARAVIEW_USE_MPI:BOOL=OFF \
                 -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_QT}/bin/qmake \
                 -DCMAKE_EXE_LINKER_FLAGS:STRING="-L${STAGING_QT}/lib" \
                 -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \

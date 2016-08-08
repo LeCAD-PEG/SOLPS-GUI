@@ -3,16 +3,15 @@
 MAKE_JOBS=${MAKE_JOBS:-4}
 BUILDROOT="${PWD}"
 BUILD_DIR="${BUILDROOT}/build"
-PARAVIEW_VERSION="5.1.0"
+PARAVIEW_VERSION="5.1.2"
 STAGING_DIR="${BUILDROOT}/staging"
 STAGING_PARAVIEW="${STAGING_DIR}/paraview/${PARAVIEW_VERSION}"
 STAGING_PLUGINS="${STAGING_DIR}/paraview-plugins/${PARAVIEW_VERSION}/${DATAVERSION}"
 
 case $(hostname) in
   *.iter.org) 
-	module use /work/imas/etc/modulefiles \
-	    /work/imas/opt/EasyBuild/modules/all
-	module load cmake binutils blitz/0.10
+	module purge
+	module load binutils/2.25 blitz/0.10
 	module load GCC/4.8.3 imas/3.4.0/ual/3.3.5 mdsplus/5.2
 	export CC=gcc
 	export CXX=g++
