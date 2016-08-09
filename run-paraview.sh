@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash
 
 PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.1.2}
 QT_VERSION=${QT_VERSION:-4.8.7}
@@ -7,10 +7,11 @@ case $(hostname) in
   *.iter.org) 
 	module purge
 	# module load MVAPICH2/2.2b-GCC-4.9.3-2.25 python/2.7/11
-	module load GCC/4.8.3 python/2.7/11
+	# module load GCC/4.8.3
 	# The following modules are needed for IMAS plugins
-	module load blitz/0.10 imas/3.4.0/ual/3.3.5 mdsplus/5.2
-	imasdb solps-iter
+	module load imas/3.5.3/ual/3.3.8 blitz/0.10
+	module switch python/2.7/11
+	echo "Please issue command 'imasdb solps-iter' before paraview."
 	;;
   *)
 	;;

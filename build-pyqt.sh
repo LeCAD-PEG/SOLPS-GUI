@@ -107,8 +107,8 @@ if [ "${BUILD_XCB}" = "YES" ]; then
   http://xcb.freedesktop.org/dist/xcb-util-image-0.4.0.tar.gz \
   http://xcb.freedesktop.org/dist/xcb-util-keysyms-0.4.0.tar.gz \
   http://xcb.freedesktop.org/dist/xcb-util-wm-0.4.1.tar.gz \
-  http://xcb.freedesktop.org/dist/xcb-util-renderutil-0.3.9.tar.gz \
-  http://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.3.tar.gz"
+  http://xcb.freedesktop.org/dist/xcb-util-renderutil-0.3.9.tar.gz"
+#  http://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.1.tar.gz"
   XCB_INCLUDES="-I${STAGING_DIR}/include -I${STAGING_DIR}/include/libxml2"
   XCB_LIBS="-L${STAGING_DIR}/lib"
   XCB_FLAGS="${XCB_FLAGS} ${XCB_INCLUDES} ${XCB_LIBS}"

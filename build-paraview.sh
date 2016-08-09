@@ -63,7 +63,6 @@ if [ ${CMAKE} != cmake -a  ! -e  ${CMAKE_SRC_DIR}/.built ]; then
   touch ${CMAKE_SRC_DIR}/.built
 fi
 
-
 #Install QT
 QT_MAJOR_VERSION=${QT_VERSION%.*}
 QT_TAR="qt-everywhere-opensource-src-${QT_VERSION}.tar.gz"

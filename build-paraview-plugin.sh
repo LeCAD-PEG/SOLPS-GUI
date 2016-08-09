@@ -11,8 +11,8 @@ STAGING_PLUGINS="${STAGING_DIR}/paraview-plugins/${PARAVIEW_VERSION}/${DATAVERSI
 case $(hostname) in
   *.iter.org) 
 	module purge
-	module load binutils/2.25 blitz/0.10
-	module load GCC/4.8.3 imas/3.4.0/ual/3.3.5 mdsplus/5.2
+	module load imas/3.5.3/ual/3.3.8 blitz/0.10 binutils/2.25
+	module switch python/2.7/11	
 	export CC=gcc
 	export CXX=g++
 	MAKE_JOBS=${MAKE_JOBS:-8}
@@ -37,7 +37,4 @@ make -j ${MAKE_JOBS} VERBOSE=1 all
 install -d ${STAGING_PLUGINS}
 install ${BUILD_DIR}/Plugins-ReadUAL${name}/libReadUAL${name}.so \
 	${STAGING_PLUGINS}
-
-
-
 
