@@ -11,7 +11,8 @@ case $(hostname) in
 	# The following modules are needed for IMAS plugins
 	module load imas/3.5.3/ual/3.3.8 blitz/0.10
 	module switch python/2.7/11
-	echo "Please issue command 'imasdb solps-iter' before paraview."
+	imasdb solps-iter
+	imasdb
 	;;
   *)
 	;;
