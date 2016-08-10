@@ -10,4 +10,5 @@
    setup.rst
    runs.rst
    dashboard.rst
+   catalyst.rst
 
