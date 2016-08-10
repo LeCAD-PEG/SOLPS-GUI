@@ -230,59 +230,100 @@ class RunsSettings(QDialog):
     def showdir5(self):
         self.update_dir(self.lineEdit_rundir5)
 
-class Preferences(QDialog):
+class Preferences():
     def __init__(self, parent=None):
         super(Preferences, self).__init__()
+        # Create reasonable defaults
+        self.bind_address = '0.0.0.0'
+        self.port = 0xCAFE + os.getuid() % 13566
+        self.solps_gui_ip = '127.0.0.1'
+        self.tcsh_path = '/bin/tcsh'
+        self.gnuplot_path = '/usr/bin/gnuplot'
+        self.log_level = 1 # info
+        self.submit_script = 'localsubmit'
+        self.use_mpi = 0
+        self.mpi_options = '-n 16'
+        self.use_debugger = 0
+        self.debugger = 'totalview'
+        self.compress_log = 0
+        self.dry_run = 0
+
+    def read(self):
+        # Read settings
+        print("Reading preferences...")
+        settings = QSettings('ITER', 'solps-gui')
+        self.bind_address = settings.value('SOLPS_GUI_BIND', self.bind_address)
+        self.port = int(settings.value('SOLPS_GUI_PORT', self.port))
+        self.solps_gui_ip = settings.value('SOLPS_GUI_IP', self.solps_gui_ip)
+        self.tcsh_path = settings.value('tcsh_path', self.tcsh_path)
+        self.gnuplot_path = settings.value('gnuplot_path', self.gnuplot_path)
+        self.log_level = int(settings.value('log_level', self.log_level))
+        self.submit_script = settings.value('submit_script', self.submit_script)
+        self.use_mpi = settings.value('use_mpi', self.use_mpi)
+        self.mpi_options = settings.value('mpi_options', self.mpi_options)
+        self.use_debugger = settings.value('use_debugger', self.use_debugger)
+        self.debugger = settings.value('debugger', self.debugger)
+        self.compress_log = settings.value('compress_log', self.compress_log)
+        self.dry_run = settings.value('dry_run', self.dry_run)
+
+    def write(self):
+        print("Writing preferences...")
+        settings = QSettings('ITER', 'solps-gui')
+        settings.setValue('SOLPS_GUI_BIND', self.bind_address)
+        settings.setValue('SOLPS_GUI_PORT', str(self.port))
+        settings.setValue('SOLPS_GUI_IP', self.solps_gui_ip)
+        settings.setValue('tcsh_path', self.tcsh_path)
+        settings.setValue('gnuplot_path', self.gnuplot_path)
+        settings.setValue('log_level', str(self.log_level))
+        settings.setValue('submit_script', str(self.submit_script))
+        settings.setValue('use_mpi', self.use_mpi)
+        settings.setValue('mpi_options', str(self.mpi_options))
+        settings.setValue('use_debugger', self.use_debugger)
+        settings.setValue('debugger', str(self.debugger))
+        settings.setValue('compress_log', self.compress_log)
+        settings.setValue('dry_run', self.dry_run)
+
+class PreferencesDialog(QDialog):
+    def __init__(self, preferences, parent=None):
+        super(PreferencesDialog, self).__init__()
         prefix = os.path.dirname(os.path.abspath(__file__))
         loadUi(prefix + '/preferences.ui', self)
+        self.preferences = preferences
         # get GUI settings
         settings = QSettings('ITER', 'solps-gui')
-        self.lineEdit_monitor_interface.setText(settings.value(
-            'SOLPS_GUI_BIND', self.lineEdit_monitor_interface.text()))
-        self.lineEdit_monitor_port.setText(settings.value(
-            'SOLPS_GUI_PORT', self.lineEdit_monitor_port.text()))
-        self.lineEdit_monitor_ip.setText(settings.value(
-            'SOLPS_GUI_IP', self.lineEdit_monitor_ip.text()))
-        self.lineEdit_tcsh_path.setText(settings.value(
-            'tcsh_path', self.lineEdit_tcsh_path.text()))
-        self.lineEdit_gnuplot_path.setText(settings.value(
-            'gnuplot_path', self.lineEdit_gnuplot_path.text()))
-        self.comboBox_log_level.setCurrentIndex(int(settings.value(
-            'log_level', self.comboBox_log_level.currentIndex())))
-        self.comboBox_submit_script.setCurrentText(settings.value(
-            'submit_script', self.comboBox_submit_script.currentText()))
-        self.checkBox_use_mpi.setCheckState(int(settings.value(
-            'use_mpi', self.checkBox_use_mpi.checkState())))
-        self.lineEdit_mpi_options.setText(settings.value(
-            'MPI_OPTS', self.lineEdit_mpi_options.text()))
-        self.checkBox_use_debugger.setCheckState(int(settings.value(
-            'use_debugger', self.checkBox_use_debugger.checkState())))
-        self.lineEdit_debugger.setText(settings.value(
-            'debugger', self.lineEdit_debugger.text()))
-        self.checkBox_compress_log.setCheckState(int(settings.value(
-            'compress_log', self.checkBox_compress_log.checkState())))
-        self.checkBox_dry_run.setCheckState(int(settings.value(
-            'dry_run', self.checkBox_dry_run.checkState())))
+        self.lineEdit_monitor_interface.setText(preferences.bind_address)
+        self.lineEdit_monitor_port.setText(str(preferences.port))
+        self.lineEdit_monitor_ip.setText(preferences.solps_gui_ip)
+        self.lineEdit_tcsh_path.setText(preferences.tcsh_path)
+        self.lineEdit_gnuplot_path.setText(preferences.gnuplot_path)
+        self.comboBox_log_level.setCurrentIndex(preferences.log_level)
+        self.comboBox_submit_script.setCurrentText(preferences.submit_script)
+        self.checkBox_use_mpi.setCheckState(int(preferences.use_mpi))
+        self.lineEdit_mpi_options.setText(preferences.mpi_options)
+        self.checkBox_use_debugger.setCheckState(int(preferences.use_debugger))
+        self.lineEdit_debugger.setText(preferences.debugger)
+        self.checkBox_compress_log.setCheckState(int(preferences.compress_log))
+        self.checkBox_dry_run.setCheckState(int(preferences.dry_run))
 
     def setPreferences(self):
         s = QSettings('ITER', 'solps-gui')
-        s.setValue('SOLPS_GUI_BIND',  self.lineEdit_monitor_interface.text())
-        s.setValue('SOLPS_GUI_PORT', self.lineEdit_monitor_port.text())
-        s.setValue('SOLPS_GUI_IP', self.lineEdit_monitor_ip.text())
-        s.setValue('tcsh_path', self.lineEdit_tcsh_path.text())
-        s.setValue('gnuplot_path', self.lineEdit_gnuplot_path.text())
-        s.setValue('log_level', str(self.comboBox_log_level.currentIndex()))
-        s.setValue('submit_script', self.comboBox_submit_script.currentText())
-        s.setValue('use_mpi', self.checkBox_use_mpi.checkState())
-        s.setValue('MPI_OPTS', self.lineEdit_mpi_options.text())
-        s.setValue('use_debugger', self.checkBox_use_debugger.checkState())
-        s.setValue('debugger', self.lineEdit_debugger.text())
-        s.setValue('compress_log', self.checkBox_compress_log.checkState())
-        s.setValue('dry_run', self.checkBox_dry_run.checkState())
+        self.preferences.bind_address = self.lineEdit_monitor_interface.text()
+        self.preferences.port = int(self.lineEdit_monitor_port.text())
+        self.preferences.solps_gui_ip = self.lineEdit_monitor_ip.text()
+        self.preferences.tcsh_path = self.lineEdit_tcsh_path.text()
+        self.preferences.gnuplot_path = self.lineEdit_gnuplot_path.text()
+        self.preferences.log_level = self.comboBox_log_level.currentIndex()
         log_levels = [logging.DEBUG, logging.INFO, logging.WARNING,
                       logging.ERROR, logging.CRITICAL]
         log_level = log_levels[self.comboBox_log_level.currentIndex()]
         logging.getLogger().setLevel(log_level)
+        self.preferences.submit_script = self.comboBox_submit_script.currentText()
+        self.preferences.use_mpi = self.checkBox_use_mpi.checkState()
+        self.preferences.mpi_options = self.lineEdit_mpi_options.text()
+        self.preferences.use_debugger = self.checkBox_use_debugger.checkState()
+        self.preferences.debugger = self.lineEdit_debugger.text()
+        self.preferences.compress_log = self.checkBox_compress_log.checkState()
+        self.preferences.dry_run = self.checkBox_dry_run.checkState()
 
 class RunsStatusServer(QThread):
     """ Networking UDP listener for receiving job status updates.
@@ -881,6 +922,9 @@ class RunsModel(QAbstractItemModel):
         self.statusServerThread = RunsStatusServer()
         settings = QSettings("ITER", "solps-gui")
         default_port = 0xCAFE + os.getuid() % 13566
+        # TODO preferences such as:
+        # address = preferences.bind
+        # port = preferences.port
         try:
             address = settings.value("SOLPS_GUI_BIND", "0.0.0.0")
             port = int(settings.value("SOLPS_GUI_PORT", str(default_port)))
@@ -1030,6 +1074,8 @@ class SOLPS_MainWindow(QMainWindow):
             print(ui_path + ' not found')
             sys.exit(2)
 
+        self.preferences = Preferences()
+        self.preferences.read()
 
         self.main_tcsh = QProcess()  # for job submission and scripting
         self.solps_top = None  # Current active ${SOLPSTOP} for tcsh
@@ -1052,6 +1098,7 @@ class SOLPS_MainWindow(QMainWindow):
         log_handler.setFormatter(logging.Formatter(log_format))
         logging.getLogger().addHandler(log_handler)
         # get GUI settings
+        #TODO change/remove, we already used it
         settings = QSettings("ITER", "solps-gui")
         log_levels = [logging.DEBUG, logging.INFO, logging.WARNING,
                       logging.ERROR, logging.CRITICAL]
@@ -1303,9 +1350,11 @@ class SOLPS_MainWindow(QMainWindow):
 
     @pyqtSlot()
     def show_preferences_dialog(self):
-        dialog = Preferences()
+        dialog = Preferences(self.preferences)
         if dialog.exec_():
             dialog.setPreferences()
+            self.preferences.write()
+
 
     def closeEvent(self, event):
         """ Save GUI state at exit.
@@ -1328,6 +1377,8 @@ class SOLPS_MainWindow(QMainWindow):
         settings.setValue("ColumnWidth",
                           self.treeViewArchive.header().saveState())
         settings.endGroup()
+        # TODO write settings at exit
+        # self.preferences.write()
 
         QMainWindow.closeEvent(self, event)
 
