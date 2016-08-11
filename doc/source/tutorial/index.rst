@@ -10,5 +10,7 @@
    setup.rst
    runs.rst
    dashboard.rst
+   edgeualplugin/index.rst
    catalyst.rst
+
 

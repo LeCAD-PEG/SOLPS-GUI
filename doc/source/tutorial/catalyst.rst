@@ -38,6 +38,8 @@ The following deficiencies should also be considered when using Catalyst:
     start listening on some other port number to allow quick switching
     between many running simulations. Recommended way is to quit ParaView
     and start over with :menuselection:`Catalyst --> Connect`
+ 5. Instrumented code get's linked with large amount of shared libraries
+    that increase memory footprint and
 
 Basic Catalyst simulation
 -------------------------
