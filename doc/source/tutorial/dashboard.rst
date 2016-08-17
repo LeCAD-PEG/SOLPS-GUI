@@ -25,7 +25,6 @@ You should see the following window to open with some resizing and opening
 the *Dashboard* tab.
 
 .. image:: dashboard_1.png
-   :scale: 100
    :align: center
 
 On the left widget box should appear. When folding nearly all of the Qt
@@ -85,7 +84,6 @@ design cycle.
      following design.
 
      .. image:: dashboard_2.png
-        :scale: 80
         :align: center
 
   6. Now we just need to redistribute the signals and we're done. For that
@@ -96,7 +94,6 @@ design cycle.
      possible signals/slots will open.
 
      .. image:: dashboard_3.png
-        :scale: 80
         :align: center
 
   7. Select ``clicked()`` as emitted signal and ``executeSolpsPlotCommand()``
@@ -104,7 +101,6 @@ design cycle.
   8. Repeat by dragging the signal from the *Director* to the *Gnuplot* widget.
 
      .. image:: dashboard_4.png
-        :scale: 80
         :align: center
 
      Now we will pass the signal of the selected run received by the Director
@@ -113,7 +109,6 @@ design cycle.
      the following "workflow" should be seen
 
      .. image:: dashboard_5.png
-        :scale: 80
         :align: center
 
   9. We can exit the signal/slot editor by pressing  :kbd:`Esc` and then
@@ -150,7 +145,6 @@ widget.
    You should see the following auto-expanding lay-out:
 
    .. image:: dashboard_7.png
-        :scale: 80
         :align: center
 
    You can notice that the size policy for the ``QTabWidget`` is now
@@ -180,7 +174,6 @@ widget.
    signal/slot editor (:kbd:`F4`) and get:
 
    .. image:: dashboard_8.png
-        :scale: 80
         :align: center
 
    that is visible as in :

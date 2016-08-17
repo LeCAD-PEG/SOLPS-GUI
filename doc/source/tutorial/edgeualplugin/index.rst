@@ -60,7 +60,6 @@ After launching the ParaView application the start window appears.
 
 
 .. figure:: images/1_start_window_marked.png
-   :scale: 80
    :align: center
 
    ParaView start window.
@@ -78,6 +77,5 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
     :menuselection:`Tools --> Manage Plugins`
 
     .. figure:: images/2_manage_plugins.png
-       :scale: 80
        :align: center
  2. In Plugin Manager press the :guilabel:`Load Now` button.
