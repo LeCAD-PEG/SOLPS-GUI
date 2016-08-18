@@ -17,4 +17,5 @@ Currently, the HOWTOs are:
    style.rst
    submit.rst
    plugin.rst
+   cpo2ids/index.rst
 

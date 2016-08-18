@@ -217,9 +217,10 @@ latex_elements = {
 'papersize': 'a4paper',
 
 # The font size ('10pt', '11pt' or '12pt').
-#'pointsize': '10pt',
+'pointsize': '11pt',
 
 # Additional stuff for the LaTeX preamble.
+# See http://tex.stackexchange.com/questions/83020/set-standard-default-scaling-of-includegraphics
 'preamble': '\usepackage{graphicx}\setkeys{Gin}{width=.50\csname Gin@nat@width\endcsname,keepaspectratio}',
 
 # Latex figure (float) alignment
