@@ -23,6 +23,7 @@ import shlex
 sys.path.insert(0, os.path.abspath('../../src/gui'))
 sys.path.insert(0, os.path.abspath('../../src/widgets'))
 sys.path.insert(0, os.path.abspath('../../src/plugins/designer'))
+sys.path.append(os.path.abspath('exts'))
 
 # -- General configuration ------------------------------------------------
 
@@ -37,6 +38,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
+    'numfig',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
