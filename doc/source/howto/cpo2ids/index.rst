@@ -8,8 +8,8 @@ CPO2IDS HOWTO
 
 :Author: Dejan Penko and Leon Kos
 
-Our goal was to create a converter which will serve us for data
-transfer between the *Edge* CPO and the *Edge_profiles* IDS
+Our goal was to create a converter which will serve for data
+transfer between the EU-ITM *Edge* CPO and the ITER *Edge_profiles* IDS
 database. Test data transfer was done on ``gateway.efda-itm.org`` using two
 different CPO databases:
 
@@ -35,8 +35,9 @@ CPO database description.
 Using the cpo2ids converter
 ===========================
 
-In order for the converter to work the following modules must be loaded 
-(using terminal on the Gateway cluster where both CPO and IDS UAL modules are installed)::
+In order for the converter to work the following modules must be
+loaded (using terminal on the Gateway cluster where both CPO and IDS
+UAL modules are installed)::
 
  $ module use -a ~dkaljun/imas/etc/modulefiles
  $ module load imas/develop/3/ual/develop
@@ -48,7 +49,8 @@ Additional commands to check available modules etc.::
 
 Then to run the cpo2ids converter [1]_  using the command::
 
- $ python cpo2ids.py --shot=16151 --run=1000 --user=kosl --tokamak=aug --version=4.10a
+ $ python cpo2ids.py --shot=16151 --run=1000 --user=kosl \
+                     --tokamak=aug --version=4.10a
 
 The *shot*, *run*, *user*, *tokamak* and *verison* variable has to be
 correctly defined in order to get access to desired database. The
@@ -57,9 +59,10 @@ has to be in the start of the command.  For now for writing to IDS the
 *shot* and *run* parameters are the same as of the CPO's. If needed
 that can be changed in the future.
 
-When the converter is done the resulting files are stored in
-``$HOME/public/imasdb/solps-iter/3/0`` as ``ids_161511000``
-(ids_shotNumber_runNumber).
+When the converter is done, the resulting files ``ids_161511000`` are 
+stored in directory ``$HOME/public/imasdb/solps-iter/3/0``, where the
+filename is having ``ids_ShotNumberRunNumber`` format.
+
 
 .. [1] cpo2ids.py can be found under SOLPS-ITER/feature/IDS GIT repository
        in directory ``modules/B2.5/src/ids``.
@@ -210,16 +213,14 @@ transferring data from
    | IDS: ``edge-profiles.ggd(1).grid-subset(i).identifier.name``
 
 -  | CPO: ``edge.grid.subgrid(i).list(1).cls`` to
-   | IDS:
-     ``edge-profiles.ggd(1).grid-subset(i).element(1).object(1).dimension``
+   | IDS: ``edge-profiles.ggd(1).grid-subset(i).element(1).object(1).dimension``
 
 in addition, while converting we add
 
 -  | IDS: ``edge-profiles.ggd(1).grid-subset(i).identifier.index``
    | = ``subgrid-base-index``
 
--  | IDS:
-     ``edge-profiles.ggd(1).grid-subset(i).element(1).object(1).index``
+-  | IDS: ``edge-profiles.ggd(1).grid-subset(i).element(1).object(1).index``
    | = ``subgrid-class-object-index``
 
 where ``i`` is **subgrid base index**.
@@ -264,7 +265,8 @@ Geometry and nodes in IDS database
 
 Similarly to CPO database, the **geometry** in IDS database is found
 under subgrid ``Nodes`` in
-``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(c=1).object(k=1).geometry``,
+``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(c=1)`` 
+``.object(k=1).geometry``,
 where ``c`` is **subgrid class** and ``k`` is **subgrid class object
 index**, stored as an one-dimensional list as shown in :num:`Fig. #ids-geo1a`
 
@@ -331,32 +333,32 @@ transferring data from:
 Geometry and nodes for subgrids class 1 (nodes/points, ``c`` = 1):
 
 -  | CPO: ``edge.grid.spaces(1).objects(2).geo`` to
-   | IDS:
-     ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(1).object(1).geometry``
+   | IDS: ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(1)``
+   |      ``.object(1).geometry``
 
 -  | CPO: ``edge.grid.subgrid(i).list(1).ind`` or
      ``.list(1).indset(1).range`` to
-   | IDS:
-     ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(1).object(k).nodes``
+   | IDS: ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(1)``
+   |      ``.object(k).nodes``
 
 For subgrids class 2 (edges, ``c`` = 2):
 
 -  | CPO: ``edge.grid.spaces(1).objects(2).boundary`` to
-   | IDS:
-     ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(2).object(k).nodes``
+   | IDS: ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(2)``
+   |      ``.object(k).nodes``
 
 For subgrids class 3 (cells, ``c`` = 3):
 
 -  | CPO: Ordered node indices (got with using boundary data from Edges
      and script) to
-   | IDS:
-     ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(3).object(1).nodes``
+   | IDS: ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(3)``
+   |      ``.object(1).nodes``
 
 -  | CPO: Using ordered node indices and
      ``edge.grid.subgrid(i).list(1).ind`` or
      ``.list(1).indset(1).range`` to
-   | IDS:
-     ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(3).object(k).nodes``
+   | IDS: ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(3)``
+   |      ``.object(k).nodes``
 
 where ``i`` is **subgrid base index**, ``c`` is **subgrid class
 index** and ``k`` is **subgrid class object index**.
