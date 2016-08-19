@@ -228,5 +228,267 @@ where ``i`` is **subgrid base index**.
 Geometry and nodes
 ------------------
 
-Main data of our geometry represent the ``nodes/points``. Edges and
-faces/cells are constructed using nodes.
+Main data of our geometry represent the *nodes/points*. *Edges* and
+*faces/cells* are constructed using *nodes*.
+
+Geometry and nodes in CPO database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The **geometry** in CPO database is stored under subgrid ``Nodes``,
+which is used also as reference for geometry of other subgrids (2
+nodes/points form an edge, 4 nodes/points form a face/cell), in
+``edge.grid.spaces(1).objects(i=2).geo`` as an 4D array as shown in
+:num:`Fig. #cpo-geo1` and :num:`Fig. #cpo-geo2`.
+
+.. _cpo-geo1:
+.. figure:: images/utilities_xsd_Element_geo.png
+   :alt: CPO ``geometry`` data structure
+
+   CPO *geometry* data structure
+
+
+.. _cpo-geo2:
+.. figure:: images/utilities_xsd_Simple_Type_array4dflt_type.png
+   :alt: CPO ``geometry`` array structure
+
+   CPO *geometry* array structure
+
+| In Subgrid chapter we have mentioned that geometry (nodes) for other
+  subgrids is found in relation of list of indices for given subgrid
+  (general path:
+| ``edge.grid.subgrid(i).list(1)...`` where ``i`` is base
+  subgrid index) with geometry of ``Nodes`` subgrid..
+
+
+Geometry and nodes in IDS database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Similarly to CPO database, the **geometry** in IDS database is found
+under subgrid ``Nodes`` in
+``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(c=1).object(k=1).geometry``,
+where ``c`` is **subgrid class** and ``k`` is **subgrid class object
+index**, stored as an one-dimensional list as shown in :num:`Fig. #ids-geo1a`
+
+.. _ids-geo1a:
+.. figure:: images/dd_edge_profiles_generic_grid_dynamic_space_dimension_object2.png
+
+   IDS *geometry* data structure.
+
+Unlike geometry in CPO database, IDS database has a list of nodes for
+given subgrid close to geometry dataset, but similarly as in CPO
+database, we get our geometry using ``edge-profiles... .nodes`` data
+of given subgrid in relation to ``edge-profiles... .geometry`` data of
+the “main” subgrid ``Nodes`` so it’s not neccessary to define
+``edge-profiles... .geometry`` for each subgrid and that way we also
+use less space.
+
+Important differences between CPO and IDS geometry and nodes data structure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Because of the 4D array geometry data structure in CPO database, the
+geometry there can be stored in multi-array structure, while in IDS
+database it can be stored only as a list of data. To read/write geometry
+from CPO database we have to state two indices, where first index
+indicates the node index (goes from ``1`` to ``n``, where n is
+number of nodes) while the second index indicates the coordinate (2D: 1
+for *x*, 2 for *y*) in form
+*[[x-1,y-1], [x-2,y-2], ..., [x-n,y-n]]* where *n*
+is number of nodes. Because geometry of IDS database is limited to
+one-dimensional space (list), only one index can be used. The decision
+was made to write in Fortran notation and in this case read/write to IDS
+database is done in form
+*[x-1, x-2, x-3, ..., x-n, y-1, y-2, y-3,... y-n]* consisting of
+*2n* elements, which gives us *n* nodes.
+
+We have mentioned, that ``geometry`` in CPO databases uses two
+indices, one of which is node index. IDS database doesn’t have this
+option and it has separate nodes list, located in
+``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(c)``
+``.object(k).nodes`` and holds in Fortran notation from 1 to *n*.
+
+.. figure:: images/dd_edge_profiles_generic_grid_dynamic_space_dimension_object.png
+   :alt: IDS ``nodes`` data structure
+
+   IDS ``nodes`` data structure
+
+Also getting the geometry of the ``Cells`` subgrid using CPO database
+was quite problematic to put together. We found only boundary data in
+``edge.grid.spaces(1).objects(3).boundary`` for which we couldn’t find
+a proper way to use it, instead we managed to correctly construct the
+``Cells`` subgrid using boundary data from ``Edges`` subgrid in
+``edge.grid.spaces(1).objects(2).boundary`` together with
+scripting. While converting geometry to IDS, the ordered node indices
+of ``Cells`` subgrid were properly stored under
+``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(3).object(1).nodes``.
+
+Converting geometry and nodes from CPO to IDS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Regarding the previously explained CPO and IDS database structure,
+transferring geometry data from CPO to IDS database is done by
+transferring data from:
+
+Geometry and nodes for subgrids class 1 (nodes/points, ``c`` = 1):
+
+-  | CPO: ``edge.grid.spaces(1).objects(2).geo`` to
+   | IDS:
+     ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(1).object(1).geometry``
+
+-  | CPO: ``edge.grid.subgrid(i).list(1).ind`` or
+     ``.list(1).indset(1).range`` to
+   | IDS:
+     ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(1).object(k).nodes``
+
+For subgrids class 2 (edges, ``c`` = 2):
+
+-  | CPO: ``edge.grid.spaces(1).objects(2).boundary`` to
+   | IDS:
+     ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(2).object(k).nodes``
+
+For subgrids class 3 (cells, ``c`` = 3):
+
+-  | CPO: Ordered node indices (got with using boundary data from Edges
+     and script) to
+   | IDS:
+     ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(3).object(1).nodes``
+
+-  | CPO: Using ordered node indices and
+     ``edge.grid.subgrid(i).list(1).ind`` or
+     ``.list(1).indset(1).range`` to
+   | IDS:
+     ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(3).object(k).nodes``
+
+where ``i`` is **subgrid base index**, ``c`` is **subgrid class
+index** and ``k`` is **subgrid class object index**.
+
+Electron density and electron temperature
+------------------------------------------
+Electron density and electron temperature in CPO database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In CPO database, electron density and electron temperature datasets are
+stored under ``fluid`` dataset where ’\ ``ne``\ ’ stands for
+electron density and ’\ ``te``\ ’ stands for electron temperature,
+as shown in :num:`Fig. #cpo-fluid`.
+
+.. _cpo-fluid:
+.. figure:: images/edge_xsd_Element_fluid.png
+   :alt: CPO ``fluid`` data structure
+
+   CPO ``fluid`` data structure
+
+Furthermore, both electron density and electron temperature dataset
+structure consists of many subdata sets, ``value`` subdata set being
+one of them (path: ``edge.fluid.ne.value(ne-species-index)`` where
+``ne-species-index`` goes from 1 to n, where n is number of electron
+density species), as shown in :num:`Fig. #cpo-ne`. In it we can find
+``subgrid`` data, which is used to store the subgrid base index, and
+``scalar`` dataset, in which array of data is stored (electron density
+values in ``1/m^3``), as seen on Fig.  :num:`Fig. #cpo-value`.
+
+.. _cpo-ne:
+.. figure:: images/edge_xsd_Element_ne.png
+   :alt: CPO ``electron density`` data structure
+
+   CPO ``electron density`` data structure
+
+.. _cpo-value:
+.. figure:: images/edge_xsd_Element_value.png
+   :alt: CPO ``value`` data structure
+
+   CPO ``value`` data structure
+
+.. figure:: images/utilities_xsd_Element_scalar_2.png
+   :alt: CPO ``scalar`` data structure
+
+   CPO ``scalar`` data structure
+
+Electron temperature ``te`` data set has identical structure as
+electron density ``ne`` data set.
+
+.. figure:: images/edge_xsd_Element_te.png
+   :alt: CPO ``electron`` ``temperature`` data structure
+
+   CPO ``electron`` ``temperature`` data structure
+
+Electron density and electron temperature in IDS database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+While in CPO database, as already mentioned, electron density ``ne``
+and electron temperature ``te`` datasets are part of ``fluid``
+dataset, in IDS database are part of ``electrons`` dataset (path in
+IDS: ``edge-profiles.ggd(1).electrons``), which furthermore
+systematically splits to electrons properties datasets, as seen on
+:num:`Fig. #ids-electrons`, with density (path:
+``edge-profiles.ggd(1).electrons.density(ne-species-index)``) and
+temperature (path:
+``edge-profiles.ggd(1).electrons.temperature(te-species-index)``)
+included.
+
+.. _ids-electrons:
+.. figure:: images/dd_edge_profiles_edge_profiles_time_slice.png
+   :alt: IDS ``electrons`` data structure
+
+   IDS ``electrons`` data structure
+
+The IDS ``density`` dataset, shown in
+:num:`Fig. #ids-electron-density` consists of less subdata sets as CPO
+electron density ``ne`` dataset. ``Grid-subset-index`` (in “Subgrid”
+and “Geometry and nodes” chapter we called it **subgrid base index**)
+and ``values`` data in IDS database are taken for being the same
+datasets as ``subgrid`` index and ``scalar`` data in CPO database.
+
+.. _ids-electron-density:
+.. figure:: images/dd_edge_profiles_edge_profiles_time_slice_electrons.png
+
+   IDS *electron density* data structure.
+
+IDS ``temperature`` dataset has the same structure as ``density``
+dataset as shown in Fig.  :num:`Fig. #ids-electron-temperature`.
+
+.. _ids-electron-temperature:
+.. figure:: images/dd_edge_profiles_edge_profiles_time_slice_electrons.png
+
+   IDS *electron temperature* data structure
+
+Converting electron density and electron temperature scalars from CPO to IDS database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Regarding the CPO and IDS database structure previously explained,
+transferring electrons density and temperature data from CPO to IDS
+database is done by transferring data from
+
+-  | CPO: `` edge.fluid.ne.value(m).subgrid`` to
+   | IDS:
+     ``edge_profiles.ggd(1).electrons.density(i).grid_subset_index``
+     (electron density subgrid/subset index),
+
+-  | CPO: `` edge.fluid.ne.value(m).scalar(j)`` to
+   | IDS: ``edge_profiles.ggd(1).electrons.density(m).values(j)``
+     (electron density values),
+
+-  | CPO: ``edge.fluid.te.value(m).subgrid`` to
+   | IDS:
+     ``edge_profiles.ggd(1).electrons.temperature(m).grid_subset_index``
+     (electron temperature subgrid/subset index) and
+
+-  | CPO: `` edge.fluid.te.value(m).scalar(j)`` to
+   | IDS:
+     ``edge_profiles.ggd(1).electrons.temperature(m).values(j)``
+     (electron temperature values),
+
+where ``m`` is **electron density/temperature species index** and
+``j`` is **scalar index**.
+
+Moreover, because in IDS we don’t have a space to store list of
+indices for ``Core``, ``SOL``, ``Inner`` ``divertor`` and ``Outer``
+``divertor`` subgrids, corresponding to ``Cells`` subgrid (all of them
+are class 3) as in CPO database (found in
+``edge.grid.subgrid(i).list(1).ind`` or ``.list(1).indset(1).range``),
+which would be used to properly connect subgrid geometry and subgrid
+scalars, we decided to create additional 4 electron density and
+electron temperature species, define proper ``grid_subset_index`` and,
+using list of indices from CPO and scalars of ``Cells`` subgrid, store
+the scalars the same way as for previous electron density and electron
+temperature species.
+
