@@ -386,7 +386,7 @@ one of them (path: ``edge.fluid.ne.value(ne-species-index)`` where
 density species), as shown in :num:`Fig. #cpo-ne`. In it we can find
 ``subgrid`` data, which is used to store the subgrid base index, and
 ``scalar`` dataset, in which array of data is stored (electron density
-values in ``1/m^3``), as seen on Fig.  :num:`Fig. #cpo-value`.
+values in ``1/m^3``), as seen on :num:`Fig. #cpo-value`.
 
 .. _cpo-ne:
 .. figure:: images/edge_xsd_Element_ne.png
@@ -530,7 +530,7 @@ where ``k`` is index corresponding to ``k`` ion.
 Ion density and ion temperature in IDS database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In IDS database, the structure of ion dataset, shown in Fig.
+In IDS database, the structure of ion dataset, shown in 
 :num:`Fig. #ids-ions`, is more extensive in comparison with the
 electrons dataset, shown in :num:`Fig. #ids-electrons`, while ion
 density and ion temperature dataset structure, shown in
