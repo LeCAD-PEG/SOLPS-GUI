@@ -88,7 +88,7 @@ Subgrids are of different classes. Class 1 is for *nodes*, class 2 for
 .. [2] In CPO *subgrid* term is used, while in IDS it's used term *subset*.
 
 .. _ids-cells-te:
-.. figure:: IDS_ReadUALEdge_Cells_Subgrid.png
+.. figure:: images/IDS_ReadUALEdge_Cells_Subgrid.png
    :alt: Cells subgrid showing electron temperature values (using IDS database)
 
    Cells subgrid showing electron temperature values (using IDS database).
@@ -96,7 +96,7 @@ Subgrids are of different classes. Class 1 is for *nodes*, class 2 for
 
 .. _ids-core-te:
 
-.. figure:: IDS_ReadUALEdge_Core_Subgrid.png
+.. figure:: images/IDS_ReadUALEdge_Core_Subgrid.png
    :alt: Core subgrid showing electron temperature values (using IDS database)
 
    Core subgrid showing electron temperature values (using IDS database).
@@ -153,7 +153,7 @@ base index** going from, the same as in CPO, ``1...n``, where ``n`` is
 sum of all subgrids, as seen in :num:`Fig. #ids-grid`.
 
 .. _ids-grid:
-.. figure:: images/dd_edge_profiles_edge_profiles_time_slice0.png
+.. figure:: images/dd_edge_profiles_edge_profiles_time_slice0-crop.png
 
    IDS *grid* structure
 
@@ -162,12 +162,12 @@ It holds **subgrid name** in ``.identifier.name`` and additional info
 :num:`Fig. #ids-subset` and :num:`Fig. #ids-identifier`.
 
 .. _ids-subset:
-.. figure:: images/dd_edge_profiles_generic_grid_dynamic_grid_subset.png
+.. figure:: images/dd_edge_profiles_generic_grid_dynamic_grid_subset-crop.png
 
    IDS *subset* structure
 
 .. _ids-identifier:
-.. figure:: images/dd_edge_profiles_generic_grid_dynamic_grid_subset2.png
+.. figure:: images/dd_edge_profiles_generic_grid_dynamic_grid_subset2-crop.png
 
    IDS *identifier* structure
 
@@ -179,12 +179,12 @@ holds **subgrid object index**, used to navigate to subgrids geometry
 data, which will be covered later.
 
 .. _ids-element:
-.. figure:: images/dd_edge_profiles_generic_grid_dynamic_grid_subset_element.png
+.. figure:: images/dd_edge_profiles_generic_grid_dynamic_grid_subset_element-crop.png
 
    IDS *element* structure   
 
 .. _ids-dimension:
-.. figure:: images/dd_edge_profiles_generic_grid_dynamic_grid_subset3.png
+.. figure:: images/dd_edge_profiles_generic_grid_dynamic_grid_subset3-crop.png
 
    IDS *dimension* structure
 
@@ -269,7 +269,7 @@ where ``c`` is **subgrid class** and ``k`` is **subgrid class object
 index**, stored as an one-dimensional list as shown in :num:`Fig. #ids-geo1a`
 
 .. _ids-geo1a:
-.. figure:: images/dd_edge_profiles_generic_grid_dynamic_space_dimension_object.png
+.. figure:: images/dd_edge_profiles_generic_grid_dynamic_space_dimension_object-crop1.png
 
    IDS *geometry* data structure.
 
@@ -306,7 +306,7 @@ option and it has separate nodes list, located in
 ``.object(k).nodes`` and holds in Fortran notation from 1 to *n*.
 
 .. _ids-nodes:
-.. figure:: images/dd_edge_profiles_generic_grid_dynamic_space_dimension_object.png
+.. figure:: images/dd_edge_profiles_generic_grid_dynamic_space_dimension_object-crop2.png
    :alt: IDS ``nodes`` data structure
 
    IDS ``nodes`` data structure
@@ -428,7 +428,7 @@ temperature (path:
 included.
 
 .. _ids-electrons:
-.. figure:: images/dd_edge_profiles_edge_profiles_time_slice.png
+.. figure:: images/dd_edge_profiles_edge_profiles_time_slice-crop.png
    :alt: IDS ``electrons`` data structure
 
    IDS ``electrons`` data structure
@@ -441,7 +441,7 @@ and ``values`` data in IDS database are taken for being the same
 datasets as ``subgrid`` index and ``scalar`` data in CPO database.
 
 .. _ids-electron-density:
-.. figure:: images/dd_edge_profiles_edge_profiles_time_slice_electrons.png
+.. figure:: images/dd_edge_profiles_edge_profiles_time_slice_electrons-crop1.png
 
    IDS *electron density* data structure.
 
@@ -449,7 +449,7 @@ IDS ``temperature`` dataset has the same structure as ``density``
 dataset as shown in :num:`Fig. #ids-electron-temperature`.
 
 .. _ids-electron-temperature:
-.. figure:: images/dd_edge_profiles_edge_profiles_time_slice_electrons.png
+.. figure:: images/dd_edge_profiles_edge_profiles_time_slice_electrons-crop2.png
 
    IDS *electron temperature* data structure
 
@@ -540,17 +540,17 @@ temperature dataset, previously shown in
 database, ``ion`` database is array of ``n`` property species.
 
 .. _ids-ions:
-.. figure:: images/dd_edge_profiles_edge_profiles_time_slice2.png
+.. figure:: images/dd_edge_profiles_edge_profiles_time_slice2-crop.png
 
    IDS *ion* structure
 
 .. _ids-ion-density:
-.. figure:: images/dd_edge_profiles_edge_profiles_time_slice_ion.png
+.. figure:: images/dd_edge_profiles_edge_profiles_time_slice_ion-crop1.png
 
    IDS *ion density* structure
 
 .. _ids-ion-temperature:
-.. figure:: images/dd_edge_profiles_edge_profiles_time_slice_ion.png
+.. figure:: images/dd_edge_profiles_edge_profiles_time_slice_ion-crop2.png
 
    IDS *ion temperature* structure.
 

@@ -19,7 +19,8 @@ crop:	# Calculates crop size for trimmed images from LaTeX file
 		sub("trim=", "", trim);\
 		sub(".*{", "", file);\
 		sub("}.*", "", file);\
-		file="images/" file ".png";\
+		outfile = "images/" file "-crop.png";\
+		file = "images/" file ".png";\
 		cmd = "identify -format \"%w %h\" " file;\
 		cmd | getline;\
 		split($$0, wh, " ");\
@@ -29,9 +30,10 @@ crop:	# Calculates crop size for trimmed images from LaTeX file
 			print "Crop not needed for", file;\
 			next;\
 		}\
-		printf("trim=%.0f %.0f %.0f %.0f size=%d %d\n",\
-		  u*p[1] , u*p[2], u*p[3], u*p[4], wh[1], wh[2]);\
-		printf("convert -crop %dx%d+%d+%d %s out.png\n",\
+		printf("#%d trim=%.0f %.0f %.0f %.0f size=%d %d\n",\
+		  ++k, u*p[1] , u*p[2], u*p[3], u*p[4], wh[1], wh[2]);\
+		printf("convert -crop %dx%d+%d+%d %s %s\n",\
 			 wh[1]-u*p[1]-u*p[3],\
-			 wh[2]-u*p[2]-u*p[4], u*p[1], u*p[4], file);\
+			 wh[2]-u*p[2]-u*p[4],\
+			 u*p[1], u*p[4], file, outfile);\
 		}' cpo2ids.tex
