@@ -88,7 +88,6 @@ Subgrids are of different classes. Class 1 is for *nodes*, class 2 for
 .. [2] In CPO *subgrid* term is used, while in IDS it's used term *subset*.
 
 .. _ids-cells-te:
-
 .. figure:: IDS_ReadUALEdge_Cells_Subgrid.png
    :alt: Cells subgrid showing electron temperature values (using IDS database)
 
@@ -270,7 +269,7 @@ where ``c`` is **subgrid class** and ``k`` is **subgrid class object
 index**, stored as an one-dimensional list as shown in :num:`Fig. #ids-geo1a`
 
 .. _ids-geo1a:
-.. figure:: images/dd_edge_profiles_generic_grid_dynamic_space_dimension_object2.png
+.. figure:: images/dd_edge_profiles_generic_grid_dynamic_space_dimension_object.png
 
    IDS *geometry* data structure.
 
@@ -306,6 +305,7 @@ option and it has separate nodes list, located in
 ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(c)``
 ``.object(k).nodes`` and holds in Fortran notation from 1 to *n*.
 
+.. _ids-nodes:
 .. figure:: images/dd_edge_profiles_generic_grid_dynamic_space_dimension_object.png
    :alt: IDS ``nodes`` data structure
 
@@ -398,6 +398,7 @@ values in ``1/m^3``), as seen on Fig.  :num:`Fig. #cpo-value`.
 
    CPO ``value`` data structure
 
+.. _cpo-scalar:
 .. figure:: images/utilities_xsd_Element_scalar_2.png
    :alt: CPO ``scalar`` data structure
 
@@ -406,6 +407,7 @@ values in ``1/m^3``), as seen on Fig.  :num:`Fig. #cpo-value`.
 Electron temperature ``te`` data set has identical structure as
 electron density ``ne`` data set.
 
+.. _cpo-te:
 .. figure:: images/edge_xsd_Element_te.png
    :alt: CPO ``electron`` ``temperature`` data structure
 
@@ -444,7 +446,7 @@ datasets as ``subgrid`` index and ``scalar`` data in CPO database.
    IDS *electron density* data structure.
 
 IDS ``temperature`` dataset has the same structure as ``density``
-dataset as shown in Fig.  :num:`Fig. #ids-electron-temperature`.
+dataset as shown in :num:`Fig. #ids-electron-temperature`.
 
 .. _ids-electron-temperature:
 .. figure:: images/dd_edge_profiles_edge_profiles_time_slice_electrons.png
@@ -491,4 +493,105 @@ electron temperature species, define proper ``grid_subset_index`` and,
 using list of indices from CPO and scalars of ``Cells`` subgrid, store
 the scalars the same way as for previous electron density and electron
 temperature species.
+
+Ion density and ion temperature
+-------------------------------
+
+Ion density and ion temperature in CPO database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In CPO database, the same as electron density ``ne`` and electron
+temperature ``te``, also ion density ``ni`` and ion temperature
+``ti`` are part of ``fluid`` database, as already previously
+shown in :num:`Fig. #cpo-fluid`, and have also the same structure, as
+seen comparing figures :num:`Fig. #cpo-ne` and :num:`Fig. #cpo-te` with
+:num:`Fig. #cpo-ni` and :num:`Fig. #cpo-ti`.
+
+.. _cpo-ni:
+.. figure:: images/edge_xsd_Element_ni.png
+   :alt: CPO ``ion`` ``density`` data structure
+
+   CPO ``ion`` ``density`` data structure
+
+But there is one difference. While electrons are only one, we can have
+many different ions and data corresponding to them, so each ion dataset
+is set as array of ``n`` ion property species. For example, path to
+ion density data in CPO database would be ``edge.fluid.ni(k)``,
+where ``k`` is index corresponding to ``k`` ion.
+
+.. _cpo-ti:
+.. figure:: images/edge_xsd_Element_ti.png
+   :alt: CPO ``ion`` ``temperature`` data structure
+
+   CPO ``ion`` ``temperature`` data structure
+
+Ion density and ion temperature in IDS database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In IDS database, the structure of ion dataset, shown in Fig.
+:num:`Fig. #ids-ions`, is more extensive in comparison with the
+electrons dataset, shown in :num:`Fig. #ids-electrons`, while ion
+density and ion temperature dataset structure, shown in
+:num:`Fig. #ids-ion-density` and :num:`Fig. #ids-ion-temperature`,
+remains the same as structure of electron density and electron
+temperature dataset, previously shown in
+:num:`Fig. #ids-electron-density` and
+:num:`Fig. #ids-electron-temperature`. Also, similarly as in CPO
+database, ``ion`` database is array of ``n`` property species.
+
+.. _ids-ions:
+.. figure:: images/dd_edge_profiles_edge_profiles_time_slice2.png
+
+   IDS *ion* structure
+
+.. _ids-ion-density:
+.. figure:: images/dd_edge_profiles_edge_profiles_time_slice_ion.png
+
+   IDS *ion density* structure
+
+.. _ids-ion-temperature:
+.. figure:: images/dd_edge_profiles_edge_profiles_time_slice_ion.png
+
+   IDS *ion temperature* structure.
+
+Converting ion density and ion temperature from CPO to IDS database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Regarding the CPO and IDS database structure previously explained,
+transferring ion density and temperature data from CPO to IDS database
+is done by transferring data from
+
+-  | CPO: ``edge.fluid.ni(p).value(m).subgrid`` to
+   | IDS:
+     ``edge_profiles.ggd(1).ion(p).density(m).grid_subset_index``
+     (ion density subgrid/subset index),
+
+-  | CPO: ``edge.fluid.ni(p).value(m).scalar(j)`` to
+   | IDS: ``edge_profiles.ggd(1).ion(k).density(m).values(j)`` (ion
+     density values),
+
+-  | CPO: ``edge.fluid.ti(p).value(i).subgrid`` to
+   | IDS:
+     ``edge_profiles.ggd(1).ion(p).temperature(m).grid_subset_index``
+     (ion temperature subgrid/subset index) and
+
+-  | CPO: ``edge.fluid.ti(p).value(m).scalar(j)`` to
+   | IDS: ``edge_profiles.ggd(1).ion(p).temperature(m).values(j)``
+     (ion temperature values),
+
+where ``p`` is **ion index**, ``m`` is **ion density/temperature
+species index** and ``j`` is **scalar index**.
+
+| Moreover, the same as discussed in previous section about converting
+  electron
+| density/temperature scalars, in IDS database we don’t have place to
+  store the list of indices for ``Core``, ``SOL``, ``Inner``
+  ``divertor`` and ``Outer`` ``divertor`` subgrids,
+  corresponding to ``Cells`` subgrid (class 3 subgrids) as in CPO
+  database. The issue was solved in the same way as for electron
+  properties. For each ion dataset we created additional 4 ion density
+  and ion temperature species, defined proper
+  ``grid_subset_index`` and, using list of indices from CPO and
+  scalars of ``Cells`` subgrid, store the scalars the same way as
+  for previous ion density and ion temperature species.
 
