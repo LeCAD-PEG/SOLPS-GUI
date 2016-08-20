@@ -5,7 +5,7 @@ all: cpo2ids.pdf
 	pdflatex $*
 
 clean:
-	rm -f cpo2ids.pdf 
+	rm -f cpo2ids.pdf converted.txt output.txt
 	rm -f *.aux *.toc *.bbl *.toc *.out *.lof *.log *.synctex.gz
 
 convert:

@@ -156,7 +156,7 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
     \end{figure}
     \clearpage
     
-    \item[5.]{Run the plugin by navigating from Menu Bar to \textit{Sources} $\to$ \textit{UAL Edge} (see Fig. \ref{fig:pv_run_plugin_1}). The Pipeline Browser will change and after choosing the desired database parameters press button \textbf{Apply} (see Fig. \ref{fig:pv_run_plugin_2}). The database will be loaded and visualized on the View Browser as seen in Fig. \ref{fig:pv_run_plugin_3} for aug tokamak and in Fig. \ref{fig:pv_run_plugin_4} for iter tokamak.}
+    \item[5.]{Run the plugin by navigating from Menu Bar to \textit{Sources} $\to$ \textit{UAL Edge} (see Fig. \ref{fig:pv_run_plugin_1}). The Pipeline Browser will change and after choosing the desired database parameters press button \textbf{Apply} (see Fig. \ref{fig:pv_run_plugin_2}). The database will be loaded and visualized on the View Browser as seen in Fig. \ref{fig:pv_run_plugin_3} for Aug tokamak and in Fig. \ref{fig:pv_run_plugin_4} for Iter tokamak.}
     \vspace{2cm}
     \begin{figure}[ht] \centering
         \includegraphics[scale=0.5,trim=0cm 0cm 0cm 0cm,clip]{6_running_plugin}
@@ -172,14 +172,14 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
     
     \begin{figure}[ht] \centering
         \includegraphics[scale=0.5,trim=0cm 0cm 0cm 0cm,clip]{8_plugin_run2}
-    	\caption{Example of visualized data gathered from tokamak $aug$ database}
+    	\caption{Example of visualized data gathered from tokamak $Aug$ database}
     	\label{fig:pv_run_plugin_3}
     \end{figure}
     \clearpage
     
     \begin{figure}[ht] \centering
         \includegraphics[scale=0.5,trim=0cm 0cm 0cm 0cm,clip]{10_plugin_loaded3}
-    	\caption{Example of visualizied data gathered from tokamak $iter$ database}
+    	\caption{Example of visualizied data gathered from tokamak $Iter$ database}
     	\label{fig:pv_run_plugin_4}
     \end{figure}
 \end{itemize}
@@ -191,7 +191,7 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
 	\label{fig:pv_reset_button}
 \end{wrapfigure}
 
-Note: Sometimes after opening iter tokamak database \textbf{no} visual change in the $View$ $Browser$ can be seen, because of the default zoom. To solve that press twice the \textbf{Reset button} found in \textit{Toolbar}
+Note: Sometimes after opening Iter tokamak database \textbf{no} visual change in the $View$ $Browser$ can be seen, because of the default zoom. To solve that press twice the \textbf{Reset button} found in \textit{Toolbar}
 
 \clearpage
 \subsection{Data analysis}
@@ -200,7 +200,7 @@ In previous chapter we can notice that we have loaded data, but no useful inform
 
 \subsubsection{Subgrids and Multi-Block Inspector}
 
-Briefly said, subgrid is "a piece" of geometry\footnote[1]{More information about subgrids can be found in \textit{Edge cpo2ids converter work notes} .pdf}. In our case, the \textbf{Multi-Block Inspector} uses the subgrids as blocks of data, using a different color for each block of data, as seen on Figures \ref{fig:pv_run_plugin_3} and \ref{fig:pv_run_plugin_4}, and it is used to select and display only the wanted blocks of data.
+Briefly said, subgrid is "a piece" of geometry\footnote[1]{More information about subgrids can be found in \textit{Edge cpo2ids converter work notes} .pdf}. In our case, the \textbf{Multi-Block Inspector} uses the subgrids as blocks of data, using a different color for each block of data, as seen in Figures \ref{fig:pv_run_plugin_3} and \ref{fig:pv_run_plugin_4}, and it is used to select and display only the wanted blocks of data.
 
 To load the Multi-Block Inspector, go to Menu bar $View$ and check the \textit{Multi-Block Inspector} selection, as seen in Fig. \ref{fig:pv_loading_mbinsp}. Then you should have already noticed that a new interface called \textit{Multi-Block Inspector} opened at the bottom of the Pipeline Browser, as seen in Fig. \ref{fig:pv_mbinsp}.
 
@@ -222,7 +222,7 @@ To load the Multi-Block Inspector, go to Menu bar $View$ and check the \textit{M
 
 \clearpage
 
-Here we can select the wanted blocks we want to be seen on screen. An example is shown in Fig. \ref{fig:pv_mbinscp_cells}, where only the $Cells$ block was selected, and in Fig. \ref{fig:pv_mbinscp_nodes}, where only the $Nodes$ block was selected. We can also choose multiple blocks at once, as shown in Fig. \ref{fig:pv_mbinspc_sol_odivertor} where blocks $SOL$ and $Outer$ $Divertor$ were selected.
+Here we can select the wanted blocks we want to be seen in the \textit{View Browser}. An example is shown in Fig. \ref{fig:pv_mbinscp_cells}, where only the $Cells$ block was selected, and in Fig. \ref{fig:pv_mbinscp_nodes}, where only the $Nodes$ block was selected. We can also choose multiple blocks at once, as shown in Fig. \ref{fig:pv_mbinspc_sol_odivertor} where blocks $SOL$ and $Outer$ $Divertor$ were selected.
 
 \begin{figure}[ht] \centering
     \includegraphics[scale=0.5,trim=0cm 0cm 0cm 0cm,clip]{13_mbinsp_cells}
@@ -247,7 +247,7 @@ Here we can select the wanted blocks we want to be seen on screen. An example is
 \clearpage 
 \subsubsection{Data arrays}
 
-Data arrays are holding data such as \textit{electron density/temperature} and \textit{ion density/temperature} scalars, which are used to color the blocks. When running the ReadUALedge plugin with the \textit{Multi-Block Inspector} the \textit{vtkBlockColors} layer is automatically selected, coloring the blocks with their specific block color. To select the wanted data layer navigate through \textbf{List of Data Arrays} as seen in Fig. \ref{fig:pv_data_arrays_list}. Examples are shown in Figures \ref{fig:pv_data_arrays_list_ne}, \ref{fig:pv_data_arrays_list_te} and \ref{fig:pv_data_arrays_list_te_core_sol}.
+Data arrays are holding data such as \textit{electron density/temperature} and \textit{ion density/temperature} values, which are used to color the blocks. When running the ReadUALedge plugin with the \textit{Multi-Block Inspector} the \textit{vtkBlockColors} layer is automatically selected, coloring the blocks with their specific block color. To select the wanted data layer navigate through \textbf{List of Data Arrays} found in Toolbar, as seen in Fig. \ref{fig:pv_data_arrays_list}. Examples are shown in Figures \ref{fig:pv_data_arrays_list_ne}, \ref{fig:pv_data_arrays_list_te} and \ref{fig:pv_data_arrays_list_te_core_sol}.
 
 \begin{figure}[ht] \centering
     \includegraphics[scale=0.5,trim=0cm 0cm 0cm 0cm,clip]{16_data_arrays_list}
@@ -279,7 +279,7 @@ Data arrays are holding data such as \textit{electron density/temperature} and \
 
 \subsubsection{Python Calculator filter}
 
-Python Calculator filter allows us to work with data arrays (Electron Density, Ion Temperature etc.) and create new data array to display the results. It can be found under $Filter\to Alphabetical\to Python Calculator$ as seen in Fig. \ref{fig:pv_python_calculator1} and \ref{fig:pv_python_calculator2}.
+Python Calculator filter allows us to work with data arrays (Electron Density, Ion Temperature etc.) and create new data array to display the results. It can be found under $Filter\to Alphabetical\to Python$ $Calculator$ as seen in Fig. \ref{fig:pv_python_calculator1} and \ref{fig:pv_python_calculator2}.
 
 \begin{figure}[ht] \centering
 \begin{minipage}[b]{0.48\textwidth}
@@ -313,7 +313,7 @@ This filter takes a case sensitive \textit{Expression}\footnote[1]{The Python Ca
 \item  Expression: \\ inputs[0].CellData['Ion Density 1']+inputs[0].CellData['Ion Density 2']
 \item  Array Association: \\ Cell Data
 \item  Array Name: \\ Custom Array Name
-item   Press Apply Button
+\item   Press Apply Button
 \end{itemize}
 
 \begin{figure}[ht] \centering
@@ -326,9 +326,9 @@ In this case the Python Calculator created a sum of \textit{Ion Density 1} and \
 
 \clearpage 
 
-Note 1: If we have a long list od data layers and want to create sum of all of them the expression can be very long. Typing it manually can be frustrating, so it's advisable to use a short self written code to generate the expression. ParaView includes also its own Python Shell. The use of Python Shell in Paraview and example of code to generate the expression is explained in \textit{ParaView Python Shell} chapter.
+Note 1: If we have a long list od data layers and want to create sum of all of them the expression can be very long. Typing it manually can be frustrating, so it's advisable to use a short self written script to generate the expression. ParaView includes also its own Python Shell. The use of Python Shell in Paraview and example of script to generate the expression is explained and shown in \textit{ParaView Python Shell} chapter.
 
-Note 2: After the Python Calculator is run and until  applying the setting in Pipeline Browser there will be one block shown in Multi-Block Inspector, if activated, with the name $PythonCalculator1$. If we deselect this block, the ParaView will crash and it may also cause the ReadUALEdge plugin to fully unload, in which case it must be again manually loaded using Plugin Manager. 
+Note 2: After the Python Calculator was ran and until applying the setting in Pipeline Browser there will be one block shown in Multi-Block Inspector, if activated, with the name $PythonCalculator1$. If we deselect this block, the ParaView might crash and it may also cause the ReadUALEdge plugin to fully unload, in which case it must be again manually loaded using Plugin Manager. 
 After pressing the \textbf{Apply} button the Multi-Block Inspector works normally. 
 
 More Python Calculator functions and operations can be found on web page \\
@@ -352,12 +352,12 @@ ParaView Python Shell\footnote[1]{uses Python 2.6.9} can be found navigating to 
     \label{fig:pv_python_shell2}
 \end{figure}
 
-Here we'll show an example solving the issue with very long Python Calculator Expressions. 
+Here we'll show an example solving the issue with quite long Python Calculator Expressions. 
 The IDS database Shot:1; Run:1; User: kosl; Tokamak: Iter has almost 100 Ion Density data arrays, so very long expression is needed to create a sum of all of them, but because inside the expression the functions are being repeated we can easily generate it using Python Shell.
 
 \clearpage
 
-The Python code and part of its output is shown in Fig. \ref{fig:pv_python_shell3}.
+The Python script and part of its output is shown in Fig. \ref{fig:pv_python_shell3}.
 
 \begin{figure}[ht] \centering
     \includegraphics[scale=0.5,trim=0cm 0cm 0cm 0cm,clip]{26_python_shell3}
@@ -365,24 +365,22 @@ The Python code and part of its output is shown in Fig. \ref{fig:pv_python_shell
     \label{fig:pv_python_shell3}
 \end{figure}
 
-The results of using the mentioned IDS database and generated expression are shown in Fig. \ref{fig:pv_python_calculator5}.
+The results of using the mentioned IDS database and the generated expression by copying it are shown in Fig. \ref{fig:pv_python_calculator5}.
 
 \begin{figure}[!htb] \centering
     \includegraphics[scale=0.5,trim=0cm 0cm 0cm 0cm,clip]{27_python_calculator5}
-    \caption{IDS iter tokamak and Custom Data Array as sum of all Ion Density arrays scalars}
+    \caption{IDS Iter tokamak and Custom Data Array as sum of all Ion Density arrays scalars}
     \label{fig:pv_python_calculator5}
 \end{figure}
 
 \clearpage
 \subsubsection{Plot Over Line filter}
 
-Plot Over Line filter is a flexible tool, used to create a plot such temperature change through the wall. 
+Plot Over Line filter is a flexible tool, used to create a chart such as temperature change through the wall. 
 
 The start and end location of the plotted data is user selected, and the plot values are taken from available Data Arrays and also from coordinates of previously mentioned start and end location.
 
-It can be found at the same location as any other filter, navigating to $Filters \to Alphabetical \to Plot over Line$, as seen on Fig. \ref{fig:pv_pov1}. When selected, two white dots, representing the start and end location taken for the plot, connected with line will appear in the \textit{View Browser}, as seen on Fig. \ref{fig:pv_pov2}, which can be moved by clicking and dragging with the mouse pointer. When done, press the \textbf{Apply} button. 
-
-
+It can be found at the same location as any other filter, navigating to $Filters \to Alphabetical \to Plot \ Over\ Line$, as seen in Fig. \ref{fig:pv_pov1}. When selected, two by line connected white dots, representing the start and end location taken for the plot, will appear on the \textit{View Browser}, as seen in Fig. \ref{fig:pv_pov2}, which can be moved by clicking and dragging with the mouse pointer. When done, press the \textbf{Apply} button. 
 
 \begin{figure}[!htb] \centering
     \includegraphics[scale=0.5,trim=0cm 0cm 0cm 0cm,clip]{28_pov1}
@@ -396,19 +394,26 @@ It can be found at the same location as any other filter, navigating to $Filters
     \label{fig:pv_pov2}
 \end{figure}
 
-After pressing the \textbf{Apply} button a new interface will open in the \textit{Pipeline Browser} and also the plot will appear on the \textit{View Browser}, as seen on Fig. \ref{fig:pv_pov3}. 
+\clearpage 
+
+By pressing the \textbf{Apply} button a new interface will appear in the \textit{Pipeline Browser} and also the default chart will appear on the \textit{View Browser}, as seen in Fig. \ref{fig:pv_pov3}. 
 
 \begin{figure}[!htb] \centering
-    \includegraphics[scale=0.5,trim=0cm 0cm 0cm 0cm,clip]{30_pov3}
-    \caption{Plot example}
+    \includegraphics[scale=0.35,trim=0.05cm 0cm 0.15cm 0cm,clip]{30_pov3}
+    \caption{Chart example}
     \label{fig:pv_pov3}
 \end{figure}
 
-We can notice, that all the Data Arrays are being shown on the plot and also making some of them unclear because of the used  value range. 
+You can notice, that all the Data Arrays are being shown in the chart and also making some of them unclear because of the used  value range. Note also that by default the X-axis is following the direction and length of the previously for the plot selected start and end point.
 
-There are many different settings to get the desired plot view, here a few of them will be shown.
+There are many different settings to get the desired chart view, here a few of them will be shown.
 
-To display only the selected Data Array plots, in the new \textit{Pipeline Browser} interface scroll down to \textbf{Series Parameters} and there the desired Data Arrays (and also showing coordinate changes from start to end point) can be chosen, as seen on Fig. \ref{fig:pv_pov4}. The range will automatically adjust to selected plot values.
+The simplest one is by clicking the left mouse button on the chart and by dragging the line by mouse.
+
+\clearpage
+To display only the selected Data Array data, in the new \textit{Pipeline Browser} interface scroll down to \textbf{Series Parameters} and there the desired Data Arrays (and also showing coordinate changes from start to end point) can be chosen, as seen in Fig. \ref{fig:pv_pov4}. The range will automatically adjust to selected plot values.
+
+Chart line colors can be changed double clicking the colored square icon in the \textit{Series Parameters} and \textbf{Choose Series Color} window will appear.
 
 \begin{figure}[!htb] \centering
     \includegraphics[scale=0.5,trim=0cm 0cm 0cm 0cm,clip]{31_pov4}
@@ -423,6 +428,51 @@ The axis range settings can be found furthermore in the \textit{Pipeline Browser
     \caption{Axis range customization}
     \label{fig:pv_pov5}
 \end{figure}
+
+\clearpage
+To crate more Line Charts for the same case click one of the window splitting tools found in the top right corner of the \textit{View Browser} such as \textbf{Split vertical} as seen in Fig. \ref{fig:pv_pov6}. It will open a new separated window and there click \textbf{Line Chart View}, as shown in Fig. \ref{fig:pv_pov7}, and new Line Chart will be created, as seen in Fig. \ref{fig:pv_pov8}. 
+\begin{figure}[!htb] \centering
+    \includegraphics[scale=0.5,trim=0cm 0cm 0cm 0cm,clip]{33_pov6}
+    \caption{View Browser Split Vertical}
+    \label{fig:pv_pov6}
+\end{figure}
+
+\begin{figure}[ht] \centering
+\begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[scale=0.45,trim=0cm 0cm 0cm 0cm,clip]{34_pov7}
+    \caption{}
+    \label{fig:pv_pov7}
+\end{minipage}\hfill
+\begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[scale=0.45,trim=0cm 0cm 0.15cm 0cm,clip]{35_pov8}
+    \caption{}
+    \label{fig:pv_pov8}
+\end{minipage}
+\end{figure}
+
+\clearpage
+Then, while the created empty \textit{Line Chart} is selected\footnote[1]{Notice the blue outline around the View in the \textit{View Browser}}, in the \textit{Pipeline Browser} click on the eye icon beside the \textit{TextOverLine} filter name, which should be transparent by default, as seen in Fig. \ref{fig:pv_pov9}. The by default selected Data Arrays should appear in the \textit{Line Chart}.
+
+\begin{figure}[!htb] \centering
+    \includegraphics[scale=0.5,trim=0cm 0cm 0cm 0cm,clip]{36_pov9}
+    \caption{Hide/Show indicator}
+    \label{fig:pv_pov9}
+\end{figure}
+
+From there we can work with the chart normally and chose wanted Data Arrays in the \textit{Series Parameters} under \textit{Pipeline Browser} as before. Just note that the \textit{Text Chart} we want to change must first be selected in the \textit{View Browser} before we can operate with it\footnote[2]{The same goes for any View in the \textit{View Browser}}.
+
+An example of using multiple Line Charts is shown in Fig. \ref{fig:pv_pov10}.
+
+\begin{figure}[!htb] \centering
+    \includegraphics[scale=0.35,trim=0cm 0cm 0cm 0cm,clip]{37_pov10}
+    \caption{Example of ordered Line Charts}
+    \label{fig:pv_pov10}
+\end{figure}
+
+
+
 
 \end{document}
 
