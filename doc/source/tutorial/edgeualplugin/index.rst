@@ -9,7 +9,7 @@ Using ParaView ReadUALEdge plugin
 
 This tutorial covers the basic instructions about running and using
 ParaView application [1]_ and how to run and use ReadUALEdge
-ParaView plugin on g04.efda-itm.
+ParaView plugin on hpc-app1.iter.org or hpc-login4.iter.org login nodes.
 
 
 
@@ -37,22 +37,30 @@ Here we'll demonstrate how to launch and use the ReadUALEdge plugin using
 two different IDS databases, first being shot: ``16151; run: 1000`` [2]_
 and  ``shot: 1; run: 1`` [3]_
 
-.. [1] During the time of writing this  tutorial ParaView version 5.1.0
-       was used.
+.. [1] During the time of writing this  tutorial ParaView version 5.1.0 was used.
 .. [2] ``user: kosl; tokamak: aug; version: 4.10a``.
 .. [3] ``user: kosl; tokamak: aug; version: 4.10a``. IDS database for
        now doesn't take in those three parameters as the CPO database does.
 
-Note that because we are using IDS database, the following modules
-must be loaded using terminal commands::
+To copy examples in his tutorial issue the following commands::
 
-% module use -a ~dkaljun/imas/etc/modulefiles
-% module load imas/develop/3/ual/develop
+ % install -d ~/public/imasdb
+ % cp -r ~kosl/public/imasdb/solps-iter ~/public/imasdb/
+ % cd ~/solps-gui
+ % ./run-paraview.sh
 
-Additional commands to check available modules etc.::
 
-% module avail imas
-% module display imas/develop/3/ual/develop
+Command ``run-paraview.sh`` command provides the following module and 
+environments ::
+
+ % module load imas/3.5.3/ual/3.8.8 GCC/4.8.3 blitz/0.10
+ % module switch python/2.7/11
+ % imasdb solps-iter
+
+Additional commands to check available modules::
+
+ % module avail imas
+ % module display imas/develop/3/ual/develop
 
 Loading the plugin
 ------------------
