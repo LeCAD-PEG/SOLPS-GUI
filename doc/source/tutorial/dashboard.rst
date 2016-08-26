@@ -192,3 +192,43 @@ We can create a large dashboard layout with many different plots by repeating
 steps 3-8 for each new plot.
 :menuselection:`Widget Box --> SOLPS --> LineInput` widget can be used to
 signal desired plots in between of Director and the Gnuplot widget.
+
+Scripting in Python
+-------------------
+
+Python widget provides scripting support to advanced users that would like
+to create workflows that interact with simulations or
+do some built-in calculation required for their work.
+
+In the following example, we want to create a series of directories for
+parameter scanning.
+
+We begin with simple Python skeleton the will emit commands to TCSH inside
+currently selected directory.
+
+.. code-block:: python
+
+   self.output.emit('pwd')
+   for i in range(10):
+      cmd = "install -d run{0:02d}".format(i)
+      print(cmd)
+      self.output.emit(cmd)
+
+Signals will be emitted through ``output`` signal provided by the
+*Script* widget available under the SOLPS group of custom widgets.
+
+To create the this example remove all widgets except the :guilabel:`Director`
+and add::
+
+1. :menuselection:`Widget Box --> SOLPS --> Script`
+2. :menuselection:`Widget Box --> SOLPS --> Tcsh`
+3. :menuselection:`Widget Box --> Buttons --> Push Button`
+
+.. image:: dashboard_10.png
+    :align: center
+
+Then press :guilabel:`F4` to and connect the widgets as follows:
+
+.. image:: dashboard_11.png
+    :align: center
+
