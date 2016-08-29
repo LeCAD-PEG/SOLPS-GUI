@@ -1,0 +1,11 @@
+--- qt-everywhere-opensource-src-5.7.0/qtscxml/examples/scxml/invoke-static/invoke-static.pro.orig	2016-08-26 16:29:16.520741000 +0200
++++ qt-everywhere-opensource-src-5.7.0/qtscxml/examples/scxml/invoke-static/invoke-static.pro	2016-08-26 16:30:20.764278000 +0200
+@@ -3,6 +3,8 @@
+ QT += qml scxml
+ CONFIG += c++11
+ 
++QMAKE_CXXFLAGS += -fpermissive
++
+ SOURCES += invoke-static.cpp
+ 
+ RESOURCES += invoke-static.qrc

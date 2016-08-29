@@ -28,7 +28,8 @@ case $(hostname) in
 	BUILD_XCB="YES"
 	BUILD_XLIB="YES"
         QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:--no-sql-mysql -no-opengl \
-			                 -skip qtcanvas3d -skip qtquick1}
+			                 -skip qtcanvas3d  -skip qtpurchasing \
+					 -skip qtvirtualkeyboard}
 	;;
 esac
 
@@ -169,6 +170,8 @@ if [ ! -e ${QT_SOURCE_DIR}/.configured ]; then # Configuring Qt
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qxcbconnection.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qbenchmarkperfevents.patch
   #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qsimd.cpp-gcc4.2.patch
+  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qdbusinternalfilters.patch
+  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-invoke-static.patch
   sed -i -e '/auto/d' qtdeclarative/tests/tests.pro \
                       qtmultimedia/tests/tests.pro \
                       qtgraphicaleffects/tests/tests.pro

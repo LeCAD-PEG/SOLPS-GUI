@@ -188,10 +188,16 @@ widget.
 
 Extended example
 ----------------
-We can create a large dashboard layout with many different plots by repeating
+We can create a large dashboard layout with many different plots with 
+:menuselection:`Widget Box --> Containers --> Tool Box` by repeating
 steps 3-8 for each new plot.
-:menuselection:`Widget Box --> SOLPS --> LineInput` widget can be used to
-signal desired plots in between of Director and the Gnuplot widget.
+`Widget Box --> SOLPS --> Director` widget must be used to 
+signal selected *runDir* property to all Gnuplot widgets.
+
+.. image:: dashboard_9.png
+	:scale: 100%
+	:height: 320px
+	:align: center
 
 Scripting in Python
 -------------------
@@ -218,7 +224,7 @@ Signals will be emitted through ``output`` signal provided by the
 *Script* widget available under the SOLPS group of custom widgets.
 
 To create the this example remove all widgets except the :guilabel:`Director`
-and add::
+and add:
 
 1. :menuselection:`Widget Box --> SOLPS --> Script`
 2. :menuselection:`Widget Box --> SOLPS --> Tcsh`
