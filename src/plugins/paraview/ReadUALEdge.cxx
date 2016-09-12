@@ -87,9 +87,10 @@ int ReadUALEdge::RequestData(
   std::clog << "Reading IDS" << std::endl;
   IDS db(this->Shot,this->Run,this->Shot,this->RefRun);
   if (!this->Version)
-    this->Version = strdup("4.10a");
-  db.open();
-  //db.openEnv(this->User, this->Tokamak, this->Version);
+    //this->Version = strdup("4.10a");
+    this->Version = strdup("3");
+  //db.open();
+  db.openEnv(this->User, this->Tokamak, this->Version);
   std::clog << "User: "<<this->User<<" Tokamak:"<<this->Tokamak<< std::endl;
   db._edge_profiles.get();
   #if 0
@@ -97,7 +98,7 @@ int ReadUALEdge::RequestData(
   //db._edge_profiles.getSlice(time, INTERPOLATION);
   db._edge_profiles.getSlice(1,1);
   ofstream myfile;
-  myfile.open ("log_edge_profiles.txt");
+  myfile.open ("log_ids_edge_profiles.txt");
   myfile << db._edge_profiles;
   myfile.close();
   //std::cout << db._edge_profiles << std::endl;
@@ -110,6 +111,8 @@ int ReadUALEdge::RequestData(
     std::clog << "ERROR! Either selected database doesn't exist or it's empty!" << std::endl;
     return 0;
   }
+  
+  
 
   class IDS::edge_profiles & edge = db._edge_profiles;
   class IDS::edge_profiles::ggd & ggd = edge.ggd(0);
@@ -242,7 +245,7 @@ int ReadUALEdge::RequestData(
       int ti_species_num = ggd.ion.extent(0); //CHANGE TO ion_species_num and combine ion density and ion temperature into single ion_species_num loop
       
       for( int k = 0; k < ti_species_num; k++){
-	vtkSmartPointer<vtkDoubleArray> ionTemperatureArray = fCreateNewDoubleArray(size, "Ion temperature ", k);
+	vtkSmartPointer<vtkDoubleArray> ionTemperatureArray = fCreateNewDoubleArray(size, "Ion Temperature ", k);
 	int ti_subgrids_num = ggd.ion(k).temperature.extent(0);
 	
 	for (int n = 0; n < ti_subgrids_num; n++){
@@ -274,7 +277,7 @@ int ReadUALEdge::RequestData(
       int ni_species_num = ggd.ion.extent(0);
       
       for( int k = 0; k < ni_species_num; k++){
-	vtkSmartPointer<vtkDoubleArray> ionDensityArray = fCreateNewDoubleArray(size, "Ion density ", k);
+	vtkSmartPointer<vtkDoubleArray> ionDensityArray = fCreateNewDoubleArray(size, "Ion Density ", k);
 	int ni_subgrids_num = ggd.ion(k).density.extent(0);
 	
 	for (int n = 0; n < ni_subgrids_num; n++){
@@ -395,8 +398,8 @@ int ReadUALEdge::RequestData(
       //ION DENSITY AND ION TEMPERATURE
       int ion_species_num = ggd.ion.extent(0);
       for(int k = 0; k < ion_species_num; k++){
-	  vtkSmartPointer<vtkDoubleArray> ionDensityArray = fCreateNewDoubleArray(size, "Ion density ", k);
-	  vtkSmartPointer<vtkDoubleArray> ionTemperatureArray = fCreateNewDoubleArray(size, "Ion temperature ", k);
+	  vtkSmartPointer<vtkDoubleArray> ionDensityArray = fCreateNewDoubleArray(size, "Ion Density ", k);
+	  vtkSmartPointer<vtkDoubleArray> ionTemperatureArray = fCreateNewDoubleArray(size, "Ion Temperature ", k);
 	  int ni_subgrids_num = ggd.ion(k).density.extent(0);
 	  int ti_subgrids_num = ggd.ion(k).temperature.extent(0);
 	  

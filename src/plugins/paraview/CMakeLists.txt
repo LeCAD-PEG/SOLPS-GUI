@@ -30,8 +30,11 @@ else()
 #   link_directories(${IMASLL_LIBRARY_DIRS})
    link_directories($ENV{MDSPLUS_DIR}/lib)
 
-SET(IMASCPP_INCLUDE_DIRS /u/dkaljun/imas/core/imas/develop/3/ual/develop/include)
-SET(IMASLL_INCLUDE_DIRS /u/dkaljun/imas/core/imas/develop/3/ual/develop/include)
+#SET(IMASCPP_INCLUDE_DIRS /u/dkaljun/imas/core/imas/develop/3/ual/develop/include)
+#SET(IMASLL_INCLUDE_DIRS /u/dkaljun/imas/core/imas/develop/3/ual/develop/include)
+
+SET(IMASCPP_INCLUDE_DIRS /afs/ipp/itm/switm/imasv1/core/imas/master/3/ual/develop/include)
+SET(IMASLL_INCLUDE_DIRS /afs/ipp/itm/switm/imasv1/core/imas/master/3/ual/develop/include)
 
 
 
