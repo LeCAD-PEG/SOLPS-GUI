@@ -153,7 +153,7 @@ shortly at time step 5. After some additional inspection of the fields press
 :menuselection:`Catalyst --> Continue` to run the simulation to the last
 timestep at 1018 timesteps. While running, live simulation is shown.
 If we open :menuselection:`Catalyst --> Set Breakpoint` while simulation is
-runnint then the time will keep increasing while editing and this can be used
+running then the time will keep increasing while editing and this can be used
 to follow the current state of the simulation. and at the end of live
 visualisation rhe following message will occur:
 
@@ -244,8 +244,61 @@ To create a new pipeline we need to:
      $ itersubmit
 
      we get a new set of files under ``b2mn.exe.dir/`` with smaller footprint.
+ 16. To open all ``.pvpt`` files at once created in ``b2mn.exe.dir/`` select 
+     :menuselection:`File --> Open` and navigate to ``b2mn.exe.dir/`` in current
+     run directory. Open the top .pvtp file (one with plus on the left of file name).
+     This will load all time steps into paraview.
 
+     .. image:: catalyst_10.png
+        :align: center
+     .. note:: In some cases ParaView fails to load all time steps. If that happens
+               close and reopen ParaView and repeat the steps above.
+ 17. Now select ``te`` from Active Menu Controls.
+
+     .. image:: catalyst_11.png
+        :align: center
+ 18. To move through time steps use Time Controls on the top of the window.
+     We can either move from step to step or play it as an animation.
+
+     .. image:: catalyst_12.png
+        :align: center
+ 19. In order to plot variable ``te`` max  value over time we need to select 
+     :menuselection:`Edit --> Find Data`. Select ``te`` and ``is max`` and 
+     *Run Selection Query*. To show the plot select *Plot Selection Over Time*.
+
+     .. image:: catalyst_13.png
+        :align: center
+ 20. Select *Close* to close the window. New plot view should open next to the
+     the default Render View. To select variables you would like to plot
+     (e.g. ``te``) go to 
+     :guilabel:`Properties` and scroll down to section *Series Parameters* where
+     we can select  variables to plot. We can also modify number of other plot 
+     options here. Note that you can plot any other statistical parameter instead 
+     of max showed in this example.
+     
+     .. image:: catalyst_14.png
+        :align: center
+ 21. We should now see similar view on the right.
+
+     .. image:: catalyst_15.png
+        :align: center
+ 22. In addition to plotting we can also analyse data with respect to position on
+     the grid. To do that select :menuselection:`Edit --> Find Data`. To specify
+     your own query select ``Query`` and type *te  >= mean(te)*. Then select 
+     *Run Selection Query*.
+
+     .. image:: catalyst_16.png
+        :align: center
+ 23. Now close the window. Cells that meet criteria we specified will 
+     will color pink. When we move through time steps, selection area will change
+     according to variable values in each time step. Again, we can use more
+     meaningful selection criteria and see how it changes with respect to time and 
+     positon on the grid.
+
+     .. image:: catalyst_17.png
+        :align: center
      .. note:: We don't need a ParaView running if we already have desired
                fields extracted with ``coproc.py`` for later analysis,
                visualization and debugging.
+
 

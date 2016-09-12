@@ -1,0 +1,10 @@
+*.aux
+*.log
+*.out
+*.toc
+*.log
+*.lof
+*.synctex.gz
+converted.txt
+output.txt
+cpo2ids.pdf

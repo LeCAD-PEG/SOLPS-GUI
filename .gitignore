@@ -1,9 +1,15 @@
 download
 build
 staging
+logging
 *~
+*.ui
+*.pyc
 *.idea
 *__pycache__
 .project
 .pydevproject
 localsetup.*sh
+!src/gui/runs.ui
+!src/gui/solps.ui
+!src/gui/preferences.ui

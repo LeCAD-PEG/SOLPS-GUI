@@ -32,7 +32,6 @@ At the first start of the SOLPS GUI you see an empty and default
 configuration.
 
 .. image:: runs_1.png
-   :scale: 80
    :align: center
 
 
@@ -53,7 +52,6 @@ Configure the runs directories
  5. Press OK. Trees will be rescanned for status.
 
 .. image:: runs_2.png
-   :scale: 80
    :align: center
 
 Sizing the windows and tree-view colums
@@ -72,7 +70,6 @@ one can resize tree-view columns and even move them by dragging left or
 right and this configuration will be "saved" at exit in user preferences.
 
 .. image:: runs_3.png
-   :scale: 75
    :align: center
 
 For demonstration only please resize the columns in the following manner:
@@ -91,7 +88,6 @@ default submission procedure. Provisionally, nothing needs to be changed
 in the following :menuselection:`Settings --> Preferences`:
 
 .. image:: runs_4.png
-   :scale: 80
    :align: center
 
 The only difference among users should be default network monitoring port.
@@ -125,7 +121,6 @@ Please do the following steps to import the
     to neigboring *baserun*.
 
 .. image:: runs_5.png
-   :scale: 80
    :align: center
 
 Editing configuration
@@ -141,7 +136,6 @@ in the same way as tree-view columns. New files can be added by editing
 ``untitled`` file tab.
 
 .. image:: runs_6.png
-   :scale: 80
    :align: center
 
 For this case no editing is needed.
@@ -154,7 +148,6 @@ select it by clicking on tree-view as highlighted in the following image
 and then pressing the :guilabel:`Run` button.
 
 .. image:: runs_8.png
-   :scale: 80
    :align: center
 
 Immediately, in the *status* column there should appear submission command
@@ -221,7 +214,6 @@ dashboard without programming in Python.  Simple *dashboard* in the
 follwing image shows composition of several widgets.
 
 .. image:: runs_7.png
-   :scale: 70
    :align: center
 
 The philosophy of dashboard operation relies on signal/slot communication
@@ -240,7 +232,6 @@ By pressing the :guilabel:`Plot` button the following *energy* analysis
 appears:
 
 .. image:: runs_9.png
-   :scale: 80
    :align: center
 
 User may select or type the commands in *solpsplots* widget or entering
@@ -327,5 +318,4 @@ For running the case:
    specified. Finally, you should receive status:
 
 .. image:: runs_10.png
-   :scale: 80
    :align: center

@@ -23,6 +23,7 @@ import shlex
 sys.path.insert(0, os.path.abspath('../../src/gui'))
 sys.path.insert(0, os.path.abspath('../../src/widgets'))
 sys.path.insert(0, os.path.abspath('../../src/plugins/designer'))
+sys.path.append(os.path.abspath('exts'))
 
 # -- General configuration ------------------------------------------------
 
@@ -37,6 +38,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
+    'numfig',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -214,13 +216,14 @@ htmlhelp_basename = 'SOLPSGUIdoc'
 
 latex_elements = {
 # The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+'papersize': 'a4paper',
 
 # The font size ('10pt', '11pt' or '12pt').
-#'pointsize': '10pt',
+'pointsize': '11pt',
 
 # Additional stuff for the LaTeX preamble.
-#'preamble': '',
+# See http://tex.stackexchange.com/questions/83020/set-standard-default-scaling-of-includegraphics
+'preamble': '\usepackage{graphicx}\setkeys{Gin}{width=.50\csname Gin@nat@width\endcsname,keepaspectratio}',
 
 # Latex figure (float) alignment
 #'figure_align': 'htbp',
