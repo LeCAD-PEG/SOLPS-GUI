@@ -60,7 +60,7 @@
        label="Tokamak"
        command="SetTokamak"
        number_of_elements="1"
-       default_values="aug"
+       default_values="solps-iter"
        panel_visibility="default">
         <Documentation>
           This property specifies the tokamak on the UAL Database. 
@@ -69,7 +69,7 @@
 
      <IntVectorProperty
          name="CPOLoad"
-         label="Load CPOs"
+         label="List Shot/Runs"
          command="SetCPOLoad"
          number_of_elements="1"
          default_values="0"
