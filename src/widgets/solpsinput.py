@@ -6,14 +6,44 @@ for files if tabs with filenames are added to it and then ``view_files``
 is called though selected tab index signal.
 """
 
-from PyQt5.QtCore import (QSize, pyqtProperty,  pyqtSignal, pyqtSlot, QSettings)
+from PyQt5.QtCore import (QSize, QEvent,
+                          pyqtProperty,  pyqtSignal, pyqtSlot, QSettings)
 from PyQt5.QtWidgets import (QTabWidget, QPlainTextEdit, QSizePolicy,
-                             QGridLayout)
-from PyQt5.QtGui import QFont
+                             QGridLayout, QToolTip)
+from PyQt5.QtGui import QFont, QTextCursor
 
 import os
 import logging
 import gzip
+
+class B2mnTextEdit(QPlainTextEdit):
+    """B2mnTextEdit(QPlainTextEdit)
+
+    Enhances plain text with tooltips and syntax highlights
+    """
+
+    def __init__(self, parent=None):
+        super(B2mnTextEdit, self).__init__(parent)
+        self.setToolTip("B2mn")
+
+    def event(self, event):
+        """ Looks for the parameters in the dictionary provided and sets
+          the tooltip generated from XML documentation.
+        """
+        if event.type() == QEvent.ToolTip:
+            # oldCursor = self.textCursor()
+            textCursor = self.cursorForPosition(event.pos())
+            textCursor.select(QTextCursor.WordUnderCursor)
+            #self.setTextCursor(oldCursor)
+            self.setTextCursor(textCursor)
+            word = textCursor.selectedText()
+
+            helpEvent = event
+            QToolTip.showText(helpEvent.globalPos(),
+                        word)
+            return True
+
+        return super(B2mnTextEdit, self).event(event)
 
 
 class SolpsInput(QTabWidget):
@@ -60,7 +90,10 @@ class SolpsInput(QTabWidget):
         font = QFont()
         font.setFamily('Monospace')
         for filename, tooltip in solps_input_files:
-            plainTextEdit = QPlainTextEdit(self)
+            if filename == 'b2mn.dat':
+                plainTextEdit = B2mnTextEdit(self)
+            else:
+                plainTextEdit = QPlainTextEdit(self)
             plainTextEdit.setObjectName(filename)
             plainTextEdit.setFont(font)
             plainTextEdit.setLineWrapMode(QPlainTextEdit.NoWrap)
@@ -137,7 +170,7 @@ class SolpsInput(QTabWidget):
             return
 
         if len(self.editors) == 0:  # Setup tabs on the fly
-            self.setup_tabs()
+            self.setup_input_tabs()
 
         for filename in self.editors:
             plainTextEdit = self.editors[filename]
