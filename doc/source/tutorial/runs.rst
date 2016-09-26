@@ -138,7 +138,8 @@ in the same way as tree-view columns. New files can be added by editing
 .. image:: runs_6.png
    :align: center
 
-For this case no editing is needed.
+For this case no editing is needed. One may hover the parameters to get
+the tooltip help extracted from the SOLPS manual.
 
 Starting the run
 ----------------
