@@ -1,0 +1,13 @@
+The following patch was needed by old DBUS library on Gateway that incorrectly defines DBUS_INTROSPECT_1_0_XML_DOCTYPE_DECL_NODE in  /usr/include/dbus-1.0/dbus/dbus-protocol.h
+See https://groups.google.com/forum/#!topic/comp.std.c++/9nD4Mb8pN1Q for explanation
+--- qt-everywhere-opensource-src-5.7.0/qtbase/src/dbus/qdbusinternalfilters.cpp.orig	2016-08-26 09:27:47.610755000 +0200
++++ qt-everywhere-opensource-src-5.7.0/qtbase/src/dbus/qdbusinternalfilters.cpp	2016-08-26 09:32:13.718979365 +0200
+@@ -127,7 +127,7 @@
+ QString qDBusIntrospectObject(const QDBusConnectionPrivate::ObjectTreeNode &node, const QString &path)
+ {
+     // object may be null
+-
++#  define DBUS_INTROSPECT_1_0_XML_DOCTYPE_DECL_NODE   "<!DOCTYPE node PUBLIC \"" DBUS_INTROSPECT_1_0_XML_PUBLIC_IDENTIFIER "\"\n\"" DBUS_INTROSPECT_1_0_XML_SYSTEM_IDENTIFIER "\">\n" 
+     QString xml_data(QLatin1String(DBUS_INTROSPECT_1_0_XML_DOCTYPE_DECL_NODE));
+     xml_data += QLatin1String("<node>\n");
+ 
