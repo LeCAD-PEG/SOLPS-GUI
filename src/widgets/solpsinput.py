@@ -6,11 +6,12 @@ for files if tabs with filenames are added to it and then ``view_files``
 is called though selected tab index signal.
 """
 
-from PyQt5.QtCore import (QSize, QEvent,
+from PyQt5.QtCore import (QSize, QEvent, QRegExp, Qt,
                           pyqtProperty,  pyqtSignal, pyqtSlot, QSettings)
 from PyQt5.QtWidgets import (QTabWidget, QPlainTextEdit, QSizePolicy,
                              QGridLayout, QToolTip)
-from PyQt5.QtGui import QFont, QTextCursor
+from PyQt5.QtGui import (QFont, QTextCursor, QSyntaxHighlighter,
+                         QTextCharFormat)
 
 import os
 import logging
@@ -18,6 +19,46 @@ import gzip
 import textwrap
 
 from tooltips import b2mn_tooltips
+
+class B2mnHighlighter( QSyntaxHighlighter ):
+    """ B2mnHighlighter( QSyntaxHighlighter )
+
+        Sets the keywords for syntax highlighting that are currently
+        documented for b2mn.dat tooltips.
+
+    """
+    def __init__( self, parent, theme ):
+        QSyntaxHighlighter.__init__( self, parent )
+        self.parent = parent
+        self.highlightingRules = []
+
+        keyword = QTextCharFormat()
+        keyword.setForeground( Qt.darkBlue )
+        keyword.setFontWeight( QFont.Bold )
+        keywords = []
+        for key in b2mn_tooltips:
+            keywords.append(key)
+
+        for word in keywords:
+            pattern = QRegExp("\\b" + word + "\\b")
+            rule = HighlightingRule( pattern, keyword )
+            self.highlightingRules.append( rule )
+
+    def highlightBlock( self, text ):
+      for rule in self.highlightingRules:
+        expression = QRegExp( rule.pattern )
+        index = expression.indexIn( text )
+        while index >= 0:
+          length = expression.matchedLength()
+          self.setFormat( index, length, rule.format )
+          index = text.find(str(expression), index + length )
+      self.setCurrentBlockState( 0 )
+
+
+class HighlightingRule():
+  def __init__( self, pattern, format ):
+    self.pattern = pattern
+    self.format = format
 
 class B2mnTextEdit(QPlainTextEdit):
     """B2mnTextEdit(QPlainTextEdit)
@@ -118,6 +159,7 @@ class SolpsInput(QTabWidget):
         for filename, tooltip in solps_input_files:
             if filename == 'b2mn.dat':
                 plainTextEdit = B2mnTextEdit(self)
+                B2mnHighlighter( plainTextEdit.document(), "Classic" )
             else:
                 plainTextEdit = QPlainTextEdit(self)
             plainTextEdit.setObjectName(filename)
