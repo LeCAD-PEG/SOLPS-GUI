@@ -15,6 +15,9 @@ from PyQt5.QtGui import QFont, QTextCursor
 import os
 import logging
 import gzip
+import textwrap
+
+from tooltips import b2mn_tooltips
 
 class B2mnTextEdit(QPlainTextEdit):
     """B2mnTextEdit(QPlainTextEdit)
@@ -24,7 +27,27 @@ class B2mnTextEdit(QPlainTextEdit):
 
     def __init__(self, parent=None):
         super(B2mnTextEdit, self).__init__(parent)
-        self.setToolTip("B2mn")
+        for key in b2mn_tooltips:
+            b2mn_tooltips[key] = self.dedent(b2mn_tooltips[key])
+
+    def dedent(self, description):
+        """ Removes first empty line from description and any leading tabs
+            from the next line before the description and any following lines.
+            First lines are wrapped to 70 characters.
+
+        :param description(string): from the XML generated tooltips dictionary
+        :return: formatted output for the tooltip
+        """
+        trim_start = 0  # Remove any leading newline that affects dedent
+        while trim_start < len(description) and description[trim_start] == '\n':
+            trim_start += 1
+        description = textwrap.dedent(description[trim_start : ])
+        lines = description.splitlines()
+        output = ''
+        for line in lines:
+            output += textwrap.fill(line, 70) + '\n'
+        return output[0:-1] # remove last newline
+
 
     def event(self, event):
         """ Looks for the parameters in the dictionary provided and sets
@@ -38,9 +61,12 @@ class B2mnTextEdit(QPlainTextEdit):
             self.setTextCursor(textCursor)
             word = textCursor.selectedText()
 
-            helpEvent = event
-            QToolTip.showText(helpEvent.globalPos(),
-                        word)
+            if word in b2mn_tooltips:
+                helpEvent = event
+                QToolTip.showText(helpEvent.globalPos(),
+                                  b2mn_tooltips[word])
+            else:
+                QToolTip.hideText()
             return True
 
         return super(B2mnTextEdit, self).event(event)
