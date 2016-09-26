@@ -217,18 +217,20 @@ currently selected directory.
 Signals will be emitted through ``output`` signal provided by the
 *Script* widget available under the SOLPS group of custom widgets.
 
-To create the this example remove all widgets except the :guilabel:`Director`
-and add::
+To create the this example remove all widgets from the *Dashboard* except
+:guilabel:`Director` and add
 
 1. :menuselection:`Widget Box --> SOLPS --> Script`
 2. :menuselection:`Widget Box --> SOLPS --> Tcsh`
 3. :menuselection:`Widget Box --> Buttons --> Push Button`
 
+to get desired layout.
+
 .. image:: dashboard_10.png
     :align: center
 
-Then press :guilabel:`F4` to and connect the widgets as follows:
+4. Press :guilabel:`F4` to and connect the widgets as follows:
 
-.. image:: dashboard_11.png
-    :align: center
+    .. image:: dashboard_11.png
+       :align: center
 

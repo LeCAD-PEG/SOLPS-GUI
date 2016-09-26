@@ -87,9 +87,9 @@ int ReadUALEdge::RequestData(
   std::clog << "Reading IDS" << std::endl;
   IDS db(this->Shot,this->Run,this->Shot,this->RefRun);
   if (!this->Version)
-    this->Version = strdup("4.10a");
+    this->Version = strdup("3");
   db.open();
-  //db.openEnv(this->User, this->Tokamak, this->Version);
+  db.openEnv(this->User, this->Tokamak, this->Version);
   std::clog << "User: "<<this->User<<" Tokamak:"<<this->Tokamak<< std::endl;
   db._edge_profiles.get();
   #if 0
