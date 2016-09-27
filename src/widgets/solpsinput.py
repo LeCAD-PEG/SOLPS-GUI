@@ -93,6 +93,8 @@ class B2mnTextEdit(QPlainTextEdit):
     def event(self, event):
         """ Looks for the parameters in the dictionary provided and sets
           the tooltip generated from XML documentation.
+
+          See http://stackoverflow.com/questions/19236165/pyqt-get-text-under-cursor
         """
         if event.type() == QEvent.ToolTip:
             # oldCursor = self.textCursor()
