@@ -27,8 +27,8 @@ class B2mnHighlighter( QSyntaxHighlighter ):
         documented for b2mn.dat tooltips.
 
     """
-    def __init__( self, parent, theme ):
-        QSyntaxHighlighter.__init__( self, parent )
+    def __init__( self, parent ):
+        QSyntaxHighlighter.__init__(self, parent)
         self.parent = parent
         self.highlightingRules = []
 
@@ -161,7 +161,7 @@ class SolpsInput(QTabWidget):
         for filename, tooltip in solps_input_files:
             if filename == 'b2mn.dat':
                 plainTextEdit = B2mnTextEdit(self)
-                B2mnHighlighter( plainTextEdit.document(), "Classic" )
+                self.b2mn_highlight = B2mnHighlighter(plainTextEdit.document())
             else:
                 plainTextEdit = QPlainTextEdit(self)
             plainTextEdit.setObjectName(filename)
@@ -200,7 +200,12 @@ class SolpsInput(QTabWidget):
                 tab = self.widget(i)
                 layout = QGridLayout(tab)
                 tab.setLayout(layout)
-                plainTextEdit = QPlainTextEdit(tab)
+                if filename == 'b2mn.dat':
+                    plainTextEdit = B2mnTextEdit(tab)
+                    self.b2mn_highlight = \
+                        B2mnHighlighter(plainTextEdit.document())
+                else:
+                    plainTextEdit = QPlainTextEdit(tab)
                 plainTextEdit.setObjectName(filename)
                 plainTextEdit.setFont(font)
                 plainTextEdit.setLineWrapMode(QPlainTextEdit.NoWrap)
@@ -244,6 +249,7 @@ class SolpsInput(QTabWidget):
 
         for filename in self.editors:
             plainTextEdit = self.editors[filename]
+
             if not os.access(self.rundir, os.W_OK):
                     plainTextEdit.setReadOnly(True)
             path = self.rundir + '/' + filename
@@ -253,6 +259,8 @@ class SolpsInput(QTabWidget):
                 try:
                     with open(path) as file:
                         plainTextEdit.setPlainText(file.read())
+                        if filename == 'b2mn.dat':
+                            self.b2mn_highlight.rehighlight()
                 except PermissionError as error:
                     plainTextEdit.setPlainText(str(error))
                     plainTextEdit.setEnabled(False)
