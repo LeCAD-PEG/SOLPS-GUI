@@ -11,7 +11,7 @@ from PyQt5.QtCore import (QSize, QEvent, QRegExp, Qt,
 from PyQt5.QtWidgets import (QTabWidget, QPlainTextEdit, QSizePolicy,
                              QGridLayout, QToolTip)
 from PyQt5.QtGui import (QFont, QTextCursor, QSyntaxHighlighter,
-                         QTextCharFormat)
+                         QTextCharFormat, QBrush)
 
 import os
 import logging
@@ -32,6 +32,8 @@ class B2mnHighlighter( QSyntaxHighlighter ):
         self.parent = parent
         self.highlightingRules = []
 
+        comment = QTextCharFormat()
+
         keyword = QTextCharFormat()
         keyword.setForeground( Qt.darkBlue )
         keyword.setFontWeight( QFont.Bold )
@@ -43,6 +45,13 @@ class B2mnHighlighter( QSyntaxHighlighter ):
             pattern = QRegExp("\\b" + word + "\\b")
             rule = HighlightingRule( pattern, keyword )
             self.highlightingRules.append( rule )
+
+        # comment
+        brush = QBrush( Qt.darkGreen, Qt.SolidPattern )
+        pattern = QRegExp( "^\*[^\n]*" )
+        comment.setForeground( brush )
+        rule = HighlightingRule( pattern, comment )
+        self.highlightingRules.append( rule )
 
     def highlightBlock( self, text ):
       for rule in self.highlightingRules:
@@ -93,6 +102,8 @@ class B2mnTextEdit(QPlainTextEdit):
     def event(self, event):
         """ Looks for the parameters in the dictionary provided and sets
           the tooltip generated from XML documentation.
+
+          See http://stackoverflow.com/questions/19236165/pyqt-get-text-under-cursor
         """
         if event.type() == QEvent.ToolTip:
             # oldCursor = self.textCursor()
