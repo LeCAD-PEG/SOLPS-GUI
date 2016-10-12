@@ -92,3 +92,302 @@ if providing limited set of "custom" widgets there can exist many different
 user's preference and maybe exchanged for reuse by others. Nice thing with
 such *graphical programming* is not just adding functionality easily
 but one can simply remove the unwanted custom widgets too.
+
+SOLPS Structure
+---------------
+
+SOLPS  consists of a suite of codes comprising a grid generator, CARRE,
+a tool for specifying the material structures and providing inputs to
+the other codes, DG, the plasma fluid code, B2, the kinetic neutrals
+Monte Carlo code, EIRENE, and in addition to that a bundle of plotting
+tools and scripts used for post-processing. Up to now there were a
+number of different versions of SOLPS . SOLPS 4.0 is an old version
+which is complete and not being updated anymore. Currently SOLPS 5.0 is
+used by the majority of regular users. Versions 5.1 and 5.2 are
+currently being developed, improving the performance of EIRENE and B2
+part of the code, respectively. The most recent version is 6.0, which
+brings improved mesh adaptation in B2 codes.
+
+.. _fig-solps-sub-workflow:
+.. figure:: howto/catalyst/images/workflow.png
+   :alt: SOLPS code workflow.
+
+   SOLPS code workflow.
+
+Since SOLPS is a large scale software with a few hundred thousand lines
+of code it has a complex workflow, depicted in :num:`Fig. #fig-solps-sub-workflow`,
+with many input and output files at
+different parts of the program. The complete workflow can be separated
+into three parts — (i) pre-processing, (ii) processing, and (iii)
+post-processing. In the following subsections these parts will be
+briefly explained.
+
+Pre-Processing
+~~~~~~~~~~~~~~
+
+Pre-Processing part of SOLPS is concerned with mesh preparation,
+processing, and preparing input data of the initial physics states.
+Pre-Processing can be divided into two parts, case build-up and grid
+generation chain. Build-up consists of a graphical user interface called
+DG, as well as programs that convert user file input and produce input
+for B2 solver, ``b2ag``, ``b2ah``, ``b2ai`` and ``b2ar``. Grid
+generation chain, on the other hand, is made of the mesh generators
+CARRE, TRIA, and Triageom.
+
+Case Build-Up
+^^^^^^^^^^^^^
+
+DG  is the interactive graphical interface software that allows to users
+to visualize, inspect, and modify SOLPS mesh geometry. As input, it
+takes geometry data from CAD drawing or other sources, values of the
+poloidal magnetic flux on a regular grid, and a computational grid used
+by B2-EIRENE and produces output files to be used by the interface
+routines the input files for B2-EIRENE and grid generator CARRE. Case
+output file is handed over to UINP module which translates it to output
+suitable for input to standalone version of EIRENE.
+
+Furthermore, four additional programs are necessary to prepare SOLPS,
+more precisely B2, for running, which process user input about geometry
+and initial states. The programs are the following.
+
+-  **``b2ag``** - Prepares input file for B2 which contains information
+   about geometry and magnetic field.
+
+-  **``b2ah``** - Prepares input file for B2 which contains information
+   about default physics parameters.
+
+-  **``b2ai``** - Prepares input file for B2 which contains information
+   about initial plasma state.
+
+-  **``b2ar``** - Prepares input file for B2 which contains information
+   about default atomic physics rates.
+
+Grid Generation Chain
+^^^^^^^^^^^^^^^^^^^^^
+
+DG works on top of a computer code which generates a structured
+curvilinear quasi-orthogonal mesh, called CARRE. CARRE  takes in data in
+the form of three files which parametrize the equilibrium and the
+structures within the vacuum vessel, and specify the various
+distributions of flux surfaces and grid points. Output files serve as a
+feed to ``b2ag`` and Triageom, and contains the graphic presentation of
+the mesh and all necessary information to do the computation with the
+mesh.
+
+In order to run the EIRENE Monte Carlo simulations there needs to be a
+triangular mesh generator. TRIA  provides a locally refined triangular
+mesh outside of the regular B2 grid. After running TRIA, the Triageom 
+program has to be run to produce the combined triangular mesh covering
+the whole computational domain.
+
+Processing
+~~~~~~~~~~
+
+The heart of the SOLPS code is the solvers B2 and EIRENE. Each of them
+can run in a standalone mode or in a coupled mode, which means that each
+solver computes its own part and passes data to the other. If running in
+a coupled mode, the two codes talk to each other through files that
+contain geometry and plasma states.
+
+EIRENE
+^^^^^^
+
+EIRENE  is a linear Monte-Carlo solver developed specifically for the
+transport of neutral particles in plasma. The code works using 2D
+toroidal geometry for divertor applications. There are two options of
+code usage. The simplest is that the code uses the same quasi-orthogonal
+grid as the B2 code. Because of many drawbacks in using EIRENE on such
+grid, it can be run on a triangular grid which is provided by TRIA in
+SOLPS code. It can fill the volume between the quasi-orthogonal grid and
+the additional surfaces. The plasma grid is divided into triangles as
+well and both of the grids are attached to each other, forming one
+continuous triangular grid.
+
+In order to run, SOLPS provides EIRENE with input geometric data. The
+form of input depends on whether it runs in standalone or coupled mode.
+The connections between modules are illustrated in
+Fig. [fig:solps\ :sub:`w`\ orkflow].
+
+B2
+^^
+
+The B2  code solves a set of fluid equations describing the
+2-dimensional radial-poloidal transport of a multi-species plasma with
+toroidal symmetry. The fluid equations for the plasma are solved on a
+regular, quasi-orthogonal grid aligned with the magnetic field, provided
+by CARRE grid generator. Original version of B2 has been replaced by
+B2.5 that is currently being used. The most recent version proposed is
+B2.6  and offers improvements to data structure and grid adaptation.
+
+The main program for B2.5 code is called ``b2mn``. It calls the driver
+routine ``b2mndr`` for the actual computation, which calls ``b2mnds``
+for initialization of B2 calculation and in each time step ``b2mndt``
+routine that performs one implicit time step for the B2 system of
+equations.
+
+Post-Processing
+~~~~~~~~~~~~~~~
+
+There are a number of scripts and routines available for
+post-processing.
+
+-  ``b2plot`` - Designed to take data from B2, B2.5 or B2.5-EIRENE and
+   plot it under interactive control.
+
+-  ``b2ts`` - An example post-processing program. it reads the basic
+   output files produced by b2mn and prints some simple geometric
+   quantities.
+
+-  ``b2yg`` - It reads and displays the geometry and magnetic field.
+
+-  ``b2yh`` - It reads and displays the table of physics parameters.
+
+-  ``b2yi`` - It reads and displays the plasma state.
+
+-  ``b2ym`` - It produces movie output.
+
+-  ``b2yn`` - It displays the progress of the inner iterations.
+
+-  ``b2yp`` - It displays the plasma state.
+
+-  ``b2yq`` - It provides a quick display of the evolution data.
+
+-  ``b2yr`` - It reads and displays a table of atomic rate coefficients.
+
+-  ``MATLAB scripts`` - Various MATLAB routines for data analysis and
+   post-processing.
+
+Grid Description
+----------------
+
+The main program for B2.5 code is called ``b2mn``. It calls the driver
+routine ``b2mndr`` for the actual computation, which calls ``b2mnds``
+for initialization of B2 calculation and in each time step ``b2mndt``
+routine that performs one implicit time step for the B2 system of
+equations.
+
+Coordinate Systems
+~~~~~~~~~~~~~~~~~~
+
+The B2 fluid model that is used to describe the plasma in the scrape-off
+layer is solved in the poloidal field-aligned coordinate system. The
+choice of the coordinate system is due to the alignment of transport of
+plasma along the magnetic field lines, which is strong in parallel and
+weak in radial direction. In addition to that the coordinate system also
+takes advantage of tokamak’s shape. Its rotational symmetry allows
+three-dimensional problem to be reduced into two dimensions. Poloidal
+cut through the torus, in :num:`Fig. #coordinates`, shows the cells are
+quadtrilaterally shaped and either aligned with or perpendicular to the
+magnetic field lines.
+
+Because of the reasons mentioned earlier, the following coordinate
+systems are used for the B2 model (Fig. [fig:coordinates]).
+
+#. **Cylindrical system** (:math:`R,\phi,z`), where :math:`R` is the
+   torus’s major radius, :math:`\phi` the toroidal direction and
+   :math:`z` the height.
+
+#. **Parallel system** (:math:`\parallel,\perp,r`), where
+   :math:`\parallel` is the direction parallel and :math:`\perp`
+   perpendicular (diamagnetic direction) to magnetic field B and
+   :math:`r` the outward normal to the flux surface.
+
+#. **Poloidal system** (:math:`\theta,r,\phi`), where :math:`\theta` is
+   tangent to the magnetic surface in the poloidal plane, :math:`r` is
+   normal to the flux surface in the poloidal plane and :math:`\phi` is
+   the angle in the toroidal direction. Later, (:math:`\theta,r,\phi`)
+   is denoted as (:math:`x,y,z`).
+
+.. _coordinates:
+.. figure:: howto/catalyst/images/coordinates.png
+   :alt: Global coordinate systems in three-dimensional simulation domain of B2 code: cylindrical (:math:`R,\phi,z`), parallel          (:math:`\parallel,\perp,r`), poloidal (:math:`x,y,z`).
+
+   Global coordinate systems in three-dimensional simulation domain of B2 code: cylindrical (:math:`R,\phi,z`), parallel    (:math:`\parallel,\perp,r`), poloidal (:math:`x,y,z`).
+
+Grid Generation Workflow
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+As described in Section [sec:SOLPS\ :sub:`S`\ tructure], SOLPS code
+provides a semi-automated grid generation workflow. A graphical
+interface, DG, is used to set up input files for the grid generator.
+Input data to DG contains information about the poloidal magnetic flux
+on regular grid and divertor geometric data from CAD drawings or other
+sources. After combining this information, the actual grid generation is
+done by CARRE grid generator that constructs mesh in four following
+steps .
+
+#. Identification of the magnetic field configuration.
+
+#. Parametrization of separatrices and outer boundaries, and partition
+   of the simulation domain into regions.
+
+#. Distribution of grid points on initial flux surfaces.
+
+#. Mapping of grid points from one flux surface to the next.
+
+These steps have to be repeated until a satisfactory grid is obtained.
+It is then passed to ``b2ag`` code which converts the grid to input
+format expected by the B2 code.
+
+Due to the grid structure and magnetic field configuration, and the fact
+that the grid generator needs to automatically apply field-alignment and
+orthogonality constraints, grid generation is a demanding process. This
+leads to improper mesh structure at the target plates . Usually, the
+user needs to manually configure parameters that affect orthogonality in
+that area.
+
+.. figure:: howto/catalyst/images/grid_workflow.png
+   :alt: Grid generation workflow.
+
+   Grid generation workflow.
+[fig:grid:sub:`w`\ orkflow]
+
+Data Structure
+~~~~~~~~~~~~~~
+
+Quadrilateral cells in physical space are converted into unit squares on
+a Cartesian coordinate system
+(Fig. [fig:phys:sub:`c`\ omp\ :sub:`s`\ pace]). This is a computational
+space where each unit represents one cell in a physical space.
+Computational domain is further divided into regions, depending on the
+magnetic field configuration. Line that divides them is called
+separatrix. The regions are as follows.
+
+#. Scrape-off layer (SOL)
+
+#. Private flux region (PFR)
+
+#. Core
+
+Every region forms a rectangular block of cells in computational space.
+Outline of the computational domain is shaped similarly to a
+two-dimensional array. This allows efficient storage of cells and the
+information each cell contains in three or more dimensional arrays.
+Every cell :math:`\Omega_{i,j}` is identified with its position
+(:math:`i,j`) and every information, e.g. position of each cell’s
+vertexes, are stored in the same position. Convenient structure of
+computational space itself defines each cell’s neighbors, which are the
+same in computational and physical space. Neighbors are defined as
+:math:`\Omega_{i{\pm}1,j{\pm}1}`. However, due to the complex geometry
+between region boundaries each cell stores information about its
+neighbors explicitly as well.
+
+.31 |B2.5 simulation domains in physical and computational space. The
+regions are scrape-off layer (SOL, colored in grey), private flux region
+(PFR, green), and core (blue). Separatrix is shown as a red line.|
+
+[fig:grid9838]
+
+.31 |B2.5 simulation domains in physical and computational space. The
+regions are scrape-off layer (SOL, colored in grey), private flux region
+(PFR, green), and core (blue). Separatrix is shown as a red line.|
+
+[fig:grid:sub:`r`\ egions]
+
+.65 |B2.5 simulation domains in physical and computational space. The
+regions are scrape-off layer (SOL, colored in grey), private flux region
+(PFR, green), and core (blue). Separatrix is shown as a red line.|
+
+[fig:comp:sub:`s`\ pace]
+
+[fig:phys:sub:`c`\ omp\ :sub:`s`\ pace]

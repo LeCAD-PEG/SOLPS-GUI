@@ -18,4 +18,5 @@ Currently, the HOWTOs are:
    submit.rst
    plugin.rst
    cpo2ids/index.rst
+   catalyst/index.rst
 

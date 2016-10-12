@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 744.09448819 1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="cell.svg"
+   inkscape:export-filename="/Users/Jure/Desktop/thesis/images/cell.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.52"
+     inkscape:cx="338.36228"
+     inkscape:cy="900.45105"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1440"
+     inkscape:window-height="825"
+     inkscape:window-x="0"
+     inkscape:window-y="1"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g4381">
+      <g
+         transform="matrix(0.52660142,-0.30403347,0.30399986,0.52654321,31.621116,112.95692)"
+         id="g4218">
+        <g
+           transform="translate(4.2332573,13.758798)"
+           id="g4255">
+          <g
+             id="g4205">
+            <path
+               style="fill:none;fill-rule:evenodd;stroke:#b3b3b3;stroke-width:1.64464664;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+               d="m 149.88083,120.3218 c 31.31409,77.5584 38.96775,154.03207 25.8073,213.40648"
+               id="path4138"
+               inkscape:connector-curvature="0"
+               inkscape:transform-center-y="-0.99258829"
+               sodipodi:nodetypes="cc" />
+            <path
+               style="fill:none;fill-rule:evenodd;stroke:#b3b3b3;stroke-width:1.64464664px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+               d="m 122.08836,169.95122 c 94.55044,3.0797 184.35987,-8.06363 270.9766,-28.78506"
+               id="path4140"
+               inkscape:connector-curvature="0"
+               sodipodi:nodetypes="cc" />
+            <path
+               style="fill:none;fill-rule:evenodd;stroke:#b3b3b3;stroke-width:1.64464664px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+               d="m 346.41331,91.536741 c 30.98143,75.122089 44.12335,148.871919 40.69612,221.347189"
+               id="path4142"
+               inkscape:connector-curvature="0"
+               sodipodi:nodetypes="cc" />
+            <path
+               style="fill:none;fill-rule:evenodd;stroke:#b3b3b3;stroke-width:1.64464664px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+               d="m 114.14765,305.93581 c 106.84144,4.84041 211.11756,-1.86315 312.66531,-20.84435"
+               id="path4144"
+               inkscape:connector-curvature="0"
+               sodipodi:nodetypes="cc" />
+          </g>
+          <g
+             style="fill:none"
+             id="g4211">
+            <path
+               style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.46697021;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+               d="M 166.76136,170.60998 366.25914,147.35763 387.5,291.65426 180.11364,307.38833 Z"
+               id="path4146"
+               inkscape:connector-curvature="0"
+               sodipodi:nodetypes="ccccc" />
+            <circle
+               style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2.46697021;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+               id="path4173"
+               cx="166.66891"
+               cy="170.66655"
+               r="1.6189945" />
+            <circle
+               r="1.6189945"
+               cy="147.18283"
+               cx="366.11035"
+               id="circle4175"
+               style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2.46697021;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+            <circle
+               r="1.6189945"
+               cy="307.05157"
+               cx="180.03514"
+               id="circle4177"
+               style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2.46697021;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+            <circle
+               r="1.6189945"
+               cy="291.5195"
+               cx="387.52106"
+               id="circle4179"
+               style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2.46697021;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+          </g>
+        </g>
+      </g>
+      <text
+         sodipodi:linespacing="125%"
+         id="text4181"
+         y="233.39221"
+         x="234.83"
+         style="font-style:normal;font-weight:normal;font-size:10px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'"
+           y="233.39221"
+           x="234.83"
+           id="tspan4183"
+           sodipodi:role="line"><tspan
+             id="tspan4187"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'">P</tspan><tspan
+             id="tspan4185"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue';baseline-shift:sub">i,j,0</tspan></tspan></text>
+      <text
+         sodipodi:linespacing="125%"
+         id="text4247"
+         y="158.36017"
+         x="289.11078"
+         style="font-style:normal;font-weight:normal;font-size:10px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'.Helvetica Neue DeskInterface';-inkscape-font-specification:'.Helvetica Neue DeskInterface'"
+           y="158.36017"
+           x="289.11078"
+           id="tspan4249"
+           sodipodi:role="line"><tspan
+             id="tspan4253"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.5px;font-family:'.Helvetica Neue DeskInterface';-inkscape-font-specification:'.Helvetica Neue DeskInterface'">Ω</tspan><tspan
+             id="tspan4251"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;font-family:'.Helvetica Neue DeskInterface';-inkscape-font-specification:'.Helvetica Neue DeskInterface';baseline-shift:sub">i,j</tspan></tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="167.83"
+         y="142.39221"
+         id="text4268"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan4270"
+           x="167.83"
+           y="142.39221"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'"
+             id="tspan4272">P</tspan><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue';baseline-shift:sub"
+             id="tspan4274">i,j,2</tspan></tspan></text>
+      <text
+         sodipodi:linespacing="125%"
+         id="text4276"
+         y="88.392204"
+         x="238.83"
+         style="font-style:normal;font-weight:normal;font-size:10px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'"
+           y="88.392204"
+           x="238.83"
+           id="tspan4278"
+           sodipodi:role="line"><tspan
+             id="tspan4280"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'">P</tspan><tspan
+             id="tspan4282"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue';baseline-shift:sub">i,j,3</tspan></tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="317.82999"
+         y="178.39221"
+         id="text4284"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan4286"
+           x="317.82999"
+           y="178.39221"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'"
+             id="tspan4288">P</tspan><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue';baseline-shift:sub"
+             id="tspan4290">i,j,1</tspan></tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="425.6579"
+       y="132.62537"
+       id="text4311"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4313"
+         x="425.6579"
+         y="132.62537" /></text>
+    <g
+       id="g4416">
+      <g
+         id="g4315"
+         transform="matrix(0.52660142,-0.30403347,0.30399986,0.52654321,251.62111,112.95692)">
+        <g
+           id="g4317"
+           transform="translate(4.2332573,13.758798)">
+          <g
+             id="g4319">
+            <path
+               sodipodi:nodetypes="cc"
+               inkscape:transform-center-y="-0.99258829"
+               inkscape:connector-curvature="0"
+               id="path4321"
+               d="m 149.88083,120.3218 c 31.31409,77.5584 38.96775,154.03207 25.8073,213.40648"
+               style="fill:none;fill-rule:evenodd;stroke:#b3b3b3;stroke-width:1.64464664;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+            <path
+               sodipodi:nodetypes="cc"
+               inkscape:connector-curvature="0"
+               id="path4323"
+               d="m 122.08836,169.95122 c 94.55044,3.0797 184.35987,-8.06363 270.9766,-28.78506"
+               style="fill:none;fill-rule:evenodd;stroke:#b3b3b3;stroke-width:1.64464664px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+            <path
+               sodipodi:nodetypes="cc"
+               inkscape:connector-curvature="0"
+               id="path4325"
+               d="m 346.41331,91.536741 c 30.98143,75.122089 44.12335,148.871919 40.69612,221.347189"
+               style="fill:none;fill-rule:evenodd;stroke:#b3b3b3;stroke-width:1.64464664px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+            <path
+               sodipodi:nodetypes="cc"
+               inkscape:connector-curvature="0"
+               id="path4327"
+               d="m 114.14765,305.93581 c 106.84144,4.84041 211.11756,-1.86315 312.66531,-20.84435"
+               style="fill:none;fill-rule:evenodd;stroke:#b3b3b3;stroke-width:1.64464664px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+          </g>
+          <g
+             id="g4329"
+             style="fill:#f2f2f2">
+            <path
+               sodipodi:nodetypes="ccccc"
+               inkscape:connector-curvature="0"
+               id="path4331"
+               d="M 166.76136,170.60998 366.25914,147.35763 387.5,291.65426 180.11364,307.38833 Z"
+               style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.46697021;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+            <circle
+               r="1.6189945"
+               cy="170.66655"
+               cx="166.66891"
+               id="circle4333"
+               style="opacity:1;fill:#f2f2f2;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2.46697021;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+            <circle
+               style="opacity:1;fill:#f2f2f2;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2.46697021;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+               id="circle4335"
+               cx="366.11035"
+               cy="147.18283"
+               r="1.6189945" />
+            <circle
+               style="opacity:1;fill:#f2f2f2;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2.46697021;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+               id="circle4337"
+               cx="180.03514"
+               cy="307.05157"
+               r="1.6189945" />
+            <circle
+               style="opacity:1;fill:#f2f2f2;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2.46697021;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+               id="circle4339"
+               cx="387.52106"
+               cy="291.5195"
+               r="1.6189945" />
+          </g>
+        </g>
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="454.82999"
+         y="233.65349"
+         id="text4341"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan4343"
+           x="454.82999"
+           y="233.65349"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'"
+             id="tspan4345">P</tspan><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue';baseline-shift:sub"
+             id="tspan4347">n</tspan></tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="509.11078"
+         y="160.3622"
+         id="text4349"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan4351"
+           x="509.11078"
+           y="160.3622"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'.Helvetica Neue DeskInterface';-inkscape-font-specification:'.Helvetica Neue DeskInterface'"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.5px;font-family:'.Helvetica Neue DeskInterface';-inkscape-font-specification:'.Helvetica Neue DeskInterface'"
+             id="tspan4353">Ω</tspan><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;font-family:'.Helvetica Neue DeskInterface';-inkscape-font-specification:'.Helvetica Neue DeskInterface';baseline-shift:sub"
+             id="tspan4355">n</tspan></tspan></text>
+      <text
+         sodipodi:linespacing="125%"
+         id="text4357"
+         y="138.3622"
+         x="379.23001"
+         style="font-style:normal;font-weight:normal;font-size:10px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'"
+           y="138.3622"
+           x="379.23001"
+           id="tspan4359"
+           sodipodi:role="line"><tspan
+             id="tspan4361"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'">P</tspan><tspan
+             id="tspan4363"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue';baseline-shift:sub">n+2×N</tspan></tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="443.82999"
+         y="90.252205"
+         id="text4365"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan4367"
+           x="443.82999"
+           y="90.252205"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'"
+             id="tspan4369">P</tspan><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue';baseline-shift:sub"
+             id="tspan4371">n+3×N</tspan></tspan></text>
+      <text
+         sodipodi:linespacing="125%"
+         id="text4373"
+         y="180.3622"
+         x="537.83002"
+         style="font-style:normal;font-weight:normal;font-size:10px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'"
+           y="180.3622"
+           x="537.83002"
+           id="tspan4375"
+           sodipodi:role="line"><tspan
+             id="tspan4377"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'">P</tspan><tspan
+             id="tspan4379"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue';baseline-shift:sub">n+N</tspan></tspan></text>
+    </g>
+  </g>
+</svg>
