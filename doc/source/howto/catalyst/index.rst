@@ -38,7 +38,7 @@ overcome this constraints, implementation of Paraview Catalyst
 *in situ* library into B2.5 code,
 which would allos users to run simulation and perform analysis at the run time.
 
-Paravies *Catalyst* brings the following improvements to the SOLPS code suite:
+ParaView *Catalyst* brings the following improvements to the SOLPS code suite:
 
 #. A significant reduction of the time users need to perform simulation
    and analysis because both can be performed at the same time.
@@ -153,8 +153,7 @@ consists of three basic steps, briefly explained bellow .
    disk and analyzed.
 
 .. figure:: images/trad_pipeline.png
-   :alt: Traditional three-step pipeline consisting of pre-processing,
-   processing, and post-processing.
+   :alt: Traditional three-step pipeline consisting of pre-processing, processing, and post-processing.
 
    Traditional three-step pipeline consisting of pre-processing,
    processing, and post-processing.
@@ -673,16 +672,14 @@ formulation changes to equation . :math:`N` denotes number of cells.
    \Omega_{n} = \left\{ P_{n}, P_{n+N}, P_{n+2\times{N}}, P_{n+3\times{N}} \right\}; \;n=0,1,...,N; \; N=(nx+2)\times{(ny+2)}
 
 .. figure:: images/cell.png
-   :alt: Cell notation with cells stored in 2D array and vertexes in 3D
-   array (left), and cells and vertexes stored in 1D array (right).
+   :alt: Cell notation with cells stored in 2D array and vertexes in 3D array (left), and cells and vertexes stored in 1D array (right).
 
    Cell notation with cells stored in 2D array and vertexes in 3D array
    (left), and cells and vertexes stored in 1D array (right).
 [fig:cell]
 
 .. figure:: images/row_col_major.png
-   :alt: 3D array of vertexes stored in a 1D array using row major and
-   column major ordering.
+   :alt: 3D array of vertexes stored in a 1D array using row major and column major ordering.
 
    3D array of vertexes stored in a 1D array using row major and column
    major ordering.
@@ -844,10 +841,10 @@ attaching data to the grid is similar to the first case.
             } 
         }
 
-Results
-=======
+Examples
+========
 
-The results are presented with two cases that are used for debugging and
+Two SOLPS-ITER example cases that are used for debugging and
 benchmarking new SOLPS features. The first case is *ITER\_535\_D+He+Ar*
 and the second one is *AUG\_16151\_D*. *ITER\_535\_D+He+Ar* (later *ITER
 535*) is an ITER all-metal walls example with Ar impurity seeding and
@@ -898,11 +895,9 @@ established we can pick the extract and show it in the render view
 case run).
 
 .. figure:: images/window.png
-   :alt: ParaView window showing electron temperature *te* during the
-   case *ITER 535* run with Catalyst (at time step 15).
+   :alt: ParaView window showing electron temperature *te* during the case *ITER 535* run with Catalyst (at time step 15).
 
-   ParaView window showing electron temperature *te* during the case
-   *ITER 535* run with Catalyst (at time step 15).
+   ParaView window showing electron temperature *te* during the case *ITER 535* run with Catalyst (at time step 15).
 [fig:window]
 
 Next, the data that is sent to pvserver can be visualized on the fly
@@ -955,8 +950,8 @@ Fig. [fig:time\ :sub:`r`\ esults].
 
 .. figure:: images/time_results.png
    :alt: Increase in average time of time steps when using Catalyst for
-   cases *AUG 16151* and *ITER 535* compared to runs without Catalyst.
-   Each bar contains an average time of a time step in red.
+         cases *AUG 16151* and *ITER 535* compared to runs without Catalyst.
+         Each bar contains an average time of a time step in red.
 
    Increase in average time of time steps when using Catalyst for cases
    *AUG 16151* and *ITER 535* compared to runs without Catalyst. Each
@@ -1040,11 +1035,9 @@ we multiply all *te* values by :math:`6,242e18`. To do that we use
 :math:`Te = te \times{6,242e18}`.
 
 .. figure:: images/derived_Te.png
-   :alt: Electron temperature, *Te* (eV) in time step 88 of the case
-   *AUG 16151*.
+   :alt: Electron temperature, *Te* (eV) in time step 88 of the case *AUG 16151*.
 
-   Electron temperature, *Te* (eV) in time step 88 of the case *AUG
-   16151*.
+   Electron temperature, *Te* (eV) in time step 88 of the case *AUG 16151*.
 [fig:derived:sub:`T`\ e]
 
 Discussion
@@ -1200,24 +1193,8 @@ The following shortcomings should be considered when using the Catalyst
    the simulation data due to the programming language (Fortran and C++)
    differences, therefore the data is deep-copied.
 
-Conclusions
-===========
 
-This thesis addressed issues of the large scale simulation SOLPS that
-have long simulation runs and produces vast amounts of data, which are
-difficult and time consuming to process. The main objective was to
-implement an *in situ* library into existing SOLPS code, that will allow
-the user to perform an analysis during the simulation run. The thesis
-first gives an explanation of SOLPS code structure, grid description and
-basics of *in situ* analysis. It continues with the explanation of the
-solution implemented into existing code and ends with an overview and
-evaluation of results.
-
-The work performed and findings identified are as follows.
-
-#. We implemented a ParaView Catalyst co-processing library in the
-   existing B2.5 code for simultaneous analysis during the simulation
-   run.
+Overall, the Catalyst adaptation brougth to SOLPS-ITER the following benefits:
 
 #. The solution saves considerable amounts of time needed to debug the
    code or visualize and inspect the simulation data.
@@ -1236,8 +1213,8 @@ The work performed and findings identified are as follows.
 #. The solution has been implemented with minimal modifications in the
    original simulation codes.
 
-The results show that implementation of an *in situ* library in the
-SOLPS code makes scientists work more intuitive and effective. It allows
+The examples show that implementation of an *in situ* library in the
+SOLPS code makes work more intuitive and effective. It allows
 them to perform an analysis of the simulation data in a straightforward
 manner using built-in tools in ParaView without any need to write code.
 On the other hand, to the users who are knowledgeable in programming,
