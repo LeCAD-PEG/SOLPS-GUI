@@ -3,10 +3,11 @@
 MAKE_JOBS=${MAKE_JOBS:-4}
 BUILDROOT="${PWD}"
 BUILD_DIR="${BUILDROOT}/build"
-PARAVIEW_VERSION="5.1.2"
-STAGING_DIR="${BUILDROOT}/staging"
+PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.1.2}
+STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 STAGING_PARAVIEW="${STAGING_DIR}/paraview/${PARAVIEW_VERSION}"
-STAGING_PLUGINS="${STAGING_DIR}/paraview-plugins/${PARAVIEW_VERSION}/${DATAVERSION}"
+STAGING_PLUGINS="${STAGING_DIR}/paraview-plugins/${PARAVIEW_VERSION}/${IMAS_VERSION}"
+
 
 case $(hostname) in
   *.iter.org) 
@@ -20,6 +21,11 @@ case $(hostname) in
   *)
 	;;
 esac
+
+if test -z "${IMAS_VERSION}" ; then
+    echo "Required IMAS module not present"
+    exit 2
+fi
 
 
 set -e

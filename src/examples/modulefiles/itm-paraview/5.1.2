@@ -1,0 +1,30 @@
+#%Module #### -*- mode: Tcl;-*-
+##
+##      ITM Paraview environment
+##      author: Olivier Hoenen
+##
+
+
+source "$env(ITMMODULESUTIL)/mod_tools.tcl"
+
+module-whatis "ITM Paraview environment (data version dependent)" 
+
+conflict itm-paraview
+prereq qt/4.8.7
+
+set VERSION  [get_version]
+set SWITMDIR [get_env SWITMDIR]
+set QTDIR    [get_env QTDIR]
+
+set PARAVIEW_VERSION [lindex [split $VERSION -] 0]
+
+set PARAVIEWPATH $SWITMDIR/paraview/$VERSION
+
+setenv PARAVIEW_HOME $PARAVIEWPATH
+setenv ITM_PARAVIEW_VERSION $PARAVIEW_VERSION
+prepend-path PATH $PARAVIEWPATH/bin
+#prepend-path LD_LIBRARY_PATH $PARAVIEWPATH/$PARAVIEW_VERSION/lib
+prepend-path LD_LIBRARY_PATH $QTDIR/lib # required by Catalyst
+
+
+

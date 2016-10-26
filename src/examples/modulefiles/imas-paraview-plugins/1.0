@@ -1,0 +1,20 @@
+#%Module #### -*- mode: Tcl;-*-
+##
+##      ITM Paraview plugins for UAL
+##      author: Olivier Hoenen
+##
+
+
+source "$env(ITMMODULESUTIL)/mod_tools.tcl"
+
+module-whatis "ITM Paraview plugin environment for IDS (IMAS version dependent)" 
+
+conflict itm-paraview-plugins
+prereq imas
+prereq itm-paraview
+
+set ITM_PARAVIEW_VERSION [get_env ITM_PARAVIEW_VERSION]
+set IMAS_VERSION         [get_env IMAS_VERSION]
+set SWITMDIR             [get_env SWITMDIR]
+
+prepend-path PV_PLUGIN_PATH $SWITMDIR/paraview-plugins/$ITM_PARAVIEW_VERSION/$IMAS_VERSION

@@ -10,6 +10,7 @@ logging
 .project
 .pydevproject
 localsetup.*sh
+.directory
 !src/gui/runs.ui
 !src/gui/solps.ui
 !src/gui/preferences.ui

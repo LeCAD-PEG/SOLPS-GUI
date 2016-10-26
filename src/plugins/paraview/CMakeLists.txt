@@ -30,22 +30,18 @@ else()
 #   link_directories(${IMASLL_LIBRARY_DIRS})
    link_directories($ENV{MDSPLUS_DIR}/lib)
 
-#SET(IMASCPP_INCLUDE_DIRS /u/dkaljun/imas/core/imas/develop/3/ual/develop/include)
-#SET(IMASLL_INCLUDE_DIRS /u/dkaljun/imas/core/imas/develop/3/ual/develop/include)
-
-SET(IMASCPP_INCLUDE_DIRS /afs/ipp/itm/switm/imasv1/core/imas/master/3/ual/develop/include)
-SET(IMASLL_INCLUDE_DIRS /afs/ipp/itm/switm/imasv1/core/imas/master/3/ual/develop/include)
+SET(IMASCPP_INCLUDE_DIRS $ENV{IMAS_PREFIX}/include)
+SET(IMASLL_INCLUDE_DIRS $ENV{IMAS_PREFIX}/include)
 
 
 
 #include_directories(/afs/ipp/itm/switm/ual/4.10a.4_R2.1.0/include)
 include_directories(/afs/ipp/itm/switm/blitz/0.10/include)
-#include_directories(/u/dkaljun/imas/core/imas/develop/3/ual/develop/include)
 
 #link_directories(/afs/ipp/itm/switm/ual/4.10a.4_R2.1.0/lib)
 #link_directories(/afs/ipp/itm/switm/mdsplus/5.2_itm_v1/lib64)
 #link_directories(/afs/ipp/itm/switm/mdsplus/5.2_itm_v1/lib)
-link_directories(/u/dkaljun/imas/core/imas/develop/3/ual/develop/lib)
+link_directories($ENV{IMAS_PREFIX}/lib)
 link_directories(${BLITZ_LIBRARY_DIRS})
 #link_directories(/afs/ipp/itm/switm/lib/hdf5/1.8.10)
 #
@@ -97,12 +93,9 @@ if (PARAVIEW_BUILD_QT_GUI)
                                pqMyPropertyWidgetDecorator.cxx
 			       pqFieldListPropertyWidgetDecorator.cxx)
 target_include_directories(ReadUALEdge PUBLIC ${IMASCPP_INCLUDE_DIRS})
-target_include_directories(ReadUALEdge PUBLIC ${IMASLL_INCLUDE_DIRS})
 target_include_directories(ReadUALEdge PUBLIC ${BLITZ_INCLUDE_DIRS})
 #target_include_directories(ReadUALEdge PUBLIC ${MDSPLUS_INCLUDE_DIRS})
-target_link_libraries(ReadUALEdge  imas-cpp imas TreeShr TdiShr MdsShr MdsIpShr XTreeShr blitz) 
-
-#   target_link_libraries(ReadUALEdge ${IMASCPP_LIBRARIES} ${IMASLL_LIBRARIES})
+target_link_libraries(ReadUALEdge  imas-cpp imas TreeShr TdiShr MdsShr MdsIpShr XTreeShr blitz)
 
 endif()
 

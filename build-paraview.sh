@@ -23,7 +23,7 @@ BUILDROOT=${PWD}
 BUILD_DIR=${BUILDROOT}/build
 DOWNLOAD_DIR=${DOWNLOAD_DIR:-${BUILDROOT}/download}
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
-#STAGING_DIR=/work/imas/project
+#STAGING_DIR=${SWITMDIR}
 STAGING_QT=${STAGING_QT:-${STAGING_DIR}/qt/${QT_VERSION}}
 STAGING_PARAVIEW=${STAGING_PARAVIEW:-$STAGING_DIR/paraview/$PARAVIEW_VERSION}
 
@@ -93,20 +93,30 @@ PARAVIEW_SOURCE_DIR="${BUILD_DIR}/ParaView-v${PARAVIEW_VERSION}"
 #Download Paraview
 PARAVIEW_MAJOR_VERSION=${PARAVIEW_VERSION%.*}
 PARAVIEW_SOURCE="ParaView-v${PARAVIEW_VERSION}.tar.gz"
-PARAVIEW_DOWNLOAD="download.php?submit=Download&version=v${PARAVIEW_MAJOR_VERSION}&type=source&os=all&downloadFile=${PARAVIEW_SOURCE}"
-
+PARAVIEW_DATA="ParaViewData-v${PARAVIEW_VERSION}.tar.gz"
+PARAVIEW_DOWNLOAD="http://www.paraview.org/files/v${PARAVIEW_MAJOR_VERSION}"
 cd ${DOWNLOAD_DIR}
+if [ ! -f ${PARAVIEW_DATA} ]; then # download examples and tutorials
+    wget -O ${DOWNLOAD_DIR}/${PARAVIEW_DATA} --no-check-certificate \
+        ${PARAVIEW_DOWNLOAD}/${PARAVIEW_DATA}
+fi
+
 if [ ! -f ${PARAVIEW_SOURCE} ]; then
-    curl -vO http://www.paraview.org/paraview-downloads/${PARAVIEW_DOWNLOAD} 
-    mv ${PARAVIEW_DOWNLOAD} ${PARAVIEW_SOURCE}
+    wget -O ${DOWNLOAD_DIR}/${PARAVIEW_SOURCE} --no-check-certificate \
+        ${PARAVIEW_DOWNLOAD}/${PARAVIEW_SOURCE}
+fi
+
+if [ ! -d ${PARAVIEW_SOURCE_DIR} ]; then
     cd ${BUILD_DIR}
     tar xzf ${DOWNLOAD_DIR}/${PARAVIEW_SOURCE}
+    tar xzf ${DOWNLOAD_DIR}/${PARAVIEW_DATA}
 # See https://github.com/OpenFOAM/ThirdParty-dev/blob/master/README.org
     patch -p2 -d ${PARAVIEW_SOURCE_DIR} < \
         ${BUILDROOT}/src/patches/paraview-ui_pqExportStateWizard.patch
     patch -p1 -d ${PARAVIEW_SOURCE_DIR} < \
         ${BUILDROOT}/src/patches/paraview-vtk-storage-mkostemp.patch
 fi
+
 
 #Configure and build paraview
 rm -rf ${PARAVIEW_BUILD}
