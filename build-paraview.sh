@@ -143,7 +143,7 @@ LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} \
 make -j ${MAKE_JOBS} VERBOSE=1
 make install
 
-STAGING_DOC=${STAGING_PARAVIEW}/share/doc/paraview/${PARAVIEW_MAJOR_VERSION}
+STAGING_DOC=${STAGING_PARAVIEW}/share/paraview-${PARAVIEW_MAJOR_VERSION}/doc
 install -d ${STAGING_DOC}
 for file in ParaViewGettingStarted-5.1.0.pdf ParaViewTutorial.pdf \
         ParaViewGuide-5.1.0.pdf ; do
