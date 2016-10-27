@@ -1350,7 +1350,7 @@ class SOLPS_MainWindow(QMainWindow):
 
     @pyqtSlot()
     def show_preferences_dialog(self):
-        dialog = Preferences(self.preferences)
+        dialog = PreferencesDialog(self.preferences)
         if dialog.exec_():
             dialog.setPreferences()
             self.preferences.write()
