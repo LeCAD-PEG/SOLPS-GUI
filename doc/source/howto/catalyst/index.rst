@@ -1011,7 +1011,7 @@ selected cell over time, to observe how the temperature converged
 
 .. figure:: images/tePFR.png
    :alt: PFR region showing electron temperature *te* (J) in time step
-   88 of the case *AUG 16151*. Cell 869 holds maximum value of *te*.
+         88 of the case *AUG 16151*. Cell 869 holds maximum value of *te*.
 
    PFR region showing electron temperature *te* (J) in time step 88 of
    the case *AUG 16151*. Cell 869 holds maximum value of *te*.
@@ -1019,8 +1019,8 @@ selected cell over time, to observe how the temperature converged
 
 .. figure:: images/teplot.png
    :alt: Electron temperature, *te* (J), on cell 869 with respect to
-   time steps in the case *AUG 16151*. Cell 869 holds the maximum value
-   of *te* in PFR region in time step 88.
+         time steps in the case *AUG 16151*. Cell 869 holds the maximum value
+         of *te* in PFR region in time step 88.
 
    Electron temperature, *te* (J), on cell 869 with respect to time
    steps in the case *AUG 16151*. Cell 869 holds the maximum value of
@@ -1824,9 +1824,3 @@ Pipeline Browser. To create a new pipeline we need to:
        | We don’t need ParaView running if we already have the desired
        fields extracted with ``coproc.py`` for later analysis,
        visualization and debugging.
-
-.. |B2.5 simulation domains in physical and computational space. The regions are scrape-off layer (SOL, colored in grey), private flux region (PFR, green), and core (blue). Separatrix is shown as a red line.| image:: images/grid_98x38.pdf
-.. |B2.5 simulation domains in physical and computational space. The regions are scrape-off layer (SOL, colored in grey), private flux region (PFR, green), and core (blue). Separatrix is shown as a red line.| image:: images/grid_regions.pdf
-.. |B2.5 simulation domains in physical and computational space. The regions are scrape-off layer (SOL, colored in grey), private flux region (PFR, green), and core (blue). Separatrix is shown as a red line.| image:: images/comp_space.pdf
-.. |Flux of atoms of specific ion species between each cell and its left neighbor cell, *fna\_fcor*, in the area where *te* is greater than :math:`2e{-17}` J. We can see that the area in figure [fig:right\ :sub:`f`\ na] is bigger than in [fig:left\ :sub:`f`\ na] and values of *fna\_fcor* changed.| image:: images/fna_fcorx10.png
-.. |Flux of atoms of specific ion species between each cell and its left neighbor cell, *fna\_fcor*, in the area where *te* is greater than :math:`2e{-17}` J. We can see that the area in figure [fig:right\ :sub:`f`\ na] is bigger than in [fig:left\ :sub:`f`\ na] and values of *fna\_fcor* changed.| image:: images/fna_fcorx15.png
