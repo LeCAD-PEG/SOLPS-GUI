@@ -65,3 +65,39 @@ that are replacing "old" Xlib libraries. *XRandr* handles multi-display
 extensions that are unavailable on remote displays. XCB errors in rendering
 are related to "old" display managers and are usually not harmful. Upgrade
 your X11 display drivers on login node if serious having problems.
+
+How do I change default browser for ``solps_doc``?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For KDE select :menuselection:`Kmenu --> Configure Desktop -->
+Advanced --> File Assoc --> Text --> HTML` and move your browser to
+the top of the preferences.
+
+How do I add acroread as default PDF viewer for ParaView help?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Default PDF viewer for xdg-open can be obtained by::
+
+   $ xdg-mime query default application/pdf
+
+If there is no system ``/usr/share/applications/acroread.desktop`` file
+one can create ``${HOME}./local/share/applications/acroread.desktop`` with
+the following contents::
+
+   [Desktop Entry]
+   Name=Adobe Reader 9
+   MimeType=application/pdf;application/vnd.fdf;application/vnd.adobe.pdx;application/vnd.adobe.xdp+xml;application/vnd.adobe.xfdf;
+   Exec=acroread
+   Type=Application
+   GenericName=PDF Viewer
+   Terminal=false
+   Icon=AdobeReader9
+   Caption=PDF Viewer
+   X-KDE-StartupNotify=false
+   Categories=Application;Office;Viewer;X-Red-Hat-Base;
+   InitialPreference=9
+
+
+and change default PDF viewer with::
+
+   $ xdg-mime default acroread.desktop application/pdf
+   
