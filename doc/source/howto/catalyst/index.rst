@@ -664,7 +664,7 @@ for every cell :math:`\Omega_{i,j}`.
    \Omega_{i,j} = \left\{ P_{i,j,0}, P_{i,j,1}, P_{i,j,2}, P_{i,j,3} \right\}; \;i=-1,0,1,...,nx; \;j=-1,0,1,...,ny
 
 However, when we store vertexes and cells in one-dimensional array,
-formulation changes to equation . :math:`N` denotes number of cells.
+formulation changes to equation. :math:`N` denotes number of cells.
 
 .. math::
 
@@ -676,14 +676,14 @@ formulation changes to equation . :math:`N` denotes number of cells.
 
    Cell notation with cells stored in 2D array and vertexes in 3D array
    (left), and cells and vertexes stored in 1D array (right).
-[fig:cell]
 
+
+.. _fig-row-sub-col-sub-major:
 .. figure:: images/row_col_major.png
    :alt: 3D array of vertexes stored in a 1D array using row major and column major ordering.
 
    3D array of vertexes stored in a 1D array using row major and column
    major ordering.
-[fig:row:sub:`c`\ ol\ :sub:`m`\ ajor]
 
 Listing [lst:points] shows the process of assigning point coordinates
 from ``crx`` and ``cry`` to object ``pts`` of type ``vtkPoints``. First,
