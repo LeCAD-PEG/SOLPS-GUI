@@ -109,7 +109,7 @@ part of the code, respectively. The most recent version is 6.0, which
 brings improved mesh adaptation in B2 codes.
 
 .. _fig-solps-sub-workflow:
-.. figure:: howto/catalyst/images/workflow.png
+.. figure:: howto/catalyst/images/workflow.*
    :alt: SOLPS code workflow.
 
    SOLPS code workflow.
@@ -299,7 +299,7 @@ systems are used for the B2 model (Fig. [fig:coordinates]).
    is denoted as (:math:`x,y,z`).
 
 .. _coordinates:
-.. figure:: howto/catalyst/images/coordinates.png
+.. figure:: howto/catalyst/images/coordinates.*
    :alt: Global coordinate systems in three-dimensional simulation domain of B2 code: cylindrical (:math:`R,\phi,z`), parallel          (:math:`\parallel,\perp,r`), poloidal (:math:`x,y,z`).
 
    Global coordinate systems in three-dimensional simulation domain of B2 code: cylindrical (:math:`R,\phi,z`), parallel    (:math:`\parallel,\perp,r`), poloidal (:math:`x,y,z`).
@@ -336,7 +336,7 @@ user needs to manually configure parameters that affect orthogonality in
 that area.
 
 .. _fig-grid-sub-workflow:
-.. figure:: howto/catalyst/images/grid_workflow.png
+.. figure:: howto/catalyst/images/grid-workflow.*
    :alt: Grid generation workflow.
 
    Grid generation workflow.
@@ -372,7 +372,7 @@ between region boundaries each cell stores information about its
 neighbors explicitly as well.
 
 .. _fig-phys-sub-comp:
-.. figure:: howto/catalyst/images/comp_space_and_grid.png
+.. figure:: howto/catalyst/images/comp-space-and-grid.*
    :alt: B2.5 simulation domains in physical and computational space.
 
    B2.5 simulation domains in physical and computational space.

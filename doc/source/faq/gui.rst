@@ -67,7 +67,7 @@ are related to "old" display managers and are usually not harmful. Upgrade
 your X11 display drivers on login node if serious having problems.
 
 How do I change default browser for ``solps_doc``?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For KDE select :menuselection:`Kmenu --> Configure Desktop -->
 Advanced --> File Assoc --> Text --> HTML` and move your browser to

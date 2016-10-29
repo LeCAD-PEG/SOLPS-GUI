@@ -78,8 +78,6 @@ a post-processing algorithm, which generates results and hands the baton
 back”*. Similarly  describes *in situ* as the *“ability to concurrently
 visualize and analyze data from simulations”*.
 
-[sec:In:sub:`S`\ itu\ :sub:`A`\ nalysis]
-
 Background
 ~~~~~~~~~~
 
@@ -107,13 +105,13 @@ compute resources as the simulation, while *in transit* moves some of
 the data to another processor to perform the analysis. Some advantages
 and disadvantages of each solution are presented below.
 
--  ***In situ:***
+-  **In situ:**
 
    -  no resource limitations for analysis;
 
    -  may affect simulation performance.
 
--  ***In transit:***
+-  **In transit:**
 
    -  does not impact performance of the scientific simulation;
 
@@ -139,7 +137,16 @@ In Situ Pipeline
 ^^^^^^^^^^^^^^^^
 
 The *In situ* approach to data processing changes the data analysis
-pipeline. Traditional pipeline (Fig. [fig:trad:sub:`p`\ ipeline])
+pipeline.
+
+.. _fig-trad-sub-pipeline:
+.. figure:: images/trad_pipeline.*
+   :alt: Traditional three-step pipeline consisting of pre-processing, processing, and post-processing.
+
+   Traditional three-step pipeline consisting of pre-processing,
+   processing, and post-processing.
+
+Traditional pipeline shown in :num:`Fig. #fig-trad-sub-pipeline`
 consists of three basic steps, briefly explained bellow .
 
 #. **Pre-processing**, where input data is prepared, e.g. domain
@@ -152,28 +159,23 @@ consists of three basic steps, briefly explained bellow .
 #. **Post-processing**, where the output of a simulation is read from
    disk and analyzed.
 
-.. figure:: images/trad_pipeline.png
-   :alt: Traditional three-step pipeline consisting of pre-processing, processing, and post-processing.
+.. _fig-insitu-sub-pipeline:
+.. figure:: images/insitu_pipeline.*
+   :alt: Pipeline with *in situ* approach.
 
-   Traditional three-step pipeline consisting of pre-processing,
-   processing, and post-processing.
-[fig:trad:sub:`p`\ ipeline]
+   Pipeline with *in situ* approach.
+
 
 Alternatively, *in situ* analysis changes pipeline as explained bellow
-and shown in Fig. [fig:insitu\ :sub:`p`\ ipeline].
+and shown in :num:`Fig. #fig-insitu-sub-pipeline` consist of.
 
 #. **Pre-processing**, which is identical to pre-processing in
    traditional pipeline.
 
-#. **Processing with *in situ* analysis**, where during the simulation
+#. **Processing with in situ analysis**, where during the simulation
    run a portion of the data is updated and displayed in certain time
    steps for analysis.
 
-.. figure:: images/insitu_pipeline.png
-   :alt: Pipeline with *in situ* approach.
-
-   Pipeline with *in situ* approach.
-[fig:insitu:sub:`p`\ ipeline]
 
 Instrumentation Libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -224,9 +226,9 @@ bellow .
 #. At this point, the simulation sends pointers to the data, that the
    VisIt servers continuously requires for processing.
 
-Libsim is divided into two libraries. First, called “front-end library”
+Libsim is divided into two libraries. First, called "front-end library"
 is a lightweight static library which is linked during the compilation
-of the simulation code. Second, named “runtime library” is bigger but is
+of the simulation code. Second, named "runtime library" is bigger but is
 used only when *in situ* analysis is requested.
 
 Additionally, Libsim requests metadata from the simulation that contains
@@ -294,57 +296,44 @@ its major components. However, since the co-processing script is written
 in a python, pipeline and client address and port can be modified after
 compilation of the simulation code.
 
-This chapter describes the implementation of Catalyst co-processing
-library in the SOLPS code. First, Section [sec:Workflow] describes the
-details behind the co-processing adaptor and how it interfaces with
-existing SOLPS code. Secondly, Section [sec:Visualization] explains the
-process of converting simulation data to VTK structures suitable for *in
-situ* visualization with ParaView.
-
-The SOLPS code is divided into several modules. Each module and how they
-connect between each other, are described in the
-Section [sec:SOLPS\ :sub:`S`\ tructure], while this section focuses on
-the B2.5 part of the suite, more specifically the driver, which contains
-``b2mn`` codes, and the Catalyst adaptor code.
-
 Workflow
 --------
 
 B2.5 code is composed of several independent programs that communicate
 through external files. Main workflow incorporates the programs
-``b2ag``, ``b2ah``, ``b2ai``, ``b2yp`` (described in
-Section [sec:SOLPS\ :sub:`S`\ tructure]. However, these are only used in
+``b2ag``, ``b2ah``, ``b2ai``, ``b2yp``. However, these are only used in
 pre-processing and post-processing.
 
+
+.. _fig-b2mn-sub-workflow:
+.. figure:: images/b2mn_workflow.*
+   :alt: Workflow of ``b2mn`` code.
+
+   Workflow of ``b2mn`` code.
+
+
 Computational part is handled by the ``b2mn`` program
-(Fig. [fig:b2mn:sub:`w`\ orkflow]). It is responsible for opening and
+(:num:`Fig. #fig-b2mn-sub-workflow`). It is responsible for opening and
 closing the input/output files, system-dependent operations (e.g. MPI
 function calls) and calling the code that actually performs computation,
 ``b2mndr``. ``B2mndr`` is responsible for control over time steps, which
 means that, like b2mn, it hands out most of the computational part to
-the routine that performs one time step, b2mndt.
+the routine that performs one time step, *b2mndt*.
 
 Co-processing is implemented in ``b2mndr``, where function calls to
 Catalyst adaptor are performed. The heart of the adaptor is a
 co-processing function that is called each time ``b2mndr`` performs a
 time step.
 
-.. figure:: images/b2mn_workflow.png
-   :alt: Workflow of ``b2mn`` code.
-
-   Workflow of ``b2mn`` code.
-[fig:b2mn:sub:`w`\ orkflow]
 
 Catalyst initialization and finalization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-| Main time stepping routine, ``b2mndr``, is written in Fortran 90
-programming language and follows the outline presented in
-Listing [lst:b2mndr].
+Main time stepping routine, ``b2mndr``, is written in Fortran 90
+programming language and follows the outline presented in the following
+listing.
 
-[c]
-
-::
+.. code-block:: fortran
 
     initialize files and data
      initialize coprocessor 
@@ -363,8 +352,7 @@ adaptor. Obviously, it is important to place co-processing function
 inside the main calculation loop in order to provide Catalyst with new
 data when each time step is calculated.
 
-One of the main objectives of *in situ* libraries
-(Section [sec:In:sub:`S`\ itu\ :sub:`A`\ nalysis]) is to not impact
+One of the main objectives of *in situ* libraries is to not impact
 simulation run if co-processing is not required. Catalyst function calls
 are enclosed in logical statements, which prevent the usage if Catalyst
 is not explicitly told to execute, so the above objective is satisfied.
@@ -391,19 +379,21 @@ needs the length of the file name besides actual path to file or only
 the name if the co-processing script is available in the same directory
 the simulation is run from.
 
-Function call as it appears in ``b2mndr`` is shown in
-Listing [lst:init]. The workflow was designed in a way that the
+Function call as it appears in ``b2mndr`` is shown in in the following listing.
+
+.. code-block:: fortran
+
+    ...
+     call coprocessorinitializewithpython('../coproc.py', 12)
+    ...
+
+The workflow was designed in a way that the
 co-processing script, called ``coproc.py`` needs to be present inside
 the run directory in order to call initialization function. The
 ``b2run`` command that runs ``b2mn`` is executed from ``b2mn.exe.dir``
 directory which is located inside the run directory, hence the ``../``
 before the file name.
 
-::
-
-    ...
-     call coprocessorinitializewithpython('../coproc.py', 12)
-     ...
 
 Finalization
 ~~~~~~~~~~~~
@@ -671,7 +661,7 @@ formulation changes to equation. :math:`N` denotes number of cells.
    \label{eq:cell_n}
    \Omega_{n} = \left\{ P_{n}, P_{n+N}, P_{n+2\times{N}}, P_{n+3\times{N}} \right\}; \;n=0,1,...,N; \; N=(nx+2)\times{(ny+2)}
 
-.. figure:: images/cell.png
+.. figure:: images/cell.*
    :alt: Cell notation with cells stored in 2D array and vertexes in 3D array (left), and cells and vertexes stored in 1D array (right).
 
    Cell notation with cells stored in 2D array and vertexes in 3D array
@@ -679,7 +669,7 @@ formulation changes to equation. :math:`N` denotes number of cells.
 
 
 .. _fig-row-sub-col-sub-major:
-.. figure:: images/row_col_major.png
+.. figure:: images/row_col_major.*
    :alt: 3D array of vertexes stored in a 1D array using row major and column major ordering.
 
    3D array of vertexes stored in a 1D array using row major and column
@@ -894,7 +884,7 @@ established we can pick the extract and show it in the render view
 (Fig. [fig:window] shows electron temperature *te* during *ITER 535*
 case run).
 
-.. figure:: images/window.png
+.. figure:: images/window.*
    :alt: ParaView window showing electron temperature *te* during the case *ITER 535* run with Catalyst (at time step 15).
 
    ParaView window showing electron temperature *te* during the case *ITER 535* run with Catalyst (at time step 15).
@@ -948,7 +938,7 @@ without live visualization. During the simulation we were displaying
 *te* from *input* source in ParaView. Results are presented in
 Fig. [fig:time\ :sub:`r`\ esults].
 
-.. figure:: images/time_results.png
+.. figure:: images/time_results.*
    :alt: Increase in average time of time steps when using Catalyst for
          cases *AUG 16151* and *ITER 535* compared to runs without Catalyst.
          Each bar contains an average time of a time step in red.
@@ -1009,7 +999,7 @@ the cell with an ID 869. Now, we present the electron temperature in the
 selected cell over time, to observe how the temperature converged
 (Fig. [fig:teplot]).
 
-.. figure:: images/tePFR.png
+.. figure:: images/tePFR.*
    :alt: PFR region showing electron temperature *te* (J) in time step
          88 of the case *AUG 16151*. Cell 869 holds maximum value of *te*.
 
@@ -1017,7 +1007,7 @@ selected cell over time, to observe how the temperature converged
    the case *AUG 16151*. Cell 869 holds maximum value of *te*.
 [fig:tePFR]
 
-.. figure:: images/teplot.png
+.. figure:: images/teplot.*
    :alt: Electron temperature, *te* (J), on cell 869 with respect to
          time steps in the case *AUG 16151*. Cell 869 holds the maximum value
          of *te* in PFR region in time step 88.
@@ -1034,7 +1024,7 @@ we multiply all *te* values by :math:`6,242e18`. To do that we use
 (Fig. [fig:derived:sub:`T`\ e]) derived from *te*, where
 :math:`Te = te \times{6,242e18}`.
 
-.. figure:: images/derived_Te.png
+.. figure:: images/derived_Te.*
    :alt: Electron temperature, *Te* (eV) in time step 88 of the case *AUG 16151*.
 
    Electron temperature, *Te* (eV) in time step 88 of the case *AUG 16151*.
