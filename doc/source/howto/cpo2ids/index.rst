@@ -82,8 +82,8 @@ pieces that give us the whole form and/or split bigger subgrids into
 smaller ones. For example, subgrid *Cells* is a whole of subgrids
 *Core*, *SOL*, *Inner* divertor* and *Outer divertor*. So, if we are
 interested only in tokamak core data, we can choose *Core* subgrid
-instead of the *Cells* subgrid, as seen in :num:`Fig. #ids-cells-te`
-and :num:`Fig. #ids-core-te`.  
+instead of the *Cells* subgrid, as seen in :numref:`ids-cells-te`
+and :numref:`ids-core-te`.  
 
 Subgrids are of different classes. Class 1 is for *nodes*, class 2 for
 *edges* and class 3 for 2D *cells/faces*.
@@ -109,15 +109,15 @@ Subgrids structure in CPO database
 
 In CPO database, subgrid base parameters and indices regarding nodes,
 edges and cells are stored in ``edge.grid.subgrid(i)``, as seen in
-:num:`Fig. #cpo-grid`, where ``i`` is **subgrid base index** going
+:numref:`cpo-grid`, where ``i`` is **subgrid base index** going
 from *1..n*, where *n* is sum of all subgrids.
 
 The ``.subgrids`` subdata holds subgrid name in ``.id`` and
-**list of indices**, as seen in :num:`Fig. #cpo-subgrids`, either in
+**list of indices**, as seen in :numref:`cpo-subgrids`, either in
 **range** form found in ``.list(1).indset(1).range`` or **list**
 form found in ``.list(1).ind(j)`` together with **subgrid class**
 located in ``.list(1).cls`` (1 for nodes, 2 for edges and 3 for
-cells) as seen in :num:`Fig. #cpo-list`, where *j* is number of all
+cells) as seen in :numref:`cpo-list`, where *j* is number of all
 indices for given subgrid.
 
 The found indices correspond to the “main” subgrid of the same class.
@@ -153,7 +153,7 @@ IDS subgrid base parameters, used to determine geometry data of
 subgrids, are stored in location
 ``edge-profiles.ggd(1).grid.grid-subset(i)``, where ``i`` is **subgrid
 base index** going from, the same as in CPO, ``1...n``, where ``n`` is
-sum of all subgrids, as seen in :num:`Fig. #ids-grid`.
+sum of all subgrids, as seen in :numref:`ids-grid`.
 
 .. _ids-grid:
 .. figure:: images/dd_edge_profiles_edge_profiles_time_slice0-crop.png
@@ -162,7 +162,7 @@ sum of all subgrids, as seen in :num:`Fig. #ids-grid`.
 
 It holds **subgrid name** in ``.identifier.name`` and additional info
 **subgrid base index** in ``.identifier.index``, as seen in
-:num:`Fig. #ids-subset` and :num:`Fig. #ids-identifier`.
+:numref:`ids-subset` and :numref:`ids-identifier`.
 
 .. _ids-subset:
 .. figure:: images/dd_edge_profiles_generic_grid_dynamic_grid_subset-crop.png
@@ -175,8 +175,8 @@ It holds **subgrid name** in ``.identifier.name`` and additional info
    IDS *identifier* structure
 
 
-Furthermore, as seen in :num:`Fig. #ids-element` and
-:num:`Fig. #ids-dimension` in ``.element(1).object(1).dimension`` it
+Furthermore, as seen in :numref:`ids-element` and
+:numref:`ids-dimension` in ``.element(1).object(1).dimension`` it
 holds **subgrid class** and in ``.element(1).object(1).index`` it
 holds **subgrid object index**, used to navigate to subgrids geometry
 data, which will be covered later.
@@ -238,7 +238,7 @@ The **geometry** in CPO database is stored under subgrid ``Nodes``,
 which is used also as reference for geometry of other subgrids (2
 nodes/points form an edge, 4 nodes/points form a face/cell), in
 ``edge.grid.spaces(1).objects(i=2).geo`` as an 4D array as shown in
-:num:`Fig. #cpo-geo1` and :num:`Fig. #cpo-geo2`.
+:numref:`cpo-geo1` and :numref:`cpo-geo2`.
 
 .. _cpo-geo1:
 .. figure:: images/utilities_xsd_Element_geo.png
@@ -268,7 +268,7 @@ under subgrid ``Nodes`` in
 ``edge-profiles.ggd(1).grid.space(1).objects-per-dimension(c=1)`` 
 ``.object(k=1).geometry``,
 where ``c`` is **subgrid class** and ``k`` is **subgrid class object
-index**, stored as an one-dimensional list as shown in :num:`Fig. #ids-geo1a`
+index**, stored as an one-dimensional list as shown in :numref:`ids-geo1a`
 
 .. _ids-geo1a:
 .. figure:: images/dd_edge_profiles_generic_grid_dynamic_space_dimension_object-crop1.png
@@ -371,7 +371,7 @@ Electron density and electron temperature in CPO database
 In CPO database, electron density and electron temperature datasets are
 stored under ``fluid`` dataset where ’\ ``ne``\ ’ stands for
 electron density and ’\ ``te``\ ’ stands for electron temperature,
-as shown in :num:`Fig. #cpo-fluid`.
+as shown in :numref:`cpo-fluid`.
 
 .. _cpo-fluid:
 .. figure:: images/edge_xsd_Element_fluid.png
@@ -383,10 +383,10 @@ Furthermore, both electron density and electron temperature dataset
 structure consists of many subdata sets, ``value`` subdata set being
 one of them (path: ``edge.fluid.ne.value(ne-species-index)`` where
 ``ne-species-index`` goes from 1 to n, where n is number of electron
-density species), as shown in :num:`Fig. #cpo-ne`. In it we can find
+density species), as shown in :numref:`cpo-ne`. In it we can find
 ``subgrid`` data, which is used to store the subgrid base index, and
 ``scalar`` dataset, in which array of data is stored (electron density
-values in ``1/m^3``), as seen on :num:`Fig. #cpo-value`.
+values in ``1/m^3``), as seen on :numref:`cpo-value`.
 
 .. _cpo-ne:
 .. figure:: images/edge_xsd_Element_ne.png
@@ -423,7 +423,7 @@ and electron temperature ``te`` datasets are part of ``fluid``
 dataset, in IDS database are part of ``electrons`` dataset (path in
 IDS: ``edge-profiles.ggd(1).electrons``), which furthermore
 systematically splits to electrons properties datasets, as seen on
-:num:`Fig. #ids-electrons`, with density (path:
+:numref:`ids-electrons`, with density (path:
 ``edge-profiles.ggd(1).electrons.density(ne-species-index)``) and
 temperature (path:
 ``edge-profiles.ggd(1).electrons.temperature(te-species-index)``)
@@ -436,7 +436,7 @@ included.
    IDS ``electrons`` data structure
 
 The IDS ``density`` dataset, shown in
-:num:`Fig. #ids-electron-density` consists of less subdata sets as CPO
+:numref:`ids-electron-density` consists of less subdata sets as CPO
 electron density ``ne`` dataset. ``Grid-subset-index`` (in “Subgrid”
 and “Geometry and nodes” chapter we called it **subgrid base index**)
 and ``values`` data in IDS database are taken for being the same
@@ -448,7 +448,7 @@ datasets as ``subgrid`` index and ``scalar`` data in CPO database.
    IDS *electron density* data structure.
 
 IDS ``temperature`` dataset has the same structure as ``density``
-dataset as shown in :num:`Fig. #ids-electron-temperature`.
+dataset as shown in :numref:`ids-electron-temperature`.
 
 .. _ids-electron-temperature:
 .. figure:: images/dd_edge_profiles_edge_profiles_time_slice_electrons-crop2.png
@@ -505,9 +505,9 @@ Ion density and ion temperature in CPO database
 In CPO database, the same as electron density ``ne`` and electron
 temperature ``te``, also ion density ``ni`` and ion temperature
 ``ti`` are part of ``fluid`` database, as already previously
-shown in :num:`Fig. #cpo-fluid`, and have also the same structure, as
-seen comparing figures :num:`Fig. #cpo-ne` and :num:`Fig. #cpo-te` with
-:num:`Fig. #cpo-ni` and :num:`Fig. #cpo-ti`.
+shown in :numref:`cpo-fluid`, and have also the same structure, as
+seen comparing figures :numref:`cpo-ne` and :numref:`cpo-te` with
+:numref:`cpo-ni` and :numref:`cpo-ti`.
 
 .. _cpo-ni:
 .. figure:: images/edge_xsd_Element_ni.png
@@ -531,14 +531,14 @@ Ion density and ion temperature in IDS database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In IDS database, the structure of ion dataset, shown in 
-:num:`Fig. #ids-ions`, is more extensive in comparison with the
-electrons dataset, shown in :num:`Fig. #ids-electrons`, while ion
+:numref:`ids-ions`, is more extensive in comparison with the
+electrons dataset, shown in :numref:`ids-electrons`, while ion
 density and ion temperature dataset structure, shown in
-:num:`Fig. #ids-ion-density` and :num:`Fig. #ids-ion-temperature`,
+:numref:`ids-ion-density` and :numref:`ids-ion-temperature`,
 remains the same as structure of electron density and electron
 temperature dataset, previously shown in
-:num:`Fig. #ids-electron-density` and
-:num:`Fig. #ids-electron-temperature`. Also, similarly as in CPO
+:numref:`ids-electron-density` and
+:numref:`ids-electron-temperature`. Also, similarly as in CPO
 database, ``ion`` database is array of ``n`` property species.
 
 .. _ids-ions:

@@ -141,12 +141,13 @@ pipeline.
 
 .. _fig-trad-sub-pipeline:
 .. figure:: images/trad_pipeline.*
-   :alt: Traditional three-step pipeline consisting of pre-processing, processing, and post-processing.
+   :alt: Traditional three-step pipeline consisting of pre-processing,
+         processing, and post-processing.
 
    Traditional three-step pipeline consisting of pre-processing,
    processing, and post-processing.
 
-Traditional pipeline shown in :num:`Fig. #fig-trad-sub-pipeline`
+Traditional pipeline shown in :numref:`fig-trad-sub-pipeline`
 consists of three basic steps, briefly explained bellow .
 
 #. **Pre-processing**, where input data is prepared, e.g. domain
@@ -167,7 +168,7 @@ consists of three basic steps, briefly explained bellow .
 
 
 Alternatively, *in situ* analysis changes pipeline as explained bellow
-and shown in :num:`Fig. #fig-insitu-sub-pipeline` consist of.
+and shown in :numref:`fig-insitu-sub-pipeline` consist of.
 
 #. **Pre-processing**, which is identical to pre-processing in
    traditional pipeline.
@@ -313,7 +314,7 @@ pre-processing and post-processing.
 
 
 Computational part is handled by the ``b2mn`` program
-(:num:`Fig. #fig-b2mn-sub-workflow`). It is responsible for opening and
+(:numref:`fig-b2mn-sub-workflow`). It is responsible for opening and
 closing the input/output files, system-dependent operations (e.g. MPI
 function calls) and calling the code that actually performs computation,
 ``b2mndr``. ``B2mndr`` is responsible for control over time steps, which
@@ -406,11 +407,11 @@ between MPI initialization and finalization, and thus the order is
 correct. Function does not take in any arguments
 (Listing [lst:finalize]).
 
-::
+.. code-block:: fortran
 
     ...
      call coprocessorfinalize()
-     ...
+    ...
 
 Adaptor
 ~~~~~~~
@@ -446,27 +447,30 @@ routine called ``coprocessor``. The second one, called *cxxAdaptor*, is
 responsible for creating a grid and storing field data, is written in
 C++ and contains two functions, ``creategrid`` and ``adddata``.
 
-Listing [lst:coproc] shows a function, ``coprocessor`` that performs
+:numref:`coprocessor` shows a function, ``coprocessor`` that performs
 co-processing. Function arguments are as follows.
 
--  **``crx``**, **``cry``** - Point coordinates in x and y direction.
+-  ``crx``, ``cry`` - Point coordinates in x and y direction.
 
--  **``ncrx``** - Number of points.
+-  ``ncrx`` - Number of points.
 
--  **``nx``**, **``ny``** - Number of cells in x and y direction.
+-  ``nx``, ``ny`` - Number of cells in x and y direction.
 
--  **``ns``** - Number of atomic species.
+-  ``ns`` - Number of atomic species.
 
--  **``step``**, **``time``** - Current time step and time.
+-  ``step``, ``time`` - Current time step and time.
 
--  **``<cell_data>``** - Field data that is assigned to cells.
+-  ``<cell_data>`` - Field data that is assigned to cells.
 
-::
+.. code-block:: fortran
+   :name: coprocessor
+   :caption: Coprocessor call
+   
 
     ...
      call coprocessor(crx,cry,ncrx,nx,ny,ns,step,time,
                       <cell_data>)
-     ...
+    ...
 
 Fortran Part
 ^^^^^^^^^^^^
@@ -487,24 +491,22 @@ is performed by the function ``needtocreategrid(flag)``, which sets a
 flag to 1 if it does not have a copy of the grid. If the grid exits, it
 returns 0, but does not check if the grid is modified or needs to be
 updated. If the adaptor needs to create a grid, it calls the function
-called ``creategrid`` that we implemented in *cxxAdaptor* and is
-described in detail in Section [sec:cxx\ :sub:`A`\ daptor].
+called ``creategrid`` that we implemented in *cxxAdaptor*.
 
 Third, *fortranAdaptor* starts adding new field data to the grid. It
 calls function ``adddata`` for each field it needs to assign to cells.
-The function is implemented in *cxxAdaptor* and is described in
-Section [sec:cxx\ :sub:`A`\ daptor].
+The function is implemented in *cxxAdaptor*.
 
 Finally, the adaptor performs co-processing and executes the pipelines
 specified in co-processing script, by calling function ``coprocess``.
 After it is finished the adaptor returns control back to the simulation
 code.
 
-Listing [lst:fortranadaptor] shows the main part of the subroutine
-``coprocessor``. Complete function is presented in
-appendix [app:fortranadaptor].
+Listing below shows the main part of the subroutine
+``coprocessor``. Complete function is presented in `fortranAdaptor.F90`_
 
-::
+.. _lst-fortranadaptor:
+.. code-block:: fortran
 
     subroutine coprocessor(crx,cry,ncrx,nx,ny,ns,step,time,vol,<cell_data>)
          ...
@@ -662,7 +664,8 @@ formulation changes to equation. :math:`N` denotes number of cells.
    \Omega_{n} = \left\{ P_{n}, P_{n+N}, P_{n+2\times{N}}, P_{n+3\times{N}} \right\}; \;n=0,1,...,N; \; N=(nx+2)\times{(ny+2)}
 
 .. figure:: images/cell.*
-   :alt: Cell notation with cells stored in 2D array and vertexes in 3D array (left), and cells and vertexes stored in 1D array (right).
+   :alt: Cell notation with cells stored in 2D array and vertexes in
+         3D array (left), and cells and vertexes stored in 1D array (right).
 
    Cell notation with cells stored in 2D array and vertexes in 3D array
    (left), and cells and vertexes stored in 1D array (right).
@@ -670,7 +673,8 @@ formulation changes to equation. :math:`N` denotes number of cells.
 
 .. _fig-row-sub-col-sub-major:
 .. figure:: images/row_col_major.*
-   :alt: 3D array of vertexes stored in a 1D array using row major and column major ordering.
+   :alt: 3D array of vertexes stored in a 1D array using row major
+         and column major ordering.
 
    3D array of vertexes stored in a 1D array using row major and column
    major ordering.
@@ -681,10 +685,8 @@ points object is created and memory space is allocated. Next, the number
 of cells ``numC`` is calculated. At the end, coordinates are attached to
 the object ``pts``.
 
-[c]
-
-::
-
+.. code-block:: c
+   
     ...
      vtkPoints* pts = vtkPoints::New();
      pts->SetNumberOfPoints(*ncrx);
@@ -718,10 +720,8 @@ them and field data is later added in the same order. As a consequence
 we need to make sure we understand how field data is stored in the
 simulation arrays, to couple them properly with cells.
 
-[c]
-
-::
-
+.. code-block:: c
+   
     ...
      vtkPolyData* grid = vtkPolyData::New();
      vtkCPPythonAdaptorAPI::GetCoProcessorData()->
@@ -782,10 +782,8 @@ separate variable. This applies to fields where the number of components
 is equal to the number of atomic species. Otherwise, the process of
 attaching data to the grid is similar to the first case.
 
-[c]
-
-::
-
+.. code-block:: c
+   
     // Get grid information from coprocessor here
         ...
         if (*dimension <= 3){
@@ -885,9 +883,12 @@ established we can pick the extract and show it in the render view
 case run).
 
 .. figure:: images/window.*
-   :alt: ParaView window showing electron temperature *te* during the case *ITER 535* run with Catalyst (at time step 15).
+   :alt: ParaView window showing electron temperature *te* during the
+   case *ITER 535* run with Catalyst (at time step 15).
 
-   ParaView window showing electron temperature *te* during the case *ITER 535* run with Catalyst (at time step 15).
+   ParaView window showing electron temperature *te* during the case
+   *ITER 535* run with Catalyst (at time step 15).
+
 [fig:window]
 
 Next, the data that is sent to pvserver can be visualized on the fly
@@ -1005,6 +1006,7 @@ selected cell over time, to observe how the temperature converged
 
    PFR region showing electron temperature *te* (J) in time step 88 of
    the case *AUG 16151*. Cell 869 holds maximum value of *te*.
+
 [fig:tePFR]
 
 .. figure:: images/teplot.*
@@ -1015,6 +1017,7 @@ selected cell over time, to observe how the temperature converged
    Electron temperature, *te* (J), on cell 869 with respect to time
    steps in the case *AUG 16151*. Cell 869 holds the maximum value of
    *te* in PFR region in time step 88.
+
 [fig:teplot]
 
 Fig. [fig:tePFR] and [fig:teplot] shows electron temperature *te* in
@@ -1025,9 +1028,11 @@ we multiply all *te* values by :math:`6,242e18`. To do that we use
 :math:`Te = te \times{6,242e18}`.
 
 .. figure:: images/derived_Te.*
-   :alt: Electron temperature, *Te* (eV) in time step 88 of the case *AUG 16151*.
+   :alt: Electron temperature, *Te* (eV) in time step 88 of the
+         case *AUG 16151*.
 
    Electron temperature, *Te* (eV) in time step 88 of the case *AUG 16151*.
+
 [fig:derived:sub:`T`\ e]
 
 Discussion
@@ -1222,8 +1227,7 @@ The Catalyst Adaptor Code
 
 fortranAdaptor.F90
 ------------------
-
-::
+.. code-block:: fortran
 
     ! Fortran part of the adaptor for paraview catalyst
     ! for b2.5 simulation.

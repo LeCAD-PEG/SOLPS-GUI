@@ -114,13 +114,13 @@ brings improved mesh adaptation in B2 codes.
 
    SOLPS code workflow.
 
-Since SOLPS is a large scale software with a few hundred thousand lines
-of code it has a complex workflow, depicted in :num:`Fig. #fig-solps-sub-workflow`,
-with many input and output files at
-different parts of the program. The complete workflow can be separated
-into three parts — (i) pre-processing, (ii) processing, and (iii)
-post-processing. In the following subsections these parts will be
-briefly explained.
+Since SOLPS is a large scale software with a few hundred thousand lines of
+code it has a complex workflow, depicted in
+:numref:`fig-solps-sub-workflow`, with many input and output files at
+different parts of the program. The complete workflow can be separated into
+three parts — (i) pre-processing, (ii) processing, and (iii)
+post-processing. In the following subsections these parts will be briefly
+explained.
 
 Pre-Processing
 ~~~~~~~~~~~~~~
