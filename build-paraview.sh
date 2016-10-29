@@ -119,6 +119,7 @@ fi
 
 
 #Configure and build paraview
+#if [ ! -e   ${PARAVIEW_BUILD}/.built ]; then
 rm -rf ${PARAVIEW_BUILD}
 install -d ${PARAVIEW_BUILD}
 cd ${PARAVIEW_BUILD}
@@ -142,6 +143,7 @@ find .  -name link.txt -exec \
 LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} \
 make -j ${MAKE_JOBS} VERBOSE=1
 make install
+#fi
 
 STAGING_DOC=${STAGING_PARAVIEW}/share/paraview-${PARAVIEW_MAJOR_VERSION}/doc
 install -d ${STAGING_DOC}
@@ -152,8 +154,9 @@ for file in ParaViewGettingStarted-5.1.0.pdf ParaViewTutorial.pdf \
              ${PARAVIEW_DOWNLOAD}/${file}
     fi
     noParaView=${file#ParaView}
-    noversion=${noParaView%-*}
-    target=${noversion}.pdf
+    noVersion=${noParaView%-*}
+    noPdf=${noVersion%.pdf}
+    target=${noPdf}.pdf
     install -m 444 ${DOWNLOAD_DIR}/${file} ${STAGING_DOC}/${target}
 done    
 
