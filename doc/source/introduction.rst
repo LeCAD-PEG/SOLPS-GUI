@@ -109,18 +109,18 @@ part of the code, respectively. The most recent version is 6.0, which
 brings improved mesh adaptation in B2 codes.
 
 .. _fig-solps-sub-workflow:
-.. figure:: howto/catalyst/images/workflow.png
+.. figure:: howto/catalyst/images/workflow.*
    :alt: SOLPS code workflow.
 
    SOLPS code workflow.
 
-Since SOLPS is a large scale software with a few hundred thousand lines
-of code it has a complex workflow, depicted in :num:`Fig. #fig-solps-sub-workflow`,
-with many input and output files at
-different parts of the program. The complete workflow can be separated
-into three parts — (i) pre-processing, (ii) processing, and (iii)
-post-processing. In the following subsections these parts will be
-briefly explained.
+Since SOLPS is a large scale software with a few hundred thousand lines of
+code it has a complex workflow, depicted in
+:numref:`fig-solps-sub-workflow`, with many input and output files at
+different parts of the program. The complete workflow can be separated into
+three parts — (i) pre-processing, (ii) processing, and (iii)
+post-processing. In the following subsections these parts will be briefly
+explained.
 
 Pre-Processing
 ~~~~~~~~~~~~~~
@@ -150,16 +150,16 @@ Furthermore, four additional programs are necessary to prepare SOLPS,
 more precisely B2, for running, which process user input about geometry
 and initial states. The programs are the following.
 
--  **``b2ag``** - Prepares input file for B2 which contains information
+-  ``b2ag`` - Prepares input file for B2 which contains information
    about geometry and magnetic field.
 
--  **``b2ah``** - Prepares input file for B2 which contains information
+-  ``b2ah`` - Prepares input file for B2 which contains information
    about default physics parameters.
 
--  **``b2ai``** - Prepares input file for B2 which contains information
+-  ``b2ai`` - Prepares input file for B2 which contains information
    about initial plasma state.
 
--  **``b2ar``** - Prepares input file for B2 which contains information
+-  ``b2ar`` - Prepares input file for B2 which contains information
    about default atomic physics rates.
 
 Grid Generation Chain
@@ -203,10 +203,10 @@ the additional surfaces. The plasma grid is divided into triangles as
 well and both of the grids are attached to each other, forming one
 continuous triangular grid.
 
-In order to run, SOLPS provides EIRENE with input geometric data. The
-form of input depends on whether it runs in standalone or coupled mode.
-The connections between modules are illustrated in
-Fig. [fig:solps\ :sub:`w`\ orkflow].
+In order to run, SOLPS provides EIRENE with input geometric data. The form
+of input depends on whether it runs in standalone or coupled mode. The
+connections between modules are illustrated in
+:numref:`fig-solps-sub-workflow`
 
 B2
 ^^
@@ -276,7 +276,7 @@ plasma along the magnetic field lines, which is strong in parallel and
 weak in radial direction. In addition to that the coordinate system also
 takes advantage of tokamak’s shape. Its rotational symmetry allows
 three-dimensional problem to be reduced into two dimensions. Poloidal
-cut through the torus, in :num:`Fig. #coordinates`, shows the cells are
+cut through the torus, in :numref:coordinates`, shows the cells are
 quadtrilaterally shaped and either aligned with or perpendicular to the
 magnetic field lines.
 
@@ -299,7 +299,7 @@ systems are used for the B2 model (Fig. [fig:coordinates]).
    is denoted as (:math:`x,y,z`).
 
 .. _coordinates:
-.. figure:: howto/catalyst/images/coordinates.png
+.. figure:: howto/catalyst/images/coordinates.*
    :alt: Global coordinate systems in three-dimensional simulation domain of B2 code: cylindrical (:math:`R,\phi,z`), parallel          (:math:`\parallel,\perp,r`), poloidal (:math:`x,y,z`).
 
    Global coordinate systems in three-dimensional simulation domain of B2 code: cylindrical (:math:`R,\phi,z`), parallel    (:math:`\parallel,\perp,r`), poloidal (:math:`x,y,z`).
@@ -307,8 +307,7 @@ systems are used for the B2 model (Fig. [fig:coordinates]).
 Grid Generation Workflow
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-As described in Section [sec:SOLPS\ :sub:`S`\ tructure], SOLPS code
-provides a semi-automated grid generation workflow. A graphical
+SOLPS code provides a semi-automated grid generation workflow. A graphical
 interface, DG, is used to set up input files for the grid generator.
 Input data to DG contains information about the poloidal magnetic flux
 on regular grid and divertor geometric data from CAD drawings or other
@@ -336,19 +335,19 @@ leads to improper mesh structure at the target plates . Usually, the
 user needs to manually configure parameters that affect orthogonality in
 that area.
 
-.. figure:: howto/catalyst/images/grid_workflow.png
+.. _fig-grid-sub-workflow:
+.. figure:: howto/catalyst/images/grid-workflow.*
    :alt: Grid generation workflow.
 
    Grid generation workflow.
-[fig:grid:sub:`w`\ orkflow]
 
 Data Structure
 ~~~~~~~~~~~~~~
 
 Quadrilateral cells in physical space are converted into unit squares on
-a Cartesian coordinate system
-(Fig. [fig:phys:sub:`c`\ omp\ :sub:`s`\ pace]). This is a computational
-space where each unit represents one cell in a physical space.
+a Cartesian coordinate system (:numref:`fig-phys-sub-comp`).
+This is a computational space where each unit represents one cell in a
+physical space.
 Computational domain is further divided into regions, depending on the
 magnetic field configuration. Line that divides them is called
 separatrix. The regions are as follows.
@@ -372,22 +371,13 @@ same in computational and physical space. Neighbors are defined as
 between region boundaries each cell stores information about its
 neighbors explicitly as well.
 
-.31 |B2.5 simulation domains in physical and computational space. The
-regions are scrape-off layer (SOL, colored in grey), private flux region
-(PFR, green), and core (blue). Separatrix is shown as a red line.|
+.. _fig-phys-sub-comp:
+.. figure:: howto/catalyst/images/comp-space-and-grid.*
+   :alt: B2.5 simulation domains in physical and computational space.
 
-[fig:grid9838]
-
-.31 |B2.5 simulation domains in physical and computational space. The
-regions are scrape-off layer (SOL, colored in grey), private flux region
-(PFR, green), and core (blue). Separatrix is shown as a red line.|
-
-[fig:grid:sub:`r`\ egions]
-
-.65 |B2.5 simulation domains in physical and computational space. The
-regions are scrape-off layer (SOL, colored in grey), private flux region
-(PFR, green), and core (blue). Separatrix is shown as a red line.|
-
-[fig:comp:sub:`s`\ pace]
-
-[fig:phys:sub:`c`\ omp\ :sub:`s`\ pace]
+   B2.5 simulation domains in physical and computational space.
+   (a) Mesh with :math:`98 \times 38` cells in physical space.
+   (b) Grid separated into three regions in physical space.
+   (c) The regions are scrape-off layer (SOL, colored in grey),
+   private flux region (PFR, green), and core (blue).
+   Separatrix is shown as a red line.

@@ -59,6 +59,12 @@ Director
 .. automodule:: director
    :members:
 
+------
+Script   
+------
+
+.. automodule:: script
+   :members:
 
 ----------------------------
 Input file editor and viewer

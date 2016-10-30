@@ -119,12 +119,12 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
 
 5. Run the plugin by navigating from Menu Bar to
    :menuselection:`Sources --> UAL Edge` (see
-   :num:`Fig. #pv-run-plugin-1`). The Pipeline Browser will change and
+   :numref:`pv-run-plugin-1`). The Pipeline Browser will change and
    after choosing the desired database parameters press button
-   :guilabel:`Apply` (see :num:`Fig. #pv-run-plugin-2`). The database
+   :guilabel:`Apply` (see :numref:`pv-run-plugin-2`). The database
    will be loaded and visualized on the View Browser as seen in
-   :num:`Fig. #pv-run-plugin-3` for AUG tokamak and in
-   :num:`Fig. #pv-run-plugin-4` for ITER tokamak.
+   :numref:`pv-run-plugin-3` for AUG tokamak and in
+   :numref:`pv-run-plugin-4` for ITER tokamak.
 
   .. _pv-run-plugin-1:
   .. figure:: images/6_running_plugin.png
@@ -170,15 +170,15 @@ Subgrids and Multi-Block Inspector
 Briefly said, subgrid is “a piece” of geometry. In our case, the
 **Multi-Block Inspector** uses the subgrids as blocks of data, using a
 different color for each block of data, as seen in Figures
-:num:`Fig. #pv-run-plugin-3` and :num:`Fig. #pv-run-plugin-4`, and it
+:numref:`pv-run-plugin-3` and :numref:`pv-run-plugin-4`, and it
 is used to select and display only the wanted blocks of data.
 
 To load the Multi-Block Inspector, go to Menu bar
 :menuselection:`View` and check the :menuselection:`Multi-Block
-Inspector` selection, as seen in :num:`Fig. #pv-loading-mbinsp`. Then
+Inspector` selection, as seen in :numref:`pv-loading-mbinsp`. Then
 you should have already noticed that a new interface called
 *Multi-Block Inspector* opened at the bottom of the Pipeline Browser,
-as seen in :num:`Fig. #pv-mbinsp`.
+as seen in :numref:`pv-mbinsp`.
 
 .. _pv-loading-mbinsp:
 .. figure:: images/11_loading_mbinsp.png
@@ -191,11 +191,11 @@ as seen in :num:`Fig. #pv-mbinsp`.
    Multi-Block Inspector
 
 Here we can select the wanted blocks we want to be seen in the *View
-Browser*. An example is shown in :num:`Fig. #pv-mbinscp-cells`, where
+Browser*. An example is shown in :numref:`pv-mbinscp-cells`, where
 only the ``Cells`` block was selected, and in
-:num:`Fig. #pv-mbinscp-nodes`, where only the ``Nodes`` block was
+:numref:`pv-mbinscp-nodes`, where only the ``Nodes`` block was
 selected. We can also choose multiple blocks at once, as shown in
-:num:`Fig. #pv-mbinspc-sol-odivertor` where blocks ``SOL`` and
+:numref:`pv-mbinspc-sol-odivertor` where blocks ``SOL`` and
 ``Outer`` ``Divertor`` were selected.
 
 .. _pv-mbinscp-cells:
@@ -225,9 +225,9 @@ When running the ReadUALedge plugin with the *Multi-Block Inspector* the
 *vtkBlockColors* layer is automatically selected, coloring the blocks
 with their specific block color. To select the wanted data layer
 navigate through **List of Data Arrays** found in Toolbar, as seen in
-:num:`Fig. #pv-data-arrays-list`. Examples are shown in Figures
-:num:`Fig. #pv-data-arrays-list-ne`, :num:`Fig. #pv-data-arrays-list-te` and
-:num:`Fig. #pv-data-arrays-list-te-core-sol`.
+:numref:`pv-data-arrays-list`. Examples are shown in Figures
+:numref:`pv-data-arrays-list-ne`, :numref:`pv-data-arrays-list-te` and
+:numref:`pv-data-arrays-list-te-core-sol`.
 
 .. _pv-data-arrays-list:
 .. figure:: images/16_data_arrays_list.png
@@ -263,8 +263,8 @@ Python Calculator filter allows us to work with data arrays (Electron
 Density, Ion Temperature etc.) and create new data array to display
 the results. It can be found under :menuselection:`Filter -->
 Alphabetical --> Python` ``Calculator`` as seen in
-:num:`Fig. #pv-python-calculator1` and
-:num:`Fig. #pv-python-calculator2`.
+:numref:`pv-python-calculator1` and
+:numref:`pv-python-calculator2`.
 
 .. _pv-python-calculator1:
 .. figure:: images/20_python_calculator1.png
@@ -277,7 +277,7 @@ Alphabetical --> Python` ``Calculator`` as seen in
    Python calculator filter
 
 After selecting the Python Calculator a new interface will open in the
-Pipeline Browser as seen in :num:`Fig. #pv-python-calculator3`.
+Pipeline Browser as seen in :numref:`pv-python-calculator3`.
 
 .. _pv-python-calculator3:
 .. figure:: images/22_python_calculator3.png
@@ -287,7 +287,7 @@ Pipeline Browser as seen in :num:`Fig. #pv-python-calculator3`.
 
 This filter takes a case sensitive *Expression*, an *Array Association*
 and custom *Array Name*. An example is shown in 
-:num:`Fig. #pv-python-calculator4`, where we used next expression and
+:numref:`pv-python-calculator4`, where we used next expression and
 options:
 
 -  | Expression:
@@ -335,7 +335,7 @@ ParaView Python Shell
 
 ParaView Python Shell can be found navigating to :menuselection:`Tools
 --> Python Shell` and it opens Paraview editor as shown in
-:num:`Fig. #pv-python-shell` and :num:`Fig. #pv-python-shell2`.
+:numref:`pv-python-shell` and :numref:`pv-python-shell2`.
 
 .. _pv-python-shell:
 .. figure:: images/24_python_shell.png
@@ -357,7 +357,7 @@ the expression the functions are being repeated we can easily generate
 it using Python Shell.
 
 The Python script and part of its output is shown in
-:num:`Fig. #pv-python-shell3`.
+:numref:`pv-python-shell3`.
 
 .. _pv-python-shell3:
 .. figure:: images/26_python_shell3.png
@@ -367,7 +367,7 @@ The Python script and part of its output is shown in
 
 The results of using the mentioned IDS database and the generated
 expression by copying it are shown in
-:num:`Fig. #pv-python-calculator5`.
+:numref:`pv-python-calculator5`.
 
 .. _pv-python-calculator5:
 .. figure:: images/27_python_calculator5.png
@@ -388,9 +388,9 @@ coordinates of previously mentioned start and end location.
 
 It can be found at the same location as any other filter, navigating to
 :menuselection:`Filters --> Alphabetical --> Plot Over Line`, as seen in
-:num:`Fig. #pv-pov1`. When selected, two by line connected white dots,
+:numref:`pv-pov1`. When selected, two by line connected white dots,
 representing the start and end location taken for the plot, will appear
-on the *View Browser*, as seen in :num:`Fig. #pv-pov2`, which can be
+on the *View Browser*, as seen in :numref:`pv-pov2`, which can be
 moved by clicking and dragging with the mouse pointer. When done, press
 the :guilabel:`Apply` button.
 
@@ -408,7 +408,7 @@ the :guilabel:`Apply` button.
 
 By pressing the :guilabel:`Apply` button a new interface will appear in the
 *Pipeline Browser* and also the default chart will appear on the *View
-Browser*, as seen in :num:`Fig. #pv-pov3`.
+Browser*, as seen in :numref:`pv-pov3`.
 
 .. _pv-pov3:
 .. figure:: images/30_pov3.png
@@ -429,7 +429,7 @@ by dragging the line by mouse.
 To display only the selected Data Array data, in the new *Pipeline
 Browser* interface scroll down to **Series Parameters** and there the
 desired Data Arrays (and also showing coordinate changes from start to
-end point) can be chosen, as seen in :num:`Fig. #pv-pov4`. The range will
+end point) can be chosen, as seen in :numref:`pv-pov4`. The range will
 automatically adjust to selected plot values.
 
 Chart line colors can be changed double clicking the colored square icon
@@ -453,10 +453,10 @@ Browser* as **Left Axis Range** and **Bottom Axis Range**.
 
 To create more Line Charts for the same case click one of the window
 splitting tools found in the top right corner of the *View Browser* such
-as **Split vertical** as seen in :num:`Fig. #pv-pov6`. It will open a new
+as **Split vertical** as seen in :numref:`pv-pov6`. It will open a new
 separated window and there click **Line Chart View**, as shown in
-:num:`Fig. #pv-pov7`, and new Line Chart will be created, as seen in
-:num:`Fig. #pv-pov8`.
+:numref:`pv-pov7`, and new Line Chart will be created, as seen in
+:numref:`pv-pov8`.
 
 .. _pv-pov6:
 .. figure:: images/33_pov6.png
@@ -476,7 +476,7 @@ separated window and there click **Line Chart View**, as shown in
 
 Then, while the created empty *Line Chart* is selected, in the *Pipeline
 Browser* click on the eye icon beside the *TextOverLine* filter name,
-which should be transparent by default, as seen in :num:`Fig. #pv-pov9`.
+which should be transparent by default, as seen in :numref:`pv-pov9`.
 The by default selected Data Arrays should appear in the *Line Chart*.
 
 .. _pv-pov9:
@@ -491,7 +491,7 @@ Just note that the *Text Chart* we want to change must first be selected
 in the *View Browser* before we can operate with it.
 
 An example of using multiple Line Charts is shown in
-:num:`Fig. #pv-pov10`.
+:numref:`pv-pov10`.
 
 .. _pv-pov10:
 .. figure:: images/37_pov10.png

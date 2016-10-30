@@ -96,10 +96,10 @@ PARAVIEW_SOURCE="ParaView-v${PARAVIEW_VERSION}.tar.gz"
 PARAVIEW_DATA="ParaViewData-v${PARAVIEW_VERSION}.tar.gz"
 PARAVIEW_DOWNLOAD="http://www.paraview.org/files/v${PARAVIEW_MAJOR_VERSION}"
 cd ${DOWNLOAD_DIR}
-if [ ! -f ${PARAVIEW_DATA} ]; then # download examples and tutorials
-    wget -O ${DOWNLOAD_DIR}/${PARAVIEW_DATA} --no-check-certificate \
-        ${PARAVIEW_DOWNLOAD}/${PARAVIEW_DATA}
-fi
+#if [ ! -f ${PARAVIEW_DATA} ]; then # download examples and tutorials
+#    wget -O ${DOWNLOAD_DIR}/${PARAVIEW_DATA} --no-check-certificate \
+#        ${PARAVIEW_DOWNLOAD}/${PARAVIEW_DATA}
+#fi
 
 if [ ! -f ${PARAVIEW_SOURCE} ]; then
     wget -O ${DOWNLOAD_DIR}/${PARAVIEW_SOURCE} --no-check-certificate \
@@ -109,7 +109,7 @@ fi
 if [ ! -d ${PARAVIEW_SOURCE_DIR} ]; then
     cd ${BUILD_DIR}
     tar xzf ${DOWNLOAD_DIR}/${PARAVIEW_SOURCE}
-    tar xzf ${DOWNLOAD_DIR}/${PARAVIEW_DATA}
+#    tar xzf ${DOWNLOAD_DIR}/${PARAVIEW_DATA}
 # See https://github.com/OpenFOAM/ThirdParty-dev/blob/master/README.org
     patch -p2 -d ${PARAVIEW_SOURCE_DIR} < \
         ${BUILDROOT}/src/patches/paraview-ui_pqExportStateWizard.patch
@@ -119,6 +119,7 @@ fi
 
 
 #Configure and build paraview
+#if [ ! -e   ${PARAVIEW_BUILD}/.built ]; then
 rm -rf ${PARAVIEW_BUILD}
 install -d ${PARAVIEW_BUILD}
 cd ${PARAVIEW_BUILD}
@@ -142,6 +143,22 @@ find .  -name link.txt -exec \
 LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} \
 make -j ${MAKE_JOBS} VERBOSE=1
 make install
+#fi
+
+STAGING_DOC=${STAGING_PARAVIEW}/share/paraview-${PARAVIEW_MAJOR_VERSION}/doc
+install -d ${STAGING_DOC}
+for file in ParaViewGettingStarted-5.1.0.pdf ParaViewTutorial.pdf \
+        ParaViewGuide-5.1.0.pdf ; do
+    if [ ! -f ${DOWNLOAD_DIR}/${file} ]; then
+         wget -O ${DOWNLOAD_DIR}/${file} --no-check-certificate \
+             ${PARAVIEW_DOWNLOAD}/${file}
+    fi
+    noParaView=${file#ParaView}
+    noVersion=${noParaView%-*}
+    noPdf=${noVersion%.pdf}
+    target=${noPdf}.pdf
+    install -m 444 ${DOWNLOAD_DIR}/${file} ${STAGING_DOC}/${target}
+done    
 
 touch .built
 
