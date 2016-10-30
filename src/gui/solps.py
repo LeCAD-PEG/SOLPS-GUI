@@ -1537,19 +1537,26 @@ class SOLPS_MainWindow(QMainWindow):
         Arguments:
              rundir (str): prepared run directory
         """
-        settings = QSettings('ITER', 'solps-gui')
-        submit_command = settings.value("submit_script", 'localsubmit')
+        #settings = QSettings('ITER', 'solps-gui')
+        #submit_command = settings.value("submit_script", 'localsubmit')
+        submit_command = self.settings.submit_script
 
         cmd = ''
         if submit_command:
             opts = ''
-            if int(settings.value('use_mpi', '0')):
-                opts += ' -m "' + settings.value('MPI_OPTS', '-n 16') + '"'
-            if int(settings.value('use_debugger', '0')):
-                opts += ' -d "' + settings.value('debugger', 'totalview') + '"'
-            if int(settings.value('compress_log', '0')):
+            if self.settings.use_mpi:
+                opts += ' -m "' + self.settings.mpi_options + '"'
+            #if int(settings.value('use_debugger', '0')):
+            #    opts += ' -d "' + settings.value('debugger', 'totalview') + '"'
+            if self.settings.use_debugger:
+                opts += ' -d "' + self.settings.debugger + '"'
+            #if int(settings.value('compress_log', '0')):
+            #    opts += ' -z'
+            if self.settings.compress_log:
                 opts += ' -z'
-            if int(settings.value('dry_run', '0')):
+            #if int(settings.value('dry_run', '0')):
+            #    opts += ' -n'
+            if self.settings.dry_run:
                 opts += ' -n'
             cmd +=  'rm -f *.prt\n' + submit_command + opts
             self.execute_tcsh_command_in_rundir(cmd, rundir)
