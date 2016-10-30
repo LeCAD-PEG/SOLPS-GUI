@@ -8,6 +8,10 @@ CPO2IDS HOWTO
 
 :Author: Dejan Penko and Leon Kos
 
+.. only:: html
+
+   .. contents::
+   
 Our goal was to create a converter which will serve for data
 transfer between the EU-ITM *Edge* CPO and the ITER *Edge_profiles* IDS
 database. Test data transfer was done on ``gateway.efda-itm.org`` using two

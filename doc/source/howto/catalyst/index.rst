@@ -1,12 +1,18 @@
 .. _cpo2ids-howto:
 
 .. highlight:: csh
+   
+=======================
+ParaView Catalyst HOWTO
+=======================
 
-==============
-Catalyst HOWTO
-==============
 
 :Author: Jure Bartol, University of Ljubljana
+
+.. only:: html
+
+   .. contents::
+
 
 Introduction
 ============
