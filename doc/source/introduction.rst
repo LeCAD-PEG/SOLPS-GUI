@@ -203,10 +203,10 @@ the additional surfaces. The plasma grid is divided into triangles as
 well and both of the grids are attached to each other, forming one
 continuous triangular grid.
 
-In order to run, SOLPS provides EIRENE with input geometric data. The
-form of input depends on whether it runs in standalone or coupled mode.
-The connections between modules are illustrated in
-:num:`Fig. #fig-solps-sub-workflow`
+In order to run, SOLPS provides EIRENE with input geometric data. The form
+of input depends on whether it runs in standalone or coupled mode. The
+connections between modules are illustrated in
+:numref:`fig-solps-sub-workflow`
 
 B2
 ^^
@@ -276,7 +276,7 @@ plasma along the magnetic field lines, which is strong in parallel and
 weak in radial direction. In addition to that the coordinate system also
 takes advantage of tokamak’s shape. Its rotational symmetry allows
 three-dimensional problem to be reduced into two dimensions. Poloidal
-cut through the torus, in :num:`Fig. #coordinates`, shows the cells are
+cut through the torus, in :numref:coordinates`, shows the cells are
 quadtrilaterally shaped and either aligned with or perpendicular to the
 magnetic field lines.
 
@@ -345,7 +345,7 @@ Data Structure
 ~~~~~~~~~~~~~~
 
 Quadrilateral cells in physical space are converted into unit squares on
-a Cartesian coordinate system (:num:`Fig. #fig-phys-sub-comp`).
+a Cartesian coordinate system (:numref:`fig-phys-sub-comp`).
 This is a computational space where each unit represents one cell in a
 physical space.
 Computational domain is further divided into regions, depending on the

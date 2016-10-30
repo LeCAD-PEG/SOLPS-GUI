@@ -1,6 +1,6 @@
-*****************
- SOLPS-GUI HOWTOs
-*****************
+******
+HOWTOs
+******
 
 SOLPS-GUI HOWTOs are documents that cover a single, specific topic,
 and attempt to cover it fairly completely. Modelled on the Linux

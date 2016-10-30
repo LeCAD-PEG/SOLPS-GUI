@@ -61,5 +61,5 @@ that the "b2mn.prt" file is up to date, it does not restart the run.
 
 .. TODO::
 
-GUI can be enhanced to mimic b2run restart logic by checking if
-the *input files* are newer than the *output files*.
+   GUI can be enhanced to mimic b2run restart logic by checking if
+   the *input files* are newer than the *output files*.

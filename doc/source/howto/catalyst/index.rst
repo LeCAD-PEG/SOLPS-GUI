@@ -63,25 +63,25 @@ ParaView *Catalyst* brings the following improvements to the SOLPS code suite:
 In Situ Analysis
 ----------------
 
-In literature  Latin phrase *in situ* (also *in-situ*) literally
+In literature  Latin phrase *in situ* (also *in-situ*) literally
 translates to “in place”. Phrase is very commonly used in science, e.g.
 in chemistry, astronomy and medicine; however, meaning in each field
 does not differentiate much from the literal sense.
 
 In computing, phrase *in situ* processing became popular in recent
 years. Some other expressions with similar meaning are *co-processing*,
-*co-analysis* and *co-visualization* . In  *in situ* computations are
+*co-analysis* and *co-visualization* . In  *in situ* computations are
 defined as processing that *“consists of processing the data using the
 resources allocated for the simulation code. In this model, the
 simulation code advances in time for a while, then hands off a baton to
 a post-processing algorithm, which generates results and hands the baton
-back”*. Similarly  describes *in situ* as the *“ability to concurrently
+back”*. Similarly  describes *in situ* as the *“ability to concurrently
 visualize and analyze data from simulations”*.
 
 Background
 ~~~~~~~~~~
 
-According to  the main challenge in computing that led to development of
+According to  the main challenge in computing that led to development of
 *in situ* processing procedures is an ever-increasing gap in performance
 between compute and Input/Output (I/O) capabilities. While computing
 power is expected to reach exaflop/s in 2018, which is an increase in
@@ -93,7 +93,7 @@ because it poses a significant bottleneck to simulation workflow. This
 typically causes a loss of details in post-process analysis which may
 lead to lower quality research.
 
-Proposed solution is to change the traditional data analysis pipeline. 
+Proposed solution is to change the traditional data analysis pipeline. 
 presents two different approaches, *in situ* and *in transit*
 processing, which are described as *“in-situ if they utilize the primary
 compute resources, while in-transit processing refers to offloading
@@ -148,7 +148,7 @@ pipeline.
    processing, and post-processing.
 
 Traditional pipeline shown in :numref:`fig-trad-sub-pipeline`
-consists of three basic steps, briefly explained bellow .
+consists of three basic steps, briefly explained bellow .
 
 #. **Pre-processing**, where input data is prepared, e.g. domain
    discretization, specifying different properties, boundary conditions,
@@ -186,7 +186,7 @@ analysis during simulation runs, such as GLEAN, ADIOS, Libsim and
 Catalyst. We will focus on the last two, Libsim and Catalyst, and
 briefly present how each performs co-processing.
 
-As stated in  both libraries try to meet the following design
+As stated in  both libraries try to meet the following design
 requirements.
 
 -  Allow diverse usage possibilities, e.g. creating animations, data
@@ -201,9 +201,9 @@ requirements.
 Libsim
 ^^^^^^
 
-Libsim is a simulation library that  uses VisIt , which is an
+Libsim is a simulation library that  uses VisIt , which is an
 open-source visualization program based on the Visualization Toolkit
-(VTK) , as the data analysis and visualization engine. VisIt uses a
+(VTK) , as the data analysis and visualization engine. VisIt uses a
 client/server architecture. Remote computing nodes usually represent a
 server side, responsible for browsing the data and performing
 computations. On the other hand, client side is a local computer and is
@@ -211,7 +211,7 @@ used to display the data.
 
 Libsim alters VisIt client/server structure in a way that combines VisIt
 server and the simulation. Libsim’s *in situ* process follows steps
-bellow .
+bellow .
 
 #. The simulation code starts execution.
 
@@ -240,7 +240,7 @@ thus not transmit redundant data.
 Catalyst
 ^^^^^^^^
 
-The Catalyst co-processing library is based on VTK and uses ParaView  as
+The Catalyst co-processing library is based on VTK and uses ParaView  as
 a main program that enables data analysis, visualization and pipeline
 control. Similarly to VisIt, ParaView also uses a client/server
 architecture. Server side, called pvserver, exploits the advantage of
@@ -399,13 +399,12 @@ before the file name.
 Finalization
 ~~~~~~~~~~~~
 
-After co-processing is performed (described in Section [sec:Adaptor]) we
+After co-processing is performed (described in Section [sec:Adaptor]) we
 need to perform finalization of Catalyst library. This returns all
 resources used by Catalyst and should be done before finalization of
 MPI, if used in code. Again, ``b2mndr`` is executed inside ``b2mn`` in
 between MPI initialization and finalization, and thus the order is
-correct. Function does not take in any arguments
-(Listing [lst:finalize]).
+correct. Function does not take in any arguments.
 
 .. code-block:: fortran
 
@@ -420,7 +419,7 @@ Next step after Catalyst initialization is to do co-processing. This
 step is done by the adaptor which queries the pipelines to see if any of
 them needs to be performed and provides VTK data objects that represent
 grid and field data to Catalyst. The sequence of actions adaptor
-performs  is shown below.
+performs  is shown below.
 
 #. Get current time and time step.
 
@@ -531,12 +530,12 @@ This part of the adaptor code, *cxxAdaptor*, is written in C++, because,
 as already mentioned, it uses VTK library, written in C++, to create VTK
 objects. These are required by Catalyst and ParaView in order to be able
 to visualize the simulation data. The interface between Fortran 90 and
-C++ code, we needed to use *name decoration*  in C++ function
+C++ code, we needed to use *name decoration*  in C++ function
 definitions. Doing that, C++ function names are properly stored in
 object files after compilation, and suitable to be called from the
 Fortran code. The layout of *cxxAdaptor* is shown in
-listing [lst:cxxadaptor]. The content of each function is described in
-detail in Section [sec:Visualization].
+numref:`lst:cxxadaptor`. The content of each function is described in
+detail in Section [sec:Visualization].
 
 The first function in *cxxAdaptor* is called ``creategrid``. It is
 designed to create a grid out of point coordinates and assign it to an
@@ -548,8 +547,10 @@ the cells in the grid. It again uses an object
 ``vtkCPInputDataDescription``, this time to get the grid and then assign
 field data to the grid’s cells.
 
-::
-
+.. code-block:: c++
+   :caption: Structure of *cxxAdaptor*.
+   :name: lst:cxxadaptor
+   
     // Include vtk and catalyst headers here.
      ...
      extern "C" void creategrid_(double* crx,double* cry,
@@ -596,25 +597,25 @@ corresponding VTK dataset type, are listed bellow.
 
 Furthermore, VTK also supports 2D and 3D cell types, e.g. triangles,
 quadrilaterals, pyramids, hexahedron. The field data can be associated
-with either cell or points. For more detail refer to .
+with either cell or points. For more detail refer to .
 
 When creating the adaptor we took advantage of three types of *VTK
 objects*, ``vtkPoints`` for vertex coordinates, ``vtkPolydata`` for grid
 representation and ``vtkDoubleArray`` to store field data.
 
-``VtkPoints``  is a data type which explicitly stores the
+``VtkPoints``  is a data type which explicitly stores the
 three-dimensional point locations. It is derived from ``vtkPointSet``
 class and allows setting points with or without automatic range checking
 and memory allocation, uses data types of different bit lengths to store
 coordinates in, and provides vertex information to VTK grid data types.
 
-``VtkPolyData``  is a data type that can store geometric structures such
+``VtkPolyData``  is a data type that can store geometric structures such
 as vertexes, lines, polygons, and triangle strips. It is derived from
 ``vtkPointSet`` class and can store geometric structure in an efficient
 manner, and it provides many getter functions to retrieve information on
 geometric structures.
 
-``VtkDoubleArray``  is an array of values of type *double*, derived from
+``VtkDoubleArray``  is an array of values of type *double*, derived from
 ``vtkDataArray``, which provides methods for automatic or manual memory
 allocation to store arrays of data. It is designed to store data in
 groups called *tuples* and each tuple contains a certain number of
@@ -627,49 +628,14 @@ Grid
 
 Firstly, we have to address the issue of interfacing Fortran data
 structure with C++. Fortran uses column major order for arranging
-multidimensional arrays in memory storage, while C++ uses row major. In
-column major ordering, consecutive elements of the columns are
+multidimensional arrays in memory storage, while C++ uses row major
+(see :numref:`fig-row-sub-col-sub-major`).
+In column major ordering, consecutive elements of the columns are
 contiguous (memory stores one column after another in flat
 one-dimensional array). However, in the row major ordering, consecutive
 elements in memory storage are also consecutive in the rows of
 multidimensional array (memory stores one row after another in flat
 one-dimensional array).
-
-Originally, points are stored in three-dimensional arrays for each
-coordinate, :math:`x` and :math:`y`. Although, when data is passed from
-Fortran to C++, the multidimensionality of the array is lost and we need
-to retrieve the information from flat array of data. The way each cell’s
-vertexes information is stored in 3D array and how it appears in memory
-is shown in Fig. [fig:row\ :sub:`c`\ ol\ :sub:`m`\ ajor]. Each cell
-:math:`\Omega_{i,j}` owns a space (:math:`i,j`), where
-:math:`i=-1,0,1,...,nx` and :math:`j=-1,0,1,...,ny`, in
-:math:`(nx+2)\times{(ny+2)}` grid and a third dimension is reserved for
-4 vertexes coordinates of every cell. Each point is denoted by
-:math:`{P_{i,j,k}}`, where :math:`k=0,1,2,3`. As a result, complete
-coordinates are stored in two (each for x and y direction)
-:math:`(nx+2)\times{(ny+2)}\times4` arrays. Equation  shows formulation
-for every cell :math:`\Omega_{i,j}`.
-
-.. math::
-
-   \label{eq:cell_ij}
-   \Omega_{i,j} = \left\{ P_{i,j,0}, P_{i,j,1}, P_{i,j,2}, P_{i,j,3} \right\}; \;i=-1,0,1,...,nx; \;j=-1,0,1,...,ny
-
-However, when we store vertexes and cells in one-dimensional array,
-formulation changes to equation. :math:`N` denotes number of cells.
-
-.. math::
-
-   \label{eq:cell_n}
-   \Omega_{n} = \left\{ P_{n}, P_{n+N}, P_{n+2\times{N}}, P_{n+3\times{N}} \right\}; \;n=0,1,...,N; \; N=(nx+2)\times{(ny+2)}
-
-.. figure:: images/cell.*
-   :alt: Cell notation with cells stored in 2D array and vertexes in
-         3D array (left), and cells and vertexes stored in 1D array (right).
-
-   Cell notation with cells stored in 2D array and vertexes in 3D array
-   (left), and cells and vertexes stored in 1D array (right).
-
 
 .. _fig-row-sub-col-sub-major:
 .. figure:: images/row_col_major.*
@@ -679,14 +645,62 @@ formulation changes to equation. :math:`N` denotes number of cells.
    3D array of vertexes stored in a 1D array using row major and column
    major ordering.
 
-Listing [lst:points] shows the process of assigning point coordinates
+Originally, points are stored in three-dimensional arrays for each
+coordinate, :math:`x` and :math:`y`. Although, when data is passed from
+Fortran to C++, the multidimensionality of the array is lost and we need to
+retrieve the information from flat array of data. The way each cell’s
+vertexes information is stored in 3D array and how it appears in memory is
+shown in :numref:`fig-row-sub-col-sub-major`.
+
+.. _fig:cells:
+.. figure:: images/cell.*
+   :align: center
+   :alt: Cell notation with cells stored in 2D array and vertexes in
+         3D array (left), and cells and vertexes stored in 1D array (right).
+
+   Cell notation with cells stored in 2D array and vertexes in 3D array
+   (left), and cells and vertexes stored in 1D array (right).
+
+
+Each cell :math:`\Omega_{i,j}` (see :numref:`fig:cells`) owns a space
+(:math:`i,j`), where :math:`i=-1,0,1,...,nx` and :math:`j=-1,0,1,...,ny`,
+in :math:`(nx+2)\times{(ny+2)}` grid and a third dimension is reserved for
+4 vertexes coordinates of every cell. Each point is denoted by
+:math:`{P_{i,j,k}}`, where :math:`k=0,1,2,3`. As a result, complete
+coordinates are stored in two (each for x and y direction)
+:math:`(nx+2)\times{(ny+2)}\times4` arrays. Equation shows formulation for
+every cell :math:`\Omega_{i,j}`.
+
+.. math::
+
+   \label{eq:cell_ij}
+   \Omega_{i,j} = \left\{ P_{i,j,0}, P_{i,j,1}, P_{i,j,2},
+                  P_{i,j,3} \right\}; \;i=-1,0,1,...,nx; \;j=-1,0,1,...,ny
+
+However, when we store vertexes and cells in one-dimensional array,
+formulation changes to equation. :math:`N` denotes number of cells.
+
+.. math::
+
+   \label{eq:cell_n}
+   \Omega_{n} = \left\{ P_{n}, P_{n+N}, P_{n+2\times{N}}, P_{n+3\times{N}}
+                \right\}; \;n=0,1,...,N; \; N=(nx+2)\times{(ny+2)}
+
+
+
+:numref:`lst:points` shows the process of assigning point coordinates
 from ``crx`` and ``cry`` to object ``pts`` of type ``vtkPoints``. First,
 points object is created and memory space is allocated. Next, the number
 of cells ``numC`` is calculated. At the end, coordinates are attached to
 the object ``pts``.
 
-.. code-block:: c
-   
+.. code-block:: c++
+   :name: lst:points
+   :caption: Process of assigning point coordinates to the object ``pts``.
+             First, ``pts`` object is created and memory space is allocated.
+             Next, the number of cells ``numC`` is calculated.
+             At the end, coordinates are attached to the object ``pts``.
+      
     ...
      vtkPoints* pts = vtkPoints::New();
      pts->SetNumberOfPoints(*ncrx);
@@ -702,25 +716,15 @@ the object ``pts``.
 
 The next step is to create cells out of vertexes saved in ``pts``
 object. The process as it appears in the *cxxAdaptor* is shown in
-listing [lst:cells]. To begin, we create a ``vtkPolyData`` type object
+:numref:`lst:cells`. To begin, we create a ``vtkPolyData`` type object
 ``grid`` and connect it with the Catalyst co-processor. Next, points in
 ``pts`` are added to the ``grid`` object and then the ``pts`` is
 deleted. Before creating cells we allocate space for sufficient number
 of cells.
 
-In the next step we need to insert each vertex, by its id, in the right
-order to properly create cells. Given the numbering in simulation with
-respect to how VTK treats vertexes in cells, we need to revert the order
-of second and third edge point. Lastly, when creating cell and assigning
-it to an object ``grid`` we also define cell type (:math:`"9"` denotes a
-quadrilateral cell) and number of vertexes in each cell (:math:`"4"`).
-
-It is important to note that cells are numbered in the order we create
-them and field data is later added in the same order. As a consequence
-we need to make sure we understand how field data is stored in the
-simulation arrays, to couple them properly with cells.
-
-.. code-block:: c
+.. code-block:: c++
+   :name: lst:cells 
+   :caption: Process of creating quadrilateral cells in function ``creategrid``.
    
     ...
      vtkPolyData* grid = vtkPolyData::New();
@@ -738,6 +742,19 @@ simulation arrays, to couple them properly with cells.
         grid->InsertNextCell(9,4,ids);
      }
      ...
+
+In the next step we need to insert each vertex, by its id, in the right
+order to properly create cells. Given the numbering in simulation with
+respect to how VTK treats vertexes in cells, we need to revert the order
+of second and third edge point. Lastly, when creating cell and assigning
+it to an object ``grid`` we also define cell type ("9" denotes a
+quadrilateral cell) and number of vertexes in each cell ("4").
+
+It is important to note that cells are numbered in the order we create
+them and field data is later added in the same order. As a consequence
+we need to make sure we understand how field data is stored in the
+simulation arrays, to couple them properly with cells.
+
 
 Field Data
 ~~~~~~~~~~
@@ -761,28 +778,16 @@ etc.
 Before adding field data to the grid, we first get grid information from
 the co-processor through the object of type
 ``vtkCPInputDataDescription`` and insert it into an object ``grid`` of
-type ``vtkPolyData``. Listing [lst:fields] shows the process of
-assigning values to the grid. Because VTK only allows certain dimensions
-of field data attached to the grid, we divided the process into two
-cases.
+type ``vtkPolyData``.
 
-In the first case, where a field is a vector (1D, 2D or 3D), the data is
-added as a one variable with one, two or three components. First we
-create a data container ``cellData`` of type ``vtkDoubleArray``, set its
-name, number of components and number of tuples, which in our case is
-the same as number of cells ``numC``. We continue by entering the switch
-statement, which inserts the field data stored in ``values`` into array
-``cellData``, depending on the number of components in each variable. In
-the last step, data is attached to the ``grid`` and a ``cellData``
-object is deleted.
+:numref:`lst:fields` shows the process of assigning values to the grid.
+Because VTK only allows certain dimensions of field data attached to the
+grid, we divided the process into two cases.
 
-The second case handles all instances, where fields contain more than 3
-components. In this case every component is added to the grid as a
-separate variable. This applies to fields where the number of components
-is equal to the number of atomic species. Otherwise, the process of
-attaching data to the grid is similar to the first case.
-
-.. code-block:: c
+.. code-block:: c++
+   :caption: Process of assigning simulation data to the grid in function
+             ``adddata``.
+   :name: lst:fields
    
     // Get grid information from coprocessor here
         ...
@@ -804,7 +809,8 @@ attaching data to the grid is similar to the first case.
                 }
                 case 3: {
                     for (vtkIdType i = 0; i < *numC; ++i){ 
-                        cellData->SetTuple3(i, values[i], values[i+(*numC)], values[i+2*(*numC)]);
+                      cellData->SetTuple3(i, values[i], values[i+(*numC)],
+                                          values[i+2*(*numC)]);
                     } break;
                 }
             }
@@ -829,27 +835,44 @@ attaching data to the grid is similar to the first case.
             } 
         }
 
+
+In the first case, where a field is a vector (1D, 2D or 3D), the data is
+added as a one variable with one, two or three components. First we
+create a data container ``cellData`` of type ``vtkDoubleArray``, set its
+name, number of components and number of tuples, which in our case is
+the same as number of cells ``numC``. We continue by entering the switch
+statement, which inserts the field data stored in ``values`` into array
+``cellData``, depending on the number of components in each variable. In
+the last step, data is attached to the ``grid`` and a ``cellData``
+object is deleted.
+
+The second case handles all instances, where fields contain more than 3
+components. In this case every component is added to the grid as a
+separate variable. This applies to fields where the number of components
+is equal to the number of atomic species. Otherwise, the process of
+attaching data to the grid is similar to the first case.
+
 Examples
 ========
 
 Two SOLPS-ITER example cases that are used for debugging and
-benchmarking new SOLPS features. The first case is *ITER\_535\_D+He+Ar*
-and the second one is *AUG\_16151\_D*. *ITER\_535\_D+He+Ar* (later *ITER
+benchmarking new SOLPS features. The first case is *ITER_535_D+He+Ar*
+and the second one is *AUG_16151_D*. *ITER_535_D+He+Ar* (later *ITER
 535*) is an ITER all-metal walls example with Ar impurity seeding and
 contains a B2.5-EIRENE coupled case (not fully converged) using the 5.2
-physics model. *AUG\_16151\_D* (later *AUG 16151* is a standard
+physics model. *AUG_16151_D* (later *AUG 16151* is a standard
 single-fluid 5.0 benchmark case. It contains a B2.5 standalone case
 converged to machine accuracy, a case with a single call to EIRENE and
 having B2.5 converged to machine accuracy, and a coupled B2.5-EIRENE
 case. We use one specific run for each case to show results - coupled
 B2.5-EIRENE *ITER 535* and standalone *AUG 16151*. For details on how to
-run each case refer to  and to  to run it with Catalyst.
+run each case refer to  and to  to run it with Catalyst.
 
 Running the case
 ----------------
 
 The general course of actions when using Catalyst with a simulation is
-the following (for step-to-step guide refer to ).
+the following (for step-to-step guide refer to ).
 
 #. Start ParaView and connect to Catalyst on the correct port.
 
@@ -863,7 +886,7 @@ the following (for step-to-step guide refer to ).
 #. Perform post-processing on the data acquired.
 
 Steps 1 and 2 can be reverted because of the way Catalyst and the
-simulation communicate (description in Section [sec:Catalyst]). This
+simulation communicate (description in Section [sec:Catalyst]). This
 allows connecting to simulation whenever most suitable for use, e.g.
 when running multiple simulations we can disconnect from one port and
 connect to another to check other simulation that may run
@@ -879,17 +902,17 @@ The live connection does not perform anything computationally expensive
 without specific prompting by the user. Therefore, we need to prompt the
 pvserver to start sending simulation data. When the connection is
 established we can pick the extract and show it in the render view
-(Fig. [fig:window] shows electron temperature *te* during *ITER 535*
+:numref:`fig:window` shows electron temperature *te* during *ITER 535*
 case run).
 
-.. figure:: images/window.*
+.. _fig:window:
+.. figure:: images/window.png
    :alt: ParaView window showing electron temperature *te* during the
-   case *ITER 535* run with Catalyst (at time step 15).
+         case *ITER 535* run with Catalyst (at time step 15).
 
    ParaView window showing electron temperature *te* during the case
    *ITER 535* run with Catalyst (at time step 15).
 
-[fig:window]
 
 Next, the data that is sent to pvserver can be visualized on the fly
 through *live visualization* feature of Catalyst. At this point we have
@@ -937,9 +960,10 @@ which extracts *te* and *ti*, and *vtkPolyDataWriter* to save *te* and
 Catalyst, with Catalyst and live visualization, with Catalyst and
 without live visualization. During the simulation we were displaying
 *te* from *input* source in ParaView. Results are presented in
-Fig. [fig:time\ :sub:`r`\ esults].
+:numref:`fig:time:sub:results`.
 
-.. figure:: images/time_results.*
+..  _fig:time:sub:results:
+.. figure:: images/time-results.*
    :alt: Increase in average time of time steps when using Catalyst for
          cases *AUG 16151* and *ITER 535* compared to runs without Catalyst.
          Each bar contains an average time of a time step in red.
@@ -947,7 +971,8 @@ Fig. [fig:time\ :sub:`r`\ esults].
    Increase in average time of time steps when using Catalyst for cases
    *AUG 16151* and *ITER 535* compared to runs without Catalyst. Each
    bar contains an average time of a time step in red.
-[fig:time:sub:`r`\ esults]
+
+
 
 Finally, *in situ* analysis affects the post-processing. Performing
 analysis during the simulation run with Catalyst enables the user to
@@ -970,36 +995,31 @@ the area where *te* is greater than :math:`2e-17` J. First, we apply our
 selection criteria (:math:`te >= 2e{-17}` J) and extract new selection.
 Now while the simulation runs the area, when our criteria are met,
 updates every time step. We inspect how the flux of atoms of specific
-ion species between each cell and its left neighbor cell, *fna\_fcor*,
-change with time steps (Fig. [fig:fna:sub:`f`\ corx]).
+ion species between each cell and its left neighbor cell, *fna_fcor*,
+change with time steps :numref:`fig:fna:sub:fcorx`.
 
-.45 |Flux of atoms of specific ion species between each cell and its
-left neighbor cell, *fna\_fcor*, in the area where *te* is greater than
-:math:`2e{-17}` J. We can see that the area in
-figure [fig:right\ :sub:`f`\ na] is bigger than
-in [fig:left\ :sub:`f`\ na] and values of *fna\_fcor* changed.|
+.. _fig:fna:sub:fcorx:
+.. figure:: images/fna_fcor.*
+   :alt: Flux of atoms of specific ion species between each cell and its
+         left neighbor cell, *fna_fcor*, in the area where *te* is greater
+         than :math:`2e{-17}` J. We can see that the area in figure (b)
+         is bigger than in (a) and values of *fna_fcor* changed.
 
-[fig:left:sub:`f`\ na]
-
-.45 |Flux of atoms of specific ion species between each cell and its
-left neighbor cell, *fna\_fcor*, in the area where *te* is greater than
-:math:`2e{-17}` J. We can see that the area in
-figure [fig:right\ :sub:`f`\ na] is bigger than
-in [fig:left\ :sub:`f`\ na] and values of *fna\_fcor* changed.|
-
-[fig:right:sub:`f`\ na]
-
-[fig:fna:sub:`f`\ corx]
+   Flux of atoms of specific ion species between each cell and its
+   left neighbor cell, *fna_fcor*, in the area where *te* is greater
+   than :math:`2e{-17}` J. We can see that the area in (b) at time step 15
+   is bigger than in (a) at time step 10 and values of *fna_fcor* changed.
 
 After the simulation has completed and we have written desired data to
 disk, we open file that holds all time steps and inspect only the region
-we are interested in, in this case PFR (Fig. [fig:tePFR]). In order to
+we are interested in, in this case PFR (:numref:`fig:tePFR`). In order to
 find a maximum value of electron temperature, *te*, we use a tool called
 *find data* and apply query :math:`te == max(te)`. In our case this is
 the cell with an ID 869. Now, we present the electron temperature in the
 selected cell over time, to observe how the temperature converged
-(Fig. [fig:teplot]).
+(:numref:`fig:teplot`).
 
+.. _fig:tePFR:
 .. figure:: images/tePFR.*
    :alt: PFR region showing electron temperature *te* (J) in time step
          88 of the case *AUG 16151*. Cell 869 holds maximum value of *te*.
@@ -1007,8 +1027,8 @@ selected cell over time, to observe how the temperature converged
    PFR region showing electron temperature *te* (J) in time step 88 of
    the case *AUG 16151*. Cell 869 holds maximum value of *te*.
 
-[fig:tePFR]
 
+.. _fig:teplot:
 .. figure:: images/teplot.*
    :alt: Electron temperature, *te* (J), on cell 869 with respect to
          time steps in the case *AUG 16151*. Cell 869 holds the maximum value
@@ -1018,22 +1038,23 @@ selected cell over time, to observe how the temperature converged
    steps in the case *AUG 16151*. Cell 869 holds the maximum value of
    *te* in PFR region in time step 88.
 
-[fig:teplot]
 
-Fig. [fig:tePFR] and [fig:teplot] shows electron temperature *te* in
-Joules (J). In order to present results in :math:`eV`, which is default,
-we multiply all *te* values by :math:`6,242e18`. To do that we use
+
+:numref:`fig:tePFR` and :numref:`fig:teplot` shows electron temperature
+*te* in Joules (J). In order to present results in :math:`eV`, which is
+default, we multiply all *te* values by :math:`6,242e18`. To do that we use
 *Calculator* filter and create new cell data *Te*
-(Fig. [fig:derived:sub:`T`\ e]) derived from *te*, where
-:math:`Te = te \times{6,242e18}`.
+(:numref:`fig:derived:sub:Te`) derived from *te*, where :math:`Te = te
+\times{6,242e18}`.
 
+.. _fig:derived:sub:Te:
 .. figure:: images/derived_Te.*
    :alt: Electron temperature, *Te* (eV) in time step 88 of the
          case *AUG 16151*.
 
    Electron temperature, *Te* (eV) in time step 88 of the case *AUG 16151*.
 
-[fig:derived:sub:`T`\ e]
+
 
 Discussion
 ==========
@@ -1098,7 +1119,7 @@ following.
 
 #. ParaView provides rich graphical data analysis tools that require no
    knowledge in programming. As some ParaView analysis tools are built
-   on top of the NumPy library  for Python, most of the functionality
+   on top of the NumPy library  for Python, most of the functionality
    the library offers, can be used graphically.
 
 #. *In situ* analysis with Catalyst is a powerful graphical debugging
@@ -1335,7 +1356,7 @@ fortranAdaptor.F90
 cxxAdaptor.cxx
 --------------
 
-::
+.. code-block:: c++
 
     // C++ part of the adaptor for paraview catalyst for b2.5 simulation.
     // Author: Jure Bartol
@@ -1455,19 +1476,19 @@ Catalyst, environment setup, and the compilation of code at ITER.
    GIT branch change to ``featureIDS`` and set up the environment and
    submodules, type the following:
 
-   ::
+.. code-block:: csh
 
-           $ git clone ssh://git@git.iter.org/bnd/solps-iter.git 
-           SOLPS-ITER-IDS
-           $ cd SOLPS-ITER-IDS
-           $ git checkout feature/IDS
-           $ git submodule init
-           $ git submodule update
-           $ cd modules/B2.5
-           $ git checkout feature/IDS
-           $ cd -
-           $ tcsh
-           $ source setup.csh
+   $ git clone ssh://git@git.iter.org/bnd/solps-iter.git \
+      SOLPS-ITER-IDS
+   $ cd SOLPS-ITER-IDS
+   $ git checkout feature/IDS
+   $ git submodule init
+   $ git submodule update
+   $ cd modules/B2.5
+   $ git checkout feature/IDS
+   $ cd -
+   $ tcsh
+   $ source setup.csh
 
 #. ParaView needs to be built with Catalyst, Python, MPI (optional) and
    a Fortran compiler (due to naming conventions in shared libraries
@@ -1554,267 +1575,3 @@ Catalyst, environment setup, and the compilation of code at ITER.
    Depending on the machine, an “undefined reference” error may occur.
    If an error occurs, run ``ldd <path to undefined library>`` to see
    what libraries are required and identify which are missing.
-
-Catalyst Tutorial for SOLPS
-===========================
-
-Basic Catalyst Simulation
--------------------------
-
-We will start the default Insitu *live visualization* on
-``hpc-app.iter.org`` login node using only B2.5.
-
-The following commands copy the case that contains the usual
-AUG\_16151\_D demo with additional ``coproc.py`` file that has hardcoded
-``hpc-app1.iter.org`` and port ``22222`` for connecting to ParaView
-Catalyst:
-
-::
-
-        $ cd SOLPS-ITER-IDS
-        $ tcsh
-        $ source setup.csh
-        $ cd runs
-        $ mkdir catalyst-demo
-        $ cd catalyst-demo
-        $ cp -av ~kosl/solps-iter-ids-jb/runs/AUG_16151_D .
-        $ cd AUG_16151_D/run_for_GUI_demo
-
-Before starting the simulation it is recommended that ParaView Catalyst
-is started with Catalyst --> Connect and select free port. This is
-especially true if several users are running this tutorial at the same
-time. One can list already occupied ports on the login node by issuing:
-
-::
-
-        $ netstat -ln --tcp | grep -v :: | grep -v 127.0.0 | less
-
-and then selecting a free port in the range from 1025 to 65535
-(inclusive). In rare (standalone) cases where a cluster is empty, one
-can select the default *Catalyst Server Port* on ``22222``. Otherwise,
-one may try another free port.
-
-|image|
-
-Immediately after starting the Catalyst server the ``catalyst:`` icon
-appears under the ``builtin:`` icon. We will pause the simulation at the
-first time step to demonstrate initial conditions by selecting Catalyst
---> Pause Simulation that will change the catalyst: icon to
-
-|image|
-
-inside the Pipeline browser. Before starting the B2.5 simulation we need
-to adjust the last line of the ``coproc.py``
-
-::
-
-        # Live Visualization, if enabled.
-        coprocessor.DoLiveVisualization(datadescription,"hpc-app1.iter.org",22222)
-
-and then start the simulation with the usual:
-
-::
-
-        $ rm -f *.prt
-        $ itersubmit
-        $ qstat -u ${USER} # should show running case for next 5 minutes
-
-Immediately after the job starts running from the batch, the code
-Catalyst *co-processor* connects back to the *Catalyst server*, which
-pauses the code and new input icon appears below the catalyst: icon.
-
-|image|
-
-If you click on the the grayed-out icon nearby the input icon the
-Extract: input extract should appear as
-
-|image|
-
-and once we click on the grayed-out ’eye’ icon the mesh is shown in a
-new RenderWindow2 as a surface. If we close RenderWindow2 and change the
-Representation to *Surface With Edges* with some zooming we see
-
-|image|
-
-Instead of a solid color one may select any other B2.5 field available
-under the Coloring combo box.
-
-Once the simulation is running you may pause it or set the breakpoint
-time step. Set the breakpoint with Catalyst --> Set Breakpoint to 5
-
-|image|
-
-and Catalyst --> Continue the simulation that will stop shortly around
-the same time as step 5. After some additional inspection of the fields
-press, Catalyst --> Continue to run the simulation to the last time step
-at 1018 time steps. While running, a live simulation is shown. If we
-open Catalyst --> Set Breakpoint while the simulation is running, then
-the time will keep increasing while editing and this can be used to
-follow the current state of the simulation and at the end of live
-visualization, the following message will appear:
-
-|image|
-
-The same message occurs if the simulation is killed by the user and
-ParaView is ready to accept a connection from the new simulations. If
-Changes need to be made to the *Catalyst Server Port* when the
-simulation is running, then ParaView needs to be restarted!
-
-It is alright if one File --> Exit the ParaView while the simulation is
-running. One can always reconnect by starting ParaView and Catalyst -->
-Connect back at any time to see the current state. The graphics pipeline
-that was created during, is preserved within the *co-processor* state
-and can be saved for future use while the simulation is running.
-
-Co-Processing pipeline
-----------------------
-
-We will extend the default co-processing script to include saving each
-time step for later analysis and creation of animation. For that, the
-``coproc.py`` pipeline needs to be changed. The easiest way to do that
-is by creating and exporting the visualization pipeline shown in the
-Pipeline Browser. To create a new pipeline we need to:
-
-#. Catalyst --> Connect
-
-#. Catalyst --> Pause Simulation
-
-#. Tools --> Manage Plugins ... and Load Selected
-   *CatalystScriptGeneratorPlugin* and Close.
-
-#. Start the simulation again with:
-
-   ::
-
-           $ rm -f *.prt
-           $ itersubmit
-
-#. Once we see the input click, select Writers --> Paralel Polydata
-   Writer from the menu. Under *properties* change default File Name
-   from ``filename_%t.pvtp`` to ``temperature_%t.pvtp`` and Write
-   Frequency to 3.
-
-   |image|
-
-#. Select CoProcessing --> Export State and Next >.
-
-#. Check Show All Sources and add *input* to proceed with Next > and
-   retain Name Simulation Inputs as input by continuing with Next >.
-
-#. Under Export State Configuration check only Live Visualization, press
-   Finish and replace
-   ``runs/catalyst-demo/AUG_16151_D/run_for_GUI_demo/coproc.py``.
-
-#. Edit last line of ``coproc.py`` and change ``localhost`` back to
-   “hpc-app1.iter.org” or enter:
-
-   ::
-
-           $ sed -i -e s/localhost/hpc-app1.iter.org/ coproc.py
-
-#. Kill simulation with:
-
-   ::
-
-           $ qstat -u ${USER}
-           $ qdel Job_ID
-
-#. We start the simulation once again with Catalyst --> Connect and
-   issuing:
-
-   ::
-
-           $ rm -f *.prt
-           $ itersubmit
-
-   that will connect to Catalyst and show new a pipeline. Actually,
-   there is no need to start ParaView unless a *live visualization* is
-   needed. The files ``solps_%t.pvtp`` will be created anyway as part of
-   the co-processor pipeline and will be preserved under
-   ``b2mn.exe.dir/``. Those files can be opened at a later time with
-   ParaView and played in time. Complete dumps of the code for each time
-   step can occupy several GBytes of disk space even for a small
-   example.
-
-#. Instead of dumping complete set of variables we create a new pipeline
-   while running a live visualization by selecting input and Filters -->
-   Alphabetical --> Pass Arrays.
-
-#. Select only ``te`` and ``ti`` in filter Properties.
-
-#. Add Writers --> Paralel Polydata Writer and rename output *File Name*
-   to ``temperature_%t.pvtp`` to get
-
-   |image|
-
-#. Repeating simulation once again with:
-
-   ::
-
-           $ rm -f *.prt
-           $ itersubmit
-
-   we get a new set of files under ``b2mn.exe.dir/`` with a smaller
-   footprint.
-
-#. To open all ``.pvpt`` files at once created in ``b2mn.exe.dir/``
-   select File --> Open and navigate to ``b2mn.exe.dir/`` in current run
-   directory. Open the top .pvtp file (one with a plus on the left of
-   file name). This will load all time steps into Paraview.
-
-   |image|
-
-       | **note:**
-       | In some cases ParaView fails to load all the time steps. If
-       that happens, close and reopen ParaView and repeat the steps
-       above.
-
-#. Now select ``te`` from Active Menu Controls.
-
-   |image|
-
-#. To move through the time steps, use the Time Controls on the top of
-   the window. We can either move from step to step or play it as an
-   animation.
-
-   |image|
-
-#. In order to plot variable ``te`` max value over time we need to
-   select Edit --> Find Data. Select ``te`` and ``is max`` and *Run
-   Selection Query*. To show the plot select *Plot Selection Over Time*.
-
-   |image|
-
-#. Select *Close* to close the window. The new plot view should open
-   next to the the default Render View. To select variables you would
-   like to plot (e.g. ``te``), go to Properties and scroll down to the
-   section *Series Parameters* where we can select variables to plot. We
-   can also modify the number of other plot options here. Note that you
-   can plot any other statistical parameter instead of the max shown in
-   this example.
-
-   |image|
-
-#. We should now see similar view on the right.
-
-   |image|
-
-#. In addition to plotting we can also analyse data in respect to the
-   position on the grid. To do that select Edit --> Find Data. To
-   specify your own query select ``Query`` and type *te >= mean(te)*.
-   Then select *Run Selection Query*.
-
-   |image|
-
-#. Now close the window. Cells that meet the criteria we specified will
-   be colored pink. When we move through time steps, the selection area
-   will change according to the variable values in each time step.
-   Again, we can use more meaningful selection criteria and see how it
-   changes in respect to time and position on the grid.
-
-   |image|
-
-       | **note:**
-       | We don’t need ParaView running if we already have the desired
-       fields extracted with ``coproc.py`` for later analysis,
-       visualization and debugging.
