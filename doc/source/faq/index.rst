@@ -77,12 +77,33 @@ extensions that are unavailable on remote displays. XCB errors in rendering
 are related to "old" display managers and are usually not harmful. Upgrade
 your X11 display drivers on login node if serious having problems.
 
-How do I change default browser for solps_doc?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+How do I change default HTML browser for solps_doc?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. note::
 
-For KDE select :menuselection:`Kmenu --> Configure Desktop -->
+   "Modern" HTML browser with Javascript and SVG support 
+   is needed to read the SOLPS GUI documentation online.
+   *K Desktop Environment* (KDE) provided default 
+   *Konqueror* browser is not sufficient!
+
+For KDE3 open KDE Control Center in shell with ::
+
+ $ kcontrol
+
+Then select :menuselection:`KDE Components --> File Associations
+--> text --> html" and move your browser to the top.`.
+
+For KDE4 select :menuselection:`Kmenu --> Configure Desktop -->
 Advanced --> File Assoc --> Text --> HTML` and move your browser to
 the top of the preferences.
+
+.. seealso:: 
+   
+   Other desktop environments (GNOME, XFCE4, FCE, 
+   Cinnamon,...) may have similar file associations desktop
+   setting. See 
+   `How do I add acroread as default PDF viewer for ParaView help?`_
+   too.
 
 
 ============
@@ -118,7 +139,7 @@ and change default PDF viewer with::
 
    $ xdg-mime default acroread.desktop application/pdf
 
-.. seealso:: `How do I change default browser for solps_doc?`_
+.. seealso:: `How do I change default HTML browser for solps_doc?`_
 
 
               
