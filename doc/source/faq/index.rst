@@ -77,7 +77,6 @@ extensions that are unavailable on remote displays. XCB errors in rendering
 are related to "old" display managers and are usually not harmful. Upgrade
 your X11 display drivers on login node if serious having problems.
 
-.. _solpsdoc:
 How do I change default browser for solps_doc?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
