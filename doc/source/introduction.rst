@@ -381,3 +381,103 @@ neighbors explicitly as well.
    (c) The regions are scrape-off layer (SOL, colored in grey),
    private flux region (PFR, green), and core (blue).
    Separatrix is shown as a red line.
+
+
+IMAS
+----
+
+The ITER Integrated Modelling & Analysis Suite (IMAS)  and the
+EUROfusion integrated modelling (EU-IM)  effort orchestrate computation
+of fusion codes with Kepler  scientfic workflow engine. Complex
+integrated modelling (IM) workflows created by EU-IM task force  on top
+of the Kepler framework include with several physics codes at different
+time and space scales. The IMAS and EU-IM Physics Data Model (PDM) is
+the main advantage in contrast to OMFIT  framework that provides physics
+modules without the underlying data model that allows coupling of codes
+with prescribed data structures named IDS (Interface Data Structures) or
+CPO (Consistent Physical Objects). Data structures that are served
+within personal or global databases are accessible with several
+programming languages (Fortran, C++, Java, Python, and Matlab)
+translated from XSD  schema. Kepler workflow engine, written in Java,
+needs to encapsulate physics codes inside its components called
+"actors". For that *component builders* were developed that helps
+"classical" code developers to "wrap" their physics code written in
+non-Java language by specifying communication *ports* and run-time
+environment to get the *actor skeleton*. From there on developers are
+required to adapt the code for PDM and any code-configurable
+input-parameters into machine readable translation that is usually in
+XML  language. Many IM workflows are quite straightforward to model in
+Kepler and are hardly changed due to their complexity in code-coupling.
+
+It should be noted that the coupling of codes on PDM does not binds the
+user to model workflow in *Kepler* and other workflow engines could be
+used instead. Some of Kepler weak points in complex IM workflows are:
+(i) no fault tolerance (recover / divert / restart) capabilities, (ii)
+remote execution model is part of the workflow, (iii) remote HPC/GRID/cloud
+submission/data transfer policy is usually incompatible with external
+workflows, (iv) variations of actors and composite actors are bound to.
+Scientific workflow systems foster *open and reproducible research* and
+tend to abstract computational resources inside web interfaces .
+*Reproducible science* should be enabled with *workflow exchange* though
+web portals such as myExperiment , *provenance* and *open data*. However,
+the technical details in running the workflows are hindering exchange for
+reuse and are rarely changed once created. Kepler graphical user interface
+(GUI) for editing and execution is an application that typically runs in a
+virtual desktop provided by a compute-cluster login-node. While scientific
+workflow engines cover "task" dependencies well by creating *direct acyclic
+graphs* they provide little support for interactive tasks in preparing the
+input data. Physics code monitoring and visualisation is another aspect
+that is not covered sufficiently and extensions are required to provide
+progress evidence to users. Visualisation pipeline that is often neglected
+in many workflow systems is primary point of VisTrails workflow system that
+concentrates in data exploration where complex 3D visualisations are
+needed. Building visualisation pipeline on top of VTK toolkit is also
+possible with interactive 3D visualisation tools such as ParaView or VisIt
+that are ubiquitously used among HPC community. Important aspect for
+day-to-day users is tailoring GUI to preferences while using the physics
+code(s) so that they can interactively explore compute progress. For that
+purpose users usually create custom GUI for controlling and monitoring in a
+*dashboard* that eases the control over their cases, called "Runs" in the
+*Scrape-Off Layer Plasma Simulation* (SOLPS) code together with the
+standalone ParaView application for *in situ* instrumentation.
+
+SOLPS is a package of codes developed over many years and was started as
+an evaluation tool for engineers but then developed into an essential
+tool that allowed combining design and modelling process of the
+divertor, with synthesising different pieces of information from
+theoretical analysis, experimental studies and engineering intuition.
+Several versions of SOLPS code exist to date. The newly developed
+SOLPS-ITER  suite of codes comprise a grid generator CARRE , a tool for
+specifying the material structures and providing inputs to the other
+codes, DivGeo, the plasma fluid code B2 , the kinetic neutrals Monte
+Carlo code Eirene , and in addition to that a bundle of plotting tools
+and scripts used for post-processing.
+
+The ambition of the SOLPS-ITER effort is to become the new standard used
+across the ITER Parties for modelling not only ITER, but any other
+tokamaks and linear plasma devices wherever applicable. In order to
+facilitate user adoption of SOLPS-ITER and migration from earlier
+versions, it has therefore been decided to include as part of the
+SOLPS-ITER package, a more user-friendly interface for some of the more
+tedious and error-prone tasks to ease the transition for users of older
+versions and provide additional added value and incentive for those
+users switching to SOLPS-ITER. At the same time, SOLPS users have, over
+the years, expressed the desire for some run monitoring framework and
+more powerful graphical post-processing tools.
+
+
+The possibility of designing the workflows and the dashboard by extending
+existing Qt tools that are traditionally used only for GUI designs and have
+programmed actions in the code. With the SOLPS-ITER GUI the workflow
+creation is possible with Python-based workflow engine. The workflow
+execution model is independent of clusters and provided by *Runs* view.
+Withi the GUI *Designer* the layout of the widgets is fully configurable
+and in contrast to other scientific workflow engines, provides the
+dashboard as the front end to users solving the workflow monitoring problem
+in a way users prefer. The sharing of a complex dashboard design is
+possible among users and is more oriented towards monitoring and graphical
+presentation, with full visualisation support. Having all these features in
+mind, we would like to highlight that the approach presented in
+continuation is significantly advanced for users with similar physics codes
+that need to be put inside a dashboard for easy handling, coupling,
+monitoring and scientific discovery exploration.

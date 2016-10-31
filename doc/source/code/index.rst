@@ -66,6 +66,14 @@ Script
 .. automodule:: script
    :members:
 
+
+------
+B2plot   
+------
+
+.. automodule:: b2plot
+   :members:
+   
 ----------------------------
 Input file editor and viewer
 ----------------------------

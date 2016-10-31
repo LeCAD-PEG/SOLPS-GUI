@@ -97,6 +97,11 @@ For KDE4 select :menuselection:`Kmenu --> Configure Desktop -->
 Advanced --> File Assoc --> Text --> HTML` and move your browser to
 the top of the preferences.
 
+Another way for `solps_doc` alias is to replace `xdg-open` with the
+explicit command such as::
+
+  firefox --url <URL to index.html>
+
 .. seealso:: 
    
    Other desktop environments (GNOME, XFCE4, FCE, 
