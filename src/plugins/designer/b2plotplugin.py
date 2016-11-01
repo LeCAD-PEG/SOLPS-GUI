@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 
 """
-gnuplotplugin.py
+b2plotplugin.py
 
-A gnuplot http://www.gnuplot.info/ custom widget plugin for Qt Designer.
+A b2plot http://www.b2plot.info/ custom widget plugin for Qt Designer.
 
 """
 
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
 
-from gnuplot import Gnuplot
+from b2plot import B2plot
 
 
-class GnuplotPlugin(QPyDesignerCustomWidgetPlugin):
-    """GnuplotPlugin(QPyDesignerCustomWidgetPlugin)
+class B2plotPlugin(QPyDesignerCustomWidgetPlugin):
+    """B2plotPlugin(QPyDesignerCustomWidgetPlugin)
     
     Provides a Python custom plugin for Qt Designer by implementing the
     QDesignerCustomWidgetPlugin via a PyQt-specific custom plugin class.
@@ -24,7 +24,7 @@ class GnuplotPlugin(QPyDesignerCustomWidgetPlugin):
     # initialized variable.
     def __init__(self, parent=None):
     
-        super(GnuplotPlugin, self).__init__(parent)
+        super(B2plotPlugin, self).__init__(parent)
 
         self.initialized = False
 
@@ -45,12 +45,12 @@ class GnuplotPlugin(QPyDesignerCustomWidgetPlugin):
     # This factory method creates new instances of our custom widget with the
     # appropriate parent.
     def createWidget(self, parent):
-        return Gnuplot(parent)
+        return B2plot(parent)
 
     # This method returns the name of the custom widget class that is provided
     # by this plugin.
     def name(self):
-        return "Gnuplot"
+        return "B2plot"
 
     # Returns the name of the group in Qt Designer's widget box that this
     # widget belongs to.
@@ -64,7 +64,7 @@ class GnuplotPlugin(QPyDesignerCustomWidgetPlugin):
 
     # Returns a short description of the custom widget for use in a tool tip.
     def toolTip(self):
-        return "Gnuplot plugin with TCSH for SOLPS plots"
+        return "B2plot plugin with TCSH for b2plots"
 
     # Returns a short description of the custom widget for use in a "What's
     # This?" help message for the widget.
@@ -82,12 +82,12 @@ class GnuplotPlugin(QPyDesignerCustomWidgetPlugin):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="Gnuplot" name="gnuplot" />\n'
+        return '<widget class="B2plot" name="b2plot" />\n'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.
     def includeFile(self):
-        return "gnuplot"
+        return "b2plot"
 
 
 # Define the image used for the icon.

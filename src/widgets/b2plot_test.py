@@ -1,3 +1,7 @@
+"""
+The following is needed to test at ITER cluster
+module switch imas/3.5.3-4-g371609a
+"""
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5 import QtGui
