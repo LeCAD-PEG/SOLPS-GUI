@@ -1,0 +1,1133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <author>Leon Kos</author>
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>651</width>
+    <height>354</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>SOLPS-ITER</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_8">
+    <item row="0" column="1">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="currentIndex">
+       <number>5</number>
+      </property>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>&amp;Initialize Run</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="2" column="0" colspan="2">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Sequence name:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLineEdit" name="lineEditSequenceName">
+          <property name="text">
+           <string>test</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3" rowspan="4">
+         <widget class="QPlainTextEdit" name="plainTextEditScript">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="plainText">
+           <string>for i in range(10):
+   print(&quot;run_%02d&quot; % i)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0" colspan="3">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Sequence description</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0" colspan="4">
+         <widget class="QPlainTextEdit" name="plainTextEdit">
+          <property name="plainText">
+           <string>This defines the directory structure ${SOLPS_ROOT}/runs/test and optional one or multiple levels of parameter scan subdirectories.</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Device template:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QCommandLinkButton" name="initializeRuns">
+          <property name="text">
+           <string>Initialize Run(s)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QCheckBox" name="checkBoxParameterScan">
+          <property name="text">
+           <string>Parameter scan</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Sequence script:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="2">
+         <widget class="QComboBox" name="comboBox">
+          <property name="currentText">
+           <string>ITER</string>
+          </property>
+          <item>
+           <property name="text">
+            <string>ITER</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>AUG</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>JET</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>COMPASS</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>MAST-U</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>&amp;Populate Baserun</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Step 1</string>
+          </property>
+          <widget class="QPushButton" name="pushButton">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>30</y>
+             <width>101</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Run DivGeo</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="2">
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>Step 2</string>
+          </property>
+          <widget class="QPushButton" name="pushButton_2">
+           <property name="geometry">
+            <rect>
+             <x>70</x>
+             <y>30</y>
+             <width>111</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Create Mesh</string>
+           </property>
+          </widget>
+          <widget class="QComboBox" name="comboBox_2">
+           <property name="geometry">
+            <rect>
+             <x>120</x>
+             <y>70</y>
+             <width>72</width>
+             <height>22</height>
+            </rect>
+           </property>
+           <item>
+            <property name="text">
+             <string>Carre</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Carre2</string>
+            </property>
+           </item>
+          </widget>
+          <widget class="QLabel" name="label_6">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>70</y>
+             <width>101</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Mesh generator</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="title">
+           <string>Step 3</string>
+          </property>
+          <widget class="QPushButton" name="pushButton_3">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>30</y>
+             <width>81</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Run UINP</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
+        <item row="1" column="0" rowspan="3" colspan="2">
+         <widget class="QGroupBox" name="groupBox_4">
+          <property name="title">
+           <string>EIRENE</string>
+          </property>
+          <widget class="QPushButton" name="pushButton_4">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>40</y>
+             <width>81</width>
+             <height>22</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Run TRIA</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_5">
+           <property name="geometry">
+            <rect>
+             <x>110</x>
+             <y>40</y>
+             <width>101</width>
+             <height>22</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Check Mesh</string>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="checkBox">
+           <property name="geometry">
+            <rect>
+             <x>50</x>
+             <y>-1</y>
+             <width>85</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Enable</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
+        <item row="1" column="2" colspan="2">
+         <widget class="QPushButton" name="pushButton_6">
+          <property name="text">
+           <string>Transport coefficients</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2" colspan="2">
+         <widget class="QPushButton" name="pushButton_7">
+          <property name="text">
+           <string>Boundary Conditions</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Topology:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3">
+         <widget class="QComboBox" name="comboBox_3">
+          <item>
+           <property name="text">
+            <string>Single Null</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Double Null</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_Runs">
+       <attribute name="title">
+        <string>&amp;Runs</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QPushButton" name="pushButton_Import">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Imports existing run from elsewhere (with possible conversion) and puts it under selected tree.</string>
+          </property>
+          <property name="text">
+           <string>Import</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="pushButton_Archive">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Moves the selected tree into Archive</string>
+          </property>
+          <property name="text">
+           <string>Archive</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="pushButton_Run">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Starts the run with the method selected in Preferences</string>
+          </property>
+          <property name="text">
+           <string>Run</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QPushButton" name="pushButton_Stop">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Creates b2mn.exe.dir/.quit that
+should eventually stop the run.</string>
+          </property>
+          <property name="text">
+           <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4">
+         <widget class="QPushButton" name="pushButton_Continue">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Copies b2fstate to b2fstati
+and starts the run</string>
+          </property>
+          <property name="text">
+           <string>Continue</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <widget class="QPushButton" name="pushButton_Edit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Edit</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QComboBox" name="comboBoxRunFilterType"/>
+        </item>
+        <item row="1" column="1" colspan="2">
+         <widget class="QCheckBox" name="filterCaseSensitivityCheckBox">
+          <property name="text">
+           <string>Case sensitive filter</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3" colspan="2">
+         <widget class="QLineEdit" name="lineEditRunFilter">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="5">
+         <widget class="QPushButton" name="pushButton_Filter">
+          <property name="text">
+           <string>Filter</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="6">
+         <widget class="QTreeView" name="treeViewRuns">
+          <property name="dragEnabled">
+           <bool>false</bool>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="textElideMode">
+           <enum>Qt::ElideRight</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_Input">
+       <attribute name="title">
+        <string>I&amp;nput</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_7">
+        <item row="0" column="0">
+         <widget class="SolpsInput" name="solpsinput"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_4">
+       <attribute name="title">
+        <string>&amp;Dashboard</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_9">
+        <item row="0" column="3" rowspan="2">
+         <layout class="QGridLayout" name="gridLayout_10">
+          <item row="1" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="SolpsPlots" name="solpsplots">
+              <property name="inputMethodHints">
+               <set>Qt::ImhNone</set>
+              </property>
+              <property name="currentIndex">
+               <number>-1</number>
+              </property>
+              <property name="frame">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_9">
+              <property name="maximumSize">
+               <size>
+                <width>100</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Plot</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="1">
+           <widget class="Gnuplot" name="gnuplot">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="runDir" stdset="0">
+             <string>/home/ITER/kosl/solps-iter/runs/AUG_16151_D/run1</string>
+            </property>
+            <property name="solpsPlotCommand">
+             <string>energy_analysis</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="1" colspan="3">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Please select current run in the Runs tab.</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="Director" name="director">
+          <property name="toolTip">
+           <string>Director for emiting selected run</string>
+          </property>
+          <property name="whatsThis">
+           <string>This widget receives a selected run and directs    it further in various ways depending on the Check state.   </string>
+          </property>
+          <property name="text">
+           <string>Director</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <property name="tristate">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="pushButton_10">
+          <property name="text">
+           <string>Run tcsh</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="3">
+         <widget class="Tcsh" name="tcsh">
+          <property name="maximumSize">
+           <size>
+            <width>300</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>7</pointsize>
+           </font>
+          </property>
+          <property name="tcshCommand">
+           <string>b2fstate_OK</string>
+          </property>
+          <property name="solpsTop" stdset="0">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLineEdit" name="lineEdit">
+          <property name="maximumSize">
+           <size>
+            <width>202</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>b2fstate_OK</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_15">
+       <attribute name="title">
+        <string>B2plot</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_11">
+        <item row="0" column="0">
+         <widget class="QPushButton" name="pushButton_8">
+          <property name="text">
+           <string>PushButton</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" rowspan="2">
+         <widget class="B2plot" name="b2plot">
+          <property name="b2plotCommand">
+           <string>echo phys a4p ti te m/ surf | b2plot</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2" rowspan="2">
+         <widget class="B2plot" name="b2plot_2">
+          <property name="b2plotCommand">
+           <string>echo comp a4p te surf | b2plot</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>215</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>View</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="SolpsInput" name="solpsview">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="tab_14">
+           <attribute name="title">
+            <string>b2mn.prt</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_7">
+           <attribute name="title">
+            <string>run.log</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_10">
+           <attribute name="title">
+            <string>run.log.gz</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_11">
+           <attribute name="title">
+            <string>b2fgmtry</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_8">
+           <attribute name="title">
+            <string>b2fstati</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_13">
+           <attribute name="title">
+            <string>b2fpardf</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_12">
+           <attribute name="title">
+            <string>b2frates</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_9">
+           <attribute name="title">
+            <string>b2fstate</string>
+           </attribute>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_5">
+       <attribute name="title">
+        <string>Ar&amp;chive</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="1">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="0">
+         <widget class="QPushButton" name="pushButton_Restore">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Restore</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QTreeView" name="treeViewArchive"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_6">
+       <attribute name="title">
+        <string>&amp;Log</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="0">
+         <widget class="QPlainTextEdit" name="plainTextEdit_Log">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="acceptDrops">
+           <bool>false</bool>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="lineWrapMode">
+           <enum>QPlainTextEdit::WidgetWidth</enum>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="placeholderText">
+           <string notr="true"/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>651</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>&amp;Actions</string>
+    </property>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>&amp;Settings</string>
+    </property>
+    <addaction name="actionRuns"/>
+    <addaction name="actionPreferences"/>
+   </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+    <addaction name="actionAbout_Qt"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuSettings"/>
+   <addaction name="menu_Help"/>
+  </widget>
+  <action name="actionExit">
+   <property name="text">
+    <string>E&amp;xit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionRuns">
+   <property name="text">
+    <string>&amp;Runs</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionAbout_Qt">
+   <property name="text">
+    <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>B2plot</class>
+   <extends>QLabel</extends>
+   <header>b2plot</header>
+  </customwidget>
+  <customwidget>
+   <class>Director</class>
+   <extends>QCheckBox</extends>
+   <header>director</header>
+  </customwidget>
+  <customwidget>
+   <class>Gnuplot</class>
+   <extends>QLabel</extends>
+   <header>gnuplot</header>
+  </customwidget>
+  <customwidget>
+   <class>SolpsInput</class>
+   <extends>QTabWidget</extends>
+   <header>solpsinput</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SolpsPlots</class>
+   <extends>QComboBox</extends>
+   <header>solpsplots</header>
+  </customwidget>
+  <customwidget>
+   <class>Tcsh</class>
+   <extends>QPlainTextEdit</extends>
+   <header>tcsh</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>186</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_10</sender>
+   <signal>clicked()</signal>
+   <receiver>tcsh</receiver>
+   <slot>executeTcshCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>230</x>
+     <y>262</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>114</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>tcsh</receiver>
+   <slot>setTcshCommand(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>56</x>
+     <y>262</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>114</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tcsh</sender>
+   <signal>solpsTopChanged(QString)</signal>
+   <receiver>label_7</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>199</x>
+     <y>114</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>176</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_9</sender>
+   <signal>clicked()</signal>
+   <receiver>gnuplot</receiver>
+   <slot>executeSolpsPlotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>628</x>
+     <y>282</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>493</x>
+     <y>165</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>solpsplots</sender>
+   <signal>editTextChanged(QString)</signal>
+   <receiver>gnuplot</receiver>
+   <slot>setSolpsPlotCommand(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>393</x>
+     <y>281</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>493</x>
+     <y>165</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>solpsplots</sender>
+   <signal>returnPressed()</signal>
+   <receiver>gnuplot</receiver>
+   <slot>executeSolpsPlotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>393</x>
+     <y>281</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>493</x>
+     <y>165</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>gnuplot</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>36</x>
+     <y>291</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>493</x>
+     <y>165</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>tcsh</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>36</x>
+     <y>291</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>114</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_checktrigger()</signal>
+   <receiver>solpsplots</receiver>
+   <slot>triggerTextChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>36</x>
+     <y>291</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>393</x>
+     <y>281</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>label_7</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>36</x>
+     <y>291</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>176</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>solpsview</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>36</x>
+     <y>291</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>101</x>
+     <y>76</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tabWidget</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>solpsview</receiver>
+   <slot>view_files(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>409</x>
+     <y>45</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>101</x>
+     <y>76</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>b2plot</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>36</x>
+     <y>291</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>170</x>
+     <y>188</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>b2plot_2</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>36</x>
+     <y>291</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>479</x>
+     <y>188</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_8</sender>
+   <signal>clicked()</signal>
+   <receiver>b2plot</receiver>
+   <slot>executeB2plotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>76</x>
+     <y>74</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>191</x>
+     <y>101</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b2plot</sender>
+   <signal>convertFinished()</signal>
+   <receiver>b2plot_2</receiver>
+   <slot>executeB2plotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>276</x>
+     <y>165</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>157</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <designerdata>
+  <property name="gridDeltaX">
+   <number>10</number>
+  </property>
+  <property name="gridDeltaY">
+   <number>10</number>
+  </property>
+  <property name="gridSnapX">
+   <bool>true</bool>
+  </property>
+  <property name="gridSnapY">
+   <bool>true</bool>
+  </property>
+  <property name="gridVisible">
+   <bool>true</bool>
+  </property>
+ </designerdata>
+</ui>

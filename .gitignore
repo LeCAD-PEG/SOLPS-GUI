@@ -3,7 +3,7 @@ build
 staging
 logging
 *~
-*.ui
+my*.ui
 *.pyc
 *.idea
 *__pycache__

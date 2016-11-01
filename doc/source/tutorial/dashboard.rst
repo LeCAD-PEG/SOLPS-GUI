@@ -186,8 +186,8 @@ widget.
 7. Testing of newly designed custom widget can be done as usual by saving
    ``mysolps.ui`` and using it with ``solps --ui mysolps.ui``.
 
-Extended example
-----------------
+Gnuplots in Tool Box container
+------------------------------
 We can create a large dashboard layout with many different plots with 
 :menuselection:`Widget Box --> Containers --> Tool Box` by repeating
 steps 3-8 for each new plot.
@@ -198,6 +198,97 @@ signal selected *runDir* property to all Gnuplot widgets.
 	:scale: 100%
 	:height: 320px
 	:align: center
+
+Chaining B2plot widgets
+-----------------------
+SOLPS provided ``b2plot`` command can create *Postscipt* files that are
+converted by :guilabel:B2plot widget and displayed on the dashboard.
+However, only one ``b2plot`` command can be executed at one time in given
+run directory. For that reason multiple B2plot widgets needs to be
+"daisy" chained so that they execute one after another. The following
+example creates additional *page* and two predefined B2plots.
+
+1. We start with the default ``solps.ui`` and at :guilabel:`Dashboard` tab
+   right-click and  :menuselection:`Insert Page --> After Current page`. Rename
+   the tab :menuselection:`Property editor --> Property -->  currentTabText`
+   from ``Page`` to ``B2plot``
+
+2. Drop two :menuselection:`Widget Box --> SOLPS --> B2plot` widgets in the
+   empty area under the tab side-by-side.
+   The first :guilabel:`B2plot` widged should be named to ``b2plot``
+   for easier reference with
+   :menuselection:`Property editor --> Property -->  QObject --> objectName`
+   to ``b2plot``. The second widget is ``b2plot_2``.
+
+   Set :menuselection:`Property Editor --> Property --> B2plot -->
+   b2plotCommand`` to ``echo phys a4p ti te m/ surf | b2plot`` for the
+   first :guilabel:`b2plot` widget.
+
+   Set  :menuselection:`Property Editor --> Property --> B2plot -->
+   b2plotCommand`` to ``echo comp a4p te surf | b2plot`` for the
+   :guilabel:`b2plot_2` widget.
+
+3. Drop :menuselection:`Widget Box --> Buttons --> Push Button` widget
+   on the top left corner of the tab and drop
+   :menuselection:`Widget Box --> Spacers --> Vertical Spacer` below the
+   :guilabel:`Push Button`. You should see approximately the following lay-out:
+
+   .. image:: dashboard_12.png
+        :align: center
+
+
+4. Select tab :guilabel:`View` and in the empty area right-click and then
+   adjust :menuselection:`Lay out --> Lay Out in a Grid` (:kbd:`Control+5`)
+   You should see the following auto-expanding lay-out:
+
+   .. image:: dashboard_13.png
+        :align: center
+
+   You can notice that the size policy for the ``QTabWidget`` is now
+   ``Expanding`` in horizontal and vertical direction.
+
+5. We will now add the signal from  :guilabel:`Director` "manually" by using
+   :menuselection:`View --> Signal/Slot editor`. Press :guilabel:`+` button
+   there and adjust new line just added in the following way:
+
+   +---------+------------------------------+-----------+---------------------+
+   | Sender  | Signal                       | Receiver  | Slot                |
+   +=========+==============================+===========+=====================+
+   |director | rundir_passthrough (QString) | b2plot    | setRundir (QString) |
+   +---------+------------------------------+-----------+---------------------+
+   |director | rundir_passthrough (QString) | b2plot_2  | setRundir (QString) |
+   +---------+------------------------------+-----------+---------------------+
+
+6. Now we just need to redistribute the signals and we're done. For that
+   we'll use graphical signal editor that is started by pressing :kbd:`F4`
+   or by :menuselection:`File --> Edit Signals Slots` . If you hover over
+   the widgets the get highligted red. Click and drag the arrow of the signal
+   from :guilabel:`Push Button` to the :guilabel:`b2plot` widget.
+   Select ``clicked()`` as emitted signal and ``executeB2plotCommand()``
+   as receiving slot. Then press :guilabel:`OK` and you should see:
+
+   .. image:: dashboard_14.png
+      :align: center
+
+7. When first B2plot will finish the secont one should start. For that we
+   drag new signal from :guilabel:`b2plot` to :guilabel:`b2plot_2` and connect
+   ``convertFinished()`` to ``executeB2plotCommand()`` as shown below:
+
+   .. image:: dashboard_15.png
+      :align: center
+
+8. Save the ``mysolps-b2plot.ui`` file somewhere and under shell run it with::
+
+    $ solps --ui mysolps-b2plot.ui
+
+9. After selecting the run direcory under :menuselection:`Runs` go to
+   :menuselection:`B2plot` again and press :guilabel:`Push Button`. After some time
+   needed to produce the plots the following output should appear:
+
+   .. image:: dashboard_16.png
+      :align: center
+
+
 
 Scripting in Python
 -------------------

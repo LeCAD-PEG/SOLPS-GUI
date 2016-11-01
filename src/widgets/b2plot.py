@@ -66,6 +66,7 @@ class B2plot(QLabel):
 
     @pyqtSlot(int)
     def show_plot(self, exit_status):
+        self.convertFinished.emit()
         if exit_status == 0:
             data = self.convert.readAll()
             image = QImage()
@@ -111,7 +112,7 @@ class B2plot(QLabel):
     def getB2plot_pltcmd(self):
         return self.b2plot_command
 
-    b2PlotCommand = pyqtProperty(str, getB2plot_pltcmd, setB2plotCommand)
+    b2plotCommand = pyqtProperty(str, getB2plot_pltcmd, setB2plotCommand)
 
     @pyqtSlot()
     def print_tcsh_stderr(self):
