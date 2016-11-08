@@ -41,22 +41,23 @@ Local submission
 
 For a single workstation ``localsubmit`` can be::
 
-    #!/usr/bin/env tcsh
-    setenv SHELL `which tcsh` # needed for batch and atd
-    cat << __EOF__ | batch
-    setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}"
-    set msg="Started on `hostname` at `date`"
-    update_solps_run_status \${msg}
-    echo ${USER} ${PWD} \${msg} | nc -u -w 0 ${SOLPS_GUI_IP} ${SOLPS_GUI_PORT}
-    if (-e input.dat) then
-       time b2run ${argv} b2mn < input.dat >! run.log
-    else
-       time b2run ${argv} -s  b2mn >! run.log
-    endif
-    set msg="Finished on `hostname` at `date`"
-    echo ${USER} ${PWD} \${msg} | nc -u -w 0 ${SOLPS_GUI_IP} ${SOLPS_GUI_PORT}
-    update_solps_run_status \${msg}
-    __EOF__
+   #!/usr/bin/env tcsh
+   cat << __EOF__ | batch
+   #!/bin/sh
+   LD_LIBRARY_PATH="${LD_LIBRARY_PATH}"
+   export LD_LIBRARY_PATH
+   msg="Started on `hostname` at `date`"
+   update_solps_run_status \${msg}
+   echo ${USER} ${PWD} \${msg} | netcat -v -u -w 1 ${SOLPS_GUI_IP} ${SOLPS_GUI_PORT}
+   if [ -s input.dat ]; then
+      time b2run ${argv} b2mn < input.dat > run.log
+   else
+      time b2run ${argv} -s  b2mn > run.log
+   fi
+   msg="Finished on `hostname` at `date`"
+   echo ${USER} ${PWD} \${msg} | netcat -v -u -w 1 ${SOLPS_GUI_IP} ${SOLPS_GUI_PORT}
+   update_solps_run_status \${msg}
+   __EOF__
 
 Described script uses ``batch`` command that submits the job to local ``atd``.
 Make sure that you increase default 0.8 load average when configuring
@@ -80,17 +81,43 @@ of. All variables escaped with backslash (``\${.}``) are not evaluated at the
 time of submission. Whereas the rest (``${.}``) are replaced before they arrive
 to ``atd``. Although majority of environmental variables are passed to ``atd``
 and restored later at the time of execution, there are some exceptions. Most
-notable is ``LD_LIBRARY_PATH``. We also need to enforce that the current
-submitting shell (*tcsh*) is used at the time of execution. For "static"
+notable is ``LD_LIBRARY_PATH``.  For "static"
 environment variables it not really important if they are escaped or not. But
 for variables that are used inside the script at the time of execution
 (e.g. ``msg``) they need to be escaped.
+
+If ``atd`` supports (was patched against) SHELL evironment variable then one
+can use ``tcsh`` also for ``atd`` script that is usually run by ``/bin/sh``::
+
+    #!/usr/bin/env tcsh
+    setenv SHELL `which tcsh` # needed for batch and atd
+    cat << __EOF__ | batch
+    setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}"
+    set msg="Started on `hostname` at `date`"
+    update_solps_run_status \${msg}
+    echo ${USER} ${PWD} \${msg} | nc -u -w 0 ${SOLPS_GUI_IP} ${SOLPS_GUI_PORT}
+    if (-e input.dat) then
+       time b2run ${argv} b2mn < input.dat >! run.log
+    else
+       time b2run ${argv} -s  b2mn >! run.log
+    endif
+    set msg="Finished on `hostname` at `date`"
+    echo ${USER} ${PWD} \${msg} | nc -u -w 0 ${SOLPS_GUI_IP} ${SOLPS_GUI_PORT}
+    update_solps_run_status \${msg}
+    __EOF__
+
+With SHELL we enforced that the current submitting shell (*tcsh*) is used at
+the time of execution.
 
 .. note::
    ``atd``  and  ``batch`` are not suitable when users are competing for
    resources.  If this is the case for your site,  you  might want to consider
    another batch system, such as
    `GNU Parallel <http://www.gnu.org/software/parallel/>`_.
+
+   ``netcat`` and ``nc`` are usually the same programs. However, wait time
+   specified by ``-w`` might not be acceptable less that one second for some
+   versions.
 
 Submission on a cluster
 ^^^^^^^^^^^^^^^^^^^^^^^

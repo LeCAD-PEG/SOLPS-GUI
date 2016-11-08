@@ -231,6 +231,9 @@ class RunsSettings(QDialog):
         self.update_dir(self.lineEdit_rundir5)
 
 class Preferences():
+    """
+    Class that holds preferences and allows reading/writing them permanently
+    """
     def __init__(self, parent=None):
         super(Preferences, self).__init__()
         # Create reasonable defaults
@@ -249,8 +252,8 @@ class Preferences():
         self.dry_run = 0
 
     def read(self):
-        # Read settings
-        print("Reading preferences...")
+        """  Reads Preferences from QSettings()
+        """
         settings = QSettings('ITER', 'solps-gui')
         self.bind_address = settings.value('SOLPS_GUI_BIND', self.bind_address)
         self.port = int(settings.value('SOLPS_GUI_PORT', self.port))
@@ -259,15 +262,16 @@ class Preferences():
         self.gnuplot_path = settings.value('gnuplot_path', self.gnuplot_path)
         self.log_level = int(settings.value('log_level', self.log_level))
         self.submit_script = settings.value('submit_script', self.submit_script)
-        self.use_mpi = settings.value('use_mpi', self.use_mpi)
+        self.use_mpi = int(settings.value('use_mpi', self.use_mpi))
         self.mpi_options = settings.value('mpi_options', self.mpi_options)
-        self.use_debugger = settings.value('use_debugger', self.use_debugger)
+        self.use_debugger = int(settings.value('use_debugger', self.use_debugger))
         self.debugger = settings.value('debugger', self.debugger)
-        self.compress_log = settings.value('compress_log', self.compress_log)
-        self.dry_run = settings.value('dry_run', self.dry_run)
+        self.compress_log = int(settings.value('compress_log', self.compress_log))
+        self.dry_run = int(settings.value('dry_run', self.dry_run))
 
     def write(self):
-        print("Writing preferences...")
+        """ Writes preference to disk
+        """
         settings = QSettings('ITER', 'solps-gui')
         settings.setValue('SOLPS_GUI_BIND', self.bind_address)
         settings.setValue('SOLPS_GUI_PORT', str(self.port))
@@ -275,15 +279,17 @@ class Preferences():
         settings.setValue('tcsh_path', self.tcsh_path)
         settings.setValue('gnuplot_path', self.gnuplot_path)
         settings.setValue('log_level', str(self.log_level))
-        settings.setValue('submit_script', str(self.submit_script))
+        settings.setValue('submit_script', self.submit_script)
         settings.setValue('use_mpi', self.use_mpi)
-        settings.setValue('mpi_options', str(self.mpi_options))
-        settings.setValue('use_debugger', self.use_debugger)
-        settings.setValue('debugger', str(self.debugger))
+        settings.setValue('mpi_options', self.mpi_options)
+        settings.setValue('use_debugger', str(self.use_debugger))
+        settings.setValue('debugger', self.debugger)
         settings.setValue('compress_log', self.compress_log)
-        settings.setValue('dry_run', self.dry_run)
+        settings.setValue('dry_run', str(self.dry_run))
 
 class PreferencesDialog(QDialog):
+    """ Maps dialog into Preferences.
+    """
     def __init__(self, preferences, parent=None):
         super(PreferencesDialog, self).__init__()
         prefix = os.path.dirname(os.path.abspath(__file__))
@@ -318,12 +324,12 @@ class PreferencesDialog(QDialog):
         log_level = log_levels[self.comboBox_log_level.currentIndex()]
         logging.getLogger().setLevel(log_level)
         self.preferences.submit_script = self.comboBox_submit_script.currentText()
-        self.preferences.use_mpi = self.checkBox_use_mpi.checkState()
+        self.preferences.use_mpi = int(self.checkBox_use_mpi.checkState())
         self.preferences.mpi_options = self.lineEdit_mpi_options.text()
-        self.preferences.use_debugger = self.checkBox_use_debugger.checkState()
+        self.preferences.use_debugger = int(self.checkBox_use_debugger.checkState())
         self.preferences.debugger = self.lineEdit_debugger.text()
-        self.preferences.compress_log = self.checkBox_compress_log.checkState()
-        self.preferences.dry_run = self.checkBox_dry_run.checkState()
+        self.preferences.compress_log = int(self.checkBox_compress_log.checkState())
+        self.preferences.dry_run = int(self.checkBox_dry_run.checkState())
 
 class RunsStatusServer(QThread):
     """ Networking UDP listener for receiving job status updates.
@@ -1068,7 +1074,7 @@ class SOLPS_MainWindow(QMainWindow):
             if ui_extension == '.ui':
                 loadUi(ui_path, self)
             else:
-                print(ui_path + ' shoud have .ui extension')
+                print(ui_path + ' should have .ui extension')
                 sys.exit(2)
         else:
             print(ui_path + ' not found')
@@ -1539,28 +1545,31 @@ class SOLPS_MainWindow(QMainWindow):
         """
         #settings = QSettings('ITER', 'solps-gui')
         #submit_command = settings.value("submit_script", 'localsubmit')
-        submit_command = self.settings.submit_script
+        submit_command = self.preferences.submit_script
+
+
 
         cmd = ''
         if submit_command:
             opts = ''
-            if self.settings.use_mpi:
-                opts += ' -m "' + self.settings.mpi_options + '"'
+            if self.preferences.use_mpi:
+                opts += ' -m "' + self.preferences.mpi_options + '"'
             #if int(settings.value('use_debugger', '0')):
             #    opts += ' -d "' + settings.value('debugger', 'totalview') + '"'
-            if self.settings.use_debugger:
-                opts += ' -d "' + self.settings.debugger + '"'
+            if self.preferences.use_debugger:
+                opts += ' -d "' + self.preferences.debugger + '"'
             #if int(settings.value('compress_log', '0')):
             #    opts += ' -z'
-            if self.settings.compress_log:
+            if self.preferences.compress_log:
                 opts += ' -z'
             #if int(settings.value('dry_run', '0')):
             #    opts += ' -n'
-            if self.settings.dry_run:
+            if self.preferences.dry_run:
                 opts += ' -n'
             cmd +=  'rm -f *.prt\n' + submit_command + opts
             self.execute_tcsh_command_in_rundir(cmd, rundir)
             msg = 'batch ' + rundir + ' ' + submit_command + opts
+
             logging.info(msg)
             self.model.jobStatusChanged(msg)
         else:
