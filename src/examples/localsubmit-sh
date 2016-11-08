@@ -1,0 +1,56 @@
+#! /usr/bin/env tcsh
+set standalone="no"
+set compress="no"
+
+argloop:
+  if ("X${1}X" == "X-zX") then
+    set compress="-gz"
+    echo run.log will be compressed
+    shift
+    goto argloop
+  endif
+  if ("X${1}X" == "X-sX") then
+    set standalone="yes"
+    echo Asking for a B2.5 standalone run
+    shift
+    goto argloop
+  endif
+
+# Please note that some atd don't support SHELL environment
+# and always use /bin/sh. 
+cat << __EOF__ | batch
+#!/bin/sh
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH
+msg="Started on `hostname` at `date`"
+update_solps_run_status \${msg}
+if test -n "\${SOLPS_GUI_IP}"; then
+  if hash netcat 2> /dev/null; then
+    echo ${USER} ${PWD} \${msg} | netcat -u -v -w 1 \${SOLPS_GUI_IP} \${SOLPS_GUI_PORT}
+  else
+    echo ${USER} ${PWD} \${msg} | nc -u -v -w 0 \${SOLPS_GUI_IP} \${SOLPS_GUI_PORT}
+  fi
+fi
+if [ -s input.dat -a ${standalone} == "no" ]; then
+  if [ ${compress} = "-gz" ]; then
+    time b2run ${argv} b2mn < input.dat | gzip -9 > run.log.gz
+  else
+    time b2run ${argv} b2mn < input.dat > run.log
+  fi
+else
+  if [ ${compress} = "-gz" ]; then
+    time b2run ${argv} -s b2mn | gzip -9 > run.log.gz
+  else
+    time b2run ${argv} -s b2mn > run.log
+  fi
+fi
+msg="Finished on `hostname` at `date`"
+if test -n "\${SOLPS_GUI_IP}"; then
+  if hash netcat 2> /dev/null; then
+    echo ${USER} ${PWD} \${msg} | netcat -u -v -w 1 \${SOLPS_GUI_IP} \${SOLPS_GUI_PORT}
+  else
+    echo ${USER} ${PWD} \${msg} | nc -u -v -w 0 \${SOLPS_GUI_IP} \${SOLPS_GUI_PORT}
+  fi
+fi
+update_solps_run_status \${msg}
+__EOF__
