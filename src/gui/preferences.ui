@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>553</width>
-    <height>201</height>
+    <width>555</width>
+    <height>197</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -171,7 +171,7 @@
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>310</x>
+     <x>320</x>
      <y>0</y>
      <width>231</width>
      <height>141</height>
@@ -206,7 +206,7 @@
      <bool>true</bool>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <item>
      <property name="text">
@@ -260,7 +260,7 @@
      <rect>
       <x>10</x>
       <y>110</y>
-      <width>111</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -274,7 +274,7 @@
    <widget class="QLineEdit" name="lineEdit_mpi_options">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>50</y>
       <width>121</width>
       <height>21</height>
@@ -292,7 +292,7 @@
      <rect>
       <x>10</x>
       <y>80</y>
-      <width>111</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -306,7 +306,7 @@
    <widget class="QLineEdit" name="lineEdit_debugger">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>140</x>
       <y>80</y>
       <width>81</width>
       <height>21</height>
@@ -319,7 +319,7 @@
    <widget class="QCheckBox" name="checkBox_dry_run">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>140</x>
       <y>110</y>
       <width>86</width>
       <height>20</height>
