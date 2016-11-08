@@ -188,7 +188,7 @@ class B2plot(QLabel):
             self.tcsh.start(self.tcsh_path, ['-l'])
             logging.info("B2plot TCSH started in " + self.solps_top)
             cmd += 'cd ' + self.solps_top + '\n'
-            cmd += '\source setup.csh\necho TCSH READY\n'
+            cmd += 'source setup.csh\necho TCSH READY\n'
             cmd += 'setenv B2PLOT_DEV "ps"\n'
         if self.b2plot_command and self.rundir:
             cmd += 'cd ' + self.rundir + '\n'
