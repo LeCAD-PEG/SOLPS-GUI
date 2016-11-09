@@ -125,11 +125,18 @@ class B2plot(QLabel):
         data = self.tcsh.readAll()
         text = str(bytearray(data).decode('utf8'))
         if 'B2PLOT FINISHED' in text:
-            self.convert.setWorkingDirectory(self.rundir)
-            self.convert_args =  ['-resize',
-                                  str(self.width()) + 'x' + str(self.height()),
-                                  'b2plot.ps', 'gif:-']
-            self.convert.start(self.convert_path, self.convert_args)
+            b2plot_ps_file = self.rundir + '/b2plot.ps'
+            if os.path.exists(b2plot_ps_file):
+                self.convert.setWorkingDirectory(self.rundir)
+                self.convert_args =  ['+antialias', '-resize',
+                                      str(self.width()) + 'x' + str(self.height()),
+                                      'b2plot.ps', 'png:-']
+                self.convert.start(self.convert_path, self.convert_args)
+            else:
+                msg ="b2plot.ps file not created from " + self.b2plot_command
+                logging.error(msg)
+                self.setText(msg)
+                self.convertFinished.emit()
 
     def find_solps_top(self, directory):
         """ Searches for setup.csh or SOLPSTOP file in the directory hierarchy.
