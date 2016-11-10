@@ -82,6 +82,9 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   PYTHONPATH= LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
   LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} \
   ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade sphinx
+  PYTHONPATH= LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
+  LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} \
+  ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install sphinx_rtd_theme
   touch ${PYTHON_SRC_DIR}/.built
 fi
 
