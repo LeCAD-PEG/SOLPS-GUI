@@ -4,6 +4,10 @@
 A PyQt custom widget with embedded SOLPS configuration editor and viewer
 for files if tabs with filenames are added to it and then ``view_files``
 is called though selected tab index signal.
+
+Tooltips are created in solps-iter/doc with::
+
+  xsltproc create-tooltips.xslt solps-input.xml > ~/solps-gui/src/widgets/tooltips.py
 """
 
 from PyQt5.QtCore import (QSize, QEvent, QRegExp, Qt,
@@ -76,9 +80,19 @@ class B2mnTextEdit(QPlainTextEdit):
     """
 
     def __init__(self, parent=None):
+        """At initialisation we reformat b2mn_tooltips from XSLT generated
+           tuples into single HTML strings.
+        """
         super(B2mnTextEdit, self).__init__(parent)
+        self.tooltips = dict()
         for key in b2mn_tooltips:
-            b2mn_tooltips[key] = self.dedent(b2mn_tooltips[key])
+            category, param_type, default, description =  b2mn_tooltips[key]
+            tooltip = '<font color=blue>Category: <b>' + category + '</b>, ' \
+                   + 'Type: <b>' + param_type + '</b>, '\
+                   + 'Default: <b>' + default + '</b></font>' \
+                   + '<pre>' + self.dedent(description) + '</pre>'
+            # empty line before <pre> is somehow enforced by HTML
+            self.tooltips[key] = tooltip
 
     def dedent(self, description):
         """ Removes first empty line from description and any leading tabs
@@ -113,10 +127,10 @@ class B2mnTextEdit(QPlainTextEdit):
             self.setTextCursor(textCursor)
             word = textCursor.selectedText()
 
-            if word in b2mn_tooltips:
+            if word in self.tooltips:
                 helpEvent = event
                 QToolTip.showText(helpEvent.globalPos(),
-                                  b2mn_tooltips[word])
+                                  self.tooltips[word])
             else:
                 QToolTip.hideText()
             return True
