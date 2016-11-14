@@ -2146,6 +2146,10 @@ b2mn_tooltips = {
 						If atomic_physics_rescale is not 0, then the code will rescale the rates stored in b2frates according to the multipliers given in the b2.atomic_physics_rescale.parameters inputfile before making use of them.
 					"""),
    
+      'b2mndr_b2time' : ('Output', 'integer', '1', """
+						Specifies the number of timesteps between writes of the time-dependent file. If b2time.gt.0, always writes out on the last timestep.
+					"""),
+   
       'b2mndr_cdfmovietim' : ('Output', 'real', '0.0', """
 						Another option for movie output. Give the real-time interval between movie frames.
 					"""),
