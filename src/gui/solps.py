@@ -51,6 +51,9 @@ from PyQt5.QtGui import (QStandardItemModel, QFontMetrics, QPen)
 from PyQt5.uic import loadUi
 from enum import IntEnum
 
+
+from addmenu import AddMenu
+
 REDIRECT_STDOUT_TO_LOG = False
 
 class Column:
@@ -1079,6 +1082,8 @@ class SOLPS_MainWindow(QMainWindow):
         else:
             print(ui_path + ' not found')
             sys.exit(2)
+
+        self.addMenu = AddMenu(self.menubar)
 
         self.preferences = Preferences()
         self.preferences.read()
