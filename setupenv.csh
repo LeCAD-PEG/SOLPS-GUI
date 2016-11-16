@@ -1,6 +1,7 @@
 # source this csh file for local setup environment if PyQT is provided locally
 setenv QTDIR "${PWD}/staging/qt/5.7.0"
 setenv PATH "${PWD}/staging/bin:${QTDIR}/bin:${PATH}"
+setenv SOLPSGUI "${PWD}/src/gui"
 
 if !($?LD_LIBRARY_PATH) then
     setenv LD_LIBRARY_PATH "${PWD}/staging/lib:${QTDIR}/lib"
