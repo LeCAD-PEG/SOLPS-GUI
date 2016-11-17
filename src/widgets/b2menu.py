@@ -2,7 +2,7 @@
 # xsltproc create-addmenu.xslt solps-input.xml > ../../solps-gui/src/widgets/b2menu.py
 b2mn_menu = {
 # Category : ( parameter, type, default, description )
-#            ( parametergroup, [(name, type, default, description)...], description)
+#         or ( parametergroup, 'paramgroup', [(name, type, default, description)...], description)
   
   'Run': [
   
@@ -23,7 +23,7 @@ b2mn_menu = {
 				Multiplier of all densities on the first timestep.
 			"""),
       
-      ( 'b2mndr_d*', [
+      ( 'b2mndr_d*', 'paramgroup', [
         
                ('b2mndr_delta_max', 'real', '0.0',''''''), 
         
@@ -90,7 +90,7 @@ b2mn_menu = {
 				Feedback on the total heavy particle density. If density_control.ne.0, the sum of all densities is kept constant.
 			"""),
       
-      ( 'b2mndt_nstg.', [
+      ( 'b2mndt_nstg.', 'paramgroup', [
         
                ('b2mndt_nstg0', 'integer', '1',''''''), 
         
@@ -117,7 +117,7 @@ b2mn_menu = {
 				This can be completed by the the 'b2mndt_nstg_ares??' switches.
 				See "Numerics" section for details.
 			"""),
-      ( 'b2news_facdrift*', [
+      ( 'b2news_facdrift*', 'paramgroup', [
         
                ('b2news_facdrift_dec', 'real', '0.0',''''''), 
         
@@ -130,7 +130,7 @@ b2mn_menu = {
          """
 				Ramping parameters for facdrift, which multiplies the diamagnetic terms. The code is started on the first time step with facdrift=facdrift_start. If facdrift_target.ne.facdrift_start, then, on each time step, facdrift is multiplied by facdrift_inc. If the code does not converge on the timestep, facdrift is decreased by facdrift_dec. A facdrift profile is also possible, see Numerics section for details.
 			"""),
-      ( 'b2news_facExB_*', [
+      ( 'b2news_facExB_*', 'paramgroup', [
         
                ('b2news_facExB_dec', 'real', '0.0',''''''), 
         
@@ -143,7 +143,7 @@ b2mn_menu = {
          """
 				Ramping parameters for facExB, which multiplies the ExB terms. Same treatment as above for facdrift.
 			"""),
-      ( 'b2news_facvis_*', [
+      ( 'b2news_facvis_*', 'paramgroup', [
         
                ('b2news_facvis_dec', 'real', '0.0',''''''), 
         
@@ -175,7 +175,7 @@ b2mn_menu = {
 				This namelist will contain profiles of sources measured from the location (ixref,iyref) (default is outer midplane separatrix), which is set with the 'set_transport_i[xy]ref' switches.
 			"""),
       
-      ( 'b2srdt_*_namelist', [
+      ( 'b2srdt_*_namelist', 'paramgroup', [
         
                ('b2srdt_numerics_namelist', 'integer', '0',''''''), 
         
@@ -246,7 +246,7 @@ b2mn_menu = {
 				Another option for movie output. Give the real-time interval between movie frames.
 			"""),
       
-      ( 'b2mndr_idout.', [
+      ( 'b2mndr_idout.', 'paramgroup', [
         
                ('b2mndr_idout0', 'string', 'pgnl;pgmm;pzmm',''''''), 
         
@@ -267,7 +267,7 @@ b2mn_menu = {
 				Specifies the maximum number of instances at which movie data will be output.
 			"""),
       
-      ( 'b2mndr_*_eps', [
+      ( 'b2mndr_*_eps', 'paramgroup', [
         
                ('b2mndr_na_eps', 'real', '1.0e19',''''''), 
         
@@ -335,7 +335,7 @@ b2mn_menu = {
 				Level 3 output (diagno.ge.3) includes the boundary sources on each call, and the boundary.prt file listing all boundary cells.
 			"""),
       
-      ( 'b2stbr_*_netcdf', [
+      ( 'b2stbr_*_netcdf', 'paramgroup', [
         
                ('b2stbr_b2wall_netcdf', 'integer', '0',''''''), 
         
@@ -388,7 +388,7 @@ b2mn_menu = {
 				If non-zero, prints sources computed by Eirene. If greater than 1, prints them on every use of the recycling sources, not just when they are computed.
 			"""),
       
-      ( 'eirene_savef3.', [
+      ( 'eirene_savef3.', 'paramgroup', [
         
                ('eirene_savef30', 'integer', '0',''''''), 
         
@@ -472,7 +472,7 @@ b2mn_menu = {
 				The value '0.0' corresponds to the old SOLPS5.0 treatment.
 			"""),
       
-      ( 'b2sifr_*th*', [
+      ( 'b2sifr_*th*', 'paramgroup', [
         
                ('b2sifr_limthee', 'real', '0.3',''''''), 
         
@@ -539,7 +539,7 @@ b2mn_menu = {
 				Multiplier of the contribution to heat sources from friction due to diamagnetic velocities. Normally already included in 'phm3' term above.
 			"""),
       
-      ( 'b2sqcx_phm.', [
+      ( 'b2sqcx_phm.', 'paramgroup', [
         
                ('b2sqcx_phm0', 'real', '1.0',''''''), 
         
@@ -569,7 +569,7 @@ b2mn_menu = {
 				It is recommended '2'.
 			"""),
       
-      ( 'b2stbc_feedback*', [
+      ( 'b2stbc_feedback*', 'paramgroup', [
         
                ('b2stbc_fchycore', 'real', '-1.0e30',''''''), 
         
@@ -631,7 +631,7 @@ b2mn_menu = {
 				If secmodel.eq.1, then the secondary electron emission coefficient at the plates is computed locally according to a kinetic model, otherwise the default values of cbsch(7,ireg) and/or gammae are used.
 			"""),
       
-      ( 'b2stbc_type13..21*', [
+      ( 'b2stbc_type13..21*', 'paramgroup', [
         
                ('b2stbc_type13_ref', 'integer', '1',''''''), 
         
@@ -650,7 +650,7 @@ b2mn_menu = {
 				When type16_ref.gt.1, then the position where the core flux tallies are computed moves along with the boundary condition.
 				If type16_kinetic_energy.eq.1, then the parallel kinetic energy flux is included in the ion heat flux component of type 16 and 17 boundary conditions.
 			"""),
-      ( 'b2stbr_sputtering...', [
+      ( 'b2stbr_sputtering...', 'paramgroup', [
         
                ('b2stbr_alpha', 'real', '0.25',''''''), 
         
@@ -722,7 +722,7 @@ b2mn_menu = {
 				Therm_evap turns on thermal evaporation when .gt.0.0 and is a multiplier to the thermal evaporation rate.
 				Redep_alpha is the multiplier to the reduction of the sputtering yield due to prompt redeposition. The promptly redeposited species is counted as eroded-then-deposited species.
 			"""),
-      ( 'b2stbr_refl*', [
+      ( 'b2stbr_refl*', 'paramgroup', [
         
                ('b2stbr_refl_model', 'integer', '1',''''''), 
         
@@ -746,7 +746,7 @@ b2mn_menu = {
 				Multiplier of the recombination contribution to the electron cooling rate (if ADPAK rates are not used because those are already included). Assumes all recombination is three-body.
 			"""),
       
-      ( 'b2t*_anomalous', [
+      ( 'b2t*_anomalous', 'paramgroup', [
         
                ('b2tanml_anomalous', 'real', '1.0',''''''), 
         
@@ -795,7 +795,7 @@ b2mn_menu = {
 				It is recommended '0'.
 			"""),
       
-      ( 'b2tfnb_flux...', [
+      ( 'b2tfnb_flux...', 'paramgroup', [
         
                ('b2tfnb_alpha', 'real', '0.0',''''''), 
         
@@ -824,7 +824,7 @@ b2mn_menu = {
 				Ycur is a multiplier to the parallel viscosity, ion inertial and anomalous currents to the ion radial flows (particle and energy).
 			"""),
       
-      ( 'b2tlc0_*', [
+      ( 'b2tlc0_*', 'paramgroup', [
         
                ('b2tlc0_alpha', 'real', '0.0',''''''), 
         
@@ -836,7 +836,7 @@ b2mn_menu = {
 				Gamma is the exponent used in the flux-limiting formula.
 				If alpha.eq.0, no flux limit is applied.
 			"""),
-      ( 'b2tlh0_*', [
+      ( 'b2tlh0_*', 'paramgroup', [
         
                ('b2tlh0_alpha', 'real', '0.0',''''''), 
         
@@ -859,7 +859,7 @@ b2mn_menu = {
 				 it is applied the SPb flux limit to the viscosity
 			"""),
       
-      ( 'b2tlnl_*', [
+      ( 'b2tlnl_*', 'paramgroup', [
         
                ('b2tlnl_ee', 'integer', '0',''''''), 
         
@@ -897,7 +897,7 @@ b2mn_menu = {
 				This switch is only active if, simultaneously, one has b2tqce_model.eq.1 and b2tfhe_fch_pTe.eq.1.0.
 			"""),
       
-      ( 'b2tqna_ballooning*', [
+      ( 'b2tqna_ballooning*', 'paramgroup', [
         
                ('b2tqna_ballooning', 'real', '0.0',''''''), 
         
@@ -920,7 +920,7 @@ b2mn_menu = {
 				The flux-scaled transport model is used in conjunction with scaling factors listed in column (7) of the transport coefficients description in input files b2ah.dat and b2mn.dat.
 			"""),
       
-      ( 'b2tqna_*_df0', [
+      ( 'b2tqna_*_df0', 'paramgroup', [
         
                ('b2tqna_max_df0', 'integer', '1e30',''''''), 
         
@@ -942,7 +942,7 @@ b2mn_menu = {
 				Scaling factor for all ion and electron transport coefficients inside private flux regions.
 			"""),
       
-      ( 'b2tqna_user_transport...', [
+      ( 'b2tqna_user_transport...', 'paramgroup', [
         
                ('b2tqna_user_transport', 'integer', '0',''''''), 
         
@@ -1067,7 +1067,7 @@ b2mn_menu = {
 				When set to 1, disables the correction of the hydrogen atomic rate data with the Weisheit data using ratwei. *** Use with caution! ***
 			"""),
       
-      ( 'b2ardr_rtn.', [
+      ( 'b2ardr_rtn.', 'paramgroup', [
         
                ('b2ardr_rtnt', 'integer', '40',''''''), 
         
@@ -1080,7 +1080,7 @@ b2mn_menu = {
 
   'Geometry': [
   
-      ( 'b2agdr_n.iso.', [
+      ( 'b2agdr_n.iso.', 'paramgroup', [
         
                ('b2agdr_nxiso1', 'integer', '-2',''''''), 
         
@@ -1095,7 +1095,7 @@ b2mn_menu = {
 				The isolated region will extend over the cell range spanned by (nxiso1:nxiso2,nyiso1:nyiso2).
 				If only some of the four coordinates are given, the region is made to extent from the given coordinates to the end of the grid. Neighbourhood arrays and region indices are automatically adjusted.
 			"""),
-      ( 'b2agfs_*cut', [
+      ( 'b2agfs_*cut', 'paramgroup', [
         
                ('b2agfs_leftcut', 'integer', 'See description (integer)','''
 					leftcut is the poloidal index of cells directly to the RIGHT of the left branch of the cut.
@@ -1116,7 +1116,7 @@ b2mn_menu = {
          """
 				Parameters describing the position and extent of the first topological cut, i.e. corresponding to the first X-point. Needed only to force different values from the ones computed automatically by b2ag.
 			"""),
-      ( 'b2agfs_*cut2', [
+      ( 'b2agfs_*cut2', 'paramgroup', [
         
                ('b2agfs_leftcut2', 'integer', 'See description (integer)','''
 					leftcut2 is the poloidal index of cells directly to the RIGHT of the left branch of the second cut.
@@ -1190,7 +1190,7 @@ b2mn_menu = {
 				To be used in b2ag.dat.
 			"""),
       
-      ( 'b2agfs_.offset', [
+      ( 'b2agfs_.offset', 'paramgroup', [
         
                ('b2agfs_xoffset', 'real*8', '0.0',''''''), 
         
@@ -1200,7 +1200,7 @@ b2mn_menu = {
 				xoffset and yoffset are offsets of the basis mesh in the x- and y-direction respectively. The mesh will be translated by (xoffset,yoffset) if any of the two is non-zero from its position given in the local_sonnet (See 'b2agfs_geometry' above) file.
 				To be used in b2ag.dat.
 			"""),
-      ( 'b2agfs_.rescale', [
+      ( 'b2agfs_.rescale', 'paramgroup', [
         
                ('b2agfs_xrescale', 'real*8', '1.0',''''''), 
         
@@ -1245,7 +1245,7 @@ b2mn_menu = {
 				Straight geometry : jxi=nx/4
 			"""),
       
-      ( 'b2stbc_coreregn*', [
+      ( 'b2stbc_coreregn*', 'paramgroup', [
         
                ('b2stbc_coreregno', '', 'integer',''''''), 
         
@@ -1255,7 +1255,7 @@ b2mn_menu = {
 				coreregno is the boundary index of the core boundary in the input files b2ah.dat and b2mn.dat. For a standard single-null case, coreregno is 1. For a straight geometry or limiter case, it is likely that coreregno need be set to 0, depending on the actual geometry details.
 				coreregn2 is the boundary index of the second core boundary in case of a double-null geometry, and is not used otherwise.
 			"""),
-      ( 'b2stbc_pfrregno.', [
+      ( 'b2stbc_pfrregno.', 'paramgroup', [
         
                ('b2stbc_pfrregno1', 'integer', '0',''''''), 
         
@@ -1300,7 +1300,7 @@ b2mn_menu = {
 				When set to 1, disables the correction of the hydrogen atomic rate data with the Weisheit data using ratwei. *** Use with caution! ***
 			"""),
       
-      ( 'b2ardr_rtn.', [
+      ( 'b2ardr_rtn.', 'paramgroup', [
         
                ('b2ardr_rtnt', 'integer', '40',''''''), 
         

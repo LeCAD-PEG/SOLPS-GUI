@@ -11,7 +11,7 @@ import logging
 import os
 import textwrap
 
-from tooltips import b2mn_tooltips
+import b2menu
 
 class AddMenu(QMenu):
     """ Script(QPlainTextEdit)
@@ -23,32 +23,54 @@ class AddMenu(QMenu):
     output = pyqtSignal(str)
     
     def __init__(self, parent=None):
+        '''
+
+        Toooltips work on QMenu as a whole but not on actions!
+        '''
         super(AddMenu, self).__init__(parent)
-        #self.setAlignment(Qt.AlignCenter)
-        #self.menuAdd = QMenu(parent)
-        #self.menuAdd.setTitle("Add")
         self.setTitle("Add")
-
-        self.menuPhysics = QMenu(self)
-        self.menuPhysics.setTitle("Physics")
-        self.addAction(self.menuPhysics.menuAction())
-        # self.menuPhysics.setToolTip("Physics switches")
         parent.addAction(self.menuAction())
-        self.menuPhysics.hovered.connect(self.handleMenuHovered)
 
-        b2mntooltips = dict()
-        for parameter in sorted(b2mn_tooltips):
-            category, param_type, default, description = b2mn_tooltips[parameter]
-            if category == 'Physics':
-                b2mntooltips[parameter] = parameter
-                # menu = QMenu(self.menuPhysics)
-                # menu.setTitle(parameter)
-                action = self.menuPhysics.addAction(parameter)
-                tooltip = '<pre><font color=blue><b>' + parameter + '</b> ' \
-                          + 'Type: <b>' + param_type + '</b>, ' \
-                          + 'Default: <b>' + default + '</b></font><br/>' \
-                          + self.dedent(description) + '</pre>'
-                action.setToolTip(tooltip)
+
+        for category in sorted(b2menu.b2mn_menu):
+            category_menu = QMenu(self)
+            category_menu.setTitle(category)
+            self.addAction(category_menu.menuAction())
+            #category_menu.setToolTip(category)
+
+            for parameter in b2menu.b2mn_menu[category]:
+                ( name, param_type, data, description ) = parameter
+                category_menu.hovered.connect(self.handleMenuHovered)
+                if param_type == 'paramgroup':
+                    paramgroup = QMenu(category_menu)
+                    paramgroup.setTitle(name)
+                    action = category_menu.addAction(paramgroup.menuAction())
+                    #paramgroup.setToolTip(description)
+                    for parameter in data:
+                        (name, param_type, default, short_desc) = parameter
+                        action = paramgroup.addAction(name)
+                        sd_formatted= self.dedent(short_desc)
+                        print(len(sd_formatted))
+                        if len(sd_formatted):
+                            sd_formated = '<br/><b>' + sd_formatted +'</b>'
+                        tooltip = '<pre><font color=blue><b>' + name + '</b> ' \
+                                  + 'Type: <b>' + param_type + '</b>, ' \
+                                  + 'Default: <b>' + default + '</b></font><br/>' \
+                                  + self.dedent(description)  \
+                                  + sd_formatted + '</pre>'
+                        action.setToolTip(tooltip)
+
+                else:
+                    action = category_menu.addAction(name)
+                    tooltip = '<pre><font color=blue><b>' + name + '</b> ' \
+                              + 'Type: <b>' + param_type + '</b>, ' \
+                              + 'Default: <b>' + data + '</b></font><br/>' \
+                              + self.dedent(description) + '</pre>'
+                    action.setToolTip(tooltip)
+
+    def handleMenuHovered(self, action):
+        QToolTip.showText(QCursor.pos(), action.toolTip(),
+                         self, self.actionGeometry(action))
 
     def dedent(self, description):
         """ Removes first empty line from description and any leading tabs
@@ -65,13 +87,11 @@ class AddMenu(QMenu):
         lines = description.splitlines()
         output = ''
         for line in lines:
-            output += textwrap.fill(line, 70) + '\n'
+            output += textwrap.fill(line, 80) + '\n'
         return output[0:-1] # remove last newline
 
 
-    def handleMenuHovered(self, action):
-       QToolTip.showText(QCursor.pos(), action.toolTip(),
-                         self, self.parent().actionGeometry(action))
+
 
 if __name__ == "__main__":
 
