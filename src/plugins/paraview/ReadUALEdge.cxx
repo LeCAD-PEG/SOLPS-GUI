@@ -165,10 +165,10 @@ int ReadUALEdge::RequestData(
     vtkSmartPointer<vtkCellArray> subgridCellArray = vtkSmartPointer<vtkCellArray>::New();
     
     //ELECTRON TEMPERATURE creating array
-    vtkSmartPointer<vtkDoubleArray> electronTemperatureArray = fCreateNewDoubleArray(size, "Electron Temperature ");
+    vtkSmartPointer<vtkDoubleArray> electronTemperatureArray = fCreateNewDoubleArray(size, "Electron Temperature");
       
     //ELECTRON DENSITY creating array
-    vtkSmartPointer<vtkDoubleArray> electronDensityArray = fCreateNewDoubleArray(size, "Electron Density ");
+    vtkSmartPointer<vtkDoubleArray> electronDensityArray = fCreateNewDoubleArray(size, "Electron Density");
     
     if (subgrid_class - 1 == 0){ // ------POINTS/NODES-----
       //class IDS::edge_profiles::ggd::grid::space::objects_per_dimension::object & object_nodes = dim_nodes.object(subgrid_class_object_id-1);
@@ -243,7 +243,7 @@ int ReadUALEdge::RequestData(
       int ti_species_num = ggd.ion.extent(0); //CHANGE TO ion_species_num and combine ion density and ion temperature into single ion_species_num loop
       
       for( int k = 0; k < ti_species_num; k++){
-	vtkSmartPointer<vtkDoubleArray> ionTemperatureArray = fCreateNewDoubleArray(size, "Ion Temperature ", k);
+	vtkSmartPointer<vtkDoubleArray> ionTemperatureArray = fCreateNewDoubleArray(size, "Ion Temperature");
 	int ti_subgrids_num = ggd.ion(k).temperature.extent(0);
 	
 	for (int n = 0; n < ti_subgrids_num; n++){
@@ -275,7 +275,18 @@ int ReadUALEdge::RequestData(
       int ni_species_num = ggd.ion.extent(0);
       
       for( int k = 0; k < ni_species_num; k++){
-	vtkSmartPointer<vtkDoubleArray> ionDensityArray = fCreateNewDoubleArray(size, "Ion Density ", k);
+	std::string ion_charge= ggd.ion(k).label;
+	stringstream ni_species_num2str;
+	ni_species_num2str << k+1;
+	string ni_species_num_str = ni_species_num2str.str();
+	
+	std::string ni_array_string;
+	if (k < 9){
+	  ni_array_string = "Ion Density 0" + ni_species_num_str + ion_charge;
+	}else{
+	  ni_array_string = "Ion Density " + ni_species_num_str + ion_charge;
+	}
+	vtkSmartPointer<vtkDoubleArray> ionDensityArray = fCreateNewDoubleArray(size, ni_array_string);
 	int ni_subgrids_num = ggd.ion(k).density.extent(0);
 	
 	for (int n = 0; n < ni_subgrids_num; n++){
@@ -396,8 +407,20 @@ int ReadUALEdge::RequestData(
       //ION DENSITY AND ION TEMPERATURE
       int ion_species_num = ggd.ion.extent(0);
       for(int k = 0; k < ion_species_num; k++){
-	  vtkSmartPointer<vtkDoubleArray> ionDensityArray = fCreateNewDoubleArray(size, "Ion Density ", k);
-	  vtkSmartPointer<vtkDoubleArray> ionTemperatureArray = fCreateNewDoubleArray(size, "Ion Temperature ", k);
+	  std::string ion_charge  = ggd.ion(k).label;
+	  stringstream ni_species_num2str;
+	  ni_species_num2str << k+1;
+	  string ni_species_num_str = ni_species_num2str.str();
+	  
+	  std::string ni_array_string;
+	  if (k < 9){
+	    ni_array_string = "Ion Density 0" + ni_species_num_str + ion_charge;
+	  }else{
+	    ni_array_string = "Ion Density " + ni_species_num_str + ion_charge;
+	  }
+	  vtkSmartPointer<vtkDoubleArray> ionDensityArray = fCreateNewDoubleArray(size, ni_array_string);
+	  
+	  vtkSmartPointer<vtkDoubleArray> ionTemperatureArray = fCreateNewDoubleArray(size, "Ion Temperature");
 	  int ni_subgrids_num = ggd.ion(k).density.extent(0);
 	  int ti_subgrids_num = ggd.ion(k).temperature.extent(0);
 	  
@@ -556,7 +579,7 @@ int ReadUALEdge::RequestData(
   std::clog << "Number of Ion Temperature species:" << num_ti_species << std::endl;
   
   int num_subgrids = grid.subgrids.extent(0);
-  std::string subgridName[num_subgrids];
+  std:: subgridName[num_subgrids];
   std::clog << "num_subgrids: "<< num_subgrids << std::endl; 
   std::clog << "Setting scalars" << std::endl;
   for(int i = 0; i < num_subgrids; i++) 
@@ -622,13 +645,13 @@ int ReadUALEdge::RequestData(
     vtkSmartPointer<vtkCellArray> subgridCellArray = vtkSmartPointer<vtkCellArray>::New();
     
     //ELECTRON TEMPERATURE creating array
-    vtkSmartPointer<vtkDoubleArray> electronTemperatureArray = fCreateNewDoubleArray(size, "Electron Temperature ");
+    vtkSmartPointer<vtkDoubleArray> electronTemperatureArray = fCreateNewDoubleArray(size, "Electron Temperature");
     
     //ELECTRON DENSITY creating array
-    vtkSmartPointer<vtkDoubleArray> electronDensityArray = fCreateNewDoubleArray(size, "Electron Density ");
+    vtkSmartPointer<vtkDoubleArray> electronDensityArray = fCreateNewDoubleArray(size, "Electron Density");
     
     //ELECTRIC POTENTIAL creating array
-    vtkSmartPointer<vtkDoubleArray> electricPotentialArray = fCreateNewDoubleArray(size, "Electric Potential ");
+    vtkSmartPointer<vtkDoubleArray> electricPotentialArray = fCreateNewDoubleArray(size, "Electric Potential");
     
     if(subgrid_class == 0) // POINTS/NODES
     {
@@ -687,7 +710,17 @@ int ReadUALEdge::RequestData(
       // Getting vertex colored by reading scalars from ion density subgrids (nodes) 
       for(int k = 0; k < num_ni_species; k++)
       {
-	vtkSmartPointer<vtkDoubleArray> ionDensityArray = fCreateNewDoubleArray(size, "Ion Density ", k);
+	std::string ion_charge = edge.species(k).label;
+	stringstream ni_species_num2str;
+	ni_species_num2str << k+1;
+	string ni_species_num_str = ni_species_num2str.str();
+	std::string ni_array_string;
+	if (k < 9){
+	  ni_array_string = "Ion Density 0" + ni_species_num_str + ion_charge;
+	}else{
+	  ni_array_string = "Ion Density " + ni_species_num_str + ion_charge;
+	}
+	vtkSmartPointer<vtkDoubleArray> ionDensityArray = fCreateNewDoubleArray(size, ni_array_string);
 	int ni_subgrid_num = edge.fluid.ni(k).value.extent(0);
 	for(int n = 0; n < ni_subgrid_num; n++)
 	{
@@ -718,7 +751,7 @@ int ReadUALEdge::RequestData(
       // Getting vertex colored by reading scalars from ion Temperature subgrids (nodes) 
       for(int k = 0; k < num_ti_species; k++)
       {
-	vtkSmartPointer<vtkDoubleArray> ionTemperatureArray = fCreateNewDoubleArray(size, "Ion Temperature ", k);
+	vtkSmartPointer<vtkDoubleArray> ionTemperatureArray = fCreateNewDoubleArray(size, "Ion Temperature");
 	int ti_subgrid_num = edge.fluid.ti(k).value.extent(0);
 	for(int n = 0; n < ti_subgrid_num; n++)
 	{
@@ -801,7 +834,17 @@ int ReadUALEdge::RequestData(
       //ION DENSITY 
       for(int k = 0; k < num_ni_species; k++)
 	{
-	  vtkSmartPointer<vtkDoubleArray> ionDensityArray = fCreateNewDoubleArray(size, "Ion Density ", k);
+	  std::string ion_charge = edge.species(k).label;	
+	  stringstream ni_species_num2str;
+	  ni_species_num2str << k+1;
+	  string ni_species_num_str = ni_species_num2str.str();
+	  std::string ni_array_string;
+	  if (k < 9){
+	    ni_array_string = "Ion Density 0" + ni_species_num_str + ion_charge;
+	  }else{
+	    ni_array_string = "Ion Density " + ni_species_num_str + ion_charge;
+	  }
+	  vtkSmartPointer<vtkDoubleArray> ionDensityArray = fCreateNewDoubleArray(size, ni_array_string);
 	  for(int j =0; j < size; j++)
 	  {
 	    ionDensityArray->SetComponent(j, 0, edge.fluid.ni(k).value(0).scalar(index_array[j]));
@@ -812,7 +855,7 @@ int ReadUALEdge::RequestData(
       //ION TEMPERATURE 
       for(int k = 0; k < num_ti_species; k++)
 	{
-	  vtkSmartPointer<vtkDoubleArray> ionTemperatureArray = fCreateNewDoubleArray(size, "Ion Temperature ", k);
+	  vtkSmartPointer<vtkDoubleArray> ionTemperatureArray = fCreateNewDoubleArray(size, "Ion Temperature");
 	  for(int j =0; j < size; j++)
 	  {
 	    ionTemperatureArray->SetComponent(j, 0, edge.fluid.ti(k).value(0).scalar(index_array[j]));

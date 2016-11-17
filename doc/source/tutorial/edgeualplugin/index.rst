@@ -12,7 +12,6 @@ ParaView application [1]_ and how to run and use ReadUALEdge
 ParaView plugin on hpc-app1.iter.org or hpc-login4.iter.org login nodes.
 
 
-
 Introduction to ParaView
 -------------------------
 
@@ -67,19 +66,18 @@ Loading the plugin
 
 After launching the ParaView application the start window appears.
 
-
-.. figure:: images/1_start_window_marked.png
-   :align: center
-   :alt: ParaView start window
-
-   ParaView start window.
-
 The main parts are:
 
  1. Menu bar
  2. Toolbar
  3. Pipeline Browser
  4. View Browser
+
+.. figure:: images/1_start_window_marked.png
+   :align: center
+   :alt: ParaView start window
+
+   ParaView start window.
 
 Loading and running the ReadUALEdge plugin is done in the next few steps:
 
@@ -262,7 +260,7 @@ Python Calculator filter
 Python Calculator filter allows us to work with data arrays (Electron
 Density, Ion Temperature etc.) and create new data array to display
 the results. It can be found under :menuselection:`Filter -->
-Alphabetical --> Python` ``Calculator`` as seen in
+Alphabetical -->` ``Python Calculator`` as seen in
 :numref:`pv-python-calculator1` and
 :numref:`pv-python-calculator2`.
 
@@ -291,7 +289,7 @@ and custom *Array Name*. An example is shown in
 options:
 
 -  | Expression:
-   | ``inputs[0].CellData[’Ion Density 1’]+inputs[0].CellData[’Ion Density 2’]``
+   | ``inputs[0].CellData[’Ion Density 01 D0’]+inputs[0].CellData[’Ion Density 02 D+1’]``
 
 -  | Array Association: Cell Data
 
@@ -305,8 +303,8 @@ options:
 
    Sum of Ion Density arrays scalars as Custom Data Array
 
-In this case the Python Calculator created a sum of *Ion Density 1* and
-*Ion Density 2* data arrays and created new data array called *Custom
+In this case the Python Calculator created a sum of *Ion Density 01 D0* and
+*Ion Density 02 D+1* data arrays and created new data array called *Custom
 Array Name*, which can be chosen from the Data Array list and analyzed.
 
 .. note::
@@ -350,13 +348,52 @@ ParaView Python Shell can be found navigating to :menuselection:`Tools
    ParaView Python Shell window
 
 Here we’ll show an example solving the issue with quite long Python
-Calculator Expressions. The IDS database ``Shot:1; Run:1; User: kosl;
+Calculator Expression. The IDS database ``Shot:1; Run:1; User: kosl;
 Tokamak: iter`` has almost 100 Ion Density data arrays, so very long
-expression is needed to create a sum of all of them, but because inside
-the expression the functions are being repeated we can easily generate
-it using Python Shell.
+expression is needed to create a sum of all of them. One way to avoid
+typing the expression by hand is by writing Python
+script, in which we read array names directly from ParaView loaded source
+and then generate the expression, and then running it inside Paraview Python Shell,
 
-The Python script and part of its output is shown in
+Example of ``Generate_Py_Calc_Expression.py`` Python script is shown below.
+
+.. code-block:: python
+
+    from paraview.simple import *
+
+    def GenerateExpression():
+        # Creating python calculator sum(all_edge_arrays) expression by reading array names
+        # directly from ParaView.
+        # IMPORTANT: The UALEdge source in Pipeline Browser bust be selected/highlighted in
+        # order for it to work!
+
+        reader = GetActiveSource() # Get data from currently selected/highlighted source in
+                                   # the Pipeline Browser.
+        UpdatePipeline()
+        numOfArrays = len(reader.CellData)
+
+        for i in range(numOfArrays):
+            # Getting the name of i-th array.
+            arrayName = reader.CellData[i].GetName()
+            # Printing the expression.
+            print "inputs[0].CellData['%s']" % (arrayName),
+            if i + 1 < numOfArrays:
+                print "+",
+
+    if __name__ == "__main__":
+        print("This script is intended to use with ParaView Shell not as a standalone script!")
+
+    GenerateExpression()
+
+
+
+To run the Python script press ``Run Script`` button found in Python Shell interface, navigate to your Python script and then press OK.
+
+.. note::
+    The ``GetActiveSource()`` function reads data from currently selected/highlighted source in the
+    Pipeline Browser, so make sure you have UALEdge source selected BEFORE running the script!
+
+Part of the output of the Python script is shown in
 :numref:`pv-python-shell3`.
 
 .. _pv-python-shell3:
@@ -364,6 +401,11 @@ The Python script and part of its output is shown in
    :alt: Python Shell code and output
 
    Python Shell code and output
+
+In this case the script reads names of all available data arrays and also uses
+all of them to create Python Calculator Expression. If we want to use only some
+data arrays in Python Calculator we can just copy parts of the generated expression
+or modify the script to get the desired output.
 
 The results of using the mentioned IDS database and the generated
 expression by copying it are shown in
