@@ -113,6 +113,7 @@ class B2mnTextEdit(QPlainTextEdit):
         return output[0:-1] # remove last newline
 
 
+
     def event(self, event):
         """ Looks for the parameters in the dictionary provided and sets
           the tooltip generated from XML documentation.
@@ -137,6 +138,10 @@ class B2mnTextEdit(QPlainTextEdit):
 
         return super(B2mnTextEdit, self).event(event)
 
+    @pyqtSlot(str)
+    def insert_line(self, line):
+        self.insertPlainText(line)
+
 
 class SolpsInput(QTabWidget):
     """SolpsInput(QTabWidget)
@@ -144,7 +149,8 @@ class SolpsInput(QTabWidget):
     Provides a custom widget that holds all SOLPS input files available for
     editing before starting the run.
     """
-    
+    lineInsert = pyqtSignal(str)
+
     def __init__(self, parent=None):
         super(SolpsInput, self).__init__(parent)
         self.setWindowTitle('SOLPS input file editor and viewer')
@@ -152,6 +158,7 @@ class SolpsInput(QTabWidget):
         self.rundir = None
         self.currently_viewing = None
         self.editors = dict()
+        self.b2mnTextEdit = None # used for signal connection
 
     def restore_tab_positions(self):
         """ Get tabs ordering from settings and restore the to saved position.
@@ -183,8 +190,9 @@ class SolpsInput(QTabWidget):
         font.setFamily('Monospace')
         for filename, tooltip in solps_input_files:
             if filename == 'b2mn.dat':
-                plainTextEdit = B2mnTextEdit(self)
+                self.b2mnTextEdit = plainTextEdit = B2mnTextEdit(self)
                 self.b2mn_highlight = B2mnHighlighter(plainTextEdit.document())
+                self.lineInsert.connect(self.b2mnTextEdit.insert_line)
             else:
                 plainTextEdit = QPlainTextEdit(self)
             plainTextEdit.setObjectName(filename)
@@ -242,6 +250,7 @@ class SolpsInput(QTabWidget):
                 try:
                     _dummy, file_extension = os.path.splitext(filename)
                     if file_extension == '.gz':
+                        # TODO handle decompress errors
                         with gzip.open(path, 'rb') as file:
                             text_content = file.read().decode("utf-8")
                             plainTextEdit.setPlainText(text_content)
@@ -293,6 +302,11 @@ class SolpsInput(QTabWidget):
                 else:
                     msg = "File cannot be saved in " + self.rundir
                 plainTextEdit.setPlaceholderText(msg)
+
+    @pyqtSlot(str)
+    def insert_line(self, line):
+        print('Reemmiting' + line)
+        self.lineInsert.emit(line)
 
     @pyqtSlot()
     def save_modified_input_files(self):
@@ -402,9 +416,10 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = SolpsInput()
     window.setRundir(os.path.expanduser("~")+
-                     '/solps-iter/runs/AUG_16151_D/run1')
+                     '/solps-iter/runs/tutorial/AUG_16151_D/run_for_GUI_demo')
     window.read_input_files()
     #window.read_input_files()  # should be resistant to multiple calls
     window.show()
-
+    window.output = pyqtSignal(str)
+    #window.output.emit("test line")
     sys.exit(app.exec_())

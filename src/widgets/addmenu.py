@@ -10,6 +10,7 @@ from PyQt5.QtGui import QCursor
 import logging
 import os
 import textwrap
+import functools
 
 import b2menu
 
@@ -45,19 +46,21 @@ class AddMenu(QMenu):
                     paramgroup = QMenu(category_menu)
                     paramgroup.setTitle(name)
                     action = category_menu.addAction(paramgroup.menuAction())
-                    paramgroup.setToolTip(description)
                     for parameter in data:
                         (name, param_type, default, short_desc) = parameter
                         action = paramgroup.addAction(name)
                         sd_formatted= self.dedent(short_desc)
                         if len(sd_formatted):
-                            sd_formated = '<br/><b>' + sd_formatted +'</b>'
+                            sd_formatted = '<br/><b>' + sd_formatted +'</b>'
                         tooltip = '<pre><font color=blue><b>' + name + '</b> ' \
                                   + 'Type: <b>' + param_type + '</b>, ' \
                                   + 'Default: <b>' + default + '</b></font>' \
                                   + '<br/>' + self.dedent(description)  \
                                   + sd_formatted + '</pre>'
                         action.setToolTip(tooltip)
+                        line = "'" + name + "'       '" + default + "'"
+                        pfn = functools.partial(self.handleMenuTriggered, line)
+                        action.triggered.connect(pfn)
 
                 else:
                     action = category_menu.addAction(name)
@@ -66,12 +69,21 @@ class AddMenu(QMenu):
                               + 'Default: <b>' + data + '</b></font><br/>' \
                               + self.dedent(description) + '</pre>'
                     action.setToolTip(tooltip)
+                    line = "'" + name + "'       '" + data + "'"
+                    pfn = functools.partial(self.handleMenuTriggered, line)
+                    action.triggered.connect(pfn)
 
     def handleMenuHovered(self, action):
-        ''' Instead of showing tooltip on hover we rather setup a new tooltip
+        """ Instead of showing tooltip on hover we rather setup a new tooltip
             to the parent and wait to be shown.
-        '''
+        """
         action.parent().setToolTip(action.toolTip())
+
+    def handleMenuTriggered(self, line):
+        #action.parent().setToolTip(action.toolTip())
+        print("Emmiting: " + line)
+        self.output.emit(line)
+
 
     def dedent(self, description):
         """ Removes first empty line from description and any leading tabs

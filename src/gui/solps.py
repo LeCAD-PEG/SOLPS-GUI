@@ -1084,6 +1084,7 @@ class SOLPS_MainWindow(QMainWindow):
             sys.exit(2)
 
         self.addMenu = AddMenu(self.menubar)
+        self.addMenu.output.connect(self.solpsinput.insert_line)
 
         self.preferences = Preferences()
         self.preferences.read()
