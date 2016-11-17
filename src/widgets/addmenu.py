@@ -24,39 +24,38 @@ class AddMenu(QMenu):
     
     def __init__(self, parent=None):
         '''
-
         Toooltips work on QMenu as a whole but not on actions!
+        For this reason we connect action's hover and set the tooltip
+        to the menu.
         '''
         super(AddMenu, self).__init__(parent)
         self.setTitle("Add")
         parent.addAction(self.menuAction())
-
+        self.hovered.connect(self.handleMenuHovered)
+        #self.setEnabled(False)
 
         for category in sorted(b2menu.b2mn_menu):
             category_menu = QMenu(self)
             category_menu.setTitle(category)
             self.addAction(category_menu.menuAction())
-            #category_menu.setToolTip(category)
 
             for parameter in b2menu.b2mn_menu[category]:
                 ( name, param_type, data, description ) = parameter
-                category_menu.hovered.connect(self.handleMenuHovered)
                 if param_type == 'paramgroup':
                     paramgroup = QMenu(category_menu)
                     paramgroup.setTitle(name)
                     action = category_menu.addAction(paramgroup.menuAction())
-                    #paramgroup.setToolTip(description)
+                    paramgroup.setToolTip(description)
                     for parameter in data:
                         (name, param_type, default, short_desc) = parameter
                         action = paramgroup.addAction(name)
                         sd_formatted= self.dedent(short_desc)
-                        print(len(sd_formatted))
                         if len(sd_formatted):
                             sd_formated = '<br/><b>' + sd_formatted +'</b>'
                         tooltip = '<pre><font color=blue><b>' + name + '</b> ' \
                                   + 'Type: <b>' + param_type + '</b>, ' \
-                                  + 'Default: <b>' + default + '</b></font><br/>' \
-                                  + self.dedent(description)  \
+                                  + 'Default: <b>' + default + '</b></font>' \
+                                  + '<br/>' + self.dedent(description)  \
                                   + sd_formatted + '</pre>'
                         action.setToolTip(tooltip)
 
@@ -69,8 +68,10 @@ class AddMenu(QMenu):
                     action.setToolTip(tooltip)
 
     def handleMenuHovered(self, action):
-        QToolTip.showText(QCursor.pos(), action.toolTip(),
-                         self, self.actionGeometry(action))
+        ''' Instead of showing tooltip on hover we rather setup a new tooltip
+            to the parent and wait to be shown.
+        '''
+        action.parent().setToolTip(action.toolTip())
 
     def dedent(self, description):
         """ Removes first empty line from description and any leading tabs
