@@ -1,0 +1,3 @@
+Sources provided here are examples on how read plasma 
+state and geometry from B2.5 and create VTK file for
+reading with ParaView.
