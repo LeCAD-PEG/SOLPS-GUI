@@ -10,6 +10,7 @@ case $(hostname) in
 	# module load GCC/4.8.3
 	# The following modules are needed for IMAS plugins
 	module load imas/3.7.0/ual/3.3.13 blitz/0.10
+	module load python/2.7/11
 	imasdb solps-iter
 	imasdb
 	;;

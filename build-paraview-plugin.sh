@@ -13,6 +13,7 @@ case $(hostname) in
   *.iter.org) 
 	module purge
 	module load imas/3.7.0/ual/3.3.13 blitz/0.10 binutils/2.25
+        module load python/2.7/11
 	export CC=gcc
 	export CXX=g++
 	MAKE_JOBS=${MAKE_JOBS:-8}

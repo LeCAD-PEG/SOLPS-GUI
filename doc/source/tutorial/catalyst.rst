@@ -9,26 +9,35 @@ Using ParaView Catalyst
 
 With this tutorial we'll show how to instrument the SOLPS-ITER code with
 *in situ* visualization using ParaView Catalyst. SOLPS-ITER code needs to be
-compiled and linked with ParaView Catalyst libraries. 
+compiled and linked with ParaView Catalyst libraries.
+
+Building SOLPS-ITER with Catalyst
+---------------------------------
+For the *Catalyst demo* we will clone and build a new SOLPS-ITER tree with::
+
+  $ git clone --recursive ssh://git@git.iter.org/bnd/solps-iter.git \
+    /home/ITER/kosl/solps-iter-catalyst
+  $ cd solps-iter-catalyst
+  $ git checkout feature/IDS
+  $ tcsh # if running under bash
+  $ source setup.csh
+  $ make b25
 
 Basic Catalyst simulation
 -------------------------
-
 We will start the default Insitu *live visualization* on
-``hpc-app.iter.org`` login node using only B2.5.
+``hpc-app1.iter.org`` login node using only B2.5.
 
 The following commands copy the case that contains the usual
 AUG_16151_D demo with additional ``coproc.py`` file that has hardcoded
 ``hpc-app1.iter.org`` and port ``22222`` for connecting to ParaView
 Catalyst:
 
-  $ cd SOLSP-ITER-IDS
-  $ tcsh
-  $ source setup.csh
+  $ stop
   $ cd runs
   $ mkdir catalyst-demo
   $ cd catalyst-demo
-  $ cp -av ~kosl/solps-iter-ids-jb/runs/AUG_16151_D .
+  $ cp -av ~kosl/solps-iter-catalyst/runs/AUG_16151_D .
   $ cd AUG_16151_D/run_for_GUI_demo
 
 Before starting the simulation it is recommended that ParaView Catalyst is
@@ -63,7 +72,9 @@ first time step to demonstrate initial conditions by selecting
    :align: center
 
 inside the :guilabel:`Pipeline browser`. Before starting the B2.5 simulation
-we need to adjust the last line of the ``coproc.py``
+on *remote* compute node(s) we need to adjust the last line of the ``coproc.py``
+from ``localhost`` to whatever our ``hostname` is. Similarly we should change
+*Catalyst Server Port* if default one is already occupied. For example:
 
 .. code-block:: python
 
@@ -75,6 +86,14 @@ and then start the simulation with the usual::
   $ rm -f *.prt
   $ itersubmit
   $ qstat -u ${USER} # should show running case for next 5 minutes
+
+.. note::
+
+   The default ``coproc.py`` file can always be copied into run directory from
+   ``${SOLPSTOP}/modules/B2.5/src/catalyst/coproc.py`` and placed inside
+   run directory to enable Catalyst coprocessing.
+   If the ``coproc.py`` file is not provided inside run directory then B2
+   will simply run without Catalyst's capabilities.
 
 Immediately after the job starts running from the batch, the code Catalyst
 *co-processor* connects back to the *Catalyst server*, which pauses the
