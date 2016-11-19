@@ -26,6 +26,8 @@ Scripts that ease submission are site dependent:
  * itmsubmit
  * jetsubmit
  * sgesubmit
+ * mephisubmit
+ * spbstusubmit
 
 and they all look for ``QSUB.*`` templates that should resist in
 ``${SOLPSTOP}/runs`` directories. Different runs can have additional
@@ -107,17 +109,20 @@ can use ``tcsh`` also for ``atd`` script that is usually run by ``/bin/sh``::
     __EOF__
 
 With SHELL we enforced that the current submitting shell (*tcsh*) is used at
-the time of execution.
+the time of execution. For more advanced local submission script revise
+:file:`solps-iter/scripts/localsubmit`.
 
 .. note::
-   ``atd``  and  ``batch`` are not suitable when users are competing for
-   resources.  If this is the case for your site,  you  might want to consider
-   another batch system, such as
+   :command:`atd`  and  :command:`batch` are not suitable when users are
+   competing for resources.  If this is the case for your site,  you  might
+   want to consider another batch system, such as
    `GNU Parallel <http://www.gnu.org/software/parallel/>`_.
 
    ``netcat`` and ``nc`` are usually the same programs. However, wait time
    specified by ``-w`` might not be acceptable less that one second for some
    versions.
+
+.. _submission_on_a_cluster:
 
 Submission on a cluster
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -152,9 +157,16 @@ To remedy the proble with *netcat* unavailability one may use
 ``solps-gui/src/utils/jobs_status/update_run_status`` netcat equivalent that
 allows multiple destinations (broadcast for multiuser monitoring).
 
+Remote updates from compute nodes though SSH
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Some clusters prevent :command:`netcat` connections from compute nodes back
+to login node. However, ``ssh`` is usually permitted. Is such "rare"
+cases one need to execute ``netcat`` remotely.
+
 When the firewall blocks access from compute nodes to login node where
-SOLPS GUI resides one may try to ssh back to login node by upgrading the
-submitted script with:
+SOLPS GUI resides one may try to :command:`ssh` back to login node by
+upgrading the submitted script with:
 
 .. code-block:: diff
 

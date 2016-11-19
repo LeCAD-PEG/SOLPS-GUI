@@ -31,7 +31,7 @@ We will start the default Insitu *live visualization* on
 The following commands copy the case that contains the usual
 AUG_16151_D demo with additional ``coproc.py`` file that has hardcoded
 ``hpc-app1.iter.org`` and port ``22222`` for connecting to ParaView
-Catalyst:
+Catalyst::
 
   $ stop
   $ cd runs
@@ -39,6 +39,10 @@ Catalyst:
   $ cd catalyst-demo
   $ cp -av ~kosl/solps-iter-catalyst/runs/AUG_16151_D .
   $ cd AUG_16151_D/run_for_GUI_demo
+
+or enter similar run therein, such as::
+
+  $ cd AUG_16151_D/16151_1.6MW_2.0e19_D=0.4_chi=1.6_standalone
 
 Before starting the simulation it is recommended that ParaView Catalyst is
 started with :menuselection:`Catalyst --> Connect` and select free port.
@@ -73,8 +77,8 @@ first time step to demonstrate initial conditions by selecting
 
 inside the :guilabel:`Pipeline browser`. Before starting the B2.5 simulation
 on *remote* compute node(s) we need to adjust the last line of the ``coproc.py``
-from ``localhost`` to whatever our ``hostname` is. Similarly we should change
-*Catalyst Server Port* if default one is already occupied. For example:
+from ``localhost`` to whatever our :command:`hostname` is. Similarly we should
+change *Catalyst Server Port* if default one is already occupied. For example:
 
 .. code-block:: python
 
@@ -86,6 +90,9 @@ and then start the simulation with the usual::
   $ rm -f *.prt
   $ itersubmit
   $ qstat -u ${USER} # should show running case for next 5 minutes
+
+EUROFusion-IM users on the Gateway login node *g03* need to setup
+``g03.efda-itm.eu`` in :file:`coproc.py` and use :command:`itmsubmit` instead.
 
 .. note::
 
@@ -164,8 +171,8 @@ by creating and exporting visualisation pipeline shown in the
 To create a new pipeline we need to:
  1. :menuselection:`Catalyst --> Connect`
  2. :menuselection:`Catalyst --> Pause Simulation`
- 3. :menuselection:`Tools --> Manage Plugins ...` and guilabel:`Load Selected`
-    *CatalystScriptGeneratorPlugin* and  guilabel:`Close`.
+ 3. :menuselection:`Tools --> Manage Plugins ...` and :guilabel:`Load Selected`
+    *CatalystScriptGeneratorPlugin* and  :guilabel:`Close`.
  4. Start the simulation again with::
 
     $ rm -f *.prt
@@ -290,3 +297,9 @@ To create a new pipeline we need to:
                visualization and debugging.
 
 
+.. todo::
+
+   In order to present results in standard *eV* default, we multiply all
+   ``te`` values that are in *Joules* by 6.242e18. To do that we use
+   Calculator filter and create new cell data ``Te`` derived from
+   ``te``, where ``Te=te*6.242e18``.

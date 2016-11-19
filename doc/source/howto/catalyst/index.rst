@@ -1475,11 +1475,11 @@ cxxAdaptor.cxx
 SOLPS Catalyst Compilation
 ==========================
 
-This appendix explains the process of obtaining the SOLPS code with
+Here we briefly explains the process of obtaining the SOLPS code with
 Catalyst, environment setup, and the compilation of code at ITER.
 
 #. To obtain the code from GIT, create new directory ``SOLPS-ITER-IDS``,
-   GIT branch change to ``featureIDS`` and set up the environment and
+   GIT branch change to ``feature/IDS`` and set up the environment and
    submodules, type the following:
 
 .. code-block:: csh
@@ -1509,17 +1509,16 @@ Catalyst, environment setup, and the compilation of code at ITER.
            $ cd SETUP
            $ emacs config.ITER.ifort64
 
-   Make sure these variables are set: ``PARAVIEW_DIR`` (top ParaView
-   directory), ``PARAVIEW_MAJOR_VERSION`` (major ParaView version) and
-   ``PARAVIEW_LIB_DIR`` (location of ParaView’s shared libraries). Also,
-   make sure ``SOLPS_CPP`` contains flag ``-DCATALYST``. To obtain
-   information about system’s ParaView and version run
-
-   ::
+   Make sure these variables are set: ``LD_CATALYST`` (list of ParaView
+   link libraries). Also, make sure ``SOLPS_CPP`` contains flag
+   ``-DCATALYST``. To obtain information about system’s ParaView and version
+   run::
 
            $ module display paraview
 
-   Note that ParaView version should be 5 or higher.
+   .. note::
+
+       ParaView version should be 5 or higher.
 
    To provide SOLPS with the libraries needed by Catalyst when linking a
    code variable, ``LD_CATALYST`` needs to contain required Catalyst
@@ -1552,9 +1551,20 @@ Catalyst, environment setup, and the compilation of code at ITER.
    ``build/CMakeFiles/Fortran90FullExample.dir/link.txt`` and assign it
    to a variable ``LD_CATALYST`` in ``config.ITER.ifort64``.
 
-   Additionally, Catalyst also requires ``qt``, ``libffi``, ``openssl``
-   libraries, thus paths to these need to be added to ``LD_CATALYST``
+   Additionally, Catalyst normally requires ``qt``, ``libffi``, ``openssl``
+   libraries and other, thus paths to these need to be added to ``LD_CATALYST``
    (e.g. to get path for ``qt`` run ``module display qt``.
+
+   .. note::
+
+       Recommended way for getting the list of requred libraries and
+       include files is by using::
+
+       $ paraview-config --libs vtkPVPythonCatalyst
+       $ paraview-config --include
+
+       inside :file:`setup.csh` and :file:`Makefile` system dependent includes
+       residing under the ``SETUP/`` directory.
 
 #. If all variables are set we can now compile complete SOLPS with
    Catalyst with
@@ -1581,3 +1591,14 @@ Catalyst, environment setup, and the compilation of code at ITER.
    Depending on the machine, an “undefined reference” error may occur.
    If an error occurs, run ``ldd <path to undefined library>`` to see
    what libraries are required and identify which are missing.
+
+#. For running SOLPS with Catalyst one needs to set :envvar:`PYTHONPATH` and
+   :envvar:`LD_LIBRARY_PATH` to ParaView's *lib* ``site-packages``. See
+   `The Catalyst Users guide <http://www.paraview.org/files/catalyst/docs/ParaViewCatalystUsersGuide_v2.pdf>`_
+   Sec. 3.7.2 *Linking with Python Simulation Codes* for explation on
+   reqirements. In short, one should use::
+
+      set PARAVIEW_LIB=`paraview-config --libs --python | sed s/-L//`
+      setenv LD_LIBRARY_PATH "${PARAVIEW_LIB}:${LD_LIBRARY_PATH}"
+      setenv PYTHONPATH "${PARAVIEW_LIB}/site-packages/vtk:${PYTHONPATH}"
+      setenv PYTHONPATH "${PARAVIEW_LIB}/site-packages:${PYTHONPATH}"

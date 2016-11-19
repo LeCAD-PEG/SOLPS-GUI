@@ -6,34 +6,52 @@
 Setting up the environment
 **************************
 
-Creating SSH host keys
-======================
+The SOLPS GUI can run locally on a laptop or can be installed on a cluster.
+The SOLPS GUI can handle multiple SOLPS trees and detached runs. Setting up the
+environment is needed depending on the "machine" in use. GUI is developed
+on ITER and EUROFusion-IM clusters as well as on local machines running *Linux*
+or *OSX* for "personal use".
 
-The following commands are needed if you would like to use SOLPS-GUI
-network run updates from compute nodes back to the login node via
-SSH::
+Running and building the SOLPS GUI can be done under BASH or TCSH shells.
+SOLPS GUI runs multiple SOLPS trees by embeding TCSH that is used exclusively
+for running SOLPS-ITER.
 
-    $ ssh-keygen -t rsa
-    $ sh -c 'SOLPS_GUI_IP=$(hostname -i) \
-    && SSH_KEY=$(ssh-keygen -F ${SOLPS_GUI_IP}) \
-    && test -z "${SSH_KEY}" \
-    && ssh-keyscan -t rsa -H ${SOLPS_GUI_IP} >> ~/.ssh/known_hosts'
+.. note::
+   The SOLPS GUI is included inside SOLPS-ITER ``setup.csh`` on supported
+   clusters. From there :command:`solps` command that starts the GUI is
+   available directly.
 
 ITER setup
 ==========
 
-Tha latest version of the GUI is available by::
+The latest version of the GUI is available on ITER HPC login nodes by::
 
-   $ module use /work/imas/etc/modulefiles
    $ module load solps-gui
    $ solps #  and "solps -h" should work
    $ solps_doc # for the lastest HTML documentation in a browser
 
+EUROFusion-IM setup
+===================
+
+The latest version of the GUI is available on all *Gateway* login nodes by::
+
+   $ module load solps-gui/dev
+   $ solps #  and "solps -h" should work
+   $ solps_doc # for the lastest HTML documentation in a browser
+
+For using ParaView Catalyst and IMAS plugins the following modules are
+available::
+
+   $ module load itm-paraview
+   $ module load imas
+   $ module load imas-paraview-plugins
+   $ imasdb solps-iter
+
 Personal use
 ============
 
-Users may build their own version by following instructions in README.md
-after ``git clone``. Short instructions for building::
+Users may build their own copies of SOLPS GUI by following instructions
+in :file:`README.md` after ``git clone``. Short instructions for building::
 
     $ git clone ssh://git@git.iter.org/bnd/solps-gui.git
     $ cd solps-gui
@@ -42,8 +60,7 @@ after ``git clone``. Short instructions for building::
 Starting the GUI::
 
     $ source setupenv.sh
-    $ src/gui/solps.py
-
+    $ solps
 
 Further instructions (optional)::
 
@@ -60,11 +77,14 @@ Updating to the latest version of GUI::
     $ git pull
 
 Submission scripts
-==================
+------------------
 
-If submission scripts are not yet available or adapted for running on
-target cluster one may revise already available scripts. Basic
-``localsubmit`` may be copied from ``solps-gui/src/examples` to
-``solps-iter/scripts`` from home directory with::
-
-    $ cp solps-gui/src/examples/localsubmit solps-iter/scripts/
+Submission scripts were tested on ITER and EUROFusion-IM (ITM) clusters and
+are part of SOLPS-ITER code. Local submission script :file:`localsubmit`
+is also part of the SOLPS-ITER code. If submission scripts are not yet
+available or adapted for running on target cluster one may revise already
+available scripts. Please revise
+:file:`solps-gui/src/examples/submit-scripts/localsubmit` and see
+:ref:`submission-howto` for instructions how to setup "batch" processing
+on a local machine and :ref:`submission_on_a_cluster` for more details on
+cluster submission.
