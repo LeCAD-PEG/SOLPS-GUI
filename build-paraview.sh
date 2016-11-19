@@ -8,7 +8,7 @@ case $(hostname) in
 	module purge
 #	module load MVAPICH2/2.2b-GCC-4.9.3-2.25
 	module load GCC/4.8.3 binutils/2.25
-	module load python/2.7/11 intel/12.0.2 
+	module load Python/2.7.9-goolf-1.5.16 intel/12.0.2 
 	export CC=gcc
 	export CXX=g++
 	MAKE_JOBS=${MAKE_JOBS:-8}

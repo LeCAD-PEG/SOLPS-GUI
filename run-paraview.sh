@@ -9,10 +9,7 @@ case $(hostname) in
 	# module load MVAPICH2/2.2b-GCC-4.9.3-2.25 python/2.7/11
 	# module load GCC/4.8.3
 	# The following modules are needed for IMAS plugins
-	#module load imas/3.5.3/ual/3.3.8 blitz/0.10
-	#module load imas/3.5.3/ual/3.3.10 blitz/0.10
-	module load imas/3.6.1/ual/3.3.12 blitz/0.10
-	module load python/2.7/11
+	module load imas/3.7.0/ual/3.3.13 blitz/0.10
 	imasdb solps-iter
 	imasdb
 	;;
