@@ -81,4 +81,9 @@ Input file editor and viewer
 .. automodule:: solpsinput
    :members:
 
+--------
+Add menu
+--------
 
+.. automodule:: addmenu
+   :members:

@@ -1,4 +1,4 @@
-   #!/usr/bin/env python3
+#!/usr/bin/env python3
 """ A PyQt custom Menu widget that adds input parameters
 """
 
@@ -15,10 +15,9 @@ import functools
 import b2menu
 
 class AddMenu(QMenu):
-    """ Script(QPlainTextEdit)
+    """ AddMenu(QMenu)
     
-        Provides a custom widget to display a gnuplot with properties and slots
-        that can be used to customize its appearance.
+        Provides a custom widget for inserting B2mn parameters into editor.
     """
 
     output = pyqtSignal(str)

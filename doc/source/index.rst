@@ -22,9 +22,9 @@ the framework of the EUROfusion Consortium and has received funding from
 the Euratom research and training programme 2014-2018 under grant agreement
 No. 633053. The views and opinions expressed herein do not necessarily
 reflect those of the European Commission nor those of the ITER
-Organization. The author wishes to thank Marijo Telena, Dejan Penko, Jure
-Bartol and Marko Protič for their contributions os various aspects during
-the development of the SOLPS-ITER GUI and tools.
+Organization. The author wishes to thank Xavier Bonnin, Marijo Telena,
+Dejan Penko, Jure Bartol and Marko Protič for their contributions on
+various aspects during the development of the SOLPS-ITER GUI and tools.
    
 .. only:: html
 

@@ -1,5 +1,5 @@
-   #!/usr/bin/env python3
-""" A PyQt custom Script widget.
+#!/usr/bin/env python3
+""" A PyQt custom Python Script widget.
 """
 
 from PyQt5.QtCore import (QProcess, QSize, pyqtSignal, QSettings,
@@ -13,8 +13,8 @@ import os
 class Script(QPlainTextEdit):
     """ Script(QPlainTextEdit)
     
-        Provides a custom widget to display a gnuplot with properties and slots
-        that can be used to customize its appearance.
+        Provides a custom widget to display a box where Python script 
+        can be entered and run.
     """
 
     output = pyqtSignal(str)
