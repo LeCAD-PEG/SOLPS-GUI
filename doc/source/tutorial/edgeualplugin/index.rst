@@ -104,7 +104,7 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
 
      Navigating and selecting plugin library file
 
-4. Now the plugin should be already loaded. If it’s not, highlight
+4. Now the plugin should be already loaded. If it's not, highlight
    the plugins name in Plugin Manager and press :guilabel:`Load
    Selected` button.  Optionally by checking the :guilabel:`Auto
    Load` option the plugin will be automatically loaded whenever the
@@ -159,7 +159,7 @@ Data analysis
 
 In previous chapter we can notice that we have loaded data, but no
 useful information could be seen, just the geometry of the tokamak using
-a lot of colors. In this tutorial we’ll first explain what those multiple
+a lot of colors. In this tutorial we'll first explain what those multiple
 color represent and then how to display full information we want.
 
 Subgrids and Multi-Block Inspector
@@ -235,24 +235,29 @@ navigate through **List of Data Arrays** found in Toolbar, as seen in
 
 .. _pv-data-arrays-list-ne:
 .. figure:: images/17_data_arrays_ne_full.png
+   :scale: 80%
    :alt: Data layer Electron Density using Cell block
 
    Data layer Electron Density using Cell block
 
 .. _pv-data-arrays-list-te:
 .. figure:: images/18_data_arrays_te.png
+   :scale: 60%
    :alt: Data layer Electron Temperature using Cell block
 
    Data layer Electron Temperature using Cell block
 
 .. _pv-data-arrays-list-te-core-sol:
 .. figure:: images/19_data_arrays_te_core_sol.png
+   :scale: 60%
    :alt: Data layer Electron Temperature using Core and SOL block
 
    Data layer Electron Temperature using Core and SOL block
 
 Other useful ParaView tools
 ---------------------------
+
+.. _paraview-python-filter:
 
 Python Calculator filter
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -285,17 +290,31 @@ Pipeline Browser as seen in :numref:`pv-python-calculator3`.
 
 This filter takes a case sensitive *Expression*, an *Array Association*
 and custom *Array Name*. An example is shown in 
-:numref:`pv-python-calculator4`, where we used next expression and
-options:
+:numref:`pv-python-calculator6`, where convert
+all values from data array ``Ion Temperature`` from *eV* to *joules*
+(``Te[J] = Te[Ev]/6.242e18``)using Python Calculator
+The expression and options are:
 
--  | Expression:
-   | ``inputs[0].CellData[’Ion Density 01 D0’]+inputs[0].CellData[’Ion Density 02 D+1’]``
-
--  | Array Association: Cell Data
-
--  | Array Name: Custom Array Name
-
+-  Expression: ``inputs[0].CellData['Ion Temperature']/6.242e18'``
+-  Array Association: Cell Data
+-  Array Name: Te[J]
 -  Press :guilabel:`Apply` button
+
+.. _pv-python-calculator6:
+.. figure:: images/38_python_calculator5.png
+   :alt: Ion Temperature data array values converted from Joules to eV
+
+   Ion Temperature data array values converted from Joules to eV
+
+In the next example we'll use Python Calculator to make a sum of 
+*Ion Density 01 D0* and *Ion Density 02 D+1* data arrays and create a new data 
+array called *Custom Array Name*.
+The expression and options are:
+
+- Expression: ``inputs[0].CellData['Ion Density 01 D0']+inputs[0].CellData['Ion Density 02 D+1']``
+- Array Association: Cell Data
+- Array Name: Custom Array Name
+- Press :guilabel:`Apply` button
 
 .. _pv-python-calculator4:
 .. figure:: images/23_python_calculator4.png
@@ -303,15 +322,14 @@ options:
 
    Sum of Ion Density arrays scalars as Custom Data Array
 
-In this case the Python Calculator created a sum of *Ion Density 01 D0* and
-*Ion Density 02 D+1* data arrays and created new data array called *Custom
-Array Name*, which can be chosen from the Data Array list and analyzed.
+This new custom data array is now available in the Data Array list and can be
+used for analysis.
 
 .. note::
 
    #1: If we have a long list od data layers and want to create sum of
    all of them the expression can be very long. Typing it manually can be
-   frustrating, so it’s advisable to use a short self written script to
+   frustrating, so it's advisable to use a short self written script to
    generate the expression. ParaView includes also its own Python Shell.
    The use of Python Shell in Paraview and example of script to generate
    the expression is explained and shown in *ParaView Python Shell*
@@ -326,7 +344,8 @@ Array Name*, which can be chosen from the Data Array list and analyzed.
    button the Multi-Block Inspector works normally.
 
 More Python Calculator functions and operations can be found on web page
-http://www.itk.org/Wiki/index.php?title=ParaView/Users_Guide/Python_Calculator\&oldid=46066 and in ParaView guide under Chapter 5.8.2.
+http://www.itk.org/Wiki/index.php?title=ParaView/Users_Guide/Python_Calculator\&oldid=46066
+and in ParaView guide under Chapter 5.8.2.
 
 ParaView Python Shell
 ~~~~~~~~~~~~~~~~~~~~~
@@ -347,7 +366,7 @@ ParaView Python Shell can be found navigating to :menuselection:`Tools
 
    ParaView Python Shell window
 
-Here we’ll show an example solving the issue with quite long Python
+Here we'll show an example solving the issue with quite long Python
 Calculator Expression. The IDS database ``Shot:1; Run:1; User: kosl;
 Tokamak: iter`` has almost 100 Ion Density data arrays, so very long
 expression is needed to create a sum of all of them. One way to avoid

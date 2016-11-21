@@ -295,11 +295,19 @@ To create a new pipeline we need to:
      .. note:: We don't need ParaView running if we already have the desired
                fields extracted with ``coproc.py`` for later analysis,
                visualization and debugging.
+ 24. In order to present results in standard *eV*, we multiply all
+     ``te`` values that are in *Joules* by 6.242e18. To do that we use
+     Calculator filter and create new cell data ``Te`` derived from
+     ``te``, where ``Te=te*6.242e18`` by
 
+       #. Setting :guilabel:`Expression` to ``te*6.242e18``
+          and :guilabel:`Array Name` to ``Te[eV]``.
+       #. Selecting :guilabel:`Array Association` to  ``Cell Data``.
+       #. After pressing :guilabel:`Apply` coloring can be selected for a
+          newly calculated ``Te[eV]``.
 
-.. todo::
+     .. note::
 
-   In order to present results in standard *eV* default, we multiply all
-   ``te`` values that are in *Joules* by 6.242e18. To do that we use
-   Calculator filter and create new cell data ``Te`` derived from
-   ``te``, where ``Te=te*6.242e18``.
+        A similar example, but for converting from electron temperature in
+        *eV* to *Joules* is described in ReadUALEdge
+        :ref:`paraview-python-filter` tutorial.
