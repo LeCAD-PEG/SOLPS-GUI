@@ -1,5 +1,6 @@
 #!/bin/sh -x
 ## Building PyQt with Python3 and Qt5
+## Minimum GCC supported version is 4.7
  
 PYTHON_VERSION=3.5.2
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
@@ -8,7 +9,7 @@ PyQT_VERSION=5.7 # should be the same as Qt
 SIP_VERSION=4.18
 
 # Site specific defaults
-case $(hostname) in
+case $(hostname -f) in
   *.iter.org) # RHEL5.11 with GCC 4.2
 	module purge
 	module use /work/imas/opt/EasyBuild/modules/all
@@ -22,7 +23,8 @@ case $(hostname) in
                         -D FC_WEIGHT_EXTRABLACK=215 \
                         -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK}
 	;;
-  g0[1234]*) # SLES 11.4 WPCD Gateway (incompatible XCB, Xlib and GL libraries)
+  g0[1234].itm.rzg.mpg.de) # SLES 11.4 WPCD Gateway (incompatible XCB, Xlib and GL libraries)
+  tok*.bc.rzg.mpg.de) # IPP MPG 
         MAKE_JOBS=${MAKE_JOBS:-16}
 	USE_QT_XCB="NO"
 	BUILD_XCB="YES"
