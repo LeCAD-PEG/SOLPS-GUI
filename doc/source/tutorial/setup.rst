@@ -35,7 +35,7 @@ EUROFusion-IM setup
 
 The latest version of the GUI is available on all *Gateway* login nodes by::
 
-   $ module load solps-gui/dev
+   $ module load solps-gui
    $ solps #  and "solps -h" should work
    $ solps_doc # for the lastest HTML documentation in a browser
 
@@ -56,6 +56,12 @@ in :file:`README.md` after ``git clone``. Short instructions for building::
     $ git clone ssh://git@git.iter.org/bnd/solps-gui.git
     $ cd solps-gui
     $ ./build-pyqt.sh # It may take several hours to compile!
+
+.. note::
+
+    You will need at least GCC version 4.7 with many development packages
+    to compile PyQt and Python 3+.
+    Please read :file:`solps-gui/README.md` for further info on some systems.
 
 Starting the GUI::
 
