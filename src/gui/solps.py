@@ -1549,9 +1549,9 @@ class SOLPS_MainWindow(QMainWindow):
             self.main_tcsh.start(tcsh_path, ['-l'])  # TODO settings for -l
             logging.info("MAIN TCSH started in " + self.solps_top)
             cmd +=  'cd ' + self.solps_top \
-                    + '\nsource setup.csh\necho TCSH READY\n' \
-                    + 'setenv SOLPS_GUI_IP ' + solps_gui_ip + '\n' \
-                    + 'setenv SOLPS_GUI_PORT ' + solps_gui_port + '\n'
+                    + '\nsource setup.csh\necho TCSH READY\n'
+        cmd += 'setenv SOLPS_GUI_IP ' + solps_gui_ip + '\n' \
+                + 'setenv SOLPS_GUI_PORT ' + solps_gui_port + '\n'
         cmd += 'cd ' + rundir + '\n'
         cmd += tcsh_command + '\n'
         self.main_tcsh.write(bytearray(cmd, 'utf8'))  # TODO flush stdout
