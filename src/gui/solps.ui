@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>651</width>
-    <height>354</height>
+    <width>678</width>
+    <height>353</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -41,45 +41,6 @@
         <string>&amp;Initialize Run</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="2" column="0" colspan="2">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Sequence name:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QLineEdit" name="lineEditSequenceName">
-          <property name="text">
-           <string>test</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="3" rowspan="4">
-         <widget class="QPlainTextEdit" name="plainTextEditScript">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="plainText">
-           <string>for i in range(10):
-   print(&quot;run_%02d&quot; % i)</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0" colspan="3">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>Sequence description</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0" colspan="4">
-         <widget class="QPlainTextEdit" name="plainTextEdit">
-          <property name="plainText">
-           <string>This defines the directory structure ${SOLPS_ROOT}/runs/test and optional one or multiple levels of parameter scan subdirectories.</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
@@ -87,28 +48,7 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="3">
-         <widget class="QCommandLinkButton" name="initializeRuns">
-          <property name="text">
-           <string>Initialize Run(s)</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QCheckBox" name="checkBoxParameterScan">
-          <property name="text">
-           <string>Parameter scan</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Sequence script:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2">
+        <item row="0" column="1">
          <widget class="QComboBox" name="comboBox">
           <property name="currentText">
            <string>ITER</string>
@@ -138,6 +78,43 @@
             <string>MAST-U</string>
            </property>
           </item>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QCommandLinkButton" name="initializeRuns">
+          <property name="text">
+           <string>Initialize Runs</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Sequence script:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <widget class="Script" name="script_sequence">
+          <property name="plainText">
+           <string>for i in range(10):
+   cmd = &quot;mkdir run{0:02d}&quot;.format(i)
+   self.output.emit(cmd)
+self.output.emit(&quot;ls -ld run*&quot;)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="Tcsh" name="tcsh_sequence"/>
+        </item>
+        <item row="3" column="0" colspan="3">
+         <widget class="QLabel" name="label_initialize_runs">
+          <property name="text">
+           <string>Please select working direcory in the Runs tab for sequence initialization.</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
        </layout>
@@ -707,8 +684,8 @@ and starts the run</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>651</width>
-     <height>20</height>
+     <width>678</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -776,6 +753,11 @@ and starts the run</string>
    <header>gnuplot</header>
   </customwidget>
   <customwidget>
+   <class>Script</class>
+   <extends>QPlainTextEdit</extends>
+   <header>script</header>
+  </customwidget>
+  <customwidget>
    <class>SolpsInput</class>
    <extends>QTabWidget</extends>
    <header>solpsinput</header>
@@ -817,12 +799,12 @@ and starts the run</string>
    <slot>executeTcshCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>274</x>
-     <y>234</y>
+     <x>83</x>
+     <y>76</y>
     </hint>
     <hint type="destinationlabel">
-     <x>274</x>
-     <y>198</y>
+     <x>206</x>
+     <y>115</y>
     </hint>
    </hints>
   </connection>
@@ -833,12 +815,12 @@ and starts the run</string>
    <slot>setTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>187</x>
-     <y>234</y>
+     <x>58</x>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>274</x>
-     <y>205</y>
+     <x>206</x>
+     <y>115</y>
     </hint>
    </hints>
   </connection>
@@ -849,12 +831,12 @@ and starts the run</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>274</x>
-     <y>205</y>
+     <x>206</x>
+     <y>115</y>
     </hint>
     <hint type="destinationlabel">
-     <x>361</x>
-     <y>251</y>
+     <x>102</x>
+     <y>82</y>
     </hint>
    </hints>
   </connection>
@@ -865,12 +847,12 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>589</x>
-     <y>232</y>
+     <x>191</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
-     <x>318</x>
-     <y>202</y>
+     <x>271</x>
+     <y>165</y>
     </hint>
    </hints>
   </connection>
@@ -881,12 +863,12 @@ and starts the run</string>
    <slot>setSolpsPlotCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>503</x>
-     <y>231</y>
+     <x>196</x>
+     <y>93</y>
     </hint>
     <hint type="destinationlabel">
-     <x>389</x>
-     <y>202</y>
+     <x>271</x>
+     <y>165</y>
     </hint>
    </hints>
   </connection>
@@ -897,12 +879,12 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>503</x>
-     <y>231</y>
+     <x>196</x>
+     <y>93</y>
     </hint>
     <hint type="destinationlabel">
-     <x>424</x>
-     <y>202</y>
+     <x>271</x>
+     <y>165</y>
     </hint>
    </hints>
   </connection>
@@ -913,12 +895,12 @@ and starts the run</string>
    <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>75</x>
-     <y>261</y>
+     <x>46</x>
+     <y>81</y>
     </hint>
     <hint type="destinationlabel">
-     <x>288</x>
-     <y>202</y>
+     <x>271</x>
+     <y>165</y>
     </hint>
    </hints>
   </connection>
@@ -929,12 +911,12 @@ and starts the run</string>
    <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>50</x>
-     <y>261</y>
+     <x>46</x>
+     <y>81</y>
     </hint>
     <hint type="destinationlabel">
-     <x>274</x>
-     <y>197</y>
+     <x>206</x>
+     <y>115</y>
     </hint>
    </hints>
   </connection>
@@ -945,12 +927,12 @@ and starts the run</string>
    <slot>triggerTextChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>100</x>
-     <y>261</y>
+     <x>46</x>
+     <y>81</y>
     </hint>
     <hint type="destinationlabel">
-     <x>475</x>
-     <y>231</y>
+     <x>196</x>
+     <y>93</y>
     </hint>
    </hints>
   </connection>
@@ -961,12 +943,12 @@ and starts the run</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>79</x>
-     <y>261</y>
+     <x>46</x>
+     <y>81</y>
     </hint>
     <hint type="destinationlabel">
-     <x>591</x>
-     <y>261</y>
+     <x>102</x>
+     <y>82</y>
     </hint>
    </hints>
   </connection>
@@ -977,12 +959,12 @@ and starts the run</string>
    <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>67</x>
-     <y>261</y>
+     <x>46</x>
+     <y>81</y>
     </hint>
     <hint type="destinationlabel">
-     <x>296</x>
-     <y>162</y>
+     <x>102</x>
+     <y>71</y>
     </hint>
    </hints>
   </connection>
@@ -997,8 +979,72 @@ and starts the run</string>
      <y>45</y>
     </hint>
     <hint type="destinationlabel">
-     <x>485</x>
-     <y>100</y>
+     <x>102</x>
+     <y>71</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>initializeRuns</sender>
+   <signal>clicked()</signal>
+   <receiver>script_sequence</receiver>
+   <slot>run()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>452</x>
+     <y>78</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>300</x>
+     <y>150</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>label_initialize_runs</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>46</x>
+     <y>81</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>353</x>
+     <y>304</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>tcsh_sequence</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>46</x>
+     <y>81</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>490</x>
+     <y>200</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>script_sequence</sender>
+   <signal>output(QString)</signal>
+   <receiver>tcsh_sequence</receiver>
+   <slot>setAndExecuteTcshCommand(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>280</x>
+     <y>196</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>404</x>
+     <y>199</y>
     </hint>
    </hints>
   </connection>

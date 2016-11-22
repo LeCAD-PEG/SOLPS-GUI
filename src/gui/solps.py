@@ -345,6 +345,8 @@ class RunsStatusServer(QThread):
     """
     retrieve = True
     jobStatusChanged = pyqtSignal(str)
+    address  = None
+    port = None
 
     def bind(self, address, port):
         # connect to UDP socket
@@ -352,6 +354,8 @@ class RunsStatusServer(QThread):
         # Bind socket to local host and port
         try:
             self._sock.bind((address, port))
+            self.address = address
+            self.port = port
         except socket.error:
             logging.error('Bind to' + address + ':' + str(port) + ' failed.')
             return False
@@ -363,9 +367,21 @@ class RunsStatusServer(QThread):
         while self.retrieve:
             data, addr = self._sock.recvfrom(1024)  # wait for data
             # print("Message", data.decode('utf-8'), "from", addr[0])
-            self.jobStatusChanged.emit(data.decode('utf-8').rstrip('\n'))
+            msg = data.decode('utf-8').rstrip('\n')
+            if msg[0:4] == 'STOP' : break
+            self.jobStatusChanged.emit(msg)
             # TODO Graceful exit from blocking recvfrom() by setting retrieve
             # TODO and sending UDP packet to ourselves.
+        logging.info("RunsStatusServer run() finished.")
+        self._sock.close()
+
+    def stop(self):
+        client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        client_sock.sendto(bytes('STOP', 'utf-8'), (self.address, self.port))
+        client_sock.close()
+        self.wait()
+        self.exit(0)
+        logging.info("RunsStatusServer stopped.")
 
 
 class RetrieveRunsFolderInfo(QThread):
@@ -950,7 +966,7 @@ class RunsModel(QAbstractItemModel):
         else:
             msg = "Failed to bind interface {0} to port {1}. " \
                   "Job monitoring will not start unless you " \
-                  "setup free port and restart! " \
+                  "setup a free port and restart! " \
                   "GUI will exit if you press Cancel.".format(address, port)
             ret = QMessageBox.warning(None, "SOLPS-GUI Status server", msg,
                                       QMessageBox.Cancel | QMessageBox.Ok)
@@ -1163,8 +1179,6 @@ class SOLPS_MainWindow(QMainWindow):
         settings.endGroup()
 
         self.actionAbout_Qt.triggered.connect(QApplication.instance().aboutQt)
-        self.checkBoxParameterScan.toggled.connect(
-            self.plainTextEditScript.setEnabled)
 
         self.comboBoxRunFilterType.addItem("Regular expression",
                                            QRegExp.RegExp)
@@ -1366,7 +1380,17 @@ class SOLPS_MainWindow(QMainWindow):
         if dialog.exec_():
             dialog.setPreferences()
             self.preferences.write()
-
+            self.model.statusServerThread.stop()
+            if self.model.statusServerThread.bind(
+                        self.preferences.bind_address, self.preferences.port):
+                self.model.statusServerThread.start()
+            else:
+                msg = "Failed to bind interface {0} to port {1}. " \
+                      "Job monitoring will not start unless you " \
+                      "setup a free port and restart! ".format(
+                       self.preferences.bind_address, self.preferences.port)
+                QMessageBox.warning(None, "SOLPS-GUI Status server", msg,
+                                    QMessageBox.Ok)
 
     def closeEvent(self, event):
         """ Save GUI state at exit.
@@ -1403,14 +1427,6 @@ class SOLPS_MainWindow(QMainWindow):
         self.expandAll()
         self.expanded()
 
-    @pyqtSlot()
-    def on_initializeRuns_clicked(self):
-
-        if self.plainTextEditScript.isEnabled():
-            script = self.plainTextEditScript.toPlainText()
-            exec(script)
-        else:
-            print("Creating %s" % self.lineEditSequenceName.text())
 
     @pyqtSlot()
     def on_pushButton_Filter_clicked(self):
@@ -1420,6 +1436,7 @@ class SOLPS_MainWindow(QMainWindow):
     def on_pushButton_Stop_clicked(self):
         """ Signals garceful stop inside b2mn.exe.dir with .quit file.
         """
+
         index = self.treeViewRuns.selectionModel().currentIndex()
         model = self.proxyModel
         index_path = model.index(index.row(), Column.path, index.parent())

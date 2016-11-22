@@ -102,6 +102,8 @@ class Tcsh(QPlainTextEdit):
 
     @pyqtSlot(str)
     def setTcshCommand(self, command):
+        """ Sets a command to be executed by executeTcshCommand()
+        """
         self.tcsh_command = command
 
     def get_tcsh_command(self):
@@ -167,6 +169,14 @@ class Tcsh(QPlainTextEdit):
             self.tcsh.write(bytearray(cmd, 'utf8'))
         else:
             logging.warning("No run directory for TCSH")
+
+    @pyqtSlot(str)
+    def setAndExecuteTcshCommand(self, command):
+        """ Immediately executes provided command in TCSH.
+        """
+        self.tcsh_command = command
+        self.executeTcshCommand()
+
 
 
 
