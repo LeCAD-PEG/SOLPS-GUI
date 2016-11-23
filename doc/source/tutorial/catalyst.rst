@@ -16,9 +16,12 @@ Building SOLPS-ITER with Catalyst
 For the *Catalyst demo* we will clone and build a new SOLPS-ITER tree with::
 
   $ git clone --recursive ssh://git@git.iter.org/bnd/solps-iter.git \
-    /home/ITER/kosl/solps-iter-catalyst
+    solps-iter-catalyst
   $ cd solps-iter-catalyst
   $ git checkout feature/IDS
+  $ git submodule update
+  $ git config --global user.name "John Doe" # Your GIT identity is needed
+  $ git config --global user.email johndoe@example.com # to be set only once.
   $ tcsh # if running under bash
   $ source setup.csh
   $ make b25
@@ -26,7 +29,8 @@ For the *Catalyst demo* we will clone and build a new SOLPS-ITER tree with::
 Basic Catalyst simulation
 -------------------------
 We will start the default Insitu *live visualization* on
-``hpc-app1.iter.org`` login node using only B2.5.
+``hpc-app1.iter.org`` login node using only *B2.5 standalone* that is not
+built by default.
 
 The following commands copy the case that contains the usual
 AUG_16151_D demo with additional ``coproc.py`` file that has hardcoded
@@ -38,7 +42,9 @@ Catalyst::
   $ mkdir catalyst-demo
   $ cd catalyst-demo
   $ cp -av ~kosl/solps-iter-catalyst/runs/AUG_16151_D .
-  $ cd AUG_16151_D/run_for_GUI_demo
+  $ cd AUG_16151_D
+  $ correct_baserun_timestamps
+  $ cd run_for_GUI_demo
 
 or enter similar run therein, such as::
 
