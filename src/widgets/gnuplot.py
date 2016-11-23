@@ -206,7 +206,6 @@ class Gnuplot(QLabel):
 
         cmd = ''
         if self.tcsh.state() != QProcess.Running:
-            self.tcsh.setWorkingDirectory(self.solps_top)
             env = QProcessEnvironment.systemEnvironment()
             env.insert('GNUPLOT_BATCH', 'true')
             self.tcsh.setProcessEnvironment(env)

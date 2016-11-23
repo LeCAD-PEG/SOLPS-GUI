@@ -1545,7 +1545,6 @@ class SOLPS_MainWindow(QMainWindow):
 
         cmd = ''
         if self.main_tcsh.state() != QProcess.Running:
-            self.main_tcsh.setWorkingDirectory(self.solps_top)
             self.main_tcsh.start(tcsh_path, ['-l'])  # TODO settings for -l
             logging.info("MAIN TCSH started in " + self.solps_top)
             cmd +=  'cd ' + self.solps_top \

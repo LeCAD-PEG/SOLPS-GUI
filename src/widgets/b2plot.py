@@ -127,7 +127,6 @@ class B2plot(QLabel):
         if 'B2PLOT FINISHED' in text:
             b2plot_ps_file = self.rundir + '/b2plot.ps'
             if os.path.exists(b2plot_ps_file):
-                self.convert.setWorkingDirectory(self.rundir)
                 self.convert_args =  ['+antialias', '-resize',
                                       str(self.width()) + 'x' + str(self.height()),
                                       'b2plot.ps', 'png:-']
@@ -189,7 +188,6 @@ class B2plot(QLabel):
 
         cmd = ''
         if self.tcsh.state() != QProcess.Running:
-            self.tcsh.setWorkingDirectory(self.solps_top)
             env = QProcessEnvironment.systemEnvironment()
             self.tcsh.setProcessEnvironment(env)
             self.tcsh.start(self.tcsh_path, ['-l'])

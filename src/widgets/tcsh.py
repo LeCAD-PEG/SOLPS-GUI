@@ -13,7 +13,7 @@ import os
 class Tcsh(QPlainTextEdit):
     """ Tcsh(QWidget)
     
-        Provides a custom widget to display a gnuplot with properties and slots
+        Provides a custom widget to display TCSH with properties and slots
         that can be used to customize its appearance.
     """
 
@@ -39,16 +39,28 @@ class Tcsh(QPlainTextEdit):
         self.tcsh = QProcess()
         self.tcsh.readyReadStandardOutput.connect(self.print_stdout)
         self.tcsh.readyReadStandardError.connect(self.print_stderr)
+        self.tcsh.error.connect(self.show_error)
+        self.tcsh.stateChanged.connect(self.stateChanged)
 
     def sizeHint(self):
         return QSize(320, 100)
+
+    @pyqtSlot(QProcess.ProcessError)
+    def show_error(self, error):
+        """ Writes an error to the widget in case that the process failed
+            to start.
+        """
+        errors = ['Failed to Start', 'Crashed', 'Timedout', 'WriteError',
+            'ReadError', 'UnknownError']
+        msg = 'ProcessError: ' + errors[error] + '\n' + self.tcsh.errorString()
+        self.setPlainText(msg)
+
 
     @pyqtSlot(QProcess.ProcessState)
     def stateChanged(self, newState):
         states = ['Not Running', 'Starting', 'Running']
         msg = 'Process state changed: ' + states[newState]
-        print(msg)
-        self.setText(msg)
+        self.appendPlainText(msg)
 
     @pyqtSlot()
     def print_stdout(self):
@@ -62,18 +74,6 @@ class Tcsh(QPlainTextEdit):
         error_data=self.tcsh.readAllStandardError()
         error_text=bytearray(error_data).decode('utf8')
         self.appendHtml('<b>' + str(error_text) + '</b>')
-
-
-    @pyqtSlot(QProcess.ProcessError)
-    def show_error(self, error):
-        """ Writes an error to the widget in case that the process failed
-            to start.
-        """
-        errors = ['Failed to Start', 'Crashed', 'Timedout', 'WriteError',
-            'ReadError', 'UnknownError']
-        msg = 'ProcessError: ' + errors[error]
-        print(msg)
-        self.setText(msg)
 
     @pyqtSlot(int)
     def setTcshPath(self, tcsh_path):
@@ -102,8 +102,6 @@ class Tcsh(QPlainTextEdit):
 
     @pyqtSlot(str)
     def setTcshCommand(self, command):
-        """ Sets a command to be executed by executeTcshCommand()
-        """
         self.tcsh_command = command
 
     def get_tcsh_command(self):
@@ -148,14 +146,16 @@ class Tcsh(QPlainTextEdit):
                 logging.error("Could not find SOLPSTOP for " + self.rundir)
             return
 
-        if rundir_solps_top != self.solps_top:  # we have new SOLPSTOP
+        if rundir_solps_top != self.solps_top:  # we have a new SOLPSTOP
             self.tcsh.kill()
             self.solps_top = rundir_solps_top
 
         cmd = ''
         if self.tcsh.state() != QProcess.Running:
-            self.tcsh.setWorkingDirectory(self.solps_top)
             self.tcsh.start(self.tcsh_path, ['-l'])
+            if not self.tcsh.waitForStarted():
+                logging.error(self.tcsh.program() + " not started")
+                return
             logging.info("TCSH started in " + self.solps_top)
             cmd +=  'cd ' + self.solps_top \
                     + '\nsource setup.csh\necho TCSH READY\n' \
@@ -170,14 +170,6 @@ class Tcsh(QPlainTextEdit):
         else:
             logging.warning("No run directory for TCSH")
 
-    @pyqtSlot(str)
-    def setAndExecuteTcshCommand(self, command):
-        """ Immediately executes provided command in TCSH.
-        """
-        self.tcsh_command = command
-        self.executeTcshCommand()
-
-
 
 
 if __name__ == "__main__":
@@ -185,11 +177,12 @@ if __name__ == "__main__":
     import sys
     from PyQt5.QtWidgets import QApplication
 
+    logging.getLogger().setLevel(logging.DEBUG)
     app = QApplication(sys.argv)
     tcsh_widget = Tcsh()
     tcsh_widget.show()
     tcsh_widget.setRundir(os.path.expanduser("~")+
-                          '/solps-iter/runs/AUG_16151_D/run1')
+                          '/solps-iter/runs/AUG_16151_D')
     tcsh_widget.setTcshCommand('ls')
     tcsh_widget.executeTcshCommand()
     tcsh_widget.setTcshCommand('ls -l')
