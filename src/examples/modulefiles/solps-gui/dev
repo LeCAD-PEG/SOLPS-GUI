@@ -1,38 +1,26 @@
-#%Module1.0#####################################################################
+#%Module######################################################################
 ##
-## $name modulefile
+##      Solps-Gui Modulefile
+##      author: Hajo Klingshirn
 ##
-set ver [lrange [split [ module-info name ] / ] 1 1 ]
-set name [lrange [split [ module-info name ] / ] 0 0 ]
-#set imas_home $::env(IMAS_HOME)
-set imas_home /work/imas
-set loading [module-info mode load]
-set desc [join [read [ open "$imas_home/etc/modulefiles/$name/.desc" ] ] ]
-proc ModulesHelp { } {
-puts stderr "\tThis module sets the environment for $name v$ver"
-}
-conflict $name
-module-whatis "$desc (v$ver)"
 
-# require pyqt
-if { ! [ is-loaded pyqt/5.5.1-qt-5.5.1-python-3.5.0 ] } {
-  module load pyqt/5.5.1-qt-5.5.1-python-3.5.0
-}
-prereq pyqt/5.5.1-qt-5.5.1-python-3.5.0
+source "$env(ITMMODULESUTIL)/mod_tools.tcl"
 
-set solpsguihome /home/ITER/kosl/solps-gui
+set VERSION [get_version]
+
+module-whatis "This module sets the environment for solps-gui"
+conflict solps-gui 
+
+module 		load pyqt/5.7.0-qt-5.7.0-python-3.5.2
+
+set SWITMDIR [get_env SWITMDIR]
+set solpsguihome /pfs/work/kosl/solps-gui
 
 setenv SOLPSGUI $solpsguihome/src/gui
-
 prepend-path PYTHONPATH $solpsguihome/src/widgets
 prepend-path PYQTDESIGNERPATH $solpsguihome/src/plugins/designer
 
-setenv LD_PRELOAD /usr/lib64/libfontconfig.so.1
-
+#setenv LD_PRELOAD /usr/lib64/libfontconfig.so.1
 set-alias solps {python3 \$SOLPSGUI/solps.py $*}
-#set-alias solps {LD_PRELOAD=/usr/lib64/libfontconfig.so.1 python3 \$SOLPSGUI/solps.py $*}
-#set-alias solps {echo $1 $2 && LD_PRELOAD=/usr/lib64/libfontconfig.so.1 python3 \$SOLPSGUI/solps.py $1 $2}
-#set-alias solps {sh -c "LD_PRELOAD=/usr/lib64/libfontconfig.so.1 python3 \$SOLPSGUI/solps.py $1 $2"}
-#set-alias solps "( LD_PRELOAD=/usr/lib64/libfontconfig.so.1 python3 \$SOLPSGUI/solps.py $* )"
 
-set-alias solps_doc "xdg-open $solpsguihome/doc/build/html/index.html"
+set-alias solps_doc "firefox --url file:///pfs/work/kosl/solps-gui/doc//build/html/index.html"

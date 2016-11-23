@@ -1,0 +1,30 @@
+#%Module######################################################################
+##
+##      Ant Modulefile
+##      author: Hajo Klingshirn
+##
+
+source "$env(ITMMODULESUTIL)/mod_tools.tcl"
+
+set VERSION [get_version]
+
+module-whatis "This module sets environment for PyQt 5.5.1, Qt 5.5.1 and Python 3.5.2"
+
+conflict pyqt
+
+set SWITMDIR [get_env SWITMDIR]
+if { $VERSION eq "5.5.1-qt-5.5.1-python-3.5.1" } {
+    set QTDIR $SWITMDIR/pyqt/5.5.1
+    set QTDIRqt $SWITMDIR/pyqt/5.5.1/qt/5.5.1
+}
+if { $VERSION eq "5.7.0-qt-5.7.0-python-3.5.2" } {
+    set QTDIR $SWITMDIR/pyqt/5.7.0
+    set QTDIRqt $SWITMDIR/pyqt/5.7.0/qt/5.70
+}
+
+prepend-path PATH $QTDIR/bin
+#prepend-path PATH $QTDIRqt/bin
+prepend-path CPATH $QTDIR/include
+prepend-path LD_LIBRARY_PATH $QTDIR/lib
+prepend-path PKG_CONFIG_PATH $QTDIR/lib/pkgconfig
+prepend-path MANPATH $QTDIR/share/man 
