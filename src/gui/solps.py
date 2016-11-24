@@ -1587,8 +1587,10 @@ class SOLPS_MainWindow(QMainWindow):
         submit_command = self.preferences.submit_script
 
         cmd = ''
+        opts = ''
         if submit_command:
-            if len(self.preferences.job_name):
+            if self.preferences.submit_script != 'localsubmit' \
+                    and len(self.preferences.job_name):
                 if ' ' in self.preferences.job_name:
                     opts = ' -j "' + self.preferences.job_name + '"'
                 else:
