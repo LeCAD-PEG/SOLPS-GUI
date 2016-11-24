@@ -1556,11 +1556,15 @@ class SOLPS_MainWindow(QMainWindow):
 
         if rundir_solps_top != self.solps_top:  # we have new SOLPSTOP
             self.main_tcsh.kill()
+            self.main_tcsh.waitForFinished()
             self.solps_top = rundir_solps_top
 
         cmd = ''
         if self.main_tcsh.state() != QProcess.Running:
             self.main_tcsh.start(tcsh_path, ['-l'])  # TODO settings for -l
+            if not self.main_tcsh.waitForStarted():
+                logging.error(self.main_tcsh.program() + " not started")
+                return
             logging.info("MAIN TCSH started in " + self.solps_top)
             cmd +=  'cd ' + self.solps_top \
                     + '\nsource setup.csh\necho TCSH READY\n'
@@ -1580,13 +1584,15 @@ class SOLPS_MainWindow(QMainWindow):
         Arguments:
              rundir (str): prepared run directory
         """
-        #settings = QSettings('ITER', 'solps-gui')
-        #submit_command = settings.value("submit_script", 'localsubmit')
         submit_command = self.preferences.submit_script
 
         cmd = ''
         if submit_command:
-            opts = ' -j ' + self.preferences.job_name
+            if len(self.preferences.job_name):
+                if ' ' in self.preferences.job_name:
+                    opts = ' -j "' + self.preferences.job_name + '"'
+                else:
+                    opts = ' -j ' + self.preferences.job_name
             if self.preferences.standalone: opts += ' -s'
             if self.preferences.use_mpi:
                 opts += ' -m "' + self.preferences.mpi_options + '"'

@@ -65,6 +65,9 @@ class Gnuplot(QLabel):
             + 'plot ' + plot_command.split('#', 1)[0]  + '\nquit\n'
         # print(self.gnuplot_cmd)
         self.gnuplot.start(self.gnuplot_path)
+        if not self.gnuplot.waitForStarted():
+            logging.error(self.gnuplot.program() + " not started")
+            return
 
     @pyqtSlot()
     def write_commands_to_gnuplot(self):
@@ -202,6 +205,7 @@ class Gnuplot(QLabel):
 
         if rundir_solps_top != self.solps_top:  # we have new SOLPSTOP
             self.tcsh.kill()
+            self.tcsh.waitForFinished()
             self.solps_top = rundir_solps_top
 
         cmd = ''
@@ -210,6 +214,9 @@ class Gnuplot(QLabel):
             env.insert('GNUPLOT_BATCH', 'true')
             self.tcsh.setProcessEnvironment(env)
             self.tcsh.start(self.tcsh_path, ['-l'])
+            if not self.tcsh.waitForStarted():
+                logging.error(self.tcsh.program() + " not started")
+                return
             logging.info("Gnuplot TCSH started in " + self.solps_top)
             cmd += "cd " + self.solps_top \
                   + '\nsource setup.csh\necho TCSH READY\n'

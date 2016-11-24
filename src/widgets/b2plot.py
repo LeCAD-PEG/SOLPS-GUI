@@ -184,6 +184,7 @@ class B2plot(QLabel):
 
         if rundir_solps_top != self.solps_top:  # we have a new SOLPSTOP
             self.tcsh.kill()
+            self.tcsh.waitForFinished()
             self.solps_top = rundir_solps_top
 
         cmd = ''
@@ -191,6 +192,9 @@ class B2plot(QLabel):
             env = QProcessEnvironment.systemEnvironment()
             self.tcsh.setProcessEnvironment(env)
             self.tcsh.start(self.tcsh_path, ['-l'])
+            if not self.tcsh.waitForStarted():
+                logging.error(self.tcsh.program() + " not started")
+                return
             logging.info("B2plot TCSH started in " + self.solps_top)
             cmd += 'cd ' + self.solps_top + '\n'
             cmd += 'source setup.csh\necho TCSH READY\n'

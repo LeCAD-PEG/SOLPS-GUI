@@ -157,6 +157,14 @@ To remedy the proble with *netcat* unavailability one may use
 ``solps-gui/src/utils/jobs_status/update_run_status`` netcat equivalent that
 allows multiple destinations (broadcast for multiuser monitoring).
 
+.. note::
+
+   On some clusters using
+   `Kerberos <https://en.wikipedia.org/wiki/Kerberos_(protocol)>`_
+   authentication (e.g. EUROFusion-IM cluster) user needs to save the password
+   with :command:`ktutil` command or :command:`save-password` script
+   to allow jobs run successfully with batch submission.
+
 Remote updates from compute nodes though SSH
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

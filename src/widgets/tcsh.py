@@ -25,7 +25,8 @@ class Tcsh(QPlainTextEdit):
         settings = QSettings('ITER', 'solps-gui')
         self.tcsh_path = settings.value("tcsh_path", '/bin/tcsh')
         self.solps_top = None
-        self.rundir = None
+        self.rundir = None # run directory set
+        self.pwd = None # pointer to current working directory
         self.tcsh_command = None
 
         #self.setAlignment(Qt.AlignCenter)
@@ -147,21 +148,26 @@ class Tcsh(QPlainTextEdit):
             return
 
         if rundir_solps_top != self.solps_top:  # we have a new SOLPSTOP
+            self.tcsh.terminate()
             self.tcsh.kill()
+            self.tcsh.waitForFinished()
             self.solps_top = rundir_solps_top
 
         cmd = ''
         if self.tcsh.state() != QProcess.Running:
+            self.pwd = None
             self.tcsh.start(self.tcsh_path, ['-l'])
             if not self.tcsh.waitForStarted():
                 logging.error(self.tcsh.program() + " not started")
                 return
             logging.info("TCSH started in " + self.solps_top)
             cmd +=  'cd ' + self.solps_top \
-                    + '\nsource setup.csh\necho TCSH READY\n' \
-                    + 'cd ' + self.rundir + '\n'
+                    + '\nsource setup.csh\necho TCSH READY\n'
 
         if self.rundir:
+            if self.rundir != self.pwd:
+                cmd += 'cd ' + self.rundir + '\n'
+                self.pwd = self.rundir
             if self.tcsh_command:
                 cmd += self.tcsh_command + '\n'
             else:

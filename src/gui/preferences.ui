@@ -350,6 +350,9 @@ Use 127.0.0.1 only for localsubmit.</string>
     <property name="text">
      <string>SOLPS-ITER</string>
     </property>
+    <property name="maxLength">
+     <number>64</number>
+    </property>
    </widget>
    <widget class="QLabel" name="label_8">
     <property name="geometry">
