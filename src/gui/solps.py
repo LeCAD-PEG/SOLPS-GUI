@@ -245,8 +245,11 @@ class Preferences():
         self.solps_gui_ip = '127.0.0.1'
         self.tcsh_path = '/bin/tcsh'
         self.gnuplot_path = '/usr/bin/gnuplot'
+        self.convert_path = '/usr/bin/convert'
         self.log_level = 1 # info
         self.submit_script = 'localsubmit'
+        self.job_name = 'SOLPS-ITER'
+        self.standalone = 0
         self.use_mpi = 0
         self.mpi_options = '-n 16'
         self.use_debugger = 0
@@ -263,8 +266,11 @@ class Preferences():
         self.solps_gui_ip = settings.value('SOLPS_GUI_IP', self.solps_gui_ip)
         self.tcsh_path = settings.value('tcsh_path', self.tcsh_path)
         self.gnuplot_path = settings.value('gnuplot_path', self.gnuplot_path)
+        self.convert_path = settings.value('convert_path', self.convert_path)
         self.log_level = int(settings.value('log_level', self.log_level))
         self.submit_script = settings.value('submit_script', self.submit_script)
+        self.job_name = settings.value('job_name', self.job_name)
+        self.standalone = int(settings.value('standalone', self.standalone))
         self.use_mpi = int(settings.value('use_mpi', self.use_mpi))
         self.mpi_options = settings.value('mpi_options', self.mpi_options)
         self.use_debugger = int(settings.value('use_debugger', self.use_debugger))
@@ -281,9 +287,12 @@ class Preferences():
         settings.setValue('SOLPS_GUI_IP', self.solps_gui_ip)
         settings.setValue('tcsh_path', self.tcsh_path)
         settings.setValue('gnuplot_path', self.gnuplot_path)
+        settings.setValue('convert_path', self.convert_path)
         settings.setValue('log_level', str(self.log_level))
         settings.setValue('submit_script', self.submit_script)
-        settings.setValue('use_mpi', self.use_mpi)
+        settings.setValue('job_name', self.job_name)
+        settings.setValue('standalone', str(self.standalone))
+        settings.setValue('use_mpi', str(self.use_mpi))
         settings.setValue('mpi_options', self.mpi_options)
         settings.setValue('use_debugger', str(self.use_debugger))
         settings.setValue('debugger', self.debugger)
@@ -305,8 +314,11 @@ class PreferencesDialog(QDialog):
         self.lineEdit_monitor_ip.setText(preferences.solps_gui_ip)
         self.lineEdit_tcsh_path.setText(preferences.tcsh_path)
         self.lineEdit_gnuplot_path.setText(preferences.gnuplot_path)
+        self.lineEdit_convert_path.setText(preferences.convert_path)
         self.comboBox_log_level.setCurrentIndex(preferences.log_level)
         self.comboBox_submit_script.setCurrentText(preferences.submit_script)
+        self.lineEdit_job_name.setText(preferences.job_name)
+        self.checkBox_standalone.setCheckState(int(preferences.standalone))
         self.checkBox_use_mpi.setCheckState(int(preferences.use_mpi))
         self.lineEdit_mpi_options.setText(preferences.mpi_options)
         self.checkBox_use_debugger.setCheckState(int(preferences.use_debugger))
@@ -321,12 +333,15 @@ class PreferencesDialog(QDialog):
         self.preferences.solps_gui_ip = self.lineEdit_monitor_ip.text()
         self.preferences.tcsh_path = self.lineEdit_tcsh_path.text()
         self.preferences.gnuplot_path = self.lineEdit_gnuplot_path.text()
+        self.preferences.convert_path = self.lineEdit_convert_path.text()
         self.preferences.log_level = self.comboBox_log_level.currentIndex()
         log_levels = [logging.DEBUG, logging.INFO, logging.WARNING,
                       logging.ERROR, logging.CRITICAL]
         log_level = log_levels[self.comboBox_log_level.currentIndex()]
         logging.getLogger().setLevel(log_level)
         self.preferences.submit_script = self.comboBox_submit_script.currentText()
+        self.preferences.job_name = self.lineEdit_job_name.text()
+        self.preferences.standalone = int(self.checkBox_standalone.checkState())
         self.preferences.use_mpi = int(self.checkBox_use_mpi.checkState())
         self.preferences.mpi_options = self.lineEdit_mpi_options.text()
         self.preferences.use_debugger = int(self.checkBox_use_debugger.checkState())
@@ -1569,25 +1584,16 @@ class SOLPS_MainWindow(QMainWindow):
         #submit_command = settings.value("submit_script", 'localsubmit')
         submit_command = self.preferences.submit_script
 
-
-
         cmd = ''
         if submit_command:
-            opts = ''
+            opts = ' -j ' + self.preferences.job_name
+            if self.preferences.standalone: opts += ' -s'
             if self.preferences.use_mpi:
                 opts += ' -m "' + self.preferences.mpi_options + '"'
-            #if int(settings.value('use_debugger', '0')):
-            #    opts += ' -d "' + settings.value('debugger', 'totalview') + '"'
             if self.preferences.use_debugger:
                 opts += ' -d "' + self.preferences.debugger + '"'
-            #if int(settings.value('compress_log', '0')):
-            #    opts += ' -z'
-            if self.preferences.compress_log:
-                opts += ' -z'
-            #if int(settings.value('dry_run', '0')):
-            #    opts += ' -n'
-            if self.preferences.dry_run:
-                opts += ' -n'
+            if self.preferences.compress_log:  opts += ' -z'
+            if self.preferences.dry_run: opts += ' -n'
             cmd +=  'rm -f *.prt\n' + submit_command + opts
             self.execute_tcsh_command_in_rundir(cmd, rundir)
             msg = 'batch ' + rundir + ' ' + submit_command + opts
