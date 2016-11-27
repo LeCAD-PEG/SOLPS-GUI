@@ -1,4 +1,4 @@
-# Copyright (c) 2015, Riverbank Computing Limited
+# Copyright (c) 2016, Riverbank Computing Limited
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -23,7 +23,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# This is v1.4 of this boilerplate.
+# This is v1.8 of this boilerplate.
 
 
 from distutils import sysconfig
@@ -38,9 +38,8 @@ import sys
 ###############################################################################
 
 
-# This must be kept in sync with hello.pro,
-
-hello_API_MAJOR = 12
+# This must be kept in sync with hello.pro
+HELLO_API_MAJOR = 12
 
 
 class ModuleConfiguration(object):
@@ -71,10 +70,15 @@ class ModuleConfiguration(object):
     # The minimum version of SIP that is required.  This should be a
     # dot-separated string of two or three integers (e.g. '1.0', '4.10.3').  If
     # it is None or an empty string then the version is not checked.
-    minimum_sip_version = '4.16'
+    minimum_sip_version = '4.18'
 
     # Set if support for C++ exceptions can be disabled.
     no_exceptions = True
+
+    # The name (without the .pyi extension) of the name of the PEP 484 stub
+    # file to be generated.  If it is None or an empty string then a stub file
+    # is not generated.
+    pep484_stub_file = 'hello'
 
     # Set if the module supports redefining 'protected' as 'public'.
     protected_is_public_is_supported = True
@@ -117,6 +121,7 @@ class ModuleConfiguration(object):
         """
 
         target_configuration.hello_version = '.'
+        target_configuration.hello_features_dir = 'features'
         target_configuration.hello_inc_dir = '.'
         target_configuration.hello_lib_dir = '.'
         target_configuration.hello_is_dll = (target_configuration.py_platform == 'win32')
@@ -135,15 +140,18 @@ class ModuleConfiguration(object):
                 help="the directory containing the hello hello header "
                         "file directory is DIR [default: QT_INSTALL_HEADERS]")
 
+        optparser.add_option('--hello-featuresdir', dest='hello_features_dir',
+                type='string', default=None, action='callback',
+                callback=optparser_store_abspath_dir, metavar="DIR",
+                help="the directory containing the hello.prf features "
+                        "file is DIR [default: "
+                        "QT_INSTALL_PREFIX/mkspecs/features]")
+
         optparser.add_option('--hello-libdir', '-o', dest='hello_lib_dir',
                 type='string', default=None, action='callback',
                 callback=optparser_store_abspath_dir, metavar="DIR",
                 help="the directory containing the hello library is DIR "
                         "[default: QT_INSTALL_LIBS]")
-
-        optparser.add_option('--no-dll', '-s', dest='hello_is_dll',
-                default=None, action='store_false',
-                help="hello is a static library and not a Windows DLL")
 
         optparser.add_option('--hello-sipdir', '-v', dest='hello_sip_dir',
                 type='string', default=None, action='callback',
@@ -162,14 +170,14 @@ class ModuleConfiguration(object):
         options are the parsed options.
         """
 
+        if options.hello_features_dir is not None:
+            target_configuration.hello_features_dir = options.hello_features_dir
+
         if options.hello_inc_dir is not None:
             target_configuration.hello_inc_dir = options.hello_inc_dir
 
         if options.hello_lib_dir is not None:
             target_configuration.hello_lib_dir = options.hello_lib_dir
-
-        if options.hello_is_dll is not None:
-            target_configuration.hello_is_dll = options.hello_is_dll
 
         if options.hello_sip_dir is not None:
             target_configuration.hello_sip_dir = options.hello_sip_dir
@@ -177,7 +185,7 @@ class ModuleConfiguration(object):
             target_configuration.hello_sip_dir = target_configuration.pyqt_sip_dir
 
         if options.hello_no_sip_files:
-            target_configuration.hello_sip_dir = 'sip'
+            target_configuration.hello_sip_dir = ''
 
     def check_module(self, target_configuration):
         """ Perform any module specific checks now that the target
@@ -185,12 +193,10 @@ class ModuleConfiguration(object):
         configuration.
         """
 
-        # Find the hello header files.
+        # Find the Hello header files.
         inc_dir = target_configuration.hello_inc_dir
         if inc_dir is None:
             inc_dir = target_configuration.qt_inc_dir
-        hello_version = '1.0'
-        target_configuration.hello_version = hello_version
 
 
         
@@ -199,51 +205,51 @@ class ModuleConfiguration(object):
         if not os.access(sciglobal, os.F_OK):
             error(
                     "hello.h could not be found in %s. If "
-                    "hello is installed then use the --hello-incdir "
+                    "Hello is installed then use the --qsci-incdir "
                     "argument to explicitly specify the correct "
                     "directory." % inc_dir)
 
-        """
-        # Get the hello version string.
-        hello_version = read_define(sciglobal, 'hello_VERSION_STR')
+        # Get the Hello version string.
+        hello_version = read_define(sciglobal, 'HELLO_VERSION_STR')
         if hello_version is None:
             error(
-                    "The hello version number could not be determined by "
+                    "The Hello version number could not be determined by "
                     "reading %s." % sciglobal)
-        """
-        
+
         lib_dir = target_configuration.hello_lib_dir
         if lib_dir is None:
             lib_dir = target_configuration.qt_lib_dir
 
-
-        """
         if not glob.glob(os.path.join(lib_dir, '*hello*')):
             error(
-                    "The hello library could not be found in %s. If "
-                    "hello is installed then use the --hello-libdir "
+                    "The Hello library could not be found in %s. If "
+                    "Hello is installed then use the --hello-libdir "
                     "argument to explicitly specify the correct "
                     "directory." % lib_dir)
+
         # Because we include the Python bindings with the C++ code we can
         # reasonably force the same version to be used and not bother about
         # versioning in the .sip files.
+        """        
         if hello_version != self.version:
             error(
-                    "hello %s is being used but the Python bindings %s "
+                    "Hello %s is being used but the Python bindings %s "
                     "are being built. Please use matching "
                     "versions." % (hello_version, self.version))
         """
-   
+
+        target_configuration.hello_version = hello_version
+
     def inform_user(self, target_configuration):
         """ Inform the user about module specific configuration information.
         target_configuration is the target configuration.
         """
 
-        inform("hello %s is being used." %
+        inform("Hello %s is being used." %
                 target_configuration.hello_version)
 
         if target_configuration.hello_sip_dir != '':
-            inform("The hello .sip files will be installed in %s." %
+            inform("The Hello .sip files will be installed in %s." %
                     target_configuration.hello_sip_dir)
 
     def pre_code_generation(self, target_config):
@@ -299,8 +305,8 @@ class ModuleConfiguration(object):
         if target_configuration.hello_lib_dir is not None:
             qmake['LIBS'] = '-L%s' % quote(target_configuration.hello_lib_dir)
 
-        if target_configuration.hello_is_dll:
-            qmake['DEFINES'] = 'hello_DLL'
+        if target_configuration.hello_features_dir is not None:
+            os.environ['QMAKEFEATURES'] = target_configuration.hello_features_dir
 
         return qmake
 
@@ -317,7 +323,7 @@ class ModuleConfiguration(object):
             lib_dir = target_configuration.qt_lib_dir
 
         return os.path.join(lib_dir,
-                'libhello.%s.dylib' % hello_API_MAJOR)
+                'libhello.%s.dylib' % HELLO_API_MAJOR)
 
 
 ###############################################################################
@@ -708,6 +714,7 @@ class _TargetConfiguration:
         self.sip = self._find_exe('sip5', 'sip')
         self.sip_version = None
         self.sysroot = ''
+        self.stubs_dir = ''
 
         self.prot_is_public = (self.py_platform.startswith('linux') or self.py_platform == 'darwin')
 
@@ -915,27 +922,6 @@ class _TargetConfiguration:
         are the command line options.
         """
 
-        try:
-            qmake = opts.qmake
-        except AttributeError:
-            # Windows.
-            qmake = None
-
-        if qmake is not None:
-            self.qmake = qmake
-        elif self.qmake is None:
-            # Under Windows qmake and the Qt DLLs must be on the system PATH
-            # otherwise the dynamic linker won't be able to resolve the
-            # symbols.  On other systems we assume we can just run qmake by
-            # using its full pathname.
-            if sys.platform == 'win32':
-                error("Make sure you have a working Qt qmake on your PATH.")
-            else:
-                error(
-                        "Make sure you have a working Qt qmake on your PATH "
-                        "or use the --qmake argument to explicitly specify a "
-                        "working Qt qmake.")
-
         # Query qmake.
         qt_config = _TargetQtConfiguration(self.qmake)
 
@@ -971,6 +957,25 @@ class _TargetConfiguration:
         if opts.sysroot is not None:
             self.sysroot = opts.sysroot
 
+        # Determine how to run qmake.
+        if opts.qmake is not None:
+            self.qmake = opts.qmake
+
+            # On Windows add the directory that probably contains the Qt DLLs
+            # to PATH.
+            if sys.platform == 'win32':
+                path = os.environ['PATH']
+                path = os.path.dirname(self.qmake) + ';' + path
+                os.environ['PATH'] = path
+
+        if self.qmake is None:
+            error(
+                    "Use the --qmake argument to explicitly specify a working "
+                    "Qt qmake.")
+
+        if opts.qmakespec is not None:
+            self.qmake_spec = opts.qmakespec
+
         if self.pyqt_package is not None:
             try:
                 self.pyqt_package = opts.pyqt_package
@@ -998,6 +1003,15 @@ class _TargetConfiguration:
                 self.pyqt_sip_dir = os.path.join(self.py_sip_dir,
                         self.pyqt_package)
 
+        if module_config.pep484_stub_file:
+            if opts.stubsdir is not None:
+                self.stubs_dir = opts.stubsdir
+
+            if opts.no_stubs:
+                self.stubs_dir = ''
+            elif self.stubs_dir == '':
+                self.stubs_dir = self.module_dir
+
         if module_config.hello_api_file:
             if opts.apidir is not None:
                 self.api_dir = opts.apidir
@@ -1007,9 +1021,6 @@ class _TargetConfiguration:
 
         if opts.destdir is not None:
             self.module_dir = opts.destdir
-
-        if opts.qmakespec is not None:
-            self.qmake_spec = opts.qmakespec
 
         if module_config.protected_is_public_is_supported:
             if opts.prot_is_public is not None:
@@ -1032,6 +1043,10 @@ class _TargetConfiguration:
         path_dirs = os.environ.get('PATH', '').split(os.pathsep)
 
         for exe in exes:
+            # Strip any surrounding quotes.
+            if exe.startswith('"') and exe.endswith('"'):
+                exe = exe[1:-1]
+
             if sys.platform == 'win32':
                 exe = exe + '.exe'
 
@@ -1059,15 +1074,26 @@ def _create_optparser(target_config, module_config):
             metavar="SPEC",
             help="pass -spec SPEC to qmake [default: %s]" % "don't pass -spec" if target_config.qmake_spec == '' else target_config.qmake_spec)
 
+    if module_config.pep484_stub_file:
+        p.add_option('--stubsdir', dest='stubsdir', type='string',
+                default=None, action='callback',
+                callback=optparser_store_abspath, metavar="DIR", 
+                help="the PEP 484 stub file will be installed in DIR "
+                        "[default: with the module]")
+        p.add_option('--no-stubs', dest='no_stubs', default=False,
+                action='store_true',
+                help="disable the installation of the PEP 484 stub file "
+                        "[default: enabled]")
+
     if module_config.hello_api_file:
         p.add_option('--apidir', '-a', dest='apidir', type='string',
                 default=None, action='callback',
                 callback=optparser_store_abspath, metavar="DIR", 
-                help="the hello API file will be installed in DIR "
-                        "[default: QT_INSTALL_DATA/hello]")
+                help="the Hello API file will be installed in DIR "
+                        "[default: QT_INSTALL_DATA/qsci]")
         p.add_option('--no-hello-api', dest='no_hello_api', default=False,
                 action='store_true',
-                help="disable the installation of the hello API file "
+                help="disable the installation of the Hello API file "
                         "[default: enabled]")
 
     if module_config.user_configuration_file_is_supported:
@@ -1105,12 +1131,11 @@ def _create_optparser(target_config, module_config):
                 default=None, action='store', metavar="FLAGS",
                 help="the sip flags used to build PyQt [default: query PyQt]")
 
-    if sys.platform != 'win32':
-        p.add_option('--qmake', '-q', dest='qmake', type='string',
-                default=None, action='callback',
-                callback=optparser_store_abspath_exe, metavar="FILE",
-                help="the pathname of qmake is FILE [default: "
-                        "%s]" % (target_config.qmake or "None"))
+    p.add_option('--qmake', '-q', dest='qmake', type='string', default=None,
+            action='callback', callback=optparser_store_abspath_exe,
+            metavar="FILE",
+            help="the pathname of qmake is FILE [default: %s]" % (
+                    target_config.qmake or "search PATH"))
 
     p.add_option('--sip', dest='sip', type='string', default=None,
             action='callback', callback=optparser_store_abspath_exe,
@@ -1154,10 +1179,6 @@ def _create_optparser(target_config, module_config):
     p.add_option('--verbose', '-w', dest='verbose', default=False,
             action='store_true',
             help="enable verbose output during configuration")
-    p.add_option('--no-timestamp', '-T', dest='no_timestamp', default=False,
-            action='store_true',
-            help="suppress timestamps in the header comments of generated "
-                    "code [default: include timestamps]")
 
     module_config.init_optparser(p, target_config)
 
@@ -1197,8 +1218,12 @@ def _inform_user(target_config, module_config):
                 "The %s module is being built with 'protected' redefined as "
                 "'public'." % module_name)
 
+    if target_config.stubs_dir != '':
+        inform("The PEP 484 stub file will be installed in %s." %
+                target_config.stubs_dir)
+
     if module_config.hello_api_file and target_config.api_dir != '':
-        inform("The hello API file will be installed in %s." %
+        inform("The Hello API file will be installed in %s." %
                 os.path.join(target_config.api_dir, 'api', 'python'))
 
 
@@ -1229,18 +1254,20 @@ def _generate_code(target_config, opts, module_config):
 
         # Add PyQt's .sip files to the search path.
         argv.append('-I')
-        argv.append(target_config.pyqt_sip_dir)
+        argv.append(quote(target_config.pyqt_sip_dir))
+
+    if target_config.stubs_dir != '':
+        # Generate the stub file.
+        argv.append('-y')
+        argv.append(quote(module_config.pep484_stub_file + '.pyi'))
 
     if module_config.hello_api_file and target_config.api_dir != '':
         # Generate the API file.
         argv.append('-a')
-        argv.append(module_config.hello_api_file + '.api')
+        argv.append(quote(module_config.hello_api_file + '.api'))
 
     if target_config.prot_is_public:
         argv.append('-P');
-
-    if opts.no_timestamp:
-        argv.append('-T')
 
     if not opts.no_docstrings:
         argv.append('-o');
@@ -1365,6 +1392,13 @@ target.CONFIG = no_check_exist
 target.path = %s
 INSTALLS += target
 ''' % quote(target_config.module_dir))
+
+    if target_config.stubs_dir != '':
+        pro.write('''
+pep484_stubs.path = %s
+pep484_stubs.files = %s.pyi
+INSTALLS += pep484_stubs
+''' % (target_config.stubs_dir, module_config.pep484_stub_file))
 
     if module_config.hello_api_file and target_config.api_dir != '':
         pro.write('''
@@ -1578,7 +1612,7 @@ def _check_sip(target_config, module_config):
                 "Make sure you have a working sip on your PATH or use the "
                 "--sip argument to explicitly specify a working sip.")
 
-    pipe = os.popen(' '.join([target_config.sip, '-V']))
+    pipe = os.popen(' '.join([quote(target_config.sip), '-V']))
 
     for l in pipe:
         version_str = l.strip()
@@ -1588,7 +1622,7 @@ def _check_sip(target_config, module_config):
 
     pipe.close()
 
-    if 'snapshot' not in version_str and 'preview' not in version_str:
+    if '.dev' not in version_str and 'snapshot' not in version_str:
         version = version_from_string(version_str)
         if version is None:
             error(

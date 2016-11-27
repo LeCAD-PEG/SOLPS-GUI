@@ -1,17 +1,6 @@
 #include "hello.h"
-#include "stdio.h"
 
-Hello::Hello(QWidget *parent):QLabel(parent)
+Hello::Hello(QWidget *parent) : QLabel(parent)
 {
-    printf("Hello, SOLPS\n");
-}
-
-Hello::Hello(const Hello &)
-{
-
-}
-
-Hello &Hello::operator=(const Hello &)
-{
-    return *this;
+  this->setText("Hello, SOLPS");
 }

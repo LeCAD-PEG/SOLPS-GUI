@@ -1,16 +1,15 @@
 // Define the interface to the hello library.
-#include <QLabel>
-#include <QWidget>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QWidget>
+
+#define HELLO_VERSION_STR "3.5"
 
 class Hello : public QLabel {
-    // This is needed by the Qt Meta-Object Compiler.
-    Q_OBJECT
 
-public:
+ public:
     Hello(QWidget *parent = 0);
 
 private:
     // Prevent instances from being copied.
-    Hello(const Hello &);
-    Hello &operator=(const Hello &);
+    Q_DISABLE_COPY(Hello)
 };

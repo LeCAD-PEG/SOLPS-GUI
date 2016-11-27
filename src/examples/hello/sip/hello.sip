@@ -5,7 +5,6 @@
 %Import QtGui/QtGuimod.sip
 %Import QtWidgets/QtWidgetsmod.sip
 
-
 class Hello : public QLabel {
 
 %TypeHeaderCode
@@ -18,5 +17,3 @@ public:
 private:
     Hello(const Hello &);
 };
-
-
