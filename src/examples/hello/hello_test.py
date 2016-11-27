@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QLabel
+from PyQt5.QtWidgets import QApplication
 from PyQt5.hello import Hello
 
 if __name__ == '__main__':

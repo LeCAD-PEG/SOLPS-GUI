@@ -141,71 +141,66 @@ Building the widget
    :caption: hello.h
    :name: hello-h
 
-    // Define the interface to the hello library.
-    #include <qlabel.h>
-    #include <qwidget.h>
-    #include <qstring.h>
+   // Define the interface to the hello library.
+   #include <QtWidgets/QLabel>
+   #include <QtWidgets/QWidget>
 
-    class Hello : public QLabel {
-        // This is needed by the Qt Meta-Object Compiler.
-        Q_OBJECT
+   #define HELLO_VERSION_STR "3.5"
+
+   class Hello : public QLabel {
 
     public:
-        Hello(QWidget *parent = 0);
+       Hello(QWidget *parent = 0);
 
-    private:
-        // Prevent instances from being copied.
-        Hello(const Hello &);
-        Hello &operator=(const Hello &);
-    };
-    #if !defined(Q_OS_WIN)
-    void setDefault(const QString &def);
-    #endif
+   private:
+       // Prevent instances from being copied.
+       Q_DISABLE_COPY(Hello)
+   };
 
 .. code-block:: c++
    :caption: hello.cpp
 
     #include "hello.h"
-    #include "stdio.h"
 
-    Hello::Hello(QWidget *parent):QLabel(parent)
-    {
-        printf("Hello, SOLPS\n");
-    }
-
-    Hello::Hello(const Hello &)
-    {
-
-    }
-
-    Hello &Hello::operator=(const Hello &)
-    {
-        return *this;
-    }
+   Hello::Hello(QWidget *parent) : QLabel(parent)
+   {
+     this->setText("Hello, SOLPS");
+   }
 
 .. code-block:: guess
-   :caption: hello.sip
+   :caption: sip/hello.sip
 
    // Define the SIP wrapper to the hello library.
-    %Module hello
+   %Module hello
 
-    %Import QtWidgets/QtWidgetsmod.sip
+   %Import QtGui/QtGuimod.sip
+   %Import QtWidgets/QtWidgetsmod.sip
 
+   class Hello : public QLabel {
 
-    class Hello : public QLabel {
+   %TypeHeaderCode
+   #include <hello.h>
+   %End
 
-    %TypeHeaderCode
-    #include <hello.h>
-    %End
+   public:
+       Hello(QWidget *parent /TransferThis/ = 0);
 
-    public:
-        Hello(QWidget *parent /TransferThis/ = 0);
+   private:
+       Hello(const Hello &);
+   };
 
-    private:
-        Hello(const Hello &);
-    };
+.. code-block:: guess
+   :caption: features/hello.prf
 
-To prepare build files ``configure.py`` needs to be edited and run with::
+   greaterThan(QT_MAJOR_VERSION, 4) {
+       QT += widgets
+
+       greaterThan(QT_MINOR_VERSION, 1) {
+           macx:QT += macextras
+       }
+   }
+
+To prepare build files :file:`configure.py` needs to be edited and run with::
 
     $ python3 configure.py --verbose
     $ make
@@ -217,8 +212,25 @@ To verify if the module hello.so has all shared libraries referenced issue::
 
     $ ldd -r hello.so
 
-Undefined symbols may be fixed by adding missing library with ``-l`` in
-the ``Makefile`` generated.
+Finally, one can run the following :file:`hello_test.py` that shows the
+*Hello* widget.
+
+.. code-block:: python
+   :caption: hello_test.py
+
+   from PyQt5.QtWidgets import QApplication
+   from PyQt5.hello import Hello
+
+   if __name__ == '__main__':
+
+       import sys
+
+       app = QApplication(sys.argv)
+       label = Hello()
+       label.show()
+       sys.exit(app.exec_())
+
+
 
 .. rubric:: References
 
