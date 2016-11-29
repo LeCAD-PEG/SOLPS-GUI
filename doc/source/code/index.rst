@@ -24,6 +24,13 @@ Custom widgets and plugins for Dashboard
 Pairs of custom widgets and plugins for Qt Designer to ease configuration
 of the Dashboard by graphical programming by users.
 
+------
+DivGeo
+------
+
+.. automodule:: divgeo
+   :members:
+
 -------
 Gnuplot
 -------
