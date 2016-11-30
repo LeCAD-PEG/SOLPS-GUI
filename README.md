@@ -30,10 +30,10 @@ or
 ## Buiding documentation
 
     $ cd doc
+    $ make latexpdf PAPER=a4 # for PDF with TexLive
     $ make html # for solps_doc alias within "modern" browser
     $ make qthelp # for solps_help alias with assistant
     $ qcollectiongenerator build/qthelp/SOLPSGUI.qhcp
-    $ make latexpdf PAPER=a4 # for PDF with TexLive
 
 
 ## ITER cluster specifics
@@ -41,18 +41,12 @@ or
 Qt5.x requires XCB library for X11 rendering instead of Xlib.
 On RHEL5 XCB is built from sources and put into staging/lib. 
 
-### Documentation building with sphinx
-Due to the problems with the installed OpenSSL libraries the following
-preloads are required to install sphinx (or other PyPI packages):
-
-    LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
-    pip3 install sphinx
-
 ### IMAS build environment
-IMAS is not required to build SOLPS-GUI
+IMAS is not required to build the SOLPS GUI.
 
     module use /work/imas/etc/modulefiles
     module load imas
+    imasdb solps-iter
 
 ## Ubuntu 14+ and other distros
 XCB development libraries are required for building Qt5.x
@@ -70,7 +64,7 @@ See https://jira.iter.org/projects/IMAS?selectedItem=com.atlassian.jira.jira-pro
     brew install qt5
     brew linkapps qt5
     brew install PyQt5 --with-python3
-    pip3 install sphinx
+    pip3 install sphinx sphinx_rtd_theme matplotlib
 
 ## User preferences
 Preferences of some widgets and settings are stored to allow users

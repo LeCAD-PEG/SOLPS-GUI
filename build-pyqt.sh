@@ -1,6 +1,6 @@
 #!/bin/sh -x
 ## Building PyQt with Python3 and Qt5
-## Minimum GCC supported version is 4.7
+## Minimum GCC supported version for building Qt5 is 4.7
  
 PYTHON_VERSION=3.5.2
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
@@ -12,8 +12,7 @@ SIP_VERSION=4.18
 case $(hostname -f) in
   *.iter.org) # RHEL5.11 with GCC 4.2
 	module purge
-	module use /work/imas/opt/EasyBuild/modules/all
-	module load GCC/4.8.3 binutils/2.25 python/2.7/11 gperf
+	module load GCC/4.8.3 binutils/2.25 python/2.7/11 #gperf
 	USE_QT_XCB="NO"
 	BUILD_XCB="YES"
 	unset CXX CC # Remove ICC to be selected by chance
@@ -23,8 +22,9 @@ case $(hostname -f) in
                         -D FC_WEIGHT_EXTRABLACK=215 \
                         -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK}
 	;;
-  g0[1234].itm.rzg.mpg.de) # SLES 11.4 WPCD Gateway (incompatible XCB, Xlib and GL libraries)
-  tok*.bc.rzg.mpg.de) # IPP MPG 
+  # SLES 11.4 WPCD Gateway (incompatible XCB, Xlib and GL libraries)
+  g0[1234].itm.rzg.mpg.de \
+  | tok*.bc.rzg.mpg.de) # IPP MPG 
         MAKE_JOBS=${MAKE_JOBS:-16}
 	USE_QT_XCB="NO"
 	BUILD_XCB="YES"
@@ -73,20 +73,17 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   cd ${BUILD_DIR}
   tar xzf ${DOWNLOAD_DIR}/${PYTHON_SRC}
   cd ${PYTHON_SRC_DIR}
-  # LDFLAGS for OpenSSL static build see the following
-  # http://stackoverflow.com/questions/7307857/libssl-static-lib-compiling-issue-with-fpic
-  LDFLAGS="-Wl,-Bsymbolic,-rpath=${STAGING_DIR}/lib" \
+  if pkg-config --exists libssl; then
+    ssl=$(pkg-config --variable=prefix libssl)
+    sed -i -e "s,#SSL=.*,SSL=${ssl}," -e "/^#.*ssl/s/#//" \
+	-e '/ssl/s|-lcrypto|-lcrypto -Wl,-rpath,$(SSL)/lib|' Modules/Setup.dist
+  fi
   ./configure --prefix=${STAGING_DIR} --enable-shared
-  LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
   make -j ${MAKE_JOBS}
-  LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
   make install
-  PYTHONPATH= LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
-  LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} \
-  ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade sphinx
-  PYTHONPATH= LD_PRELOAD=/usr/lib64/libgssapi_krb5.so:/usr/lib64/libz.so \
-  LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} \
-  ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install sphinx_rtd_theme
+  LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
+  ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
+      pip sphinx sphinx_rtd_theme matplotlib
   touch ${PYTHON_SRC_DIR}/.built
 fi
 
@@ -94,8 +91,6 @@ XCB_FLAGS="-xcb -no-xcb-xlib" # XCB is mandatory for Linux
 if [ "${USE_QT_XCB}" = "YES" ]; then # build QT with QT-provided XCB libs
   XCB_FLAGS="${XCB_FLAGS} -qt-xcb"
 fi
-
-PYTHON="${STAGING_DIR}/bin/python${PYTHON_MAINVERSION}"
 
 ## Build XCB Xlib and libXML for Qt5 locally instead of Qt provided XCB libs.
 # For Qt5.x build problems on RHEL5 see
@@ -139,7 +134,7 @@ for url in ${URLS}; do
   else configopt=
   fi
   PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH} \
-  PYTHON=${PYTHON} ./configure --prefix=${STAGING_DIR} ${configopt}
+  ./configure --prefix=${STAGING_DIR} ${configopt}
   make -j ${MAKE_JOBS}
   make install
   touch .built
@@ -218,12 +213,15 @@ fi
 
 SIP_SRC_DIR="${BUILD_DIR}/sip-${SIP_VERSION}"
 SIP_INSTALL_DIR="${STAGING_DIR}"
+PYTHON="${STAGING_DIR}/bin/python${PYTHON_MAINVERSION}"
+
 
 if [ ! -e   ${SIP_SRC_DIR}/.built ]; then
   rm -rf ${SIP_SRC_DIR}
   cd ${BUILD_DIR}
   tar xzf ${DOWNLOAD_DIR}/${SIP_SRC}
   cd ${SIP_SRC_DIR}
+  LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
   ${PYTHON} configure.py
   make -j ${MAKE_JOBS}
   make install 
@@ -251,6 +249,7 @@ if [ ! -e   ${PyQT_SRC_DIR}/.built ]; then
   cd ${BUILD_DIR}
   tar xzf ${DOWNLOAD_DIR}/${PyQT_SRC}
   cd ${PyQT_SRC_DIR}
+  LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
   ${PYTHON} configure.py --confirm-license --verbose \
       --qmake=${STAGING_DIR}/qt/${QT_VERSION}/bin/qmake \
       --sip=${STAGING_DIR}/bin/sip

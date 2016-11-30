@@ -1,6 +1,6 @@
 #!/bin/sh -x
 
-PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.1.2}
+PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.2.0}
 QT_VERSION=${QT_VERSION:-4.8.7}
 CMAKE_VERSION=3.6.1
 case $(hostname) in
@@ -113,8 +113,8 @@ if [ ! -d ${PARAVIEW_SOURCE_DIR} ]; then
 # See https://github.com/OpenFOAM/ThirdParty-dev/blob/master/README.org
     patch -p2 -d ${PARAVIEW_SOURCE_DIR} < \
         ${BUILDROOT}/src/patches/paraview-ui_pqExportStateWizard.patch
-    patch -p1 -d ${PARAVIEW_SOURCE_DIR} < \
-        ${BUILDROOT}/src/patches/paraview-vtk-storage-mkostemp.patch
+#    patch -p1 -d ${PARAVIEW_SOURCE_DIR} < \
+#        ${BUILDROOT}/src/patches/paraview-vtk-storage-mkostemp.patch
 fi
 
 
@@ -126,6 +126,7 @@ cd ${PARAVIEW_BUILD}
 
 install -d ${STAGING_PARAVIEW}
 ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Release \
+		-DVTK_RENDERING_BACKEND:STRING=OpenGL \
                 -DBUILD_SHARED_LIBS:BOOL=ON  \
                 -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
                 -DBUILD_TESTING:BOOL=OFF \
@@ -141,7 +142,7 @@ find .  -name link.txt -exec \
            -e "s|-L${STAGING_QT}/lib|-L${STAGING_QT}/lib -lQtCore -lQtGui|" {} \;
 
 LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} \
-make -j ${MAKE_JOBS} VERBOSE=1
+make -j ${MAKE_JOBS} VERBOSE=0
 make install
 #fi
 
