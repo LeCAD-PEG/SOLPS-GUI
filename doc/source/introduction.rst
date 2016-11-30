@@ -443,8 +443,8 @@ standalone ParaView application for *in situ* instrumentation.
 
 SOLPS is a package of codes developed over many years and was started as
 an evaluation tool for engineers but then developed into an essential
-tool that allowed combining design and modelling process of the
-divertor, with synthesising different pieces of information from
+tool that allowed combining the design and modelling process of the
+divertor, with synthesising different pieces of information from the
 theoretical analysis, experimental studies and engineering intuition.
 Several versions of SOLPS code exist to date. The newly developed
 SOLPS-ITER  suite of codes comprise a grid generator CARRE , a tool for
@@ -471,10 +471,10 @@ existing Qt tools that are traditionally used only for GUI designs and have
 programmed actions in the code. With the SOLPS-ITER GUI the workflow
 creation is possible with Python-based workflow engine. The workflow
 execution model is independent of clusters and provided by *Runs* view.
-Withi the GUI *Designer* the layout of the widgets is fully configurable
+Within the GUI *Designer* the layout of the widgets is fully configurable
 and in contrast to other scientific workflow engines, provides the
 dashboard as the front end to users solving the workflow monitoring problem
-in a way users prefer. The sharing of a complex dashboard design is
+in user friendly way. The sharing of a complex dashboard design is
 possible among users and is more oriented towards monitoring and graphical
 presentation, with full visualisation support. Having all these features in
 mind, we would like to highlight that the approach presented in
