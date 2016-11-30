@@ -2,7 +2,7 @@
 """ A PyQt custom DivGeo widget for Qt Designer.
 """
 
-from PyQt5.QtCore import (Qt, QProcess, QProcessEnvironment, QSize, pyqtSignal,
+from PyQt5.QtCore import (Qt, QProcess, QSize, pyqtSignal,
                           QSettings, pyqtSlot, pyqtProperty, QPoint, QRect)
 from PyQt5.QtGui import QImage, QPixmap, QWindow
 from PyQt5.QtWidgets import QLabel, QFrame, QWidget
@@ -37,9 +37,10 @@ class DivGeo(QLabel):
         self.divgeo = QProcess(self.container)
         self.divgeo.error.connect(self.show_error)
         self.divgeo.readyReadStandardError.connect(self.stderrReady)
+        self.divgeo.readyReadStandardOutput.connect(self.stdoutReady)
 
     def __del__(self):
-        if self.divgeo.state() != QProcess.NotRunning:
+        if self.divgeo.state(): # state() == 0 means NotRunning
             self.divgeo.kill()
             print("Terminating DivGeo")
 
@@ -54,6 +55,12 @@ class DivGeo(QLabel):
        error_data = self.divgeo.readAllStandardError()
        error_text = bytearray(error_data).decode('utf8')
        logging.error(error_text)
+
+    @pyqtSlot()
+    def stdoutReady(self):
+        data = self.divgeo.readAllStandardOutput()
+        text = bytearray(data).decode('utf8')
+        logging.debug(text)
 
     @pyqtSlot()
     def startDivGeo(self):
@@ -118,6 +125,10 @@ if __name__ == "__main__":
     import sys
     from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
     from PyQt5.QtCore import QRect
+    import logging
+
+    logging.getLogger().setLevel(logging.DEBUG)
+
     app = QApplication(sys.argv)
     main_window = QMainWindow()
     main_window.resize(648, 520)

@@ -212,7 +212,9 @@ if __name__ == "__main__":
 
     import sys
     from PyQt5.QtWidgets import QApplication
+    import logging
 
+    logging.getLogger().setLevel(logging.DEBUG)
     app = QApplication(sys.argv)
     window = B2plot()
     window.show()
