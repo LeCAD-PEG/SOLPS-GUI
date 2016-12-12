@@ -36,6 +36,7 @@ class B2plot(QLabel):
         self.solps_top_changed = False
         self.rundir = None
         self.b2plot_command = None
+        self.b2plot_page = 0
 
         self.setAlignment(Qt.AlignCenter)
         self.setFrameStyle(QFrame.StyledPanel)
@@ -107,12 +108,31 @@ class B2plot(QLabel):
 
     @pyqtSlot(str)
     def setB2plotCommand(self, command):
+        """ Sets b2plot command for later execution.
+
+            Args:
+                command (str): Command in usual b2plot style.
+                                ``echo "b2plot commands" | b2plot``
+        """
         self.b2plot_command = command
 
     def getB2plot_pltcmd(self):
         return self.b2plot_command
 
     b2plotCommand = pyqtProperty(str, getB2plot_pltcmd, setB2plotCommand)
+
+    def setB2plotPage(self, page):
+        """ Sets the page for conversion into final image.
+
+            Args:
+                page (int): page number. First page is 0 and it is default.
+        """
+        self.b2plot_page = page
+
+    def getB2plotPage(self):
+        return self.b2plot_page
+
+    b2plotPage = pyqtProperty(int, getB2plotPage, setB2plotPage)
 
     @pyqtSlot()
     def print_tcsh_stderr(self):
@@ -127,9 +147,9 @@ class B2plot(QLabel):
         if 'B2PLOT FINISHED' in text:
             b2plot_ps_file = self.rundir + '/b2plot.ps'
             if os.path.exists(b2plot_ps_file):
-                self.convert_args =  ['+antialias', '-resize',
-                                      str(self.width()) + 'x' + str(self.height()),
-                                      'b2plot.ps', 'png:-']
+                self.convert_args =  ['+antialias', '-resize', str(self.width())
+                                      + 'x' + str(self.height()), 'b2plot.ps[' +
+                                      str(self.b2plot_page) + ']', 'png:-']
                 self.convert.start(self.convert_path, self.convert_args)
             else:
                 msg ="b2plot.ps file not created from " + self.b2plot_command
