@@ -408,6 +408,10 @@ class Eirene(QWidget):
 
     def setPlaceholderText(self, text):
         self.tree.setPlainText(text)
+    def document(self): # TODO save
+        return self
+    def isModified(self):
+        return False
 
 if __name__ == "__main__":
 
