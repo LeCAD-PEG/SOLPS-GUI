@@ -144,9 +144,9 @@ book keeping and printout. EIRENE labels the time steps from NTIME0 to NTIME.</p
 time per cycle is defined as NTMSTP * DTIMV (see below, input block 13).</p>
 <p>After each time-cycle the subroutine TMSTEP is called. In this routine the “census
 arrays”, which store the test particle population at time ti:
-ti = ti􀀀1 + t = t0 + it = TIME0 + ITIME  [NTMSTP  DTIMV ]
+ti = ti1 + t = t0 + it = TIME0 + ITIME  [NTMSTP * DTIMV ]
 are filled and prepared for the next time-cycle. The census arrays from the previous
-time cycle (if any), i.e., at t = ti􀀀1, are overwritten here.
+time cycle (if any), i.e., at t = ti1, are overwritten here.
 <p>After the last time-cycle, the census arrays are written on file fort.15, in order to permit
 continuation in time in a next run.
 The background conditions (and source distributions or any other input parameters) for
@@ -308,7 +308,7 @@ class EireneEdit(QTreeWidget):
 
     def setPlainText(self, text):
         lines = text.splitlines()
-        group = self
+        group = parent = self
         for i, line in enumerate(lines):
             if line[:3] == '***':
                 item = QTreeWidgetItem(self)
@@ -325,6 +325,8 @@ class EireneEdit(QTreeWidget):
                 item = QTreeWidgetItem(parent)
                 # item.setText(0, str(i))
                 item.setText(1, line.rstrip())
+                if parent == self:
+                    return
                 if parent.data(1, Qt.DisplayRole)[:6] == "*** 1.":
                     row = parent.indexOfChild(item)
                     if row == 0:
@@ -399,6 +401,12 @@ class Eirene(QWidget):
             self.help.setText('<b>' + parameter + '</b>:'
                               + eirene_params[parameter])
     def setPlainText(self, text):
+        self.tree.setPlainText(text)
+
+    def setReadOnly(self, state):
+        return
+
+    def setPlaceholderText(self, text):
         self.tree.setPlainText(text)
 
 if __name__ == "__main__":
