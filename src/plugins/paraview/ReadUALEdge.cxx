@@ -110,8 +110,6 @@ int ReadUALEdge::RequestData(
     return 0;
   }
   
-  
-
   class IDS::edge_profiles & edge = db._edge_profiles;
   class IDS::edge_profiles::ggd & ggd = edge.ggd(0);
   class IDS::edge_profiles::ggd::grid & grid = ggd.grid;
@@ -120,17 +118,32 @@ int ReadUALEdge::RequestData(
   class IDS::edge_profiles::ggd::grid::space::objects_per_dimension & dim_edges = space.objects_per_dimension(1);
   class IDS::edge_profiles::ggd::grid::space::objects_per_dimension & dim_cells = space.objects_per_dimension(2);
   
+  // Checking, if we have nodes, edges and cells data in current IDS database
+  int num_nodes_nodes = 0;
+  int num_nodes_geo = 0;
+  int num_edges_nodes = 0;
+  int num_cells_nodes = 0;
+
+  if(dim_nodes.object.extent(0) > 0){
+    num_nodes_nodes = dim_nodes.object(0).nodes.extent(0);
+    num_nodes_geo = dim_nodes.object(0).geometry.extent(0);
+  }
+  if(dim_edges.object.extent(0) > 0){
+    num_edges_nodes = dim_nodes.object(0).nodes.extent(0)/2;
+  }
+  if(dim_cells.object.extent(0) > 0){
+    num_cells_nodes = dim_cells.object(0).nodes.extent(0)/4;
+  }
   
-  int num_nodes_nodes = dim_nodes.object(0).nodes.extent(0);
-  int num_nodes_geo = dim_nodes.object(0).geometry.extent(0);
-  int num_edges_nodes = dim_edges.object(0).nodes.extent(0)/2;
-  int num_cells_nodes = dim_cells.object(0).nodes.extent(0)/4;
+//   std::clog << "dim_nodes.object.extent(0): " << dim_nodes.object.extent(0) << std::endl;
+//   std::clog << "dim_edges.object.extent(0): " << dim_edges.object.extent(0) << std::endl;
+//   std::clog << "dim_cells.object.extent(0): " << dim_cells.object.extent(0) << std::endl;  
   
   std::clog << "num_nodes_geo: " << num_nodes_geo << std::endl;
   std::clog << "num_nodes_nodes: " << num_nodes_nodes << std::endl;
   std::clog << "num_edges_nodes: " << num_edges_nodes << std::endl;
   std::clog << "num_cells_nodes: " << num_cells_nodes << std::endl;
-  
+
   //vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkQuad> Quad =  vtkSmartPointer<vtkQuad>::New();
   vtkSmartPointer<vtkCellArray> cellArray = vtkSmartPointer<vtkCellArray>::New();
@@ -143,7 +156,7 @@ int ReadUALEdge::RequestData(
   }
   
   int num_subgrids = grid.grid_subset.extent(0);
-  
+
   for(int i = 0; i < num_subgrids; i++){
     int subgrid_class = grid.grid_subset(i).element(0).object(0).dimension; // 0 -> nodes; 1 -> edges; 2 -> faces/cells
     int subgrid_space = grid.grid_subset(i).element(0).object(0).space;
@@ -160,7 +173,7 @@ int ReadUALEdge::RequestData(
     }else if(subgrid_class -1 == 2){
       size = dim_cells.object(subgrid_class_object_id-1).nodes.extent(0)/4;
     }
- 
+
     //std::clog << i << "  " << subgrid_base_id << "  " <<  subgrid_class_object_id << "  " <<  subgrid_name << "  " <<  subgrid_class << std::endl;
     vtkSmartPointer<vtkCellArray> subgridCellArray = vtkSmartPointer<vtkCellArray>::New();
     
@@ -169,74 +182,64 @@ int ReadUALEdge::RequestData(
       
     //ELECTRON DENSITY creating array
     vtkSmartPointer<vtkDoubleArray> electronDensityArray = fCreateNewDoubleArray(size, "Electron Density");
-    
+//
     if (subgrid_class - 1 == 0){ // ------POINTS/NODES-----
       //class IDS::edge_profiles::ggd::grid::space::objects_per_dimension::object & object_nodes = dim_nodes.object(subgrid_class_object_id-1);
       vtkSmartPointer<vtkUnstructuredGrid> subgridPointsUnstructuredGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
       
       //int size = dim_nodes.object(subgrid_class_object_id-1).nodes.extent(0);
       //std::clog << "subgrid " << subgrid_base_id << " class 0 size: "<< size << std::endl;
+
+      //////////Setting points
+      vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+      vtkSmartPointer<vtkCellArray> subgridVertices = vtkSmartPointer<vtkCellArray>::New();
+      vtkSmartPointer<vtkVertex> subgridVertex = vtkSmartPointer<vtkVertex>::New();
+      for (int j = 0; j < size; j++){
+	points->InsertNextPoint(dim_nodes.object(subgrid_class_object_id-1).geometry(j), dim_nodes.object(subgrid_class_object_id-1).geometry(size+j), 0.0);
+        subgridVertex->GetPointIds()->SetId(0, j);
+	subgridVertices->InsertNextCell(subgridVertex);
+      }
+      subgridPointsUnstructuredGrid->SetPoints(points);
+      subgridPointsUnstructuredGrid->SetCells(VTK_VERTEX, subgridVertices);
       
       //ELECTRON TEMPERATURE creating array
       //vtkSmartPointer<vtkDoubleArray> electronTemperatureArray = fCreateNewDoubleArray(size, "Electron Temperature ");
-      int te_subgrids_num = ggd.electrons.temperature.extent(0);
-    
+      int te_subgrids_num = ggd.electrons.temperature.extent(0); 
     
       //ELECTRON DENSITY creating array
       //vtkSmartPointer<vtkDoubleArray> electronDensityArray = fCreateNewDoubleArray(size, "Electron Density ");
       int ne_subgrids_num = ggd.electrons.density.extent(0);
-    
+
       // Getting vertex colored by reading scalars from electron temperature subgrids (nodes)
       for (int n = 0; n < te_subgrids_num; n++){
 	int te_subgrid_base_id = ggd.electrons.temperature(n).grid_subset_index;
 	
 	if (subgrid_base_id == te_subgrid_base_id && size == ggd.electrons.temperature(n).values.extent(0)){ //If database was written correctly, then the size of subgrid geometry(nodes) and subgrid values (scalars) are of the same size
-	  
-	  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-	  vtkSmartPointer<vtkCellArray> subgridVertices = vtkSmartPointer<vtkCellArray>::New();
-	  vtkSmartPointer<vtkVertex> subgridVertex = vtkSmartPointer<vtkVertex>::New();
 	  electronTemperatureArray->SetNumberOfValues(size);
 	  
 	  for (int j = 0; j < size; j++){
-	    points->InsertNextPoint(dim_nodes.object(subgrid_class_object_id-1).geometry(j), dim_nodes.object(subgrid_class_object_id-1).geometry(size+j), 0.0);
 	    //std::clog << "j: " << j << " x: " << dim_nodes.object(subgrid_class_object_id-1).geometry(j) << " y: " << dim_nodes.object(subgrid_class_object_id-1).geometry(size+j) << std::endl;
-	    subgridVertex->GetPointIds()->SetId(0, j);
-	    subgridVertices->InsertNextCell(subgridVertex);
 	    electronTemperatureArray->SetComponent(j,0, ggd.electrons.temperature(n).values(j));
 	  }
-	  subgridPointsUnstructuredGrid->SetPoints(points);
-	  subgridPointsUnstructuredGrid->SetCells(VTK_VERTEX, subgridVertices);
 	  subgridPointsUnstructuredGrid->GetCellData()->AddArray(electronTemperatureArray);
 	  break;
 	}
-	
       }
-      
+    
+    
       // Getting vertex colored by reading scalars from electron density subgrids (nodes)
       for (int n = 0; n < ne_subgrids_num; n++){
 	int ne_subgrid_base_id = ggd.electrons.density(n).grid_subset_index;
 	
 	if (subgrid_base_id == ne_subgrid_base_id && size == ggd.electrons.density(n).values.extent(0)){ //If database was written correctly, then the size of subgrid geometry(nodes) and subgrid values (scalars) are of the same size
-	  //std::clog << "size base: " << size << " size subgrid: " << ggd.electrons.density(k).values.extent(0) << std::endl;
-	  
-	  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-	  vtkSmartPointer<vtkCellArray> subgridVertices = vtkSmartPointer<vtkCellArray>::New();
-	  vtkSmartPointer<vtkVertex> subgridVertex = vtkSmartPointer<vtkVertex>::New();
 	  electronDensityArray->SetNumberOfValues(size);
 	  
 	  for (int j = 0; j < size; j++){
-	    points->InsertNextPoint(dim_nodes.object(subgrid_class_object_id-1).geometry(j), dim_nodes.object(subgrid_class_object_id-1).geometry(size+j), 0.0);
-	    //std::clog << "j: " << j << " x: " << dim_nodes.object(subgrid_class_object_id-1).geometry(j) << " y: " << dim_nodes.object(subgrid_class_object_id-1).geometry(size+j) << std::endl;
-	    subgridVertex->GetPointIds()->SetId(0, j);
-	    subgridVertices->InsertNextCell(subgridVertex);
 	    electronDensityArray->SetComponent(j,0, ggd.electrons.density(n).values(j));
 	  }
-	  subgridPointsUnstructuredGrid->SetPoints(points);
-	  subgridPointsUnstructuredGrid->SetCells(VTK_VERTEX, subgridVertices);
 	  subgridPointsUnstructuredGrid->GetCellData()->AddArray(electronDensityArray);
 	  break;
 	}
-	
       }
       
       // Getting vertex colored by reading scalars from ion temperature subgrids (nodes)
@@ -250,21 +253,11 @@ int ReadUALEdge::RequestData(
 	  int ti_subgrid_base_id = ggd.ion(k).temperature(n).grid_subset_index;
 	  
 	  if (subgrid_base_id == ti_subgrid_base_id && size == ggd.ion(k).temperature(n).values.extent(0)){ //If database was written correctly, then the size of subgrid geometry(nodes) and subgrid values (scalars) are of the same size
-	    
-	    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-	    vtkSmartPointer<vtkCellArray> subgridVertices = vtkSmartPointer<vtkCellArray>::New();
-	    vtkSmartPointer<vtkVertex> subgridVertex = vtkSmartPointer<vtkVertex>::New();
 	    ionTemperatureArray->SetNumberOfValues(size);
 	    
 	    for (int j = 0; j < size; j++){
-	      points->InsertNextPoint(dim_nodes.object(subgrid_class_object_id-1).geometry(j), dim_nodes.object(subgrid_class_object_id-1).geometry(size+j), 0.0);
-	      //std::clog << "j: " << j << " x: " << dim_nodes.object(subgrid_class_object_id-1).geometry(j) << " y: " << dim_nodes.object(subgrid_class_object_id-1).geometry(size+j) << std::endl;
-	      subgridVertex->GetPointIds()->SetId(0, j);
-	      subgridVertices->InsertNextCell(subgridVertex);
 	      ionTemperatureArray->SetComponent(j,0, ggd.ion(k).temperature(n).values(j));
 	    }
-	    subgridPointsUnstructuredGrid->SetPoints(points);
-	    subgridPointsUnstructuredGrid->SetCells(VTK_VERTEX, subgridVertices);
 	    subgridPointsUnstructuredGrid->GetCellData()->AddArray(ionTemperatureArray);
 	    break;
 	  }
@@ -293,21 +286,11 @@ int ReadUALEdge::RequestData(
 	  int ni_subgrid_base_id = ggd.ion(k).density(n).grid_subset_index;
 	  
 	  if (subgrid_base_id == ni_subgrid_base_id && size == ggd.ion(k).density(n).values.extent(0)){ //If database was written correctly, then the size of subgrid geometry(nodes) and subgrid values (scalars) are of the same size
-	    
-	    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-	    vtkSmartPointer<vtkCellArray> subgridVertices = vtkSmartPointer<vtkCellArray>::New();
-	    vtkSmartPointer<vtkVertex> subgridVertex = vtkSmartPointer<vtkVertex>::New();
 	    ionDensityArray->SetNumberOfValues(size);
 	    
 	    for (int j = 0; j < size; j++){
-	      points->InsertNextPoint(dim_nodes.object(subgrid_class_object_id-1).geometry(j), dim_nodes.object(subgrid_class_object_id-1).geometry(size+j), 0.0);
-	      //std::clog << "j: " << j << " x: " << dim_nodes.object(subgrid_class_object_id-1).geometry(j) << " y: " << dim_nodes.object(subgrid_class_object_id-1).geometry(size+j) << std::endl;
-	      subgridVertex->GetPointIds()->SetId(0, j);
-	      subgridVertices->InsertNextCell(subgridVertex);
 	      ionDensityArray->SetComponent(j,0, ggd.ion(k).density(n).values(j));
 	    }
-	    subgridPointsUnstructuredGrid->SetPoints(points);
-	    subgridPointsUnstructuredGrid->SetCells(VTK_VERTEX, subgridVertices);
 	    subgridPointsUnstructuredGrid->GetCellData()->AddArray(ionDensityArray);
 	    break;
 	  }
@@ -321,7 +304,8 @@ int ReadUALEdge::RequestData(
       //std::clog << "num_blocks:" << num_blocks << std::endl;
       mainMB->SetBlock(num_blocks, subgridPointsUnstructuredGrid);
       mainMB->GetMetaData((unsigned int) num_blocks)->Set(vtkCompositeDataSet::NAME(), subgrid_name.c_str()); 
-      
+    //}
+    #if 1
     }else if (subgrid_class -1 == 1){  //------LINES-----
       //vtkSmartPointer<vtkPoints> subgridLinesPoints = vtkSmartPointer<vtkPoints>::New();
       vtkSmartPointer<vtkUnstructuredGrid> subgridLinesUnstructuredGrid =vtkSmartPointer<vtkUnstructuredGrid>::New();
@@ -355,7 +339,7 @@ int ReadUALEdge::RequestData(
       //std::clog << "num_blocks:" << num_blocks << std::endl;
       mainMB->SetBlock(num_blocks, subgridLinesUnstructuredGrid);
       mainMB->GetMetaData((unsigned int) num_blocks)->Set(vtkCompositeDataSet::NAME(), subgrid_name.c_str()); 
-      
+
     }else if (subgrid_class -1 == 2){ //-----CELLS------
       vtkSmartPointer<vtkUnstructuredGrid> subgridCellsUnstructuredGrid =vtkSmartPointer<vtkUnstructuredGrid>::New();
       vtkSmartPointer<vtkQuad> subgridQuad =  vtkSmartPointer<vtkQuad>::New();
@@ -363,14 +347,19 @@ int ReadUALEdge::RequestData(
       
       //int size = dim_cells.object(subgrid_class_object_id-1).nodes.extent(0)/4;
       //std::clog << "subgrid " << subgrid_base_id << "  class 2 size: "<< size << std::endl;
- 
+
+
       for(int j = 0; j < size; j++)
       {
-	
 	int cell_ind_0 = dim_cells.object(subgrid_class_object_id-1).nodes(j)-1;
 	int cell_ind_1 = dim_cells.object(subgrid_class_object_id-1).nodes(size+j)-1;
 	int cell_ind_2 = dim_cells.object(subgrid_class_object_id-1).nodes(2*size+j)-1;
 	int cell_ind_3 = dim_cells.object(subgrid_class_object_id-1).nodes(3*size+j)-1;
+	#if 0
+        if(j < 300){
+	  std::clog << j << ": " << cell_ind_0 << " " << cell_ind_1 << " " << cell_ind_2 << " " << cell_ind_3 << std::endl;
+        }
+        #endif
 	
 	subgridQuad->GetPointIds()->SetId(0,cell_ind_0);
 	subgridQuad->GetPointIds()->SetId(1,cell_ind_1);
@@ -379,14 +368,12 @@ int ReadUALEdge::RequestData(
 	subgridCellArray->InsertNextCell(subgridQuad);
 	
       }
-      
       int te_subgrids_num = ggd.electrons.temperature.extent(0);
       int ne_subgrids_num = ggd.electrons.density.extent(0);
       //std::clog << "subgrid_class_object_id: " << subgrid_class_object_id << std::endl;
       for (int n = 0; n < te_subgrids_num; n++){ //te_subgrids_num == ne_subgrids_num, thats why we can include also electron density in the next coming loops
 	int te_subgrid_base_id = ggd.electrons.density(n).grid_subset_index;
 	if (subgrid_base_id == te_subgrid_base_id && size == ggd.electrons.temperature(n).values.extent(0)){ //If database was written correctly, then the size of subgrid geometry(nodes) and subgrid values (scalars) are of the same size
-	  //std::clog << "test" << std::endl;
 	  for(int j = 0; j < size; j++){
 	    
 	    //ELECTRON DENSITY and ELECTRON TEMPERATURE
@@ -396,14 +383,13 @@ int ReadUALEdge::RequestData(
 	  break;
 	}
       }
-      
+
       subgridCellsUnstructuredGrid->SetPoints(points_global);
       subgridCellsUnstructuredGrid->SetCells(VTK_QUAD, subgridCellArray);
-      
       //Setting Electron Density and Electron Temperature to UnstructuredGrid
       subgridCellsUnstructuredGrid->GetCellData()->AddArray(electronTemperatureArray);
       subgridCellsUnstructuredGrid->GetCellData()->AddArray(electronDensityArray);
-      
+
       //ION DENSITY AND ION TEMPERATURE
       int ion_species_num = ggd.ion.extent(0);
       for(int k = 0; k < ion_species_num; k++){
@@ -457,11 +443,12 @@ int ReadUALEdge::RequestData(
       mainMB->SetBlock(num_blocks, subgridCellsUnstructuredGrid);
       mainMB->GetMetaData((unsigned int) num_blocks)->Set(vtkCompositeDataSet::NAME(), subgrid_name.c_str());
     }
+   #endif
   }
-  
   
   output->ShallowCopy(mainMB);
   db.close();
+  
 #else
   ItmNs::Itm itm(this->Shot,this->Run,this->Shot,this->RefRun);
 
