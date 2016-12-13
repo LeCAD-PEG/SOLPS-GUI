@@ -23,6 +23,7 @@ import gzip
 import textwrap
 
 from tooltips import b2mn_tooltips
+from eirene import Eirene
 
 class B2mnHighlighter( QSyntaxHighlighter ):
     """ B2mnHighlighter( QSyntaxHighlighter )
@@ -199,8 +200,13 @@ class SolpsInput(QTabWidget):
             plainTextEdit.setFont(font)
             plainTextEdit.setLineWrapMode(QPlainTextEdit.NoWrap)
             tab_index = self.addTab(plainTextEdit, filename)
-            self.setTabToolTip(tab_index, tooltip)
+
             self.editors[filename] = plainTextEdit
+            if filename == 'input.dat':
+                eirene = Eirene()
+                tab_index = self.addTab(eirene, filename)
+                self.editors[filename] = eirene
+            self.setTabToolTip(tab_index, tooltip)
         self.restore_tab_positions()
 
     @pyqtSlot(int)
@@ -416,7 +422,8 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = SolpsInput()
     window.setRundir(os.path.expanduser("~")+
-                     '/solps-iter/runs/tutorial/AUG_16151_D/run_for_GUI_demo')
+      '/solps-iter/runs/tutorial/ITER_535_D+He+Ar/baserun')
+    # '/solps-iter/runs/tutorial/AUG_16151_D/run_for_GUI_demo')
     window.read_input_files()
     #window.read_input_files()  # should be resistant to multiple calls
     window.show()
