@@ -234,9 +234,14 @@ class MyLineEdit(QLineEdit):
         self.last_param = None
 
     def set_card_help(self, card_description):
-        for param_name, width in card_description:
-            for i in range(width):
-                self.parameter_description.append(param_name)
+        if card_description[0] == 'I':
+            for param_name in card_description[1:]:
+                for i in range(6):
+                    self.parameter_description.append(param_name)
+        elif card_description[0] == 'B':
+            for i, param_name in enumerate(card_description[1:]):
+                if i%6 != 0:
+                    self.parameter_description.append(param_name)
 
     def event(self, ev):
         if ev.type() == QEvent.MouseButtonRelease\
@@ -330,29 +335,21 @@ class EireneEdit(QTreeWidget):
                 if parent.data(1, Qt.DisplayRole)[:6] == "*** 1.":
                     row = parent.indexOfChild(item)
                     if row == 0:
-                        item.setData(1, Qt.UserRole, [('NMACH', 6), ('NMODE', 6),
-                        ('NTCPU', 6), ('NFILE', 6),  ('NITER0', 6),
-                        ('NITER', 6), ('NTIME0', 6), ('NTIME', 6) ])
+                        item.setData(1, Qt.UserRole, ['I', 'NMACH', 'NMODE',
+                        'NTCPU', 'NFILE', 'NITER0', 'NITER', 'NTIME0',
+                                                      'NTIME'])
 
                     elif row == 1:
-                        item.setData(1, Qt.UserRole, [('NLSCL', 1),
-                                                  ('NLTEST', 1),
-                                                  ('NLANA', 1),
-                                                  ('NLDRFT', 1),
-                                                  ('NLCRR', 1),
-                                                  ('NOP', 1),
-                                                  ('NLERG', 1),
-                                                  ('NLIDENT', 1),
-                                                  ('NLONE', 1),
-                                                  ('NLMOVIE', 1)])
-
+                        item.setData(1, Qt.UserRole, ['B', 'NLSCL',
+                          'NLTEST', 'NLANA', 'NLDRFT', 'NLCRR',
+                           'NLERG', 'NLIDENT', 'NLONE', 'NLMOVIE' ])
                 elif parent.data(1, Qt.DisplayRole)[:6] == "*** 2.":
                     row = parent.indexOfChild(item)
                     if row == 0:
                         item.setData(1, Qt.UserRole,
-                        [('INDGRD', 6), ('INDGRD', 6), ('INDGRD', 6)])
+                        ['I', 'INDGRD', 'INDGRD', 'INDGRD'])
                     elif row == 1:
-                        item.setData(1, Qt.UserRole, [('NLRAD', 1)])
+                        item.setData(1, Qt.UserRole, ['B', 'NLRAD'])
             item.setFlags(item.flags() | Qt.ItemIsEditable)
 
     def readInput(self, path):
