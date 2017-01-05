@@ -16,7 +16,8 @@ def readB2fgmtry(file_path):
     found_cry = 0
     with open(file_path + "/b2fgmtry", 'r') as infile:
         for line in infile:
-            lineSplit = line.split() #line split in form ['*cf:', 'int', '2', 'nx,ny']
+            lineSplit = line.split()    #line split in form
+                                        # ['*cf:', 'int', '2', 'nx,ny']
             if len(lineSplit) >= 4:
                 if lineSplit[3] == "nx,ny":
                     found_nxyx = 1
@@ -26,22 +27,26 @@ def readB2fgmtry(file_path):
                 ny = int(lineSplit[1])
                 found_nxyx = 0
 
-            if (found_crx == 1 and found_cry == 0): # "start writing coorindates between 'crx' and next 'cf*:' to crx array"
+            if (found_crx == 1 and found_cry == 0):
+            #start writing coorindates between 'crx' and next 'cf*:' to crx array
                 for j in range(len(lineSplit)):
                     if lineSplit[j] == "*cf:":
                         found_crx = 0
                         found_cry = 0
                         break
                     else:
-                        crx.append(float(lineSplit[j].split('E')[0]) * pow(10, int(lineSplit[j].split('E')[1])))
-            if (found_crx == 0 and found_cry == 1): # "start writing coorindates between 'cry' and next 'cf*:' to cry array"
+                        crx.append(float(lineSplit[j].split('E')[0]) * \
+                                   pow(10, int(lineSplit[j].split('E')[1])))
+            if (found_crx == 0 and found_cry == 1):
+            #start writing coorindates between 'cry' and next 'cf*:' to cry array
                 for j in range(len(lineSplit)):
                     if lineSplit[j] == "*cf:":
                         found_crx = 0
                         found_cry = 0
                         break
                     else:
-                        cry.append(float(lineSplit[j].split('E')[0]) * pow(10, int(lineSplit[j].split('E')[1])))
+                        cry.append(float(lineSplit[j].split('E')[0]) * \
+                                   pow(10, int(lineSplit[j].split('E')[1])))
             for i in range(len(lineSplit)):
                 if lineSplit[i] == "crx":
                     found_crx = 1
@@ -56,7 +61,8 @@ def readB2fgmtry(file_path):
     return crx, cry, nx, ny
 
 def readB2fstati(file_path):
-    # Reading values from file b2fstati (electron density (ne), electron temperature(te), ion temperature(ti))
+    # Reading values from file b2fstati
+    # (electron density (ne), electron temperature(te), ion temperature(ti))
     # and inserting them into array for later use
 
     ne = []
@@ -69,8 +75,10 @@ def readB2fstati(file_path):
 
     with open(file_path + "/b2fstati", 'r') as infile:
         for line in infile:
-            lineSplit = line.split() #line split in form ['*cf:', 'int', '2', 'nx,ny']
-            if (found_ne == 1 and found_te == 0 and found_ti == 0): # "start writing coorindates between 'ne' and next 'cf*:' to ne array"
+            lineSplit = line.split()    #line split in form
+                                        # ['*cf:', 'int', '2', 'nx,ny']
+            if (found_ne == 1 and found_te == 0 and found_ti == 0):
+            #start writing coorindates between 'ne' and next 'cf*:' to ne array
                 for j in range(len(lineSplit)):
                     if lineSplit[j] == "*cf:":
                         found_ne = 0
@@ -78,8 +86,10 @@ def readB2fstati(file_path):
                         found_ti = 0
                         break
                     else:
-                        ne.append(float(lineSplit[j].split('E')[0]) * pow(10, int(lineSplit[j].split('E')[1])))
-            if (found_ne == 0 and found_te == 1 and found_ti == 0): # "start writing coorindates between 'te' and next 'cf*:' to te array"
+                        ne.append(float(lineSplit[j].split('E')[0]) * \
+                                  pow(10, int(lineSplit[j].split('E')[1])))
+            if (found_ne == 0 and found_te == 1 and found_ti == 0):
+            #start writing coorindates between 'te' and next 'cf*:' to te array
                 for j in range(len(lineSplit)):
                     if lineSplit[j] == "*cf:":
                         found_ne = 0
@@ -87,8 +97,10 @@ def readB2fstati(file_path):
                         found_ti = 0
                         break
                     else:
-                        te.append(float(lineSplit[j].split('E')[0]) * pow(10, int(lineSplit[j].split('E')[1])))
-            if (found_ne == 0 and found_te == 0 and found_ti == 1): # "start writing coorindates between 'ti' and next 'cf*:' to ti array"
+                        te.append(float(lineSplit[j].split('E')[0]) * \
+                                  pow(10, int(lineSplit[j].split('E')[1])))
+            if (found_ne == 0 and found_te == 0 and found_ti == 1):
+            # start writing coorindates between 'ti' and next 'cf*:' to ti array
                 for j in range(len(lineSplit)):
                     if lineSplit[j] == "*cf:":
                         found_ne = 0
@@ -96,7 +108,8 @@ def readB2fstati(file_path):
                         found_ti = 0
                         break
                     else:
-                        ti.append(float(lineSplit[j].split('E')[0]) * pow(10, int(lineSplit[j].split('E')[1])))
+                        ti.append(float(lineSplit[j].split('E')[0]) * \
+                                  pow(10, int(lineSplit[j].split('E')[1])))
             for i in range(len(lineSplit)):
                 if lineSplit[i] == "ne":
                     found_ne = 1
@@ -115,7 +128,7 @@ def readB2fstati(file_path):
                     break
     return ne, te, ti
 
-def B2toIDS(shot, run, user, tokamak, version, xc, yc, nx, ny, ne, te, ti):
+def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti):
     # Writing previously found data in b2fgmtry and b2fstati to IDS database
     print('Writing IDS: ')
     time = 1
@@ -124,8 +137,8 @@ def B2toIDS(shot, run, user, tokamak, version, xc, yc, nx, ny, ne, te, ti):
     # --Creating IDS database--
     imas_obj = imas.ids(shot, run, shot, run)
 
-    imas_obj.create()  # Create the data entry
-    # imas_obj.create_env(user, tokamak, version)
+    # imas_obj.create()  # Create the data entry
+    imas_obj.create_env(user, device, version)
 
     if imas_obj.isConnected():
         print('Creation of data entry OK!')
@@ -139,7 +152,7 @@ def B2toIDS(shot, run, user, tokamak, version, xc, yc, nx, ny, ne, te, ti):
     imas_obj.edge_profiles.putNonTimed()
     imas_obj.edge_profiles.ggd[0].grid.space.resize(1)
     imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension.resize(3)
-    imas_obj.edge_profiles.ids_properties.homogeneous_time = 1  # Mandatory to define this property (?)
+    imas_obj.edge_profiles.ids_properties.homogeneous_time = 1  
 
     num_coord = len(xc) + len(yc)  # Number of all available coordinates
     num_subgrids = 2  # Number of subgrid to write (Cells and Nodes)
@@ -149,38 +162,54 @@ def B2toIDS(shot, run, user, tokamak, version, xc, yc, nx, ny, ne, te, ti):
 
     imas_obj.edge_profiles.ggd[0].grid.grid_subset.resize(num_subgrids)
 
-    ## --WRITING DATA FOR SUBGRID "Nodes" (subgrid base id : 2, subgrid class : 1)--
-    # Note that writing of all data in form of indices is done in Fortran index counting (starting with 1), not in C++/python index counting (starts with 0)!
-    # But we must have in mind, that currently we're working with Python ( Python_Index == Fortran_Index -1)!
+    ## --WRITING DATA FOR SUBGRID "Nodes"
+    # (subgrid base id : 2, subgrid class : 1) --
+    # Note that writing of all data in form of indices is done in Fortran index 
+    # counting (starting with 1), not in C++/python index counting 
+    # (starts with 0)!
+    # But we must have in mind, that currently we're working with Python 
+    # ( Python_Index == Fortran_Index -1)!
     num_nodes = int(num_coord / 2)  # We have 2D coordinates, P(x,y)
-    subgrid_base_index = 2  # Subgrid index of subgrid Nodes (Indexing of subgrids is as in shot: 1, run:1, tokamak:iter; and shot:16151, run:1000; tokamak:aug
+    subgrid_base_index = 2  # Subgrid index of subgrid Nodes 
+                        # (Indexing of subgrids is as in shot: 1, run:1,
+                        # device:iter; and shot:16151, run:1000; device:aug
     subgrid_name = "Nodes"
-    subgrid_class = 1  # Subgrid Nodes consists of points -> subgrid class 1 (edges -> class 2; cells -> class 3)
-    obj_class_1_id = 1  # Index used to identify between the subgrids under the same subgrid-class group
-    imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension[subgrid_class - 1].object.resize(1)
+    subgrid_class = 1   # Subgrid Nodes consists of points -> subgrid class 1 
+                        # (edges -> class 2; cells -> class 3)
+    obj_class_1_id = 1  # Index used to identify between the subgrids under the 
+                        # same subgrid-class group
 
     # Writing base subgrid data/parameters
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1].identifier.name = subgrid_name
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1].identifier.index = subgrid_base_index
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1].element.resize(1)
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1].element[0].object.resize(1)
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1].element[0].object[0].space = 0 + 1
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1].element[0].object[0].dimension = subgrid_class
+    subgridBaseData = \
+        imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index-1]
+    subgridGeoData = imas_obj.edge_profiles.ggd[0].grid.space[0] \
+        .objects_per_dimension[subgrid_class - 1]
 
-    # --Allocating space and writing to IDS: Geometry and Nodes for class 1 -> Nodes-- #
-    imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension[subgrid_class - 1].object.resize(1)
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1].element[0].object[0].index = obj_class_1_id
-    imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension[subgrid_class - 1].object[obj_class_1_id - 1].geometry.resize(num_coord)
-    imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension[subgrid_class - 1].object[obj_class_1_id - 1].nodes.resize(num_nodes)
+    subgridGeoData.object.resize(1)
+    
+    subgridBaseData.identifier.name = subgrid_name
+    subgridBaseData.identifier.index = subgrid_base_index
+    subgridBaseData.element.resize(1)
+    subgridBaseData.element[0].object.resize(1)
+    subgridBaseData.element[0].object[0].space = 0 + 1
+    subgridBaseData.element[0].object[0].dimension = subgrid_class
+
+    # --Allocating space and writing to IDS:
+    # Geometry and Nodes for class 1 -> Nodes -- #
+    subgridGeoData.object.resize(1)
+    subgridBaseData.element[0].object[0].index = obj_class_1_id
+    subgridGeoData.object[obj_class_1_id - 1].geometry.resize(num_coord)
+    subgridGeoData.object[obj_class_1_id - 1].nodes.resize(num_nodes)
 
     for n in range(num_nodes):
-        # There are num_nodes geometry entries. [x1, x2, ... xn, y1, y2, ...yn] -> Fortran notation
-        imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension[0].object[obj_class_1_id - 1].geometry[n] = xc[n]
-        imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension[0].object[obj_class_1_id - 1].geometry[num_nodes + n] = yc[n]
-        imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension[0].object[obj_class_1_id - 1].nodes[n] = n + 1
+        # There are num_nodes geometry entries.
+        # [x1, x2, ... xn, y1, y2, ...yn] -> Fortran notation
+        subgridGeoData.object[obj_class_1_id - 1].geometry[n] = xc[n]
+        subgridGeoData.object[obj_class_1_id - 1].geometry[num_nodes + n]=yc[n]
+        subgridGeoData.object[obj_class_1_id - 1].nodes[n] = n + 1
         imas_obj.edge_profiles.time[n] = time
 
-    ## --WRITING DATA FOR SUBGRID "Cells" (base subgrid id = 1; subgrid class 3)--
+    ## --WRITING DATA FOR SUBGRID "Cells" (base subgrid id = 1; subgrid class 3)
     numCellsX = nx + 2
     numCellsY = ny + 2
     num_cells = numCellsX * numCellsY
@@ -189,72 +218,79 @@ def B2toIDS(shot, run, user, tokamak, version, xc, yc, nx, ny, ne, te, ti):
     subgrid_class = 3
     obj_class_3_id = 1
 
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1].identifier.name = subgrid_name
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1].identifier.index = subgrid_base_index
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1].element.resize(1)
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1].element[0].object.resize(1)
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1].element[0].object[0].space = 0 + 1
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1].element[0].object[0].dimension = subgrid_class
+    # setting subgridDaseData and subgridGeoData for Cells subgrid
+    subgridBaseData = \
+        imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1]
+    subgridGeoData = imas_obj.edge_profiles.ggd[0].grid.space[0] \
+        .objects_per_dimension[subgrid_class - 1]
 
-    imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension[subgrid_class - 1].object.resize(1)
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1].element[0].object[0].index = obj_class_3_id
-    imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension[subgrid_class - 1].object[obj_class_3_id - 1].nodes.resize(
+    subgridBaseData.identifier.name = subgrid_name
+    subgridBaseData.identifier.index = subgrid_base_index
+    subgridBaseData.element.resize(1)
+    subgridBaseData.element[0].object.resize(1)
+    subgridBaseData.element[0].object[0].space = 0 + 1
+    subgridBaseData.element[0].object[0].dimension = subgrid_class
+
+    subgridGeoData.object.resize(1)
+    subgridBaseData.element[0].object[0].index = obj_class_3_id
+    subgridGeoData.object[obj_class_3_id - 1].nodes.resize(
         num_cells * 4)  # each cell consists of 4 nodes
 
-    # The same as in VtkBuilder.cpp
+    # Writing cells geometry for Cells subgrid
     cellId  = 0
     for j in range(numCellsY):
         for i in range(numCellsX):
-            imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension[subgrid_class - 1].object[obj_class_3_id - 1].nodes[
-                cellId + 0 * numCellsX * numCellsY] = cellId + 0 * numCellsX * numCellsY + 1
-            imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension[subgrid_class - 1].object[obj_class_3_id - 1].nodes[
-                cellId + 1 * numCellsX * numCellsY] = cellId + 1 * numCellsX * numCellsY + 1
-            imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension[subgrid_class - 1].object[obj_class_3_id - 1].nodes[
-                cellId + 3 * numCellsX * numCellsY] = cellId + 2 * numCellsX * numCellsY + 1
-            imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension[subgrid_class - 1].object[obj_class_3_id - 1].nodes[
-                cellId + 2 * numCellsX * numCellsY] = cellId + 3 * numCellsX * numCellsY + 1
+            subgridGeoData.object[obj_class_3_id - 1].nodes[
+                cellId+0*numCellsX*numCellsY] = cellId+0*numCellsX*numCellsY+1
+            subgridGeoData.object[obj_class_3_id - 1].nodes[
+                cellId+1*numCellsX*numCellsY] = cellId+1*numCellsX*numCellsY+1
+            subgridGeoData.object[obj_class_3_id - 1].nodes[
+                cellId+3*numCellsX*numCellsY] = cellId+2*numCellsX*numCellsY+1
+            subgridGeoData.object[obj_class_3_id - 1].nodes[
+                cellId+2*numCellsX*numCellsY] = cellId+3*numCellsX*numCellsY+1
             cellId += 1
-            '''
-            p1 = cellId + 0*numCellsX*numCellsY +1
-            p2 = cellId + 1*numCellsX*numCellsY +1
-            p3 = cellId + 2*numCellsX*numCellsY +1
-            p4 = cellId + 3*numCellsX*numCellsY +1
-            print("%d | %d | %d | %d" % (p1, p2, p3, p4))
-            '''
 
     ## WRITING VALUES (ne, te, ti) for "Cells" subgrid
     # Writing ne (electron density)
     num_ne_subgrid = 1
     num_ne_values = len(ne)
     imas_obj.edge_profiles.ggd[0].electrons.density.resize(num_ne_subgrid)
-    imas_obj.edge_profiles.ggd[0].electrons.density[num_ne_subgrid - 1].grid_subset_index = subgrid_base_index
-    imas_obj.edge_profiles.ggd[0].electrons.density[num_ne_subgrid - 1].values.resize(num_ne_values)
+    nePath = imas_obj.edge_profiles.ggd[0].electrons.density[num_ne_subgrid - 1]
+    nePath.grid_subset_index = subgrid_base_index
+    nePath.values.resize(num_ne_values)
     for n in range(num_ne_values):
-        imas_obj.edge_profiles.ggd[0].electrons.density[num_ne_subgrid - 1].values[n] = ne[n]
+        nePath.values[n] = ne[n]
 
     # Writing te (electron temperature)
     num_te_subgrid = 1
     num_te_values = len(te)
     imas_obj.edge_profiles.ggd[0].electrons.temperature.resize(num_te_subgrid)
-    imas_obj.edge_profiles.ggd[0].electrons.temperature[num_te_subgrid - 1].grid_subset_index = subgrid_base_index
-    imas_obj.edge_profiles.ggd[0].electrons.temperature[num_te_subgrid - 1].values.resize(num_te_values)
+    tePath=imas_obj.edge_profiles.ggd[0].electrons.temperature[num_te_subgrid-1]
+    tePath.grid_subset_index = subgrid_base_index
+    tePath.values.resize(num_te_values)
     for n in range(num_te_values):
-        imas_obj.edge_profiles.ggd[0].electrons.temperature[num_te_subgrid - 1].values[n] = te[n] *(6.242e18)
         # converting to eV (1 J = 6.242e18 eV)
+        tePath.values[n] = te[n] *(6.242e18)
+
 
     # Writing ti (ion temperature)
     num_ti_subgrid = 1
     num_ti_values = len(ti)
-    num_ti_species = 1  # Number of ion species, as in number of different ion charges.
+    num_ti_species = 1  # Number of ion species, as in
+                        # number of different ion charges.
+    ion_specie = 1
     # This regards mostly the ion density of each ion charge,
     # as ion temperature is taken as the same for all ion charges.
     imas_obj.edge_profiles.ggd[0].ion.resize(num_ti_species)
-    imas_obj.edge_profiles.ggd[0].ion[0].temperature.resize(num_ti_subgrid)
-    imas_obj.edge_profiles.ggd[0].ion[0].temperature[num_ti_subgrid - 1].grid_subset_index = subgrid_base_index
-    imas_obj.edge_profiles.ggd[0].ion[0].temperature[num_ti_subgrid - 1].values.resize(num_ti_values)
+    imas_obj.edge_profiles.ggd[0].ion[ion_specie - 1].temperature.\
+        resize(num_ti_subgrid)
+    tiPath = imas_obj.edge_profiles.ggd[0].ion[ion_specie-1]. \
+        temperature[num_ti_subgrid - 1]
+    tiPath.grid_subset_index = subgrid_base_index
+    tiPath.values.resize(num_ti_values)
     for n in range(num_ti_values):
-        imas_obj.edge_profiles.ggd[0].ion[0].temperature[num_ti_subgrid - 1].values[n] = ti[n] * (6.242e18)
         # converting to eV (1 J = 6.242e18 eV)
+        tiPath.values[n] = ti[n] * (6.242e18)
 
     imas_obj.edge_profiles.putSlice()
 
@@ -262,14 +298,17 @@ def B2toIDS(shot, run, user, tokamak, version, xc, yc, nx, ny, ne, te, ti):
     print("Closing IDS.")
 
 if __name__ == "__main__":
-    '''
+
     # For launching python script directly from treminal with python command
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "srutvh", ["filepath=", "shot=", "run=", "user=", "tokamak=", "version=", "help"])
+        opts, args = getopt.getopt(sys.argv[1:], "srutvh", ["dirpath=",
+                                                            "shot=", "run=",
+                                                            "user=", "device=",
+                                                            "version=", "help"])
 
         for opt, arg in opts:
             #print opt, arg
-            if opt in ("-fp", "--filepath"):
+            if opt in ("-fp", "--dirpath"):
                 filepath = arg
             elif opt in ("-s", "--shot"):
                 shot = int(arg)
@@ -277,16 +316,22 @@ if __name__ == "__main__":
                 run = int(arg)
             elif opt in ("-u", "--user"):
                 user = arg
-            elif opt in ("-t", "--tokamak"):
-                tokamak = arg
+            elif opt in ("-t", "--device"):
+                device = arg
             elif opt in ("-v", "--version"):
                 version = arg
 
             if opt in ("-h", "--help"):
-                print "In order to run b2read file path, shot, run, user, tokamak and version variables must be defined. Example (terminal): " \
-                      "python main.py --filepath=/home/ITER/tomsicp/solps-iter/runs/AUG_16151_D/baserun --shot=1000 --run=1 --user=tomsicp --tokamak=solps-iter --version=3"
+                print("In order to run b2read file path, shot, run, user,"
+                    "device and version variables must be defined."
+                    "Example (terminal): "
+                    "python3.5 put_edge_ids.py "
+                    "--dirpath=/home/ITER/tomsicp/solps-iter/runs/AUG_16151_D/"
+                    "baserun "
+                    "--shot=1000 --run=1 --user=tomsicp --device=solps-iter "
+                    "--version=3")
                 try:
-                    filepath, shot, run, user, tokamak, version
+                    filepath, shot, run, user, device, version
                 except:
                     sys.exit()
 
@@ -294,18 +339,13 @@ if __name__ == "__main__":
         print ('Supplied option not recognized!')
         print ('For help: b2read -h / --help')
         sys.exit(2)
-    '''
 
-
-    # file_path = raw_input("Specifty file dir: ")
-    filepath = "/home/ITER/tomsicp/solps-iter/runs/AUG_16151_D/baserun"
     # few paths to example files for testing
-    # file_path = /home/ITER/tomsicp/solps-iter/runs/AUG_16151_D/baserun
-    # file_path = /home/ITER/tomsicp/solps-iter-devel/runs/ITER_535_D+He+Ar/baserun
+    # /home/ITER/tomsicp/solps-iter/runs/AUG_16151_D/baserun
+    # /home/ITER/tomsicp/solps-iter-devel/runs/ITER_535_D+He+Ar/baserun
 
     xc, yc, nx, ny = readB2fgmtry(filepath)
     ne, te, ti = readB2fstati(filepath)
 
-    B2toIDS(1000, 1, "tomsicp", "solps-iter", "3", xc, yc, nx, ny, ne, te, ti)
-    # B2toIDS(shot, run, user, tokamak, version, xc, yc, nx, ny, ne, te, ti)
+    B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti)
 
