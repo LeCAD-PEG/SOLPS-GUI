@@ -54,6 +54,12 @@ XCB development libraries are required for building Qt5.x
     apt-cache search libxcb
     sudo apt-get install libxcb.*-dev
     sudo apt-get install libudev-dev libxi-dev
+   
+## PIP3 packages
+
+   apt-get install libssl-dev liblzma-dev
+
+are required to build pip3 and corresponding Python packages, themes.
 
 
 ## Component tracker
