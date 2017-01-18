@@ -713,10 +713,19 @@ ILCELL parameters (block 3B)</p> <p>(Default: NRADD = 0 ).</p>""",
 
 'VOLADD':"""<p>Volume (<em>cm<sup>-3</sup></em>) of each additional zone as
 seen by the test-particles.</p>""", }
-
+"""dict: eirene_params contains the parameters and their description. They are
+extracted from http://www.eirene.de/html/manual.html.
+"""
 
 
 class MyValidator(QValidator):
+    """This is a custom validator for the Delegator editors. Depending on the
+    line contents it creates an appropriate mask.
+
+    Attributes:
+        n (int): Number of certain elements in the line
+        mask (string): A regex mask for validating current line.
+    """
     def __init__(self, parent=None, n=None, type=None):
         super(MyValidator, self).__init__(parent)
         self.n = n
@@ -735,6 +744,21 @@ class MyValidator(QValidator):
             self.mask = "."
 
     def validate(self, string, pos):
+        """The overloaded validate fucntion from QValidator class. Any illegal
+        changes are rejected: String length changed, added/removed element,
+        type changed of the element.
+
+        First it checks if the length of the string in the editor is different
+        than the predetermined length. It doesn't reject the input right away
+        since the length of the string might deviate while editing but it can
+        be the same at the end.
+
+        Then the regex search is called to see if the number of elements of
+        predetermined type doesn't the predetermined number.
+
+        Finally if the previous checks are not executed, it returns that the
+        change is valid
+        """
         if len(string) != self.length:
             return QValidator.Intermediate, string, pos
 
@@ -745,15 +769,34 @@ class MyValidator(QValidator):
 
 
 class MyLineEdit(QLineEdit):
+    """This is the custom QLineEdit for the QStyledItemDelegation. It contains
+    functions that handle the help description for the current selected card
+    and some overloaded functions for additional cosmetics.
+
+    Attributes:
+        parameter_description (array): Contains the parameter name of the
+            help_description dictionary. Whenever you click on a position in
+            the editor the paramameter name is selected and then the proper
+            help text selected and displayed.
+        last_param (string): Last parameter selected.
+        parameter_help (pyqtSignal): This is the signal that emits whenever a
+            keyboard release or a mouse release event is occured.
+    """
 
     parameter_help = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(MyLineEdit, self).__init__(parent)
         self.parameter_description = []
-        self.key_list = []
         self.last_param = None
     def set_card_help(self, card_description):
+        """Setting the help description for current card. The card has multiple
+        types of values, so each is handled accordingly.
+
+        Args:
+            card_description (array): This array contains roles and other info-
+                rmation for the validator class.
+        """
         if len(card_description) <= 2:
             return None
         self.parameter_description.append(card_description[2])
@@ -779,6 +822,9 @@ class MyLineEdit(QLineEdit):
               self.parameter_description.append(param_name)
     
     def focusInEvent(self, e):
+        """This overloaded function causes the editor to de-highlight the curr-
+        ent editor text and set the cursor position to 0.
+        """
         self.deselect()
         self.setCursorPosition(0)
         return super(MyLineEdit, self).focusInEvent(e)
@@ -799,8 +845,15 @@ class MyLineEdit(QLineEdit):
 
 
 class CardEditDelegate(QStyledItemDelegate):
-    """
-    See http://stackoverflow.com/questions/2801959
+    """Custom QStyledItemDelegate for creating editors and help descriptions
+    for card. The Delegate creates an editor and provides data for help desc-
+    ription to it. It also handels the events for the help description and the
+    modified event.
+
+    Attributes:
+        parameter_help (pyqtSignal): The signal responsible for help descrip-
+            tion handling.
+        lineEdit (QLineEdit): The editor it creates and provide the help to.
     """
 
     parameter_help = pyqtSignal(str)
@@ -811,6 +864,20 @@ class CardEditDelegate(QStyledItemDelegate):
         self.counter = 0
 
     def createEditor(self, parent, option, index):
+        """The overloaded function from QStyledItemDelegate that creates a cu-
+        stom editor, handles data for help descprition to it and changing
+        some geometrics for the editor.
+
+        Args:
+            parent (QWidget): The parent widget for the editor
+            option (QQStyleOptionViewItem): The object that contains graphical
+                data for painting and rendering.
+            index (QModelIndex): The index object that contains the current
+                location the editing line.
+
+        Returns:
+            lineEdit (QLineEdit): A custom QLineEdit that acts as the editor.
+        """
         self.lineEdit = MyLineEdit(parent)
         self.lineEdit.setFrame(True)
 
@@ -832,8 +899,14 @@ class CardEditDelegate(QStyledItemDelegate):
         self.updateEditorGeometry(self.lineEdit, option,index)
 
         return self.lineEdit
-    # TODO: DISCUSS having the last help opened or no description!
+
     def destroyEditor(self, editor, index):
+        """Overloaded function from QStyledItemDelegate that sets the help
+        description to 'EDIT'.
+
+        Otherwise it is a default function that acts as the editor destroyer
+        when we stop editing.
+        """
         editor.parameter_help.emit('EDIT')
         super(CardEditDelegate, self).destroyEditor(editor, index)
 
@@ -868,28 +941,25 @@ class EireneEdit(QTreeWidget):
                                 self.assign_roles_block_2,
                                 '*** 3a.':
                                 self.assign_roles_block_3a,}
-        self.item_childs = []
         self.setSelectionMode(QAbstractItemView.NoSelection)
     def itemSelectionChanged(self):
         print(self.selectedItems())
 
-    def addChild(self, item):
-        self.item_childs.append(item)
-
     def setPlainText(self, text):
+        """Reading input file for EIRENE and display it in tree style.
+        Args:
+            text (str): Text from the input dat.
+        """
         lines = text.splitlines()
         group = parent = self
         for i, line in enumerate(lines):
             if line[:3] == '***':
                 item = QTreeWidgetItem(self)
-                self.addChild(item)
                 row = 0
                 item.setText(0, line.rstrip())
                 parent = group = item
             elif line[0] == '*':
                 item = QTreeWidgetItem(group)
-                if group == self:
-                    self.addChild(item)
                 item.setText(0, line.rstrip())
                 parent = item
             else:
@@ -957,8 +1027,7 @@ class EireneEdit(QTreeWidget):
         return args, role
 
     def assign_roles_block_2(self, line, row):
-        """
-        Assigning roles for block 2.
+        """Assigning roles for block 2.
         Because there are some variables that exist only if
         one or some flags are true, this function has so called
         block2_mark, which marks where in those conditions we
@@ -1205,21 +1274,39 @@ class EireneEdit(QTreeWidget):
         return arguments
 
     def changed(self):
+        """This function is called whenever an item is modified in the editor.
+        It does not accept or return anything, since it only changes a boolean
+        to True.
+        """
+
         self._modified = True
 
     def isModified(self):
         return self._modified
 
     def toPlainText(self):
-        self.text = ''
-        self.gatherText(self.item_childs)
-        return self.text
+        """Gathers text from tree items, puts it together and then returns it.
+        """
+        items = [self.topLevelItem(i) for i in range(self.topLevelItemCount())]
+        text = self.gatherText(items)
+        return text
 
     def gatherText(self, childs):
+        """Gathers text from childs and returns it. It calls itself recursively
+        if the childs have their own children.
+
+        Args:
+            childs (array): An array of tree widget item.
+        Returns:
+            str: Returns accumulated text.
+        """
+        text = ''
         for el in childs:
-            self.text += el.data(0, Qt.DisplayRole) + '\n'
+            text += el.data(0, Qt.DisplayRole) + '\n'
             if el.childCount():
-                self.gatherText([el.child(i) for i in range(el.childCount())])
+                childs = [el.child(i) for i in range(el.childCount())]
+                text += self.gatherText(childs)
+        return text
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_F2:  # Edit key F2
@@ -1272,6 +1359,9 @@ class Eirene(QWidget):
     def setPlainText(self, text):
         self.tree.setPlainText(text)
 
+    def toPlainText(self):
+        return self.tree.toPlainText()
+
     def setReadOnly(self, state):
         return
 
@@ -1295,6 +1385,20 @@ if __name__ == "__main__":
     input_dat='input_2.dat'
 
     widget.tree.readInput(os.path.expanduser(input_dat))
+
+
+    # Test if gathering text from Eirene editor works fine.
+    with open(input_dat, 'r') as f:
+        text_to_compare = f.read().splitlines()
+    editor_text = widget.tree.toPlainText().splitlines()
+    size=len(editor_text)
+    same = True
+    for i in range(size):
+        if editor_text[i] != text_to_compare[i].rstrip():
+            same = False
+            print(i, editor_text[i], text_to_compare[i])
+    print('Texts are ', same)
+
 
     widget.show()
     sys.exit(app.exec_())
