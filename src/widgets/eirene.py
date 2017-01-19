@@ -1,9 +1,31 @@
 #!/usr/bin/env python3
 
 """
+EIRENE EDITOR
 
-A PyQt custom widget with Eirene input edit capabilities.
+The goal of the EIRENE editor is to have a readable view into the settings file
+and a help that shows us a short description of a setting.
 
+The editor reads the file line by line. If we know the pattern of the sett-
+ings in the file, we can add a help description as well as a validation for Edi-
+ting. This way we cannot mess up the settings and also have a view into what 
+setting we are changing.
+
+The pattern and help description are derived from the manual.
+
+So far only the first 4 blocks have the help description and validation.
+
+MANUAL:
+The editor has two main windows, one with the text in a tree-style view and the
+second window contains the help description for the variables.
+
+To start editing a line either push "F" key or double-click. If the line
+has help description, it also has a validation for editing.
+
+
+
+DEV:
+TODO
 """
 
 from PyQt5.QtCore import (Qt, QProcess, QSize, pyqtProperty,
@@ -713,10 +735,6 @@ ILCELL parameters (block 3B)</p> <p>(Default: NRADD = 0 ).</p>""",
 
 'VOLADD':"""<p>Volume (<em>cm<sup>-3</sup></em>) of each additional zone as
 seen by the test-particles.</p>""", }
-"""dict: eirene_params contains the parameters and their description. They are
-extracted from http://www.eirene.de/html/manual.html.
-"""
-
 
 class MyValidator(QValidator):
     """This is a custom validator for the Delegator editors. Depending on the
@@ -782,12 +800,12 @@ class MyLineEdit(QLineEdit):
         parameter_help (pyqtSignal): This is the signal that emits whenever a
             keyboard release or a mouse release event is occured.
     """
-
     parameter_help = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(MyLineEdit, self).__init__(parent)
         self.parameter_description = []
+        self.key_list = []
         self.last_param = None
     def set_card_help(self, card_description):
         """Setting the help description for current card. The card has multiple
@@ -861,11 +879,10 @@ class CardEditDelegate(QStyledItemDelegate):
     def __init__(self, parent=None):
         super(CardEditDelegate, self).__init__(parent)
         self.lineEdit = None
-        self.counter = 0
 
     def createEditor(self, parent, option, index):
         """The overloaded function from QStyledItemDelegate that creates a cu-
-        stom editor, handles data for help descprition to it and changing
+        stom editor, handles data for help description to it and changing
         some geometrics for the editor.
 
         Args:
@@ -935,65 +952,273 @@ class EireneEdit(QTreeWidget):
         self.card_edit_delegate = CardEditDelegate(self)
         self.setItemDelegate(self.card_edit_delegate)
         self.values = {}
-        self.block_functions = {'*** 1. ': 
-                                self.assign_roles_block_1,
-                                '*** 2. ': 
-                                self.assign_roles_block_2,
-                                '*** 3a.':
-                                self.assign_roles_block_3a,}
+        self.blocks = [self.block_1, self.block_2, self.block_3a, self.block_3b]
+        self.number_of_blocks = len(self.blocks)
         self.setSelectionMode(QAbstractItemView.NoSelection)
+
     def itemSelectionChanged(self):
         print(self.selectedItems())
 
     def setPlainText(self, text):
-        """Reading input file for EIRENE and display it in tree style.
-        Args:
-            text (str): Text from the input dat.
+        """This function sets the text from the input configuration file for 
+        EIRENE into the tree. The way it works is that we have block functions
+        and dummy block functions.
+
+        The block functions have the predetermined help description parameters
+        set to lines of the input file. The block functions are written in a 
+        way that if there is a pattern in the input file, the work needed
+        to add more help description parameters should be easy.
         """
-        lines = text.splitlines()
-        group = parent = self
-        for i, line in enumerate(lines):
-            if line[:3] == '***':
-                item = QTreeWidgetItem(self)
-                row = 0
-                item.setText(0, line.rstrip())
-                parent = group = item
-            elif line[0] == '*':
-                item = QTreeWidgetItem(group)
-                item.setText(0, line.rstrip())
-                parent = item
+        self.text = text.splitlines()
+        self.text_size = len(self.text)
+        self.row = 0
+        self.clear()
+        self.curr_par = self.grup_par =self
+        # Initiator
+
+        for i in range(self.number_of_blocks):
+            try:
+                self.blocks[i]()
+            except Exception as e:
+                print('Error:')
+                print(e)
+                continue
+        while 1:
+            try:
+                self.dummy_block()
+            except IndexError as e:
+                break
+
+    def looks_like_boolean_card(self, line):
+        """ A check function that accepts a string and then determine if the 
+        string is composed of booleans. Usually is enough only to check if
+        the string 'F' or 'T' are in the line.
+
+        Example:
+            'FTTTF FTTFF T' - is a boolean card
+            '     2     1'  - is not a boolean card
+
+        Args:
+            line [str]: A line from the input file
+        Returns:
+            bool: A boolean saying if the string is indeed composed only of
+                booleans.
+        """
+        return any([c in line for c in 'fFtT'])
+
+    def block_1(self):
+        """Function for setting help desc. parameters for block 1:
+        *** 1. Data for operating mode
+        """
+        self.getline(['I', 'NMACH', 'NMODE', 'NTCPU', 'NFILE', 'NITER0', 
+                      'NITER', 'NTIME0', 'NTIME'])
+
+        line = self.getline()
+        if  not self.looks_like_boolean_card(line):
+            role = ['I', 'NOPTIM', 'NOPTM1', 'NGEOM_USR', 'NCOUP_INPUT', 
+                    'NSMSTRA', 'NSTORAM', 'NGSTAL', 'NRTAL', 'NREAC_ADD']
+            self.getline(role)
+
+        role = ['B', 'NLSCL', 'NLTEST', 'NLANA', 'NLDRFT', 'NLCRR', 'NLERG', 
+                'NLIDENT', 'NLONE', 'NLMOVIE']
+        self.getline(role)
+        # Arbitrary lines
+        line = self.getline()
+        while line[:3]!='***':
+            if 'CFILE' in line:
+                self.getline(['S', 'CFILE'])
             else:
-                item = QTreeWidgetItem(parent)
-                strip_line = line.rstrip()
-                item.setText(0, strip_line)
-                if parent == self:
-                    return
-                block = group.data(0, Qt.DisplayRole)[:7]
-                if block in self.block_functions:
-                    args, role = self.block_functions[block](strip_line, row)
-                    #Number of arguments for validator
-                    if role[0]=='S':
-                        role.insert(1, len(strip_line))
-                    else:
-                        role.insert(1, len(args))
-                    item.setData(0, Qt.UserRole, role)
-                    if role[0]=='S':
-                        pass
-                    else:
-                        for i, el in enumerate(role[2:]):
-                            if i >= len(args):
-                                break
-                            else:
-                                self.values[el] = args[i]
-                    row += 1
-            item.setFlags(item.flags()|Qt.ItemIsEditable|Qt.ItemIsSelectable)
+                self.getline(['S', 'NOP'])
+            line = self.getline()
+
+        return None
+    def block_2(self):
+        """Function for setting help desc. parameters for block 2:
+        *** 2. Data for standard mesh 
+        """
+
+        self.getline(['I', 'INGRD(1)', 'INGRD(2)', 'INGRD(3)'])
+        self.getline(['B', 'NLRAD'])
+        if self.values['NLRAD']:
+            self.getline(['B', 'NLSLB', 'NLCRC', 'NLELL', 'NLTRI',
+                                       'NLPLG', 'NLFEM', 'NLTET', 'NLGEN'])
+
+            self.getline(['I', 'NR1ST', 'NRSEP', 'NRPLG', 'NPPLG', 'NRKNOT', 
+                       'NCOOR'])
+
+
+            if self.values['INGRD(1)'] <= 5:
+
+                if self.values['NLSLB'] or self.values['NLCRC'] or \
+                self.values['NLELL'] or self.values['NLTRI']:
+                    self.getline(['R', 'RIA', 'RGA', 'RAA', 'RRA'])
+
+                    if self.values['NLELL'] or self.values['NLTRI']:
+                        self.getline(['R', 'ER1IN', 'EP1OT', 'EP1CH', 'EXEP1'])
+                        self.getline(['R', 'ELLIN', 'ELLOT', 'ELLCH', 'EXELL'])
+                        if self.values['NLTRI']:
+                            self.getline(['R', 'TRIIN', 'TRIOT', 'TRICH', 
+                                       'EXTRI'])
+
+                    elif self.values['NLPLG']:
+                        self.getline(['R', 'XPCOR', 'YPCOR', 'ZPCOR',
+                                      'PLREFL'])
+                        role = ['R']
+                        for k in range(1, self.values['NPPLG']+1):
+                            role.append('NPOINT(1,' + str(k) + ')')
+                            role.append('NPOINT(2,' + str(k) + ')')
+                        if len(role)>=1:
+                            self.getline(role)
+
+                        for i in range(1,self.values['NR1ST']+1):
+                            role = ['R']
+                            for j in range(1, self.values['NRPLG']+1):
+                                role.append('XPOL('+str(self.counter)+','+
+                                            str(j)+')')
+                                role.append('YPOL('+str(self.counter)+','+
+                                            str(j)+')')
+                            if len(role) > 1:
+                                self.getline(role)
+                    elif self.values['NLFEM'] or self.values['NLTET']:
+                        self.getline(['R', 'XPCOR', 'YPCOR', 'ZPCOR'])
+
+            elif self.values['INGRD(1)'] == 6:
+                if self.values['NLSLB'] or self.values['NLCRC'] or \
+                self.values['NLELL'] or self.values['NLTRI']:
+                    self.getline(['R', 'RIA', 'RGA', 'RAA'])
+                elif self.values['NLPLG'] or self.values['NLFEM'] or\
+                    self.values['NLTET']:
+                    self.getline(['R', 'XPCOR', 'YPCOR', 'ZPCOR'])
+
+        self.getline(['B', 'NLPOL'])
+        self.getline(['B', 'NLPLY', 'NLPLA', 'NLPLP'])
+        self.getline(['I', 'NP2ND', 'NPSEP', 'NPPLA', 'NPPER'])
+        if self.values['INGRD(2)'] < 5:
+            self.getline(role = ['R', 'YIA', 'YGA', 'YAA'])
+
+        self.getline(['B', 'NLTOR'])
+        self.getline(['B', 'NLTRZ', 'NLTRA', 'NLTRT'])
+        self.getline(['I', 'NT3RD', 'NTSEP', 'NTTRA', 'NTPER'])
+        if self.values['INGRD(3)'] < 5:
+            self.getline(['R', 'ZIA', 'ZGA', 'ZAA', 'ZZA', 'ROA'])
+
+        self.getline(['B', 'NLMLT'])
+        self.getline(['I', 'NBLMT'])
+        if self.values['NLMLT']:
+            role = ['R']
+            for i in range(1, self.values['NBLMT']+1):
+                role.append('VOLCOR('+str(i)+')')
+            self.getline(role)
+        # 2e. Data for additional cells outside standard mesh
+        self.getline(['B', 'NLADD'])
+        self.getline(['I', 'NRADD'])
+        role = ['R']
+        for i in range(1, int(self.values['NRADD'])+1):
+            role.append('VOLADD(' + str(i) + ')')
+        if len(role) != 1:
+            self.getline(role)
+
+    def block_3a(self):
+        """Function for setting help desc. parameters for block 3a:
+        *** 3a. Data for non default standard surfaces
+        """
+
+        self.getline(['I', 'NSTSI'])
+
+        for i in range(self.values['NSTSI']):
+            self.getline(['I', 'TXTSFL', 'ISTS', 'IDIMP', 'INUMP(ISTSI,IDIMP)',
+                        'IRPTA1', 'IRPTE1', 'IRPTA2', 'IRPTA3', 'IRPTE3'])
+            self.getline(['I', 'ILIIN', 'ILSIDE', 'ILSWCH', 'ILEQUI', 'ILCOL',
+                        'ILIT', 'ILCELL', 'ILBOX', 'ILPLG'])
+            line = self.getline()
+            if 'SURFMOD' in line:
+                self.getline(['S', 'SURFMOD_MODNAME'])
+            elif line[:1] == '*':
+                pass
+            elif self.values['ILIIN']>0:
+                # Optional
+                self.getline(['I', 'ILREF', 'ILSPT', 'ISRS', 'ISRC'])
+                self.getline(['R', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)', 
+                            'TRANSP(2,N)', 'FSHEAT'])
+                self.getline(['R', 'RECYCF', 'RECYCT', 'RECPRM', 'EXPPL',
+                              'EXPEL', 'EXPIL'])
+                self.getline(['R', 'RECYCS', 'RECYCC', 'SPTRM','ESPUTS', 
+                              'ESPUTC'])
+    def block_3b(self):
+        """Function for setting help desc. parameters for block 3b:
+        *** 3b. Data for additional surfaces 
+
+        For this block there is a problem in certain cases: when real RLBND
+        parameter is negative, I have found no way to determine the -KL ine-
+        qualities.
+
+        L is the linear inequality.
+        K is the second order inequality.
+
+        """
+        self.getline(['I', 'NLIMI'])
+        line = self.getline()
+        while 'CH' in line:
+            self.getline(['S', 'CH-card'])
+            line = self.getline()
+        for i in range(self.values['NLIMI']):
+            self.getline(['R', 'RLBND', 'RLARE', 'RLWMN', 'RLWMX'])
+            self.getline(['I', 'ILIIN', 'ILSIDE', 'ILSWCH', 'ILEQUI', 'ILTOR', 
+                          'ILCOL', 'ILFIT', 'ILCELL', 'ILBOX', 'ILPLG'])
+
+            if self.values['RLBND'] < 2:
+                self.getline(['R', 'A0LM', 'A1LM', 'A2LM', 'A3LM', 'A4LM',
+                              'A5LM', 'A6LM', 'A7LM', 'A8LM', 'A9LM'])
+                if self.values['RLBND'] > 0:
+                    self.getline(['R', 'XLIMS1', 'YLIMS1', 'ZLIMS1',
+                                  'XLIMS2', 'YLIMS2', 'ZLIMS2'])
+            elif self.values['RLBND'] >= 2:
+                self.getline(['R', 'P1(1,..)', 'P1(2,..)', 'P1(3,..)', 
+                             'P2(1,..)', 'P2(2,..)', 'P2(3,..)'])
+
+                # Cannot determine K!
+            line = self.getline()
+            if self.values['ILIIN']>0 and line.split()[0].isdigit():
+                #Optional!
+                self.getline(['I', 'ILREF', 'ILSPT', 'ISRS', 'ISRC'])
+                self.getline(['R', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)', 
+                            'TRANSP(2,N)', 'FSHEAT'])
+                self.getline(['R', 'RECYCF', 'RECYCT', 'RECPRM', 'EXPPL',
+                              'EXPEL', 'EXPIL'])
+                self.getline(['R', 'RECYCS', 'RECYCC', 'SPTRM','ESPUTS', 
+                              'ESPUTC'])
+                line = self.getline()
+            if 'SU' in line:
+                self.getline(['S', 'SURFMOD_MODNAME'])
+
+    def dummy_block(self):
+        """This function reads the lines from the input file and then simply
+        put it into the tree structure but without help parameters.
+        """
+        line = self.getline()
+        while line != None:
+            self.row+=1
+            if line.startswith('***'):
+                self.curr_par = self.grup_par =  self.createItem(self, line)
+                break
+
+            elif line.startswith('**'):
+                self.curr_par = self.createItem(self.grup_par, line)
+
+            elif line.startswith('*'):
+                item = self.createItem(self.grup_par, line)
+                if self.curr_par != self:
+                    self.curr_par = item
+            else:
+                self.createItem(self.curr_par, line)
+            line = self.getline()
 
     def readInput(self, path):
         if os.path.exists(path):
             try:
                 with open(path) as file:
-                    text = file.read()
-                    self.setPlainText(text)
+                    self.text = file.read()
+                    self.setPlainText(self.text)
             except PermissionError as error:
                 logging.error(str(error))
         else:
@@ -1001,275 +1226,120 @@ class EireneEdit(QTreeWidget):
             logging.error(msg)
         return
 
-    def assign_roles_block_1(self, line, row):
-        args = self.get_arguments(line)
-        role = []
-        if row == 0:
-            role = ['I', 'NMACH', 'NMODE', 'NTCPU', 'NFILE',
-                    'NITER0', 'NITER', 'NTIME0', 'NTIME']
-        elif row == 1:
-            if 'F' not in line or 'T' not in line:
-                role = ['I', 'NOPTIM', 'NOPTM1', 'NGEOM_USR',
-                        'NCOUP_INPUT', 'NSMSTRA', 'NSTORAM',
-                        'NGSTAL', 'NRTAL', 'NREAC_ADD']
-            else:
-                role = ['B', 'NLSCL', 'NLTEST', 'NLANA',
-                        'NLDRFT', 'NLCRR', 'NLERG', 'NLIDENT',
-                        'NLONE', 'NLMOVIE']
-        elif row == 2:
-            role = ['B', 'NLSCL', 'NLTEST', 'NLANA',
-                    'NLDRFT', 'NLCRR', 'NLERG', 'NLIDENT',
-                    'NLONE', 'NLMOVIE']
-        if row > 2:
-            if 'CFILE' in line:
-                role = ['S', 'CFILE']
+    def getline(self, role=None):
+        """ Function getline is the main function which ties the lines from the
+        input file to the tree structure in the editor.
 
-        return args, role
+        When the function is given a role, the role is then added to a widget
+        tree item as Qt.UserData, a user specified data in a widget. This data
+        is then used for displaying help description.
 
-    def assign_roles_block_2(self, line, row):
-        """Assigning roles for block 2.
-        Because there are some variables that exist only if
-        one or some flags are true, this function has so called
-        block2_mark, which marks where in those conditions we
-        currently are, hence the complexity and length of this
-        function.
+        Args:
+            role [array]: This array contains the help desc. parameters
 
-        Or basically this is a state function.
+        Returns:
+            line [str]: When there is no role passed as argument getline
+                function returns the current line without changing the main row
+                index
+            IndexError [error]: If for some the main row index is raised beyond
+                the size of the text, the IndexError exception is returned.
         """
-        args = self.get_arguments(line)
-        if row == 0:
-            role = ['I', 'INGRD(1)', 'INGRD(2)', 'INGRD(3)']
-            return args, role
-        elif row == 1:
-            role = ['B', 'NLRAD']
-            if args[0]:
-                # NLRAD is true
-                self.block2_mark = '2a-1'
-            else:
-                self.block2_mark = '2b-1'
-            return args, role
-        elif row > 1:
-            if self.block2_mark == '2a-1':
-                    role = ['B', 'NLSLB', 'NLCRC', 'NLELL', 'NLTRI',
-                            'NLPLG', 'NLFEM', 'NLTET', 'NLGEN']
-                    self.block2_mark = '2a-2'
+        parent = self.curr_par
+        group  = self.grup_par
 
-            elif self.block2_mark == '2a-2':
-                role = ['I', 'NR1ST', 'NRSEP', 'NRPLG', 'NPPLG', 'NRKNOT', 
-                        'NCOOR']
-                self.block2_mark = '2a-3'
+        if self.row >= self.text_size:
+            raise IndexError
+        line = self.text[self.row].rstrip()
+        if role==None:
+            return line
 
-            elif self.block2_mark == '2a-3':
-                if self.values['INGRD(1)'] <= 5:
-                    if self.values['NLCRC'] or self.values['NLELL']\
-                                            or self.values['NLTRI']:
-                        role = ['R', 'RIA', 'RGA', 'RAA', 'RRA']
-                        if self.values['NLELL']or self.values['NLTRI']:
-                            self.block2_mark == '2a-4a'
-                        elif self.values['NLPLG']:
-                            self.block2_mark == '2a-4b'
-                        elif self.values['NLFEM']:
-                            self.block2_mark == '2a-4c'
+        self.row += 1 
 
-                elif self.values['INGRD(1)'] == 6:
-                    if self.values['NLSLB'] or self.values['NLCRC']\
-                    or self.values['NLELL'] or self.values['NLTRI']:
-                        role = ['R', 'RIA', 'RGA', 'RAA']
-                    elif self.values['NLPLG'] or self.values['NLFEM']\
-                    or self.values['NLTET']:
-                        role = ['R', 'XPCOR', 'YPCOR', 'ZPCOR']
-                    self.block2_mark = '2b-1'
+        if line[:3] == '***':
+            block_item = self.createItem(self, line)
+            self.curr_par = self.grup_par = block_item
+            self.getline(role)
 
-            elif self.block2_mark == '2a-4a':
-                role = ['R', 'ER1IN', 'EP1OT', 'EP1CH', 'EXEP1']
-                self.block2_mark = '2a-4a-2'
 
-            elif self.block2_mark == '2a-4a-2':
-                role = ['R', 'ELLIN', 'ELLOT', 'ELLCH', 'EXELL']
-                if self.values['NLTRI']:
-                    self.block2_mark = '2a-4a-3'
+        elif line[:1] == '*':
+            item = self.createItem(group, line)
+            if group != self:
+                self.curr_par = item
 
-            elif self.block2_mark == '2a-4a-3':
-                role = ['R', 'TRIIN', 'TRIOT', 'TRICH', 'EXTRI']
-                self.block2_mark = '2b-1'
+            self.getline(role)
+        elif role:
+            self.createItem(parent, line, role)
 
-            elif self.block2_mark == '2a-4b':
-                role = ['R', 'XPCOR', 'YPCOR', 'ZPCOR', 'PLREFL']
-                self.block2_mark = '2a-4b-1'
 
-            elif self.block2_mark == '2a-4b-1':
-                role = ['R']
-                for k in range(1, self.values['NPPLG']+1):
-                    role.append('NPOINT(1,' + str(k) + ')')
-                    role.append('NPOINT(2,' + str(k) + ')')
-                self.block2_mark = '2a-4b-2'
-                self.counter = 1
+    def createItem(self, parent, text, role=None):
+        """This function creates a QTreeWidgetItem and then is put into the
+        tree. Besides the default flags this itam has, there are also added
+        the Qt.ItemIsEditable and Qt.ItemIsSelectable flag.
 
-            elif self.block2_mark == '2a-4b-2':
-                if self.counter < self.values['NR1ST']:
-                    role = ['R']
-                    for j in range(1, self.values['NRPLG']+1):
-                        chunk.append('XPOL('+str(self.counter)+','+str(j)+')')
-                        chunk.append('YPOL('+str(self.counter)+','+str(j)+')')
-                    self.counter += 1
+        Args:
+            parent [QTreeWidgetItem]: Who it belongs to for the tree 
+                structure hiearchy
+            text [str]: The text string to display
+            role [array]: Possible help description parameters
+        Returns:
+            item [QTreeWidgetItem]: The created item is returned for furthur 
+                tree structure.
+        """
+        item = QTreeWidgetItem(parent)
+        item.setText(0, text)
+        item.setFlags(item.flags() | Qt.ItemIsEditable | Qt.ItemIsSelectable)
+        if role:
+            self.set_variables(role, text)
+            item.setData(0, Qt.UserRole, role)
+        return item
 
-                elif self.counter == self.values['NR1ST']:
-                    role = ['R']
-                    for j in range(1, self.values['NRPLG']+1):
-                        chunk.append('XPOL('+str(self.counter)+','+str(j)+')')
-                        chunk.append('YPOL('+str(self.counter)+','+str(j)+')')
-                    self.block2_mark = '2b-1'
+    def set_variables(self, role, text):
+        """This function sets the values to the parameters of the input file.
+        This is mainly used for certain situations when a card or cards are 
+        dependant on other previous values or booleans.
 
-            elif self.block2_mark == '2a-4c':
-                role = ['R', 'XPCOR', 'YPCOR', 'ZPCOR']
-                self.block2_mark = '2a-4c-2'
+        The values are then stored on the dictionary self.values.
 
-            elif self.block2_mark == '2a-4c-2':
-                role = ['I', 'NRKNOT']
-                self.block2_mark = '2a-4c-3'
+        In the role array there is also stored the numbers of variables in the
+        given time. This is used in the validator for validating input.
 
-            elif self.block2_mark == '2a-4c-3':
-                role = ['R']+['XTRIAN('+str(i)+')' for i in \
-                        range(self.values['NRKNOT'])]
-                self.block2_mark = '2a-4c-4'
+        Args:
+            role [array]: The name of variables in a card
+            text [str]: The text containing values for the roles
 
-            elif self.block2_mark == '2a-4c-4':
-                block.append(['R'] + ['YTRIAN(' + str(i) + ')' for i in \
-                                      range(self.values['NRKNOT'])])
-                self.block2_mark = '2b-1'
+        """
+        args = self.get_arguments(text, role[0])
+        for i in range(1, len(role)):
+            if i <= len(args) and role[0] != 'S':
+                self.values[role[i]] = args[i-1]
+        role.insert(1,len(args))
 
-            elif self.block2_mark == '2b-1':
-                role = ['B', 'NLPOL']
-                self.block2_mark = '2b-2'
+    def get_arguments(self, line, type):
+        """This function accepts a string line and then based on a pattern, it 
+        extracts the correct typed values and then return it via an array.
 
-            elif self.block2_mark == '2b-2':
-                role = ['B', 'NLPLY', 'NLPLA', 'NLPLP']
-                self.block2_mark = '2b-3'
-
-            elif self.block2_mark == '2b-3':
-                role = ['I', 'NP2ND', 'NPSEP', 'NPPLA', 'NPPER']
-                if self.values['INGRD(2)'] < 5:
-                    self.block2_mark = '2b-4'
-                else:
-                    self.block2_mark = '2c-1'
-
-            elif self.block2_mark == '2b-4':
-                role = ['R', 'YIA', 'YGA', 'YAA']
-                self.block2_mark = '2c-1'
-
-            elif self.block2_mark == '2c-1':
-                role = ['B', 'NLTOR']
-                self.block2_mark = '2c-2'
-
-            elif self.block2_mark == '2c-2':
-                role = ['B', 'NLTRZ', 'NLTRA', 'NLTRT']
-                self.block2_mark = '2c-3'
-
-            elif self.block2_mark == '2c-3':
-                role = ['I', 'NT3RD', 'NTSEP', 'NTTRA', 'NTPER']
-                if self.values['INGRD(3)'] < 5:
-                    self.block2_mark = '2c-4'
-                else:
-                    self.block2_mark = '2d-1'
-
-            elif self.block2_mark == '2c-4':
-                role = ['R', 'ZIA', 'ZGA', 'ZAA', 'ZZA', 'ROA']
-                self.block2_mark = '2d-1'
-
-            elif self.block2_mark == '2d-1':
-                role = ['B', 'NLMLT']
-                self.block2_mark = '2d-2'
-
-            elif self.block2_mark == '2d-2':
-                if 'F' in line or 'T' in line:
-                    role = ['B', 'NLADD']
-                    self.block2_mark = '2e-2'
-                else:
-                    role = ['I', 'NBLMT']
-                    if self.values['NLMLT']:
-                        self.block2_mark = '2d-3'
-                    else:
-                        self.block2_mark = '2e-1'
-
-            elif self.block2_mark == '2d-3':
-                role = ['R']
-                for i in range(1, self.values['NBLMT']+1):
-                    role.append('VOLCOR('+str(i)+')')
-                self.block2_mark = '2e-1'
-
-            elif self.block2_mark == '2e-1':
-                role = ['B', 'NLADD']
-                self.block2_mark = '2e-2'
-
-            elif self.block2_mark == '2e-2':
-                role = ['I', 'NRADD']
-                if args[0]:
-                    self.block2_mark = '2e-3'       
-
-            elif self.block2_mark == '2e-3':
-                role = ['R']
-                for i in range(1, self.values['NRADD']+1):
-                    role.append('VOLADD(' + str(i) + ')')
-
-            else:
-                print('WRONG')
-            return args, role
-        else:
-            print('WRONG')
-
-    def assign_roles_block_3a(self, line, row):
-        args = self.get_arguments(line)
-        if row == 0:
-            # First get the number of non-default surfaces
-            role = ['I', 'NSTSI']
-            self.surf_counter = 1
-        else:
-            if self.surf_counter == 3:
-                if len(args) != 5 and not 'SU' in line:
-                    self.surf_counter = 1
-            if self.surf_counter >6:
-                self.surf_counter = 1
-
-            if self.surf_counter == 1:
-                role = ['I', 'TXTSFL', 'ISTS', 'IDIMP', 'INUMP(ISTSI,IDIMP)',
-                        'IRPTA1', 'IRPTE1', 'IRPTA2', 'IRPTA3', 'IRPTE3']
-            elif self.surf_counter == 2:        
-                role = ['I', 'ILIIN', 'ILSIDE', 'ILSWCH', 'ILEQUI', 'ILCOL',
-                        'ILIT', 'ILCELL', 'ILBOX', 'ILPLG']
-            elif self.surf_counter == 3:
-                if 'SU' in line:
-                    role = ['S', 'SURFMOD_modname']
-                    self.surf_counter = 0
-                else:
-                    role = ['I', 'ILREF', 'ILSPT', 'ISRS', 'ISRC']
-            elif self.surf_counter == 4:
-                role = ['R', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)', 
-                        'TRANSP(2,N', 'FSHEAT']
-            elif self.surf_counter == 5:
-                role = ['R', 'RECYCF', 'RECYCT', 'RECPRM', 'EXPPL', 'EXPEL',
-                        'EXPIL']
-            elif self.surf_counter == 6:
-                role = ['R', 'RECYCS', 'RECYCC', 'SPTRM','ESPUTS', 'ESPUTC']
-            self.surf_counter += 1
-        return args, role
-    
-    def assign_roles_block_3b(self, line, row):
-        pass
-
-    def get_arguments(self, line):
-        if 'F' in line or 'T' in line:
+        Args:
+            line [str]: A line from the input file
+            type [str]: Type of variables in the line
+        Returns:
+            arguments [array]: Depending on the line it can contain booleans,
+                integers or real numbers.
+        """
+        if  type == 'B':
             arguments = []
             for char in line:
                 if char != ' ':
                     arguments.append(True if char == 'T' else False)
-        elif 'E' in line:
+        elif type == 'R':
             arguments = []
-            for el in line.split():
-                arguments.append(float(el))
-        else:
+            for i in range(len(line)//12):
+                arguments.append(float(line[12*i:12*(i+1)]))
+        elif type == 'I':
             arguments = []
-            for el in line.split():
-                arguments.append(int(el))
+            for i in range(len(line)//6):
+                arguments.append(int(line[i*6:(i+1)*6]))
+        elif type == 'S':
+            arguments = ''.join([char for char in line])
 
         return arguments
 
@@ -1278,27 +1348,31 @@ class EireneEdit(QTreeWidget):
         It does not accept or return anything, since it only changes a boolean
         to True.
         """
-
         self._modified = True
 
     def isModified(self):
         return self._modified
 
     def toPlainText(self):
-        """Gathers text from tree items, puts it together and then returns it.
+        """ It returns the text from the editor. It is first gathered from the 
+        elements of the tree then returned.
+
+        Returns:
+            text [str]: Text from the editor.
         """
         items = [self.topLevelItem(i) for i in range(self.topLevelItemCount())]
         text = self.gatherText(items)
         return text
 
     def gatherText(self, childs):
-        """Gathers text from childs and returns it. It calls itself recursively
-        if the childs have their own children.
+        """ The text is gathered through the elements or children from the
+        tree. It is also propagated for instances when children have their
+        children.
 
         Args:
-            childs (array): An array of tree widget item.
+            childs [QTreeWidgetItem]: Element or elements from the tree
         Returns:
-            str: Returns accumulated text.
+            text [str]: Text from the editor
         """
         text = ''
         for el in childs:
@@ -1332,7 +1406,6 @@ class Eirene(QWidget):
         self.help = QTextBrowser(self.splitter)
         self.splitter.setStretchFactor(0, 7)
         self.splitter.setStretchFactor(1, 3)
-        #self.show_help('NTCPU')
         self.tree.card_edit_delegate.parameter_help.connect(self.show_help)
         self.show_help('EDIT')
 
@@ -1380,24 +1453,13 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)                    # problems
     widget = Eirene()
 
-    input_dat='~/solps-iter/runs/tutorial/ITER_535_D+He+Ar/baserun/input.dat'
-    input_dat='input.dat'
-    input_dat='input_2.dat'
+    if len(sys.argv[1]): 
+        input_dat = sys.argv[1]
+    else:
+        input_dat='input.dat'
+        #input_dat='input_2.dat'
 
     widget.tree.readInput(os.path.expanduser(input_dat))
-
-
-    # Test if gathering text from Eirene editor works fine.
-    with open(input_dat, 'r') as f:
-        text_to_compare = f.read().splitlines()
-    editor_text = widget.tree.toPlainText().splitlines()
-    size=len(editor_text)
-    same = True
-    for i in range(size):
-        if editor_text[i] != text_to_compare[i].rstrip():
-            same = False
-            print(i, editor_text[i], text_to_compare[i])
-    print('Texts are ', same)
 
 
     widget.show()
