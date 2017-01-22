@@ -88,6 +88,13 @@ Input file editor and viewer
 .. automodule:: solpsinput
    :members:
 
+-------------------
+Eirene input editor
+-------------------
+
+.. automodule:: eirene
+   :members:
+
 --------
 Add menu
 --------
