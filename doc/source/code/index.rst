@@ -17,9 +17,9 @@ Python code description
 .. automodule:: solps
    :members:
 
-========================================
-Custom widgets and plugins for Dashboard
-========================================
+============================================
+Custom widgets and plugins for the Dashboard
+============================================
 
 Pairs of custom widgets and plugins for Qt Designer to ease configuration
 of the Dashboard by graphical programming by users.
@@ -88,9 +88,26 @@ Input file editor and viewer
 .. automodule:: solpsinput
    :members:
 
+-------------------
+Eirene input editor
+-------------------
+
+.. automodule:: eirene
+   :members:
+
 --------
 Add menu
 --------
 
 .. automodule:: addmenu
+   :members:
+
+------------
+Put edge IDS  
+------------
+
+This widget reads the geometry and plasma state and creates IDS.
+It can be used as a standalone tool too.
+
+.. automodule:: put_edge_ids
    :members:
