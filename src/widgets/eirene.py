@@ -31,13 +31,14 @@ TODO
 from PyQt5.QtCore import (Qt, QProcess, QSize, pyqtProperty,
                           pyqtSignal, pyqtSlot, QEvent, QAbstractItemModel,
                           QItemSelectionModel, QRect)
-from PyQt5.QtGui import QImage, QPixmap, QFont, QValidator
+from PyQt5.QtGui import (QImage, QFont, QValidator)
 from PyQt5.QtWidgets import (QWidget, QSplitter, QTreeWidget, QTextBrowser,
                              QTreeWidgetItem, QAbstractItemView,
                              QStyledItemDelegate, QLineEdit, QAbstractItemView)
 
 import logging
 import re
+
 eirene_params = {
 'NMACH' : """<b>Code-number</b> for the computer used
 <dl>
@@ -807,6 +808,7 @@ class MyLineEdit(QLineEdit):
         self.parameter_description = []
         self.key_list = []
         self.last_param = None
+
     def set_card_help(self, card_description):
         """Setting the help description for current card. The card has multiple
         types of values, so each is handled accordingly.
@@ -817,6 +819,7 @@ class MyLineEdit(QLineEdit):
         """
         if len(card_description) <= 2:
             return None
+        self.variablesType = card_description[0]
         self.parameter_description.append(card_description[2])
         if card_description[0] == 'I':
             for param_name in card_description[2:]:
@@ -861,6 +864,14 @@ class MyLineEdit(QLineEdit):
                 self.last_param = None
         return super(MyLineEdit, self).event(ev)
 
+    # TODO: BACKGROUND PIXMAP FOR EDITING
+    # Using paintEvent function to draw alternate columns colors to the card.
+    # The format are different, as the types of the cards are:
+    # Integers
+    # Reals
+    # Booleans
+    # "quasi free" format of different types
+    # Free format string
 
 class CardEditDelegate(QStyledItemDelegate):
     """Custom QStyledItemDelegate for creating editors and help descriptions
@@ -913,6 +924,7 @@ class CardEditDelegate(QStyledItemDelegate):
         x, y, width, height = option.rect.getCoords()
         option.rect.setCoords(50, y, x + width - 50, height)
         option.font.setFamily('Monospace')
+
         self.updateEditorGeometry(self.lineEdit, option,index)
 
         return self.lineEdit
@@ -931,6 +943,7 @@ class CardEditDelegate(QStyledItemDelegate):
         x, y, width, height = option.rect.getCoords()
         option.rect.setCoords(50, y, x + width - 50, height)
         super(CardEditDelegate, self).paint(painter, option, index)
+
 
     @pyqtSlot(str)
     def help(self, parameter):
@@ -981,7 +994,7 @@ class EireneEdit(QTreeWidget):
                 self.blocks[i]()
             except Exception as e:
                 print('Error:')
-                print(e)
+                print(e, self.row)
                 continue
         while 1:
             try:
@@ -1103,7 +1116,13 @@ class EireneEdit(QTreeWidget):
             self.getline(['R', 'ZIA', 'ZGA', 'ZAA', 'ZZA', 'ROA'])
 
         self.getline(['B', 'NLMLT'])
-        self.getline(['I', 'NBLMT'])
+        # Sometimes even though NLMLt is false the next line can still 
+        # be NBLMT, an integer.
+
+        line = self.getline()
+        if line.split()[0].isdigit():
+            self.getline(['I', 'NBLMT'])
+
         if self.values['NLMLT']:
             role = ['R']
             for i in range(1, self.values['NBLMT']+1):
@@ -1464,5 +1483,3 @@ if __name__ == "__main__":
 
     widget.show()
     sys.exit(app.exec_())
-
-
