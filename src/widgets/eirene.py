@@ -965,7 +965,9 @@ class EireneEdit(QTreeWidget):
         self.card_edit_delegate = CardEditDelegate(self)
         self.setItemDelegate(self.card_edit_delegate)
         self.values = {}
-        self.blocks = [self.block_1, self.block_2, self.block_3a, self.block_3b]
+        self.blocks = [self.block_1, self.block_2, self.block_3a, 
+                       self.block_3b, self.block_4, self.block_5, self.block_6,
+                       self.block_7, self.block_8, self.block_9, self.block_10]
         self.number_of_blocks = len(self.blocks)
         self.setSelectionMode(QAbstractItemView.NoSelection)
 
@@ -1210,6 +1212,233 @@ class EireneEdit(QTreeWidget):
             if 'SU' in line:
                 self.getline(['S', 'SURFMOD_MODNAME'])
 
+    def block_4(self):
+        line = self.getline()
+        if line.startswith('INCLUDE'):
+            # Omit the next functions
+            return
+        #  Reactions
+        self.getline(['I', 'NATMI'])
+        line = self.getline()
+        while not line.startswith('**'):
+            self.getline(['S', 'Reactions card'])
+            line = self.getline()
+
+        #**4a.   Neutral atom species
+        self.getline(['I', 'NREACI'])
+        line = self.getline()
+        while not line.startswith('**'):
+            self.getline(['S', 'Neutral atom species card'])
+            line = self.getline()
+
+        #**4b.   Neutral molecule species
+        self.getline(['I', 'NMOLI'])
+        line = self.getline()
+        while not line.startswith('**'):
+            self.getline(['S', 'Neutral molecule species card'])
+            line = self.getline()
+
+        #**4c.   Test ion species
+        self.getline(['I', 'NIONI'])
+        line = self.getline()
+        while not line.startswith('**'):
+            self.getline(['S', 'Test ion species card'])
+            line = self.getline()
+
+        #**4d. Photon species
+
+        if self.getline()[:3]=='***':
+            self.values['NPHOTI'] = 0
+            return
+        else:
+            self.getline(['I', 'NPHOTI'])
+            line = self.getline()
+            while not line.startswith('**'):
+                self.getline(['S', 'Test ion species card'])
+                line = self.getline()
+
+    def block_5(self):
+        self.getline(['I', 'NPLSI'])
+        line = self.getline()
+        while not line.startswith('**'):
+            self.getline(['S', 'Plasma species card'])
+            line = self.getline()
+
+        # ** 5b. Plasma background data
+        self.getline(['I'] + ['INDPRO('+str(i)+')' for i in range(1,13)])
+
+        if self.values['INDPRO(1)'] <= 5:
+            self.getline(['R','TE0', 'TE1', 'TE2', 'TE3', 'TE4', 'TE5'])
+        elif self.values['INDPRO(2)'] <= 5:
+            for i in range(1, self.values['NPLSI']+1):
+                self.getline(['R', 'TI0('+str(i)+')', 'TI1('+str(i)+')', 
+                              'TI2('+str(i)+')', 'TI3('+str(i)+')', 
+                              'TI4('+str(i)+')', 'TI5('+str(i)+')'])
+        elif self.values['INDPRO(3)'] <= 5:  
+            for i in range(1, self.values['NPLSI']+1):
+                self.getline(['R', 'DI0('+str(i)+')', 'DI1('+str(i)+')', 
+                              'DI2('+str(i)+')', 'DI3('+str(i)+')', 
+                              'DI4('+str(i)+')', 'DI5('+str(i)+')'])   
+        elif self.values['INDPRO(4)'] <= 5:
+            for i in range(1, self.values['NPLSI']+1):
+                self.getline(['R', 'VX0('+str(i)+')', 'VX1('+str(i)+')', 
+                              'VX2('+str(i)+')', 'VX3('+str(i)+')', 
+                              'VX4('+str(i)+')', 'VX5('+str(i)+')'])  
+            for i in range(1, self.values['NPLSI']+1):
+                self.getline(['R', 'VY0('+str(i)+')', 'VY1('+str(i)+')', 
+                              'VY2('+str(i)+')', 'VY3('+str(i)+')', 
+                              'VY4('+str(i)+')', 'VY5('+str(i)+')'])  
+            for i in range(1, self.values['NPLSI']+1):
+                self.getline(['R', 'VZ0('+str(i)+')', 'VZ1('+str(i)+')', 
+                              'VZ2('+str(i)+')', 'VZ3('+str(i)+')', 
+                              'VZ4('+str(i)+')', 'VZ5('+str(i)+')'])  
+        elif self.values['INDPRO(5)'] <= 5:
+            self.getline(['R', 'B0', 'B1', 'B2', 'B3', 'B4', 'B5'])
+        elif self.values['INDPRO(12)'] <= 5:
+            self.getline(['R', 'VL0', 'VL1', 'VL2', 'VL3', 'VL4', 'VL5'])
+
+    def block_6(self):
+        self.getline(['B', 'NLTRIM'])
+        self.getline(['S', 'A_on_B'])
+        line = self.getline()
+        while 'path' in line or 'PATH' in line:
+            self.getline(['S', 'PATH CARD'])
+
+        self.getline(['R'] + ['DATD('+str(i)+')' for i in\
+                     range(1, self.values['NATMI'] + 1)])
+        self.getline(['R'] + ['DMLD('+str(i)+')' for i in\
+                     range(1, self.values['NMOLI'] + 1)])
+        self.getline(['R'] + ['DIOD('+str(i)+')' for i in\
+                     range(1, self.values['NIONI'] + 1)])
+        self.getline(['R'] + ['DPLD('+str(i)+')' for i in\
+                     range(1, self.values['NPLSI'] + 1)])
+        if self.values['NPHOTI']>0:
+            self.getline(['R'] + ['DPHT('+str(i)+')' for i in\
+                 range(1, self.values['NPLSI'] + 1)])
+        self.getline(['R', 'ERMIN', 'ERCUT', 'RPROB0', 'RINTEG', 'EINTEG',
+                      'AINTEG'])
+
+        line = self.getline()
+        while line[:3]!='***':
+            self.getline(['S', 'SURFMOD'])
+            self.getline(['I', 'ILREF', 'ILSPT', 'ISRS', 'ISRC'])
+            self.getline(['R', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)', 
+                          'TRANSP(2,N)', 'FSHEAT'])
+            self.getline(['R', 'RECYCF', 'RECYCT', 'RECPRM', 'EXPPL', 'EXPEL', 
+                          'EXPIL'])
+            self.getline(['R', 'RECYCS', 'RECYCC', 'SPTPRM', 'ESPUTS', 
+                          'ESPUTC'])
+            line = self.getline()
+
+    def block_7(self):
+        self.getline(['I', 'NSTRAI'])
+        self.getline(['I'] + ['INDSRC('+str(i)+')' for i in\
+                     range(1,self.values['NSTRAI']+1)])
+        self.getline(['R', 'ALLOC', 'AMPTS'])
+
+        for i in range(1, self.values['NSTRAI']+1):
+            line = self.getline()
+            self.curr_par = self.createItem(self.grup_par, 
+                                                line, ['S', 'TXTSOU'])
+            self.row+=1
+
+
+            self.getline(['B', 'NLAVRP', 'NLAVRT', 'NLSYMP', 'NLSYMT'])
+            self.getline(['I', 'NPTS', 'NINITL', 'NEMODS', 'NAMODS',
+                          'NMINPTS'])
+            self.getline(['S', 'Plasma properties. Section 2.7'])
+            self.getline(['B', 'NLATM', 'NLMOL', 'NLION', 'NLPLS', 'NLPHOT'])
+            self.getline(['I', 'NSPEZ'])
+            self.getline(['B', 'NLPNT', 'NLLNE', 'NLSRF', 'NLVOL', 'NLCNS'])
+            self.getline(['I', 'NSRFSI'])
+            for i in range(1, self.values['NSRFSI']+1):
+                self.getline(['I', 'INUM', 'INDIM', 'INSOR', 'INGRDA(1)', 
+                              'INGRDE(1)', 'INGRDA(2)', 'INGRDE(2)', 
+                              'INGRDA(3)', 'INGRDE(3)'])
+                self.getline(['R', 'SORWGT', 'SORLIM', 'SORIND', 
+                              'SOREXP', 'SORIFL',])
+                self.getline(['I', 'NRSOR', 'NPSOR', 'NTSOR', 'NBSOR', 
+                              'NASOR', 'NISOR'])
+                self.getline(['R', 'SORAD1', 'SORAD2', 'SORAD3', 'SORAD4', 
+                              'SORAD5', 'SORAD6',])
+                self.getline(['R', 'SORENI', 'SORENE', 'SORVDX', 'SORVDY', 
+                              'SORVDZ',])
+                self.getline(['R', 'SORCOS', 'SORMAX', 'SORCTX', 'SORCTY',
+                              'SORCTZ',])
+    def block_8(self):
+        self.getline(['I', 'NZADD'])
+        for i in range(1, self.values['NZADD']+1):
+            self.getline(['I', 'INI', 'INE'])
+
+    def block_9(self):
+        role = ['B']
+        role += ['NLPRCA('+str(i)+')' for i in range(self.values['NATMI'])]
+        role += ['NLPRCM('+str(i)+')' for i in range(self.values['NMOLI'])]
+        role += ['NLPRCI('+str(i)+')' for i in range(self.values['NIONI'])]
+        role += ['NLPRCPH('+str(i)+')' for i in range(self.values['NPHOTI'])]
+        self.getline(role)
+        self.getline(['I', 'NPRCSF'])
+        self.getline(['I', 'MAXLEV', 'MAXRAD', 'MAXPOL', 'MAXTOR', 'MAXADD'])
+        for i in range(1, self.values['MAXLEV']+1):
+            self.getline(['R', 'ID','NSSPL('+str(i)+')','PRMSPL('+str(i)+')'])
+        for i in range(1, self.values['MAXPOL']+1):
+            self.getline(['R', 'ID','NSSPL('+str(self.values['N1ST']+i)+')',
+                          'PRMSPL('+str(self.values['N1ST']+i)+')'])
+        for i in range(1, self.values['MAXTOR']+1):
+            self.getline(['R', 'ID','NSSPL('+str(self.values['N1ST']+
+                                                 self.values['N2ST']+i)+')',
+                          'PRMSPL('+str(self.values['N1ST']+
+                                        self.values['N1ST']+i)+')'])
+        for i in range(1, self.values['MAXADD']+1):
+            self.getline(['R', 'ID','NSSPL('+str(self.values['N1ST']+
+                                                 self.values['N2ND']+
+                                                 self.values['N3RD']+i)+')',
+                          'PRMSPL('+str(self.values['N1ST']+
+                                        self.values['N1ST']+
+                                        self.values['N3RD']+i)+')'])
+        self.getline(['R', 'WMINV', 'WMINS', 'WMINC', 'WMINL'])
+        self.getline(['R', 'SPLPAR'])
+        self.getline(['I', 'NSIGVI', 'NSIGSI', 'NSIGCI', 'NSIGI_BGK', 
+                      'NSIGI_COP', 'NSIGI_SPC',])
+        for i in range(1, self.values['NSIGVI']+1):
+            self.getline(['R', 'IGH', 'IIH'])
+        for i in range(1, self.values['NSIGSI']+1):
+            self.getline(['R', 'IGHW', 'IIHW'])
+        for i in range(1, self.values['NSIGCI']+1):
+            self.getline(['R'] + ['IGHC(1,'+str(i)+')', 'IIHC(1,'+str(i)+')',
+                                  'IGHC(2,'+str(i)+')', 'IIHC(2,'+str(i)+')'])
+
+    def block_10(self):
+        self.getline(['I', 'NADVI', 'NCLVI', 'NALVI', 'NADSI', 'NALSI', 
+                      'NADSPC'])
+        for i in range(1, self.values['NADVI']+1):
+            self.getline(['R', 'IADVE('+str(i)+')', 'IADVS('+str(i)+')',
+                          'IADVT('+str(i)+')', 'IADVR('+str(i)+')',
+                          'TXTTAL('+str(i)+',NTALA)',
+                          'TXTSPC('+str(i)+',NTALA)',
+                          'TXTUNT('+str(i)+',NTALA)'])
+
+        for i in range(1, self.values['NCLVI']+1):
+            self.getline(['R', 'ICLVE('+str(i)+')', 'ICLVS('+str(i)+')',
+                          'ICLVT('+str(i)+')', 'ICLVR('+str(i)+')',
+                          'TXTTAL('+str(i)+',NTALC)',
+                          'TXTSPC('+str(i)+',NTALC)',
+                          'TXTUNT('+str(i)+',NTALC)'])
+        for i in range(1, self.values['NALVI']+1):
+            self.getline(['R', 'ALSTRNG', 'TXTTAL('+str(i)+',NTALR)',
+                          'TXTSPC('+str(i)+',NTALR)',
+                          'TXTUNT('+str(i)+',NTALR)'])
+        for i in range(1, self.values['NADSI']+1):
+            self.getline(['R', 'IADSE('+str(i)+')', 'IADSS('+str(i)+')',
+                          'IADST('+str(i)+')', 'IADSR('+str(i)+')',
+                          'TXTTAL('+str(i)+',NTLSA)',
+                          'TXTSPC('+str(i)+',NTLSA)',
+                          'TXTUNT('+str(i)+',NTLSA)'])
+        for i in range(1, self.values['NALSI']+1):
+            self.getline(['R', 'ALSTRNG', 'TXTTAL('+str(i)+',NTLSR)',
+                          'TXTSPC('+str(i)+',NTLSR)',
+                          'TXTUNT('+str(i)+',NTLSR)'])
+
     def dummy_block(self):
         """This function reads the lines from the input file and then simply
         put it into the tree structure but without help parameters.
@@ -1236,6 +1465,7 @@ class EireneEdit(QTreeWidget):
         if os.path.exists(path):
             try:
                 with open(path) as file:
+                    self.filename = path
                     self.text = file.read()
                     self.setPlainText(self.text)
             except PermissionError as error:
@@ -1463,23 +1693,44 @@ class Eirene(QWidget):
     def document(self):
         return self.tree
 
+    def standealoneSave(self):
+        path = self.tree.filename
+
+        if os.path.exists(path):
+            try:
+                with open(path, 'w') as f:
+                    text = self.tree.toPlainText()
+                    f.write(text)
+            except PermissionError as error:
+                logging.error(str(error))
+        else:
+            logging.error('Path does not exist.')
+
 
 if __name__ == "__main__":
 
     import sys, os
-    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtWidgets import QApplication, QMainWindow
     os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = "1" # for solving high-dpi
     app = QApplication(sys.argv)                    # problems
     widget = Eirene()
+
+    class Standalone(QMainWindow):
+        def __init__(self, parent=None):
+            super(Standalone, self).__init__(parent)
+            self.eirene = Eirene(self)
+            self.setCentralWidget(self.eirene)
+        def closeEvent(self, e):
+            self.eirene.standealoneSave()
+            super(Standalone, self).closeEvent(e)
+
 
     if len(sys.argv[1]): 
         input_dat = sys.argv[1]
     else:
         input_dat='input.dat'
         #input_dat='input_2.dat'
-
-    widget.tree.readInput(os.path.expanduser(input_dat))
-
-
-    widget.show()
+    mainwindow = Standalone()
+    mainwindow.eirene.tree.readInput(os.path.expanduser(input_dat))
+    mainwindow.show()
     sys.exit(app.exec_())
