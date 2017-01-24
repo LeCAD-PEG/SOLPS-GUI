@@ -58,10 +58,10 @@ values of NMACH.</p>""",
 alone-code. Code coupling segment couple_Dummy.f may be used. Input block 14
 has a fixed format, see section 2.14.</dd> <dt> &ne; 0</dt><dd> EIRENE calls
 the code coupling subroutine INFCOP in the code coupling segment couple_Name.f
-where 'Name' is a character string identifying the particular external code,
-to which EIRENE is to be coupled (e.g.: Name=B2, Name=DIVIMP, Name=U-file,
-Name=FIDAP, Name=EMC3, Name=OSM, etc.).  Hence: the routine INFCOP is called
-by EIRENE for communication with external data sources, e.g., external data
+where 'Name' is a character string identifying the particular external code, to
+which EIRENE is to be coupled (e.g.: Name=B2, Name=DIVIMP, Name=U-file,
+Name=FIDAP, Name=EMC3, Name=OSM, etc.).  Hence: the routine INFCOP is called by
+EIRENE for communication with external data sources, e.g., external data
 structures for iterative mode by coupling to other codes. The calling program
 for the first 3 entries of INFCOP is subroutine INPUT, and the call to
 subroutine INFCOP is after reading 13 blocks from the formatted input file
@@ -81,15 +81,15 @@ perform global balances etc. after summation of the contributions from the
 individual strata.</dd> </dl> """,
 
 'NTCPU' : """<p>Maximum number of CPU seconds allowed for this run. NTCPU must
-be less than or equal to the time parameter in the job-card (if any).</p>
-<p>If more than one iteration is carried out (NITER, see below, this section)
-or more than one time cycle (NTIME, see below, this section), then each
-iteration or cycle can take up to NTCPU seconds.</p> <p>In 2008 the definition
-of NTCPU was slightly changed: the initialisation overhead is not any longer
-included in NTCPU. I.e., this variable NTCPU now is close to the true Monte
-Carlo sampling time. The total cpu-time, including initialisation overhead as
-well as post-processing is printed at the end of an EIRENE run (see: "total
-cpu-time of this run" in printout file).</p>""",
+be less than or equal to the time parameter in the job-card (if any).</p> <p>If
+more than one iteration is carried out (NITER, see below, this section) or more
+than one time cycle (NTIME, see below, this section), then each iteration or
+cycle can take up to NTCPU seconds.</p> <p>In 2008 the definition of NTCPU was
+slightly changed: the initialisation overhead is not any longer included in
+NTCPU. I.e., this variable NTCPU now is close to the true Monte Carlo sampling
+time. The total cpu-time, including initialisation overhead as well as post-
+processing is printed at the end of an EIRENE run (see: "total cpu-time of this
+run" in printout file).</p>""",
 
 'NFILE' : """<b>Flag for the use of dump files FT10, FT11, FT12, FT13,
 FT14 and FT15.</b>
@@ -789,7 +789,7 @@ class MyValidator(QValidator):
 
 class MyLineEdit(QLineEdit):
     """This is the custom QLineEdit for the QStyledItemDelegation. It contains
-    functions that handle the help description for the current selected card
+    functions that handle the help description for the current selected cardrole.insert
     and some overloaded functions for additional cosmetics.
 
     Attributes:
@@ -809,7 +809,7 @@ class MyLineEdit(QLineEdit):
         self.key_list = []
         self.last_param = None
 
-    def set_card_help(self, card_description):
+    def set_card_help(self, card_type, variables_name, number_of_args):
         """Setting the help description for current card. The card has multiple
         types of values, so each is handled accordingly.
 
@@ -817,29 +817,28 @@ class MyLineEdit(QLineEdit):
             card_description (array): This array contains roles and other info-
                 rmation for the validator class.
         """
-        if len(card_description) <= 2:
-            return None
-        self.variablesType = card_description[0]
-        self.parameter_description.append(card_description[2])
-        if card_description[0] == 'I':
-            for param_name in card_description[2:]:
+        if card_type==None:
+            return
+        self.parameter_description.append(variables_name[0])
+        if card_type == 'I':
+            for param_name in variables_name:
                 for i in range(6):
                     self.parameter_description.append(param_name)
 
-        elif card_description[0] == 'B':
+        elif card_type == 'B':
             i = 1
-            for param_name in card_description[2:]:
+            for param_name in variables_name:
                 if i % 6 == 0:
                     self.parameter_description.append(' ')
                 self.parameter_description.append(param_name)
                 i += 1
-        elif card_description[0] == 'R':
-            for param_name in card_description[2:]:
+        elif card_type == 'R':
+            for param_name in variables_name:
                 for j in range(13):
                         self.parameter_description.append(param_name)
-        elif card_description[0] == 'S':
-            param_name = card_description[2]
-            for j in range(card_description[1]):
+        elif card_type == 'S':
+            param_name = variables_name[0]
+            for j in range(number_of_args):
               self.parameter_description.append(param_name)
     
     def focusInEvent(self, e):
@@ -908,14 +907,14 @@ class CardEditDelegate(QStyledItemDelegate):
         """
         self.lineEdit = MyLineEdit(parent)
         self.lineEdit.setFrame(True)
-
-        card_data = index.data(Qt.UserRole)
-        if card_data is not None:
-            self.lineEdit.set_card_help(card_data)
-            val = MyValidator(self.lineEdit, card_data[1], card_data[0])
+        card_type = index.data(Qt.UserRole)[0]
+        number_of_args = index.data(Qt.UserRole)[1]
+        variables_name = index.data(Qt.UserRole)[2]
+        self.lineEdit.set_card_help(card_type, variables_name,
+                                    number_of_args)
+        if card_type:
+            val = MyValidator(self.lineEdit, number_of_args, card_type)
             self.lineEdit.setValidator(val)
-        else:
-            self.lineEdit.set_card_help([])
 
         self.lineEdit.parameter_help.connect(self.parameter_help)
         self.lineEdit.editingFinished.connect(self.parent().changed)
@@ -972,10 +971,6 @@ class EireneEdit(QTreeWidget):
                        self.block_14, self.block_15, self.block_16]
         self.number_of_blocks = len(self.blocks)
         self.setSelectionMode(QAbstractItemView.NoSelection)
-
-    def itemSelectionChanged(self):
-        print(self.selectedItems())
-
     def setPlainText(self, text):
         """This function sets the text from the input configuration file for 
         EIRENE into the tree. The way it works is that we have block functions
@@ -992,14 +987,19 @@ class EireneEdit(QTreeWidget):
         self.clear()
         self.curr_par = self.grup_par =self
         # Initiator
-        self.dummy_block()
+        try:
+            self.dummy_block()
+        except Exception as e:
+            pass
         for i in range(self.number_of_blocks):
             try:
                 self.blocks[i]()
                 self.dummy_block()
             except Exception as e:
                 print(e)
-                continue
+                print('Row:', self.row)
+                if self.row < self.text_size:
+                    print('Line:', self.text[self.row])
 
     def looks_like_boolean_card(self, line):
         """ A check function that accepts a string and then determine if the 
@@ -1538,8 +1538,7 @@ class EireneEdit(QTreeWidget):
         if line[:3] == '***':
             block_item = self.createItem(self, line)
             self.curr_par = self.grup_par = block_item
-            raise Exception('Line: '+ line +'\nRow: '+str(self.row)+'. Role: '+
-                            str(role))
+            raise Exception
 
 
         elif line[:1] == '*':
@@ -1569,9 +1568,17 @@ class EireneEdit(QTreeWidget):
         item = QTreeWidgetItem(parent)
         item.setText(0, text)
         item.setFlags(item.flags() | Qt.ItemIsEditable | Qt.ItemIsSelectable)
+        if self.grup_par == self:
+            block = item.data(0, Qt.DisplayRole)
+        else:
+            block = self.grup_par.data(0, Qt.DisplayRole)
         if role:
             self.set_variables(role, text)
-            item.setData(0, Qt.UserRole, role)
+            # user_role = (type, number of args, variables name, row)
+            user_role = (role[0], role[1], role[2:], self.row, block)
+        else:
+            user_role = (None, None, None, self.row, block)
+        item.setData(0, Qt.UserRole, user_role)
         return item
 
     def set_variables(self, role, text):
@@ -1742,7 +1749,7 @@ class Eirene(QWidget):
 if __name__ == "__main__":
 
     import sys, os
-    from PyQt5.QtWidgets import QApplication, QMainWindow
+    from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
     os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = "1" # for solving high-dpi
     app = QApplication(sys.argv)                    # problems
     widget = Eirene()
@@ -1751,10 +1758,32 @@ if __name__ == "__main__":
         def __init__(self, parent=None):
             super(Standalone, self).__init__(parent)
             self.eirene = Eirene(self)
+            self.eirene.tree.itemSelectionChanged.connect(self.UpdateStatusBar)
+            self.eirene.tree.setSelectionMode(Qt.SingleSelection)
             self.setCentralWidget(self.eirene)
         def closeEvent(self, e):
             self.eirene.standealoneSave()
             super(Standalone, self).closeEvent(e)
+
+        @pyqtSlot()
+        def UpdateStatusBar(self):
+            selectedItem = self.eirene.tree.selectedItems()[0]
+            parentItem = selectedItem.parent()
+            if parentItem != None:
+                block = parentItem.data(0, Qt.DisplayRole)
+                if len(block)<50:
+                    block+=(50-len(block))*' '
+            else:
+                block = 50*' '
+            if selectedItem.data(0, Qt.UserRole)!=None:
+                row = str(selectedItem.data(0, Qt.UserRole)[3])
+                if len(row) < 6:
+                    row+=(6-len(row))*' '
+            else:
+                row = 6*' '
+
+            self.statusBar().showMessage('Block: '+ block +
+                                         'Row: '+ row, 0)
 
 
     if len(sys.argv[1]): 
