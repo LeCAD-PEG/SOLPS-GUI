@@ -751,7 +751,7 @@ class MyValidator(QValidator):
         if type == 'B':
             self.length = self.n + int(self.n/5)
             self.n = self.length
-            self.mask = "T|F|\s"
+            self.mask = "T|F|t|f|\s"
         elif type == 'R':
             self.length = self.n * 12
             self.mask = "-?\d\.\d\d\d\d\dE(\+|\-)\d\d"
@@ -967,7 +967,9 @@ class EireneEdit(QTreeWidget):
         self.values = {}
         self.blocks = [self.block_1, self.block_2, self.block_3a, 
                        self.block_3b, self.block_4, self.block_5, self.block_6,
-                       self.block_7, self.block_8, self.block_9, self.block_10]
+                       self.block_7, self.block_8, self.block_9, self.block_10,
+                       self.block_11, self.block_12, self.block_13, 
+                       self.block_14, self.block_15, self.block_16]
         self.number_of_blocks = len(self.blocks)
         self.setSelectionMode(QAbstractItemView.NoSelection)
 
@@ -990,19 +992,14 @@ class EireneEdit(QTreeWidget):
         self.clear()
         self.curr_par = self.grup_par =self
         # Initiator
-
+        self.dummy_block()
         for i in range(self.number_of_blocks):
             try:
                 self.blocks[i]()
-            except Exception as e:
-                print('Error:')
-                print(e, self.row)
-                continue
-        while 1:
-            try:
                 self.dummy_block()
-            except IndexError as e:
-                break
+            except Exception as e:
+                print(e)
+                continue
 
     def looks_like_boolean_card(self, line):
         """ A check function that accepts a string and then determine if the 
@@ -1046,7 +1043,6 @@ class EireneEdit(QTreeWidget):
                 self.getline(['S', 'NOP'])
             line = self.getline()
 
-        return None
     def block_2(self):
         """Function for setting help desc. parameters for block 2:
         *** 2. Data for standard mesh 
@@ -1438,6 +1434,41 @@ class EireneEdit(QTreeWidget):
             self.getline(['R', 'ALSTRNG', 'TXTTAL('+str(i)+',NTLSR)',
                           'TXTSPC('+str(i)+',NTLSR)',
                           'TXTUNT('+str(i)+',NTLSR)'])
+    def block_11(self):
+        pass
+
+    def block_12(self):
+        self.getline(['I', 'NCHORI', 'NCHENI'])
+        if self.values['NCHORI'] > 0:
+            for i in range(1, self.values['NCHORI']+1):
+                self.getline(['S', 'TXTSIG'])
+                self.getline(['I', 'NSPTAL', 'NSPSCL', 'NSPNEW', 'NSPCHR'])
+                self.getline(['I', 'NSPSTR', 'NSPSPZ', 'NSPINI', 'NSPEND', 
+                              'NSPBLC', 'NSPADD'])
+                self.getline(['I', 'EMIN1', 'EMAX1', 'ESHIFT'])
+                self.getline(['I', 'IPIVOT', 'XPIVOT', 'YPIVOT', 'ZPIVOT'])
+                self.getline(['I', 'ICHORD', 'XCHORD', 'YCHORD', 'ZCHORD'])
+            self.getline(['I', 'PLCHOR', 'PLSPEC'])
+    def block_13(self):
+        self.getline(['I', 'NPRNLI', 'NINITL_READ', 'NPRMUL'])
+        if self.values['NLERG'] == 0 and self.values['NPRNLI'] == 0:
+            self.values['NPRNLI'] = 100
+        if self.values['NPRNLI'] > 0:
+            self.getline(['I', 'NPTST', 'NTMSTP'])
+            self.getline(['R', 'DTIMV', 'TIME0'])
+        self.getline(['I', 'NSNVI'])
+        if self.values['NSNVI'] > 0 :
+            self.dummy_block() # No additional descritpion in the manual for
+                               # this part
+
+    def block_14(self):
+        pass
+
+    def block_15(self):
+        pass
+
+    def block_16(self):
+        pass
 
     def dummy_block(self):
         """This function reads the lines from the input file and then simply
@@ -1507,7 +1538,8 @@ class EireneEdit(QTreeWidget):
         if line[:3] == '***':
             block_item = self.createItem(self, line)
             self.curr_par = self.grup_par = block_item
-            self.getline(role)
+            raise Exception('Line: '+ line +'\nRow: '+str(self.row)+'. Role: '+
+                            str(role))
 
 
         elif line[:1] == '*':
