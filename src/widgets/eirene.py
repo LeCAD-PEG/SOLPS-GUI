@@ -735,7 +735,373 @@ in these zones has to be specified explicitly by making use of the ILSWCH,
 ILCELL parameters (block 3B)</p> <p>(Default: NRADD = 0 ).</p>""",
 
 'VOLADD':"""<p>Volume (<em>cm<sup>-3</sup></em>) of each additional zone as
-seen by the test-particles.</p>""", }
+seen by the test-particles.</p>""", 
+
+'NSTSI':"""<p>Total number of non-default standard surfaces that do not act as
+prescribed by the default transparent standard co-ordinate surface
+model.</p>""",
+
+'TXTSFL':"""<p>Text to characterize a surface (&ldquo;name of the
+surface&rdquo;) on the printout file.</p>""",
+
+'ISTS':"""<p> irrelevant; labelling index</p>""",
+
+'IDIMP':"""<p>flag to identify mesh from which this particular surface is
+chosen.</p> <p>= 1 surface from the x- (radial) standard mesh (RSURF) Note that
+for the unstructured grid options NLTRI and NLTET (i.e. for the 2D triangular
+grid option or for the general 3D grids of tetrahedra) all surfaces are
+referred to as 1st grid (x or radial) surfaces, by abuse of language.</p>""",
+
+'INUMP':"""<p>Number of the surface in mesh RSURF, PSURF or TSURF
+respectively</p>""", 
+
+'IRPTA':"""<p>Only a subregion of the surface acts by the &ldquo;non-default
+options&rdquo; specified for this particular surface. This subregion is defined
+by these flags.</p> <p>If JMP is a surface from the first mesh, then IRPTA2
+&rarr; IRPTE2 and IRPTA3 &rarr; IRPTE3 are the surface index ranges of the 2nd
+and 3rd mesh, respectively,for which this surface acts as non-default surface.
+IRPTA1 and IRPTE1 are irrelevant.</p> <p>If JMP is a surface from the 2nd mesh,
+then IRPTA1 &rarr; IRPTE1 and IRPTA3 &rarr; IRPTE3 are the surface index ranges
+of the 1st and 3rd mesh, respectively, for which this surface acts as non-
+default surface. IRPTA2 and IRPTE2 are irrelevant.</p> <p>If JMP is a surface
+from the 3rd mesh, then IRPTA1 &rarr; IRPTE1 and IRPTA2 &rarr; IRPTE2 are the
+surface index ranges of the 1st and 2rd mesh, respectively, for which this
+surface acts as non-default surface. IRPTA3 and IRPTE3 are irrelevant.</p>""",
+
+'IRPTE': """<p>Only a subregion of the surface acts by the &ldquo;non-default
+options&rdquo; specified for this particular surface. This subregion is defined
+by these flags.</p> <p>If JMP is a surface from the first mesh, then IRPTA2
+&rarr; IRPTE2 and IRPTA3 &rarr; IRPTE3 are the surface index ranges of the 2nd
+and 3rd mesh, respectively,for which this surface acts as non-default surface.
+IRPTA1 and IRPTE1 are irrelevant.</p> <p>If JMP is a surface from the 2nd mesh,
+then IRPTA1 &rarr; IRPTE1 and IRPTA3 &rarr; IRPTE3 are the surface index ranges
+of the 1st and 3rd mesh, respectively, for which this surface acts as non-
+default surface. IRPTA2 and IRPTE2 are irrelevant.</p> <p>If JMP is a surface
+from the 3rd mesh, then IRPTA1 &rarr; IRPTE1 and IRPTA2 &rarr; IRPTE2 are the
+surface index ranges of the 1st and 2rd mesh, respectively, for which this
+surface acts as non-default surface. IRPTA3 and IRPTE3 are irrelevant.</p>""",
+
+'CH-card': """<p><b>CH0 n1/m1 n2/m2 ... </b> surfaces from the range n1 to m1,
+n2 to m2, ..., are ignored by EIRENE. Specifying a surface in such a CH0-card
+is identical to taking it out from the input file. It may be more convenient in
+some cases, however, to use the CH0 option, because the labelling index of the
+remaining valid surfaces is not altered then. No input is read for these
+surfaces, and the input segment for the next valid surface (identified by the
+string &rsquo;*text&rsquo;) is read next.</p> <p><b>CH1(ILIMI) n1/m1 n2/m2 ...
+</b> surfaces from the range n1 to m1, n2 to m2, ..., are considered invisible
+for a particle located on this current surface ILIMI. Intersection of
+trajectories starting from surface ILIMI with those &ldquo;invisible&rdquo;
+surfaces is not checked.</p> <p><b>CH2(ILIMI) n1/m1 n2/m2 ... </b> Only for
+second order surfaces ILIMI, n1-m1, ... The first of the two possible
+intersections is ignored for particles located on surface no. ILIMI.</p>""",
+
+'NLIMI':"""<p>Number of surfaces in the input block</p>""",
+
+'TXTSUR': """<p> Text to identify a surface (&ldquo;name of the surface&rdquo;)
+<on the printout file/p>""",
+
+'RLBND': """flag for different options to define the boundary of the
+surface</p>
+<dl>
+<dt>RLBND = 0</dt>
+<dd>No boundary inequalities specified, i.e. the whole surface is seen by the 
+test particles.</dd>
+<dt>0< RLBND < 2</dt>
+<dd>= 1 Only that part of the surface, which lies inside the right 
+parallelepiped defined by the two vectors (XLIMS1, YLIMS1, ZLIMS1) and 
+(XLIMS2, YLIMS2, ZLIMS2), is seen by the particles. I.e. the three 
+inequalities</dd><br>
+<dd>= 1.5   Complement to RLBND = 1.
+Only the surface element outside the parallelepiped is seen by the particles.
+</dd>
+<dt>RLBND &ge; 2</dt>
+<dd>In this case the surface will be defined by the input of the coordinates of
+at least 2 and at highest 5 points on a plane surface. If there are only 2 
+points, the surface is parallel to one axis.&nbsp;&nbsp; If there are 3 or 
+more points,&nbsp; then the boundary of this plane surface is a closed 
+polygon (<em>P<sub>1</sub></em><em>, ..., P <sub>n</sub></em><em>, 
+P<sub>1</sub></em>). Therefore, the correct order of points at input is 
+relevant.&nbsp; The orientation of the positive surface normal vector is 
+defined by the first&nbsp; 3 points, and it is given by the vector product 
+(<em>P3 </em>- <em>P1 </em>)x(<em>P3</em>- <em>P2 </em>). Thus, the&nbsp; 
+orientation can be reversed e.g. by interchanging <em>P<sub>2</sub></em>&nbsp; 
+and <em>P<sub>3</sub></em>.</dd><br>
+<dd>2.1 plane surface parallel to z axis. The surface equation of this plane 
+eads ax+by+c=0 with the coefficients a,b and c such that the points 
+<em>P<sub>1</sub></em><em>, P<sub>2</sub></em> lie on this surface and the 
+valid part of that surface ranges from <em>P<sub>1</sub></em> to 
+<em>P<sub>2</sub></em> in the xy-plane. The z-coordinates of these two points 
+define the boundaries in z direction</dd><br>
+<dd>>= 2.2 Complement to RLBND = 2.1</dd><br>
+<dd>>= 2.4 as RLBND=2.1 option, but with z and y exchanged. I.e., now the y 
+coordinates of the points <em>P<sub>1</sub></em>, <em>P<sub>2</sub></em> are 
+the boundaries of the surface ax+bz+c=0 in y direction.</dd><br>
+<dd>>= 2.5Complement to RLBND = 2.4</dd><br>
+<dd>>= 2.7 as RLBND=2.1 option, but with z and x exchanged. I.e., now the x 
+coordinates of the points <em>P<sub>1</sub></em>, <em>P<sub>2</sub></em> are 
+the boundaries of the surface ay+bz+c+0 in x direction.</dd><br>
+<dd>>= 2.8 Complement to RLBND = 2.7</dd><br>
+<dd>>= 3 plane triangle defined by the corners style="text-indent: 25px;", 
+P<sub>2</sub><em>, P<sub>3</sub></em><p><em>P</em>1=(P1(1),P1(2),P1(3))</p>
+<p><em>P</em>2=(P2(1),P2(2),P2(3))</p>
+<p><em>P</em>3=(P3(1),P3(2),P3(3))</p></dd><br>
+<dd>= 3.5 complement to RLBND = 3; only The plane surface outside the triangle 
+is seen by the test particles.</dd><br>
+<dd>>= 4 plane quadrangle; surface inside the polygon</p>
+<p>(<em>P<sub>1</sub></em> , <em>P<sub>2</sub></em> , <em>P<sub>4</sub></em> , 
+<em>P<sub>3</sub></em> , <em>P<sub>1</sub></em> ).</p> <p>Here 
+<em>P<sub>1</sub></em> , <em>P<sub>2</sub></em> , 
+<em>P<sub>3</sub></em> are as in the RLBND=3 option, and 
+<em>P<sub>4</sub></em> = (P4(1), P4(2), P4(3)) Thus this surface is the union 
+of the triangles with vertices <em>P<sub>1</sub></em> , <em>P<sub>2</sub></em>,
+<em>P<sub>3</sub></em> and <em>P<sub>2</sub></em> , <em>P<sub>4</sub></em> ,
+<em>P<sub>3</sub></em> respectively.</dd><br>
+<dd>= 4.5 complement to RLBND = 4; only the part of the plane surface outside 
+the quad- rangle is seen by the test particles</dd><br>
+<dd>= 5 plane quint-angle; surface inside the polygon (<em>P<sub>1</sub></em> ,
+<em>P<sub>2</sub></em> , <em>P<sub>4</sub></em> , <em>P<sub>5</sub></em> , 
+<em>P<sub>3</sub></em> , <em>P<sub>1</sub></em>) <em>P<sub>1</sub></em> , 
+<em>P<sub>2</sub></em> , <em>P<sub>3</sub></em> , <em>P<sub>4</sub></em> 
+as RLBND=4, and <em>P<sub>5</sub></em> = (P5(1), P5(2), P5(3))</dd><br>
+<dd>= 5.5 complement to RLBND = 5; only the part of the plane surface outside 
+the quint- angle is seen by the test particles.</dd><br>
+<dt>RLBND &lt; 0</dt>
+<dd>-KL</dd><br>
+<dd>The surface is bounded by L linear inequalities and by K second order 
+inequalities.</dd><br>
+<dd><em>ALIMS </em>+ <em>XLIMS </em>&middot; <em>x </em>+ <em>Y LIMS 
+</em>&middot; <em>y </em>+ <em>ZLIMS </em>&middot; <em>z </em>&le; 0 
+(L inequalities)</dd><br>
+<dd><em>ALIMS</em>0&nbsp; +&nbsp;&nbsp; <em>XLIMS</em>1 &middot; <em>x 
+</em>+ <em>Y LIMS</em>1 &middot; <em>y </em>+ <em>ZLIMS</em>1 &middot; 
+<em>z</em></p> <p>+&nbsp;&nbsp; <em>XLIMS</em>2 &middot; <em>x<sup>2</sup>; 
+</em>+ <em>YLIMS</em>2 &middot; <em>y<sup>2</sup>; </em>+ <em>ZLIMS</em>2
+ &middot; <em>z <sup>2</sup></em></p><p>+ <em>XLIMS</em>3 &middot; <em>xy 
+ </em>+ <em>YLIMS</em>3 &middot; <em>xz </em>+ <em>ZLIMS</em>3 &middot; 
+ <em>yz </em>&le; 0(K inequalities)
+ </dd><br>
+</dl>
+""",
+
+'RLARE': """<p>Area (in <em>cm<sup>2</sup></em>) of the surface element which
+is seen by the test particles. (Default: 666.0) (needed only for scaling of non
+default surface averaged tallies) If RLARE is not specified here, (i.e., if a
+value less than or equal to zero is read) then EIRENE tries to evaluate this
+area itself. For some surfaces this is still not possible
+automatically.</p>""",
+
+'RLWN': """<p>lower weight limit for space weight window for particles crossing
+the surface in positive direction. (not in use)</p>""",
+
+'RLWMX': """<p> upper weight limit for space weight window for particles
+<crossing the surface in positive direction. (not in use)/p>""",
+
+'ILIIN': """<p>defines the type of surface</p>
+<dl>
+  <dt>&gt; 0 non-transparent surface</dt>
+<dl>
+<dt>= 1 reflecting, partly or purely absorbing surface. local reflection model 
+has to be specified unless default model is to be used; all surface tallies  
+are updated and a switch can be operated.</dt><p></p>
+<dt>= 2 purely absorbing surface ;. surface tallies for incident fluxes are 
+updated and the particle history is stopped then.</dt><p></p>
+<dt>= 3 mirror for incident test particles. I.e., specular reflection for 
+neutral test particles, and for charged test particles the sign of the velocity
+ component parallel to the B-field is reversed.</t><p></p>
+<dt>=m4 periodicity surface, with regard to x, y, or z coordinate, depending 
+upon whether this surface is a standard x, y, or z grid surface, respectively. 
+Move particle to x / radial grid surface no. m, m integer (or to y / poloidal
+ or to z / toroidal surface no. m, respectively) and continue track from there
+  with otherwise identical particle parameters. <br />This option is currently
+   implemented only for Cartesian grids (NLSLB and NLTRZ) and for non-default
+    standard grid surfaces only.</dt><p></p>
+<dt>The periodicity options are not fully implemented yet. Please contact the
+ author for the current status of your particular version.</dt><p></p>
+</dl>
+  <dt>&le; 0 transparent surface (for example: hole in one of the other
+ "additional surfaces"). Particle and energy fluxes onto and from these 
+ surfaces do not contribute to global balances.</dt><dd>IBM</dd>
+<dl>
+<dt>= 0 Particle history is not interrupted
+No surface tallies are updated, no switches can be operated. Fastest option.
+</dt><p></p>
+<dt>= -1 Particle history will be stopped and restarted. A switch can be 
+operated. I.e., this surface is used only for switching (see below: ILSWCH) 
+or re- initializing the particle’s track at the point of intersection. 
+No surface tallies are updated.</dt><p></p>
+<dt>>= -2 as -1, and, additionally:<p> if a particle is crossing the surface in 
+the positive direction, (one sided-) sur- face tallies are updated, e.g., by 
+default: partial particle and energy currents <em>J<sup>+</sup></em> (Amp) and 
+<em>K<sup>+</sup></em> (Watt). These are stored in the POT... and EOT... 
+tallies of Table. If the paed in the PRF... and ERF... tallies of Table 5.3 
+.article crosses the surface in the direction opposite to the surface normal, 
+then negative partial particle and energy currents <em>J<sup>-</sup></em>; 
+(Amp) and <em>K<sup>-</sup></em>; (Watt) are updated. These are stored in the 
+PRF... and ERF... tallies of Table.<p></dt><p></p>
+<dt>= -3 Net currents (e.g. J+ −J-), are evaluated, and stored on the POT... 
+and EOT... tallies (see Table 5.3 ). The PRF... and ERF... tallies are empty 
+for these surfaces.</dt><p></p>
+<dt> -4 Not in use. Currently: same as ILIIN=-2 option.</dt><p></p>
+</dl>
+</dl>""",
+
+'ILSIDE': """<dl>
+<dt>=  0 both sides of the surface act as described by ILIIN option (default).
+</dt>
+<dt>=  1 particles incident on the surface in the negative direction will be 
+absorbed (i.e., ILIIN = 2 option from that side).</dt>
+<dt>=  2 particles incident on the surface in the negative direction will be 
+killed and the message</dt>
+<dd>"ERROR IN ADDCOL"<br> or <br> "ERROR IN STDCOL" <br> will be printed. The 
+contribution of these particles to the particle- and energy flux balances will 
+be called PTRASH and ETRASH respectively. This option should be used for 
+geometry testing whenever the user expects particles incident only from one 
+side.</dd>
+<dt>=  3 particles incident on the surface in the negative direction will 
+not see the surface, i.e., this surface acts like a (semi) transparent surface 
+(ILIIN = 0 option) from that side.</dt>
+<dt>= -1 as 1, but with the opposite direction of the surface normal</dt>
+<dt>= -2 as 2, but with the opposite direction of the surface normal</dt>
+<dt>= -3 as 3, but with the opposite direction of the surface normal</dt>
+</dl>""",
+
+'ILSWCH': """ = IJKLMN, i.e. six digits I, J, K, L, M and N
+<dl>
+<dt>= 0 no switch is operated</dt>
+<dt>N EIRENE flag ITIME</dt><dd><p>N = 1   The calculation of the step sizes in
+ the standard mesh is abandoned for a
+particle which crosses the surface in the positive direction, and is 
+reactivated,
+if the particle strikes in the negative direction</p><p>
+N = 2   as 1, but with the direction of the surface normal reversed for this 
+option.</p></dd>
+<dt>M EIRENE flag IFPATH</dt><dd><p>M = 1   Abandon the calculation of the 
+collision rates (entry into the vacuum) for
+a particle which is striking the surface in the direction of the surface 
+normal.
+For particles incident from the other direction, evaluation of collision rates 
+is
+reactivated.</p><p>M = 2 as 1, but with the direction of the surface normal
+ reversed.</p></dd>
+<dt>L EIRENE flag IUPDTE</dt><dd><p>L = 1   Abandon the updating of 
+volume-averaged tallies for a particle which is
+striking the surface in the direction of the surface normal. For particles 
+incident from the other direction, updating of volume averaged tallies is 
+reactivated.</p><p>L = 2 as 1, but with the direction of the surface normal 
+reversed for this option.</p></dd>
+<dt>I,J,K flags for switching cell numbers at transition into a different mesh 
+cell.</dt>
+<dt>K for particles in an additional cell, i.e., not in one of the "standard 
+mesh" blocks:</dt><dd><p>K = 1   Increase the actual additional cell number NACELL for a particle striking
+the surface in the direction of the surface normal by ILACLL. Decrease NA-
+CELL by ILACLL if the particle is striking in the negative direction. 
+Specification of ILACLL is via the input variable ILCELL, see below.</p><p>
+K = 2   as K = 1,  but with the direction of the surface normal reversed for 
+this
+option.</p><p>for particles inside the "standard mesh ", i.e., not in the 
+"additional cell region"</p><p>K = 1   Increase the standard mesh block number
+ NBLOCK for a particle strik-
+ing the surface in the direction of the surface normal by ILBLCK. Decrease
+NBLOCK  by  ILBLCK  if  the  particle  is  striking  in  the  negative  
+direction.
+Specification of ILBLCK is via the input variable ILCELL, see below.</p><p>K
+ = 2 as K = 1, but with the direction of the surface normal reversed.</p></dd>
+<dt>J for particles at the boundary between "additional" and "standard" mesh
+ regions.</dt><br><dd> = 1   entrance into standard mesh, block no. 
+NBLOCK = ILBLCK or exit from standard mesh into additional cell NACELL = 
+ILACLL.
+Specification of ILACLL and ILBLCK is via the input variable ILCELL, see
+below.  If ILACLL = 0, then no switch to additional cell is operated.  (E.g.:
+for surfaces which are reflecting from this side).</dd><br><dd>J = 2 as J = 1. 
+The direction of the surface normal does not matter here.</dd><br>
+<dt>I similar to J-flag, i.e., for transitions between standard and additional 
+meshes, but
+different cell number switching.</dt><br><dd>I = 1   Entrance into standard 
+mesh, block no. NBLOCK = NACELL+ILBLCK, if the particle is striking in the 
+positive direction, or
+NBLOCK = NACELL-ILBLCK,
+if the particle is striking in the negative direction.  Exit from standard mesh
+into additional cell
+NACELL = NBLOCK+ILACLL,
+for a particle striking the surface in the positive direction, or
+NACELL = NBLOCK-ILACLL,
+if the particle is striking in the negative direction.
+Specification of ILACLL and ILBLCK is via the input variable ILCELL, see
+below.</dd><br><dd>I = 2 as I = 1, but with the direction of the surface 
+normal reversed.</dd>
+<dd>If a test particle history starts from a surface (NLSRF option), then 
+ILSWCH acts as if
+this particle had struck the surface prior to the birth process in the 
+positive direction.
+This default setting is only available for ILSIDE 6=0 and can (must) be 
+overruled by
+the SORIFL flag , e.g.  if a surface source needs to be defined on a
+surface with ILSIDE = 0.</dd>
+</dl>""",
+
+'ILEQUI':"""<p>The algebraic equations for the surfaces J and
+IABS(ILEQUI(J)) will be described by exactly the same coefficients (up to a
+common sign, if ILEQUI(J) .lt. 0). For example a triangle can be specified by
+the three corners and another part of the same plane surface can be specified
+directly by its algebraic coefficients. To avoid round-off errors one should
+use the ILEQUI option in such cases, in particular if surface J is a
+transparent &ldquo;hole&rdquo; in surface ILEQUI(J), or vice versa.</p>""",
+
+'ILTOR':"""For NLTRA option only (see block 2c): <p>if ILTOR<em>&gt;</em>0
+:</p> <p>the surface is defined with respect to the local coordinate system of
+the toroidal segment with &ldquo;cell-number&rdquo; ILTOR, hence: 1 &le;ILTOR
+&le;NTTRAM.</p> <p>if ILTOR=0 :</p> <p>the surface is defined with respect to
+any local coordinate system. I.e., the surface equations are taken to be the
+same in each local system.</p> <p>If the surface equations are z-independent,
+then this surface is toroidally symmetric (within the NLTRA-approximation).</p>
+<p>Otherwise the surface has NTTRAM-fold periodicity.</p> <p>This flag is
+irrelevant for NLTRZ (i.e., if cylindrical coordinates are used) or for NL-
+TRT.</p> <p>Default: ILTOR = 0</p>""",
+
+'ILCOL':"""<p>Flag for the color that is used for plotting this surface on 2d
+or 3d geometry plots. If ILCOL &le; 0 than -ILCOL is used and the surface area
+is filled in by that color on the 3d geometry plots.</p><p>Default:
+ILCOL=1</p>""",
+
+'ILFIT':"""<p>This option is relevant only for surfaces with one ignorable
+coordinate, i.e. it only works for the 2<em>. </em>&le; <em>RLBND </em>&le; 3.
+surface boundary options.</p> <p>It is a tool to facilitate a neat fitting of
+surfaces, in particular for connecting curved and plane surfaces (i.e. to avoid
+particle leakage due to numerical round-off errors in the algebraic surface
+coefficients.</p> <p>M and N (3 digits each, M may be omitted if not needed)
+are the numbers of the surfaces (which must have the same ignorable coordinate)
+the boundaries of which should match to those of the actual surface J. The
+boundaries of these neighboring surfaces M and N must be specified by the RLBND
+= 1 or RLBND = 1.5 option.</p> <p>The fitting is achieved by a small automatic
+internal modification of the surface data P1 and/or P2 of surface number J in
+subroutine SETFIT. Printout of the modifications made there is activated with
+the TRCSUR flag (input block 11).</p> <p><b>ILCELL </b> Parameter ILBLCK and
+ILACLL for the ILSWCH flags described above. Let ILCELL = NM, with N and M
+being integers with 3 digits each. Then N = ILBLCK and M = ILACLL.</p>
+<p><b>ILBOX </b> to be written</p> <p><b>ILPLG </b> EIRENE can write out
+information for a finite element mesh generator to produce a grid of triangles
+for a multiply connected 2D domain with cracks and holes. The various (inner
+and outer) boundaries are given as polygonal lines, which are composed of
+selected standard grid surface segments (NLPLG option) and/or additional
+surfaces <br>(2 &le; RLBND <em>&lt; </em>3 option). <br>This flag identifies
+closed polygonal lines composed of additional surfaces given by the 2-point
+option and/or of standard surfaces in the x-y-plane. For example if
+ILPLG(I)=NN, for surfaces I = I1, I2, ...IN, (NN a positive integer) then these
+IN surfaces form a closed polygonal line in the x-y-plane. The region inside
+this closed line is part of the com- putational domain. By a negative integer
+value of NN a closed polygonal region can be excluded from the computational
+domain, i.e., a hole in the domain is specified by these surfaces. EIRENE
+writes an output file appropriate for a finite element mesh gen- erator
+(available from FZ-Juelich) to produce a triangular discretization of the
+resulting (possibly multiply connected) domain. This option can be used to
+discretize arbitrarily complex 2D domains with internal and external boundaries
+given by the additional or non-default standard surfaces. <br>These finite
+element grids can be combined with the regular grids by using the problem
+specific geometry routines (see section 3) or the code interfacing routines
+INFCOP (see section 4).</p>""",
+}
+
+
 
 class MyValidator(QValidator):
     """This is a custom validator for the Delegator editors. Depending on the
@@ -806,7 +1172,6 @@ class MyLineEdit(QLineEdit):
     def __init__(self, parent=None):
         super(MyLineEdit, self).__init__(parent)
         self.parameter_description = []
-        self.key_list = []
         self.last_param = None
 
     def set_card_help(self, card_type, variables_name, number_of_args):
@@ -919,13 +1284,6 @@ class CardEditDelegate(QStyledItemDelegate):
         self.lineEdit.parameter_help.connect(self.parameter_help)
         self.lineEdit.editingFinished.connect(self.parent().changed)
 
-        # Additional cosmetics changes.
-        x, y, width, height = option.rect.getCoords()
-        option.rect.setCoords(50, y, x + width - 50, height)
-        option.font.setFamily('Monospace')
-
-        self.updateEditorGeometry(self.lineEdit, option,index)
-
         return self.lineEdit
 
     def destroyEditor(self, editor, index):
@@ -937,11 +1295,6 @@ class CardEditDelegate(QStyledItemDelegate):
         """
         editor.parameter_help.emit('EDIT')
         super(CardEditDelegate, self).destroyEditor(editor, index)
-
-    def paint(self, painter, option, index):
-        x, y, width, height = option.rect.getCoords()
-        option.rect.setCoords(50, y, x + width - 50, height)
-        super(CardEditDelegate, self).paint(painter, option, index)
 
 
     @pyqtSlot(str)
@@ -963,6 +1316,7 @@ class EireneEdit(QTreeWidget):
         self.setAlternatingRowColors(True)
         self.card_edit_delegate = CardEditDelegate(self)
         self.setItemDelegate(self.card_edit_delegate)
+        self.setCurrentIndex(self.model().index(0, 0))
         self.values = {}
         self.blocks = [self.block_1, self.block_2, self.block_3a, 
                        self.block_3b, self.block_4, self.block_5, self.block_6,
@@ -970,7 +1324,9 @@ class EireneEdit(QTreeWidget):
                        self.block_11, self.block_12, self.block_13, 
                        self.block_14, self.block_15, self.block_16]
         self.number_of_blocks = len(self.blocks)
-        self.setSelectionMode(QAbstractItemView.NoSelection)
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setSelectionBehavior(QAbstractItemView.SelectItems)
+        self.setIndentation(20)
     def setPlainText(self, text):
         """This function sets the text from the input configuration file for 
         EIRENE into the tree. The way it works is that we have block functions
@@ -1144,7 +1500,7 @@ class EireneEdit(QTreeWidget):
 
         for i in range(self.values['NSTSI']):
             self.getline(['I', 'TXTSFL', 'ISTS', 'IDIMP', 'INUMP(ISTSI,IDIMP)',
-                        'IRPTA1', 'IRPTE1', 'IRPTA2', 'IRPTA3', 'IRPTE3'])
+                        'IRPTA', 'IRPTE', 'IRPTA', 'IRPTA', 'IRPTE'])
             self.getline(['I', 'ILIIN', 'ILSIDE', 'ILSWCH', 'ILEQUI', 'ILCOL',
                         'ILIT', 'ILCELL', 'ILBOX', 'ILPLG'])
             line = self.getline()
