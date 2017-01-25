@@ -111,8 +111,8 @@ if [ ! -d ${PARAVIEW_SOURCE_DIR} ]; then
     tar xzf ${DOWNLOAD_DIR}/${PARAVIEW_SOURCE}
 #    tar xzf ${DOWNLOAD_DIR}/${PARAVIEW_DATA}
 # See https://github.com/OpenFOAM/ThirdParty-dev/blob/master/README.org
-    patch -p2 -d ${PARAVIEW_SOURCE_DIR} < \
-        ${BUILDROOT}/src/patches/paraview-ui_pqExportStateWizard.patch
+#    patch -p2 -d ${PARAVIEW_SOURCE_DIR} < \
+#        ${BUILDROOT}/src/patches/paraview-ui_pqExportStateWizard.patch
 #    patch -p1 -d ${PARAVIEW_SOURCE_DIR} < \
 #        ${BUILDROOT}/src/patches/paraview-vtk-storage-mkostemp.patch
 fi
