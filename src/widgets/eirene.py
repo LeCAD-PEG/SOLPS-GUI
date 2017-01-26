@@ -207,24 +207,24 @@ tions.</p>""",
 
 'NOPTM1': """<p>Default: 1</p>""",
 
-'NGEOM_USR': """<p>for value =1: user defined (external) geometry package
+'NGEOM_USR' : """<p>for value =1: user defined (external) geometry package
 (LEVGEO=10), then no grid storage is provided in EIRENE. Default: 0</p>""",
 
-'NCOUP_INPUT': """<p> =1: Storage for data transfer via coupling routines, =0:
+'NCOUP_INPUT' : """<p> =1: Storage for data transfer via coupling routines, =0:
 no such storage.  Default: 1</p>""",
 
-'NSMSTRA': """<p>"Sum over strata" disabled for value 0, enabled for value 1.
+'NSMSTRA' : """<p>"Sum over strata" disabled for value 0, enabled for value 1.
 Default: 1</p>""",
 
-'NSTORAM': """<p>Storage vs.  speed in atomic data evaluation. Maximum
+'NSTORAM' : """<p>Storage vs.  speed in atomic data evaluation. Maximum
 storage, fastest com- putation: =9. Minimum storage, maximum work (slowest
 option) =0. Default: 9</p>""",
 
-'NGSTAL': """<p>Storage for spatial distribution of surface tallies on non-
+'NGSTAL' : """<p>Storage for spatial distribution of surface tallies on non-
 default standard surfaces for value =1. For value =0: only total (spatially
 integrated) surfaces fluxes. Default: 0</p>""",
 
-'NRTAL': """<p>Condensing mesh cells into fewer larger cells, for output
+'NRTAL' : """<p>Condensing mesh cells into fewer larger cells, for output
 volume tallies. The under- lying fine mesh has NRAD cells (see input block 2).
 The coarser mesh, obtained from condensing cells into one larger cell, has
 NRTAL cells.  Default: 0: Then internally: NRTAL=NRAD, and no condensation is
@@ -239,30 +239,30 @@ NRTAL).</p> <p>The index array NCLTAL(NRAD) can be defined in the problem
 specific "user" rou- tines (see section 3), e.g.: INIUSR, GEOUSR, etc..</p>
 <p>Default: NCLTAL(IRAD)=IRAD for IRAD=1,NRAD</p>""",
 
-'NREAC_ADD': """<p> Storage for additional reaction decks read onto EIRENE
+'NREAC_ADD' : """<p> Storage for additional reaction decks read onto EIRENE
 arrays in USR- routines, post-processing, etc. Default: 0</p>""",
 
 'NOP' : """No description available.""",
 
-'NLSCL':"""<p>Some volume averaged tallies are re-scaled in order to exactly
+'NLSCL' : """<p>Some volume averaged tallies are re-scaled in order to exactly
 preserve the total number of particles, which otherwise would be the case only
 up to statistical precision (due to the use of track-length estimators).
 EIRENE computes three factors FATM, FMOL and FION such that particle balances
 for atoms, molecules and test ions, respectively, are accurately observed,
 if NLSCL = TRUE.</p>""" ,
 
-'NLTEST':"""<p>Tests for consistency between cell numbers and geometrical data
-along the particle tracks are carried out at each point of collision. If
+'NLTEST' : """<p>Tests for consistency between cell numbers and geometrical
+data along the particle tracks are carried out at each point of collision. If
 inconsistencies are detected, the history is stopped and an error message is
 printed. The contribution of these particles to the particle- and energy
 balances is stored in the bins "PTRASH" and "ETRASH" respectively.""",
 
-  'NLANA':"""<p>De-activates (NLANA=.TRUE.) all non-analog sampling
+  'NLANA' : """<p>De-activates (NLANA=.TRUE.) all non-analog sampling
 distributions, such as biased source sampling, splitting, etc.. Select
 NLANA=.TRUE., if particle trajectory plots are used to get an intuitive
 picture of what is going on physically.</p>""",
 
-'NLDRFT':"""<p>Drift component in the bulk ions velocity distribution is
+'NLDRFT' : """<p>Drift component in the bulk ions velocity distribution is
 included, i.e. the assumed underlying distribution in velocity space is a
 drifting Maxwellian for volumetric background tallies of bulk particles. (see
 input block 5, input tallies VXIN, VYIN, VZIN)). Otherwise (if NLDRFT = FALSE)
@@ -272,29 +272,29 @@ tallies for energy exchange, momentum exchange between test particles and
 background particles, as well as sampling from linear collision
 kernels.</p>""",
 
-'NLCRR':"""<p>Correlated sampling is used. See discussion at end of section
+'NLCRR' : """<p>Correlated sampling is used. See discussion at end of section
 1.8.""",
 
-'NLERG':"""<p>The case is automatically reduced to a case for estimating cell
+'NLERG' : """<p>The case is automatically reduced to a case for estimating cell
 volumes by utilizing an "ergodic property". More details: see paragraph 2.1.2
 below.</p>""",
 
-'NLIDENT':"""<p>In multi-processor calculation mode NLIDENT forces all
+'NLIDENT' : """<p>In multi-processor calculation mode NLIDENT forces all
 processors working on the same stratum to use the same sequence of random
 numbers and hence to carry out exactly identical work. This flag can be used
 to test the parallelized code version.</p>""",
 
-'NLONE':"""<p>The case is automatically reduced to a single species and "one
+'NLONE' : """<p>The case is automatically reduced to a single species and "one
 speed transport" problem (to simplify setting up cases for comparison with
 analytic results). (not ready, don't use)</p>""",
 
-'NLMOVIE':"""<p>reset a number of model parameters to enable a series of
+'NLMOVIE' : """<p>reset a number of model parameters to enable a series of
 geometry plots for making particle trajectory movies. This option only works
 in connection with time dependent mode, see NTIME flag described above, and
 input block 2.13. More details: see paragraph 2.1.3 below.</p>""",
 
 # *** 2.
-'INGRD(1)':"""This index controls the meaning of input
+'INGRD(1)' : """This index controls the meaning of input
 variables of different standard grid options.
 <dl>
   <dt>INDGRD(1)</dt><dd>for the radial (or x-direction) grid</dd>
@@ -303,7 +303,7 @@ variables of different standard grid options.
 </dl>
 Data for first standard mesh: radial or x grid RSURF""",
 
-'INGRD(2)':"""This index controls the meaning of input variables of
+'INGRD(2)' : """This index controls the meaning of input variables of
 different standard grid options.
 <dl>
   <dt>INDGRD(1)</dt><dd>for the radial (or x-direction) grid</dd>
@@ -312,7 +312,7 @@ different standard grid options.
 </dl>
 Data for first standard mesh: radial or x grid RSURF""",
 
-'INGRD(3)':"""This index controls the meaning of input variables of
+'INGRD(3)' : """This index controls the meaning of input variables of
 different standard grid options.
 <dl>
   <dt>INDGRD(1)</dt><dd>for the radial (or x-direction) grid</dd>
@@ -321,7 +321,7 @@ different standard grid options.
 </dl>
 Data for first standard mesh: radial or x grid RSURF""",
 
-'NLRAD': """
+'NLRAD' : """
 <p>A radial or x grid is defined. Otherwise the complete sub-block 2A
 may be omitted.  Depending upon the logical parameters in the next
 input card the "geometry - level" variable LEVGEO is set internally.
@@ -344,24 +344,22 @@ geometry level</dd> LEVGEO = 1 is used. Volume discretisation may
 still be achieved "by hand" by defining</dd> "additional surfaces"
 (input block 3b) and appropriate cell number switching.</p>""",
 
-'NLSLB': """ <p>Geometry level: LEVGEO = 1</p> <p> Cartesian geometry, the x
+'NLSLB' : """ <p>Geometry level: LEVGEO = 1</p> <p> Cartesian geometry, the x
 co-ordinate is discretized by setting:</p> <p>x<sub>1</sub> = RSURF(I)  I=1,
 NR1ST.</p> <p> Furthermore, the flux-surface labeling grid RHOSRF(I) is
 identical with the grid RSURF(I).</p>""",
 
-'NLCRC': """ <p>Geometry level: LEVGEO = 2</p> <p>Cylindrical or toroidal
+'NLCRC' : """<p>Geometry level: LEVGEO = 2</p> <p>Cylindrical or toroidal
 geometry, 1D ("radial") mesh of concentric, circular surfaces.  Polar
 coordinates are used in the x-y plane.  The third coordinate (either
 <em>z</em> or toroidal angle &phi;)</p> <p>The radial surfaces are given by
 <em>r<sup>2</sup> = x<sup>2</sup> + y<sup>2</sup> = const</em>. and radial
 coordinate <em>r</em> is discreticized by setting r<sub>1</sub>=RSURF(I) I=I,
-NR1ST. Furthermore RHOSRF(I)= <span style="white-space: nowrap; font-
-size:larger"> &radic;<span style="text-
-decoration:overline;">&nbsp;AREA/&pi;&nbsp;</span> </span>where AREA is the
+NR1ST. Furthermore RHOSRF(I)= &radic; &nbsp;AREA/&pi; where AREA is the
 area inside surface number I. Thus for this option one has
 again:RHOSRF(I)=RSURF(I), I=1, NR1ST. </p>""",
 
-'NLELL': """
+'NLELL' : """
 <p>Geometry level: LEVGEO = 2</p> 
 <p>Mesh of nested, but
 not necessarily concentric or confocal elliptical flux surfaces. The equation
@@ -375,10 +373,10 @@ co- ordinate surface in the first (radial or <em>x</em>-grid).</p>
  <p>RHOSRF:as in NLCRC option</p> <p>Note: RHOSRF and RSURF may differ in this
 case.</p>""",
 
-'NLTRI': """ <p>Geometry level: LEVGEO = 2</p> <p>to be written:
+'NLTRI' : """ <p>Geometry level: LEVGEO = 2</p> <p>to be written:
 triangularity in mesh of nested closed algebraic surfaces</p>""",
 
-'NLPLG': """ <p>Geometry level: LEVGEO = 3</p> <p>The mesh in the x-y plane is
+'NLPLG' : """ <p>Geometry level: LEVGEO = 3</p> <p>The mesh in the x-y plane is
 described by NR1ST polygonal arcs of length NRPLG each.  A polygon may consist
 of several "valid" and "invalid" parts (to account for "grid cuts" in CFD
 meshes). The "invalid" parts of a polygon are not seen by test particles and
@@ -388,20 +386,20 @@ meshes including grid cuts.</p> <p>The polygons must not intersect each
 other.</p> <p>In this case RHOSRF(1)=0., and RHOSRF(I) is the area enclosed by
 polygon number 1 and polygon number I.</p>""",
 
-'NLFEM': """ <p>Geometry level: LEVGEO = 4</p> <p>The mesh in the x-y plane
+'NLFEM' : """ <p>Geometry level: LEVGEO = 4</p> <p>The mesh in the x-y plane
 consists of NR1ST triangles,  composed from NRKNOT knots.</p> <p>In this case
 a flux surface labeling grid RHOSRF is not defined.</p>""",
 
-'NLTET': """ <p>Geometry level: LEVGEO = 5</p> <p>3D discretisation of volume
+'NLTET' : """ <p>Geometry level: LEVGEO = 5</p> <p>3D discretisation of volume
 by tetrahedrons.  For this grid option please make contact to the
 authors.</p>""",
 
-'NLGEN': """ <p>Geometry level: LEVGEO = 10</p> <p>Arbitrary geometrical
+'NLGEN' : """ <p>Geometry level: LEVGEO = 10</p> <p>Arbitrary geometrical
 configuration.  Mesh consists of NR1ST arbitrarily shapes cells (in  any
 dimension).   Particle  tracing  routines  must  be  provided  by  user
 (VOLUSR, SAMUSR, TIMUSR, LEAUSR)</p>""",
 
-'NR1ST': """Number of grid-points in the radial (or x-direction) standard mesh
+'NR1ST' : """Number of grid-points in the radial (or x-direction) standard mesh
 <p>if NR1ST&le;1, no radial (or x-direction) standard mesh is defined.</p>
 <p>if NLPLG = .TRUE. : number of polygons for discretisation in "radial" or x
 direction</p> <p>if NLFEM = .TRUE. : number of triangles for discretisation in
@@ -409,69 +407,69 @@ x-y plane</p> <p>if NLTET = .TRUE. or if NLGEN = .TRUE. : number of cells in
 otherwise arbitrary mesh option NLGEN. Use problem specific routines to set up
 mesh, cell volumes, and flight interesction times for test partilces.</p>""",
 
-'NRSEP': """This flag is active for LEVGEO = 1 or LEVGEO = 2. Otherwise it is
+'NRSEP' : """This flag is active for LEVGEO = 1 or LEVGEO = 2. Otherwise it is
 irrelevant. <p>The  first  (x-  or  radial)  standard  mesh  is  composed  by
 two  equidistant  x-  or  radial grids of co-ordinate surfaces with different
 grid density.  There are NR1ST-NRSEP+1 grid-points  in  the  first,  and
 NRSEP  grid-points  in  the  second  part.   The  grid-point RSURF(NR1ST-
 NRSEP+1) belongs to both parts.</p>""",
 
-'RIA': """left endpoint of standard grid (internally set &ge; 0 if LEVGEO = 2)
+'RIA' : """left endpoint of standard grid (internally set &ge; 0 if LEVGEO = 2)
 ; RSURF(1)=RIA""",
 
-'RGA': """boundary separating first and second part of standard grid with
+'RGA' : """boundary separating first and second part of standard grid with
 different grid-point densities; RSURF(NR1ST-NRSEP+1)=RGA""",
 
-'RAA': """right endpoint of standard grid: RSURF(NR1ST)=RAA""",
+'RAA' : """right endpoint of standard grid: RSURF(NR1ST)=RAA""",
 
-'RRA': """if RRA &gt; RAA, one additional, outer void zone is defined
+'RRA' : """if RRA &gt; RAA, one additional, outer void zone is defined
 <p>RSURF(NR1ST)=RRA, and the parameter RAA now determines the surface no.
 NR1ST- 1.</p> <p>(irrelevant, if RRA &le; RAA)</p>""",
 
-'EPIN': """if NLELL = .TRUE. : <p>Value of EP(r) for cylindrical co-ordinate
+'EPIN' : """if NLELL = .TRUE. : <p>Value of EP(r) for cylindrical co-ordinate
 surface number 1 with <em>r<sub>1</sub></em>=RIA (see:  NL- CRC = .TRUE.
 option above)</p>""",
 
-'EPOT': """if NLELL = .TRUE. : <p> Value of EP(r) for cylindrical surface
+'EPOT' : """if NLELL = .TRUE. : <p> Value of EP(r) for cylindrical surface
 number NR1ST with <em>r<sub>NR1ST</sub></em>=RAA</p>""",
 
-'EPCH': """if NLELL = .TRUE. : <p> Value of EP(r) for cylindrical surface
+'EPCH' : """if NLELL = .TRUE. : <p> Value of EP(r) for cylindrical surface
 number NR1ST+1 with <em>r<sub>NR1ST+1</sub></em>=RAA</p> <p>(irrelevant, if
 RRA &le; RAA)</p>""",
 
-'EXEP': """if NLELL = .TRUE. : <p>The variation of the "shift function" EP(r)
+'EXEP' : """if NLELL = .TRUE. : <p>The variation of the "shift function" EP(r)
 with r is given by</p> <p><em>EP(r) = EPIN + ((r-RIA)/(RAA-
 RIA))<sup>EXEP</sup> * (EPOT - EPIN)</em></p>""",
 
-'ELIN': """if NLELL = .TRUE. : <p>Value of EL(r) for cylindrical surface
+'ELIN' : """if NLELL = .TRUE. : <p>Value of EL(r) for cylindrical surface
 number 1 with <em>r<sub>1</sub></em>=RIA (see: NLELL = .TRUE. option)</p>""",
 
-'ELOT': """if NLELL = .TRUE. : <p>Value of EL(r) for cylindrical surface
+'ELOT' : """if NLELL = .TRUE. : <p>Value of EL(r) for cylindrical surface
 number NR1ST with <em>r<sub>NR1ST</sub></em>=RAA</p>""",
 
-'ELCH': """if NLELL = .TRUE. : <p>Value of EL(r) for cylindrical surface
+'ELCH' : """if NLELL = .TRUE. : <p>Value of EL(r) for cylindrical surface
 number NR1ST+1 with <em>r<sub>NR1ST+1</sub></em>=RAA</p> <p>(irrelevant for
 RRA &le; RAA)</p>""",
 
-'EXEL': """if NLELL = .TRUE. : <p>The variation of the "ellipticity  function"
+'EXEL' : """if NLELL = .TRUE. : <p>The variation of the "ellipticity  function"
 EP(r) with r is given by</p> <p><em>EP(r) = EPIN + ((r-RIA)/(RAA-
 RIA))<sup>EXEP</sup> * (EPOT - EPIN)</em></p>""",
 
-'TRIN': """if NLTRI = .TRUE. : <p> to  be  written:  the  option  for
+'TRIN' : """if NLTRI = .TRUE. : <p> to  be  written:  the  option  for
 algbraically  given  triangular grids is currently no available. </p>""",
 
-'TROT': """if NLTRI = .TRUE. : <p> to  be  written:  the  option  for
+'TROT' : """if NLTRI = .TRUE. : <p> to  be  written:  the  option  for
 algbraically  given  triangular grids is currently no available. </p>""",
 
-'TRCH': """if NLTRI = .TRUE. : <p> to  be  written:  the  option  for
+'TRCH' : """if NLTRI = .TRUE. : <p> to  be  written:  the  option  for
 algbraically  given  triangular grids is currently no available. </p>""",
 
-'EXTR': """if NLTRI = .TRUE. : <p> to  be  written:  the  option  for
+'EXTR' : """if NLTRI = .TRUE. : <p> to  be  written:  the  option  for
 algbraically  given  triangular grids is currently no available. </p>""",
 
-'NRPLG': """if NLPLG = .TRUE. : <p>Number of points per polygon</p>""",
+'NRPLG' : """if NLPLG = .TRUE. : <p>Number of points per polygon</p>""",
 
-'NPPLG': """if NLPLG = .TRUE. : <p>Number of valid parts on each polygon. Each
+'NPPLG' : """if NLPLG = .TRUE. : <p>Number of valid parts on each polygon. Each
 polygon is described by the x and y co-ordinates of NRPLG points.  It is not
 necessary that all this points are used for the polygon.  One can cut the
 polygon into several valid parts interrupted by parts which are not seen by
@@ -479,51 +477,51 @@ the test particles.  ( Default :  NPPLG = 1 ).  This option facilitates the
 use of 2-d computer generated meshes which contain topological grid
 cuts.</p>""",
 
-'XPCOR': """ <p>if NLPLG = .TRUE. : shift whole mesh by that vector in
+'XPCOR' : """ <p>if NLPLG = .TRUE. : shift whole mesh by that vector in
 x,y-plane</p> <p>if NLFEM = .TRUE. : x and y co-ordinates of the knots,
 respectively</p>""",
 
-'YPCOR': """if NLPLG = .TRUE. : <p>shift whole mesh by that vector in
+'YPCOR' : """if NLPLG = .TRUE. : <p>shift whole mesh by that vector in
 x,y-plane</p> <p>if NLFEM = .TRUE. : x and y co-ordinates of the knots,
 respectively</p>""",
 
-'RFPOL': """if NLPLG = .TRUE. : <p> if RFPOL > 0., one additional polygon zone
+'RFPOL' : """if NLPLG = .TRUE. : <p> if RFPOL > 0., one additional polygon zone
 is defined, at a distance RFPOL out- side the polygon NR1ST, and then NR1ST is
 increased by one.</p> <p>(irrelevant, if RFPOL &le; 0.)</p>""",
 
-'NPOINT(1,J)': """if NLPLG = .TRUE. : <p>Index of the first point of the valid
+'NPOINT(1,J)' : """if NLPLG = .TRUE. : <p>Index of the first point of the valid
 part number J (same for each radial polygon)</p> <p>( Default : NPOINT(1,1) =
 1 )</p>""",
 
-'NPOINT(2,J)': """if NLPLG = .TRUE. : <p>Index of the first point of the valid
+'NPOINT(2,J)' : """if NLPLG = .TRUE. : <p>Index of the first point of the valid
 part number J (same for each radial polygon)</p> <p>( Default : NPOINT(2,1) =
 NRPLG  )</p>""",
 
-'XPOL(K,I)': """if NLPLG = .TRUE. : <p>x-co-ordinate of the polygon point
+'XPOL(K,I)' : """if NLPLG = .TRUE. : <p>x-co-ordinate of the polygon point
 number K on polygon number I</p>""",
 
-'YPOL(K,I)': """if NLPLG = .TRUE. : <p>y-co-ordinate of the polygon point
+'YPOL(K,I)' : """if NLPLG = .TRUE. : <p>y-co-ordinate of the polygon point
 number K on polygon number I</p>""",
 
-'NRKNOT': """if NLFEM = .TRUE. : <p>There are NRKNOT knots, by which the
+'NRKNOT' : """if NLFEM = .TRUE. : <p>There are NRKNOT knots, by which the
 triangles are defined</p>""",
 
-'XTRIAN': """if NLFEM = .TRUE. : <p>x and y co-ordinates of the knots,
+'XTRIAN' : """if NLFEM = .TRUE. : <p>x and y co-ordinates of the knots,
 respectively</p>""",
 
-'YTRIAN': """if NLFEM = .TRUE. : <p>x and y co-ordinates of the knots,
+'YTRIAN' : """if NLFEM = .TRUE. : <p>x and y co-ordinates of the knots,
 respectively</p>""",
 
-'NVERT(I,ITRI)': """if NLFEM = .TRUE. : <p>Each triangle ITRI is defined by 3
+'NVERT(I,ITRI)' : """if NLFEM = .TRUE. : <p>Each triangle ITRI is defined by 3
 points <em>P<sub>1</sub>, P<sub>2</sub>, P<sub>3</sub></em>  from the set of
 NRKNOT knots. NVERT(I,ITRI) is the number of point P<sub>I</sub> (I=1,2,3) in
 the set of knots for triangle ITRI.<p>""",
 
-'NSIDE(I,ITRI)': """if NLFEM = .TRUE. : <p>NSIDE(I,ITRI) is the number (1,2 or
+'NSIDE(I,ITRI)' : """if NLFEM = .TRUE. : <p>NSIDE(I,ITRI) is the number (1,2 or
 3) of the side of the neighboring triangle, which corresponds to side
 S<sub>I</sub> of the triangle ITRI to be written</p>""",
 
-'IPROP(I,ITRI)': """if NLFEM = .TRUE. : <p>ISTS = ABS(IPROP) is the integer,
+'IPROP(I,ITRI)' : """if NLFEM = .TRUE. : <p>ISTS = ABS(IPROP) is the integer,
 by which a particular surface property is assigned to side I of the triangle
 ITRI. ISTS=0 stands for default grid option (transparent surface, cell
 indexing is done automatically).  Otherwise ISTS is the number of an
@@ -533,18 +531,18 @@ default the normal vector of each side of a triangle points out of the
 triangle. In case IPROP < 0, this vector points into the triangle. This is
 relevant at surface options with ILSIDE &ne; 0.</p>""",
 
-'NLPOL': """if NLTET or NLGEN = .TRUE.: <p>A poloidal or y grid is defined.
+'NLPOL' : """if NLTET or NLGEN = .TRUE.: <p>A poloidal or y grid is defined.
 Otherwise the complete block 2B may be omitted and the volume averaged tallies
 are then automatically integrated over this co-ordinate.</p> """,
 
-'INDGRD(2)': """if NLTET or NLGEN = .TRUE.: <dl> <dt>= 1</dt><dd>standard grid
+'INDGRD(2)' : """if NLTET or NLGEN = .TRUE.: <dl> <dt>= 1</dt><dd>standard grid
 option</dd> <dt>= 2,3,4,5,6</dt><dd>not in use (default: INDGRD(2)=1)</dd>
 </dl>""",
 
-'NP2ND':"""if NLTET or NLGEN = .TRUE.: <p>Number of grid-points in y- or
+'NP2ND' : """if NLTET or NLGEN = .TRUE.: <p>Number of grid-points in y- or
 poloidal direction</p>""",
 
-'YIA':"""if NLTET or NLGEN = .TRUE.: <dl> <dt>for the LEVGEO=1
+'YIA' : """if NLTET or NLGEN = .TRUE.: <dl> <dt>for the LEVGEO=1
 option:</dt><dd>the y grid PSURF is defined in the same way as the x grid,
 using the parameters YIA,YGA,.... (cm) instead of RIA,RGA,....</dd> <dt>for
 the LEVGEO=2 option:</dt><dd>the  poloidal  angle &theta; grid  PSURF  is
@@ -555,7 +553,7 @@ all options LEVGEO > 2: this input card is irrelevant.</p></dd> </dl>
 YYA=1. in case of LEVGEO=1, and YIA=0., YGA=0., YAA=360., YYA=360. in case of
 LEVGEO=2.</p>""",
 
-'YGA':"""if NLTET or NLGEN = .TRUE.: <dl> <dt>for the LEVGEO=1
+'YGA' : """if NLTET or NLGEN = .TRUE.: <dl> <dt>for the LEVGEO=1
 option:</dt><dd>the y grid PSURF is defined in the same way as the x grid,
 using the parameters YIA,YGA,.... (cm) instead of RIA,RGA,....</dd> <dt>for
 the LEVGEO=2 option:</dt><dd>the  poloidal  angle &theta; grid  PSURF  is
@@ -566,7 +564,7 @@ all options LEVGEO > 2: this input card is irrelevant.</p></dd> </dl>
 YYA=1. in case of LEVGEO=1, and YIA=0., YGA=0., YAA=360., YYA=360. in case of
 LEVGEO=2.</p>""",
 
-'YAA':"""if NLTET or NLGEN = .TRUE.: <dl> <dt>for the LEVGEO=1
+'YAA' : """if NLTET or NLGEN = .TRUE.: <dl> <dt>for the LEVGEO=1
 option:</dt><dd>the y grid PSURF is defined in the same way as the x grid,
 using the parameters YIA,YGA,.... (cm) instead of RIA,RGA,....</dd> <dt>for
 the LEVGEO=2 option:</dt><dd>the  poloidal  angle &theta; grid  PSURF  is
@@ -577,7 +575,7 @@ all options LEVGEO > 2: this input card is irrelevant.</p></dd> </dl>
 YYA=1. in case of LEVGEO=1, and YIA=0., YGA=0., YAA=360., YYA=360. in case of
 LEVGEO=2.</p>""",
 
-'YYA':"""if NLTET or NLGEN = .TRUE.: <dl> <dt>for the LEVGEO=1
+'YYA' : """if NLTET or NLGEN = .TRUE.: <dl> <dt>for the LEVGEO=1
 option:</dt><dd>the y grid PSURF is defined in the same way as the x grid,
 using the parameters YIA,YGA,.... (cm) instead of RIA,RGA,....</dd> <dt>for
 the LEVGEO=2 option:</dt><dd>the  poloidal  angle &theta; grid  PSURF  is
@@ -588,19 +586,19 @@ all options LEVGEO > 2: this input card is irrelevant.</p></dd> </dl>
 YYA=1. in case of LEVGEO=1, and YIA=0., YGA=0., YAA=360., YYA=360. in case of
 LEVGEO=2.</p>""",
 
-'NLTOR':""" <p>A toroidal or z grid is defined.  Otherwise the complete block
+'NLTOR' : """ <p>A toroidal or z grid is defined.  Otherwise the complete block
 2C may be omitted and the volume averaged tallies are then automatically
 integrated over this co-ordinate.</p> <p>In case NLTOR = TRUE, sub-block 2C
 must be read</p>""",
 
-'INDGRD(3)': """ <dl> <dt>= 1</dt><dd>standard grid option</dd> <dt>=
+'INDGRD(3)' :  """ <dl> <dt>= 1</dt><dd>standard grid option</dd> <dt>=
 2,3,4,5,6</dt><dd>not in use (default: INDGRD(3)=1)</dd> </dl>""",
 
-'NLTRZ':"""=TRUE <p>cylindrical approximation is used, i.e., TSURF is a grid
+'NLTRZ' : """=TRUE <p>cylindrical approximation is used, i.e., TSURF is a grid
 in z direction. The co-ordinate surfaces are given by z=TSURF(L)</p>
 <p>(Default: NLTRZ = TRUE)</p>""",
 
-'NLTRA':"""=TRUE <p>toroidal approximation is used. The coordinate line is a
+'NLTRA' : """=TRUE <p>toroidal approximation is used. The coordinate line is a
 polygonal approximation of a circle, or an angular section thereof.</p> <p>In
 case NLTOR = TRUE, the 3rd grid TSURF is a grid of toroidal angles. The
 toroidal segment (or the full torus) is approximated by NT3RD-1 straight
@@ -620,16 +618,16 @@ other radial sur- faces. RMTOR converges to ROA with increasing NTTRA. NTTRA
 &#x2243; 30 is already a very good  approximation.</p> <p>(Default: NLTRA =
 FALSE).</p>""",
 
-'NLTRT':"""=TRUE <p>torus co-ordinates R,PHI,THETA. Presently being developed
+'NLTRT' : """=TRUE <p>torus co-ordinates R,PHI,THETA. Presently being developed
 for NLSLB,NLPLG and NLTRI options. Not ready for use.</p>""",
 
-'NT3RD':""" <p>Number of grid-points in z- or toroidal direction</p>
+'NT3RD' : """ <p>Number of grid-points in z- or toroidal direction</p>
 <p>(default: NT3RD = 1, i.e. no grid is defined)</p>""",
 
-'NTTRA':"""
+'NTTRA' : """
 only needed in case NLTRA and .NOT.NLTOR. See above.""",
 
-'ZIA':""" <p>The 3rd grid ZSURF is defined in the same way as the x grid,
+'ZIA' : """ <p>The 3rd grid ZSURF is defined in the same way as the x grid,
 using the parameters ZIA, ZGA,.... (cm) instead of RIA, RGA,....</p> <p>In
 case of NLTRZ = TRUE , a z-grid is defined. ROA is irrelevant.</p> <p>In case
 of NLTRA = TRUE , ZIA and ZAA are toroidal angles (in degrees). A grid of
@@ -646,7 +644,7 @@ block 11), this major radius offset ROA of poloidal cross sections has to be
 taken into account when defining plot- frames.</p> <p>(Defaults: NLTRA =
 FALSE, ZIA = 0 , ZAA = 1)</p>""",
 
-'ZGA':""" <p>The 3rd grid ZSURF is defined in the same way as the x grid,
+'ZGA' : """ <p>The 3rd grid ZSURF is defined in the same way as the x grid,
 using the parameters ZIA, ZGA,.... (cm) instead of RIA, RGA,....</p> <p>In
 case of NLTRZ = TRUE , a z-grid is defined. ROA is irrelevant.</p> <p>In case
 of NLTRA = TRUE , ZIA and ZAA are toroidal angles (in degrees). A grid of
@@ -663,7 +661,7 @@ block 11), this major radius offset ROA of poloidal cross sections has to be
 taken into account when defining plot- frames.</p> <p>(Defaults: NLTRA =
 FALSE, ZIA = 0 , ZAA = 1)</p>""",
 
-'ZAA':""" <p>The 3rd grid ZSURF is defined in the same way as the x grid,
+'ZAA' : """ <p>The 3rd grid ZSURF is defined in the same way as the x grid,
 using the parameters ZIA, ZGA,.... (cm) instead of RIA, RGA,....</p> <p>In
 case of NLTRZ = TRUE , a z-grid is defined. ROA is irrelevant.</p> <p>In case
 of NLTRA = TRUE , ZIA and ZAA are toroidal angles (in degrees). A grid of
@@ -680,7 +678,7 @@ block 11), this major radius offset ROA of poloidal cross sections has to be
 taken into account when defining plot- frames.</p> <p>(Defaults: NLTRA =
 FALSE, ZIA = 0 , ZAA = 1)</p>""",
 
-'ZZA':""" <p>The 3rd grid ZSURF is defined in the same way as the x grid,
+'ZZA' : """<p>The 3rd grid ZSURF is defined in the same way as the x grid,
 using the parameters ZIA, ZGA,.... (cm) instead of RIA, RGA,....</p> <p>In
 case of NLTRZ = TRUE , a z-grid is defined. ROA is irrelevant.</p> <p>In case
 of NLTRA = TRUE , ZIA and ZAA are toroidal angles (in degrees). A grid of
@@ -697,7 +695,7 @@ block 11), this major radius offset ROA of poloidal cross sections has to be
 taken into account when defining plot- frames.</p> <p>(Defaults: NLTRA =
 FALSE, ZIA = 0 , ZAA = 1)</p>""",
 
-'ROA':""" <p>The 3rd grid ZSURF is defined in the same way as the x grid,
+'ROA' : """<p>The 3rd grid ZSURF is defined in the same way as the x grid,
 using the parameters ZIA, ZGA,.... (cm) instead of RIA, RGA,....</p> <p>In
 case of NLTRZ = TRUE , a z-grid is defined. ROA is irrelevant.</p> <p>In case
 of NLTRA = TRUE , ZIA and ZAA are toroidal angles (in degrees). A grid of
@@ -714,48 +712,49 @@ block 11), this major radius offset ROA of poloidal cross sections has to be
 taken into account when defining plot- frames.</p> <p>(Defaults: NLTRA =
 FALSE, ZIA = 0 , ZAA = 1)</p>""",
 
-'NLMLT':"""<p>the complete "Standard Mesh" data are copied NBMLT times</p>""",
+'NLMLT' : """<p>the complete "Standard Mesh" data are copied NBMLT 
+times</p>""",
 
-'NBMLT':"""<p>Number of identical copies of the standard mesh. Transition from
-one such mesh (called "block" in EIRENE) into another one has to be defined by
-transparent additional surfaces (see block 3B)</p>""",
+'NBMLT' : """<p>Number of identical copies of the standard mesh. Transition
+from one such mesh (called "block" in EIRENE) into another one has to be
+defined by transparent additional surfaces (see block 3B)</p>""",
 
-'VOLCOR':"""<p>The volumes of all cells of the standard mesh as computed by
+'VOLCOR' : """<p>The volumes of all cells of the standard mesh as computed by
 EIRENE (in sub- routine. VOLUME) are multiplied by one common factor VOLCOR
 for each "block".</p>""",
 
-'NLADD':"""<p>There are cells in the computational volume, which are defined
+'NLADD' : """<p>There are cells in the computational volume, which are defined
 through "additional surfaces" as cell boundaries.  E.g.  a standard mesh (if
 there is one) is augmented by "additional cells" in this case.  If NLADD =
 FALSE , the complete block 2D may be omitted and the defaults are
 used.</p>""",
 
-'NRADD':"""<p>Number of additional zones. The cell indexing along test flights
-in these zones has to be specified explicitly by making use of the ILSWCH,
-ILCELL parameters (block 3B)</p> <p>(Default: NRADD = 0 ).</p>""",
+'NRADD' : """<p>Number of additional zones. The cell indexing along test
+flights in these zones has to be specified explicitly by making use of the
+ILSWCH, ILCELL parameters (block 3B)</p> <p>(Default: NRADD = 0 ).</p>""",
 
-'VOLADD':"""<p>Volume (<em>cm<sup>-3</sup></em>) of each additional zone as
+'VOLADD' : """<p>Volume (<em>cm<sup>-3</sup></em>) of each additional zone as
 seen by the test-particles.</p>""", 
 
-'NSTSI':"""<p>Total number of non-default standard surfaces that do not act as
-prescribed by the default transparent standard co-ordinate surface
+'NSTSI' : """<p>Total number of non-default standard surfaces that do not act
+as prescribed by the default transparent standard co-ordinate surface
 model.</p>""",
 
-'TXTSFL':"""<p>Text to characterize a surface (&ldquo;name of the
+'TXTSFL' : """<p>Text to characterize a surface (&ldquo;name of the
 surface&rdquo;) on the printout file.</p>""",
 
-'ISTS':"""<p> irrelevant; labelling index</p>""",
+'ISTS' : """<p> irrelevant; labelling index</p>""",
 
-'IDIMP':"""<p>flag to identify mesh from which this particular surface is
+'IDIMP' : """<p>flag to identify mesh from which this particular surface is
 chosen.</p> <p>= 1 surface from the x- (radial) standard mesh (RSURF) Note that
 for the unstructured grid options NLTRI and NLTET (i.e. for the 2D triangular
 grid option or for the general 3D grids of tetrahedra) all surfaces are
 referred to as 1st grid (x or radial) surfaces, by abuse of language.</p>""",
 
-'INUMP':"""<p>Number of the surface in mesh RSURF, PSURF or TSURF
+'INUMP' : """<p>Number of the surface in mesh RSURF, PSURF or TSURF
 respectively</p>""", 
 
-'IRPTA':"""<p>Only a subregion of the surface acts by the &ldquo;non-default
+'IRPTA' : """<p>Only a subregion of the surface acts by the &ldquo;non-default
 options&rdquo; specified for this particular surface. This subregion is defined
 by these flags.</p> <p>If JMP is a surface from the first mesh, then IRPTA2
 &rarr; IRPTE2 and IRPTA3 &rarr; IRPTE3 are the surface index ranges of the 2nd
@@ -768,7 +767,7 @@ from the 3rd mesh, then IRPTA1 &rarr; IRPTE1 and IRPTA2 &rarr; IRPTE2 are the
 surface index ranges of the 1st and 2rd mesh, respectively, for which this
 surface acts as non-default surface. IRPTA3 and IRPTE3 are irrelevant.</p>""",
 
-'IRPTE': """<p>Only a subregion of the surface acts by the &ldquo;non-default
+'IRPTE' : """<p>Only a subregion of the surface acts by the &ldquo;non-default
 options&rdquo; specified for this particular surface. This subregion is defined
 by these flags.</p> <p>If JMP is a surface from the first mesh, then IRPTA2
 &rarr; IRPTE2 and IRPTA3 &rarr; IRPTE3 are the surface index ranges of the 2nd
@@ -781,7 +780,7 @@ from the 3rd mesh, then IRPTA1 &rarr; IRPTE1 and IRPTA2 &rarr; IRPTE2 are the
 surface index ranges of the 1st and 2rd mesh, respectively, for which this
 surface acts as non-default surface. IRPTA3 and IRPTE3 are irrelevant.</p>""",
 
-'CH-card': """<p><b>CH0 n1/m1 n2/m2 ... </b> surfaces from the range n1 to m1,
+'CH-card' : """<p><b>CH0 n1/m1 n2/m2 ... </b> surfaces from the range n1 to m1,
 n2 to m2, ..., are ignored by EIRENE. Specifying a surface in such a CH0-card
 is identical to taking it out from the input file. It may be more convenient in
 some cases, however, to use the CH0 option, because the labelling index of the
@@ -795,12 +794,12 @@ surfaces is not checked.</p> <p><b>CH2(ILIMI) n1/m1 n2/m2 ... </b> Only for
 second order surfaces ILIMI, n1-m1, ... The first of the two possible
 intersections is ignored for particles located on surface no. ILIMI.</p>""",
 
-'NLIMI':"""<p>Number of surfaces in the input block</p>""",
+'NLIMI' : """<p>Number of surfaces in the input block</p>""",
 
-'TXTSUR': """<p> Text to identify a surface (&ldquo;name of the surface&rdquo;)
-<on the printout file/p>""",
+'TXTSUR' : """<p> Text to identify a surface (&ldquo;name of the
+surface&rdquo;) <on the printout file/p>""",
 
-'RLBND': """flag for different options to define the boundary of the
+'RLBND' : """flag for different options to define the boundary of the
 surface</p>
 <dl>
 <dt>RLBND = 0</dt>
@@ -883,20 +882,20 @@ inequalities.</dd><br>
 </dl>
 """,
 
-'RLARE': """<p>Area (in <em>cm<sup>2</sup></em>) of the surface element which
+'RLARE' : """<p>Area (in <em>cm<sup>2</sup></em>) of the surface element which
 is seen by the test particles. (Default: 666.0) (needed only for scaling of non
 default surface averaged tallies) If RLARE is not specified here, (i.e., if a
 value less than or equal to zero is read) then EIRENE tries to evaluate this
 area itself. For some surfaces this is still not possible
 automatically.</p>""",
 
-'RLWN': """<p>lower weight limit for space weight window for particles crossing
-the surface in positive direction. (not in use)</p>""",
+'RLWMN' : """<p>lower weight limit for space weight window for particles
+crossing the surface in positive direction. (not in use)</p>""",
 
-'RLWMX': """<p> upper weight limit for space weight window for particles
+'RLWMX' : """<p> upper weight limit for space weight window for particles
 <crossing the surface in positive direction. (not in use)/p>""",
 
-'ILIIN': """<p>defines the type of surface</p>
+'ILIIN' : """<p>defines the type of surface</p>
 <dl>
   <dt>&gt; 0 non-transparent surface</dt>
 <dl>
@@ -927,7 +926,7 @@ No surface tallies are updated, no switches can be operated. Fastest option.
 </dt><p></p>
 <dt>= -1 Particle history will be stopped and restarted. A switch can be 
 operated. I.e., this surface is used only for switching (see below: ILSWCH) 
-or re- initializing the particle’s track at the point of intersection. 
+or reinitializing the particle's track at the point of intersection. 
 No surface tallies are updated.</dt><p></p>
 <dt>>= -2 as -1, and, additionally:<p> if a particle is crossing the surface in 
 the positive direction, (one sided-) sur- face tallies are updated, e.g., by 
@@ -938,14 +937,14 @@ tallies of Table. If the paed in the PRF... and ERF... tallies of Table 5.3
 then negative partial particle and energy currents <em>J<sup>-</sup></em>; 
 (Amp) and <em>K<sup>-</sup></em>; (Watt) are updated. These are stored in the 
 PRF... and ERF... tallies of Table.<p></dt><p></p>
-<dt>= -3 Net currents (e.g. J+ −J-), are evaluated, and stored on the POT... 
+<dt>= -3 Net currents (e.g. J+ -J-), are evaluated, and stored on the POT... 
 and EOT... tallies (see Table 5.3 ). The PRF... and ERF... tallies are empty 
 for these surfaces.</dt><p></p>
 <dt> -4 Not in use. Currently: same as ILIIN=-2 option.</dt><p></p>
 </dl>
 </dl>""",
 
-'ILSIDE': """<dl>
+'ILSIDE' : """<dl>
 <dt>=  0 both sides of the surface act as described by ILIIN option (default).
 </dt>
 <dt>=  1 particles incident on the surface in the negative direction will be 
@@ -965,7 +964,7 @@ not see the surface, i.e., this surface acts like a (semi) transparent surface
 <dt>= -3 as 3, but with the opposite direction of the surface normal</dt>
 </dl>""",
 
-'ILSWCH': """ = IJKLMN, i.e. six digits I, J, K, L, M and N
+'ILSWCH' : """ = IJKLMN, i.e. six digits I, J, K, L, M and N
 <dl>
 <dt>= 0 no switch is operated</dt>
 <dt>N EIRENE flag ITIME</dt><dd><p>N = 1   The calculation of the step sizes in
@@ -992,10 +991,11 @@ reversed for this option.</p></dd>
 <dt>I,J,K flags for switching cell numbers at transition into a different mesh 
 cell.</dt>
 <dt>K for particles in an additional cell, i.e., not in one of the "standard 
-mesh" blocks:</dt><dd><p>K = 1   Increase the actual additional cell number NACELL for a particle striking
-the surface in the direction of the surface normal by ILACLL. Decrease NA-
-CELL by ILACLL if the particle is striking in the negative direction. 
-Specification of ILACLL is via the input variable ILCELL, see below.</p><p>
+mesh" blocks:</dt><dd><p>K = 1   Increase the actual additional cell number 
+NACELL for a particle striking the surface in the direction of the surface 
+normal by ILACLL. Decrease NACELL by ILACLL if the particle is striking in the 
+negative direction. Specification of ILACLL is via the input variable ILCELL, 
+see below.</p><p>
 K = 2   as K = 1,  but with the direction of the surface normal reversed for 
 this
 option.</p><p>for particles inside the "standard mesh ", i.e., not in the 
@@ -1039,7 +1039,7 @@ the SORIFL flag , e.g.  if a surface source needs to be defined on a
 surface with ILSIDE = 0.</dd>
 </dl>""",
 
-'ILEQUI':"""<p>The algebraic equations for the surfaces J and
+'ILEQUI' : """<p>The algebraic equations for the surfaces J and
 IABS(ILEQUI(J)) will be described by exactly the same coefficients (up to a
 common sign, if ILEQUI(J) .lt. 0). For example a triangle can be specified by
 the three corners and another part of the same plane surface can be specified
@@ -1047,7 +1047,7 @@ directly by its algebraic coefficients. To avoid round-off errors one should
 use the ILEQUI option in such cases, in particular if surface J is a
 transparent &ldquo;hole&rdquo; in surface ILEQUI(J), or vice versa.</p>""",
 
-'ILTOR':"""For NLTRA option only (see block 2c): <p>if ILTOR<em>&gt;</em>0
+'ILTOR' : """For NLTRA option only (see block 2c): <p>if ILTOR<em>&gt;</em>0
 :</p> <p>the surface is defined with respect to the local coordinate system of
 the toroidal segment with &ldquo;cell-number&rdquo; ILTOR, hence: 1 &le;ILTOR
 &le;NTTRAM.</p> <p>if ILTOR=0 :</p> <p>the surface is defined with respect to
@@ -1058,12 +1058,12 @@ then this surface is toroidally symmetric (within the NLTRA-approximation).</p>
 irrelevant for NLTRZ (i.e., if cylindrical coordinates are used) or for NL-
 TRT.</p> <p>Default: ILTOR = 0</p>""",
 
-'ILCOL':"""<p>Flag for the color that is used for plotting this surface on 2d
+'ILCOL' : """<p>Flag for the color that is used for plotting this surface on 2d
 or 3d geometry plots. If ILCOL &le; 0 than -ILCOL is used and the surface area
 is filled in by that color on the 3d geometry plots.</p><p>Default:
 ILCOL=1</p>""",
 
-'ILFIT':"""<p>This option is relevant only for surfaces with one ignorable
+'ILFIT' : """<p>This option is relevant only for surfaces with one ignorable
 coordinate, i.e. it only works for the 2<em>. </em>&le; <em>RLBND </em>&le; 3.
 surface boundary options.</p> <p>It is a tool to facilitate a neat fitting of
 surfaces, in particular for connecting curved and plane surfaces (i.e. to avoid
@@ -1099,6 +1099,574 @@ given by the additional or non-default standard surfaces. <br>These finite
 element grids can be combined with the regular grids by using the problem
 specific geometry routines (see section 3) or the code interfacing routines
 INFCOP (see section 4).</p>""",
+
+'RINTEG' : """<dl> 
+<dt>>0</dt>
+<dd> Fixed (independent of energy and angle ofincidence) particle 
+reflection co- efficient. <br>The fast particle reflection probabilities 
+RPROBF are set to <em>p<sub>f</sub>= MIN(1 - p<sub>a</sub>,RINTEG)</em>, 
+regardless of the reflection model selected by the flag ILREF in block 6B.  
+<em>p<sub>a</sub></em> is kept as specified, and <em>p<sub>t</sub></em> is 
+then recomputed as <em>p<sub>t</sub> = 1 - p<sub>f</sub> - p<sub>a</sub></em>. 
+<em>RINTEG &ge; 1 - p<sub>a</sub></em> enforces the fast particle reflection 
+model for all un-pumped incident particles, i.e., RINTEG is internally reset 
+<em>to 1 - p<sub>a</sub></em>.</dd><br> 
+<dt>=0</dt> 
+<dd>Default: fast particle 
+reflection probability as defined by the reflection model chosen.
+</dd><br>
+<dt><0</dt>
+<dd>The fast particle reflection probabilities <em>RPROBF</em> are
+set to 1.0, i.e., even pump- ing is turned off (as distinct from the choice
+<em>RINTEG=1.0</em>, which would preserve the pumping speed at a surface).
+</dd>""",
+
+'EINTEG' : """<dl>
+<dt>>0</dt>
+<dd> Fixed (independent of energy and angle of incidence) energy reflection 
+coefficient. 
+<br>particle reflection model by an reflection assumption: <em>E<sub>out</sub> 
+= E<sub>in</sub> &middot. EINTEG.</em>
+</dd><br>
+<dt>=0</dt>
+<dd>Default: no modification of energy distribution in the reflection model for
+ fast particle reflection.
+</dd><br>
+<dt><0</dt>
+<dd>elastic <em>(E<sub>out</sub> = E<sub>in</sub>)</em> reflection for all 
+particles reflected according to the fast particle reflection model. Hence: 
+same as <em>EINTEG=1.0.</em>
+</dd>
+</dl>""",
+
+'AINTEG' : """<dl>
+<dt>>0</dt>
+<dd> (not ready to use) <br>
+Fixed (independent of energy and angle of incidence) momentum reflection 
+coefficient.<br>
+This choice replaces the angle random sampling procedure in the fast particle
+reflection model by a momentum reflection assumption such that, on average:
+<em>v&#772;<sub>out</sub> = v<sub>in</sub> &middot; AINTEG</em>.
+</dd><br>
+<dt>=0</dt>
+<dd>Default: no modification of angular distributions in reflection model for 
+fast particle reflection.
+</dd><br>
+<dt><0</dt>
+<dd>specular reflection for all particles reflected according to the fast 
+particle reflection model.</em>
+</dd>
+</dl>
+""",
+
+'ILREF' : """Flag for choice of local reflection model
+<dl>
+<dt>=1</dt>
+<dd>TRIM database reflection model is used. NLTRIM must be .TRUE..</dd>
+<dt>=2</dt>
+<dd>"modified Behrisch Matrix model" is used</dd>
+<dt>=3</dt>
+<dd>user supplied reflection model (see section 3.3: Subroutine REFUSR)</dd>
+</dl>
+Default: ILREF = 2""",
+
+'ILSPT' : """Flag for choice of local sputtering model.<br>
+Let ILSPT = MN, with M and N single digit integers each. Then N controls the 
+options for physical sputtering, and M controls chemical sputtering. See 
+subroutine SPUTER.
+<dl>
+<dt>N=0</dt>
+<dd>no physical sputtering at this surface</dd>
+<dt>N=1</dt>
+<dd>constant physical sputtering rate (see parameter RECYCS below)</dd>
+<dt>N=2</dt>
+<dd>modified Roth-Bogdansky formula for sputter yield, Thompson energy 
+distribution  and cosine angular distribution for emitted particles.</dd>
+<dt>N=9</dt>
+<dd>(was option N=3 in Eirene-2004 and older)<br>
+user supplied sputtering model (see section 3.3: Entry SPTUSR to subroutine
+REFUSR)</dd>
+<dt>M=0</dt>
+<dd>no chemical sputtering at this surface</dd>
+<dt>M=1</dt>
+<dd>constant chemical sputtering rate</dd>
+<dt>M=2</dt>
+<dd>"Roth formula" for chemical sputter yield, thermal distribution for 
+emitted particles , "weak flux dependence option A6".</dd>
+<dt>M=3</dt>
+<dd>"Roth formula" for chemical sputter yield, thermal distribution for emitted
+ particles , "strong flux dependence option A7".</dd>
+<dt>M=4</dt>
+<dd>"Roth formula" for chemical sputter yield, thermal distribution for emitted
+ particles , "new flux dependence option A8 (2004)".</dd>
+<dt>M=5</dt>
+<dd>not in use</dd>
+<dt>M=6</dt>
+<dd>"Haasz-Davis 1998 formula" for chemical sputter yield</dd>
+<dt>M=7</dt>
+<dd>"Haasz-Davis 1998 formula" for chemical sputter yield, and multiplicative 
+factor for flux dependence (Roth, 2004).</dd>
+<dt>M=9</dt>
+<dd>(was option N=3 in Eirene-2004 and older)
+user supplied sputtering model (see section 3.3: Entry SPTUSR to subroutine
+REFUSR)</dd>
+</dl>
+Default: ILSPT=0""",
+
+'ISRS' : """sputtered particle species flag (physical sputtering).
+<dl>
+<dt>>0</dt>
+<dd>both the sputtered particle and the reflected particle (if any) will be 
+followed. Their contribution to surface particle and energy fluxes is stored in
+ surface averaged tallies 1 to 24, i.e., sputtered particles are not explicitly
+ distinguished from reflected particles in the particle and energy balances. 
+Furthermore the "sputtered flux surface tallies" 33 to 37 (5.1.2 in older 
+versions before 2002, and on tallies 51 to 81, (5.1.1) else, are also updated. 
+The species index of the sputtered particle (atom) is IATM=ISRS. Hence, on 
+input, one must have 1 &le; ISRS &le; NATMI, otherwise: error exit.</dd>
+<dt>&le;0</dt>
+<dd>Same as ISRS > 0, however, the species index of the sputtered particle is 
+determined automatically from comparing the charge and mass numbers of the 
+available atomic species (input block 4a) with the corresponding surface 
+material (nuclear mass and charge) data of the surface element. If no suitable 
+atomic test particle is is found, then only sputter tallies are scored, but no 
+sputtered particles are then subsequently traced.</dd>
+<dt>=0</dt>
+<dd>same as ISRS &le; 0, but in this case a sputtered particle is NOT followed,
+ even if its atomic test particle species could be identified. Only the 
+reflected particles are followed. and only their contribution to surface 
+particle and energy fluxes is stored in regular surface averaged tallies 1 to 
+24. Sputter tallies are still scored.</dd>
+</dl>
+Note: ISRS=ISRS(ISPZ,MSURF), so the above described options for sputtered 
+particle species, as well as for either only scoring fluxes or even tracing 
+these sputtered particles, can be made dependent on the incident species index 
+ISPZ.""",
+
+'ISRC' : """sputtered particle species flag (physical sputtering).
+<dl>
+<dt>>0</dt>
+<dd>both the sputtered particle and the reflected particle (if any) will be 
+followed. Their contribution to surface particle and energy fluxes is stored in
+ surface averaged tallies 1 to 24, i.e., sputtered particles are not explicitly
+ distinguished from reflected particles in the balances. Furthermore the 
+"sputtered flux surface tallies" 25 to 28 are updated. The species index of the
+ sputtered particle (atom) is IATM=ISRC, if ISRC&le;NATMI, or (molecules) IMOL, 
+if ISRC = NATMI+IMOL and NATMI < ISRC &le; NATMI+NMOLI. Hence, on input, ISRC
+&le; NATMI+NMOLI.</dd>
+<dt>&le;0</dt>
+<dd>There is no chemical sputtering for the particular surface element and 
+incident species (note: ISRC=ISRC(ISPZ,MSURF), i.e., p<sub>c</sub> = 0 here.
+Only the reflected particles are followed. Their contribution to surface 
+particle and energy fluxes is stored in surface averaged tallies 1 to 24.</dd>
+<dt>=0</dt>
+<dd>Same as ISRC > 0, however, the species index of the sputtered particle is 
+determined automatically from comparing the charge and mass numbers of the 
+atomic species (input block 4a) with the corresponding data of the surface 
+element. I.e., in case of Carbon surfaces the sputtered particle is a C-atom, 
+if such an atom has been specified in input block 4a</dd>
+</dl>""",
+
+'ZNML' : """= KLMN (4 digits)
+<dl>
+<dt>KL</dt>
+<dd>atomic weight of wall material. Note: the nearest integer of the mass 
+number in the TRIM runs is used. For example, a copper target is specified in 
+the TRIM files with an atomic weight of 63.54, and the corresponding TRIM file 
+is used for surfaces with KL=64.</dd>
+<dt>MN</dt>
+<dd>nuclear charge number of wall material</dd>
+</dl>
+Example: Carbon: ZNML=1206.<br>
+Example: Molybdenum: ZNML=9642.<br>
+Example: Copper: ZNML=6429.<br>
+Default: ZNML = 5.626E3 (stands for Fe).""",
+
+'EWALL' : """<dl>
+<dt><0</dt>
+<dd>-EWALL = TW is a (surface-) temperature (eV) in a Maxwellian flux 
+distribution for the thermal particle energy. The resulting mean energy is 
+E<sub>mean</sub>= 2 &middot; T W .</dd>
+<dt>> 0</dt>
+<dd>+EWALL = Energy of mono-energetic (thermal) particles.
+The relation between surface temperature TW and the mean energy of particles
+then reads EWALL = E<sub>mean</sub> = 1.5 &middot; T W .</dd>
+<dt>= 0</dt>
+<dd>Energy is sampled from a Thompson distribution, using the flag EWBIN (see
+below) as parameter for the surface binding energy</dd>
+</dl>
+Default: EWALL = +0.0388 ( TW &cong; 0.026 eV &cong; 300 K)<br>
+Note that the EW ALL > 0 option enables EIRENE to include boundary conditions
+in "one speed transport equation" approximations, which often are of great 
+interest in general linear transport theory.""",
+
+'EWBIN' : """see EWALL = 0 option.<br>Default: EWBIN = 0.0 (irrelevant for 
+"Default Model")""",
+
+'TRANSP(1,N)' : """Semi-transparency for particles incident from the positive 
+side. Renders a nontransparent surface (ILIIN > 0) semi-transparent. The 
+probability for passing through the surface is TRANSP. Hence: the probability 
+for reflection/re-emission etc. is 1-TRANSP.<br>
+Default: 0.0 (i.e., fully reflecting surface).<br>
+Irrelevant for transparent surfaces.""",
+
+'TRANSP(2,N)' : """Semi-transparency for particles incident from the negative 
+side on a non-transparent surface.<br>
+Default: 0.0 (i.e., fully reflecting surface).<br>
+Irrelevant for transparent surfaces.""",
+
+'FSHEAT' : """surface sheath potential factor. The sheath potential is 
+<em>FSHEAT &middot; T<sub>e</sub></em> with T<sub>e</sub> the electron 
+temperature at the point of incidence. This sheath potential is applied if 
+ions (test ions or bulk ions) hit a non-transparent surface.<br> 
+If FSHEAT &le; 0.0, then a sheath potential computed from the local background 
+plasma flow conditions is used (function SHEATH), assuming ambi-polar flow, a 
+Boltzmann distribution for electrons and zero secondary electron emission. 
+See section 1.5. In case of zero (undefined) background plasma flow velocity at
+ the place of incidence, a default of FSHEAT = 2.8 is used (corresponding to 
+T<sub>e</sub> = T<sub>i</sub>, and a single ion species D<sup>+</sup> plasma 
+flowing at ion acoustic speed parallel to the B-field into the sheath.<br>
+Default: FSHEAT=0.0""",
+
+'RECYCF' : """<p>Multiplier for reflection probability RPROBF:</p>
+<p<>Particles can be re-emitted from surfaces by either the "fast reflection" 
+model or by a "thermal emission" model. Flag RECYCF controls (scales) the "fast
+ particle reflection" probability p<sub>f</sub> .</p>
+<p>The probability <em>p<sub>f</sub> = RPROBF (E<sub>in</sub> , 
+&theta;<sub>in</sub> , ispez, wall)</em> for the "fast" particle reflection 
+model, as specified by other flags for this surface, is modified to<br>
+<em>RPROBF (E<sub>in</sub> , &theta;<sub>in</sub> , ispez, wall) = AMIN 
+(RECYCF &middot; RPROBF, RECYCT )</em>,<br>
+where RPROBF was evaluated from the reflection model specified by ILREF. 
+Note the cut-off at recycling coefficient RECYCT (defined below).</p>
+<p>The total recycling coefficient RECYCT = p<sub>f</sub> + p<sub>t</sub> is 
+unchanged by flag RECYCF.</p>
+<p>Hence, by the use of RECYCF not only the fast particle reflection 
+probability, but also the probability for thermal particle emission 
+p<sub>t</sub> is altered to maintain a total recycling coefficient at this 
+surface of RECYCT.</p>
+Default: RECYCF = 1 for incident atoms, test ions and bulk ions.<br>
+Default: RECYCF = RPROBF = 0 for incident molecules.""",
+
+'RECYCT' : """Recycling coefficient (must not be negative):<br>
+<p>A flux RECYCT &middot; Influx is re-emitted from a surface, for any Influx 
+of particles of any species, where all fluxes are measured as "atomic fluxes" 
+(=fluxes of nuclei). RECYCT hence defines the sticking probability p a [and 
+hence also the pumping speed (6.7)] of any surface in EIRENE, for all incident 
+species.</p>
+<p>The fraction p<sub>a</sub> = (1 - RECYCT) of incident (atomic) flux will be 
+absorbed at the surface. The non-sticking, i.e. the re-emitted fraction 
+RECYCT = 1 - p<sub>a</sub> is split into a "fast" and a "thermal" component.
+</p>
+<p>A fraction p<sub>f</sub>= RPROBF [see (6.6)] of the incident particles is 
+reflected as described by the "fast particle reflection model". However, by 
+relation (6.6) it is ensured that RPROBF is always less than or equal to 
+RECYCT.</p>
+<p>The fraction p<sub>t</sub> = RPROBT = (RECYCT - RPROBF) will be re-emitted 
+by the "thermal particle reflection model". This flag is to be used to define 
+an effective pumping speed at certain surfaces, see paragraph 2.6.1 below.</p>
+Note: RPROBF = 0 for incident molecules (ITYP=2) by default.<br>
+Default: RECYCT = 1. , i.e. p a = 0""",
+
+'RECPRM' : """free model parameter for user supplied recycling models ILREF = 
+9. Default: RECPRM = 0.""",
+
+'EXPPL' : """(only for ILREF = 2 option)<br>
+angular dependence of fast particle reflection coefficient. The formula<br>
+<em>R(&Phi;) = 1 - (1 - RPROBF) &middot; cos<sup>EXPPL</sup>(&Phi;)</em><br>
+is used, e1 = EXP P L, see equation 4.60, where:<br>
+RPROBF Reflection probability from "Behrisch Matrix" model, which is valid only
+for normal incidence.
+<dl><dt>&Theta;</dt>
+<dd>Angle of incidence against surface normal</dd>
+<dt>R(&Theta;)</dt>
+<dd>Reflection probability for particles incident with angle &Theta;
+note: R(&Theta;) = 1 for &Theta; = 90 &middot; and EXPPL > 0.</dd></dl>
+Default: EXPPL = 1. (recommended from a comparison with the TRIM database)""",
+
+'EXPEL' : """as EXPPL, but for the energy reflection coefficient.<br>
+Default: EXPEL = 0.5 (recommended from a comparison with the TRIM database). e2
+= EXPEL, see equations 4.61 and 4.62""",
+
+'EXPIL' : """Index for angular distribution of re-emitted atom or molecule; 
+affects both models ILREF = 1 and ILREF = 2<br>
+<dl><dt>EXPIL=0</dt>
+<dd>cosine distribution, independent of choice of fast particle reflection 
+model</dd>
+<dt>EXPIL > 0</dt>
+<dd>mixed cosine-specular model.<br>
+In case of ILREF=1 the angular distribution given by the database is used.<br>
+In case of ILREF=2 the specular contribution increases according to equations
+4.63 with angle of incidence &Theta; and with e3 = EXPIL (recommended: EXP IL 
+&le;1).</dd></dl>
+Default: EXPIL = 0.""",
+
+'RECYCS' : """The meaning of this flag for the "physical sputtering" options 
+depends upon the value of the first digit N of ILSPT:<br>
+<dl><dt>N=0</dt>
+<dd>no physical sputtering, YIELD1 = 0. RECYCS is irrelevant.</dd>
+<dt>N=1</dt>
+<dd>constant physical sputtering yield, YIELD1 = RECYCS</dd>
+<dt>N=2</dt>
+<dd>RECYCS is a multiplier for the sputtered particle flux YIELD1. YIELD1 is
+computed from the incident species, energy, angle and surface parameters by the
+sputter model N = 2. Hence: the sputtered particle yield YIELD1 as computed
+from subroutine SPUTER is modified to
+YIELD1 = RECY S &middot; YIELD1.</dd>
+<dt>N=9</dt>
+<dd>RECYCS is a free model parameter, which can be used in the user supplied
+sputter model for any particular surface element.</dd></dl>
+Default: RECYCS = 1.""",
+
+'RECYCC' : """The meaning of this flag for the "chemical sputtering" options 
+depends upon the mvalue of the second digit M of ILSPT:<br>
+<dl><dt>M=0</dt>
+<dd>no chemical sputtering, YIELD2 = 0. RECYCC is irrelevant.</dd>
+<dt>M=1</dt>
+<dd>constant chemical sputtering yield, YIELD2 = RECYCC.</dd>
+<dt>M=2</dt>
+<dd>RECYCC is a multiplier for the sputtered particle flux YIELD2. YIELD2 is
+computed from the incident species, energy, angle and surface parameters by the
+sputter model M = 2. Hence: the sputtered particle flux YIELD2 as computed
+from subroutine SPUTER is modified to YIELD2 = RECYCC &middot; YIELD2.</dd>
+<dt>M=9</dt>
+<dd>RECYCC is a free model parameter, which can be used in the user supplied
+sputter model for any particular surface element.</dd></dl>
+Default: RECYCC = 1.""",
+
+'SPTPRM' : """free model parameter for user supplied sputtering models N=3, 
+M=3.<br> Default: SPTPRM = 0.""",
+
+'ESPUTS' : """(new: March 2015) parameter (flag) for energy of physically 
+sputtered particle. Currently not in use.<br>Default: ESPUTS = 0.""",
+
+'ESPUTC' : """(new: March 2015) parameter (flag) for energy of chemically 
+sputtered particle. By default: chemically sputtered particles are released 
+from the wall by the "thermal surface emission model", as also used for the 
+recycling/reflection thermal emission, i.e. with wall temperature 
+(as specified by EWALL parameter, see above) and either a cosine 
+(for monoenergetic emission at EWALL = 1.5 TWALL) angular distribution, or
+sampling from a stationary Maxwellian flux distribution at -EWALL = TWALL.<br>
+If ESPUTC .GT. 0, then the the chemically sputtered particles are released with 
+ a monoenergetic distribution at E0 = ESPUTC, and a cosine angular 
+distribution.<br>Default: ESPUTC = 0.""",
+
+'NSTRAI' : """Number of different sources ("Strata"), which are computed one 
+after the other and are linearly superimposed at the end of the run.<br>
+(NSTRAI &le: NSTRA, see "Parameter-Statements")""",
+
+'INDSRC' : """<p>INDSRC(ISTRA)=0-5 the input data for stratum ISTRA are read 
+here, but may be modified in some user routine (SAMUSR) or interface routine 
+(INFCOP, at entry IF2COP(ISTRA))</p>
+<p/INDSRC(ISTRA)=6 no input data for stratum ISTRA are read here. The 
+definition of this stratum must be entirely in some problem specific routine 
+(IF2COP, etc.). See section 3.4 for one such example, namely the default 
+surface recycling source model as specified in coupled B2-EIRENE runs.</p><p>
+INDSRC(ISTRA)=-1 the input data for stratum ISTRA are read here, and no attempt
+is made to modify these. I.e. IF2COP(ISTRA) is not called.</p>""",
+
+'ALLOC' : """Allocation of CPU-time to stratum weighted as
+(1-ALLOC)*NPTS+ALLOC*FLUX""",
+
+'AMPTS' : """(available since 2014 in master version) Multiplier, used 
+simultaneously for permitted total CPU time NTCPU (input block 1), and for 
+specified number of MC histories NPTS(ISTRA) (see below). Default: 
+AMPTS=1.0""",
+
+'TXTSOU' : """Text to characterize the stratum (name of the source) on the 
+printout file.""",
+
+'NLAVRP' : """= .TRUE. not in use""",
+
+'NLAVRT' : """= .TRUE. not in use""",
+
+'NLSYMP' : """= .TRUE.<br>
+Symmetrize profiles with respect to poloidal (y-) co-ordinate x<sup>2</sup> , 
+i.e., with respect to the poloidal surface x<sup>2</sup> = PSURF((NP2ND+1)/2) 
+in case NP2ND is an odd integer, or with respect to the cell center 
+x<sup>2</sup> = PZONE(NP2ND/2) in case NP2ND is an even integer.""",
+
+'NPTS' : """<dl>
+<dt>> 0</dt>
+<dd> Maximum number of test particle histories.<br>
+If there is more than one stratum (NSTRAI > 1) then the total CPU-time NTIME 
+(input block 1) will be distributed proportional to NPTS to the single strata. 
+NPTS is the maximum number of test-particles only if sufficient CPU time is 
+available. Otherwise a message "NO FURTHER COMPUTATION TIME FOR THIS STRATUM" 
+is printed and the particle loop for the respective stratum is stopped.</dd>
+<dt>= 0</dt><dd>: this stratum is "turned off".</dd>
+<dt>< 0</dt><dd>: no limitation in the number of particles. The entire CPU time 
+assigned to this stratum will be used up. (NPTS is reset to the largest 
+integer on the machine. Hence: some care is needed here in case of multiple 
+strata, in combination with the ALLOC-options to assign CPU time to individual 
+strata).<dd>""",
+
+'NINITL' : """<dl>
+<dt>>0</dt>
+<dd>seed for initialization of random number generator. The results for all 
+those individual strata can be reproduced exactly for which the same number of
+test-flights is computed as in a previous run.<dd>
+<dt>=0</dt>
+<dd>no initialization of random numbers for the particular stratum. In case of 
+the first stratum, the default initialization is used. Runs can only be 
+reproduced, if the same number of test-flights is computed for each stratum. 
+Somewhat weakened correlation between subsequent runs as compared to the 
+NINITL > 0 option.</dd>
+<dt><0</dt>
+<dd>truly random initialization (determined by machine clock). These runs 
+cannot be reproduced exactly. Subsequent runs are uncorrelated. (E.g.: 
+recommended for stochastic approximation procedures in nonlinear 
+applications.</d>""",
+
+'NEMODS' : """Flag to select one of the preprogrammed source energy conditional
+distributions given the source particle's position and species. (See:
+"distribution in velocity space")""",
+
+'NAMODS' : """Flag to select one of the preprogrammed conditional source
+angular distributions given the position, species and energy of the source
+particle. (See: "distribution in velocity space")""",
+
+'NMINPTS' : """Minimum number of test particles enforced for this stratum,
+independent of NTCPU flag in input block 1. Hence: setting this flag may
+increase EIRENE run time above the cpu-time assigned to a run in the first
+input line in input block 1. Default: NMINPTS = 0""",
+
+'FLUX' : """<dl><dt>SCALV=0 (default) FLUX = Source strength in Ampere.</dt>
+<dd>FLUX is the scaling factor for all surface- or volume averaged tallies.<br>
+FLUX is an "atomic flux" (or: an "atomic ion flux"). Each source particle may
+carry a different flux NPRT(ISPZ) (initial weight) depending on the species 
+ISPZ (see: distribution for the species index). NPRT is specified in the blocks
+4 and 5. The total "atomic" source particle flux for each stratum is scaled to 
+be FLUX. For example, a H 2 molecule source, with NPRT <sub>H<sub>2</sub></sub>
+ = 2, is treated as if a flux of FLUX/1.602E-19/2 H<sub>2</sub> -molecules per 
+second is emitted, resulting in an equivalent "atomic flux" FLUX/1.602E-19 per 
+second.</dd>
+<dt>SCALV &ne; 0</dt>
+<dd>The default scaling of tallies with FLUX can be overruled by this flag. The
+common scaling factor for all surface- and volume averaged tallies is
+determined such that one particular tally has the prescribed value SCALV. This
+determines the scaling of all other volume av- eraged and surface averaged
+tallies. By this option, for example, one can set the neutral particle density
+to a prescribed value in one particular cell. Hence, one can prescribe the
+local Knudsen number for nonlinear applications including neutral-neutral
+interactions.</dd></dl>""",
+
+'SCALV' : """<dl><dt>SCALV=0 (default) FLUX = Source strength in Ampere.</dt>
+<dd>FLUX is the scaling factor for all surface- or volume averaged tallies.<br>
+FLUX is an "atomic flux" (or: an "atomic ion flux"). Each source particle may
+carry a different flux NPRT(ISPZ) (initial weight) depending on the species 
+ISPZ (see: distribution for the species index). NPRT is specified in the blocks
+4 and 5. The total "atomic" source particle flux for each stratum is scaled to 
+be FLUX. For example, a H 2 molecule source, with NPRT <sub>H<sub>2</sub></sub>
+ = 2, is treated as if a flux of FLUX/1.602E-19/2 H<sub>2</sub> -molecules per 
+second is emitted, resulting in an equivalent "atomic flux" FLUX/1.602E-19 per 
+second.</dd>
+<dt>SCALV &ne; 0</dt>
+<dd>The default scaling of tallies with FLUX can be overruled by this flag. The
+common scaling factor for all surface- and volume averaged tallies is
+determined such that one particular tally has the prescribed value SCALV. This
+determines the scaling of all other volume av- eraged and surface averaged
+tallies. By this option, for example, one can set the neutral particle density
+to a prescribed value in one particular cell. Hence, one can prescribe the
+local Knudsen number for nonlinear applications including neutral-neutral
+interactions.</dd></dl>""",
+
+'IVLSF' : """<dl><dt>=1</dt><dd>
+The following ISCL..-flags select one particular volume averaged tally</dd>
+<dt>=2</dt>
+<dd>The following ISCL..-flags select one particular surface averaged 
+tally</dd></dl>""",
+
+'ISCLS' : """species index of selected tally""",
+
+'ISCLT' : """tally number of selected tally (refer to tables 5.2, 5.3)""",
+
+'ISCL1' : """<dl><dt>IVLSF=1</dt>
+<dd>cell numbers NRCELL, NPCELL, NTCELL, NBLOCK, NACELL, respectively.
+if (NPCELL = 0) or (NTCELL = 0), then ISCL1 = NCELL, the cell number in
+the 1-dimensional arrays (see end of section 2.2.1).
+The additional cell region is specified by NRCELL=0, NPCELL=1, NTCELL=1,
+NBLOCK=NBMLT+1 (see section 2.2) and the proper value of NACELL.</dd>
+<dt>IVLSF=2</dt><dd>to be written</dd></dl>""",
+
+'NLATM' : """Atomic source. History starts in subroutine FOLNEUT with type
+index ITYP=1, species index ISPZ = IATM and initial weight NPRTA(IATM) (see
+block 4A)
+<p>Out of NLATM, NLMOL, NLION, NLPHOT, NLPLS one and only one of these
+five variables must be .TRUE. .</p>""",
+
+'NLMOL' : """Molecule source. History starts in subroutine FOLNEUT with type
+index ITYP=2, species index ISPZ = IMOL and initial weight NPRTM(IMOL) (see
+block 4B)
+<p>Out of NLATM, NLMOL, NLION, NLPHOT, NLPLS one and only one of these
+five variables must be .TRUE. .</p>""",
+
+'NLION' : """Test ion source. History starts in subroutine FOLION with type
+index ITYP=3, species index ISPZ = IION and initial weight NPRTI(IION) (see
+block 4C)
+<p>Out of NLATM, NLMOL, NLION, NLPHOT, NLPLS one and only one of these
+five variables must be .TRUE. .</p>""",
+
+'NLPHOT' : """<p>Photon source. History starts in subroutine FOLNEUT with type
+index ITYP=0, species index ISPZ = IPHOT and initial weight NPRTPH(IPHOT) (see
+block 4D)</p>
+<p>Not all options for direct photon sources are fully programmed. Currently we
+mostly use the bulk particle volume recombination source (see next) to
+simulated radiative decay from excited states as birth profile for (bound-
+bound) line-photons.</p><p>Out of NLATM, NLMOL, NLION, NLPHOT, NLPLS one and
+only one of these five variables must be .TRUE. .</p>""",
+
+'NLPLS' : """Bulk ion source. Initial co-ordinates of a bulk ion with species
+index ISPZ = IPLS and initial weight NPRTP(IPLS) (see block 5) are generated,
+then a surface reflection model or a volume re-combination model is called and
+atoms, molecules or test ions with species index either IATM, IMOL or IION are
+created.<p>Out of NLATM, NLMOL, NLION, NLPHOT, NLPLS one and only one of these
+five variables must be .TRUE. .</p>""",
+
+'NSPEZ' : """ Species index of the source particle
+<dl>
+<dt>1 &le; NSPEZ &le; NATMI, NMOLI, NIONI, NPLSI</dt>
+<dd>NSPEZ is the (fixed) species index of the source particle. No random
+sampling for the species index is done. </dd>
+<dt>NSPEZ > NATMI, NMOLI, NIONI, NPLSI</dt>
+<dd>(depending upon the type of the source particle) the species index is
+sampled from the distribution DATM, DMOL, DION, DPLS, respectively. The
+"surface species distributions" DATM, DMOL, DION and DPLS are read in the block
+"Data for General Reflection Models", see 2.6.</dd>
+<dt>NSPEZ = 0</dt>
+<dd><p>the species index of the particle is directly sampled from the "analog
+distribution" WEISPZ, i.e., no biased source species sampling. WEISPZ is
+defined internally by the code.</p>
+<p>The distribution WEISPZ is currently defined only for NLPLS=TRUE sources,
+and here only for surface recycling sources using the STEP-function option (in
+SAMSRF, see further below this section and paragraph 2.7.1). There it is set
+according to the local bulk ion flux composition.</p>
+<p>WEISPZ may also be transferred into a run via user specified source sampling
+(SAMUSR.f, see section 3.4 ) <br>In all other cases NSPEZ must be positive.</p>
+</dd>
+<dt>NSPEZ < 0</dt>
+<dd>The "surface species distributions" DATM, DMOL, DION and DPLS are consid-
+ered as biased source species distributions, whereas the analog (physical)
+distri- bution is provided automatically by the array WEISPZ from the source
+sampling routines SAMPNT, SAMLNE, SAMSRF or SAMVOL respectively. An appro-
+priate weight correction is carried out after sampling from DATM, DMOL, DION or
+DPLS, respectively, in subroutine LOCATE.</dd></dl>
+Note: If a step function (function STEP, see below) is used for sampling the
+start po- sition of a test particle on a surface, then the species index NSPEZ
+automatically also fixes the choice of the index ISPZ for the spatial step
+function STEP(ISTEP,ISPZ,...) selected by the flags SORLIM and SORIND (=ISTEP)
+(see below). This default can be overruled when SORIND has three digits.""",
+
+'NLPNT' : """Point Source""",
+
+'NLLNE' : """Line Source (not ready)""",
+
+'NLSRF' : """Surface Source""",
+
+'NLSRF' : """Surface Source""",
+
+'NLCNS' : """Initial conditions source (sampling from census array), for time-
+dependent mode of operation, see input blocks 1. and 13.""",
 }
 
 
@@ -1111,8 +1679,9 @@ class MyValidator(QValidator):
         n (int): Number of certain elements in the line
         mask (string): A regex mask for validating current line.
     """
-    def __init__(self, parent=None, n=None, type=None):
+    def __init__(self, parent=None, n=None, type=None, old_text=None):
         super(MyValidator, self).__init__(parent)
+        self.old_text = old_text
         self.n = n
         if type == 'B':
             self.length = self.n + int(self.n/5)
@@ -1128,6 +1697,12 @@ class MyValidator(QValidator):
             self.length = self.n
             self.mask = "."
 
+    def fixup(self, string):
+        if self.old_text:
+            return self.old_text
+        else:
+            return string
+
     def validate(self, string, pos):
         """The overloaded validate fucntion from QValidator class. Any illegal
         changes are rejected: String length changed, added/removed element,
@@ -1142,7 +1717,7 @@ class MyValidator(QValidator):
         predetermined type doesn't the predetermined number.
 
         Finally if the previous checks are not executed, it returns that the
-        change is valid
+        change is valid.
         """
         if len(string) != self.length:
             return QValidator.Intermediate, string, pos
@@ -1179,8 +1754,12 @@ class MyLineEdit(QLineEdit):
         types of values, so each is handled accordingly.
 
         Args:
-            card_description (array): This array contains roles and other info-
-                rmation for the validator class.
+            card_ty (str): This string contains the type of the card.
+            variables_name (array): This array contains the variables name at
+                the current card
+            number_of_args (int): This intiger contains the number of items on
+                the current card. This is used for the free format or for the
+                not-described cards.
         """
         if card_type==None:
             return
@@ -1272,16 +1851,19 @@ class CardEditDelegate(QStyledItemDelegate):
         """
         self.lineEdit = MyLineEdit(parent)
         self.lineEdit.setFrame(True)
-        card_type = index.data(Qt.UserRole)[0]
-        number_of_args = index.data(Qt.UserRole)[1]
-        variables_name = index.data(Qt.UserRole)[2]
-        self.lineEdit.set_card_help(card_type, variables_name,
-                                    number_of_args)
-        if card_type:
-            val = MyValidator(self.lineEdit, number_of_args, card_type)
-            self.lineEdit.setValidator(val)
 
-        self.lineEdit.parameter_help.connect(self.parameter_help)
+        if index.data(Qt.UserRole):
+            card_type = index.data(Qt.UserRole)[0]
+            number_of_args = index.data(Qt.UserRole)[1]
+            variables_name = index.data(Qt.UserRole)[2]
+            self.lineEdit.set_card_help(card_type, variables_name,
+                                        number_of_args)
+            if card_type:
+                val = MyValidator(self.lineEdit, number_of_args, card_type,
+                                  index.data(Qt.DisplayRole))
+                self.lineEdit.setValidator(val)
+
+            self.lineEdit.parameter_help.connect(self.parameter_help)
         self.lineEdit.editingFinished.connect(self.parent().changed)
 
         return self.lineEdit
@@ -1296,7 +1878,6 @@ class CardEditDelegate(QStyledItemDelegate):
         editor.parameter_help.emit('EDIT')
         super(CardEditDelegate, self).destroyEditor(editor, index)
 
-
     @pyqtSlot(str)
     def help(self, parameter):
         self.parameter_help.emit(parameter)
@@ -1305,7 +1886,7 @@ class CardEditDelegate(QStyledItemDelegate):
 class EireneEdit(QTreeWidget):
     def __init__(self, parent=None):
         super(EireneEdit, self).__init__(parent)
-        self._modified = False
+        self.TextModified = False
         self.setSortingEnabled(False)
         self.headerItem().setHidden(True)
         self.setColumnWidth(0, 32)
@@ -1327,6 +1908,7 @@ class EireneEdit(QTreeWidget):
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectItems)
         self.setIndentation(20)
+
     def setPlainText(self, text):
         """This function sets the text from the input configuration file for 
         EIRENE into the tree. The way it works is that we have block functions
@@ -1356,6 +1938,7 @@ class EireneEdit(QTreeWidget):
                 print('Row:', self.row)
                 if self.row < self.text_size:
                     print('Line:', self.text[self.row])
+        self.setCurrentItem(self.topLevelItem(0))
 
     def looks_like_boolean_card(self, line):
         """ A check function that accepts a string and then determine if the 
@@ -1499,7 +2082,7 @@ class EireneEdit(QTreeWidget):
         self.getline(['I', 'NSTSI'])
 
         for i in range(self.values['NSTSI']):
-            self.getline(['I', 'TXTSFL', 'ISTS', 'IDIMP', 'INUMP(ISTSI,IDIMP)',
+            self.getline(['I', 'TXTSFL', 'ISTS', 'IDIMP', 'INUMP',
                         'IRPTA', 'IRPTE', 'IRPTA', 'IRPTA', 'IRPTE'])
             self.getline(['I', 'ILIIN', 'ILSIDE', 'ILSWCH', 'ILEQUI', 'ILCOL',
                         'ILIT', 'ILCELL', 'ILBOX', 'ILPLG'])
@@ -1684,7 +2267,7 @@ class EireneEdit(QTreeWidget):
 
     def block_7(self):
         self.getline(['I', 'NSTRAI'])
-        self.getline(['I'] + ['INDSRC('+str(i)+')' for i in\
+        self.getline(['I'] + ['INDSRC' for i in \
                      range(1,self.values['NSTRAI']+1)])
         self.getline(['R', 'ALLOC', 'AMPTS'])
 
@@ -1992,10 +2575,10 @@ class EireneEdit(QTreeWidget):
         It does not accept or return anything, since it only changes a boolean
         to True.
         """
-        self._modified = True
+        self.TextModified = True
 
     def isModified(self):
-        return self._modified
+        return self.TextModified
 
     def toPlainText(self):
         """ It returns the text from the editor. It is first gathered from the 
@@ -2027,13 +2610,52 @@ class EireneEdit(QTreeWidget):
         return text
 
     def keyPressEvent(self, e):
-        if e.key() == Qt.Key_F2:  # Edit key F2
-            if self.selectedItems():
-                item = self.selectedItems()[0]
-                self.scrollToItem(item, QAbstractItemView.PositionAtTop)
+        #if e.key() == Qt.Key_F2:  # Edit key F2
+        #    if self.selectedItems():
+        #        item = self.selectedItems()[0]
+        #        self.scrollToItem(item, QAbstractItemView.PositionAtTop)
+        if e.key() == Qt.Key_Enter:
+            self.card_edit_delegate.lineEdit.editingFinished.emit()
+        elif e.key() == Qt.Key_I and e.modifiers() == Qt.ControlModifier:
+            self.insertRow(self.selectedItems()[0])
+        elif e.key() == Qt.Key_K and e.modifiers() == Qt.ControlModifier:
+            self.removeRow(self.selectedItems()[0])
 
-            
         return super(EireneEdit, self).keyPressEvent(e)
+
+    def insertRow(self, at_item):
+        parent = at_item.parent()
+        item = QTreeWidgetItem()
+        item.setText(0, '*')
+        item.setFlags(item.flags() | Qt.ItemIsEditable | Qt.ItemIsSelectable)
+        if parent == None:
+            self.insertTopLevelItem(self.indexOfTopLevelItem(at_item)+1,
+                                    item)
+        else:
+            parent.insertChild(self.indexOfChild(at_item)+1,
+                               item)
+        self.TextModified = True
+
+    def removeRow(self, item):
+        parent = item.parent()
+        if parent == None:
+            self.takeTopLevelItem(self.indexOfTopLevelItem(item))
+        else:
+            parent.removeChild(item)
+        self.TextModified = True
+
+    def rowNumber(self, item):
+        parent = item.parent()
+        if parent == None:
+            row = self.indexOfTopLevelItem(item)
+            for i in range(row):
+                row += self.rowCount(self.topLevelItem(i))
+            return row
+
+        else:
+            row = parent.indexOfChild(item)
+
+
 
 
 class Eirene(QWidget):
@@ -2053,7 +2675,6 @@ class Eirene(QWidget):
         self.tree.card_edit_delegate.parameter_help.connect(self.show_help)
         self.show_help('EDIT')
 
-
     def sizeHint(self):
         return QSize(600, 400)
 
@@ -2064,11 +2685,14 @@ class Eirene(QWidget):
         if parameter == '': 
             self.help.clear()
         elif parameter == 'EDIT':
-            self.help.setText('<b> Reading mode: </b>' + '<p> Press F2 to\
-                              start editing!')
+            self.help.setText("<p> Press F2 to edit line."
+                              "<p> Use arrow keys to navigate through rows and\
+                              to expand/collapse rows.<p>"
+                              "<p> CTRL + I to insert rows</p>"
+                              "<p> CTRL + K to remove row</p>")
         elif parameter in eirene_params:
             self.help.setText('<b>' + parameter + '</b>:'
-                              + eirene_params[parameter])
+                              + '<p>' + eirene_params[parameter] + '<p>')
         else:
             self.help.setText('<b>' + parameter + '</b>:'
                               + eirene_params['NOP'])
@@ -2088,25 +2712,14 @@ class Eirene(QWidget):
     def document(self):
         return self.tree
 
-    def standealoneSave(self):
-        path = self.tree.filename
-
-        if os.path.exists(path):
-            try:
-                with open(path, 'w') as f:
-                    text = self.tree.toPlainText()
-                    f.write(text)
-            except PermissionError as error:
-                logging.error(str(error))
-        else:
-            logging.error('Path does not exist.')
-
 
 if __name__ == "__main__":
 
     import sys, os
-    from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
-    os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = "1" # for solving high-dpi
+    from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel,
+                                QTreeWidgetItemIterator)
+
+    os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1' # for solving high-dpi
     app = QApplication(sys.argv)                    # problems
     widget = Eirene()
 
@@ -2115,32 +2728,55 @@ if __name__ == "__main__":
             super(Standalone, self).__init__(parent)
             self.eirene = Eirene(self)
             self.eirene.tree.itemSelectionChanged.connect(self.UpdateStatusBar)
-            self.eirene.tree.setSelectionMode(Qt.SingleSelection)
+            self.eirene.tree.setSelectionMode(
+                                            QAbstractItemView.SingleSelection)
             self.setCentralWidget(self.eirene)
+
         def closeEvent(self, e):
-            self.eirene.standealoneSave()
+            self.documentSave()
             super(Standalone, self).closeEvent(e)
+
+        def documentSave(self):
+            if self.eirene.tree.TextModified:
+                path = self.eirene.tree.filename
+
+                if os.path.exists(path):
+                    try:
+                        with open(path, 'w') as f:
+                            text = self.eirene.tree.toPlainText()
+                            f.write(text)
+                    except PermissionError as error:
+                        logging.error(str(error))
+                else:
+                    logging.error('Path does not exist.')
 
         @pyqtSlot()
         def UpdateStatusBar(self):
             selectedItem = self.eirene.tree.selectedItems()[0]
+
+            # Cursor position
+            # TODO
+
+            # Row
+            row = 0
+            iterator = QTreeWidgetItemIterator(self.eirene.tree)
+            while iterator.value():
+                item = iterator.value()
+                if item == selectedItem:
+                    row = row
+                    break
+                else:
+                    iterator += 1
+                    row += 1
+
+            # Block
             parentItem = selectedItem.parent()
             if parentItem != None:
                 block = parentItem.data(0, Qt.DisplayRole)
-                if len(block)<50:
-                    block+=(50-len(block))*' '
             else:
-                block = 50*' '
-            if selectedItem.data(0, Qt.UserRole)!=None:
-                row = str(selectedItem.data(0, Qt.UserRole)[3])
-                if len(row) < 6:
-                    row+=(6-len(row))*' '
-            else:
-                row = 6*' '
-
-            self.statusBar().showMessage('Block: '+ block +
-                                         'Row: '+ row, 0)
-
+                block = selectedItem.data(0, Qt.DisplayRole)
+            message = '%6d' % row + ' ' + '%s' % block 
+            self.statusBar().showMessage(message)
 
     if len(sys.argv[1]): 
         input_dat = sys.argv[1]
