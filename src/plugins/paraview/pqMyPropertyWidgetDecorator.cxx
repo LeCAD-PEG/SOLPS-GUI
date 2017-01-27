@@ -36,7 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "ReadUALEdge.h"
 
 //-----------------------------------------------------------------------------
 pqMyPropertyWidgetDecorator::pqMyPropertyWidgetDecorator(
@@ -56,6 +58,12 @@ pqMyPropertyWidgetDecorator::pqMyPropertyWidgetDecorator(
   this->ObserverId = pqCoreUtilities::connect(
     prop, vtkCommand::UncheckedPropertyModifiedEvent,
     this, SIGNAL(visibilityChanged()));
+
+  vtkSMProperty* prop_user = proxy? proxy->GetProperty("User") : NULL;
+  this->ObserverId = pqCoreUtilities::connect(
+    prop_user, vtkCommand::UncheckedPropertyModifiedEvent,
+    this, SIGNAL(visibilityChanged()));
+
 }
 
 //-----------------------------------------------------------------------------
@@ -82,5 +90,57 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
       }
     }
 
+  // Extracting available Shot/Runs from the user, defined in the "User" text box, and adding them to the Shot/Run list 
+  vtkSMProperty* prop_user = proxy? proxy->GetProperty("User") : NULL;
+  vtkSMStringVectorProperty* prop_user_strVec = dynamic_cast<vtkSMStringVectorProperty*>(proxy->GetProperty("User"));
+  std::vector<std::string> UserShotRunList;
+
+  const char *user;
+  if(prop_user)
+  {
+    // Getting text currently in"User" checkbox to string
+    user = vtkSMUncheckedPropertyHelper(prop_user).GetAsString();
+  }
+
+  // Getting the users $HOME directory 
+  std::string cmd = "echo ~" + string(user);
+  char buffer[128];
+  std::string homedir = "";
+  FILE* pipe = popen(cmd.c_str(), "r");
+
+  if (!pipe) std::clog << "popen() failed!" << std::endl;
+  try {
+      while (!feof(pipe)) {
+          if (fgets(buffer, 128, pipe) != NULL)
+              homedir += buffer;
+      }
+  } catch (...) {
+      pclose(pipe);
+      throw;
+  }
+  pclose(pipe);
+
+  // Example of userIMASShotRunDir: /home/ITER/penkod/public/imasdb/solps-iter/3/0
+  std::string userIMASShotRunDir = homedir + "/public/imasdb/solps-iter/3/0";
+  userIMASShotRunDir.erase(std::remove(userIMASShotRunDir.begin(), userIMASShotRunDir.end(), '\n'), userIMASShotRunDir.end());
+  UserShotRunList = findShotRun(userIMASShotRunDir, string(user));
+
+  vtkSMProperty* prop_SHlist = proxy? proxy->GetProperty("ShotRunList") : NULL;
+  if (!prop_SHlist)
+  {
+    qDebug("Could not locate property named 'ShotRunList'. "
+      "pqMyPropertyWidgetDecorator will have no effect.");
+  }
+  else if(prop_SHlist)
+  {
+    vtkSMStringVectorProperty* prop_SHlist_strVec = dynamic_cast<vtkSMStringVectorProperty*>(proxy->GetProperty("ShotRunList"));
+    for(int i = 0; i < UserShotRunList.size(); i++)
+  {
+    // Filling the Shot/Run List
+    prop_SHlist_strVec->SetElement(i, UserShotRunList[i].c_str());
+  }
+    proxy->UpdatePropertyInformation(prop_SHlist_strVec);
+    proxy->UpdateSelfAndAllInputs();
+  }
   return this->Superclass::canShowWidget(show_advanced);
 }

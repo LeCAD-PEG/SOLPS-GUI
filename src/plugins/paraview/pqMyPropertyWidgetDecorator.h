@@ -47,7 +47,6 @@ public:
 
   /// Overridden to hide the widget when ShrinkFactor < 0.1
   virtual bool canShowWidget(bool show_advanced) const;
-
 private:
   Q_DISABLE_COPY(pqMyPropertyWidgetDecorator)
 
