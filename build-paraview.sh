@@ -111,15 +111,15 @@ if [ ! -d ${PARAVIEW_SOURCE_DIR} ]; then
     tar xzf ${DOWNLOAD_DIR}/${PARAVIEW_SOURCE}
 #    tar xzf ${DOWNLOAD_DIR}/${PARAVIEW_DATA}
 # See https://github.com/OpenFOAM/ThirdParty-dev/blob/master/README.org
-    patch -p2 -d ${PARAVIEW_SOURCE_DIR} < \
-        ${BUILDROOT}/src/patches/paraview-ui_pqExportStateWizard.patch
+#    patch -p2 -d ${PARAVIEW_SOURCE_DIR} < \
+#        ${BUILDROOT}/src/patches/paraview-ui_pqExportStateWizard.patch
 #    patch -p1 -d ${PARAVIEW_SOURCE_DIR} < \
 #        ${BUILDROOT}/src/patches/paraview-vtk-storage-mkostemp.patch
 fi
 
 
 #Configure and build paraview
-#if [ ! -e   ${PARAVIEW_BUILD}/.built ]; then
+if [ ! -e   ${PARAVIEW_BUILD}/.built ]; then
 rm -rf ${PARAVIEW_BUILD}
 install -d ${PARAVIEW_BUILD}
 cd ${PARAVIEW_BUILD}
@@ -144,12 +144,13 @@ find .  -name link.txt -exec \
 LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} \
 make -j ${MAKE_JOBS} VERBOSE=0
 make install
-#fi
+fi
 
 STAGING_DOC=${STAGING_PARAVIEW}/share/paraview-${PARAVIEW_MAJOR_VERSION}/doc
 install -d ${STAGING_DOC}
-for file in ParaViewGettingStarted-5.1.0.pdf ParaViewTutorial.pdf \
-        ParaViewGuide-5.1.0.pdf ; do
+for file in ParaViewGettingStarted-${PARAVIEW_VERSION}.pdf \
+    ParaViewTutorial.pdf  ParaViewGuide-${PARAVIEW_VERSION}.pdf \
+    ParaViewCatalystGuide-${PARAVIEW_VERSION}.pdf  ; do
     if [ ! -f ${DOWNLOAD_DIR}/${file} ]; then
          wget -O ${DOWNLOAD_DIR}/${file} --no-check-certificate \
              ${PARAVIEW_DOWNLOAD}/${file}
