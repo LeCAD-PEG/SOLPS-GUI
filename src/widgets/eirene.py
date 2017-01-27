@@ -39,7 +39,19 @@ from PyQt5.QtWidgets import (QWidget, QSplitter, QTreeWidget, QTextBrowser,
 import logging
 import re
 
+no_description_in_manual = """No description in manual."""
+
+point_example = """Coordinate for corner of a triangle.
+<p>Example:</p>
+<p>plane triangle defined by the corners P<sub>1</sub> , P<sub>2</sub> , 
+P<sub>3</sub></p>
+<p>P 1 =(P1(1),P1(2),P1(3))</p>
+<p>P 2 =(P2(1),P2(2),P2(3))</p>
+<p>P 3 =(P3(1),P3(2),P3(3))</p>"""
+
 eirene_params = {
+'NOD' : """<p>No description available.</p>""",
+
 'NMACH' : """<b>Code-number</b> for the computer used
 <dl>
   <dt>= 1</dt><dd>CRAY</dd>
@@ -242,14 +254,12 @@ specific "user" rou- tines (see section 3), e.g.: INIUSR, GEOUSR, etc..</p>
 'NREAC_ADD' : """<p> Storage for additional reaction decks read onto EIRENE
 arrays in USR- routines, post-processing, etc. Default: 0</p>""",
 
-'NOP' : """No description available.""",
-
 'NLSCL' : """<p>Some volume averaged tallies are re-scaled in order to exactly
 preserve the total number of particles, which otherwise would be the case only
 up to statistical precision (due to the use of track-length estimators).
 EIRENE computes three factors FATM, FMOL and FION such that particle balances
 for atoms, molecules and test ions, respectively, are accurately observed,
-if NLSCL = TRUE.</p>""" ,
+if NLSCL = TRUE.</p>""",
 
 'NLTEST' : """<p>Tests for consistency between cell numbers and geometrical
 data along the particle tracks are carried out at each point of collision. If
@@ -257,7 +267,7 @@ inconsistencies are detected, the history is stopped and an error message is
 printed. The contribution of these particles to the particle- and energy
 balances is stored in the bins "PTRASH" and "ETRASH" respectively.""",
 
-  'NLANA' : """<p>De-activates (NLANA=.TRUE.) all non-analog sampling
+'NLANA' : """<p>De-activates (NLANA=.TRUE.) all non-analog sampling
 distributions, such as biased source sampling, splitting, etc.. Select
 NLANA=.TRUE., if particle trajectory plots are used to get an intuitive
 picture of what is going on physically.</p>""",
@@ -292,6 +302,17 @@ analytic results). (not ready, don't use)</p>""",
 geometry plots for making particle trajectory movies. This option only works
 in connection with time dependent mode, see NTIME flag described above, and
 input block 2.13. More details: see paragraph 2.1.3 below.</p>""",
+
+'NLDFST' : no_description_in_manual,
+'NLOLDRAN' : no_description_in_manual,
+'NLCASCAD' : no_description_in_manual,
+'NLOCTREE' : no_description_in_manual,
+'NLWRMSH' : no_description_in_manual,
+'NEXVS' : no_description_in_manual,
+'NLTRIMESH' : no_description_in_manual,
+
+'CFILE' : """There can be any number of these cards starting with character
+string CFILE in the input file. &quot;CFILE&quot; DBHANDLE DBFNAME""",
 
 # *** 2.
 'INGRD(1)' : """This index controls the meaning of input
@@ -344,7 +365,7 @@ geometry level</dd> LEVGEO = 1 is used. Volume discretisation may
 still be achieved "by hand" by defining</dd> "additional surfaces"
 (input block 3b) and appropriate cell number switching.</p>""",
 
-'NLSLB' : """ <p>Geometry level: LEVGEO = 1</p> <p> Cartesian geometry, the x
+'NLSLB' : """<p>Geometry level: LEVGEO = 1</p> <p> Cartesian geometry, the x
 co-ordinate is discretized by setting:</p> <p>x<sub>1</sub> = RSURF(I)  I=1,
 NR1ST.</p> <p> Furthermore, the flux-surface labeling grid RHOSRF(I) is
 identical with the grid RSURF(I).</p>""",
@@ -373,10 +394,10 @@ co- ordinate surface in the first (radial or <em>x</em>-grid).</p>
  <p>RHOSRF:as in NLCRC option</p> <p>Note: RHOSRF and RSURF may differ in this
 case.</p>""",
 
-'NLTRI' : """ <p>Geometry level: LEVGEO = 2</p> <p>to be written:
+'NLTRI' : """<p>Geometry level: LEVGEO = 2</p> <p>to be written:
 triangularity in mesh of nested closed algebraic surfaces</p>""",
 
-'NLPLG' : """ <p>Geometry level: LEVGEO = 3</p> <p>The mesh in the x-y plane is
+'NLPLG' : """<p>Geometry level: LEVGEO = 3</p> <p>The mesh in the x-y plane is
 described by NR1ST polygonal arcs of length NRPLG each.  A polygon may consist
 of several "valid" and "invalid" parts (to account for "grid cuts" in CFD
 meshes). The "invalid" parts of a polygon are not seen by test particles and
@@ -386,15 +407,15 @@ meshes including grid cuts.</p> <p>The polygons must not intersect each
 other.</p> <p>In this case RHOSRF(1)=0., and RHOSRF(I) is the area enclosed by
 polygon number 1 and polygon number I.</p>""",
 
-'NLFEM' : """ <p>Geometry level: LEVGEO = 4</p> <p>The mesh in the x-y plane
+'NLFEM' : """<p>Geometry level: LEVGEO = 4</p> <p>The mesh in the x-y plane
 consists of NR1ST triangles,  composed from NRKNOT knots.</p> <p>In this case
 a flux surface labeling grid RHOSRF is not defined.</p>""",
 
-'NLTET' : """ <p>Geometry level: LEVGEO = 5</p> <p>3D discretisation of volume
+'NLTET' : """<p>Geometry level: LEVGEO = 5</p> <p>3D discretisation of volume
 by tetrahedrons.  For this grid option please make contact to the
 authors.</p>""",
 
-'NLGEN' : """ <p>Geometry level: LEVGEO = 10</p> <p>Arbitrary geometrical
+'NLGEN' : """<p>Geometry level: LEVGEO = 10</p> <p>Arbitrary geometrical
 configuration.  Mesh consists of NR1ST arbitrarily shapes cells (in  any
 dimension).   Particle  tracing  routines  must  be  provided  by  user
 (VOLUSR, SAMUSR, TIMUSR, LEAUSR)</p>""",
@@ -477,7 +498,7 @@ the test particles.  ( Default :  NPPLG = 1 ).  This option facilitates the
 use of 2-d computer generated meshes which contain topological grid
 cuts.</p>""",
 
-'XPCOR' : """ <p>if NLPLG = .TRUE. : shift whole mesh by that vector in
+'XPCOR' : """<p>if NLPLG = .TRUE. : shift whole mesh by that vector in
 x,y-plane</p> <p>if NLFEM = .TRUE. : x and y co-ordinates of the knots,
 respectively</p>""",
 
@@ -586,12 +607,12 @@ all options LEVGEO > 2: this input card is irrelevant.</p></dd> </dl>
 YYA=1. in case of LEVGEO=1, and YIA=0., YGA=0., YAA=360., YYA=360. in case of
 LEVGEO=2.</p>""",
 
-'NLTOR' : """ <p>A toroidal or z grid is defined.  Otherwise the complete block
+'NLTOR' : """<p>A toroidal or z grid is defined.  Otherwise the complete block
 2C may be omitted and the volume averaged tallies are then automatically
 integrated over this co-ordinate.</p> <p>In case NLTOR = TRUE, sub-block 2C
 must be read</p>""",
 
-'INDGRD(3)' :  """ <dl> <dt>= 1</dt><dd>standard grid option</dd> <dt>=
+'INDGRD(3)' :  """<dl> <dt>= 1</dt><dd>standard grid option</dd> <dt>=
 2,3,4,5,6</dt><dd>not in use (default: INDGRD(3)=1)</dd> </dl>""",
 
 'NLTRZ' : """=TRUE <p>cylindrical approximation is used, i.e., TSURF is a grid
@@ -621,13 +642,13 @@ FALSE).</p>""",
 'NLTRT' : """=TRUE <p>torus co-ordinates R,PHI,THETA. Presently being developed
 for NLSLB,NLPLG and NLTRI options. Not ready for use.</p>""",
 
-'NT3RD' : """ <p>Number of grid-points in z- or toroidal direction</p>
+'NT3RD' : """<p>Number of grid-points in z- or toroidal direction</p>
 <p>(default: NT3RD = 1, i.e. no grid is defined)</p>""",
 
 'NTTRA' : """
 only needed in case NLTRA and .NOT.NLTOR. See above.""",
 
-'ZIA' : """ <p>The 3rd grid ZSURF is defined in the same way as the x grid,
+'ZIA' : """<p>The 3rd grid ZSURF is defined in the same way as the x grid,
 using the parameters ZIA, ZGA,.... (cm) instead of RIA, RGA,....</p> <p>In
 case of NLTRZ = TRUE , a z-grid is defined. ROA is irrelevant.</p> <p>In case
 of NLTRA = TRUE , ZIA and ZAA are toroidal angles (in degrees). A grid of
@@ -644,7 +665,7 @@ block 11), this major radius offset ROA of poloidal cross sections has to be
 taken into account when defining plot- frames.</p> <p>(Defaults: NLTRA =
 FALSE, ZIA = 0 , ZAA = 1)</p>""",
 
-'ZGA' : """ <p>The 3rd grid ZSURF is defined in the same way as the x grid,
+'ZGA' : """<p>The 3rd grid ZSURF is defined in the same way as the x grid,
 using the parameters ZIA, ZGA,.... (cm) instead of RIA, RGA,....</p> <p>In
 case of NLTRZ = TRUE , a z-grid is defined. ROA is irrelevant.</p> <p>In case
 of NLTRA = TRUE , ZIA and ZAA are toroidal angles (in degrees). A grid of
@@ -661,7 +682,7 @@ block 11), this major radius offset ROA of poloidal cross sections has to be
 taken into account when defining plot- frames.</p> <p>(Defaults: NLTRA =
 FALSE, ZIA = 0 , ZAA = 1)</p>""",
 
-'ZAA' : """ <p>The 3rd grid ZSURF is defined in the same way as the x grid,
+'ZAA' : """<p>The 3rd grid ZSURF is defined in the same way as the x grid,
 using the parameters ZIA, ZGA,.... (cm) instead of RIA, RGA,....</p> <p>In
 case of NLTRZ = TRUE , a z-grid is defined. ROA is irrelevant.</p> <p>In case
 of NLTRA = TRUE , ZIA and ZAA are toroidal angles (in degrees). A grid of
@@ -736,6 +757,32 @@ ILSWCH, ILCELL parameters (block 3B)</p> <p>(Default: NRADD = 0 ).</p>""",
 'VOLADD' : """<p>Volume (<em>cm<sup>-3</sup></em>) of each additional zone as
 seen by the test-particles.</p>""", 
 
+#2.3 Block 3
+
+'ILPLG' : """<p>EIRENE can write out information for a finite element mesh
+generator to produce a grid of triangles for a multiply connected 2D domain
+with cracks and holes. The various (inner and outer) boundaries are given as
+polygonal lines, which are composed of selected standard grid surface segments
+(NLPLG option) and/or additional surfaces (2 &le; RLBND < 3 option).</p>
+<p>This flag identifies closed polygonal lines composed of additional surfaces
+given by the 2-point option and/or of standard surfaces in the x-y-plane. For
+example if ILPLG(I)=NN, for surfaces I = I1, I2, ...IN, (NN a positive integer)
+then these IN surfaces form a closed polygonal line in the x-y-plane. The
+region inside this closed line is part of the com- putational domain. By a
+negative integer value of NN a closed polygonal region can be excluded from the
+computational domain, i.e., a hole in the domain is specified by these
+surfaces. EIRENE writes an output file appropriate for a finite element mesh
+gen- erator (available from FZ-Juelich) to produce a triangular discretization
+of the resulting (possibly multiply connected) domain. This option can be used
+to discretize arbitrarily complex 2D domains with internal and external
+boundaries given by the additional or non-default standard surfaces.</p>""",
+
+'ILCELL' : """Parameter ILBLCK and ILACLL for the ILSWCH flags described above.
+Let ILCELL = NM, with N and M being integers with 3 digits each. Then N =
+ILBLCK and M = ILACLL.""",
+
+'ILBOX' : no_description_in_manual,
+
 'NSTSI' : """<p>Total number of non-default standard surfaces that do not act
 as prescribed by the default transparent standard co-ordinate surface
 model.</p>""",
@@ -779,6 +826,8 @@ default surface. IRPTA2 and IRPTE2 are irrelevant.</p> <p>If JMP is a surface
 from the 3rd mesh, then IRPTA1 &rarr; IRPTE1 and IRPTA2 &rarr; IRPTE2 are the
 surface index ranges of the 1st and 2rd mesh, respectively, for which this
 surface acts as non-default surface. IRPTA3 and IRPTE3 are irrelevant.</p>""",
+
+# 2.3.2
 
 'CH-card' : """<p><b>CH0 n1/m1 n2/m2 ... </b> surfaces from the range n1 to m1,
 n2 to m2, ..., are ignored by EIRENE. Specifying a surface in such a CH0-card
@@ -882,6 +931,133 @@ inequalities.</dd><br>
 </dl>
 """,
 
+# 2.4
+'NREACI' : """Total number of different reactions to be read.</p> 
+<dl> <dd><p>The next block has different meanings for &ldquo;real
+particles&rdquo; and &ldquo;photons&rdquo;. Cross section and rate coefficients
+are specified for particles, but emission and absorbtion line shapes are
+specified for photons.</p>
+<b>&ldquo;real particles&rdquo;</b>
+<p>An interaction potential em>V /em>(em>r/em>), cross section em>&sigma;
+</em>plus a reaction rate coefficient &lang;em>&sigma;v/em>&rang; for one
+<process counts as one reaction, but higher order rate coefficients such as
+<energy or momentum weighted rate coefficients for the same process count as
+<new reaction and must be labelled by a different index em>IR /em>(see
+<below)./p>
+<p>Storage is provided for up to NREAC different additional reactions (see
+<&ldquo;Parameter Statements&rdquo;, section a href="#_bookmark169">3.1/a>),
+<i.e., one must guarantee NREACI.LE.NREAC/p></dd></dl>""",
+
+'NATMI' : """Total number of atomic species blocks""",
+
+'NMOLI' : """Total number of molecule species blocks""",
+
+'NIONI' : """Total number of test ion species blocks""",
+
+'NPHOTI' : """Total number of photon species blocks""",
+
+'INDPRO' : """<dl>dd>Flag-array for the type of profile. The last digit
+(between 1 and 9) <controls the type of profile. A second digit and/or the sign
+control further <options, as described below. A third digit for each entry can
+be used to <switch from a cell-wise constant profile (default) to a smooth
+(interpolated <into cells) profile. This option is currently being tested for
+the magnetic <field input profiles. I.e. INDPRO(5)=103 provides the same
+magnetic field as <INDPRO(3)=3, however the magnetic field is evaluated on the
+fly (along <particle trajectories) by interpolation, at the very point of
+particle <position rather than at the cell center (=const. per cell).
+<p>INDPRO is an array of length 12. Each element in this array controls one
+<particular input tally, namely:/p>
+<p>INDPRO(1) for TEIN</p>
+<p>INDPRO(2)</p>
+<dl>dd>for TIIN By the default (em>0 &lt; INDPRO(2) &lt; 10/em>): one common
+<em>T/em>em>sub>i /sub>/em>profile for all &ldquo;bulk ion&rdquo; species is
+<set. I.e., read only one profile card. p>b>New options since 2001:/b>/p>
+<p>Values of INDPRO(2) larger than 10: use only the last digit, and one
+<em>T/em>em>sub>i /sub>/em>profile card must be read for each bulk ion species
+<IPLS. For example: em>INDPRO(2)=15 /em>or em>=25/em>, means: one separate ion
+<temperature must be specified for each bulk ion species, and the profile type
+<is 5. (em>INDPRO(2)=-5 /em>would do the same.)/p> /dd> /dl></dd></dl>
+<dl><dd><p>INDPRO(3) read NPLSI cards, for DIIN , IPLS = 1, NPLSI</p>
+<p>INDPRO(4) read NPLSI cards, for VXIN, VYIN, VZIN , IPLS = 1, NPLSI</p>
+<dl>dd>b>New options since 2001:/b> p>By the default (em>0 &lt; INDPRO(4) &lt;
+<10/em>): one separate flow field for each bulk species is set, velocity is
+<given in cm/sec./p> p>Negative value of INDPRO(4) means: Mach number units
+<instead. The sound speed em>cs /em>is taken to be the isothermal ion acoustic
+<speed of species IPLS. em>ABS(INDPRO(4) /em>is then used as flag for the
+<choice of profile type./p> p>Values of INDPRO(4) larger than 10: use only the
+<last digit, and only one com- mon flow field is set for all bulk ion species.
+<Note the difference to the em>T/em>em>sub>i/sub> /em>options: there the
+<meaning of INDPRO larger than 10 was exactly opposite to the meaning here for
+<the flow fields (due to historical reasons and for backward compatibility of
+<input files. EIRENE had originally by default one single common ion temper-
+<ature, but one flow field for each bulk ion species)./p> /dd>/dl>
+<p>INDPRO(5)</p>
+<dl>dd>for PITCH (later, in initialization phase, converted into cartesian unit
+<B- field vector BXIN,BYIN,BZIN) Pitch is defined as em>B/em>em>sub>y/sub>
+</em>em>/B/em>em>sub>tot/sub> /em>(LEVGEO=1), em>B/em>em>sub>&theta;/sub>
+</em>em>/B/em>em>sub>tot/sub>/em>(LEVGEO=2), or as
+<em>B/em>em>sub>pol/sub>/em>em>/B/em>em>sub>tot/sub> /em> (LEVGEO=3), where
+<em>B/em>em>sub>pol/sub>/em> is the direction along the polygons./dd> dd>b>New
+<options since 2001: /b>In case INDPRO(5)=3 (flat profile) the two redundant
+<input parameters B2, B3 are used to define a constant B-field strength [T],
+<see below under profile type INDPRO=3./dd>/dl> /dd>
+<dd><p>INDPRO(6) for ADIN</p></dd>
+<dd><p>INDPRO(7) for WGHT (to be written)</p></dd>
+<dd><p>INDPRO(12) for VOL.</p></dd>
+<dd>p>For the input tally profiles no. 6 and 7 (ADIN, WGHT) only the options
+<INDPRO=5 or INDPRO=6 exist./p> p>For the profile no. 12 (cell volumes) the
+<options INDPRO(12) = 4, 5, 6, or INDPRO(12)/p> p>= 7 are active options. For
+<all other values of INDPRO for these latter four profiles the default profiles
+<described above (&ldquo;General remarks&rdquo;) are set./p> p>For each profile
+<up to 6 parameters P0 , . . . , P5 are read, e.g. TE0, ..., TE5 forthe/p>
+<p>em>T/em>em>e/em>-profile, TI0, ... , TI5 for the
+<em>T/em>em>sub>i/sub>/em>-profile, and so on./p> p>Depending upon the value of
+<INDPRO one of the profile routines PROFN, PROFE, PROFS, . . . etc. is called
+<from subroutine PLASMA./p> p>INDPRO = 1-4/p> dl> dd>""",
+
+# 2.5
+
+# 2.6
+
+'NLTRIM' : """<dl><dd>TRIM database is used, if &ldquo;Database Reflection
+Model&rdquo; is specified in at least one block for local reflection data. Data
+are read from data-set FT21 (no &ldquo;Path Card&rdquo; specified, old option),
+or from the domain specified by the &ldquo;Path Card&rdquo; (new option, see
+next card). If the old option is used, then the complete TRIM file is read,
+containing the first 12 TRIM target-projectile combination data-sets listed in
+section 1.4, i.e., the files H_on_Fe to_Ton_W.</dd> <dd>If the parameter NHD6
+<em>&lt; </em>12, (section 3.1>) then only the first NHD6 files are read from
+FT21.</dd> </dl>""",
+
+'PATH CARD' : """<dl><dd>This card is machine specific. If EIRENE finds a card
+containing the string &rsquo;PATH&rsquo; or &rsquo;path&rsquo;, it assumes that
+this card specifies the path to the domain containing the TRIM surface
+reflection data files.</dd> </dl>""",
+
+'A_on_B' : """<dl> <dd>Name of a particular TRIM data file in the domain
+specified by the path card. E.g., H_on_Fe would include the data file for
+hydrogen onto iron into the EIRENE run. Up to NHD6 such &ldquo;Target-
+Projectile Specification Cards&rdquo; may be included. For a complete list of
+such files currently available see again section 1.4.</dd> </dl>""",
+
+'DATD' : """<dl> <dd> distribution for sampling the species index of reflected
+or otherwise emitted atoms. <dd>The NATMI relative   <dd>frequencies DATD(IATM)
+IATM = 1,NATMI</dd> 
+<dd>are used to produce the corresponding cumulative distribution DATM in order
+to facil- itate sampling (inversion method). Normalization of DATD such 
+that</dd>
+<dd><em>&sum;<sub>IATM</sub> </em><em>DATD</em>(<em>IATM</em> ) = 1</dd> <dd>is
+carried out internally.</dd>""",
+
+'DMLD' :  """as for DATD, but for molecules. Cumulative distribution is
+DMOL.""",
+
+'DIOD' : """as for DATD, but for test ions. Cumulative distribution is DION.
+""",
+
+'DPLD' : """as for DATD, but for bulk ions. Cumulative distribution is
+DPLS.""",
+
 'RLARE' : """<p>Area (in <em>cm<sup>2</sup></em>) of the surface element which
 is seen by the test particles. (Default: 666.0) (needed only for scaling of non
 default surface averaged tallies) If RLARE is not specified here, (i.e., if a
@@ -964,7 +1140,7 @@ not see the surface, i.e., this surface acts like a (semi) transparent surface
 <dt>= -3 as 3, but with the opposite direction of the surface normal</dt>
 </dl>""",
 
-'ILSWCH' : """ = IJKLMN, i.e. six digits I, J, K, L, M and N
+'ILSWCH' : """= IJKLMN, i.e. six digits I, J, K, L, M and N
 <dl>
 <dt>= 0 no switch is operated</dt>
 <dt>N EIRENE flag ITIME</dt><dd><p>N = 1   The calculation of the step sizes in
@@ -1121,6 +1297,8 @@ set to 1.0, i.e., even pump- ing is turned off (as distinct from the choice
 <em>RINTEG=1.0</em>, which would preserve the pumping speed at a surface).
 </dd>""",
 
+'RPROBO' : """""",
+
 'EINTEG' : """<dl>
 <dt>>0</dt>
 <dd> Fixed (independent of energy and angle of incidence) energy reflection 
@@ -1158,6 +1336,46 @@ particle reflection model.</em>
 </dd>
 </dl>
 """,
+
+'NPLSI' : """ Number for how many species card to read.""",
+
+'VL' : no_description_in_manual,
+
+'P1' : point_example,
+'P2' : point_example,
+'P3' : point_example,
+'P4' : point_example,
+'P5' : point_example,
+
+# 2.6
+
+'ERMIN' : """For incident particle energies below ERMIN, the &quot;fast&quot;
+particle reflection model is switched off. Only the &quot;thermal&quot;
+particle model is used.""",
+
+'ERCUT' : """<p>These variables may be used to modify the default
+&quot;Behrisch Matrix&quot; reflection coefficients for particles incident on
+a surface at low energies E<sub>in</sub> . The original data [16] are used only
+for E<sub>in</sub> > ERCUT and for normal incidence &theta;<sub>in</sub> =
+0.</p>
+<p>In the range ERMIN < E<sub>in</sub> < ERCUT the particle reflection
+coefficient p<sub>f</sub>(E<sub>in</sub> , &theta;<sub>in</sub> = 0) is
+replaced by a smooth cubic interpolation curve p<sub>f</sub>(E<sub>in</sub>)
+such that p<sub>f</sub>(0) = RPROBF .</p>
+<p>The original &quot;Behrisch Matrix&quot; is recovered by setting ERCUT ≤
+<0./p>""",
+
+'RPROB0' : """<p>These variables may be used to modify the default
+&quot;Behrisch Matrix&quot; reflection coefficients for particles incident on
+a surface at low energies E<sub>in</sub> . The original data [16] are used only
+for E<sub>in</sub> > ERCUT and for normal incidence &theta;<sub>in</sub> =
+0.</p>
+<p>In the range ERMIN < E<sub>in</sub> < ERCUT the particle reflection
+coefficient p<sub>f</sub>(E<sub>in</sub> , &theta;<sub>in</sub> = 0) is
+replaced by a smooth cubic interpolation curve p<sub>f</sub>(E<sub>in</sub>)
+such that p<sub>f</sub>(0) = RPROBF .</p>
+<p>The original &quot;Behrisch Matrix&quot; is recovered by setting ERCUT ≤
+<0./p>""",
 
 'ILREF' : """Flag for choice of local reflection model
 <dl>
@@ -1437,9 +1655,6 @@ Default: RECYCC = 1.""",
 'SPTPRM' : """free model parameter for user supplied sputtering models N=3, 
 M=3.<br> Default: SPTPRM = 0.""",
 
-'ESPUTS' : """(new: March 2015) parameter (flag) for energy of physically 
-sputtered particle. Currently not in use.<br>Default: ESPUTS = 0.""",
-
 'ESPUTC' : """(new: March 2015) parameter (flag) for energy of chemically 
 sputtered particle. By default: chemically sputtered particles are released 
 from the wall by the "thermal surface emission model", as also used for the 
@@ -1450,6 +1665,11 @@ sampling from a stationary Maxwellian flux distribution at -EWALL = TWALL.<br>
 If ESPUTC .GT. 0, then the the chemically sputtered particles are released with 
  a monoenergetic distribution at E0 = ESPUTC, and a cosine angular 
 distribution.<br>Default: ESPUTC = 0.""",
+
+'ESPUTS' : """(new: March 2015) parameter (flag) for energy of physically
+sputtered particle. Currently not in use. Default: ESPUTS = 0.""",
+
+# 2.7
 
 'NSTRAI' : """Number of different sources ("Strata"), which are computed one 
 after the other and are linearly superimposed at the end of the run.<br>
@@ -1531,64 +1751,6 @@ independent of NTCPU flag in input block 1. Hence: setting this flag may
 increase EIRENE run time above the cpu-time assigned to a run in the first
 input line in input block 1. Default: NMINPTS = 0""",
 
-'FLUX' : """<dl><dt>SCALV=0 (default) FLUX = Source strength in Ampere.</dt>
-<dd>FLUX is the scaling factor for all surface- or volume averaged tallies.<br>
-FLUX is an "atomic flux" (or: an "atomic ion flux"). Each source particle may
-carry a different flux NPRT(ISPZ) (initial weight) depending on the species 
-ISPZ (see: distribution for the species index). NPRT is specified in the blocks
-4 and 5. The total "atomic" source particle flux for each stratum is scaled to 
-be FLUX. For example, a H 2 molecule source, with NPRT <sub>H<sub>2</sub></sub>
- = 2, is treated as if a flux of FLUX/1.602E-19/2 H<sub>2</sub> -molecules per 
-second is emitted, resulting in an equivalent "atomic flux" FLUX/1.602E-19 per 
-second.</dd>
-<dt>SCALV &ne; 0</dt>
-<dd>The default scaling of tallies with FLUX can be overruled by this flag. The
-common scaling factor for all surface- and volume averaged tallies is
-determined such that one particular tally has the prescribed value SCALV. This
-determines the scaling of all other volume av- eraged and surface averaged
-tallies. By this option, for example, one can set the neutral particle density
-to a prescribed value in one particular cell. Hence, one can prescribe the
-local Knudsen number for nonlinear applications including neutral-neutral
-interactions.</dd></dl>""",
-
-'SCALV' : """<dl><dt>SCALV=0 (default) FLUX = Source strength in Ampere.</dt>
-<dd>FLUX is the scaling factor for all surface- or volume averaged tallies.<br>
-FLUX is an "atomic flux" (or: an "atomic ion flux"). Each source particle may
-carry a different flux NPRT(ISPZ) (initial weight) depending on the species 
-ISPZ (see: distribution for the species index). NPRT is specified in the blocks
-4 and 5. The total "atomic" source particle flux for each stratum is scaled to 
-be FLUX. For example, a H 2 molecule source, with NPRT <sub>H<sub>2</sub></sub>
- = 2, is treated as if a flux of FLUX/1.602E-19/2 H<sub>2</sub> -molecules per 
-second is emitted, resulting in an equivalent "atomic flux" FLUX/1.602E-19 per 
-second.</dd>
-<dt>SCALV &ne; 0</dt>
-<dd>The default scaling of tallies with FLUX can be overruled by this flag. The
-common scaling factor for all surface- and volume averaged tallies is
-determined such that one particular tally has the prescribed value SCALV. This
-determines the scaling of all other volume av- eraged and surface averaged
-tallies. By this option, for example, one can set the neutral particle density
-to a prescribed value in one particular cell. Hence, one can prescribe the
-local Knudsen number for nonlinear applications including neutral-neutral
-interactions.</dd></dl>""",
-
-'IVLSF' : """<dl><dt>=1</dt><dd>
-The following ISCL..-flags select one particular volume averaged tally</dd>
-<dt>=2</dt>
-<dd>The following ISCL..-flags select one particular surface averaged 
-tally</dd></dl>""",
-
-'ISCLS' : """species index of selected tally""",
-
-'ISCLT' : """tally number of selected tally (refer to tables 5.2, 5.3)""",
-
-'ISCL1' : """<dl><dt>IVLSF=1</dt>
-<dd>cell numbers NRCELL, NPCELL, NTCELL, NBLOCK, NACELL, respectively.
-if (NPCELL = 0) or (NTCELL = 0), then ISCL1 = NCELL, the cell number in
-the 1-dimensional arrays (see end of section 2.2.1).
-The additional cell region is specified by NRCELL=0, NPCELL=1, NTCELL=1,
-NBLOCK=NBMLT+1 (see section 2.2) and the proper value of NACELL.</dd>
-<dt>IVLSF=2</dt><dd>to be written</dd></dl>""",
-
 'NLATM' : """Atomic source. History starts in subroutine FOLNEUT with type
 index ITYP=1, species index ISPZ = IATM and initial weight NPRTA(IATM) (see
 block 4A)
@@ -1623,7 +1785,7 @@ atoms, molecules or test ions with species index either IATM, IMOL or IION are
 created.<p>Out of NLATM, NLMOL, NLION, NLPHOT, NLPLS one and only one of these
 five variables must be .TRUE. .</p>""",
 
-'NSPEZ' : """ Species index of the source particle
+'NSPEZ' : """Species index of the source particle
 <dl>
 <dt>1 &le; NSPEZ &le; NATMI, NMOLI, NIONI, NPLSI</dt>
 <dd>NSPEZ is the (fixed) species index of the source particle. No random
@@ -1657,6 +1819,49 @@ automatically also fixes the choice of the index ISPZ for the spatial step
 function STEP(ISTEP,ISPZ,...) selected by the flags SORLIM and SORIND (=ISTEP)
 (see below). This default can be overruled when SORIND has three digits.""",
 
+# 2.7
+
+'Plasma properties. Section 2.7' : """
+<b>FLUX SCALV IVLSF ISCLS ISCLT ISCL1 ISCL2 ISCL3 ISCLB ISCLA</b>
+<b>FLUX, SCALV</b>
+<dt>SCALV=0 (default) FLUX = Source strength in Ampere.</dt>
+<dd>FLUX is the scaling factor for all surface- or volume averaged tallies.<br>
+FLUX is an "atomic flux" (or: an "atomic ion flux"). Each source particle may
+carry a different flux NPRT(ISPZ) (initial weight) depending on the species 
+ISPZ (see: distribution for the species index). NPRT is specified in the blocks
+4 and 5. The total "atomic" source particle flux for each stratum is scaled to 
+be FLUX. For example, a H 2 molecule source, with NPRT <sub>H<sub>2</sub></sub>
+ = 2, is treated as if a flux of FLUX/1.602E-19/2 H<sub>2</sub> -molecules per 
+second is emitted, resulting in an equivalent "atomic flux" FLUX/1.602E-19 per 
+second.</dd>
+<dt>SCALV &ne; 0</dt>
+<dd>The default scaling of tallies with FLUX can be overruled by this flag. The
+common scaling factor for all surface- and volume averaged tallies is
+determined such that one particular tally has the prescribed value SCALV. This
+determines the scaling of all other volume av- eraged and surface averaged
+tallies. By this option, for example, one can set the neutral particle density
+to a prescribed value in one particular cell. Hence, one can prescribe the
+local Knudsen number for nonlinear applications including neutral-neutral
+interactions.</dd></dl>
+<b>IVLSF</b>
+<dl><dt>=1</dt><dd>
+The following ISCL..-flags select one particular volume averaged tally</dd>
+<dt>=2</dt>
+<dd>The following ISCL..-flags select one particular surface averaged 
+tally</dd></dl>
+<b>ISCLS</b>
+<p>species index of selected tally</p>
+<b>ISCLT</b>
+<p>tally number of selected tally (refer to tables 5.2, 5.3)</p>
+<b>ISCL1</b>
+<p><dl><dt>IVLSF=1</dt>
+<dd>cell numbers NRCELL, NPCELL, NTCELL, NBLOCK, NACELL, respectively.
+if (NPCELL = 0) or (NTCELL = 0), then ISCL1 = NCELL, the cell number in
+the 1-dimensional arrays (see end of section 2.2.1).
+The additional cell region is specified by NRCELL=0, NPCELL=1, NTCELL=1,
+NBLOCK=NBMLT+1 (see section 2.2) and the proper value of NACELL.</dd>
+<dt>IVLSF=2</dt><dd>to be written</dd></dl></p>""",
+
 'NLPNT' : """Point Source""",
 
 'NLLNE' : """Line Source (not ready)""",
@@ -1667,8 +1872,739 @@ function STEP(ISTEP,ISPZ,...) selected by the flags SORLIM and SORIND (=ISTEP)
 
 'NLCNS' : """Initial conditions source (sampling from census array), for time-
 dependent mode of operation, see input blocks 1. and 13.""",
-}
 
+'NSRFSI' : """<b>(=NPNTSI)</b> <p> Total number of different points, over which
+the starting points for this stratum are distributed (corresponds to &quot;sub-
+strata&quot option for surface and volume sources, there to facilitate sampling
+ of spatial coordinates).</p>  
+<p>Total number of different surfaces, or surface segments, over which the
+starting points for this stratum are distributed (&quot;sub-strata&quot, 
+to facilitate sampling of spatial coordinates).</p>""",
+
+'INUM' : """irrelevant; labelling index for sub-strata""",
+
+'SORWGT' : """Relative frequency for starting point labelled INUM. The sum of
+SORWGT for all NPNTSI points is normalized to one internally.""",
+
+'NRSOR' : """<p> 0 x- or radial cell number NRCELL of the zone containing the
+point source.</p> 
+<p>= 0 NRCELL is found automatically from the &quot;standard mesh&quot zoning.</p> 
+<p>< 0 only for surface sources (NLSRF), see below.</p>""",
+
+'NPSOR' : """ditto from NRSOR, for y- or poloidal cell number NPCELL""",
+
+'NTSOR' : """ditto from NRSOR, for z- or toroidal cell number NTCELL""",
+
+'NBSOR' : """standard mesh block number NBLOCK. Defaulted to NBLOCK = 1, if
+NBSOR &le; 0""",
+
+'NASOR' : """additional cell number NACELL, if point source is located outside
+the standard mesh. Defaulted to NACELL = 0, if at least one of the variables
+NRCELL, NPCELL or NTCELL are larger than zero.""",
+
+'NISOR' : """polygon index IPOLG. Meaningless if NLPLG = .FALSE.""",
+
+'SORAD1' : """x-co-ordinate of source point X0""",
+
+'SORAD2' : """y-co-ordinate of source point Y0""",
+
+'SORAD3' : """z-co-ordinate of source point Z0""",
+
+'SORAD4' : """SORAD4, SORAD5, SORAD6, are the x,y and z coordinates of a vector
+C = (CRT X, CRT Y, CRT Z) which may be used to distinguish one particular
+direction for the distribution in velocity space (see below). Internally this
+vector is normalized to length 1. Irrelevant for an isotropic velocity
+distribution.""",
+
+'SORAD5' : """SORAD4, SORAD5, SORAD6, are the x,y and z coordinates of a vector
+C = (CRT X, CRT Y, CRT Z) which may be used to distinguish one particular
+direction for the distribution in velocity space (see below). Internally this
+vector is normalized to length 1. Irrelevant for an isotropic velocity
+distribution.""",
+
+'SORAD6' : """SORAD4, SORAD5, SORAD6, are the x,y and z coordinates of a vector
+C = (CRT X, CRT Y, CRT Z) which may be used to distinguish one particular
+direction for the distribution in velocity space (see below). Internally this
+vector is normalized to length 1. Irrelevant for an isotropic velocity
+distribution.""",
+
+'INDIM' : """<dl><dt>= 0</dt>
+<dd>source on &quot;additional surface&quot; ASURF (see block 3B)</dt></d>
+<dt>= 1</dt>
+<dd>source on &quot;standard surface&quot; RSURF, x- (or radial) mesh
+(see block 2A and 3A)</dd>
+<dt>= 2</dt>
+<dd>source on &quot;standard surface&quot; PSURF, y- (or poloidal) mesh
+(see block 2B and 3A)</dd>
+<dt>= 3</dt>
+<dd>source on &quot;standard surface&quot; TSURF, z- (or toroidal) mesh
+(see block 2C and 3A)</dd>
+<dt>= 4</dt>
+<dd><p>source on a surface composed of one or more segments of radial and/or
+poloidal polygons. The further details of the spatial distribution are defined
+in code cou- pling routines, i.e., the code coupling routine IF1COP must be
+called. Spe- cial versions of IF1COP are available, e.g., in the code segments
+COUPLE<sub>B2</sub> , COUPLE<sub>B2.5</sub> (coupling to B2 (BRAAMS) multi-
+fluid plasma code) , COUPLE<sub>DIVIMP</sub> (coupling to DIVIMP impurity ion
+kinetic transport code) or COUPLE<sub>U file</sub> (TRANSP-code format).</p>
+<p>The position on the surface is sampled from a (piecewise constant) step
+function defined from plasma fluxes onto that surface vs. arc-length. The flags
+INSOR, INGRDA and INGRDE described below are set automatically in this option
+and hence need not be specified.</p>
+</dl>""",
+
+'INSOR' : """number of the surface in the mesh RSURF, PSURF, TSURF or ASURF
+respec- tively. (Redundant in case INDIM=4)""",
+
+'INGRDA' : """same as IRPTA, IRPTE flags in input block 3a. Defines subrange on
+standard surfaces, on which the source is distributed. Irrelevant for sources
+on additional surfaces.""",
+
+'INGRDE' : """same as IRPTA, IRPTE flags in input block 3a. Defines subrange on
+standard surfaces, on which the source is distributed. Irrelevant for sources
+on additional surfaces.""",
+
+'SORWGT' : """Relative frequency for starting points on surface labelled INUM.
+The sum of SORWGT for all NSRFSI surfaces is normalized to one internally.""",
+
+'SORLIM' : """= KLMN
+<p>if SORLIM &le; 0, the user supplied Subroutine SAMUSR is called to sample
+all 3 initial co-ordinates (X0,Y0,Z0), see section 3.4.</p>
+<p>if SORLIM > 0, then one of the preprogrammed options is used (the digits L,M
+and N are relevant only for surface sources). In this case:</p>
+<dl><dt>N</dt><dd>Index to select one of the preprogrammed distributions in
+radial or x-direction on the surface.</dd>
+<dt>M</dt><dd>Index to select one of the preprogrammed distributions in
+poloidal or y-direction on the surface.</dd>
+<dt>L</dt><dd>Index to select one of the preprogrammed distributions in
+toroidal or z-direction on the surface.</dd>
+<dt>K</dt><dd>Index to select one of the preprogrammed distributions for the
+<starting time.</dd>
+<dt>M,N,L = 0</dt><dd>The respective co-ordinate is computed from the 2 others
+and from the equation for surface number INSOR.</dd></dl>
+<p>Thus, one and only one of these 3 digits must be equal to 0, because the
+birth-point for a surface source is determined already by two coordinates and
+the labeling o index of the surface.</p>
+<p>If INDIM=0, any one of the 3 digits can be the 0, depending upon the
+particular equation for the surface ASURF(INSOR).</p>
+<p>In case INDIM=1, one has to set N=0 (is now done automatically), and the
+poloidal (or y) and toroidal (or z) co-ordinate is sampled according to the
+flags M and L.</p>
+<p>Correspondingly in case INDIM=2 one must specify M=0, and in case INDIM=3
+the flag L=0 has to be set (is redundant).</p>
+<p>L,M,N = 1 &delta;-distribution at (a+b)/2</p>
+<p>L,M,N = 2 Uniform distribution on the interval [a,b]</p>
+<p>L,M,N = 3 Truncated exponential decay with decay length λ on the interval 
+[a,b]. I.e. the sampling distribution reads:<dd>
+f (x) = c &middot; exp(−x/&lambda;) if x &isin; [a, b] and f (x) = 0 elsewhere,
+</dd><br>
+<dd>with normalized constant<dd><br>
+<dd>c = {&lambda;(exp[−a/&lambda;] − exp[−b/&lambda;])}<sup>-1</sup></p></dd>
+<p>L,M,N = 4 Step-function (see below: Function STEP, subsection 2.7.1) (only
+one of either L or M or N should be 4)</p>
+<p>K = 1 &delta;-distribution at TIME0 for time of particle birth. (A delta
+function source in time for the kinetic equation in integral form corresponds
+to an initial condition for time-dependent linear kinetic integro-differential
+equation).</p>
+<p>K = 2 Uniform distribution in [TIME0,TIME0+DTIMV] for time of particle 
+birth.
+Default: K=2 in time-dependent mode (NTIME >0) and K=1, TIME0=0 in time-
+independent mode (NTIME = 0), see section 2.1.</p>""",
+
+'SORIND' : """<p>Flag to choose one from the various step functions (SORLIM-
+option 4), which have been defined in the initialization phase. Up to NSTEP
+(PARMUSR, see section 3.1) step functions can be described there. SORIND is the
+labelling index of the se- lected step function.</p>
+<p>Each step function STEP(ISTEP,...) can consist of step functions for fluxes
+of up to NSPZ species, see 2.7.1. NSPZ depends upon the initialization of this
+function. By default the source species index NSPEZ is used when sampling from
+step functions.</p>
+<p>New option (Aug. 2006), e.g. for testing isotope effects: If SORIND ≥ 100,
+then the 3rd digit is used to select the species index from step function
+ISTEP. I.e.: Let SORIND = LMN, then MN is used to sample from step function
+ISTEP = MN for species ISPZ</p>
+<p>= L. This concerns the spatial distribution. The species index itself of the
+sampled particle is still determined by the flag NSPEZ, see above.</p>""",
+
+'SOREXP' : """Decay length &lambda; in the exponential distribution  (option
+3)""",
+
+'SORIFL' : """<p>The first of the 4 digits can be used to overrule the default
+orientation of the surface normal at the birth point, or if ILSIDE = 0 for this
+particular surface. If this digit is nonzero, a value 1 would lead to a test
+flight originating from the surface as if a particle has been incident onto
+this surface in the positive direction, and the value 2 means that this
+imaginary particle has been striking in the negative direction.</p>
+<p>The last 3 digits of SORIFL act as LMN of the ILSWCH flag described in
+section 2.3B assuming incidence in the positive direction.</p>
+<p>If any of this 3 digits equals zero, than the ILSWCH flag for this
+particular surface is activated. (See also: section 2.3B, input flag
+ILSWCH)</p>""",
+
+'SORCOS' : """<p>Depending upon the value of the flag NAMODS various different
+angular distributions may be selected. Each one depends upon the two parameter
+P = SORCOS and Q = SORMAX.</p>
+<dl><dt>NAMODS = 1</dt>
+<dd><p>The polar angle &theta; against the unit vector (C = C<sub>X</sub>,
+C<sub>Y</sub>, C<sub>Z</sub>) of the source parti- cle’s velocity is sampled
+from a cosine**P distribution around the &quot;inner normal vector&quot; (-1.0)
+&middot;C, i.e., f (&theta;)d&theta; ∼ sin(&theta;) &middot; cos<sup>p</sup>
+(&theta;)d&theta;.</p>
+<p>Important special cases:</p>
+<p>P = 0 isotropic distribution</p>
+<p>P = 1 cosine distribution</p>
+<p>P &#8811; 1 close to δ-distribution around vector −&delta; &middot; 
+C</p></dd>
+<dt>NAMODS = 2</dt>
+<dd>The polar angle against −1 &middot; C is sampled from a Gaussian 
+distribution with zero mean value, and the parameter P now is used for the 
+standard deviation (degree) of that distribution.</dd></dl>
+<p>The second parameter Q is the cut-off angle (degree) for the polar angle
+<distribution/p>
+<p>note:</p>
+<dl><dt>Q &le; 180° is enforced internally</dt>
+<dt>Q &le; 90° is enforced internally for surface sources</dt>
+<dt>Q = 0 for a beam, i.e., for an angular δ-distribution at −1 &middot; 
+C</dt></dl""",
+
+'SORMAX' : """<p>Depending upon the value of the flag NAMODS various different
+angular distributions may be selected. Each one depends upon the two parameter
+P = SORCOS and Q = SORMAX.</p>
+<dl><dt>NAMODS = 1</dt>
+<dd><p>The polar angle &theta; against the unit vector (C = C<sub>X</sub>,
+C<sub>Y</sub>, C<sub>Z</sub>) of the source parti- cle’s velocity is sampled
+from a cosine**P distribution around the &quot;inner normal vector&quot; (-1.0)
+&middot;C, i.e., f (&theta;)d&theta; ∼ sin(&theta;) &middot; cos<sup>p</sup>
+(&theta;)d&theta;.</p>
+<p>Important special cases:</p>
+<p>P = 0 isotropic distribution</p>
+<p>P = 1 cosine distribution</p>
+<p>P &#8811; 1 close to δ-distribution around vector −&delta; &middot; 
+C</p></dd>
+<dt>NAMODS = 2</dt>
+<dd>The polar angle against −1 &middot; C is sampled from a Gaussian 
+distribution with zero mean value, and the parameter P now is used for the 
+standard deviation (degree) of that distribution.</dd></dl>
+<p>The second parameter Q is the cut-off angle (degree) for the polar angle
+<distribution/p>
+<p>note:</p>
+<dl><dt>Q &le; 180° is enforced internally</dt>
+<dt>Q &le; 90° is enforced internally for surface sources</dt>
+<dt>Q = 0 for a beam, i.e., for an angular δ-distribution at −1 &middot; 
+C</dt></dl""",
+
+'SORCTX' : """<p>The unit vector C mentioned above is given by normalization of
+SORCTX, SORCTY, SORCTZ (if this vector is not zero) or else by the surface
+normal vector (in case of surface sources) or else by the default (1.,0.,0.)
+(point, line, or volume sources).</p>
+<p>By this option, for example, the main direction of emission from a surface
+can be influenced. The new distribution of the polar angle is then not
+necessarily centered around the inner surface normal vector any longer, in case
+of surface sources.</p>""",
+
+'SORCTY' : """<p>The unit vector C mentioned above is given by normalization of
+SORCTX, SORCTY, SORCTZ (if this vector is not zero) or else by the surface
+normal vector (in case of surface sources) or else by the default (1.,0.,0.)
+(point, line, or volume sources).</p>
+<p>By this option, for example, the main direction of emission from a surface
+can be influenced. The new distribution of the polar angle is then not
+necessarily centered around the inner surface normal vector any longer, in case
+of surface sources.</p>""",
+
+'SORCTZ' : """<p>The unit vector C mentioned above is given by normalization of
+SORCTX, SORCTY, SORCTZ (if this vector is not zero) or else by the surface
+normal vector (in case of surface sources) or else by the default (1.,0.,0.)
+(point, line, or volume sources).</p>
+<p>By this option, for example, the main direction of emission from a surface
+can be influenced. The new distribution of the polar angle is then not
+necessarily centered around the inner surface normal vector any longer, in case
+of surface sources.</p>""",
+
+'SORENI' : no_description_in_manual,
+
+'SORENE' : no_description_in_manual,
+
+'SORVDX' : no_description_in_manual,
+
+'SORVDY' : no_description_in_manual,
+
+'SORVDZ' : no_description_in_manual,
+
+#2.8
+
+'NZADD' : """Number of specific zones.""",
+# No actual description in this section.
+
+#2.9
+
+'NLPRCA' : """conditional expectation estimator (eq. 3.22) is used for atom
+species IATM""",
+
+'NLPRCM' : """conditional expectation estimator is used for molecule species 
+IMOL""",
+
+'NLPRCI' : """conditional expectation estimator is used for test ion species
+IION (not ready to use)""",
+
+'NLPRCPH' : """conditional expectation estimator is used for photon species
+IPHOT (in versions 2004 and younger)""",
+
+'IPRSF' : """<p>conditional expectation estimator is used, if trajectory points
+towards additional sur- face IPRSF. IPRSF &le; NLIMI, the total number of
+additional surfaces read in input block 3B.</p>  
+<p>NPRCSF surfaces have that property of &quot;attracting
+trajectories&quot;.</p>""",
+
+'NPRCSF' : """No description in manual""",
+
+'MAXLEV' : """Maximum number of levels for splitting (&le; 15)""",
+
+'MAXRAD' : """<p>Total number of radial splitting surfaces (-NR1ST &le; MAXRAD
+&le; NR1ST)</p>
+
+<dl><dt>MAXRAD < 0</dt>
+<dd>-MAXRAD is used, the position of the radial splitting surfaces is 
+automatically defined, and a constant splitting parameter (SPLPAR, see below) 
+is used for radial splitting and RR.</dd>
+<dt>MAXRAD > 0</dt>
+<dd>radial surfaces with numbers NSSPL(IN), IN=1,MAXRAD are S&R-surfaces.
+The splitting parameter for surface NSSPL(IN) is PRMSPL(IN).</dd></dl>""",
+
+'MAXPOL' : """Total number of poloidal splitting surfaces (0 &le; MAXPOL &le;
+NP2ND). The S&R-surfaces and splitting parameters are selected as in the case
+of radial surfaces, see above.""",
+
+'MAXTOR' : """Total number of toroidal splitting surfaces (0 &le; MAXTOR &le;
+NT3RD). The S&R-surfaces and splitting parameters are selected as in the case
+of radial surfaces, see above.""",
+
+'MAXADD' : """Total number of additional splitting surfaces (0 &le; MAXADD &le;
+NLIMI). The S&R-surfaces and splitting parameters are selected as in the case
+of radial surfaces, see above.""",
+
+'PRMSPL' : """Splitting parameter for surface.""",
+
+'WMINV' : """minimum weight used for suppression of absorption at collisions
+(&quot;survival bi- assing&quot). If a particle goes into a collision with
+weight less than WMINV, then sup- pression of absorption or any other non-
+analog weight correction is abandoned, and the analog game is played. WMINV
+acts only for events in the volume including volume source birth events, but
+not for events at surfaces.""",
+
+'WMINS' : """Same as WMINV, but for surface events (including surface source
+birth events).""",
+
+'WMINC' : """<p>minimum acceptable weight for conditional expectation
+estimators (by abuse of language). More precisely, WMINC is the minimal
+acceptable probability for a test flight to reach a particular cell without
+collision. If this probability is smaller than WMINC, the particle track is
+stopped and restarted. E.g. for WMINC &ge; 1, the estimator used in the NIMBUS
+code results (ref. [14]), whereas for WMINC = 0 each particle path is
+integrated according to equation 3.22, until the nearest non transparent
+surface along the track is reached, regardless of any collisions. Periodicity
+surfaces are regarded as &quot;transparent&quot in this context.</p>
+<p>Note: strictly speaking this is not a non-analog method, but rather a
+particular choice of an unbiased estimator. Hence: the flag NLANA in input
+block 1 does not affect flags for conditional expectation estimators.</p>""",
+
+'WMINL' : """to be written""",
+
+'SPLPAR' : """splitting parameter for default radial splitting option (MAXRAD <
+0)""",
+
+'NSIGVI' : """number of standard deviation profiles for volume averaged tallies
+to be estimated. NSIGVI must be less than or equal to the parameter NSD in
+PARMUSR 3.1.""",
+
+'NSIGSI' : """number of standard deviation profiles for surface averaged
+tallies to be estimated. NSIGSI must be less than or equal to the parameter
+NSDW in PARMUSR 3.1.""",
+
+'NSIGCI' : """number of correlation coefficients between volume tallies to be
+estimated. NSIGCI must be less than or equal to the parameter NCV in PARMUSR
+3.1.""",
+
+'NSIGI_BGK' : """if NSIGI_BGK > 0, then the standard deviations are evaluated
+for all tallies needed for the iteration procedure for the nonlinear BGK
+collision terms. See subroutine STATIS_BGK in code segment BGK.F""",
+
+'NSIGI_COP' : """if NSIGI_COP > 0, then the standard deviations are evaluated
+for all tallies needed for the iteration procedure for the coupling to a plasma
+fluid model. The rele- vant tallies are selected in subroutine STATIS_COP in
+code segment COUPLE_....F, section 4.2""",
+
+'NSIGI_SPC' : """if NSIGI_SPC > 0, then the standard deviations are evaluated
+for all surface flux spectra defined in sub-block 10F below.""",
+
+'IGH' : """Index of species for selected volume averaged tally""",
+
+'IIH' : """Index of volume averaged tally for which empirical standard
+deviation is to be calcu- lated (see table 5.2).""",
+
+'IGHW' : """Index of species for selected surface averaged tally""",
+
+'IIHW' : """Index of surface averaged tally for which empirical standard
+deviation is to be calcu- lated (see table 5.3)""",
+
+'IGHC1' : """Species and tally index for first and second tally, respectively,
+between which the cor- relation coefficient is evaluated""",
+
+'IIHC1' : """Species and tally index for first and second tally, respectively,
+between which the cor- relation coefficient is evaluated""",
+
+'IGHC2' : """Species and tally index for first and second tally, respectively,
+between which the cor- relation coefficient is evaluated""",
+
+'IIHC2' : """Species and tally index for first and second tally, respectively,
+between which the cor- relation coefficient is evaluated""",
+
+#2.10
+
+
+'NADVI' : """Total number of additional volume averaged, track-length estimated
+tallies""",
+
+'NCLVI' : """Total number of additional volume averaged, collision estimated
+tallies""",
+
+'NALVI' : """Total number of tallies defined as algebraic expressions of other
+volume averaged tallies""",
+
+'NADSI' : """Total number of additional surface averaged tallies""",
+
+'NALSI' : """Total number of tallies defined as algebraic expressions of other
+surface averaged tallies""",
+
+'NADSPC' : """Total number of surface or cell averaged energy spectra""",
+
+'IADVE' : """flag for scaling factor for this tally (carried out in subroutine 
+MCARLO)
+<dl><dt>=1</dt><dd>scale tally per unit volume [1/cm<sup>3</sup> ]. The tally
+is printed and plotted in the units [1/cm<sup>3</sup>] &middot; [units of
+g<sup>∗</sup>] &middot; [cm] &middot; [source strength FLUX] however, with FLUX
+converted to units [1/s] (rather than input units [Ampere]). For the definition
+of the detector functions g and g ∗ see section 3.2, the variable FLUX is
+explained in input block no. 2.7. This scaling is default for &quot;density 
+tallies&quot of particles, momentum and energy.</dd>
+<dt>=2</dt><dd>scale tally per unit cell. Same units as above, however not per
+cm<sup>3</sup> but per cell instead.</dd>
+<dt>=3</dt><dd>same as IADVE = 1, but with FLUX in Ampere, rather than 1/s.
+This scaling is default for &quot;source rate tallies&quot, e.g. for particle, 
+momentum and energy sources.</dd>
+<dt>=4</dt>same as IADVE = 2, but with FLUX in Ampere, rather than 1/s.</dd>
+</dl>
+else no re-scaling done, units as chosen in subroutine UPTUSR.""",
+
+'IADVS' : """species index of default volume averaged tally, which is to be
+replaced by this ad- ditional track-length estimated tally. In case of tallies
+with no species index, IADVS must be set equal to 1.""",
+
+'IADVT' : """number of default volume averaged tally, which is to be replaced
+by this tracklength estimated tally.""",
+
+'IADVR' : """If automatic re-scaling of volumetric tallies is performed (i.e.
+if NLSCL = TRUE), then re-scale this tally with EIRENE recommended factor FATM
+(IADVR = 1), FMOL (IADVR = 2) or FION (IADVR = 3) (see block 1 for the flag
+NLSCL and the variables FATM,FMOL,FION)""",
+
+'TXTTAL' : """Text to label tally on numerical or graphical output.""",
+
+'TXTSPC' : """Text describing the species of particles contributing for this
+tally in output rou- tines.""",
+
+'TXTUNT' : """Text describing the units of this tally in output routines.""",
+
+'ICLVE' : """as IADVE, for collision estimated tally (subroutine UPCUSR).""",
+
+'ICLVS' : """species index of default volume averaged tally, which is to be
+replaced by this col- lision estimated tally. In case of tallies with no
+species index, ICLVS must be set equal to 1.""",
+
+'ICLVT' : """number of default volume averaged tally, which is to be replaced
+by this collision estimated tally.""",
+
+'ICLVR' : """as IADVR above, for collision estimated tally (subroutine
+UPCUSR).""",
+
+'ALSTRNG' : """<p>character string which is interpreted as an algebraic
+expression in some volume averaged tallies. An operand <i, j> stands for tally
+number j, first (species) index i, in tables 5.1 (input tallies) and 5.2
+(output tallies) . Note that the first index for tallies with no species index
+must read 1, and the tally number of input tallies must be nega- tive. Example:
+<1, −1> for the electron temperature tally, <2, 3> for the particle density of
+test ion species no. IION=2 . Expressions <c> with an integer or real constant
+c are interpreted as scalars. The string may contain an arbitrary (but &le; 20)
+number of operands, and of operators +, -, *, /, **, and of properly nested
+parentheses (...).</p>
+<p>Standard deviations are not available, generally, for algebraic tallies. For
+linear combi- nations of tallies it is, in principle, possible to obtain also
+the standard deviations, this evaluation of error estimates for such
+combinations of tally is, however, is currently carried out only in a
+proprietary code segment (available from the author).</p>
+<p>E.g., the total electron particle source due to test particle - plasma 
+interaction in units:#/s/m<sup>3<sup>can be obtained by the line:</p>
+<p>(<1,7> + <1,12> + <1,17>)*<1.e6>/<1.6022e-19></p>
+<p>in code versions older than 2002 (see tables in section 5.1.2), and the same
+expressions in versions 2002 and younger, i.e. after implementation of photons
+as further species type (and the related default tallies, tables in section
+5.1.1):</p>
+<p>(<1,9> + <1,15> + <1,21>)*<1.e6>/<1.6022e-19></p>
+<p>and it would be stored on the tally: &quot;ALGV&quot with the first
+(labelling) index IALVI. Note that the cell volume array VOL is regarded as a
+volume averaged tally, by abuse of language (tally number = -14, see table
+5.1).</p>""",
+
+#2.11
+
+'*** 11. Data for numerical and graphicaloutput' : """TODO""",
+
+
+#2.12
+'NCHORI' : """Total number of different line of sights""",
+
+'NCHENI' : """<p>ABS(NCHENI) is the total number of energies, at which the
+spectrum is eval- uated (irrelevant e.g. for total signals, such as Lyman and
+Balmer emissivity without line shape resolution).</p>
+<p>The energy grid is equidistant on a linear scale, if NCHENI ≥ 0, and
+equidistant on a logarithmic scale otherwise.</p>""",
+
+'TXTSIG' : """Text in printout at the beginning of the data from this line of
+sight integral.""",
+
+'NSPTAL' : """Flag for choice of preprogrammed function which is &quot;line
+integrated&quot;.
+<dl><dt>=1</dt>
+<dd>charge exchange source rate (SIGCX)</dd>
+<dt>=2</dt>
+<dd>Hydrogen line emission source rate (SIGAL)</dd>
+<dt>=3</dt>
+<dd>spectral radiance of photonic lines (SIGRAD) (new in versions 2005 and
+<younger)/dd>
+<dt>=10</dt>
+<dd>user supplied integrand (SIGUSR) (this was option NSPTAL =3, in versions
+2004 and older)</dd></dl>""",
+
+'NSPSCL' : """Flag for choice of linear or logarithmic axes in plots of spectra
+(vs. energy or wavelength, resp.) and of source term distribution along line of
+sight.
+<dl><dt>=0</dt>
+<dd>both axes linear</dd>
+<dt>=1</dt>
+<dd>x axis linear, y axis logarithmic</dd>
+<dt>=2</dt>
+<dd>x axis logarithmic, y axis linear</dd>
+<dt>=3</dt>
+<dd>both axes logarithmic</dd></dl>""",
+
+'NSPNEW' : """Flag for the choice whether a spectrum is plotted on the same
+picture as the previous one (NSPNEW = 0) or onto a new graph (otherwise).""",
+
+'NSPCHR' : """if .gt. 0: then automatically all cells along chord are
+identified, and energy re- solved spectra (input block 10f) are computed in all
+these cells by automatically aug- menting input block 10f correspondingly.
+These spectra are line-of-sight spectra in the direction of the chord specified
+here (direction SPCVX, SPCVY, SPCVZ in augmented input block 10f is taken to be
+a unit vector along this present line of sight).""",
+'NSPSTR' : """Index for stratum, which is to be used for line integration
+(NSPSTR = 0: sum over strata).""",
+'NSPSPZ' : """<p>In case NSPTAL=1:</p>
+<p>Index for atomic species IATM, with IATM ≤ NATM, for which charge exchange
+spectrum is to be computed (NSPSPZ = 0: sum over atom species index)</p>
+<p>In case NSPTAL=2:</p>
+<p>Number of contribution to line intensity, as programmed in Subr.
+Ba<sub>Alpha</sub , Ba<sub>Gamma</sub> , Ly<sub>Beta</sub> , etc. (Currently up
+to 6 contributions for each H atom spectral line, and the total)</p>
+<dl><dt>=1</dt>
+<dd>coupling to ground state: H(1s)</dd>
+<dt>=2</dt>
+<dd>coupling to continuum: H<sup>+</sup></dd>
+<dt>=3</dt>
+<dd>coupling to: H<sub>2</sub></dd>
+<dt>=4</dt>
+<dd>coupling to: H<sub>2</sub><sup>+</sup></dd>
+<dt>=5</dt>
+<dd>coupling to: H<sup>-</sup></dd>
+<dt>=6</dt>
+<dd>coupling to: Hsub>3/sub>sup>+/sup>(new in versions 2012 and younger)</dd>
+<dt>=0</dt>
+<dd>total, sum over all contributions to a particular line (was = 6, in
+versions 2011 and older)</dd>
+<p>In case NSPTAL=3:</p>
+<p>Index for photon species (line), i.e. for IPHOT, with IPHOT &le; NPHOT, for
+which side-on spectrum is to be computed (NSPSPZ = 0: sum over photon species
+index, not ready)</p>""",
+
+'NSPINI' : """only for NSPTAL=1: 
+<p>Multipliers for the maximum ion temperature
+Ti<sub>max</sub> found along line of sight, for tem- perature fitting. The CX 
+ion temperature is fitted from the CX line of side spectrum in the interval 
+[NSPINI × Ti<sub>max</sub> , NSPEND × Ti<sub>max</sub> ]</p>""",
+
+'NSPBLC' : """Standard mesh block number of 2nd point on line of sight.""",
+
+'NSPADD' : """Additional cell number of 2nd point on line of sight.
+<p>If NSPADD = 0 , then this 2nd point must lie in standard mesh block
+<NSPBLC./p>
+<p>If NSPADD &ne; 0, then the block number NSPBLC must be NSPBLC = NBMLT+1, 
+i.e. the second point on the line of sight is in the &quot;additional cell 
+regionq&quot;.</p>""",
+
+'EMIN1' : """<p>for NSPTAL=1,3,10: minimum and maximum energy for spectral
+resolution, respectively.</p>
+<p>for NSPTAL=2:</p>
+<p>Old input version (still maintained for backward compatibility of input
+files: EMIN1 is an energy parameter to identify the particular hydrogen line
+and EMAX1 is not used. EMIN1 is given in eV, by Ry × (1/n<sup>2</sup> −
+1/m<sup>2</sup>), with Ry = 13.6 (eV).</p>
+<p>EMIN1 = 12.089: Lyman-beta line<br>
+EMIN1 = 3.0222: Balmer-delta line<br>
+EMIN1 = 2.8560: Balmer-gamma line<br>
+EMIN1 = 2.5500: Balmer-beta line<br>
+EMIN1 = 1.8889: Balmer-alpha line<br></p>
+<p>Other side on line emissivities can be obtained using the user supplied line
+of side inte- gral SIGUSR (option NSPTAL=10) and analogy to the preprogrammed
+options, as well as the internal EIRENE hydrogen atom collisional radiative
+routine H-COLRAD.F to obtain the required reduced population coefficients for H
+∗ (n). For the preprogrammed options these latter coefficients for n = 2, 3, 4,
+5, 6 are stored in AMJUEL, section H12, see this web page under: EIRENE AMS
+data files.</p>""",
+
+'ESHIFT' : """(for NSPTAL=1, 3, 10 options only)
+<p>energy shift for spectral resolution in printout, and plot</p>""",
+
+'IPIVOT' : """(only needed for NLTRA option, &quot;toroidal approximation&quot, 
+sub-block2c)
+<dl><dt>1 &le; IPIVOT &le; NTTRA-1 (currently no available, error exit)</dt>
+<dd>number of local toroidal co-ordinate system (NTTRA: see sub-block 2c), in
+which this pivot point is specified. The pivot point is then given in cartesian
+coordinates is this local system</dd>
+<dt>IPIVOT=0</dt>
+<dd>pivot point is given in global cylindrical coordinates,
+XPIVOT,YPIVOT,ZPIVOT = r, z, &phi;, with &phi; in degrees. The corresponding
+toroidal block numbers ITTRA are found automatically.</dd></dl>""",
+
+'XPIVOT' : """1st co-ordinate of pivot point for line of sight, e.g. x""",
+
+'YPIVOT' : """2nd co-ordinate of pivot point for line of sight, e.g. y""",
+
+'ZPIVOT' : """3rd co-ordinate of pivot point for line of sight, e.g. z""",
+
+'ICHORD' : """(only needed for NLTRA option, sub-block 2c) Meaning analogous to
+that of first point flag IPIVOT:""",
+
+'XCHORD' : """1st co-ordinate of second point for line of sight""",
+
+'YCHORD' : """2nd co-ordinate of second point for line of sight""",
+
+'ZCHORD' : """3rd co-ordinate of second point for line of sight""",
+
+'PLCHOR' : """the lines of sight are plotted into (2D or 3D) geometry plots.
+This, however, is automatically turned off if other plots are done between
+geometry plots (initialization phase) and line-of-sight integration (post
+processing phase).""",
+
+'PLSPEC' : """the spectra along the lines of sight are plotted (irrelevant in
+case of NSPTAL = 2).""",
+
+#2.13
+
+'NPRNLI' : """<p>Total number of test particles in time dependent arrays
+(&quot;census arrays&quot;) (in old versions before 2001: NPRNLI must be &le;
+NPRNL, see: PARMUSR). The scoring on census arrays stops at latest when NPRNLI
+scores are on the census array.</p>
+
+<p>If NPRNLI > 0, but the rest of the data in this block are not specified,
+then a default time-horizon is defined. See default values specified below.</p>
+
+<p>If NPRNLI = 0, no census arrays are scored</p>
+
+<p>In case NLERG = TRUE (see input block 1), a time horizon is absolutely
+necessary in order to prevent infinite histories. Therefore, in case NLERG=TRUE
+and NPRNLI=0 an automatic correction to NPRNLI=100 is carried out.</p>""",
+
+'NINITL_READ' : """(new: 2013) Same as NINITL in block 7: provides random
+number seed for &quot;time-stratum&quot; (sampling from census array (default:
+=0, no fresh initialization of random number generator for this stratum)""",
+
+'NPRMUL' : """(new: 2013) Multiplicative factor for NPRNLI, in order to
+increase size of cen- sus to more than 999999 particles, which otherwise would
+be the maximum due to I6 formatted integer input. Default: = 0: no
+multiplication carried out""",
+
+'NPTST' : """<p>Same as NPTS in block 7. This is the number of histories, which
+are continued from a previous time-cycle (&quot;Time dependence stratum
+ISTRA=NSTRAI+1&quot;). The initial coordinates are randomly sampled (with
+replacement) from the census-array data from an earlier time-cycle. The
+probability for sampling a particular particle from the census array is
+proportional to its weight stored on the census array as well. Due to
+&quot;sampling with replacement&quot; an individual particle, which is on
+census, may be sampled more than once, or not at all, with the likelihood for
+these events given by its weight (&quot;warm restart&quot;). This census array
+is either defined at the end of the previous time cycle in the same run (subr.
+TMSTEP), or it is read from an earlier run from stream 15 (via a call to subr.
+RSNAP from subr. INPUT) in the initial phase of the run, for the very first
+time-cycle (continuation of an earlier sequence of time-cycles).</p>
+<p>If NPTST = 0 , then NPTST is reset to IPRNL. IPRNL is the the number of
+scores on the census array in the previous time cycle.</p>
+<p>If NPTST < 0 , then NPTST is reset to IPRNL, and the random sampling from
+the census array is now replaced by a one-to-one re-launch of all particles
+from the census array without random sampling (&quot;cold restart&quot;). Until
+Aug. 2015 this option was avail- able only in connection with the NLMOVIE
+option (movies of trajectories) and had led to other modifications of the run
+parameters as well. (Automatically then internally: NLMOVIE = TRUE). New:
+NLMOVIE AND NPTST < 0 options are now indepen- dent from each other. In both
+cases: one by one re-launch from old census is enforced, rather than random
+sampling from old census.</p>
+<p>Default: NPTST=0</p>""",
+
+'NTMSTP' : """<p>Total number of time-steps for particle tracing. Each
+trajectory can score on census up to NTMSTP times. Particle trajectories are
+stopped after NTMSTP time- steps.</p>
+<p>Default: NTMSTP=1</p>
+<p>For convenience and by abuse of language, we refer to the 3-dimensional
+hyper-surface t = t<sub>n</sub> of the four dimensional (r, t)-space as
+&quot;time- surface&quot;, and, hence, tallies evalu- ated at fixed time t n
+(&quot ;snapshot-tallies&quot;) are surface averaged tallies in this
+terminology.</p>
+<p>Fluxes onto this surface are stored on the arrays for a surface no.
+NLIM+NSTSI+1, which is added automatically to the NLIM additional and NSTSI
+non-default standard surfaces.</p>
+<p>The time-surface is transparent for NTMSTP-1 steps and absorbing afterwards,
+i.e., absorbing at time t = NTMSTP × DTIMV. Snapshot tallies are averages over
+NTMSTP time-steps.</p>
+<p>If NTMSTP < 0, then each particle can score an unlimited number of times on
+census, i.e., the time-surface is always transparent. This option can be used
+for initialization of census arrays for time dependent runs. The census arrays
+then represent a stationary distribution corresponding to a certain constant
+(in time) influx of particles, rather than an estimate at a fixed time. Hence,
+for any fixed detector function (volume averaged tally), the snapshot estimator
+should give the same results (up to statistical precision) as the track-length
+estimator or the collision estimator. Note that in order to obtain this
+stationary estimate from snapshot estimates an additional multiplicative factor
+DTIMV (s) (see next) is applied to snapshot tallies in case NTMSTP < 0.</p>""",
+
+'DTIMV' : """Length of each individual internal time-step (seconds)
+<p>Default: DTIMV=1.D-02</p>""",
+
+'TIME0' : """Initial time t<sub>0</sub> of the first time-step. (irrelevant,
+only for printout and book-keeping)
+<p>Default: TIME0=0.</p>""",
+
+'NSNVI' : """Number of snapshot tallies computed from census arrays. In old
+EIRENE ver- sions without dynamic allocation of storage NSNVI must be less or
+equal NSNV (see PARMUSR), and the detector functions are user supplied in
+subroutine UPNUSR, see Sub-section 3.2.3.
+<p>Default: NSNVI=0</p>""",
+
+'*** 11. Data for numerical and graphical output' : """TODO""",
+#2.14
+'*** 14. Data for interfacing routine "infusr"' : """TODO""",
+#2.15
+'*** 15. Data for interfacing routine "geousr"' : """to be written""",
+#2.16
+'*** 16' : """to be written""",
+
+}
 
 
 class MyValidator(QValidator):
@@ -1803,7 +2739,7 @@ class MyLineEdit(QLineEdit):
                     self.last_param = self.parameter_description[p]
 
             else:
-                self.parameter_help.emit('NOP')
+                self.parameter_help.emit('NOD')
                 self.last_param = None
         return super(MyLineEdit, self).event(ev)
 
@@ -1870,12 +2806,12 @@ class CardEditDelegate(QStyledItemDelegate):
 
     def destroyEditor(self, editor, index):
         """Overloaded function from QStyledItemDelegate that sets the help
-        description to 'EDIT'.
+        description to 'EDIT_HELP'.
 
         Otherwise it is a default function that acts as the editor destroyer
         when we stop editing.
         """
-        editor.parameter_help.emit('EDIT')
+        editor.parameter_help.emit('EDIT_HELP')
         super(CardEditDelegate, self).destroyEditor(editor, index)
 
     @pyqtSlot(str)
@@ -1971,7 +2907,8 @@ class EireneEdit(QTreeWidget):
             self.getline(role)
 
         role = ['B', 'NLSCL', 'NLTEST', 'NLANA', 'NLDRFT', 'NLCRR', 'NLERG', 
-                'NLIDENT', 'NLONE', 'NLMOVIE']
+                     'NLIDENT', 'NLONE', 'NLMOVIE', 'NLDFST', 'NLOLDRAN',
+                     'NLCASCAD', 'NLOCTREE', 'NLWRMSH', 'NEXVS', 'NLTRIMESH']
         self.getline(role)
         # Arbitrary lines
         line = self.getline()
@@ -1979,7 +2916,7 @@ class EireneEdit(QTreeWidget):
             if 'CFILE' in line:
                 self.getline(['S', 'CFILE'])
             else:
-                self.getline(['S', 'NOP'])
+                self.getline(['S', 'NOD'])
             line = self.getline()
 
     def block_2(self):
@@ -2085,7 +3022,7 @@ class EireneEdit(QTreeWidget):
             self.getline(['I', 'TXTSFL', 'ISTS', 'IDIMP', 'INUMP',
                         'IRPTA', 'IRPTE', 'IRPTA', 'IRPTA', 'IRPTE'])
             self.getline(['I', 'ILIIN', 'ILSIDE', 'ILSWCH', 'ILEQUI', 'ILCOL',
-                        'ILIT', 'ILCELL', 'ILBOX', 'ILPLG'])
+                        'ILFIT', 'ILCELL', 'ILBOX', 'ILPLG'])
             line = self.getline()
             if 'SURFMOD' in line:
                 self.getline(['S', 'SURFMOD_MODNAME'])
@@ -2267,7 +3204,7 @@ class EireneEdit(QTreeWidget):
 
     def block_7(self):
         self.getline(['I', 'NSTRAI'])
-        self.getline(['I'] + ['INDSRC' for i in \
+        self.getline(['I'] + ['INDSRC('+str(i)+')' for i in \
                      range(1,self.values['NSTRAI']+1)])
         self.getline(['R', 'ALLOC', 'AMPTS'])
 
@@ -2374,7 +3311,23 @@ class EireneEdit(QTreeWidget):
                           'TXTSPC('+str(i)+',NTLSR)',
                           'TXTUNT('+str(i)+',NTLSR)'])
     def block_11(self):
-        pass
+        self.getline(['B', 'TRCPLT', 'TRCHST', 'TRCNAL', 'TRCREA', 'TRCSIG'])
+        self.getline(['B', 'TRCGRD', 'TRCSUR', 'TRCREF', 'TRCFLE', 'TRCAMD'])
+        self.getline(['B', 'TRCINT', 'TRCLST', 'TRCSOU', 'TRCREC', 'TRCTIM'])
+        self.getline(['B', 'TRCBLA', 'TRCBLM', 'TRCBLI', 'TRCBLP', 'TRCBLE'])
+        self.getline(['B', 'TRCBLPH', 'TRCTAL', 'TRCOCT', 'TRCCEN', 'TRCDUMM'])
+
+        #Following booleans not in use
+        self.getline(['B', 'TRCDBG2', 'TRCDBGE', 'TRCDBGM', 'TRCDBGF', 
+                      'TRCDBGL'])
+        self.getline(['B', 'TRCDBGS', 'TRCDBGG', 'TRCDBGMPI', 'TRCDBGC'])
+        # Following lines are not sufficiently described in manual or in 
+        # input.f.
+        line = self.getline()
+        while line[:3] != '***':
+            self.getline(['S', '*** 11. Data for numerical and graphical'
+                               'output'])
+            line = self.getline()
 
     def block_12(self):
         self.getline(['I', 'NCHORI', 'NCHENI'])
@@ -2401,13 +3354,21 @@ class EireneEdit(QTreeWidget):
                                # this part
 
     def block_14(self):
-        pass
+        line = self.getline()
+        while line[:3] != '***':
+            self.getline(['S', '*** 14. Data for interfacing routine '
+                         '"infusr"'])
 
     def block_15(self):
-        pass
+        line = self.getline()
+        while line[:3] != '***':
+            self.getline(['S', '*** 15. Data for interfacing routine '
+                               '"geousr"'])
 
     def block_16(self):
-        pass
+        line = self.getline()
+        while line[:3] != '***':
+            self.getline(['S', '*** 16'])
 
     def dummy_block(self):
         """This function reads the lines from the input file and then simply
@@ -2663,9 +3624,13 @@ class Eirene(QWidget):
     Provides a custom widget for Eirene input.
     """
     returnPressed = pyqtSignal()
-    
     def __init__(self, parent=None):
         super(Eirene, self).__init__(parent)
+        # The following array contains the variables, that are numbered
+        # in the settings file but has the same description!
+        self.group_cards = ['INDSRC', 'INDPRO', 'NLPRCA', 'DPLD', 'PRMSPL',
+                            'DIOD', 'DMLD', 'DATD', 'VL', 
+                            'P1', 'P2', 'P3', 'P4', 'P5']
         self.splitter = QSplitter(self)
         self.splitter.setOrientation(Qt.Vertical)
         self.tree = EireneEdit(self.splitter)
@@ -2673,7 +3638,7 @@ class Eirene(QWidget):
         self.splitter.setStretchFactor(0, 7)
         self.splitter.setStretchFactor(1, 3)
         self.tree.card_edit_delegate.parameter_help.connect(self.show_help)
-        self.show_help('EDIT')
+        self.show_help('EDIT_HELP')
 
     def sizeHint(self):
         return QSize(600, 400)
@@ -2684,18 +3649,32 @@ class Eirene(QWidget):
     def show_help(self, parameter):
         if parameter == '': 
             self.help.clear()
-        elif parameter == 'EDIT':
-            self.help.setText("<p> Press F2 to edit line."
+        elif parameter == 'EDIT_HELP':
+            if self.tree.selectedItems():
+                item = self.tree.selectedItems()[0]
+                card_data = item.data(0, Qt.UserRole)
+                type_of_card = card_data[0]
+                card_variables = card_data[2]
+                text = '<p>'+type_of_card+" :"+" ".join(card_variables)+'</p>'
+            else: 
+                text = ''
+            self.help.setText(text + "<p> Press F2 to edit line."
                               "<p> Use arrow keys to navigate through rows and\
                               to expand/collapse rows.<p>"
                               "<p> CTRL + I to insert rows</p>"
                               "<p> CTRL + K to remove row</p>")
         elif parameter in eirene_params:
-            self.help.setText('<b>' + parameter + '</b>:'
-                              + '<p>' + eirene_params[parameter] + '<p>')
+                self.help.setText('<b>' + parameter + '</b>:'
+                                + '<p>' + eirene_params[parameter] + '<p>')
         else:
-            self.help.setText('<b>' + parameter + '</b>:'
-                              + eirene_params['NOP'])
+            for card in self.group_cards:
+                if parameter.startswith(card):
+                    self.help.setText('<b>' + parameter + '</b>:'
+                                    + '<p>' + eirene_params[card] + '<p>')
+                    return
+
+            self.help.setText('<b>' + parameter + '</b>:' + 
+                              eirene_params['NOD'])
 
     def setPlainText(self, text):
         self.tree.setPlainText(text)
