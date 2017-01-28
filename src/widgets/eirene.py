@@ -1,31 +1,20 @@
 #!/usr/bin/env python3
-
 """
-EIRENE EDITOR
+Eirene editor
 
-The goal of the EIRENE editor is to have a readable view into the settings file
-and a help that shows us a short description of a setting.
+EIRENE editor structures input.dat in a readable tree-view with a help that
+shows us a short description of input cards from Eirene manual.
 
-The editor reads the file line by line. If we know the pattern of the sett-
-ings in the file, we can add a help description as well as a validation for Edi-
-ting. This way we cannot mess up the settings and also have a view into what 
-setting we are changing.
+The editor reads the file line by line. If format of the card is known then
+help description as well as a validation is performed.
 
 The pattern and help description are derived from the manual.
 
-So far only the first 4 blocks have the help description and validation.
+The editor widget has two main windows, one with the text in a tree-style
+view and the second window contains the help description for the variables.
 
-MANUAL:
-The editor has two main windows, one with the text in a tree-style view and the
-second window contains the help description for the variables.
-
-To start editing a line either push "F" key or double-click. If the line
+To start editing a line either push "F2" key or double-click. If the line
 has help description, it also has a validation for editing.
-
-
-
-DEV:
-TODO
 """
 
 from PyQt5.QtCore import (Qt, QProcess, QSize, pyqtProperty,
@@ -3430,7 +3419,7 @@ class EireneEdit(QTreeWidget):
         if self.row >= self.text_size:
             raise IndexError
         line = self.text[self.row].rstrip()
-        if role==None:
+        if role is None:
             return line
 
         self.row += 1 
@@ -3757,7 +3746,7 @@ if __name__ == "__main__":
             message = '%6d' % row + ' ' + '%s' % block 
             self.statusBar().showMessage(message)
 
-    if len(sys.argv[1]): 
+    if len(sys.argv) > 1: 
         input_dat = sys.argv[1]
     else:
         input_dat='input.dat'
