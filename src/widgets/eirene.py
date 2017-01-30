@@ -1695,6 +1695,9 @@ i.e., with respect to the poloidal surface x<sup>2</sup> = PSURF((NP2ND+1)/2)
 in case NP2ND is an odd integer, or with respect to the cell center 
 x<sup>2</sup> = PZONE(NP2ND/2) in case NP2ND is an even integer.""",
 
+'NLSYMT' : """same as NLSYMP, but for toroidal (z-) co-ordinate, i.e., for
+toroidal surface TSURF((NT3RD+1)/2) or TZONE(NT3RD/2) respectively.""",
+
 'NPTS' : """<dl>
 <dt>> 0</dt>
 <dd> Maximum number of test particle histories.<br>
@@ -1857,7 +1860,7 @@ NBLOCK=NBMLT+1 (see section 2.2) and the proper value of NACELL.</dd>
 
 'NLSRF' : """Surface Source""",
 
-'NLSRF' : """Surface Source""",
+'NLVOL' : """Surface Source""",
 
 'NLCNS' : """Initial conditions source (sampling from census array), for time-
 dependent mode of operation, see input blocks 1. and 13.""",
@@ -2144,7 +2147,8 @@ additional surfaces read in input block 3B.</p>
 <p>NPRCSF surfaces have that property of &quot;attracting
 trajectories&quot;.</p>""",
 
-'NPRCSF' : """No description in manual""",
+'NPRCSF' : """Number of surfaces that have property of &quot;attracting
+trajectories&quot;""",
 
 'MAXLEV' : """Maximum number of levels for splitting (&le; 15)""",
 
@@ -2344,6 +2348,87 @@ volume averaged tally, by abuse of language (tally number = -14, see table
 5.1).</p>""",
 
 #2.11
+
+'TRCPLT' : """Trace-back from plot routines.""",
+
+'TRCHST' : """Printout of trajectories of selected test particle histories into
+geometry plots. These histories are selected by the flags I1TRC and I2TRC, see
+below, sub-block 11B.2.""",
+
+'TRCNAL' : """Trace-back for non-analog methods, i.e. splitting surfaces,
+suppression of ab- sorption, weighted post-collision species sampling etc.""",
+
+'TRCMOD' : """Trace-back from routines for iterative mode (MOD TMSTEP, MODBGK,
+and problem specific routines called from MODUSR).""",
+
+'TRCSIG' : """Trace-back from post processing line integral diagnostics block
+DIAGNO""",
+
+'TRCGRD' : """Printout of &quot;standard mesh surface data&quot;""",
+
+'TRCSUR' : """Printout of data for &quot;additional surfaces&quot;""",
+
+'TRCREF' : """Printout of reflection model related data. In particular a list
+of all non-perfect recycling surfaces is printed, i.e., a list of surfaces for
+which there is some absorption at least for one incident particle species.""",
+
+'TRCFLE' : """Trace-back from subroutines WRSTRT, WRGEOM, WRPLAS (writing on
+and reading from the dump files FT10, FT11, FT12, FT13 etc.""",
+
+'TRCAMD' : """Trace-back from atomic and molecular data routines
+XSECTA, XSECTM, XSECTI""",
+
+'TRCINT' : """Traceback from user specified interfacing routine INFCOP, e.g. of
+data related to coupling of EIRENE to other codes.""",
+
+'TRCLST' : """Printout of information during the last history of each stratum.
+E.g., sampling efficiencies, and other accumulated information, which is only
+available in the history generation routines during particle tracing.""",
+
+'TRCSOU' : """Traceback from primary source sampling routines, e.g. from
+LOCATE, SAMPNT, SAMLNE, SAMSRF, SAMVOL and SAMUSR""",
+
+'TRCREC' : """Printout of EIRENE recommendations for next run on same case:<br>
+A) stratified source sampling, at present: for proportional allocation of
+weights.<br> B) weight windows, at present: to be written""",
+
+'TRCTIM' : """Printout cpu-time information for each history""",
+
+'TRCBLA' : """Global particle and energy balance for atoms is printed.""",
+
+'TRCBLM' : """Global particle and energy balance for molecules is printed.""",
+
+'TRCBLI' : """Global particle and energy balance for test ions is printed.""",
+
+'TRCBLP' : """Global particle and energy balance for bulk ions is printed.""",
+
+'TRCBLE' : """Global particle and energy balance for electrons is printed.""",
+
+'TRCBLPH' : """Global particle and energy balance for photons is printed.""",
+
+'TRCTAL' : """Print list of activated and de-activated tallies. The default
+settings eliminate some tallies from storage and estimators which are likely to
+be irrelevant in a particular run, e.g. all photon related tallies are
+deactivated automatically if no radiation trans- fer calculation is included in
+a run. These default settings are overruled by the flags NTLVOUT and NTLSOUT at
+the end of this sub-block 11A, see below.""",
+
+'TRCOCT' : """to be written: printout from octree geometry optimization
+procedure""",
+
+'TRCCEN' : """printout from census array stored in time dependent mode: species
+and stratum resolved census fluxes""",
+
+'TRCDUMM' : no_description_in_manual,
+'TRCDBG2' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
+'TRCDBGE' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
+'TRCDBGM' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
+'TRCDBGF' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
+'TRCDBGL' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
+'TRCDBGS' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
+'TRCDBGG' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
+'TRCDBGMPI' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
+'TRCDBGC' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""",
 
 '*** 11. Data for numerical and graphicaloutput' : """TODO""",
 
@@ -3300,16 +3385,16 @@ class EireneEdit(QTreeWidget):
                           'TXTSPC('+str(i)+',NTLSR)',
                           'TXTUNT('+str(i)+',NTLSR)'])
     def block_11(self):
-        self.getline(['B', 'TRCPLT', 'TRCHST', 'TRCNAL', 'TRCREA', 'TRCSIG'])
-        self.getline(['B', 'TRCGRD', 'TRCSUR', 'TRCREF', 'TRCFLE', 'TRCAMD'])
-        self.getline(['B', 'TRCINT', 'TRCLST', 'TRCSOU', 'TRCREC', 'TRCTIM'])
-        self.getline(['B', 'TRCBLA', 'TRCBLM', 'TRCBLI', 'TRCBLP', 'TRCBLE'])
-        self.getline(['B', 'TRCBLPH', 'TRCTAL', 'TRCOCT', 'TRCCEN', 'TRCDUMM'])
+        self.getline(['B', 'TRCPLT', 'TRCHST', 'TRCNAL', 'TRCREA', 'TRCSIG',
+                           'TRCGRD', 'TRCSUR', 'TRCREF', 'TRCFLE', 'TRCAMD',
+                           'TRCINT', 'TRCLST', 'TRCSOU', 'TRCREC', 'TRCTIM',
+                           'TRCBLA', 'TRCBLM', 'TRCBLI', 'TRCBLP', 'TRCBLE',
+                           'TRCBLPH', 'TRCTAL', 'TRCOCT', 'TRCCEN', 'TRCDUMM'])
 
         #Following booleans not in use
         self.getline(['B', 'TRCDBG2', 'TRCDBGE', 'TRCDBGM', 'TRCDBGF', 
-                      'TRCDBGL'])
-        self.getline(['B', 'TRCDBGS', 'TRCDBGG', 'TRCDBGMPI', 'TRCDBGC'])
+                      'TRCDBGL', 'TRCDBGS', 'TRCDBGG', 'TRCDBGMPI', 'TRCDBGC'])
+
         # Following lines are not sufficiently described in manual or in 
         # input.f.
         line = self.getline()
@@ -3617,8 +3702,8 @@ class Eirene(QWidget):
         super(Eirene, self).__init__(parent)
         # The following array contains the variables, that are numbered
         # in the settings file but has the same description!
-        self.group_cards = ['INDSRC', 'INDPRO', 'NLPRCA', 'DPLD', 'PRMSPL',
-                            'DIOD', 'DMLD', 'DATD', 'VL', 
+        self.group_cards = ['INDSRC', 'INDPRO', 'NLPRCA', 'PRMSPL', 'INGRDA', 
+                            'INGRDE', 'DPLD', 'DIOD', 'DMLD', 'DATD', 'VL', 
                             'P1', 'P2', 'P3', 'P4', 'P5']
         self.splitter = QSplitter(self)
         self.splitter.setOrientation(Qt.Vertical)
@@ -3627,6 +3712,7 @@ class Eirene(QWidget):
         self.splitter.setStretchFactor(0, 7)
         self.splitter.setStretchFactor(1, 3)
         self.tree.card_edit_delegate.parameter_help.connect(self.show_help)
+        self.tree.itemSelectionChanged.connect(self.show_help)
         self.show_help('EDIT_HELP')
 
     def sizeHint(self):
@@ -3635,18 +3721,19 @@ class Eirene(QWidget):
     def resizeEvent(self, event):
         self.splitter.resize(event.size())
 
-    def show_help(self, parameter):
+    def show_help(self, parameter='EDIT_HELP'):
         if parameter == '': 
             self.help.clear()
         elif parameter == 'EDIT_HELP':
+            text = ''
             if self.tree.selectedItems():
                 item = self.tree.selectedItems()[0]
                 card_data = item.data(0, Qt.UserRole)
                 type_of_card = card_data[0]
-                card_variables = card_data[2]
-                text = '<p>'+type_of_card+" :"+" ".join(card_variables)+'</p>'
-            else: 
-                text = ''
+                if type_of_card:
+                    card_variables = card_data[2]
+                    text = '<p>'+type_of_card+" :"+" ".join(card_variables)+\
+                           '</p>'
             self.help.setText(text + "<p> Press F2 to edit line."
                               "<p> Use arrow keys to navigate through rows and\
                               to expand/collapse rows.<p>"
