@@ -88,7 +88,8 @@ class B2mnTextEdit(QPlainTextEdit):
         self.tooltips = dict()
         for key in b2mn_tooltips:
             category, param_type, default, description =  b2mn_tooltips[key]
-            tooltip = '<font color=blue>Category: <b>' + category + '</b>, ' \
+            tooltip = '<font color=blue>Switch: <b>' + key \
+                   + '</b> Category: <b>' + category + '</b>, ' \
                    + 'Type: <b>' + param_type + '</b>, '\
                    + 'Default: <b>' + default + '</b></font>' \
                    + '<pre>' + self.dedent(description) + '</pre>'
@@ -122,12 +123,12 @@ class B2mnTextEdit(QPlainTextEdit):
           See http://stackoverflow.com/questions/19236165/pyqt-get-text-under-cursor
         """
         if event.type() == QEvent.ToolTip:
-            # oldCursor = self.textCursor()
+            #oldCursor = self.textCursor()
             textCursor = self.cursorForPosition(event.pos())
             textCursor.select(QTextCursor.WordUnderCursor)
-            #self.setTextCursor(oldCursor)
-            self.setTextCursor(textCursor)
+            #self.setTextCursor(textCursor)
             word = textCursor.selectedText()
+            #self.setTextCursor(oldCursor)
 
             if word in self.tooltips:
                 helpEvent = event
