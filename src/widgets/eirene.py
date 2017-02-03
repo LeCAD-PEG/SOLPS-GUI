@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/env python3
 """
 Eirene editor
@@ -17,14 +18,12 @@ To start editing a line either push "F2" key or double-click. If the line
 has help description, it also has a validation for editing.
 """
 
-from PyQt5.QtCore import (Qt, QProcess, QSize, pyqtProperty,
-                          pyqtSignal, pyqtSlot, QEvent, QAbstractItemModel,
-                          QItemSelectionModel, QRect)
-from PyQt5.QtGui import (QImage, QFont, QValidator)
-from PyQt5.QtWidgets import (QWidget, QSplitter, QTreeWidget, QTextBrowser,
-                             QTreeWidgetItem, QAbstractItemView,
-                             QStyledItemDelegate, QLineEdit, QAbstractItemView)
-
+from PyQt5.QtCore import Qt, QSize, pyqtSignal, pyqtSlot, QEvent
+from PyQt5.QtGui import QFont, QValidator
+from PyQt5.QtWidgets import (QWidget, QSplitter, QTreeWidget, QTextBrowser,\
+                             QTreeWidgetItem, QAbstractItemView,\
+                             QStyledItemDelegate, QLineEdit, \
+                             QAbstractItemView)
 import logging
 import re
 
@@ -301,7 +300,7 @@ input block 2.13. More details: see paragraph 2.1.3 below.</p>""",
 'NLTRIMESH' : no_description_in_manual,
 
 'CFILE' : """There can be any number of these cards starting with character
-string CFILE in the input file. &quot;CFILE&quot; DBHANDLE DBFNAME""",
+string CFILE in the input file. <quote>CFILE</quote> DBHANDLE DBFNAME""",
 
 # *** 2.
 'INGRD(1)' : """This index controls the meaning of input
@@ -1338,33 +1337,33 @@ particle reflection model.</em>
 
 # 2.6
 
-'ERMIN' : """For incident particle energies below ERMIN, the &quot;fast&quot;
-particle reflection model is switched off. Only the &quot;thermal&quot;
-particle model is used.""",
+'ERMIN' : """For incident particle energies below ERMIN, the
+<quote>fast</quote> particle reflection model is switched off. Only the
+<quote>thermal</quote> particle model is used.""",
 
 'ERCUT' : """<p>These variables may be used to modify the default
-&quot;Behrisch Matrix&quot; reflection coefficients for particles incident on
-a surface at low energies E<sub>in</sub> . The original data [16] are used only
-for E<sub>in</sub> > ERCUT and for normal incidence &theta;<sub>in</sub> =
+<quote>Behrisch Matrix</quote> reflection coefficients for particles incident
+on a surface at low energies E<sub>in</sub> . The original data [16] are used
+only for E<sub>in</sub> > ERCUT and for normal incidence &theta;<sub>in</sub> =
 0.</p>
 <p>In the range ERMIN < E<sub>in</sub> < ERCUT the particle reflection
 coefficient p<sub>f</sub>(E<sub>in</sub> , &theta;<sub>in</sub> = 0) is
 replaced by a smooth cubic interpolation curve p<sub>f</sub>(E<sub>in</sub>)
 such that p<sub>f</sub>(0) = RPROBF .</p>
-<p>The original &quot;Behrisch Matrix&quot; is recovered by setting ERCUT ≤
-<0./p>""",
+<p>The original <quote>Behrisch Matrix</quote> is recovered by setting ERCUT 
+&le; <0./p>""",
 
 'RPROB0' : """<p>These variables may be used to modify the default
-&quot;Behrisch Matrix&quot; reflection coefficients for particles incident on
-a surface at low energies E<sub>in</sub> . The original data [16] are used only
-for E<sub>in</sub> > ERCUT and for normal incidence &theta;<sub>in</sub> =
+<quote>Behrisch Matrix</quote> reflection coefficients for particles incident
+on a surface at low energies E<sub>in</sub> . The original data [16] are used
+only for E<sub>in</sub> > ERCUT and for normal incidence &theta;<sub>in</sub> =
 0.</p>
 <p>In the range ERMIN < E<sub>in</sub> < ERCUT the particle reflection
 coefficient p<sub>f</sub>(E<sub>in</sub> , &theta;<sub>in</sub> = 0) is
 replaced by a smooth cubic interpolation curve p<sub>f</sub>(E<sub>in</sub>)
 such that p<sub>f</sub>(0) = RPROBF .</p>
-<p>The original &quot;Behrisch Matrix&quot; is recovered by setting ERCUT ≤
-<0./p>""",
+<p>The original <quote>Behrisch Matrix</quote> is recovered by setting ERCUT 
+&le; <0./p>""",
 
 'ILREF' : """Flag for choice of local reflection model
 <dl>
@@ -1866,11 +1865,11 @@ NBLOCK=NBMLT+1 (see section 2.2) and the proper value of NACELL.</dd>
 dependent mode of operation, see input blocks 1. and 13.""",
 
 'NSRFSI' : """<b>(=NPNTSI)</b> <p> Total number of different points, over which
-the starting points for this stratum are distributed (corresponds to &quot;sub-
-strata&quot option for surface and volume sources, there to facilitate sampling
- of spatial coordinates).</p>  
+the starting points for this stratum are distributed (corresponds to
+<quote>sub- strata<quote> option for surface and volume sources, there to
+facilitate sampling  of spatial coordinates).</p>
 <p>Total number of different surfaces, or surface segments, over which the
-starting points for this stratum are distributed (&quot;sub-strata&quot, 
+starting points for this stratum are distributed (<quote>sub-strata<quote>, 
 to facilitate sampling of spatial coordinates).</p>""",
 
 'INUM' : """irrelevant; labelling index for sub-strata""",
@@ -1880,7 +1879,8 @@ SORWGT for all NPNTSI points is normalized to one internally.""",
 
 'NRSOR' : """<p> 0 x- or radial cell number NRCELL of the zone containing the
 point source.</p> 
-<p>= 0 NRCELL is found automatically from the &quot;standard mesh&quot zoning.</p> 
+<p>= 0 NRCELL is found automatically from the <quote>standard mesh<quote>
+zoning.</p> 
 <p>< 0 only for surface sources (NLSRF), see below.</p>""",
 
 'NPSOR' : """ditto from NRSOR, for y- or poloidal cell number NPCELL""",
@@ -1921,15 +1921,15 @@ vector is normalized to length 1. Irrelevant for an isotropic velocity
 distribution.""",
 
 'INDIM' : """<dl><dt>= 0</dt>
-<dd>source on &quot;additional surface&quot; ASURF (see block 3B)</dt></d>
+<dd>source on <quote>additional surface<quote> ASURF (see block 3B)</dt></d>
 <dt>= 1</dt>
-<dd>source on &quot;standard surface&quot; RSURF, x- (or radial) mesh
+<dd>source on <quote>standard surface<quote> RSURF, x- (or radial) mesh
 (see block 2A and 3A)</dd>
 <dt>= 2</dt>
-<dd>source on &quot;standard surface&quot; PSURF, y- (or poloidal) mesh
+<dd>source on <quote>standard surface<quote> PSURF, y- (or poloidal) mesh
 (see block 2B and 3A)</dd>
 <dt>= 3</dt>
-<dd>source on &quot;standard surface&quot; TSURF, z- (or toroidal) mesh
+<dd>source on <quote>standard surface<quote> TSURF, z- (or toroidal) mesh
 (see block 2C and 3A)</dd>
 <dt>= 4</dt>
 <dd><p>source on a surface composed of one or more segments of radial and/or
@@ -1986,12 +1986,12 @@ flags M and L.</p>
 the flag L=0 has to be set (is redundant).</p>
 <p>L,M,N = 1 &delta;-distribution at (a+b)/2</p>
 <p>L,M,N = 2 Uniform distribution on the interval [a,b]</p>
-<p>L,M,N = 3 Truncated exponential decay with decay length λ on the interval 
-[a,b]. I.e. the sampling distribution reads:<dd>
-f (x) = c &middot; exp(−x/&lambda;) if x &isin; [a, b] and f (x) = 0 elsewhere,
+<p>L,M,N = 3 Truncated exponential decay with decay length &lambda; on the 
+interval [a,b]. I.e. the sampling distribution reads:<dd>
+f(x) = c &middot; exp(-x/&lambda;) if x &isin; [a, b] and f (x) = 0 elsewhere,
 </dd><br>
 <dd>with normalized constant<dd><br>
-<dd>c = {&lambda;(exp[−a/&lambda;] − exp[−b/&lambda;])}<sup>-1</sup></p></dd>
+<dd>c = {&lambda;(exp[-a/&lambda;] - exp[-b/&lambda;])}<sup>-1</sup></p></dd>
 <p>L,M,N = 4 Step-function (see below: Function STEP, subsection 2.7.1) (only
 one of either L or M or N should be 4)</p>
 <p>K = 1 &delta;-distribution at TIME0 for time of particle birth. (A delta
@@ -2011,8 +2011,8 @@ labelling index of the se- lected step function.</p>
 of up to NSPZ species, see 2.7.1. NSPZ depends upon the initialization of this
 function. By default the source species index NSPEZ is used when sampling from
 step functions.</p>
-<p>New option (Aug. 2006), e.g. for testing isotope effects: If SORIND ≥ 100,
-then the 3rd digit is used to select the species index from step function
+<p>New option (Aug. 2006), e.g. for testing isotope effects: If SORIND &ge;
+100, then the 3rd digit is used to select the species index from step function
 ISTEP. I.e.: Let SORIND = LMN, then MN is used to sample from step function
 ISTEP = MN for species ISPZ</p>
 <p>= L. This concerns the spatial distribution. The species index itself of the
@@ -2038,17 +2038,17 @@ angular distributions may be selected. Each one depends upon the two parameter
 P = SORCOS and Q = SORMAX.</p>
 <dl><dt>NAMODS = 1</dt>
 <dd><p>The polar angle &theta; against the unit vector (C = C<sub>X</sub>,
-C<sub>Y</sub>, C<sub>Z</sub>) of the source parti- cle’s velocity is sampled
-from a cosine**P distribution around the &quot;inner normal vector&quot; (-1.0)
-&middot;C, i.e., f (&theta;)d&theta; ∼ sin(&theta;) &middot; cos<sup>p</sup>
-(&theta;)d&theta;.</p>
+C<sub>Y</sub>, C<sub>Z</sub>) of the source particle's velocity is sampled
+from a cosine**P distribution around the <quote>inner normal vector<quote> 
+(-1.0) &middot;C, i.e., f (&theta;)d&theta; ~ sin(&theta;) &middot; 
+cos<sup>p</sup> (&theta;)d&theta;.</p>
 <p>Important special cases:</p>
 <p>P = 0 isotropic distribution</p>
 <p>P = 1 cosine distribution</p>
-<p>P &#8811; 1 close to δ-distribution around vector −&delta; &middot; 
+<p>P &#8811; 1 close to &delta;-distribution around vector -&delta; &middot; 
 C</p></dd>
 <dt>NAMODS = 2</dt>
-<dd>The polar angle against −1 &middot; C is sampled from a Gaussian 
+<dd>The polar angle against -1 &middot; C is sampled from a Gaussian 
 distribution with zero mean value, and the parameter P now is used for the 
 standard deviation (degree) of that distribution.</dd></dl>
 <p>The second parameter Q is the cut-off angle (degree) for the polar angle
@@ -2056,7 +2056,7 @@ standard deviation (degree) of that distribution.</dd></dl>
 <p>note:</p>
 <dl><dt>Q &le; 180° is enforced internally</dt>
 <dt>Q &le; 90° is enforced internally for surface sources</dt>
-<dt>Q = 0 for a beam, i.e., for an angular δ-distribution at −1 &middot; 
+<dt>Q = 0 for a beam, i.e., for an angular &delta;-distribution at -1 &middot; 
 C</dt></dl""",
 
 'SORMAX' : """<p>Depending upon the value of the flag NAMODS various different
@@ -2064,17 +2064,17 @@ angular distributions may be selected. Each one depends upon the two parameter
 P = SORCOS and Q = SORMAX.</p>
 <dl><dt>NAMODS = 1</dt>
 <dd><p>The polar angle &theta; against the unit vector (C = C<sub>X</sub>,
-C<sub>Y</sub>, C<sub>Z</sub>) of the source parti- cle’s velocity is sampled
-from a cosine**P distribution around the &quot;inner normal vector&quot; (-1.0)
-&middot;C, i.e., f (&theta;)d&theta; ∼ sin(&theta;) &middot; cos<sup>p</sup>
-(&theta;)d&theta;.</p>
+C<sub>Y</sub>, C<sub>Z</sub>) of the source parti- cle's velocity is sampled
+from a cosine**P distribution around the <quote>inner normal vector<quote> 
+(-1.0) &middot;C, i.e., f (&theta;)d&theta; ~ sin(&theta;) &middot; 
+cos<sup>p</sup> (&theta;)d&theta;.</p>
 <p>Important special cases:</p>
 <p>P = 0 isotropic distribution</p>
 <p>P = 1 cosine distribution</p>
-<p>P &#8811; 1 close to δ-distribution around vector −&delta; &middot; 
+<p>P &#8811; 1 close to &delta;-distribution around vector -&delta; &middot; 
 C</p></dd>
 <dt>NAMODS = 2</dt>
-<dd>The polar angle against −1 &middot; C is sampled from a Gaussian 
+<dd>The polar angle against -1 &middot; C is sampled from a Gaussian 
 distribution with zero mean value, and the parameter P now is used for the 
 standard deviation (degree) of that distribution.</dd></dl>
 <p>The second parameter Q is the cut-off angle (degree) for the polar angle
@@ -2082,7 +2082,7 @@ standard deviation (degree) of that distribution.</dd></dl>
 <p>note:</p>
 <dl><dt>Q &le; 180° is enforced internally</dt>
 <dt>Q &le; 90° is enforced internally for surface sources</dt>
-<dt>Q = 0 for a beam, i.e., for an angular δ-distribution at −1 &middot; 
+<dt>Q = 0 for a beam, i.e., for an angular &delta;-distribution at -1 &middot; 
 C</dt></dl""",
 
 'SORCTX' : """<p>The unit vector C mentioned above is given by normalization of
@@ -2144,11 +2144,11 @@ IPHOT (in versions 2004 and younger)""",
 'IPRSF' : """<p>conditional expectation estimator is used, if trajectory points
 towards additional sur- face IPRSF. IPRSF &le; NLIMI, the total number of
 additional surfaces read in input block 3B.</p>  
-<p>NPRCSF surfaces have that property of &quot;attracting
-trajectories&quot;.</p>""",
+<p>NPRCSF surfaces have that property of <quote>attracting
+trajectories<quote>.</p>""",
 
-'NPRCSF' : """Number of surfaces that have property of &quot;attracting
-trajectories&quot;""",
+'NPRCSF' : """Number of surfaces that have property of <quote>attracting
+trajectories<quote>""",
 
 'MAXLEV' : """Maximum number of levels for splitting (&le; 15)""",
 
@@ -2178,7 +2178,7 @@ of radial surfaces, see above.""",
 'PRMSPL' : """Splitting parameter for surface.""",
 
 'WMINV' : """minimum weight used for suppression of absorption at collisions
-(&quot;survival bi- assing&quot). If a particle goes into a collision with
+(<quote>survival bi- assing<quote>). If a particle goes into a collision with
 weight less than WMINV, then sup- pression of absorption or any other non-
 analog weight correction is abandoned, and the analog game is played. WMINV
 acts only for events in the volume including volume source birth events, but
@@ -2195,7 +2195,7 @@ stopped and restarted. E.g. for WMINC &ge; 1, the estimator used in the NIMBUS
 code results (ref. [14]), whereas for WMINC = 0 each particle path is
 integrated according to equation 3.22, until the nearest non transparent
 surface along the track is reached, regardless of any collisions. Periodicity
-surfaces are regarded as &quot;transparent&quot in this context.</p>
+surfaces are regarded as <quote>transparent<quote> in this context.</p>
 <p>Note: strictly speaking this is not a non-analog method, but rather a
 particular choice of an unbiased estimator. Hence: the flag NLANA in input
 block 1 does not affect flags for conditional expectation estimators.</p>""",
@@ -2277,13 +2277,13 @@ is printed and plotted in the units [1/cm<sup>3</sup>] &middot; [units of
 g<sup>∗</sup>] &middot; [cm] &middot; [source strength FLUX] however, with FLUX
 converted to units [1/s] (rather than input units [Ampere]). For the definition
 of the detector functions g and g ∗ see section 3.2, the variable FLUX is
-explained in input block no. 2.7. This scaling is default for &quot;density 
-tallies&quot of particles, momentum and energy.</dd>
+explained in input block no. 2.7. This scaling is default for <quote>density 
+tallies<quote> of particles, momentum and energy.</dd>
 <dt>=2</dt><dd>scale tally per unit cell. Same units as above, however not per
 cm<sup>3</sup> but per cell instead.</dd>
 <dt>=3</dt><dd>same as IADVE = 1, but with FLUX in Ampere, rather than 1/s.
-This scaling is default for &quot;source rate tallies&quot, e.g. for particle, 
-momentum and energy sources.</dd>
+This scaling is default for <quote>source rate tallies<quote>, 
+e.g. for particle, momentum and energy sources.</dd>
 <dt>=4</dt>same as IADVE = 2, but with FLUX in Ampere, rather than 1/s.</dd>
 </dl>
 else no re-scaling done, units as chosen in subroutine UPTUSR.""",
@@ -2324,7 +2324,7 @@ expression in some volume averaged tallies. An operand <i, j> stands for tally
 number j, first (species) index i, in tables 5.1 (input tallies) and 5.2
 (output tallies) . Note that the first index for tallies with no species index
 must read 1, and the tally number of input tallies must be nega- tive. Example:
-<1, −1> for the electron temperature tally, <2, 3> for the particle density of
+<1, -1> for the electron temperature tally, <2, 3> for the particle density of
 test ion species no. IION=2 . Expressions <c> with an integer or real constant
 c are interpreted as scalars. The string may contain an arbitrary (but &le; 20)
 number of operands, and of operators +, -, *, /, **, and of properly nested
@@ -2342,7 +2342,7 @@ expressions in versions 2002 and younger, i.e. after implementation of photons
 as further species type (and the related default tallies, tables in section
 5.1.1):</p>
 <p>(<1,9> + <1,15> + <1,21>)*<1.e6>/<1.6022e-19></p>
-<p>and it would be stored on the tally: &quot;ALGV&quot with the first
+<p>and it would be stored on the tally: <quote>ALGV<quote> with the first
 (labelling) index IALVI. Note that the cell volume array VOL is regarded as a
 volume averaged tally, by abuse of language (tally number = -14, see table
 5.1).</p>""",
@@ -2364,9 +2364,9 @@ and problem specific routines called from MODUSR).""",
 'TRCSIG' : """Trace-back from post processing line integral diagnostics block
 DIAGNO""",
 
-'TRCGRD' : """Printout of &quot;standard mesh surface data&quot;""",
+'TRCGRD' : """Printout of <quote>standard mesh surface data<quote>""",
 
-'TRCSUR' : """Printout of data for &quot;additional surfaces&quot;""",
+'TRCSUR' : """Printout of data for <quote>additional surfaces<quote>""",
 
 'TRCREF' : """Printout of reflection model related data. In particular a list
 of all non-perfect recycling surfaces is printed, i.e., a list of surfaces for
@@ -2420,14 +2420,14 @@ procedure""",
 and stratum resolved census fluxes""",
 
 'TRCDUMM' : no_description_in_manual,
-'TRCDBG2' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
-'TRCDBGE' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
-'TRCDBGM' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
-'TRCDBGF' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
-'TRCDBGL' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
-'TRCDBGS' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
-'TRCDBGG' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
-'TRCDBGMPI' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""", 
+'TRCDBG2' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""",
+'TRCDBGE' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""",
+'TRCDBGM' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""",
+'TRCDBGF' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""",
+'TRCDBGL' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""",
+'TRCDBGS' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""",
+'TRCDBGG' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""",
+'TRCDBGMPI' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""",
 'TRCDBGC' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""",
 
 '*** 11. Data for numerical and graphicaloutput' : """TODO""",
@@ -2445,8 +2445,8 @@ equidistant on a logarithmic scale otherwise.</p>""",
 'TXTSIG' : """Text in printout at the beginning of the data from this line of
 sight integral.""",
 
-'NSPTAL' : """Flag for choice of preprogrammed function which is &quot;line
-integrated&quot;.
+'NSPTAL' : """Flag for choice of preprogrammed function which is <quote>line
+integrated<quote>.
 <dl><dt>=1</dt>
 <dd>charge exchange source rate (SIGCX)</dd>
 <dt>=2</dt>
@@ -2520,15 +2520,15 @@ ion temperature is fitted from the CX line of side spectrum in the interval
 <p>If NSPADD = 0 , then this 2nd point must lie in standard mesh block
 <NSPBLC./p>
 <p>If NSPADD &ne; 0, then the block number NSPBLC must be NSPBLC = NBMLT+1, 
-i.e. the second point on the line of sight is in the &quot;additional cell 
-regionq&quot;.</p>""",
+i.e. the second point on the line of sight is in the <quote>additional cell 
+regionq<quote>.</p>""",
 
 'EMIN1' : """<p>for NSPTAL=1,3,10: minimum and maximum energy for spectral
 resolution, respectively.</p>
 <p>for NSPTAL=2:</p>
 <p>Old input version (still maintained for backward compatibility of input
 files: EMIN1 is an energy parameter to identify the particular hydrogen line
-and EMAX1 is not used. EMIN1 is given in eV, by Ry × (1/n<sup>2</sup> −
+and EMAX1 is not used. EMIN1 is given in eV, by Ry × (1/n<sup>2</sup> -
 1/m<sup>2</sup>), with Ry = 13.6 (eV).</p>
 <p>EMIN1 = 12.089: Lyman-beta line<br>
 EMIN1 = 3.0222: Balmer-delta line<br>
@@ -2546,8 +2546,8 @@ data files.</p>""",
 'ESHIFT' : """(for NSPTAL=1, 3, 10 options only)
 <p>energy shift for spectral resolution in printout, and plot</p>""",
 
-'IPIVOT' : """(only needed for NLTRA option, &quot;toroidal approximation&quot, 
-sub-block2c)
+'IPIVOT' : """(only needed for NLTRA option, <quote>toroidal 
+approximation<quote>, sub-block2c)
 <dl><dt>1 &le; IPIVOT &le; NTTRA-1 (currently no available, error exit)</dt>
 <dd>number of local toroidal co-ordinate system (NTTRA: see sub-block 2c), in
 which this pivot point is specified. The pivot point is then given in cartesian
@@ -2583,7 +2583,7 @@ case of NSPTAL = 2).""",
 #2.13
 
 'NPRNLI' : """<p>Total number of test particles in time dependent arrays
-(&quot;census arrays&quot;) (in old versions before 2001: NPRNLI must be &le;
+(<quote>census arrays<quote>) (in old versions before 2001: NPRNLI must be &le;
 NPRNL, see: PARMUSR). The scoring on census arrays stops at latest when NPRNLI
 scores are on the census array.</p>
 
@@ -2597,8 +2597,9 @@ necessary in order to prevent infinite histories. Therefore, in case NLERG=TRUE
 and NPRNLI=0 an automatic correction to NPRNLI=100 is carried out.</p>""",
 
 'NINITL_READ' : """(new: 2013) Same as NINITL in block 7: provides random
-number seed for &quot;time-stratum&quot; (sampling from census array (default:
-=0, no fresh initialization of random number generator for this stratum)""",
+number seed for <quote>time-stratum<quote> (sampling from census array
+(default: =0, no fresh initialization of random number generator for this
+stratum)""",
 
 'NPRMUL' : """(new: 2013) Multiplicative factor for NPRNLI, in order to
 increase size of cen- sus to more than 999999 particles, which otherwise would
@@ -2606,30 +2607,29 @@ be the maximum due to I6 formatted integer input. Default: = 0: no
 multiplication carried out""",
 
 'NPTST' : """<p>Same as NPTS in block 7. This is the number of histories, which
-are continued from a previous time-cycle (&quot;Time dependence stratum
-ISTRA=NSTRAI+1&quot;). The initial coordinates are randomly sampled (with
+are continued from a previous time-cycle (<quote>Time dependence stratum
+ISTRA=NSTRAI+1<quote>). The initial coordinates are randomly sampled (with
 replacement) from the census-array data from an earlier time-cycle. The
 probability for sampling a particular particle from the census array is
 proportional to its weight stored on the census array as well. Due to
-&quot;sampling with replacement&quot; an individual particle, which is on
+<quote>sampling with replacement<quote> an individual particle, which is on
 census, may be sampled more than once, or not at all, with the likelihood for
-these events given by its weight (&quot;warm restart&quot;). This census array
-is either defined at the end of the previous time cycle in the same run (subr.
-TMSTEP), or it is read from an earlier run from stream 15 (via a call to subr.
-RSNAP from subr. INPUT) in the initial phase of the run, for the very first
-time-cycle (continuation of an earlier sequence of time-cycles).</p>
+these events given by its weight (<quote>warm restart<quote>). This census
+array is either defined at the end of the previous time cycle in the same run
+(subr. TMSTEP), or it is read from an earlier run from stream 15 (via a call to
+subr. RSNAP from subr. INPUT) in the initial phase of the run, for the very
+first time-cycle (continuation of an earlier sequence of time-cycles).</p>
 <p>If NPTST = 0 , then NPTST is reset to IPRNL. IPRNL is the the number of
-scores on the census array in the previous time cycle.</p>
-<p>If NPTST < 0 , then NPTST is reset to IPRNL, and the random sampling from
-the census array is now replaced by a one-to-one re-launch of all particles
-from the census array without random sampling (&quot;cold restart&quot;). Until
-Aug. 2015 this option was avail- able only in connection with the NLMOVIE
-option (movies of trajectories) and had led to other modifications of the run
-parameters as well. (Automatically then internally: NLMOVIE = TRUE). New:
-NLMOVIE AND NPTST < 0 options are now indepen- dent from each other. In both
-cases: one by one re-launch from old census is enforced, rather than random
-sampling from old census.</p>
-<p>Default: NPTST=0</p>""",
+scores on the census array in the previous time cycle.</p> <p>If NPTST < 0 ,
+then NPTST is reset to IPRNL, and the random sampling from the census array is
+now replaced by a one-to-one re-launch of all particles from the census array
+without random sampling (<quote>cold restart<quote>). Until Aug. 2015 this
+option was avail- able only in connection with the NLMOVIE option (movies of
+trajectories) and had led to other modifications of the run parameters as well.
+(Automatically then internally: NLMOVIE = TRUE). New: NLMOVIE AND NPTST < 0
+options are now indepen- dent from each other. In both cases: one by one re-
+launch from old census is enforced, rather than random sampling from old
+census.</p> <p>Default: NPTST=0</p>""",
 
 'NTMSTP' : """<p>Total number of time-steps for particle tracing. Each
 trajectory can score on census up to NTMSTP times. Particle trajectories are
@@ -2637,8 +2637,8 @@ stopped after NTMSTP time- steps.</p>
 <p>Default: NTMSTP=1</p>
 <p>For convenience and by abuse of language, we refer to the 3-dimensional
 hyper-surface t = t<sub>n</sub> of the four dimensional (r, t)-space as
-&quot;time- surface&quot;, and, hence, tallies evalu- ated at fixed time t n
-(&quot ;snapshot-tallies&quot;) are surface averaged tallies in this
+<quote>time- surface<quote>, and, hence, tallies evalu- ated at fixed time t n
+(<quote>snapshot-tallies<quote>) are surface averaged tallies in this
 terminology.</p>
 <p>Fluxes onto this surface are stored on the arrays for a surface no.
 NLIM+NSTSI+1, which is added automatically to the NLIM additional and NSTSI
@@ -2740,8 +2740,8 @@ class MyValidator(QValidator):
 
 class MyLineEdit(QLineEdit):
     """This is the custom QLineEdit for the QStyledItemDelegation. It contains
-    functions that handle the help description for the current selected cardrole.insert
-    and some overloaded functions for additional cosmetics.
+    functions that handle the help description for the current selected
+    cardrole. Insert and some overloaded functions for additional cosmetics.
 
     Attributes:
         parameter_description (array): Contains the parameter name of the
@@ -2771,7 +2771,7 @@ class MyLineEdit(QLineEdit):
                 the current card. This is used for the free format or for the
                 not-described cards.
         """
-        if card_type==None:
+        if card_type is None:
             return
         self.parameter_description.append(variables_name[0])
         if card_type == 'I':
@@ -2793,8 +2793,8 @@ class MyLineEdit(QLineEdit):
         elif card_type == 'S':
             param_name = variables_name[0]
             for j in range(number_of_args):
-              self.parameter_description.append(param_name)
-    
+                self.parameter_description.append(param_name)
+
     def focusInEvent(self, e):
         """This overloaded function causes the editor to de-highlight the curr-
         ent editor text and set the cursor position to 0.
@@ -2808,7 +2808,7 @@ class MyLineEdit(QLineEdit):
                 or ev.type() == QEvent.KeyRelease:
             p = self.cursorPosition()
             if p < len(self.parameter_description):
-                if  self.parameter_description[p] != self.last_param:
+                if self.parameter_description[p] != self.last_param:
                     self.parameter_help.emit(self.parameter_description[p])
                     self.last_param = self.parameter_description[p]
 
@@ -2944,14 +2944,11 @@ class EireneEdit(QTreeWidget):
                 self.blocks[i]()
                 self.dummy_block()
             except Exception as e:
-                print(e)
-                print('Row:', self.row)
-                if self.row < self.text_size:
-                    print('Line:', self.text[self.row])
+                continue
         self.setCurrentItem(self.topLevelItem(0))
 
     def looks_like_boolean_card(self, line):
-        """ A check function that accepts a string and then determine if the 
+        """ A check function that accepts a string and then determine if the
         string is composed of booleans. Usually is enough only to check if
         the string 'F' or 'T' are in the line.
 
@@ -2971,22 +2968,22 @@ class EireneEdit(QTreeWidget):
         """Function for setting help desc. parameters for block 1:
         *** 1. Data for operating mode
         """
-        self.getline(['I', 'NMACH', 'NMODE', 'NTCPU', 'NFILE', 'NITER0', 
+        self.getline(['I', 'NMACH', 'NMODE', 'NTCPU', 'NFILE', 'NITER0',
                       'NITER', 'NTIME0', 'NTIME'])
 
         line = self.getline()
         if  not self.looks_like_boolean_card(line):
-            role = ['I', 'NOPTIM', 'NOPTM1', 'NGEOM_USR', 'NCOUP_INPUT', 
+            role = ['I', 'NOPTIM', 'NOPTM1', 'NGEOM_USR', 'NCOUP_INPUT',
                     'NSMSTRA', 'NSTORAM', 'NGSTAL', 'NRTAL', 'NREAC_ADD']
             self.getline(role)
 
-        role = ['B', 'NLSCL', 'NLTEST', 'NLANA', 'NLDRFT', 'NLCRR', 'NLERG', 
+        role = ['B', 'NLSCL', 'NLTEST', 'NLANA', 'NLDRFT', 'NLCRR', 'NLERG',
                      'NLIDENT', 'NLONE', 'NLMOVIE', 'NLDFST', 'NLOLDRAN',
                      'NLCASCAD', 'NLOCTREE', 'NLWRMSH', 'NEXVS', 'NLTRIMESH']
         self.getline(role)
         # Arbitrary lines
         line = self.getline()
-        while line[:3]!='***':
+        while line[:3] != '***':
             if 'CFILE' in line:
                 self.getline(['S', 'CFILE'])
             else:
@@ -2995,49 +2992,48 @@ class EireneEdit(QTreeWidget):
 
     def block_2(self):
         """Function for setting help desc. parameters for block 2:
-        *** 2. Data for standard mesh 
+        *** 2. Data for standard mesh
         """
 
         self.getline(['I', 'INGRD(1)', 'INGRD(2)', 'INGRD(3)'])
         self.getline(['B', 'NLRAD'])
         if self.values['NLRAD']:
             self.getline(['B', 'NLSLB', 'NLCRC', 'NLELL', 'NLTRI',
-                                       'NLPLG', 'NLFEM', 'NLTET', 'NLGEN'])
+                               'NLPLG', 'NLFEM', 'NLTET', 'NLGEN'])
 
-            self.getline(['I', 'NR1ST', 'NRSEP', 'NRPLG', 'NPPLG', 'NRKNOT', 
-                       'NCOOR'])
-
+            self.getline(['I', 'NR1ST', 'NRSEP', 'NRPLG', 'NPPLG', 'NRKNOT',
+                               'NCOOR'])
 
             if self.values['INGRD(1)'] <= 5:
 
                 if self.values['NLSLB'] or self.values['NLCRC'] or \
-                self.values['NLELL'] or self.values['NLTRI']:
+                   self.values['NLELL'] or self.values['NLTRI']:
                     self.getline(['R', 'RIA', 'RGA', 'RAA', 'RRA'])
 
                     if self.values['NLELL'] or self.values['NLTRI']:
                         self.getline(['R', 'ER1IN', 'EP1OT', 'EP1CH', 'EXEP1'])
                         self.getline(['R', 'ELLIN', 'ELLOT', 'ELLCH', 'EXELL'])
                         if self.values['NLTRI']:
-                            self.getline(['R', 'TRIIN', 'TRIOT', 'TRICH', 
-                                       'EXTRI'])
+                            self.getline(['R', 'TRIIN', 'TRIOT', 'TRICH',
+                                               'EXTRI'])
 
                     elif self.values['NLPLG']:
                         self.getline(['R', 'XPCOR', 'YPCOR', 'ZPCOR',
                                       'PLREFL'])
                         role = ['R']
-                        for k in range(1, self.values['NPPLG']+1):
+                        for k in range(1, self.values['NPPLG'] + 1):
                             role.append('NPOINT(1,' + str(k) + ')')
                             role.append('NPOINT(2,' + str(k) + ')')
-                        if len(role)>=1:
+                        if len(role) >= 1:
                             self.getline(role)
 
-                        for i in range(1,self.values['NR1ST']+1):
+                        for i in range(1, self.values['NR1ST'] + 1):
                             role = ['R']
-                            for j in range(1, self.values['NRPLG']+1):
-                                role.append('XPOL('+str(self.counter)+','+
-                                            str(j)+')')
-                                role.append('YPOL('+str(self.counter)+','+
-                                            str(j)+')')
+                            for j in range(1, self.values['NRPLG'] + 1):
+                                role.append('XPOL(' + str(self.counter) + ',' +
+                                            str(j) + ')')
+                                role.append('YPOL(' + str(self.counter) + ',' +
+                                            str(j) + ')')
                             if len(role) > 1:
                                 self.getline(role)
                     elif self.values['NLFEM'] or self.values['NLTET']:
@@ -3045,17 +3041,17 @@ class EireneEdit(QTreeWidget):
 
             elif self.values['INGRD(1)'] == 6:
                 if self.values['NLSLB'] or self.values['NLCRC'] or \
-                self.values['NLELL'] or self.values['NLTRI']:
+                   self.values['NLELL'] or self.values['NLTRI']:
                     self.getline(['R', 'RIA', 'RGA', 'RAA'])
                 elif self.values['NLPLG'] or self.values['NLFEM'] or\
-                    self.values['NLTET']:
+                self.values['NLTET']:
                     self.getline(['R', 'XPCOR', 'YPCOR', 'ZPCOR'])
 
         self.getline(['B', 'NLPOL'])
         self.getline(['B', 'NLPLY', 'NLPLA', 'NLPLP'])
         self.getline(['I', 'NP2ND', 'NPSEP', 'NPPLA', 'NPPER'])
         if self.values['INGRD(2)'] < 5:
-            self.getline(role = ['R', 'YIA', 'YGA', 'YAA'])
+            self.getline(['R', 'YIA', 'YGA', 'YAA'])
 
         self.getline(['B', 'NLTOR'])
         self.getline(['B', 'NLTRZ', 'NLTRA', 'NLTRT'])
@@ -3064,7 +3060,7 @@ class EireneEdit(QTreeWidget):
             self.getline(['R', 'ZIA', 'ZGA', 'ZAA', 'ZZA', 'ROA'])
 
         self.getline(['B', 'NLMLT'])
-        # Sometimes even though NLMLt is false the next line can still 
+        # Sometimes even though NLMLt is false the next line can still
         # be NBLMT, an integer.
 
         line = self.getline()
@@ -3073,14 +3069,14 @@ class EireneEdit(QTreeWidget):
 
         if self.values['NLMLT']:
             role = ['R']
-            for i in range(1, self.values['NBLMT']+1):
-                role.append('VOLCOR('+str(i)+')')
+            for i in range(1, self.values['NBLMT'] + 1):
+                role.append('VOLCOR(' + str(i) + ')')
             self.getline(role)
         # 2e. Data for additional cells outside standard mesh
         self.getline(['B', 'NLADD'])
         self.getline(['I', 'NRADD'])
         role = ['R']
-        for i in range(1, int(self.values['NRADD'])+1):
+        for i in range(1, int(self.values['NRADD']) + 1):
             role.append('VOLADD(' + str(i) + ')')
         if len(role) != 1:
             self.getline(role)
@@ -3089,31 +3085,31 @@ class EireneEdit(QTreeWidget):
         """Function for setting help desc. parameters for block 3a:
         *** 3a. Data for non default standard surfaces
         """
-
         self.getline(['I', 'NSTSI'])
 
         for i in range(self.values['NSTSI']):
             self.getline(['I', 'TXTSFL', 'ISTS', 'IDIMP', 'INUMP',
-                        'IRPTA', 'IRPTE', 'IRPTA', 'IRPTA', 'IRPTE'])
+                               'IRPTA', 'IRPTE', 'IRPTA', 'IRPTA', 'IRPTE'])
             self.getline(['I', 'ILIIN', 'ILSIDE', 'ILSWCH', 'ILEQUI', 'ILCOL',
-                        'ILFIT', 'ILCELL', 'ILBOX', 'ILPLG'])
+                               'ILFIT', 'ILCELL', 'ILBOX', 'ILPLG'])
             line = self.getline()
             if 'SURFMOD' in line:
                 self.getline(['S', 'SURFMOD_MODNAME'])
             elif line[:1] == '*':
                 pass
-            elif self.values['ILIIN']>0:
+            elif self.values['ILIIN'] > 0:
                 # Optional
                 self.getline(['I', 'ILREF', 'ILSPT', 'ISRS', 'ISRC'])
-                self.getline(['R', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)', 
-                            'TRANSP(2,N)', 'FSHEAT'])
+                self.getline(['R', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)',
+                                   'TRANSP(2,N)', 'FSHEAT'])
                 self.getline(['R', 'RECYCF', 'RECYCT', 'RECPRM', 'EXPPL',
                               'EXPEL', 'EXPIL'])
-                self.getline(['R', 'RECYCS', 'RECYCC', 'SPTRM','ESPUTS', 
+                self.getline(['R', 'RECYCS', 'RECYCC', 'SPTRM', 'ESPUTS',
                               'ESPUTC'])
+
     def block_3b(self):
         """Function for setting help desc. parameters for block 3b:
-        *** 3b. Data for additional surfaces 
+        *** 3b. Data for additional surfaces
 
         For this block there is a problem in certain cases: when real RLBND
         parameter is negative, I have found no way to determine the -KL ine-
@@ -3130,7 +3126,7 @@ class EireneEdit(QTreeWidget):
             line = self.getline()
         for i in range(self.values['NLIMI']):
             self.getline(['R', 'RLBND', 'RLARE', 'RLWMN', 'RLWMX'])
-            self.getline(['I', 'ILIIN', 'ILSIDE', 'ILSWCH', 'ILEQUI', 'ILTOR', 
+            self.getline(['I', 'ILIIN', 'ILSIDE', 'ILSWCH', 'ILEQUI', 'ILTOR',
                           'ILCOL', 'ILFIT', 'ILCELL', 'ILBOX', 'ILPLG'])
 
             if self.values['RLBND'] < 2:
@@ -3140,19 +3136,19 @@ class EireneEdit(QTreeWidget):
                     self.getline(['R', 'XLIMS1', 'YLIMS1', 'ZLIMS1',
                                   'XLIMS2', 'YLIMS2', 'ZLIMS2'])
             elif self.values['RLBND'] >= 2:
-                self.getline(['R', 'P1(1,..)', 'P1(2,..)', 'P1(3,..)', 
+                self.getline(['R', 'P1(1,..)', 'P1(2,..)', 'P1(3,..)',
                              'P2(1,..)', 'P2(2,..)', 'P2(3,..)'])
 
                 # Cannot determine K!
             line = self.getline()
-            if self.values['ILIIN']>0 and line.split()[0].isdigit():
+            if self.values['ILIIN'] > 0 and line.split()[0].isdigit():
                 #Optional!
                 self.getline(['I', 'ILREF', 'ILSPT', 'ISRS', 'ISRC'])
-                self.getline(['R', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)', 
-                            'TRANSP(2,N)', 'FSHEAT'])
+                self.getline(['R', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)',
+                                   'TRANSP(2,N)', 'FSHEAT'])
                 self.getline(['R', 'RECYCF', 'RECYCT', 'RECPRM', 'EXPPL',
                               'EXPEL', 'EXPIL'])
-                self.getline(['R', 'RECYCS', 'RECYCC', 'SPTRM','ESPUTS', 
+                self.getline(['R', 'RECYCS', 'RECYCC', 'SPTRM', 'ESPUTS',
                               'ESPUTC'])
                 line = self.getline()
             if 'SU' in line:
@@ -3170,30 +3166,30 @@ class EireneEdit(QTreeWidget):
             self.getline(['S', 'Reactions card'])
             line = self.getline()
 
-        #**4a.   Neutral atom species
+        # **4a.   Neutral atom species
         self.getline(['I', 'NREACI'])
         line = self.getline()
         while not line.startswith('**'):
             self.getline(['S', 'Neutral atom species card'])
             line = self.getline()
 
-        #**4b.   Neutral molecule species
+        # **4b.   Neutral molecule species
         self.getline(['I', 'NMOLI'])
         line = self.getline()
         while not line.startswith('**'):
             self.getline(['S', 'Neutral molecule species card'])
             line = self.getline()
 
-        #**4c.   Test ion species
+        # **4c.   Test ion species
         self.getline(['I', 'NIONI'])
         line = self.getline()
         while not line.startswith('**'):
             self.getline(['S', 'Test ion species card'])
             line = self.getline()
 
-        #**4d. Photon species
+        # **4d. Photon species
 
-        if self.getline()[:3]=='***':
+        if self.getline()[:3] == '***':
             self.values['NPHOTI'] = 0
             return
         else:
@@ -3211,33 +3207,33 @@ class EireneEdit(QTreeWidget):
             line = self.getline()
 
         # ** 5b. Plasma background data
-        self.getline(['I'] + ['INDPRO('+str(i)+')' for i in range(1,13)])
+        self.getline(['I'] + ['INDPRO(' + str(i) + ')' for i in range(1, 13)])
 
         if self.values['INDPRO(1)'] <= 5:
-            self.getline(['R','TE0', 'TE1', 'TE2', 'TE3', 'TE4', 'TE5'])
+            self.getline(['R', 'TE0', 'TE1', 'TE2', 'TE3', 'TE4', 'TE5'])
         elif self.values['INDPRO(2)'] <= 5:
-            for i in range(1, self.values['NPLSI']+1):
-                self.getline(['R', 'TI0('+str(i)+')', 'TI1('+str(i)+')', 
-                              'TI2('+str(i)+')', 'TI3('+str(i)+')', 
-                              'TI4('+str(i)+')', 'TI5('+str(i)+')'])
-        elif self.values['INDPRO(3)'] <= 5:  
-            for i in range(1, self.values['NPLSI']+1):
-                self.getline(['R', 'DI0('+str(i)+')', 'DI1('+str(i)+')', 
-                              'DI2('+str(i)+')', 'DI3('+str(i)+')', 
-                              'DI4('+str(i)+')', 'DI5('+str(i)+')'])   
+            for i in range(1, self.values['NPLSI'] + 1):
+                self.getline(['R', 'TI0(' + str(i) + ')', 'TI1(' + str(i) +')',
+                              'TI2(' + str(i) + ')', 'TI3(' + str(i) + ')',
+                              'TI4(' + str(i) + ')', 'TI5(' + str(i) + ')'])
+        elif self.values['INDPRO(3)'] <= 5:
+            for i in range(1, self.values['NPLSI'] + 1):
+                self.getline(['R', 'DI0(' + str(i) + ')', 'DI1(' + str(i) +')',
+                              'DI2(' + str(i) + ')', 'DI3(' + str(i) + ')',
+                              'DI4(' + str(i) + ')', 'DI5(' + str(i) + ')'])
         elif self.values['INDPRO(4)'] <= 5:
-            for i in range(1, self.values['NPLSI']+1):
-                self.getline(['R', 'VX0('+str(i)+')', 'VX1('+str(i)+')', 
-                              'VX2('+str(i)+')', 'VX3('+str(i)+')', 
-                              'VX4('+str(i)+')', 'VX5('+str(i)+')'])  
-            for i in range(1, self.values['NPLSI']+1):
-                self.getline(['R', 'VY0('+str(i)+')', 'VY1('+str(i)+')', 
-                              'VY2('+str(i)+')', 'VY3('+str(i)+')', 
-                              'VY4('+str(i)+')', 'VY5('+str(i)+')'])  
-            for i in range(1, self.values['NPLSI']+1):
-                self.getline(['R', 'VZ0('+str(i)+')', 'VZ1('+str(i)+')', 
-                              'VZ2('+str(i)+')', 'VZ3('+str(i)+')', 
-                              'VZ4('+str(i)+')', 'VZ5('+str(i)+')'])  
+            for i in range(1, self.values['NPLSI'] + 1):
+                self.getline(['R', 'VX0(' + str(i) + ')', 'VX1(' + str(i) +')',
+                              'VX2(' + str(i) + ')', 'VX3(' + str(i) + ')',
+                              'VX4(' + str(i) + ')', 'VX5(' + str(i) + ')'])
+            for i in range(1, self.values['NPLSI'] + 1):
+                self.getline(['R', 'VY0(' + str(i) + ')', 'VY1(' + str(i) +')',
+                              'VY2(' + str(i) + ')', 'VY3(' + str(i) + ')',
+                              'VY4(' + str(i) + ')', 'VY5(' + str(i) + ')'])
+            for i in range(1, self.values['NPLSI'] + 1):
+                self.getline(['R', 'VZ0(' + str(i) + ')', 'VZ1(' + str(i) +')',
+                              'VZ2(' + str(i) + ')', 'VZ3(' + str(i) + ')',
+                              'VZ4(' + str(i) + ')', 'VZ5(' + str(i) + ')'])
         elif self.values['INDPRO(5)'] <= 5:
             self.getline(['R', 'B0', 'B1', 'B2', 'B3', 'B4', 'B5'])
         elif self.values['INDPRO(12)'] <= 5:
@@ -3250,22 +3246,22 @@ class EireneEdit(QTreeWidget):
         while 'path' in line or 'PATH' in line:
             self.getline(['S', 'PATH CARD'])
 
-        self.getline(['R'] + ['DATD('+str(i)+')' for i in\
+        self.getline(['R'] + ['DATD(' + str(i) + ')' for i in
                      range(1, self.values['NATMI'] + 1)])
-        self.getline(['R'] + ['DMLD('+str(i)+')' for i in\
+        self.getline(['R'] + ['DMLD(' + str(i) + ')' for i in
                      range(1, self.values['NMOLI'] + 1)])
-        self.getline(['R'] + ['DIOD('+str(i)+')' for i in\
+        self.getline(['R'] + ['DIOD(' + str(i) + ')' for i in
                      range(1, self.values['NIONI'] + 1)])
-        self.getline(['R'] + ['DPLD('+str(i)+')' for i in\
+        self.getline(['R'] + ['DPLD(' + str(i) + ')' for i in
                      range(1, self.values['NPLSI'] + 1)])
-        if self.values['NPHOTI']>0:
-            self.getline(['R'] + ['DPHT('+str(i)+')' for i in\
+        if self.values['NPHOTI'] > 0:
+            self.getline(['R'] + ['DPHT(' + str(i) + ')' for i in
                  range(1, self.values['NPLSI'] + 1)])
         self.getline(['R', 'ERMIN', 'ERCUT', 'RPROB0', 'RINTEG', 'EINTEG',
                       'AINTEG'])
 
         line = self.getline()
-        while line[:3]!='***':
+        while line[:3] != '***':
             self.getline(['S', 'SURFMOD'])
             self.getline(['I', 'ILREF', 'ILSPT', 'ISRS', 'ISRC'])
             self.getline(['R', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)', 
@@ -3278,16 +3274,15 @@ class EireneEdit(QTreeWidget):
 
     def block_7(self):
         self.getline(['I', 'NSTRAI'])
-        self.getline(['I'] + ['INDSRC('+str(i)+')' for i in \
-                     range(1,self.values['NSTRAI']+1)])
+        self.getline(['I'] + ['INDSRC('+str(i)+')' for i in
+                     range(1, self.values['NSTRAI'] + 1)])
         self.getline(['R', 'ALLOC', 'AMPTS'])
 
-        for i in range(1, self.values['NSTRAI']+1):
+        for i in range(1, self.values['NSTRAI'] + 1):
             line = self.getline()
-            self.curr_par = self.createItem(self.grup_par, 
-                                                line, ['S', 'TXTSOU'])
-            self.row+=1
-
+            self.curr_par = self.createItem(self.grup_par,
+                                            line, ['S', 'TXTSOU'])
+            self.row += 1
 
             self.getline(['B', 'NLAVRP', 'NLAVRT', 'NLSYMP', 'NLSYMT'])
             self.getline(['I', 'NPTS', 'NINITL', 'NEMODS', 'NAMODS',
@@ -3297,23 +3292,24 @@ class EireneEdit(QTreeWidget):
             self.getline(['I', 'NSPEZ'])
             self.getline(['B', 'NLPNT', 'NLLNE', 'NLSRF', 'NLVOL', 'NLCNS'])
             self.getline(['I', 'NSRFSI'])
-            for i in range(1, self.values['NSRFSI']+1):
-                self.getline(['I', 'INUM', 'INDIM', 'INSOR', 'INGRDA(1)', 
-                              'INGRDE(1)', 'INGRDA(2)', 'INGRDE(2)', 
+            for i in range(1, self.values['NSRFSI'] + 1):
+                self.getline(['I', 'INUM', 'INDIM', 'INSOR', 'INGRDA(1)',
+                              'INGRDE(1)', 'INGRDA(2)', 'INGRDE(2)',
                               'INGRDA(3)', 'INGRDE(3)'])
-                self.getline(['R', 'SORWGT', 'SORLIM', 'SORIND', 
-                              'SOREXP', 'SORIFL',])
-                self.getline(['I', 'NRSOR', 'NPSOR', 'NTSOR', 'NBSOR', 
+                self.getline(['R', 'SORWGT', 'SORLIM', 'SORIND',
+                              'SOREXP', 'SORIFL'])
+                self.getline(['I', 'NRSOR', 'NPSOR', 'NTSOR', 'NBSOR',
                               'NASOR', 'NISOR'])
-                self.getline(['R', 'SORAD1', 'SORAD2', 'SORAD3', 'SORAD4', 
-                              'SORAD5', 'SORAD6',])
-                self.getline(['R', 'SORENI', 'SORENE', 'SORVDX', 'SORVDY', 
-                              'SORVDZ',])
+                self.getline(['R', 'SORAD1', 'SORAD2', 'SORAD3', 'SORAD4',
+                              'SORAD5', 'SORAD6'])
+                self.getline(['R', 'SORENI', 'SORENE', 'SORVDX', 'SORVDY',
+                              'SORVDZ'])
                 self.getline(['R', 'SORCOS', 'SORMAX', 'SORCTX', 'SORCTY',
-                              'SORCTZ',])
+                              'SORCTZ'])
+
     def block_8(self):
         self.getline(['I', 'NZADD'])
-        for i in range(1, self.values['NZADD']+1):
+        for i in range(1, self.values['NZADD'] + 1):
             self.getline(['I', 'INI', 'INE'])
 
     def block_9(self):
@@ -3325,65 +3321,77 @@ class EireneEdit(QTreeWidget):
         self.getline(role)
         self.getline(['I', 'NPRCSF'])
         self.getline(['I', 'MAXLEV', 'MAXRAD', 'MAXPOL', 'MAXTOR', 'MAXADD'])
-        for i in range(1, self.values['MAXLEV']+1):
-            self.getline(['R', 'ID','NSSPL('+str(i)+')','PRMSPL('+str(i)+')'])
-        for i in range(1, self.values['MAXPOL']+1):
-            self.getline(['R', 'ID','NSSPL('+str(self.values['N1ST']+i)+')',
-                          'PRMSPL('+str(self.values['N1ST']+i)+')'])
-        for i in range(1, self.values['MAXTOR']+1):
-            self.getline(['R', 'ID','NSSPL('+str(self.values['N1ST']+
-                                                 self.values['N2ST']+i)+')',
-                          'PRMSPL('+str(self.values['N1ST']+
-                                        self.values['N1ST']+i)+')'])
-        for i in range(1, self.values['MAXADD']+1):
-            self.getline(['R', 'ID','NSSPL('+str(self.values['N1ST']+
-                                                 self.values['N2ND']+
-                                                 self.values['N3RD']+i)+')',
-                          'PRMSPL('+str(self.values['N1ST']+
-                                        self.values['N1ST']+
-                                        self.values['N3RD']+i)+')'])
+        for i in range(1, self.values['MAXLEV'] + 1):
+            self.getline(['R', 'ID', 'NSSPL(' + str(i) + ')', 'PRMSPL(' +
+                          str(i) + ')'])
+        for i in range(1, self.values['MAXPOL'] + 1):
+            self.getline(['R', 'ID', 'NSSPL(' + str(self.values['N1ST'] + i) +
+                         ')', 'PRMSPL(' + str(self.values['N1ST'] + i) + ')'])
+        for i in range(1, self.values['MAXTOR'] + 1):
+            self.getline(['R', 'ID', 'NSSPL(' + str(self.values['N1ST'] +
+                          self.values['N2ST'] + i) + ')',
+                          'PRMSPL(' + str(self.values['N1ST'] +
+                                          self.values['N1ST'] + i) + ')'])
+        for i in range(1, self.values['MAXADD'] + 1):
+            self.getline(['R', 'ID', 'NSSPL(' + str(self.values['N1ST'] +
+                                                    self.values['N2ND'] +
+                                                    self.values['N3RD'] + i) +
+                               ')',
+                          'PRMSPL(' + str(self.values['N1ST'] +
+                                          self.values['N1ST'] +
+                                          self.values['N3RD'] + i) + ')'])
         self.getline(['R', 'WMINV', 'WMINS', 'WMINC', 'WMINL'])
         self.getline(['R', 'SPLPAR'])
-        self.getline(['I', 'NSIGVI', 'NSIGSI', 'NSIGCI', 'NSIGI_BGK', 
-                      'NSIGI_COP', 'NSIGI_SPC',])
-        for i in range(1, self.values['NSIGVI']+1):
+        self.getline(['I', 'NSIGVI', 'NSIGSI', 'NSIGCI', 'NSIGI_BGK',
+                      'NSIGI_COP', 'NSIGI_SPC'])
+        for i in range(1, self.values['NSIGVI'] + 1):
             self.getline(['R', 'IGH', 'IIH'])
-        for i in range(1, self.values['NSIGSI']+1):
+        for i in range(1, self.values['NSIGSI'] + 1):
             self.getline(['R', 'IGHW', 'IIHW'])
-        for i in range(1, self.values['NSIGCI']+1):
-            self.getline(['R'] + ['IGHC(1,'+str(i)+')', 'IIHC(1,'+str(i)+')',
-                                  'IGHC(2,'+str(i)+')', 'IIHC(2,'+str(i)+')'])
+        for i in range(1, self.values['NSIGCI'] + 1):
+            self.getline(['R'] + ['IGHC(1,' + str(i) + ')',
+                                  'IIHC(1,' + str(i) + ')',
+                                  'IGHC(2,' + str(i) + ')',
+                                  'IIHC(2,' + str(i) + ')'])
 
     def block_10(self):
-        self.getline(['I', 'NADVI', 'NCLVI', 'NALVI', 'NADSI', 'NALSI', 
+        self.getline(['I', 'NADVI', 'NCLVI', 'NALVI', 'NADSI', 'NALSI',
                       'NADSPC'])
-        for i in range(1, self.values['NADVI']+1):
-            self.getline(['R', 'IADVE('+str(i)+')', 'IADVS('+str(i)+')',
-                          'IADVT('+str(i)+')', 'IADVR('+str(i)+')',
-                          'TXTTAL('+str(i)+',NTALA)',
-                          'TXTSPC('+str(i)+',NTALA)',
-                          'TXTUNT('+str(i)+',NTALA)'])
+        for i in range(1, self.values['NADVI'] + 1):
+            self.getline(['R', 'IADVE(' + str(i) + ')',
+                               'IADVS(' + str(i) + ')',
+                               'IADVT(' + str(i) + ')',
+                               'IADVR(' + str(i) + ')',
+                               'TXTTAL(' + str(i) + ',NTALA)',
+                               'TXTSPC(' + str(i) + ',NTALA)',
+                               'TXTUNT(' + str(i) + ',NTALA)'])
 
-        for i in range(1, self.values['NCLVI']+1):
-            self.getline(['R', 'ICLVE('+str(i)+')', 'ICLVS('+str(i)+')',
-                          'ICLVT('+str(i)+')', 'ICLVR('+str(i)+')',
-                          'TXTTAL('+str(i)+',NTALC)',
-                          'TXTSPC('+str(i)+',NTALC)',
-                          'TXTUNT('+str(i)+',NTALC)'])
-        for i in range(1, self.values['NALVI']+1):
-            self.getline(['R', 'ALSTRNG', 'TXTTAL('+str(i)+',NTALR)',
-                          'TXTSPC('+str(i)+',NTALR)',
-                          'TXTUNT('+str(i)+',NTALR)'])
-        for i in range(1, self.values['NADSI']+1):
-            self.getline(['R', 'IADSE('+str(i)+')', 'IADSS('+str(i)+')',
-                          'IADST('+str(i)+')', 'IADSR('+str(i)+')',
-                          'TXTTAL('+str(i)+',NTLSA)',
-                          'TXTSPC('+str(i)+',NTLSA)',
-                          'TXTUNT('+str(i)+',NTLSA)'])
-        for i in range(1, self.values['NALSI']+1):
-            self.getline(['R', 'ALSTRNG', 'TXTTAL('+str(i)+',NTLSR)',
-                          'TXTSPC('+str(i)+',NTLSR)',
-                          'TXTUNT('+str(i)+',NTLSR)'])
+        for i in range(1, self.values['NCLVI'] + 1):
+            self.getline(['R', 'ICLVE(' + str(i) + ')',
+                               'ICLVS(' + str(i) + ')',
+                               'ICLVT(' + str(i) + ')',
+                               'ICLVR(' + str(i) + ')',
+                               'TXTTAL(' + str(i) + ',NTALC)',
+                               'TXTSPC(' + str(i) + ',NTALC)',
+                               'TXTUNT(' + str(i) + ',NTALC)'])
+        for i in range(1, self.values['NALVI'] + 1):
+            self.getline(['R', 'ALSTRNG',
+                               'TXTTAL(' + str(i) + ',NTALR)',
+                               'TXTSPC(' + str(i) + ',NTALR)',
+                               'TXTUNT(' + str(i) + ',NTALR)'])
+        for i in range(1, self.values['NADSI'] + 1):
+            self.getline(['R', 'IADSE(' + str(i) + ')',
+                               'IADSS(' + str(i) + ')',
+                               'IADST(' + str(i) + ')',
+                               'IADSR(' + str(i) + ')',
+                               'TXTTAL(' + str(i) + ',NTLSA)',
+                               'TXTSPC(' + str(i) + ',NTLSA)',
+                               'TXTUNT(' + str(i) + ',NTLSA)'])
+        for i in range(1, self.values['NALSI'] + 1):
+            self.getline(['R', 'ALSTRNG', 'TXTTAL(' + str(i) + ',NTLSR)',
+                          'TXTSPC(' + str(i) + ',NTLSR)',
+                          'TXTUNT(' + str(i) + ',NTLSR)'])
+
     def block_11(self):
         self.getline(['B', 'TRCPLT', 'TRCHST', 'TRCNAL', 'TRCREA', 'TRCSIG',
                            'TRCGRD', 'TRCSUR', 'TRCREF', 'TRCFLE', 'TRCAMD',
@@ -3391,11 +3399,11 @@ class EireneEdit(QTreeWidget):
                            'TRCBLA', 'TRCBLM', 'TRCBLI', 'TRCBLP', 'TRCBLE',
                            'TRCBLPH', 'TRCTAL', 'TRCOCT', 'TRCCEN', 'TRCDUMM'])
 
-        #Following booleans not in use
-        self.getline(['B', 'TRCDBG2', 'TRCDBGE', 'TRCDBGM', 'TRCDBGF', 
+        # Following booleans not in use
+        self.getline(['B', 'TRCDBG2', 'TRCDBGE', 'TRCDBGM', 'TRCDBGF',
                       'TRCDBGL', 'TRCDBGS', 'TRCDBGG', 'TRCDBGMPI', 'TRCDBGC'])
 
-        # Following lines are not sufficiently described in manual or in 
+        # Following lines are not sufficiently described in manual or in
         # input.f.
         line = self.getline()
         while line[:3] != '***':
@@ -3415,6 +3423,7 @@ class EireneEdit(QTreeWidget):
                 self.getline(['I', 'IPIVOT', 'XPIVOT', 'YPIVOT', 'ZPIVOT'])
                 self.getline(['I', 'ICHORD', 'XCHORD', 'YCHORD', 'ZCHORD'])
             self.getline(['I', 'PLCHOR', 'PLSPEC'])
+
     def block_13(self):
         self.getline(['I', 'NPRNLI', 'NINITL_READ', 'NPRMUL'])
         if self.values['NLERG'] == 0 and self.values['NPRNLI'] == 0:
@@ -3423,9 +3432,8 @@ class EireneEdit(QTreeWidget):
             self.getline(['I', 'NPTST', 'NTMSTP'])
             self.getline(['R', 'DTIMV', 'TIME0'])
         self.getline(['I', 'NSNVI'])
-        if self.values['NSNVI'] > 0 :
-            self.dummy_block() # No additional descritpion in the manual for
-                               # this part
+        if self.values['NSNVI'] > 0:
+            self.dummy_block()  # No additional descritpion in the manual
 
     def block_14(self):
         line = self.getline()
@@ -3449,10 +3457,10 @@ class EireneEdit(QTreeWidget):
         put it into the tree structure but without help parameters.
         """
         line = self.getline()
-        while line != None:
-            self.row+=1
+        while line is not None:
+            self.row += 1
             if line.startswith('***'):
-                self.curr_par = self.grup_par =  self.createItem(self, line)
+                self.curr_par = self.grup_par = self.createItem(self, line)
                 break
 
             elif line.startswith('**'):
@@ -3499,7 +3507,7 @@ class EireneEdit(QTreeWidget):
                 the size of the text, the IndexError exception is returned.
         """
         parent = self.curr_par
-        group  = self.grup_par
+        group = self.grup_par
 
         if self.row >= self.text_size:
             raise IndexError
@@ -3514,7 +3522,6 @@ class EireneEdit(QTreeWidget):
             self.curr_par = self.grup_par = block_item
             raise Exception
 
-
         elif line[:1] == '*':
             item = self.createItem(group, line)
             if group != self:
@@ -3524,19 +3531,18 @@ class EireneEdit(QTreeWidget):
         elif role:
             self.createItem(parent, line, role)
 
-
     def createItem(self, parent, text, role=None):
         """This function creates a QTreeWidgetItem and then is put into the
         tree. Besides the default flags this itam has, there are also added
         the Qt.ItemIsEditable and Qt.ItemIsSelectable flag.
 
         Args:
-            parent [QTreeWidgetItem]: Who it belongs to for the tree 
+            parent [QTreeWidgetItem]: Who it belongs to for the tree
                 structure hiearchy
             text [str]: The text string to display
             role [array]: Possible help description parameters
         Returns:
-            item [QTreeWidgetItem]: The created item is returned for furthur 
+            item [QTreeWidgetItem]: The created item is returned for furthur
                 tree structure.
         """
         item = QTreeWidgetItem(parent)
@@ -3557,7 +3563,7 @@ class EireneEdit(QTreeWidget):
 
     def set_variables(self, role, text):
         """This function sets the values to the parameters of the input file.
-        This is mainly used for certain situations when a card or cards are 
+        This is mainly used for certain situations when a card or cards are
         dependant on other previous values or booleans.
 
         The values are then stored on the dictionary self.values.
@@ -3577,7 +3583,7 @@ class EireneEdit(QTreeWidget):
         role.insert(1,len(args))
 
     def get_arguments(self, line, type):
-        """This function accepts a string line and then based on a pattern, it 
+        """This function accepts a string line and then based on a pattern, it
         extracts the correct typed values and then return it via an array.
 
         Args:
@@ -3587,19 +3593,19 @@ class EireneEdit(QTreeWidget):
             arguments [array]: Depending on the line it can contain booleans,
                 integers or real numbers.
         """
-        if  type == 'B':
+        if type == 'B':
             arguments = []
             for char in line:
                 if char != ' ':
                     arguments.append(True if char == 'T' else False)
         elif type == 'R':
             arguments = []
-            for i in range(len(line)//12):
-                arguments.append(float(line[12*i:12*(i+1)]))
+            for i in range(len(line) // 12):
+                arguments.append(float(line[12 * i:12 * (i + 1)]))
         elif type == 'I':
             arguments = []
-            for i in range(len(line)//6):
-                arguments.append(int(line[i*6:(i+1)*6]))
+            for i in range(len(line) // 6):
+                arguments.append(int(line[i * 6:(i + 1) * 6]))
         elif type == 'S':
             arguments = ''.join([char for char in line])
 
@@ -3616,7 +3622,7 @@ class EireneEdit(QTreeWidget):
         return self.TextModified
 
     def toPlainText(self):
-        """ It returns the text from the editor. It is first gathered from the 
+        """ It returns the text from the editor. It is first gathered from the
         elements of the tree then returned.
 
         Returns:
@@ -3663,17 +3669,17 @@ class EireneEdit(QTreeWidget):
         item = QTreeWidgetItem()
         item.setText(0, '*')
         item.setFlags(item.flags() | Qt.ItemIsEditable | Qt.ItemIsSelectable)
-        if parent == None:
-            self.insertTopLevelItem(self.indexOfTopLevelItem(at_item)+1,
+        if parent is None:
+            self.insertTopLevelItem(self.indexOfTopLevelItem(at_item) + 1,
                                     item)
         else:
-            parent.insertChild(self.indexOfChild(at_item)+1,
+            parent.insertChild(self.indexOfChild(at_item) + 1,
                                item)
         self.TextModified = True
 
     def removeRow(self, item):
         parent = item.parent()
-        if parent == None:
+        if parent is None:
             self.takeTopLevelItem(self.indexOfTopLevelItem(item))
         else:
             parent.removeChild(item)
@@ -3681,7 +3687,7 @@ class EireneEdit(QTreeWidget):
 
     def rowNumber(self, item):
         parent = item.parent()
-        if parent == None:
+        if parent is None:
             row = self.indexOfTopLevelItem(item)
             for i in range(row):
                 row += self.rowCount(self.topLevelItem(i))
@@ -3740,16 +3746,16 @@ class Eirene(QWidget):
                               "<p> CTRL + I to insert rows</p>"
                               "<p> CTRL + K to remove row</p>")
         elif parameter in eirene_params:
-                self.help.setText('<b>' + parameter + '</b>:'
-                                + '<p>' + eirene_params[parameter] + '<p>')
+                self.help.setText('<b>' + parameter + '</b>:' +
+                                  '<p>' + eirene_params[parameter] + '<p>')
         else:
             for card in self.group_cards:
                 if parameter.startswith(card):
-                    self.help.setText('<b>' + parameter + '</b>:'
-                                    + '<p>' + eirene_params[card] + '<p>')
+                    self.help.setText('<b>' + parameter + '</b>:' +
+                                      '<p>' + eirene_params[card] + '<p>')
                     return
 
-            self.help.setText('<b>' + parameter + '</b>:' + 
+            self.help.setText('<b>' + parameter + '</b>:' +
                               eirene_params['NOD'])
 
     def setPlainText(self, text):
@@ -3771,8 +3777,8 @@ class Eirene(QWidget):
 if __name__ == "__main__":
 
     import sys, os
-    from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel,
-                                QTreeWidgetItemIterator)
+    from PyQt5.QtWidgets import (QApplication, QMainWindow,
+                                 QTreeWidgetItemIterator)
 
     os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1' # for solving high-dpi
     app = QApplication(sys.argv)                    # problems
@@ -3782,7 +3788,6 @@ if __name__ == "__main__":
         def __init__(self, parent=None):
             super(Standalone, self).__init__(parent)
             self.eirene = Eirene(self)
-            self.eirene.tree.itemSelectionChanged.connect(self.UpdateStatusBar)
             self.eirene.tree.setSelectionMode(
                                             QAbstractItemView.SingleSelection)
             self.setCentralWidget(self.eirene)
@@ -3805,12 +3810,24 @@ if __name__ == "__main__":
                 else:
                     logging.error('Path does not exist.')
 
-        @pyqtSlot()
+        def event(self, e):
+            if e.type() == QEvent.KeyRelease:
+                self.UpdateStatusBar()
+            return super(Standalone, self).event(e)
+
         def UpdateStatusBar(self):
             selectedItem = self.eirene.tree.selectedItems()[0]
 
             # Cursor position
             # TODO
+            try:
+                editor = self.eirene.tree.card_edit_delegate.lineEdit
+                if editor:
+                    cursor_position = editor.cursorPosition()
+                else:
+                    cursor_position = 0
+            except RuntimeError as e:
+                cursor_position = 0
 
             # Row
             row = 0
@@ -3826,17 +3843,18 @@ if __name__ == "__main__":
 
             # Block
             parentItem = selectedItem.parent()
-            if parentItem != None:
+            if parentItem is not None:
                 block = parentItem.data(0, Qt.DisplayRole)
             else:
                 block = selectedItem.data(0, Qt.DisplayRole)
-            message = '%6d' % row + ' ' + '%s' % block 
+            message = '%6d' % row + ' ' + '%3d' % cursor_position + ' ' + \
+                      '%s' % block
             self.statusBar().showMessage(message)
 
-    if len(sys.argv) > 1: 
+    if len(sys.argv) > 1:
         input_dat = sys.argv[1]
     else:
-        input_dat='input.dat'
+        input_dat = 'input.dat'
         #input_dat='input_2.dat'
     mainwindow = Standalone()
     mainwindow.eirene.tree.readInput(os.path.expanduser(input_dat))
