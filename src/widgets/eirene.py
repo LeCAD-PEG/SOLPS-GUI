@@ -3738,13 +3738,13 @@ class Eirene(QWidget):
                 type_of_card = card_data[0]
                 if type_of_card:
                     card_variables = card_data[2]
-                    text = '<p>'+type_of_card+" :"+" ".join(card_variables)+\
-                           '</p>'
+                    text = '<p>' + type_of_card + " :" \
+                           " ".join(card_variables) + '</p>'
             self.help.setText(text + "<p> Press F2 to edit line."
-                              "<p> Use arrow keys to navigate through rows and\
-                              to expand/collapse rows.<p>"
-                              "<p> CTRL + I to insert rows</p>"
-                              "<p> CTRL + K to remove row</p>")
+                              "<p>Use arrow keys to navigate through rows "
+                              "and to expand/collapse rows.</p>"
+                              "<p>CTRL + I to insert rows. "
+                              "CTRL + K to remove row</p>")
         elif parameter in eirene_params:
                 self.help.setText('<b>' + parameter + '</b>:' +
                                   '<p>' + eirene_params[parameter] + '<p>')

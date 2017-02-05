@@ -12,7 +12,8 @@ SIP_VERSION=4.18
 case $(hostname -f) in
   *.iter.org) # RHEL5.11 with GCC 4.2
 	module purge
-	module load GCC/4.8.3 binutils/2.25 python/2.7/11 #gperf
+	# module load GCC/4.8.3 binutils/2.25 python/2.7/11 #gperf
+        module load imas/3.7.2/ual/3.3.14
 	USE_QT_XCB="NO"
 	BUILD_XCB="YES"
 	unset CXX CC # Remove ICC to be selected by chance
@@ -83,7 +84,13 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   make install
   LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
   ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
-      pip sphinx sphinx_rtd_theme matplotlib
+      pip sphinx sphinx_rtd_theme matplotlib mock nose
+  # The following Python modules are preferred by IMAS
+  if [ x${IMAS_PREFIX}" != x ]; then
+    ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
+      Cython mpi4py scipy luigi tornado deap decorator liac-arff ecdsa \
+      netaddr paramiko paycheck # netifaces 
+  fi
   touch ${PYTHON_SRC_DIR}/.built
 fi
 
