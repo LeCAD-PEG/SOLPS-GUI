@@ -37,7 +37,13 @@ P<sub>3</sub></p>
 <p>P 2 =(P2(1),P2(2),P2(3))</p>
 <p>P 3 =(P3(1),P3(2),P3(3))</p>"""
 
-eirene_params = {
+eirene_params = { 
+
+'*** 1. Data for operating mode' : """The variables in this
+block control some of the more general options in EIRENE such as over- all
+running time, usage of dump files but also a few parameters depending on the
+simulation model (drifts included or not, etc.).""",
+
 'NOD' : """<p>No description available.</p>""",
 
 'NMACH' : """<b>Code-number</b> for the computer used
@@ -303,6 +309,14 @@ input block 2.13. More details: see paragraph 2.1.3 below.</p>""",
 string CFILE in the input file. <quote>CFILE</quote> DBHANDLE DBFNAME""",
 
 # *** 2.
+
+'*** 2. Data for standard mesh' : """EIRENE follows atoms, molecules or test
+ions in a 3-dimensional computational box. This box is discretized by zones
+(mesh cells), the boundaries of which are defined either by regular
+&quot;standard mesh surfaces&quot;, i.e., co-ordinate surfaces, which are
+described here, and/or by zones whose boundaries are defined more generally by
+&quot;additional surfaces&quot; (see below block 3B).""",
+
 'INGRD(1)' : """This index controls the meaning of input
 variables of different standard grid options.
 <dl>
@@ -747,6 +761,15 @@ seen by the test-particles.</p>""",
 
 #2.3 Block 3
 
+'*** 3a. Data for non default standard surfaces' : """Grid surfaces may be
+assigned special properties (e.g.: reflecting, absorbing, periodicity, modified
+cell index switching, etc...). Their definition is described in subsection
+2.3.1. In addition to these grid surfaces also additional surfaces can be seen
+by the histories (vacuum boundaries, special surfaces for scoring fluxes,
+diagnostic surfaces, ....). Such surfaces can be general linear or second order
+surfaces in 3D space. Their definition and properties are described in
+subsection 2.3.2.""",
+
 'ILPLG' : """<p>EIRENE can write out information for a finite element mesh
 generator to produce a grid of triangles for a multiply connected 2D domain
 with cracks and holes. The various (inner and outer) boundaries are given as
@@ -816,6 +839,10 @@ surface index ranges of the 1st and 2rd mesh, respectively, for which this
 surface acts as non-default surface. IRPTA3 and IRPTE3 are irrelevant.</p>""",
 
 # 2.3.2
+
+'*** 3b. Data for additional surfaces' : """Internally each additional surface
+is defined by an algebraic equation and some algebraic inequalities specifying
+the boundary of that surface""",
 
 'CH-card' : """<p><b>CH0 n1/m1 n2/m2 ... </b> surfaces from the range n1 to m1,
 n2 to m2, ..., are ignored by EIRENE. Specifying a surface in such a CH0-card
@@ -920,6 +947,19 @@ inequalities.</dd><br>
 """,
 
 # 2.4
+
+'*** 4. Data for species and atomic physics module' : """EIRENE can handle up
+to NATM &quot;atomd&quot; species, NMOL &quot;moleculed&quot; species, NION
+&quot;test iond&quot; species, NPHOT &quot;photond&quot; species (lines) and
+NREAC different atomic, molecular or photonic reactions between these
+&quot;test particlesd&quot; and the &quot;bulk ionsd&quot; or electrons. There
+may be up to NPLS &quot;bulk iond&quot; species, and one electron gas derived
+internally from the assumption of local charge neutrality. Amongst the heavy
+background particles (the &quot;bulk ionsd&quot;) may be species with charge
+state zero, i.e., neutral particles. By abuse of language, we refer to them as
+&quot;bulk ionsd&quot; as well, but we mean in this case: heavy background
+particles, i.e. more general objects.""",
+
 'NREACI' : """Total number of different reactions to be read.</p> 
 <dl> <dd><p>The next block has different meanings for &ldquo;real
 particles&rdquo; and &ldquo;photons&rdquo;. Cross section and rate coefficients
@@ -1005,7 +1045,12 @@ particle <position rather than at the cell center (=const. per cell).
 
 # 2.5
 
-# 2.6
+'*** 5. Data for plasma background' : """The background medium (mostly plasma)
+consists of NPLS (sometimes in the code: NPLSI) different so called &quot;bulk
+particle&quot; species, also referred to as &quot;bulk ions&quot;, by abuse of
+language. For each of these species arrays of the parameters: particle density,
+temperature, flow velocity (3 cartesian components), are defined, one value per
+parameter and per grid cell. There are, in total, NSBOX cells in a run.""",
 
 'NLTRIM' : """<dl><dd>TRIM database is used, if &ldquo;Database Reflection
 Model&rdquo; is specified in at least one block for local reflection data. Data
@@ -1337,6 +1382,16 @@ particle reflection model.</em>
 
 # 2.6
 
+'*** 6a. General data for reflection model' : """An outline of surface
+interaction models in general terms was given in section 1.4. As for the
+implementation of such models in EIRENE, there are two parts to the surface
+interaction data block. The first part contains data which are general to the
+EIRENE reflection model (&quot;Block for General Reflection Data&quot;), at all
+surfaces. The second part may be different for each individual surface element
+(label: MSURF ) and thus must be specified for each reflecting &quot;non-
+default&quot; surface of the &quot;standard mesh&quot; and for each reflecting
+&quot;additional surface&quot;.""",
+
 'ERMIN' : """For incident particle energies below ERMIN, the
 <quote>fast</quote> particle reflection model is switched off. Only the
 <quote>thermal</quote> particle model is used.""",
@@ -1659,6 +1714,19 @@ sputtered particle. Currently not in use. Default: ESPUTS = 0.""",
 
 # 2.7
 
+'*** 7. Data for primary sources, nstrai strata' : """The primary source (and:
+initial distribution of test particles, in time dependent mode) is given as a
+function Q(i, r, t, v). Q is the density of the probability distribution from
+which the species index i, the starting point r, the velocity vector v and the
+starting time t are sampled in subroutine LOCATE. (i, r, t, v) is the state of
+the starting particle, which then will be &quot;followed&quot; (traced) in
+subroutine FOLNEUT or FOLION. There are five primary types of spatiotemporal
+distributions for primary sources (&quot;Strata&quot;) , namely Point sources,
+Line sources (to be written), Surface sources, Volume sources and &quot;Census
+sources&quot;. The first four are uniform in a time-interval (or time-
+independent), and the fifth one is an initial distribution (in volume) at a
+given point in time.""",
+
 'NSTRAI' : """Number of different sources ("Strata"), which are computed one 
 after the other and are linearly superimposed at the end of the run.<br>
 (NSTRAI &le: NSTRA, see "Parameter-Statements")""",
@@ -1809,8 +1877,6 @@ start po- sition of a test particle on a surface, then the species index NSPEZ
 automatically also fixes the choice of the index ISPZ for the spatial step
 function STEP(ISTEP,ISPZ,...) selected by the flags SORLIM and SORIND (=ISTEP)
 (see below). This default can be overruled when SORIND has three digits.""",
-
-# 2.7
 
 'Plasma properties. Section 2.7' : """
 <b>FLUX SCALV IVLSF ISCLS ISCLT ISCL1 ISCL2 ISCL3 ISCLB ISCLA</b>
@@ -2124,10 +2190,33 @@ of surface sources.</p>""",
 
 #2.8
 
+'*** 8. Additional data for specific zones' : """Input data in this block
+permit explicit specification of plasma parameters T<sub>e</sub> ,
+T<sub>i</sub> , D<sub>i</sub> , V<sub>x</sub> , V<sub>y</sub> , V<sub>z</sub>
+and of zone volumes VOL in selected cells ICELL. Furthermore, information may
+be given to the geometrical block of EIRENE that some &quot;additional
+surfaces&quot; are &quot;invisible&quot; for a particle located in cell ICELL
+and, therefore, possible crossings need not be checked for advancing this
+particle at the next step. (Intelligent use of this option can lead to a
+considerable speeding up of the code, less intelligent use will lead to
+dramatic errors.) All this information will be included in the EIRENE arrays
+after the initialization phase (Subroutines INPUT, PLASMA, GRID, VOLUME) and
+before setting the derived profiles (D<sub>e</sub> , flux-surface labelling
+grids,...)""",
+
 'NZADD' : """Number of specific zones.""",
 # No actual description in this section.
 
 #2.9
+
+'*** 9. Data for statistic and nonanalog model' : """The statistical
+performance (FOM, d&quot;figure of merit&quot, see equation 3.25 in section
+1.3.3) of an EIRENE run (as for any Monte Carlo application in general) is very
+sensitive to the non- analog methods used by EIRENE. Therefore the input
+parameters in this block, which define the non-analog setting of an EIRENE run,
+should only be used, if the user has carefully worked through the code and has
+a detailed knowledge of the Monte Carlo techniques acti- vated by setting the
+flags in this block.""",
 
 'NLPRCA' : """conditional expectation estimator (eq. 3.22) is used for atom
 species IATM""",
@@ -2253,6 +2342,13 @@ between which the cor- relation coefficient is evaluated""",
 
 #2.10
 
+'*** 10. Data for additional tallies' : """There is a large number of
+preprogrammed d&quot;default&quot volume or surface averaged tallies, which
+have been selected mainly to allow assessment of global particle and energy
+balances for all test particle species, as well as coupling of neutral gas and
+plasma transport equations. These tallies are estimated at each EIRENE run
+unless they are explicitly abandoned by the surface crossing switches ILSWCH
+(section 2.3.2), or are turned off in input block 2.11.""",
 
 'NADVI' : """Total number of additional volume averaged, track-length estimated
 tallies""",
@@ -2349,6 +2445,16 @@ volume averaged tally, by abuse of language (tally number = -14, see table
 
 #2.11
 
+'*** 11. Data for numerical and graphical output' : """The input flags in this
+block control all the numerical and graphical output of an EIRENE run. This
+comprises diagnostics during the initialization phase (e.g. 2d and 3d geometry
+plots) as well as selected test particle histories printed and plotted during
+their generation. All numerical output of a run is arranged in so called
+d&quot;tallies&quot. There are volume averaged tallies, surface averaged
+tallies (d&quot;surface crossing tallies&quot) and global tallies. These latter
+tallies are derived from the former ones by integration over the total
+computational volume, or over all non-transparent surfaces, respectively.""",
+
 'TRCPLT' : """Trace-back from plot routines.""",
 
 'TRCHST' : """Printout of trajectories of selected test particle histories into
@@ -2430,10 +2536,26 @@ and stratum resolved census fluxes""",
 'TRCDBGMPI' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""",
 'TRCDBGC' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""",
 
-'*** 11. Data for numerical and graphicaloutput' : """TODO""",
-
-
 #2.12
+
+'*** 12. Data for diagnostic module' : """The data in this block are used to
+define a line-of-sight (LOS) across the computational do- main, are
+evaluated.This is done in subroutine LININT, which is called from subroutine
+DIAGNO at the end (post processing phase) of an EIRENE run. The spatial
+dependence of the function g(l) is defined as function of one or more of the
+estimated volume averaged tallies (e.g., atom density), and/or input tallies
+(e.g. plasma temperatures). At present there are two (version 2004 and older)
+or three preprogrammed functions g(l), and the option to call a user supplied
+integrant. Firstly there are the Lyman- and Balmer series volume source rates
+(emissivity), see Subr. SIGAL. Secondly the neutral atom charge exchange source
+rate can be integrated along a line of sight for a given energy of the
+impacting plasma ion (Subr. SIGCX). This routine includes re-absorption along
+the line of sight. A LOS spectrum (also: d&quot;side-on spec- trum&quot) of up
+to NCHEN energies may be obtained by this procedure. Thirdly (version 2005 and
+younger) the side-on radiances of selected lines (photon test particle
+species), including reabsorption, can be obtained (Subr. SIGRAD). A number of
+different emission line shape profiles is available for these.""",
+
 'NCHORI' : """Total number of different line of sights""",
 
 'NCHENI' : """<p>ABS(NCHENI) is the total number of energies, at which the
@@ -2583,6 +2705,21 @@ case of NSPTAL = 2).""",
 
 #2.13
 
+'*** 13. Data for nonlinear and time dep. option' : """The data in this block
+are used to define a discretisation in time, and the test-particle self
+interaction effects. These latter options are based upon the d&quot;Bird’s
+Direct Monte Carlo Sim- ulation&quot (DMCS) procedure, and are currently not in
+use (see [23] for a detailed description of its implementation in EIRENE). They
+can be activated by replacing the current dummy routine STOSS, which is called
+after each time-step from subroutine EIRENE, by a routine that reads the
+particle population from the d&quot;census arrays&quot described below, and
+which then carries out the binary self-collisions (modification of the
+individual particle velocity vectors). The rest of the code for time dependency
+and the DMCS algorithm is the same and described in this section. Note that,
+currently, with the use of a dummy routine STOSS, non-linear self collision
+effects can still be simulated, in BGK approximation, by using the iterative
+mode of operation (NITERI, NITERE, input block 1), see section 1.9.""",
+
 'NPRNLI' : """<p>Total number of test particles in time dependent arrays
 (<quote>census arrays<quote>) (in old versions before 2001: NPRNLI must be &le;
 NPRNL, see: PARMUSR). The scoring on census arrays stops at latest when NPRNLI
@@ -2671,9 +2808,22 @@ equal NSNV (see PARMUSR), and the detector functions are user supplied in
 subroutine UPNUSR, see Sub-section 3.2.3.
 <p>Default: NSNVI=0</p>""",
 
-'*** 11. Data for numerical and graphical output' : """TODO""",
 #2.14
-'*** 14. Data for interfacing routine "infusr"' : """TODO""",
+
+'*** 14. Data for interfacing routine "infusr"' : """Data in input block 14
+control additional input for an EIRENE run. In case NMODE = 0 (see input block
+1), i.e., no call to interfacing subroutine INFCOP, only the additional input
+tallies ADIN (see table 5.1), if any, are specified here. Otherwise, if NMODE
+&ne;  0 the data in this block are read from the code interfacing subrou- tine
+INFCOP (at entry IF0COP) rather than from subroutine INPUT. They may be used to
+modify or complete the model defined by the formatted input file so far. For
+example, by this option the entire geometry specification (blocks 2,3) can be
+modified or overwritten by a few geometry parameters without rewriting input
+blocks 2 and 3. This allows rapid geometry op- timization (geometry parameter
+studies), which otherwise would require to generate a large set of different
+geometry input blocks. As this routine is problem specific, it must be written
+by the user and, therefore, input can be from any file and in any format chosen
+there.""",
 
 'LSYMET' : """<dl>
 <dt>=.TRUE.</dt>
@@ -2923,34 +3073,44 @@ particles (neutrals and ions) is conserved.""",
 
 # *** 15.
 
+'*** 15. Data for interfacing routine "geousr"': """This input block is used to
+adjust the edges of the additional walls in the Eirene description of the
+vacuum vessel walls to match exactly the location of the grid corners from the
+plasma solver in B2.5. This block may begin with an optional text line
+containing either GENERAL or BIASED GARCHING, which changes the format below.
+The SOLPS-ITER default is to not include this text line. By default, the grid
+corners at the targets will be adjusted to the additional surfaces specified,
+and there should be one such additional surface per grid corner. Each
+additional surface can only serve for one grid corner adjustment, no more.""",
+
 'NADMOD' : """Number of additional surfaces to be modified (should be 2 per
 divertor target, and 2 for a limiter geometry case)""",
 
 'NASMOD' : """Number of standard surfaces to be modified. Should be 0 for
 standard SOLPS-ITER couplings.""",
 
-'NORMOD' : """ Number of cell faces whose normal is to inverted. Should be 0 for
-standard SOLPS-ITER couplings.""",
+'NORMOD' : """ Number of cell faces whose normal is to inverted. Should be 0
+for standard SOLPS-ITER couplings.""",
 
 'NRS' : """Index of the additional surface being modified""",
 
 'IPUNKT' : """ABS(IPUNKT) is the index of the vertex of that additional surface
 being modified""",
 
-'XCOOR' : """New X-coordinate of the point being modified (in cm). Not necessary
-in standard SOLPS-ITER couplings.""",
+'XCOOR' : """New X-coordinate of the point being modified (in cm). Not
+necessary in standard SOLPS-ITER couplings.""",
 
-'YCOOR' : """New Y-coordinate of the point being modified (in cm). Not necessary
-in standard SOLPS-ITER couplings.""",
+'YCOOR' : """New Y-coordinate of the point being modified (in cm). Not
+necessary in standard SOLPS-ITER couplings.""",
 
-'ZCOOR' : """New Z-coordinate of the point being modified (in cm). Not necessary
-in standard SOLPS-ITER couplings.""",
+'ZCOOR' : """New Z-coordinate of the point being modified (in cm). Not
+necessary in standard SOLPS-ITER couplings.""",
 
 'XPOLPOS' : """X-index (poloidal) of the grid cell to which the additional
 surface vertex must be matched""",
 
-'YPOLPOS' : """Y-index (radial) of the grid cell to which the additional surface
-vertex must be matched""",
+'YPOLPOS' : """Y-index (radial) of the grid cell to which the additional
+surface vertex must be matched""",
 
 'NAS' : """Index of the standard surface to be modified""",
 
@@ -2967,6 +3127,10 @@ vertex must be matched""",
 
 
 #*** OPEN MPI DISTRIBUTION
+
+'*** INFORMATION FOR MPI' : """Choose the MPI parallelization strategy to be
+applied""",
+
 'DISTRIBUTION' : """<p>MPI parallelization strategies</p>
 <dl>
 <dt>BALANCED_DISTRIBUTION</dt>
@@ -3807,7 +3971,6 @@ class EireneEdit(QTreeWidget):
             self.getline(['I', 'NADMOD', 'NASMOD'])
             for i in range(1, self.values['NADMOD'] + 1):
                 line = self.getline().split()
-                print(line)
                 if int(line[1]) < 0:
                     role = ['S', 'NRS', 'IPUNKT', 'XPOLPOS', 'YPOLPOS']
                 else:
@@ -3828,7 +3991,9 @@ class EireneEdit(QTreeWidget):
         while line is not None:
             self.row += 1
             if line.startswith('***'):
-                self.curr_par = self.grup_par = self.createItem(self, line)
+                role = ['S', line]
+                item = self.createItem(self, line, role)
+                self.curr_par = self.grup_par = item
                 break
 
             elif line.startswith('**'):
@@ -3916,16 +4081,13 @@ class EireneEdit(QTreeWidget):
         item = QTreeWidgetItem(parent)
         item.setText(0, text)
         item.setFlags(item.flags() | Qt.ItemIsEditable | Qt.ItemIsSelectable)
-        if self.grup_par == self:
-            block = item.data(0, Qt.DisplayRole)
-        else:
-            block = self.grup_par.data(0, Qt.DisplayRole)
+
         if role:
             self.set_variables(role, text)
-            # user_role = (type, number of args, variables name, row)
-            user_role = (role[0], role[1], role[2:], self.row, block)
+            # user_role = (type, number of args, variables name)
+            user_role = (role[0], role[1], role[2:])
         else:
-            user_role = (None, None, None, self.row, block)
+            user_role = (None, None, None)
         item.setData(0, Qt.UserRole, user_role)
         return item
 
@@ -4036,13 +4198,17 @@ class EireneEdit(QTreeWidget):
         parent = at_item.parent()
         item = QTreeWidgetItem()
         item.setText(0, '*')
+
         item.setFlags(item.flags() | Qt.ItemIsEditable | Qt.ItemIsSelectable)
         if parent is None:
-            self.insertTopLevelItem(self.indexOfTopLevelItem(at_item) + 1,
+            item.setData(0, Qt.UserRole, (None, None, None))
+            self.insertTopLevelItem(self.indexOfTopLevelItem(at_item),
                                     item)
         else:
-            parent.insertChild(self.indexOfChild(at_item) + 1,
+            item.setData(0, Qt.UserRole, (None, None, None))
+            parent.insertChild(parent.indexOfChild(at_item),
                                item)
+        self.setCurrentItem(item)
         self.TextModified = True
 
     def removeRow(self, item):
@@ -4109,6 +4275,8 @@ class Eirene(QWidget):
                     card_variables = card_data[2]
                     text = '<p>' + type_of_card + " :" +\
                            " ".join(card_variables) + '</p>'
+                elif item.data(0, Qt.DisplayRole).startswith('***'):
+                    text = "Block: " + item.data(0, Qt.DisplayRole)
             self.help.setText(text + "<p> Press F2 to edit line."
                               "<p>Use arrow keys to navigate through rows "
                               "and to expand/collapse rows.</p>"

@@ -40,33 +40,33 @@ class B2mnHighlighter( QSyntaxHighlighter ):
         comment = QTextCharFormat()
 
         keyword = QTextCharFormat()
-        keyword.setForeground( Qt.darkBlue )
-        keyword.setFontWeight( QFont.Bold )
+        keyword.setForeground(Qt.darkBlue)
+        keyword.setFontWeight(QFont.Bold)
         keywords = []
         for key in b2mn_tooltips:
             keywords.append(key)
 
         for word in keywords:
             pattern = QRegExp("\\b" + word + "\\b")
-            rule = HighlightingRule( pattern, keyword )
-            self.highlightingRules.append( rule )
+            rule = HighlightingRule(pattern, keyword)
+            self.highlightingRules.append(rule)
 
         # comment
-        brush = QBrush( Qt.darkGreen, Qt.SolidPattern )
-        pattern = QRegExp( "^\*[^\n]*" )
-        comment.setForeground( brush )
-        rule = HighlightingRule( pattern, comment )
-        self.highlightingRules.append( rule )
+        brush = QBrush(Qt.darkGreen, Qt.SolidPattern)
+        pattern = QRegExp("^\*[^\n]*")
+        comment.setForeground(brush)
+        rule = HighlightingRule(pattern, comment)
+        self.highlightingRules.append(rule)
 
-    def highlightBlock( self, text ):
+    def highlightBlock(self, text):
       for rule in self.highlightingRules:
-        expression = QRegExp( rule.pattern )
-        index = expression.indexIn( text )
+        expression = QRegExp(rule.pattern)
+        index = expression.indexIn(text)
         while index >= 0:
           length = expression.matchedLength()
-          self.setFormat( index, length, rule.format )
-          index = text.find(str(expression), index + length )
-      self.setCurrentBlockState( 0 )
+          self.setFormat(index, length, rule.format)
+          index = text.find(str(expression), index + length)
+      self.setCurrentBlockState(0)
 
 
 class HighlightingRule():
@@ -205,6 +205,7 @@ class SolpsInput(QTabWidget):
             self.editors[filename] = plainTextEdit
             if filename == 'input.dat':
                 eirene = Eirene()
+                self.removeTab(tab_index)
                 tab_index = self.addTab(eirene, filename)
                 self.editors[filename] = eirene
             self.setTabToolTip(tab_index, tooltip)
