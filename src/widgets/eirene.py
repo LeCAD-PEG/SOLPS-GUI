@@ -2482,8 +2482,9 @@ a unit vector along this present line of sight).""",
 'NSPSTR' : """Index for stratum, which is to be used for line integration
 (NSPSTR = 0: sum over strata).""",
 'NSPSPZ' : """<p>In case NSPTAL=1:</p>
-<p>Index for atomic species IATM, with IATM ≤ NATM, for which charge exchange
-spectrum is to be computed (NSPSPZ = 0: sum over atom species index)</p>
+<p>Index for atomic species IATM, with IATM &le; NATM, for which charge
+exchange spectrum is to be computed (NSPSPZ = 0: sum over atom species
+index)</p>
 <p>In case NSPTAL=2:</p>
 <p>Number of contribution to line intensity, as programmed in Subr.
 Ba<sub>Alpha</sub , Ba<sub>Gamma</sub> , Ly<sub>Beta</sub> , etc. (Currently up
@@ -2673,11 +2674,319 @@ subroutine UPNUSR, see Sub-section 3.2.3.
 '*** 11. Data for numerical and graphical output' : """TODO""",
 #2.14
 '*** 14. Data for interfacing routine "infusr"' : """TODO""",
-#2.15
-'*** 15. Data for interfacing routine "geousr"' : """to be written""",
-#2.16
-'*** 16' : """to be written""",
 
+'LSYMET' : """<dl>
+<dt>=.TRUE.</dt>
+<dd>Upside-down symmetry of all tallies transferred to external code via common
+block EIRBRA) is enforced.</dd>
+<dd>Symmetry plane is the PSURF/2. surface, i.e., the poloidal (or y) co-
+ordinate surface PSURF(NP2ND/2) at the center of the computational interval in
+this co- ordinate.</dd>
+<dd>This option has historical reasons. The very first B2-EIRENE runs ever have
+been performed for &quot;upside-down symmetric&quot; ITER double null
+configurations (Reiter et al., 1991, [2]). In more recent versions this option
+may not be available anymore.</dd>
+<dt>=.FALSE:</dt>
+<dd>no such symmetry is enforced</dd>
+</dl>""",
+
+'LBALAN' : """dl>
+<dt>=.TRUE.</dt>
+<dd>Global particle and energy flux balance is performed and printed at
+the end of an EIRENE stand alone run (steady state or single time-step) and at
+the end of a short cycle between a plasma transport code and EIRENE. These
+balances compare plasma particle and energy fluxes at the boundaries, volume
+sources in plasma balance equations and neutral-plasma interaction sources and
+sinks.</dd>
+<dt>=.FALSE:</dt>
+<dd>no such balances are computed</dd>
+</dl>""",
+
+'LCHKQUD' : """Check quadrangles switch ???""",
+
+'NFLA' : """Number of different (bulk) ion species in plasma code.""",
+
+'NCUTB' : """Number of mesh cells in each grid cut in plasma code (specific to
+grid generator used in connection with B2 fluid code).""",
+
+'NCUTL' : """Number of mesh cells in each grid cut in EIRENE.
+<p>Note: if NCUT 6 &ne; NCUTL, the index mapping routines INDMAP and INDMPI are
+called at each call to the interfacing routines.</p>""",
+
+'MSHFRM' : """new flags, available only since 2013, see section 2.14.3""",
+'NTRFRM' : """new flags, available only since 2013, see section 2.14.3""",
+'NFULL' : """new flags, available only since 2013, see section 2.14.3""",
+'IBRAD' : """new flags for magnetic field orientation, available only since
+March 2015, see section 2.14.3""",
+'IBPOL' : """new flags for magnetic field orientation, available only since
+March 2015, see section 2.14.3""",
+'IBTOR' : """new flags for magnetic field orientation, available only since
+March 2015, see section 2.14.3""",
+
+'I' : """irrelevant, labelling index for EIRENE bulk ion species IPLS, runs
+from 1 to NPLS""",
+
+'IFLB' : """<dl><dt>>0</dt>
+<dd>labelling index of bulk ion species in plasma code. EIRENE bulk ion species
+IPLS corresponds to plasma code species IFLB(IPLS). Hence: IFLB &le; NFLA,
+otherwise: error exit.</dd>
+<dd>The drift velocity vector for all EIRENE species IPLS is set identical to
+the drift velocity of the plasma code species IFLB(IPLS).</dd>
+<dd>Only one common ion temperature is available from B2, B2.5 code runs, even
+for multi-species applications. The bulk ion temperature TIIN(IPLS,....) for
+all EIRENE species IPLS, which are read from the plasma code data files, i.e.,
+for all species with IFLB(IPLS) > 0</dd>
+<dt><0</dt>
+<dd>The plasma density, flow field and temperature field for EIRENE species
+IPLS is read from the input stream fort.II, with II=-IFLB. (Currently only
+II=13). This file fort.13 must be available, e.g., from a previous EIRENE run,
+in which NFILEL = 1 or NFILEL = 3 options have been used to produce that file.
+(see input block 1). This option permits iteration on some species, which are
+not treated in the plasma code, e.g.: for neutral-neutral interactions.</dd>
+<dt>=0</dt>
+<dd>The corresponding bulk ion species IPLS in EIRENE has zero density, i.e.
+bulk ions of this species are not present in this EIRENE run. Note the issue
+re. electron density and quasi-neutrality mentioned above.</dd></dl""",
+
+'FCTE' : """<p>bulk ion density (and flux) multiplication factor. The EIRENE
+bulk ion density (and fluxes) for species IPLS are obtained by multiplying the
+corresponding plasma code profiles for species IFLB(IPLS) with the factor FCTE.
+This option is needed, e.g., if the plasma code treats one ion species of mass
+2.5 AMU, while EIRENE treats D ions and T ions separately.</p>
+<p>Note: in an iterative mode all plasma species in the plasma code should also
+be in EIRENE. There may be more in EIRENE, with charge state zero (see
+introduction to section 2.4), but not less, because otherwise the electron
+density computed in EIRENE from quasi-neutrality (and used, e.g., for
+ionization mean free paths), may be inconsis- tent with the electron density in
+the plasma code.</p>""",
+
+'BMASS' : """Mass of plasma code species IFLB(IPLS) is BMASS(IPLS) in AMU.""",
+
+'NDXA' : """grid size in 2D plasma code. NDXA is the size of the grid
+tangential to the flux surfaces, and NDYA is the size of the grid normal to the
+flux surfaces.<br> These grid sizes have to be equal to the grid sizes (1st and
+2nd grid RSURF and PSURF) of the mesh, on which plasma code data are specified
+for EIRENE.<br> I.e., NDYA=NR1ST-1 and NDXA=NP2ND-1 must be obeyed.""",
+
+'NDYA' : """grid size in 2D plasma code. NDXA is the size of the grid
+tangential to the flux surfaces, and NDYA is the size of the grid normal to the
+flux surfaces.<br> These grid sizes have to be equal to the grid sizes (1st and
+2nd grid RSURF and PSURF) of the mesh, on which plasma code data are specified
+for EIRENE.<br> I.e., NDYA=NR1ST-1 and NDXA=NP2ND-1 must be obeyed.""",
+
+'NTARGI' : """Number of different surface recycling sources defined from the
+plasma code sur- face effluxes at specified boundaries.""",
+
+'NTGPRT' : """Number of different surface segments (radially or poloidally), by
+which this target recycling stratum no. ITARGI is composed.""",
+
+'NDT' : """number of surface in plasma code mesh, either in tangential or in
+normal direction. If the plasma code uses cell centered indexing, then the
+north and the east surfaces of a cell are labeled by the indices of the cell.
+In EIRENE cell indexing, the south and the west surface have the same index as
+the corresponding cell in the first (radial) and second (poloidal) mesh,
+respectively. Therefore NDT may be different from the surface labelling index
+in EIRENE input block 2.3.1. Note also that NDT refers to cell numbers after
+index mapping, if NCUTL is not equal to NCUTB.""",
+
+'NINCT' : """<dl>
+<dt>=1</dt>
+<dd>positive (i.e., outer) surface normal is in the positive co-ordinate
+direction (as it is the case by default for EIRENE standard co-ordinate
+surfaces).</dd>
+<dt>=-1</dt>
+<dd>positive surfaces normal is in the negative co-ordinate
+<direction./dd>/dl>""",
+
+'NIXY' : """<dl>
+<dt>=1</dt>
+<dd>surface in the direction normal to the flux surface, i.e., it belongs to
+the 2nd EIRENE mesh PSURF (usually: divertor target)</dd>
+<dt>=2</dt>
+<dd>surface is in the tangential direction, i.e., it belongs to the 1st EIRENE
+mesh RSURF (usually: vessel, liner, interface to vacuum region)</dd></dl>""",
+
+'NTIN' : """<p>The surface source is restricted to the cells ranging from cell
+number NTIN to cell number NTEN-1, along the co-ordinate surface.</p>
+<p> Note that NTIN and NTEN label cell boundaries, hence the NTEN-1 above.</p>
+<p> Note further: the total number of surface cells in one surface recycling
+source ITARG (i.e., summed over NTGPRT(ITARG)) must not be larger then
+NR1ST+NP2ND (see definition of parameter NGITT in Common Deck PARMMOD).</p>""",
+
+'NTEN' : """<p>The surface source is restricted to the cells ranging from cell
+number NTIN to cell number NTEN-1, along the co-ordinate surface.</p>
+<p> Note that NTIN and NTEN label cell boundaries, hence the NTEN-1 above.</p>
+<p> Note further: the total number of surface cells in one surface recycling
+source ITARG (i.e., summed over NTGPRT(ITARG)) must not be larger then
+NR1ST+NP2ND (see definition of parameter NGITT in Common Deck PARMMOD).</p>""",
+
+'NIFLG' : """This corresponds to the SORIFL flag in input block 7, and is
+needed only if IND- SRC=6, i.e., if the source is specified by data from block
+14 alone.""",
+
+'NPTC' : """This corresponds to the NPTS flag in input block 7, and is needed
+only if IND- SRC=6, i.e., if the source is specified by data from block 14
+alone.""",
+
+'NSPZI' : """Species range for this stratum. Only the EIRENE fluids IPLS
+corresponding to plasma code fluids IFL with NSPZI < IFL < NSPZE are sampled
+from this stratum. See index map ILFB(IPLS) specified above in this same input
+block.<br> One (geometrical) target may appear several times, with different
+species ranges. This permits to apply stratified sampling within the species
+distribution, and hence to remove statistical noise resulting from species
+source sampling.""",
+
+'NSPZE' : """Species range for this stratum. Only the EIRENE fluids IPLS
+corresponding to plasma code fluids IFL with NSPZI < IFL < NSPZE are sampled
+from this stratum. See index map ILFB(IPLS) specified above in this same input
+block.<br> One (geometrical) target may appear several times, with different
+species ranges. This permits to apply stratified sampling within the species
+distribution, and hence to remove statistical noise resulting from species
+source sampling.""",
+
+'NEMOD' : """This corresponds to the NEMODS flag in input block 7, and is
+needed only if INDSRC=6, i.e., if the source is specified by data from block 14
+alone. As for NPTC, only the value from the first stratum segment is used.""",
+
+'CHGP' : """The short cycle between EIRENE and the plasma code (i.e., only
+recomputing of source term profiles in subroutine EIRSRT at each time-step, but
+no new random walks) is stopped, if the total volume integrated particle source
+rate has changed by more than CHGP per cent as compared to the previous full
+EIRENE run.""",
+
+'CHGEE' : """as CHGP, but for total electron energy source rate.""",
+'CHGEI' : """as CHGP, but for total electron energy source rate.""",
+'CHGMOM' : """as CHGP, but for total electron energy source rate.""",
+
+'NAINB' : """total number (=NAINI) of additional plasma code tallies
+transferred onto EIRENE input tally ADIN (e.g. in order to utilize EIRENE
+output facilities for plasma code data, or for the options described in sub
+block 10c.""",
+
+'NAINS': """species index of tally in B2 arrays.""",
+
+'NAINT' : """lag to determine which particular quantity is put onto input tally
+ADIN(I,...).<br> In the current version of subroutine INFCOP for interfacing to
+B2 the following <quot>;B2- quantities<quot>; can be selected.<br>
+<em>1 &le; NAINT 1 &le; 16: </em>
+<dl>
+<dt>=1</dt><dd>
+<dd>DI :plasma ion density [m<sup>-3</sup>], also on DIIN, by IPLS species</dd>
+<dt>=2</dt>
+<dd>UU :poloidal velocity [m/s]</dd>
+<dt>=3</dt>
+<dd>VV :radial velocity [m/s]</dd>
+<dt>=6</dt>
+<dd>PR :plasma pressure [N/m<sub>2</sup>]</dd>
+<dt>=7</dt>
+<dd>UP :parallel velocity [m/s]</dd>
+<dt>=8</dt>
+<dd>RR :pitch angle [1]</dd>
+<dt>=9</dt>
+<dd>FNIX: Particle fluxes along the field [1/s]</dd>
+<dt>=10</dt>
+<dd>FNIY Particle fluxes across the field [1/s]</dd>
+<dt>=11</dt>
+<dd>FEIX Ion energy fluxes along the field [W att]</dd>
+<dt>=12</dt>
+<dd>FEIY Ion energy fluxes across the field [W att]</dd>
+<dt>=13</dt>
+<dd>FEEX Electron energy fluxes along the field [W att]</dd>
+<dt>=14</dt>
+<dd>FEEY Electron energy fluxes across the field [W att]</dd>
+<dt>=15</dt>
+<dd>VOL: cell volume [m<sup>3</sup>]</dd>
+<dt>=16</dt>
+<dd>BFELD: magnitude of magnetic field [T ]</dd>
+</dl>
+<p>21 &le; NAINT &le; 30 : normalized EIRENE atomic/molecular data profiles
+(rate co- efficients in atomic units). These can be selected also in the
+NMODE=0 (subroutine INFCOP not called) option, see previous paragraph for their
+description. These op- tions allow verification of selected atomic/molecular
+data on the computational grid and evaluated using the plasma background data
+of a particular run (in particular: check for extrapolation errors in A&amp;M
+data)</p>""",
+
+'TXTPLS' : """text for printout and plotting, same as described for additional
+output tallies in bock 10.""",
+'TXTPSP' : """text for printout and plotting, same as described for additional
+output tallies in bock 10.""",
+'TXTPUN' : """text for printout and plotting, same as described for additional
+output tallies in bock 10.""",
+
+'NAOTB' : """total number of additional EIRENE surface tallies transferred to
+B2 code (e.g. in order to allow re-scaling in B2 such that total number of
+particles (neutrals and ions) is conserved.""",
+
+'NAOTS' : """not in use""",
+'NAOTT' : """not in use""",
+
+# *** 15.
+
+'NADMOD' : """Number of additional surfaces to be modified (should be 2 per
+divertor target, and 2 for a limiter geometry case)""",
+
+'NASMOD' : """Number of standard surfaces to be modified. Should be 0 for
+standard SOLPS-ITER couplings.""",
+
+'NORMOD' : """ Number of cell faces whose normal is to inverted. Should be 0 for
+standard SOLPS-ITER couplings.""",
+
+'NRS' : """Index of the additional surface being modified""",
+
+'IPUNKT' : """ABS(IPUNKT) is the index of the vertex of that additional surface
+being modified""",
+
+'XCOOR' : """New X-coordinate of the point being modified (in cm). Not necessary
+in standard SOLPS-ITER couplings.""",
+
+'YCOOR' : """New Y-coordinate of the point being modified (in cm). Not necessary
+in standard SOLPS-ITER couplings.""",
+
+'ZCOOR' : """New Z-coordinate of the point being modified (in cm). Not necessary
+in standard SOLPS-ITER couplings.""",
+
+'XPOLPOS' : """X-index (poloidal) of the grid cell to which the additional
+surface vertex must be matched""",
+
+'YPOLPOS' : """Y-index (radial) of the grid cell to which the additional surface
+vertex must be matched""",
+
+'NAS' : """Index of the standard surface to be modified""",
+
+'NSSIR' : """Radial position of the standard surface to be modified""",
+
+'NSSIP' : """Poloidal position of the standard surface to be modified""",
+
+'IDIR' : """Direction of the face whose normal is being inverted (1 = radial,
+2=poloidal)""",
+
+'IR' : """Radial index of the cell where the normal is being inverted""",
+
+'IP' : """Poloidal index of the cell where the normal is being inverted""",
+
+
+#*** OPEN MPI DISTRIBUTION
+'DISTRIBUTION' : """<p>MPI parallelization strategies</p>
+<dl>
+<dt>BALANCED_DISTRIBUTION</dt>
+<dd>A balanced strategy where the work is attempted to be divided evenly among
+processors (currently the SOLPS-ITER default). If the initial setup for the
+BALANCED strategy fails, the code then attempts the APCAS strategy.</dd>
+<dt>APCAS_DISTRIBUTION</dt>
+<dd>meaning All Processors Compute All Strata, where the work of each stratum
+is divided among all processors. Usually involves more communication between
+processors.</dd>
+<dt>ORIGINAL_DISTRIBUTION</dt>
+<dd>The original strategy implemented in versions of Eirene prior to SOLPS-ITER
+version 3.0.5. In that strategy, each processor is handed either part of a
+large stratum or one or several full smaller strata. This strategy works well
+if the number of processors is larger than the number of strata, but is not
+recommended if the number of strata is larger than the number of 
+processors.</dd>
+<dt>AUTOMATIC_DISTRIBUTION</dt>
+<dd>tells the code to use the current default, whatever it may be.</dd>
+</dl>""",
 }
 
 
@@ -2791,9 +3100,11 @@ class MyLineEdit(QLineEdit):
                 for j in range(13):
                         self.parameter_description.append(param_name)
         elif card_type == 'S':
-            param_name = variables_name[0]
-            for j in range(number_of_args):
-                self.parameter_description.append(param_name)
+            for param_name in variables_name:
+                N = self.determine_format_of_free_type(param_name)
+                N = N if N is not None else number_of_args
+                for i in range(N):
+                    self.parameter_description.append(param_name)
 
     def focusInEvent(self, e):
         """This overloaded function causes the editor to de-highlight the curr-
@@ -2816,6 +3127,20 @@ class MyLineEdit(QLineEdit):
                 self.parameter_help.emit('NOD')
                 self.last_param = None
         return super(MyLineEdit, self).event(ev)
+
+    def determine_format_of_free_type(self, variables):
+        for variable in variables:
+            if variable.startswith('LG') or variable.startswith('TRC') or \
+               variable.startswith('NL'):
+                return 1
+            elif variable.startswith('C') or variable.startswith('T'):
+                return None
+            elif variable.startswith('I') or variable.startswith('J') or\
+               variable.startswith('N'):
+               return 6
+            else:
+                return 12
+
 
     # TODO: BACKGROUND PIXMAP FOR EDITING
     # Using paintEvent function to draw alternate columns colors to the card.
@@ -3436,21 +3761,64 @@ class EireneEdit(QTreeWidget):
             self.dummy_block()  # No additional descritpion in the manual
 
     def block_14(self):
-        line = self.getline()
-        while line[:3] != '***':
-            self.getline(['S', '*** 14. Data for interfacing routine '
-                         '"infusr"'])
+        self.getline(['B', 'LSYMET', 'LBALAN', 'LCHKQUD'])
+        self.getline(['I', 'NFLA', 'NCUTB', 'NCUTL', 'IMF', 'NTRFRM', 'NFULL',
+                           'IBRAD', 'IBPOL', 'IBTOR'])
+        for i in range(1, self.values['NPLSI'] + 1):
+            self.getline(['S', 'I', 'IFLB', 'FCTE', 'BMASS', 'LKINDP'])
+        self.getline(['I', 'NDXA', 'NDYA'])
+        self.getline(['I', 'NTARGI'])
+
+        role = ['I']
+        for i in range(1, self.values['NTARGI'] + 1):
+            role.append('NTGPRT(' + str(i) + ')')
+        self.getline(role)
+
+        for i in range(1, self.values['NTARGI'] + 1):
+            for j in range(1, self.values['NTGPRT(' + str(i) + ')'] + 1):
+                self.getline(['I', 'I', 'NDT', 'NINCT', 'NIXY', 'NTIN', 'NTEN',
+                                   'NIFLG', 'NPTC', 'NPTCM', 'NSPZI', 'NSPZE',
+                                   'NEMOD'])
+
+        self.getline(['R', 'CHGP', 'CHGEE', 'CHGEI', 'CHGMOM'])
+        self.getline(['I', 'NAINB', 'NCOPIB', 'NCOPEB'])
+
+        for i in range(1, self.values['NAINB'] + 1):
+            self.getline(['I', 'I', 'NAINS', 'NAINT', 'TXTPLS', 'TXTPSP', 
+                               'TXTPUN'])
+        self.getline(['I', 'NAOTB'])
+
+        for i in range(1, self.values['NAOTB'] + 1):
+            self.getline(['I', 'I', 'NAOTS', 'NAOTT'])
 
     def block_15(self):
         line = self.getline()
-        while line[:3] != '***':
-            self.getline(['S', '*** 15. Data for interfacing routine '
-                               '"geousr"'])
+        if 'GENERAL' in line or 'BIASED_GARCHING' in line:
+            self.row += 1
+            self.getline('I', 'NADMOD', 'NASMOD', 'NORMOD')
+            for i in range(1, self.values['NADMOD'] + 1):
+                self.getline(['S', 'NRS', 'IPUNKT', 'XCOOR', 'YCOOR', 'ZCOOR'])
+            for i in range(1, self.values['NASMOD'] + 1):
+                self.getline(['S', 'NAS', 'IPUNKT', 'NSSIR', 'NSSIP'])
+            for i in range(1, self.values['NORMOD']):
+                self.getline(['S', 'IDIR', 'IR', 'IP'])
+
+        else:
+            self.getline(['I', 'NADMOD', 'NASMOD'])
+            for i in range(1, self.values['NADMOD'] + 1):
+                line = self.getline().split()
+                print(line)
+                if int(line[1]) < 0:
+                    role = ['S', 'NRS', 'IPUNKT', 'XPOLPOS', 'YPOLPOS']
+                else:
+                    role = ['I', 'NRS', 'IPUNKT']
+                self.getline(role)
+            for i in range(1, self.values['NASMOD'] + 1):
+                self.getline(['S', 'NAS', 'IPUNKT', 'NSSIR', 'NSSIP'])
+
 
     def block_16(self):
-        line = self.getline()
-        while line[:3] != '***':
-            self.getline(['S', '*** 16'])
+        self.getline(['S', 'DISTRIBUTION'])
 
     def dummy_block(self):
         """This function reads the lines from the input file and then simply
@@ -3506,14 +3874,14 @@ class EireneEdit(QTreeWidget):
             IndexError [error]: If for some the main row index is raised beyond
                 the size of the text, the IndexError exception is returned.
         """
-        parent = self.curr_par
-        group = self.grup_par
-
         if self.row >= self.text_size:
             raise IndexError
         line = self.text[self.row].rstrip()
         if role is None:
             return line
+
+        parent = self.curr_par
+        group = self.grup_par
 
         self.row += 1 
 
@@ -3708,8 +4076,9 @@ class Eirene(QWidget):
         super(Eirene, self).__init__(parent)
         # The following array contains the variables, that are numbered
         # in the settings file but has the same description!
-        self.group_cards = ['INDSRC', 'INDPRO', 'NLPRCA', 'PRMSPL', 'INGRDA', 
-                            'INGRDE', 'DPLD', 'DIOD', 'DMLD', 'DATD', 'VL', 
+        self.group_cards = ['NTGPRT', 'INDSRC', 'INDPRO', 'NLPRCA', 'PRMSPL', 
+                            'INGRDA', 'INGRDE', 'DPLD', 'DIOD', 'DMLD', 'DATD',
+                            'VL', 
                             'P1', 'P2', 'P3', 'P4', 'P5']
         self.splitter = QSplitter(self)
         self.splitter.setOrientation(Qt.Vertical)
@@ -3738,7 +4107,7 @@ class Eirene(QWidget):
                 type_of_card = card_data[0]
                 if type_of_card:
                     card_variables = card_data[2]
-                    text = '<p>' + type_of_card + " :" \
+                    text = '<p>' + type_of_card + " :" +\
                            " ".join(card_variables) + '</p>'
             self.help.setText(text + "<p> Press F2 to edit line."
                               "<p>Use arrow keys to navigate through rows "
