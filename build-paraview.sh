@@ -3,7 +3,7 @@
 PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.2.0}
 QT_VERSION=${QT_VERSION:-4.8.7}
 CMAKE_VERSION=3.6.1
-case $(hostname) in
+case $(hostname -f) in
   *.iter.org) 
 	module purge
 #	module load MVAPICH2/2.2b-GCC-4.9.3-2.25
@@ -12,6 +12,10 @@ case $(hostname) in
 	export CC=gcc
 	export CXX=g++
 	MAKE_JOBS=${MAKE_JOBS:-8}
+	;;
+  *.marconi.cineca.it)
+        # module unload itm-gcc/6.1.0 itm-python
+	MAKE_JOBS=${MAKE_JOBS:-16}
 	;;
   *)
 	;;

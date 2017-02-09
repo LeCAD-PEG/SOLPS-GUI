@@ -34,6 +34,14 @@ case $(hostname -f) in
 			                 -skip qtcanvas3d  -skip qtpurchasing \
 					 -skip qtvirtualkeyboard}
 	;;
+
+  *.marconi.cineca.it) # CentOS 7, module unload itm-gcc/6.1.0 itm-python/2.7
+        MAKE_JOBS=${MAKE_JOBS:-16}
+	USE_QT_XCB="YES"
+	BUILD_XCB="NO"
+	BUILD_XLIB="NO"
+	;;
+
 esac
 
 MAKE_JOBS=${MAKE_JOBS:-4}    # Safe default nowadays
@@ -86,7 +94,7 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
       pip sphinx sphinx_rtd_theme matplotlib mock nose
   # The following Python modules are preferred by IMAS
-  if [ x${IMAS_PREFIX}" != x ]; then
+  if [ -n "${IMAS_PREFIX}" ]; then
     ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
       Cython mpi4py scipy luigi tornado deap decorator liac-arff ecdsa \
       netaddr paramiko paycheck # netifaces 
