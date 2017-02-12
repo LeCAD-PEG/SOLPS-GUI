@@ -2,11 +2,11 @@
 ## Building PyQt with Python3 and Qt5
 ## Minimum GCC supported version for building Qt5 is 4.7
  
-PYTHON_VERSION=3.5.2
+PYTHON_VERSION=3.5.3
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
-QT_VERSION=5.7.0
-PyQT_VERSION=5.7 # should be the same as Qt 
-SIP_VERSION=4.18
+QT_VERSION=5.7.1
+PyQT_VERSION=5.7.1 # should be the same as Qt 
+SIP_VERSION=4.19
 
 # Site specific defaults
 case $(hostname -f) in
@@ -35,8 +35,12 @@ case $(hostname -f) in
 					 -skip qtvirtualkeyboard}
 	;;
 
-  *.marconi.cineca.it) # CentOS 7, module unload itm-gcc/6.1.0 itm-python/2.7
+  *.marconi.cineca.it) # CentOS 7, 
         MAKE_JOBS=${MAKE_JOBS:-16}
+	. /etc/profile.d.gw/modules.sh
+	# module unload itm-gcc/6.1.0 itm-python/2.7
+	module purge
+	module list
 	USE_QT_XCB="YES"
 	BUILD_XCB="NO"
 	BUILD_XLIB="NO"

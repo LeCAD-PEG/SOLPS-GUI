@@ -14,7 +14,9 @@ case $(hostname -f) in
 	MAKE_JOBS=${MAKE_JOBS:-8}
 	;;
   *.marconi.cineca.it)
-        # module unload itm-gcc/6.1.0 itm-python
+	. /etc/profile.d.gw/modules.sh
+        module unload itm-gcc/6.1.0 gnu/6.1.0
+	module switch itm-python/2.7kos
 	MAKE_JOBS=${MAKE_JOBS:-16}
 	;;
   *)
