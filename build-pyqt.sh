@@ -2,11 +2,11 @@
 ## Building PyQt with Python3 and Qt5
 ## Minimum GCC supported version for building Qt5 is 4.7
  
-PYTHON_VERSION=3.5.2
+PYTHON_VERSION=3.5.3
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
-QT_VERSION=5.7.0
-PyQT_VERSION=5.7 # should be the same as Qt 
-SIP_VERSION=4.18
+QT_VERSION=5.7.1
+PyQT_VERSION=5.7.1 # should be the same as Qt 
+SIP_VERSION=4.19
 
 # Site specific defaults
 case $(hostname -f) in
@@ -34,6 +34,18 @@ case $(hostname -f) in
 			                 -skip qtcanvas3d  -skip qtpurchasing \
 					 -skip qtvirtualkeyboard}
 	;;
+
+  *.marconi.cineca.it) # CentOS 7, 
+        MAKE_JOBS=${MAKE_JOBS:-16}
+	. /etc/profile.d.gw/modules.sh
+	# module unload itm-gcc/6.1.0 itm-python/2.7
+	module purge
+	module list
+	USE_QT_XCB="YES"
+	BUILD_XCB="NO"
+	BUILD_XLIB="NO"
+	;;
+
 esac
 
 MAKE_JOBS=${MAKE_JOBS:-4}    # Safe default nowadays
@@ -86,7 +98,7 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
       pip sphinx sphinx_rtd_theme matplotlib mock nose
   # The following Python modules are preferred by IMAS
-  if [ x${IMAS_PREFIX}" != x ]; then
+  if [ -n "${IMAS_PREFIX}" ]; then
     ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
       Cython mpi4py scipy luigi tornado deap decorator liac-arff ecdsa \
       netaddr paramiko paycheck # netifaces 
