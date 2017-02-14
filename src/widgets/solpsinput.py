@@ -25,7 +25,9 @@ import textwrap
 from tooltips import b2mn_tooltips
 from eirene import Eirene
 
-class B2mnHighlighter( QSyntaxHighlighter ):
+from b2 import B2Edit
+
+class B2mnHighlighter(QSyntaxHighlighter):
     """ B2mnHighlighter( QSyntaxHighlighter )
 
         Sets the keywords for syntax highlighting that are currently
@@ -115,7 +117,6 @@ class B2mnTextEdit(QPlainTextEdit):
         return output[0:-1] # remove last newline
 
 
-
     def event(self, event):
         """ Looks for the parameters in the dictionary provided and sets
           the tooltip generated from XML documentation.
@@ -136,7 +137,6 @@ class B2mnTextEdit(QPlainTextEdit):
                                   self.tooltips[word])
             else:
                 QToolTip.hideText()
-            return True
 
         return super(B2mnTextEdit, self).event(event)
 
@@ -191,12 +191,13 @@ class SolpsInput(QTabWidget):
         font = QFont()
         font.setFamily('Monospace')
         for filename, tooltip in solps_input_files:
-            if filename == 'b2mn.dat':
-                self.b2mnTextEdit = plainTextEdit = B2mnTextEdit(self)
-                self.b2mn_highlight = B2mnHighlighter(plainTextEdit.document())
-                self.lineInsert.connect(self.b2mnTextEdit.insert_line)
-            else:
-                plainTextEdit = QPlainTextEdit(self)
+#            if filename == 'b2mn.dat':
+#                self.b2mnTextEdit = plainTextEdit = B2mnTextEdit(self)
+#                self.b2mn_highlight = B2mnHighlighter(plainTextEdit.document())
+#                self.lineInsert.connect(self.b2mnTextEdit.insert_line)
+#            else:
+#                
+            plainTextEdit = QPlainTextEdit(self)
             plainTextEdit.setObjectName(filename)
             plainTextEdit.setFont(font)
             plainTextEdit.setLineWrapMode(QPlainTextEdit.NoWrap)
@@ -208,6 +209,12 @@ class SolpsInput(QTabWidget):
                 self.removeTab(tab_index)
                 tab_index = self.addTab(eirene, filename)
                 self.editors[filename] = eirene
+            elif filename.startswith('b2'):
+                editor = B2Edit(filename=filename)
+                self.lineInsert.connect(editor.display_widget.insert_line)
+                self.removeTab(tab_index)
+                tab_idnex = self.addTab(editor, filename)
+                self.editors[filename] = editor
             self.setTabToolTip(tab_index, tooltip)
         self.restore_tab_positions()
 
@@ -239,12 +246,12 @@ class SolpsInput(QTabWidget):
                 tab = self.widget(i)
                 layout = QGridLayout(tab)
                 tab.setLayout(layout)
-                if filename == 'b2mn.dat':
-                    plainTextEdit = B2mnTextEdit(tab)
-                    self.b2mn_highlight = \
-                        B2mnHighlighter(plainTextEdit.document())
-                else:
-                    plainTextEdit = QPlainTextEdit(tab)
+                #if filename == 'b2mn.dat':
+                #    plainTextEdit = B2mnTextEdit(tab)
+                #    self.b2mn_highlight = \
+                #        B2mnHighlighter(plainTextEdit.document())
+                #else:
+                plainTextEdit = QPlainTextEdit(tab)
                 plainTextEdit.setObjectName(filename)
                 plainTextEdit.setFont(font)
                 plainTextEdit.setLineWrapMode(QPlainTextEdit.NoWrap)
@@ -299,8 +306,6 @@ class SolpsInput(QTabWidget):
                 try:
                     with open(path) as file:
                         plainTextEdit.setPlainText(file.read())
-                        if filename == 'b2mn.dat':
-                            self.b2mn_highlight.rehighlight()
                 except PermissionError as error:
                     plainTextEdit.setPlainText(str(error))
                     plainTextEdit.setEnabled(False)

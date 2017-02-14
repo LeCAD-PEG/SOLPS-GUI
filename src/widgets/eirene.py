@@ -3,6 +3,9 @@
 """
 Eirene editor
 
+Copyright (c) 2017, ITER Organization
+Route de Vinon-sur-Verdon, CS 90 046, 13067 St. Paul Lez Durance Cedex, France
+
 EIRENE editor structures input.dat in a readable tree-view with a help that
 shows us a short description of input cards from Eirene manual.
 
@@ -3540,7 +3543,7 @@ class EireneEdit(QTreeWidget):
         self.getline(['B', 'NLPLY', 'NLPLA', 'NLPLP'])
         self.getline(['I', 'NP2ND', 'NPSEP', 'NPPLA', 'NPPER'])
         if self.values['INGRD(2)'] < 5:
-            self.getline(['R', 'YIA', 'YGA', 'YAA'])
+            self.getline(['R', 'YIA', 'YGA', 'YAA', 'YYA'])
 
         self.getline(['B', 'NLTOR'])
         self.getline(['B', 'NLTRZ', 'NLTRA', 'NLTRT'])
@@ -3981,6 +3984,13 @@ class EireneEdit(QTreeWidget):
 
 
     def block_16(self):
+        """ Acording to the Eirene manual, this block can have a free styled
+        format, including empty lines.
+        """
+        line = self.getline()
+        while line == '':
+            self.row+=1
+            line = self.getline()
         self.getline(['S', 'DISTRIBUTION'])
 
     def dummy_block(self):
@@ -4319,7 +4329,6 @@ if __name__ == "__main__":
 
     os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1' # for solving high-dpi
     app = QApplication(sys.argv)                    # problems
-    widget = Eirene()
 
     class Standalone(QMainWindow):
         def __init__(self, parent=None):
