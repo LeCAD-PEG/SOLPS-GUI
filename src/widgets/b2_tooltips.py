@@ -54,51 +54,66 @@ b2ah_tooltips = {
 }
 b2ar_tooltips = {
          
-      'tlohi' : ('', 'Real*2', """range of temperatures for atomic physics table in eV""", 'None'),
+      'tlohi' : ('basic parameters', 'Real*2', """range of temperatures for atomic physics table in eV""", 'None'),
    
-      'nlohi' : ('', 'Real*2', """range of densities for atomic physics table in m^-3""", 'None'),
+      'nlohi' : ('basic parameters', 'Real*2', """range of densities for atomic physics table in m^-3""", 'None'),
    
-      'numnuc' : ('', 'Integer', """number of distinct species""", 'None'),
+      'numnuc' : ('basic parameters', 'Integer', """number of distinct species""", 'None'),
    
-      'nucspec' : ('', 'Integer*3', """nuclear charge, lowest charge state, highest charge state""", 'None'),
+      'nucspec' : ('basic parameters', 'Integer*3', """nuclear charge, lowest charge state, highest charge state""", 'None'),
    
-      'flag' : ('', 'String', """which atomic physics database to use""", 'adpak or strahl'),
+      'flag' : ('basic parameters', 'String', """which atomic physics database to use""", 'adpak or strahl'),
    
-      'tailep' : ('', 'Real*2', """range of temperatures for atomic physics table in eV""", 'None'),
+      'tailep' : ('basic parameters', 'Real*2', """range of temperatures for atomic physics table in eV""", 'None'),
    
-      'adpak' : ('', 'Real*2', """A complete atomic physics package with scaling law rates applicable to all charge states, but not always of high accuracy [1]""", 'None'),
+      'adpak' : ('basic parameters', 'Real*2', """A complete atomic physics package with scaling law rates applicable to all charge states, but not always of high accuracy [1]""", 'None'),
    
-      'strahl' : ('', 'Real*2', """A collisional-radiative package developed at IPP–Garching [2], stored in the stra.dat file""", 'None'),
+      'strahl' : ('basic parameters', 'Real*2', """A collisional-radiative package developed at IPP–Garching [2], stored in the stra.dat file""", 'None'),
    
-      'adas' : ('', 'Real*2', """(Atomic Data and Analysis Structure) A complete collisional-radiative atomic physics database, actively being maintained and upgraded [3, 4]. Recommended. Available at http://adas.phys.strath.ac.uk/""", 'None'),
+      'adas' : ('basic parameters', 'Real*2', """(Atomic Data and Analysis Structure) A complete collisional-radiative atomic physics database, actively being maintained and upgraded [3, 4]. Recommended. Available at http://adas.phys.strath.ac.uk/""", 'None'),
    
-      'amns' : ('', 'Real*2', """(Atomic, Molecular, Nuclear, and Surface data) For ITM-environment runs only, uses access to the ITM AMNS tools and database""", 'None'),
+      'amns' : ('basic parameters', 'Real*2', """(Atomic, Molecular, Nuclear, and Surface data) For ITM-environment runs only, uses access to the ITM AMNS tools and database""", 'None'),
    
 }
 b2ai_tooltips = {
          
-      'dimens' : ('', 'Integer', """the number of charge states""", 'None'),
+      'dimens' : ('basic parameters', 'Integer', """the number of charge states""", 'None'),
    
-      'label' : ('', 'String', """a label""", 'None'),
+      'label' : ('basic parameters', 'String', """a label""", 'None'),
    
-      'specs' : ('', 'String Integer*4', """atomic charge, nuclear charge, atomic mass and atomic charge squared for each charge stateminimum atomic charge of the stage, maximum atomic charge of the stage, nuclear charge, and atomic mass; this data should match that given in b2ah.dat""", 'None'),
+      'specs' : ('basic parameters', 'String Integer*4', """atomic charge, nuclear charge, atomic mass and atomic charge squared for each charge stateminimum atomic charge of the stage, maximum atomic charge of the stage, nuclear charge, and atomic mass; this data should match that given in b2ah.dat""", 'None'),
    
-      'naini' : ('', 'Real*ns', """initial densities for each of the charge states, in m^-3""", 'None'),
+      'naini' : ('basic parameters', 'Real*ns', """initial densities for each of the charge states, in m^-3""", 'None'),
    
-      'ttini' : ('', 'Real', """initial ion and electron temperature, in eV""", 'None'),
+      'ttini' : ('basic parameters', 'Real', """initial ion and electron temperature, in eV""", 'None'),
    
 }
 b2mn_tooltips = {
          
-      'b2cmpa' : ('', 'string', """specifies a block of basic parameters, overriding those specified in the block of the same name in b2ah.dat""", 'None'),
+      'b2cmpa' : ('basic parameters', 'string', """specifies a block of basic parameters, overriding those specified in the block of the same name in b2ah.dat""", 'None'),
    
-      'b2cmpb' : ('', 'string', """specifies a block of boundary conditions, overriding those specified in the block of the same name in
+      'b2cmpb' : ('boundary conditions', 'string', """specifies a block of boundary conditions, overriding those specified in the block of the same name in
         		b2ah.dat""", 'None'),
    
-      'b2cmpt' : ('', 'string', """specifies a block of transport coefficients, overriding those specified in the block of the same name in
-        		b2ah.dat""", 'None'),
+      'b2cmpt' : ('transport coefficients', 'string', """specifies a block of transport coefficients, overriding those specified in the block of the same name in
+        		b2ah.dat:
+        		*cfdf0 auxiliary transport quantity (1 line per species)
+        		*cfdna density driven particle diffusion coefficient (1 line per species)
+        		*cfdpa pressure driven particle diffusion coefficient (1 line per species)
+        		*cfvla anomalous ”pinch” velocity (1 line per species)
+        		*cfvsa anomalous transverse momentum diffusivity (1 line per species)
+        		*cfhci anomalous ion/neutral heat diffusivity (1 line per species)
+        		*cfhce anomalous electron heat diffusivity
+        		*cfsig diffusivity corresponding to the anomalous electrical conductivity
+        		*cfalf diffusivity corresponding to the anomalous thermo-electric coefficient
+        		*cflim coefficients for flux limiting""", 'None'),
    
-      'cflim' : ('', 'string', """TODO""", 'None'),
+      'cflim' : ('', 'real*8 array', """cflim contains coefficients for flux limiting. cflim(0)=cflme
+        		specifies the flux limit factor for poloidal electron heat
+        		transport. cflim(1)=cflmi specifies the flux limit factor for poloidal all atom heat transport. cflim(2)=cflmv specifies the
+        		flux limit factor for poloidal atom momentum transport.
+        		Zero settings turn off these flux limits.
+        		cflim(3:7) are not used in the default version of the code.""", 'None'),
    
       'b2agdr_nxiso1' : ('Geometry', 'integer', """
 				Range of an optional isolated region to be included in the geometry. 

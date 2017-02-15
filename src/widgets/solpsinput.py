@@ -23,126 +23,7 @@ import gzip
 import textwrap
 
 from eirene import Eirene
-
 from b2 import B2Edit
-
-class B2mnHighlighter(QSyntaxHighlighter):
-    """ B2mnHighlighter( QSyntaxHighlighter )
-
-        Sets the keywords for syntax highlighting that are currently
-        documented for b2mn.dat tooltips.
-
-    """
-    def __init__( self, parent ):
-        QSyntaxHighlighter.__init__(self, parent)
-        self.parent = parent
-        self.highlightingRules = []
-
-        comment = QTextCharFormat()
-
-        keyword = QTextCharFormat()
-        keyword.setForeground(Qt.darkBlue)
-        keyword.setFontWeight(QFont.Bold)
-        keywords = []
-        for key in b2mn_tooltips:
-            keywords.append(key)
-
-        for word in keywords:
-            pattern = QRegExp("\\b" + word + "\\b")
-            rule = HighlightingRule(pattern, keyword)
-            self.highlightingRules.append(rule)
-
-        # comment
-        brush = QBrush(Qt.darkGreen, Qt.SolidPattern)
-        pattern = QRegExp("^\*[^\n]*")
-        comment.setForeground(brush)
-        rule = HighlightingRule(pattern, comment)
-        self.highlightingRules.append(rule)
-
-    def highlightBlock(self, text):
-      for rule in self.highlightingRules:
-        expression = QRegExp(rule.pattern)
-        index = expression.indexIn(text)
-        while index >= 0:
-          length = expression.matchedLength()
-          self.setFormat(index, length, rule.format)
-          index = text.find(str(expression), index + length)
-      self.setCurrentBlockState(0)
-
-
-class HighlightingRule():
-  def __init__( self, pattern, format ):
-    self.pattern = pattern
-    self.format = format
-
-class B2mnTextEdit(QPlainTextEdit):
-    """B2mnTextEdit(QPlainTextEdit)
-
-    Enhances plain text with tooltips and syntax highlights
-    """
-
-    def __init__(self, parent=None):
-        """At initialisation we reformat b2mn_tooltips from XSLT generated
-           tuples into single HTML strings.
-        """
-        super(B2mnTextEdit, self).__init__(parent)
-        self.tooltips = dict()
-        for key in b2mn_tooltips:
-            category, param_type, default, description =  b2mn_tooltips[key]
-            tooltip = '<font color=blue>Switch: <b>' + key \
-                   + '</b> Category: <b>' + category + '</b>, ' \
-                   + 'Type: <b>' + param_type + '</b>, '\
-                   + 'Default: <b>' + default + '</b></font>' \
-                   + '<pre>' + self.dedent(description) + '</pre>'
-            # empty line before <pre> is somehow enforced by HTML
-            self.tooltips[key] = tooltip
-
-    def dedent(self, description):
-        """ Removes first empty line from description and any leading tabs
-            from the next line before the description and any following lines.
-            First lines are wrapped to 70 characters.
-
-        :param description(string): from the XML generated tooltips dictionary
-        :return: formatted output for the tooltip
-        """
-        trim_start = 0  # Remove any leading newline that affects dedent
-        while trim_start < len(description) and description[trim_start] == '\n':
-            trim_start += 1
-        description = textwrap.dedent(description[trim_start : ])
-        lines = description.splitlines()
-        output = ''
-        for line in lines:
-            output += textwrap.fill(line, 70) + '\n'
-        return output[0:-1] # remove last newline
-
-
-    def event(self, event):
-        """ Looks for the parameters in the dictionary provided and sets
-          the tooltip generated from XML documentation.
-
-          See http://stackoverflow.com/questions/19236165/pyqt-get-text-under-cursor
-        """
-        if event.type() == QEvent.ToolTip:
-            #oldCursor = self.textCursor()
-            textCursor = self.cursorForPosition(event.pos())
-            textCursor.select(QTextCursor.WordUnderCursor)
-            #self.setTextCursor(textCursor)
-            word = textCursor.selectedText()
-            #self.setTextCursor(oldCursor)
-
-            if word in self.tooltips:
-                helpEvent = event
-                QToolTip.showText(helpEvent.globalPos(),
-                                  self.tooltips[word])
-            else:
-                QToolTip.hideText()
-
-        return super(B2mnTextEdit, self).event(event)
-
-    @pyqtSlot(str)
-    def insert_line(self, line):
-        self.insertPlainText(line)
-
 
 class SolpsInput(QTabWidget):
     """SolpsInput(QTabWidget)
@@ -159,7 +40,6 @@ class SolpsInput(QTabWidget):
         self.rundir = None
         self.currently_viewing = None
         self.editors = dict()
-        self.b2mnTextEdit = None # used for signal connection
 
     def restore_tab_positions(self):
         """ Get tabs ordering from settings and restore the to saved position.
@@ -189,13 +69,7 @@ class SolpsInput(QTabWidget):
         """
         font = QFont()
         font.setFamily('Monospace')
-        for filename, tooltip in solps_input_files:
-#            if filename == 'b2mn.dat':
-#                self.b2mnTextEdit = plainTextEdit = B2mnTextEdit(self)
-#                self.b2mn_highlight = B2mnHighlighter(plainTextEdit.document())
-#                self.lineInsert.connect(self.b2mnTextEdit.insert_line)
-#            else:
-#                
+        for filename, tooltip in solps_input_files:            
             plainTextEdit = QPlainTextEdit(self)
             plainTextEdit.setObjectName(filename)
             plainTextEdit.setFont(font)
@@ -212,7 +86,7 @@ class SolpsInput(QTabWidget):
                 editor = B2Edit(filename=filename)
                 self.lineInsert.connect(editor.display_widget.insert_line)
                 self.removeTab(tab_index)
-                tab_idnex = self.addTab(editor, filename)
+                tab_index = self.addTab(editor, filename)
                 self.editors[filename] = editor
             self.setTabToolTip(tab_index, tooltip)
         self.restore_tab_positions()
@@ -245,11 +119,6 @@ class SolpsInput(QTabWidget):
                 tab = self.widget(i)
                 layout = QGridLayout(tab)
                 tab.setLayout(layout)
-                #if filename == 'b2mn.dat':
-                #    plainTextEdit = B2mnTextEdit(tab)
-                #    self.b2mn_highlight = \
-                #        B2mnHighlighter(plainTextEdit.document())
-                #else:
                 plainTextEdit = QPlainTextEdit(tab)
                 plainTextEdit.setObjectName(filename)
                 plainTextEdit.setFont(font)
@@ -317,8 +186,10 @@ class SolpsInput(QTabWidget):
 
     @pyqtSlot(str)
     def insert_line(self, line):
+        if type(self.currentWidget()) == type(B2Edit()):
+            self.currentWidget().display_widget.insert_line(line)
         print('Reemmiting' + line)
-        self.lineInsert.emit(line)
+        
 
     @pyqtSlot()
     def save_modified_input_files(self):
