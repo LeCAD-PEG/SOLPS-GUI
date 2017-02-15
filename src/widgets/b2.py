@@ -4,13 +4,13 @@ from PyQt5.QtWidgets import QWidget, QPlainTextEdit, QVBoxLayout, QToolTip
 from PyQt5.QtGui import (QSyntaxHighlighter, QTextCursor, QTextCharFormat,
                          QFont, QBrush)
 import logging
-import b2tooltips
+import b2_tooltips
 
-b2_tooltips = {'b2mn': b2tooltips.b2mn_tooltips,
-               'b2ag': b2tooltips.b2ag_tooltips,
-               'b2ah': b2tooltips.b2ah_tooltips,
-               'b2ar': b2tooltips.b2ar_tooltips,
-               'b2ai': b2tooltips.b2ai_tooltips,
+b2_tooltips = {'b2mn': b2_tooltips.b2mn_tooltips,
+               'b2ag': b2_tooltips.b2ag_tooltips,
+               'b2ah': b2_tooltips.b2ah_tooltips,
+               'b2ar': b2_tooltips.b2ar_tooltips,
+               'b2ai': b2_tooltips.b2ai_tooltips,
                }
 
 

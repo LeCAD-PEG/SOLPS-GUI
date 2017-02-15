@@ -22,7 +22,6 @@ import logging
 import gzip
 import textwrap
 
-from tooltips import b2mn_tooltips
 from eirene import Eirene
 
 from b2 import B2Edit
