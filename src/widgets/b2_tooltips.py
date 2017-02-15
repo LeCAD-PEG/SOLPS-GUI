@@ -1,10 +1,9 @@
 b2ag_tooltips = {
          
       'dimens' : ('', 'string', """specifies the size of the gridfirst pair is NX & NY of the grid you want to producesecond pair is the size of the grid that was originally createdeach needs to be an integer multiple of the corresponding entry of the first pair. Note that for double-
-				null cases, the interior guard cells corresponding to the top divertor boundaries should not be multi-
-				plied.""", 'None'),
+				null cases, the interior guard cells corresponding to the top divertor boundaries should not be multiplied.""", 'None'),
    
-      'param' : ('', 'Integers', """at least 100 additional numbers, of which only the first is relevant for us-1.0read the mesh data using the ”simplified” Carre format-2.0read the mesh data using the Sonnet format""", 'None'),
+      'param' : ('', 'Integers', """at least 100 additional numbers, of which only the first is relevant for us-1.0read the mesh data using the "simplified" Carre format-2.0read the mesh data using the Sonnet format""", 'None'),
    
 }
 b2ah_tooltips = {
