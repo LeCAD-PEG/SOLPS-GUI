@@ -3169,7 +3169,7 @@ class MyValidator(QValidator):
         super(MyValidator, self).__init__(parent)
         self.old_text = old_text
         self.n = n
-        if type == 'B':
+        if type == 'L':
             self.length = self.n + int(self.n/5)
             self.n = self.length
             self.mask = "T|F|t|f|\s"
@@ -3255,7 +3255,7 @@ class MyLineEdit(QLineEdit):
                 for i in range(6):
                     self.parameter_description.append(param_name)
 
-        elif card_type == 'B':
+        elif card_type == 'L':
             i = 1
             for param_name in variables_name:
                 if i % 6 == 0:
@@ -3469,7 +3469,7 @@ class EireneEdit(QTreeWidget):
                     'NSMSTRA', 'NSTORAM', 'NGSTAL', 'NRTAL', 'NREAC_ADD']
             self.getline(role)
 
-        role = ['B', 'NLSCL', 'NLTEST', 'NLANA', 'NLDRFT', 'NLCRR', 'NLERG',
+        role = ['L', 'NLSCL', 'NLTEST', 'NLANA', 'NLDRFT', 'NLCRR', 'NLERG',
                      'NLIDENT', 'NLONE', 'NLMOVIE', 'NLDFST', 'NLOLDRAN',
                      'NLCASCAD', 'NLOCTREE', 'NLWRMSH', 'NEXVS', 'NLTRIMESH']
         self.getline(role)
@@ -3488,9 +3488,9 @@ class EireneEdit(QTreeWidget):
         """
 
         self.getline(['I', 'INGRD(1)', 'INGRD(2)', 'INGRD(3)'])
-        self.getline(['B', 'NLRAD'])
+        self.getline(['L', 'NLRAD'])
         if self.values['NLRAD']:
-            self.getline(['B', 'NLSLB', 'NLCRC', 'NLELL', 'NLTRI',
+            self.getline(['L', 'NLSLB', 'NLCRC', 'NLELL', 'NLTRI',
                                'NLPLG', 'NLFEM', 'NLTET', 'NLGEN'])
 
             self.getline(['I', 'NR1ST', 'NRSEP', 'NRPLG', 'NPPLG', 'NRKNOT',
@@ -3539,19 +3539,19 @@ class EireneEdit(QTreeWidget):
                 self.values['NLTET']:
                     self.getline(['R', 'XPCOR', 'YPCOR', 'ZPCOR'])
 
-        self.getline(['B', 'NLPOL'])
-        self.getline(['B', 'NLPLY', 'NLPLA', 'NLPLP'])
+        self.getline(['L', 'NLPOL'])
+        self.getline(['L', 'NLPLY', 'NLPLA', 'NLPLP'])
         self.getline(['I', 'NP2ND', 'NPSEP', 'NPPLA', 'NPPER'])
         if self.values['INGRD(2)'] < 5:
             self.getline(['R', 'YIA', 'YGA', 'YAA', 'YYA'])
 
-        self.getline(['B', 'NLTOR'])
-        self.getline(['B', 'NLTRZ', 'NLTRA', 'NLTRT'])
+        self.getline(['L', 'NLTOR'])
+        self.getline(['L', 'NLTRZ', 'NLTRA', 'NLTRT'])
         self.getline(['I', 'NT3RD', 'NTSEP', 'NTTRA', 'NTPER'])
         if self.values['INGRD(3)'] < 5:
             self.getline(['R', 'ZIA', 'ZGA', 'ZAA', 'ZZA', 'ROA'])
 
-        self.getline(['B', 'NLMLT'])
+        self.getline(['L', 'NLMLT'])
         # Sometimes even though NLMLt is false the next line can still
         # be NBLMT, an integer.
 
@@ -3565,7 +3565,7 @@ class EireneEdit(QTreeWidget):
                 role.append('VOLCOR(' + str(i) + ')')
             self.getline(role)
         # 2e. Data for additional cells outside standard mesh
-        self.getline(['B', 'NLADD'])
+        self.getline(['L', 'NLADD'])
         self.getline(['I', 'NRADD'])
         role = ['R']
         for i in range(1, int(self.values['NRADD']) + 1):
@@ -3732,7 +3732,7 @@ class EireneEdit(QTreeWidget):
             self.getline(['R', 'VL0', 'VL1', 'VL2', 'VL3', 'VL4', 'VL5'])
 
     def block_6(self):
-        self.getline(['B', 'NLTRIM'])
+        self.getline(['L', 'NLTRIM'])
         self.getline(['S', 'A_on_B'])
         line = self.getline()
         while 'path' in line or 'PATH' in line:
@@ -3776,13 +3776,13 @@ class EireneEdit(QTreeWidget):
                                             line, ['S', 'TXTSOU'])
             self.row += 1
 
-            self.getline(['B', 'NLAVRP', 'NLAVRT', 'NLSYMP', 'NLSYMT'])
+            self.getline(['L', 'NLAVRP', 'NLAVRT', 'NLSYMP', 'NLSYMT'])
             self.getline(['I', 'NPTS', 'NINITL', 'NEMODS', 'NAMODS',
                           'NMINPTS'])
             self.getline(['S', 'Plasma properties. Section 2.7'])
-            self.getline(['B', 'NLATM', 'NLMOL', 'NLION', 'NLPLS', 'NLPHOT'])
+            self.getline(['L', 'NLATM', 'NLMOL', 'NLION', 'NLPLS', 'NLPHOT'])
             self.getline(['I', 'NSPEZ'])
-            self.getline(['B', 'NLPNT', 'NLLNE', 'NLSRF', 'NLVOL', 'NLCNS'])
+            self.getline(['L', 'NLPNT', 'NLLNE', 'NLSRF', 'NLVOL', 'NLCNS'])
             self.getline(['I', 'NSRFSI'])
             for i in range(1, self.values['NSRFSI'] + 1):
                 self.getline(['I', 'INUM', 'INDIM', 'INSOR', 'INGRDA(1)',
@@ -3805,7 +3805,7 @@ class EireneEdit(QTreeWidget):
             self.getline(['I', 'INI', 'INE'])
 
     def block_9(self):
-        role = ['B']
+        role = ['L']
         role += ['NLPRCA('+str(i)+')' for i in range(self.values['NATMI'])]
         role += ['NLPRCM('+str(i)+')' for i in range(self.values['NMOLI'])]
         role += ['NLPRCI('+str(i)+')' for i in range(self.values['NIONI'])]
@@ -3885,14 +3885,14 @@ class EireneEdit(QTreeWidget):
                           'TXTUNT(' + str(i) + ',NTLSR)'])
 
     def block_11(self):
-        self.getline(['B', 'TRCPLT', 'TRCHST', 'TRCNAL', 'TRCREA', 'TRCSIG',
+        self.getline(['L', 'TRCPLT', 'TRCHST', 'TRCNAL', 'TRCREA', 'TRCSIG',
                            'TRCGRD', 'TRCSUR', 'TRCREF', 'TRCFLE', 'TRCAMD',
                            'TRCINT', 'TRCLST', 'TRCSOU', 'TRCREC', 'TRCTIM',
                            'TRCBLA', 'TRCBLM', 'TRCBLI', 'TRCBLP', 'TRCBLE',
                            'TRCBLPH', 'TRCTAL', 'TRCOCT', 'TRCCEN', 'TRCDUMM'])
 
         # Following booleans not in use
-        self.getline(['B', 'TRCDBG2', 'TRCDBGE', 'TRCDBGM', 'TRCDBGF',
+        self.getline(['L', 'TRCDBG2', 'TRCDBGE', 'TRCDBGM', 'TRCDBGF',
                       'TRCDBGL', 'TRCDBGS', 'TRCDBGG', 'TRCDBGMPI', 'TRCDBGC'])
 
         # Following lines are not sufficiently described in manual or in
@@ -3928,7 +3928,7 @@ class EireneEdit(QTreeWidget):
             self.dummy_block()  # No additional descritpion in the manual
 
     def block_14(self):
-        self.getline(['B', 'LSYMET', 'LBALAN', 'LCHKQUD'])
+        self.getline(['L', 'LSYMET', 'LBALAN', 'LCHKQUD'])
         self.getline(['I', 'NFLA', 'NCUTB', 'NCUTL', 'IMF', 'NTRFRM', 'NFULL',
                            'IBRAD', 'IBPOL', 'IBTOR'])
         for i in range(1, self.values['NPLSI'] + 1):
@@ -4133,7 +4133,7 @@ class EireneEdit(QTreeWidget):
             arguments [array]: Depending on the line it can contain booleans,
                 integers or real numbers.
         """
-        if type == 'B':
+        if type == 'L':
             arguments = []
             for char in line:
                 if char != ' ':
