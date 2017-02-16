@@ -98,6 +98,7 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
       pip sphinx sphinx_rtd_theme matplotlib mock nose
   # The following Python modules are preferred by IMAS
   if [ -n "${IMAS_PREFIX}" ]; then
+    LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
     ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
       Cython mpi4py scipy luigi tornado deap decorator liac-arff ecdsa \
       netaddr paramiko paycheck # netifaces 
