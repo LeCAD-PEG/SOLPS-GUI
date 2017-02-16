@@ -4,13 +4,13 @@ from PyQt5.QtWidgets import QWidget, QPlainTextEdit, QVBoxLayout, QToolTip
 from PyQt5.QtGui import (QSyntaxHighlighter, QTextCursor, QTextCharFormat,
                          QFont, QBrush)
 import logging
-import b2tooltips
+import b2_tooltips
 
-b2_tooltips = {'b2mn': b2tooltips.b2mn_tooltips,
-               'b2ag': b2tooltips.b2ag_tooltips,
-               'b2ah': b2tooltips.b2ah_tooltips,
-               'b2ar': b2tooltips.b2ar_tooltips,
-               'b2ai': b2tooltips.b2ai_tooltips,
+b2_tooltips = {'b2mn': b2_tooltips.b2mn_tooltips,
+               'b2ag': b2_tooltips.b2ag_tooltips,
+               'b2ah': b2_tooltips.b2ah_tooltips,
+               'b2ar': b2_tooltips.b2ar_tooltips,
+               'b2ai': b2_tooltips.b2ai_tooltips,
                }
 
 
@@ -24,9 +24,11 @@ class B2PlainTextEdit(QPlainTextEdit):
     def __init__(self, parent=None, rules=list()):
         super(B2PlainTextEdit, self).__init__(parent)
         self.tooltips = dict()
+        self.old_text = None
+        self.modified = False
         for key in rules:
             category, param_type, description, default_value = rules[key]
-            tooltip = '<font color=blue>Switch: <b>' + key \
+            tooltip = '<font color=blue><b>' + key \
                       + '</b> Category: <b>' + category + '</b>, ' \
                       + 'Type: <b>' + param_type + '</b>, '\
                       + 'Default: <b>' + default_value + '</b></font><br>' \
@@ -43,7 +45,13 @@ class B2PlainTextEdit(QPlainTextEdit):
                 QToolTip.hideText()
         return super(B2PlainTextEdit, self).event(event)
 
-    @pyqtSlot(str)
+    def setPlainText(self, text):
+        if self.old_text is None:
+            self.old_text = text
+        elif self.old_text != text:
+            self.modified = True
+        return super(B2PlainTextEdit, self).setPlainText(text)
+
     def insert_line(self, line):
         self.insertPlainText(line)
 
@@ -111,9 +119,11 @@ class B2Handler:
         else:
             self.display_widget.setPlainText(text)
 
-    def toPlainText(self, text=None):
+    def toPlainText(self):
         return self.display_widget.toPlainText()
 
+    def isModified(self):
+        return self.display_widget.modified
 
 class B2Edit(QWidget):
     def __init__(self, parent=None, filename=''):
@@ -134,7 +144,7 @@ class B2Edit(QWidget):
     def setPlainText(self, text):
         self.text_handler.setPlainText(text)
 
-    def toPlainText(self, text):
+    def toPlainText(self):
         return self.display_widget.toPlainText()
 
     def setReadOnly(self, state):
@@ -145,7 +155,6 @@ class B2Edit(QWidget):
 
     def document(self):
         return self.text_handler
-
 
 if __name__ == '__main__':
     import sys
