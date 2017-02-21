@@ -1,11 +1,11 @@
-#!/bin/sh -x
-## Building PyQt with Python3 and Qt5
+#!/bin/bash -x
+## Building PyQt with Python2 and Qt4
 ## Minimum GCC supported version for building Qt5 is 4.7
  
-PYTHON_VERSION=3.6.0
+PYTHON_VERSION=2.7.13
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
-QT_VERSION=5.7.1
-PyQT_VERSION=5.7.1 # should be the same as Qt 
+QT_VERSION=${QT_VERSION:-4.8.7}
+PyQT_VERSION=4.12 # should be the same as Qt 
 SIP_VERSION=4.19
 
 # Site specific defaults
@@ -68,7 +68,7 @@ install -d ${BUILD_DIR}
 install -d ${STAGING_DIR}
 install -d ${DOWNLOAD_DIR}
 
-## Install Python3
+## Install Python2
 
 PYTHON_SRC="Python-${PYTHON_VERSION}.tgz"
 PYTHON_SITE="https://www.python.org/ftp/python"
@@ -95,130 +95,43 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   make -j ${MAKE_JOBS}
   make install
   LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
-  ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
-      pip sphinx sphinx_rtd_theme matplotlib mock nose
+#  ${STAGING_DIR}/bin/pip --trusted-host pypi.python.org install --upgrade \
+#      pip sphinx sphinx_rtd_theme matplotlib mock nose
   # The following Python modules are preferred by IMAS
   if [ -n "${IMAS_PREFIX}" ]; then
     LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
-    ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
+    ${STAGING_DIR}/bin/pip --trusted-host pypi.python.org install --upgrade \
       Cython mpi4py scipy luigi tornado deap decorator liac-arff ecdsa \
       netaddr paramiko paycheck # netifaces 
   fi
   touch ${PYTHON_SRC_DIR}/.built
 fi
 
-XCB_FLAGS="-xcb -no-xcb-xlib" # XCB is mandatory for Linux 
-if [ "${USE_QT_XCB}" = "YES" ]; then # build QT with QT-provided XCB libs
-  XCB_FLAGS="${XCB_FLAGS} -qt-xcb"
-fi
 
-## Build XCB Xlib and libXML for Qt5 locally instead of Qt provided XCB libs.
-# For Qt5.x build problems on RHEL5 see
-# https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-rhel5-linux-centos-5-7
-# See http://kate-editor.org/2014/12/22/qt-5-4-on-red-hat-enterprise-5/
-
-URLS="http://xmlsoft.org/sources/libxml2-2.9.3.tar.gz"
-if [ "${BUILD_XCB}" = "YES" ]; then
-  URLS="${URLS} \
-  http://xorg.freedesktop.org/archive/individual/proto/xproto-7.0.28.tar.gz\
-  http://xcb.freedesktop.org/dist/xcb-proto-1.11.tar.gz \
-  http://xcb.freedesktop.org/dist/libpthread-stubs-0.3.tar.gz \
-  http://xcb.freedesktop.org/dist/libxcb-1.11.1.tar.gz \
-  http://xcb.freedesktop.org/dist/xcb-util-0.4.0.tar.gz \
-  http://xcb.freedesktop.org/dist/xcb-util-image-0.4.0.tar.gz \
-  http://xcb.freedesktop.org/dist/xcb-util-keysyms-0.4.0.tar.gz \
-  http://xcb.freedesktop.org/dist/xcb-util-wm-0.4.1.tar.gz \
-  http://xcb.freedesktop.org/dist/xcb-util-renderutil-0.3.9.tar.gz"
-#  http://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.1.tar.gz"
-  XCB_INCLUDES="-I${STAGING_DIR}/include -I${STAGING_DIR}/include/libxml2"
-  XCB_LIBS="-L${STAGING_DIR}/lib"
-  XCB_FLAGS="${XCB_FLAGS} ${XCB_INCLUDES} ${XCB_LIBS}"
-fi
-
-if [ "${BUILD_XLIB}" = "YES" ] ; then 
-  URLS="${URLS} http://www.x.org/releases/X11R7.7/src/lib/libX11-1.5.0.tar.gz"
-fi
-
-install -d  ${BUILD_DIR}/libs
-cd ${BUILD_DIR}/libs
-for url in ${URLS}; do
-  file=${url##*/}
-  test -f ${DOWNLOAD_DIR}/${file} || wget --no-check-certificate \
-      -O ${DOWNLOAD_DIR}/${file} ${url}
-  pkgdir=${file%.*.*}
-  test -e ${pkgdir}/.built && continue
-  rm -rf ${pkgdir}
-  tar xf ${DOWNLOAD_DIR}/${file}
-  cd ${pkgdir}
-  if [ "${pkgdir%%-*}" = "libxml2" ]; then configopt="--without-python"
-  else configopt=
-  fi
-  PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH} \
-  ./configure --prefix=${STAGING_DIR} ${configopt}
-  make -j ${MAKE_JOBS}
-  make install
-  touch .built
-  cd ..
-done
-
-## Install QT
-
+#Install QT
 QT_MAJOR_VERSION=${QT_VERSION%.*}
 QT_TAR="qt-everywhere-opensource-src-${QT_VERSION}.tar.gz"
-QT_SITE="http://download.qt.io/official_releases/qt"
-#QT_SITE="http://download.qt.io/development_releases/qt/"
-QT_DOWNLOAD="${QT_SITE}/${QT_MAJOR_VERSION}/${QT_VERSION}/single/${QT_TAR}"
-
+QT_DOWNLOAD="http://download.qt.io/official_releases/qt/${QT_MAJOR_VERSION}/${QT_VERSION}/${QT_TAR}"
 QT_SOURCE_DIR="${BUILD_DIR}/qt-everywhere-opensource-src-${QT_VERSION}"
 
+#Download tar and unpack
 if [ ! -f ${DOWNLOAD_DIR}/${QT_TAR} ]; then
-  wget -P ${DOWNLOAD_DIR} ${QT_DOWNLOAD}
+  cd ${DOWNLOAD_DIR}
+  wget ${QT_DOWNLOAD}
 fi
 
-
-if [ ! -e ${QT_SOURCE_DIR}/.configured ]; then # Configuring Qt
-  rm -rf ${QT_SOURCE_DIR} ${STAGING_QT} 
+if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
+  #Building QT
+  rm -rf ${QT_SOURCE_DIR}
   cd ${BUILD_DIR}
   tar xzf ${DOWNLOAD_DIR}/${QT_TAR} 
+  
   cd ${QT_SOURCE_DIR}
-  sed -i.orig -e 's/-Wno-error=return-type//' \
-      qtlocation/src/3rdparty/poly2tri/poly2tri.pro
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-openssl.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-no-offscreen.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
-  patch -p 1 -d ${QT_SOURCE_DIR}<${PATCH_DIR}/qglxintegration-glx-context.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qxcbconnection.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qbenchmarkperfevents.patch
-  #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qsimd.cpp-gcc4.2.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qdbusinternalfilters.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-invoke-static.patch
-  sed -i -e '/auto/d' qtdeclarative/tests/tests.pro \
-                      qtmultimedia/tests/tests.pro \
-                      qtgraphicaleffects/tests/tests.pro
-  PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH} \
-    ./configure -v --prefix=${STAGING_QT} -opensource -confirm-license \
-      -shared -no-audio-backend \
-      -skip qtgamepad \
-      -skip qtwebchannel \
-      -skip qtwebengine \
-      -skip qtwebsockets \
-      -skip qtwebview \
-      -skip qt3d ${XCB_FLAGS} ${QT_EXTRA_FLAGS} \
-      -qt-xkbcommon -xkb-config-root /usr/share/X11/xkb
-  touch ${QT_SOURCE_DIR}/.configured
-fi
-
-if [ ! -e ${QT_SOURCE_DIR}/.built ]; then  ## Building Qt and docs
-  cd ${QT_SOURCE_DIR}
+  ./configure --prefix=${STAGING_QT} -no-webkit -opensource -confirm-license
   make -j ${MAKE_JOBS}
-  make install
-  # Building Qt documentation
-  PATH="${STAGING_QT}/bin:${PATH}" make -C qttools/src sub-qdoc
-  PATH="${STAGING_QT}/bin:${PATH}" make -C qtbase/src html_docs
-  PATH="${STAGING_QT}/bin:${PATH}" make qmake_all
-  PATH="${STAGING_QT}/bin:${PATH}" make -j ${MAKE_JOBS} docs install_docs
+  make install 
   touch ${QT_SOURCE_DIR}/.built
-fi # building Qt
+fi
 
 ## Install sip
 
@@ -233,7 +146,7 @@ fi
 
 SIP_SRC_DIR="${BUILD_DIR}/sip-${SIP_VERSION}"
 SIP_INSTALL_DIR="${STAGING_DIR}"
-PYTHON="${STAGING_DIR}/bin/python${PYTHON_MAINVERSION}"
+PYTHON=${STAGING_DIR}/bin/python2.7
 
 
 if [ ! -e   ${SIP_SRC_DIR}/.built ]; then
@@ -250,9 +163,8 @@ fi
 
 ## Install PyQT
 
-PyQT_SRC="PyQt5_gpl-${PyQT_VERSION}.tar.gz"
-PyQT_SITE="http://sourceforge.net/projects/pyqt/files/PyQt5"
-#PyQT_SITE="https://www.riverbankcomputing.com/static/Downloads/PyQt5}"
+PyQT_SRC="PyQt4_gpl_x11-${PyQT_VERSION}.tar.gz"
+PyQT_SITE="http://sourceforge.net/projects/pyqt/files/PyQt4"
 PyQT_DOWNLOAD="${PyQT_SITE}/PyQt-${PyQT_VERSION}/${PyQT_SRC}/download"
 
 
@@ -261,7 +173,7 @@ if [ ! -f ${DOWNLOAD_DIR}/${PyQT_SRC} ]; then
         ${PyQT_DOWNLOAD}
 fi
 
-PyQT_SRC_DIR="${BUILD_DIR}/PyQt5_gpl-${PyQT_VERSION}"
+PyQT_SRC_DIR="${BUILD_DIR}/PyQt4_gpl_x11-${PyQT_VERSION}"
 PyQT_INSTALL_DIR="${STAGING_DIR}"
 
 if [ ! -e   ${PyQT_SRC_DIR}/.built ]; then
