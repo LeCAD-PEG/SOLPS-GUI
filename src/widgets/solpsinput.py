@@ -100,7 +100,6 @@ class SolpsInput(QTabWidget):
             connected here. If file is ending with .gz then gzip decompression
             is applied to read the file.
         """
-
         if not self.isVisible():
             return
 
@@ -179,7 +178,18 @@ class SolpsInput(QTabWidget):
                     plainTextEdit.setEnabled(False)
             else:
                 if os.access(self.rundir, os.W_OK):
-                    msg = "File does not exist yet. Start typing here."
+                    msg = "File does not exist yet. "
+                    stencil_path_1 = self.rundir + '/../baserun/' + filename +\
+                                   '.stencil'
+                    stencil_path_2 = self.rundir + filename + '.stencil'
+                    if os.path.exists(stencil_path_1) or\
+                       os.path.exists(stencil_path_2):
+                        msg += "Press F2 to load the stencil file or start"\
+                               " typing here."
+                        self.editors[filename].path = stencil_path_1 if \
+                            os.path.exists(stencil_path_1) else stencil_path_2
+                    else:
+                        msg += "Start typing here.!"
                 else:
                     msg = "File cannot be saved in " + self.rundir
                 plainTextEdit.setPlaceholderText(msg)

@@ -5,14 +5,35 @@ from PyQt5.QtGui import (QSyntaxHighlighter, QTextCursor, QTextCharFormat,
                          QFont, QBrush)
 import logging
 import b2_tooltips
+import textwrap
 
-b2_tooltips = {'b2mn': b2_tooltips.b2mn_tooltips,
-               'b2ag': b2_tooltips.b2ag_tooltips,
-               'b2ah': b2_tooltips.b2ah_tooltips,
-               'b2ar': b2_tooltips.b2ar_tooltips,
-               'b2ai': b2_tooltips.b2ai_tooltips,
+b2_tooltips = {'b2mn.dat': b2_tooltips.b2mn_tooltips,
+               'b2ag.dat': b2_tooltips.b2ag_tooltips,
+               'b2ah.dat': b2_tooltips.b2ah_tooltips,
+               'b2ar.dat': b2_tooltips.b2ar_tooltips,
+               'b2ai.dat': b2_tooltips.b2ai_tooltips,
+               'parameters' : b2_tooltips.b2parameter_tooltips,
                }
 
+
+
+def dedent(description):
+    """ Removes first empty line from description and any leading tabs
+        from the next line before the description and any following lines.
+        First lines are wrapped to 70 characters.
+
+    :param description(string): from the XML generated tooltips dictionary
+    :return: formatted output for the tooltip
+    """
+    trim_start = 0  # Remove any leading newline that affects dedent
+    while trim_start < len(description) and description[trim_start] == '\n':
+        trim_start += 1
+    description = textwrap.dedent(description[trim_start : ])
+    lines = description.splitlines()
+    output = ''
+    for line in lines:
+        output += textwrap.fill(line, 70) + '\n'
+    return output[0:-1] # remove last newline
 
 class HighlightingRule():
     def __init__(self, pattern, format):
@@ -29,16 +50,18 @@ class B2PlainTextEdit(QPlainTextEdit):
         for key in rules:
             category, param_type, description, default_value = rules[key]
             tooltip = '<font color=blue><b>' + key \
-                      + '</b> Category: <b>' + category + '</b>, ' \
-                      + 'Type: <b>' + param_type + '</b>, '\
-                      + 'Default: <b>' + default_value + '</b></font><br>' \
-                      + description
-            self.tooltips[key] = tooltip
+                      + '</b> Category: <b>' + category + '</b>,' \
+                      + 'Type: <b>' + param_type + '</b>,'\
+                      + 'Default: <b>' + default_value + '</b></font>' \
+                      + '<pre>' + dedent(description) + '</pre>'
+
+            self.tooltips[key.lower()] = tooltip
+
     def event(self, event):
         if event.type() == QEvent.ToolTip:
             textCursor = self.cursorForPosition(event.pos())
             textCursor.select(QTextCursor.WordUnderCursor)
-            word = textCursor.selectedText()
+            word = textCursor.selectedText().lower()
             if word in self.tooltips:
                 QToolTip.showText(event.globalPos(), self.tooltips[word])
             else:
@@ -77,7 +100,7 @@ class B2Highlighter(QSyntaxHighlighter):
             keywords.append(key)
 
         for word in keywords:
-            pattern = QRegExp(word)
+            pattern = QRegExp(word, Qt.CaseInsensitive)
             rule = HighlightingRule(pattern, self.keyword)
             self.highlightingRules.append(rule)
 
@@ -128,11 +151,16 @@ class B2Handler:
 class B2Edit(QWidget):
     def __init__(self, parent=None, filename=''):
         super(B2Edit, self).__init__(parent)
-
-        if filename[:4] not in b2_tooltips:
-            tooltips = {}
-        else:
-            tooltips = b2_tooltips[filename[:4]]
+        self.path = ''
+        if filename in b2_tooltips:
+            tooltips = b2_tooltips[filename]
+        else:       
+            tooltips = b2_tooltips['parameters']
+        # Importing additional tooltips from b2mn tooltips
+        for switch_name in b2_tooltips['b2mn.dat']:
+            if switch_name not in tooltips and \
+                switch_name[:4] == filename[:4]:
+                tooltips[switch_name] = b2_tooltips['b2mn.dat'][switch_name]
         self.display_widget = B2PlainTextEdit(self, tooltips)
         self.text_handler = B2Handler(self, self.display_widget)
         self.text_handler.highlighter.prepare_rules(tooltips)
@@ -140,6 +168,15 @@ class B2Edit(QWidget):
         layout.addWidget(self.display_widget)
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_F2: 
+            if self.path:
+                # No checks are required since the solpsinput.py have
+                # checked if stensils exist
+                with open(self.path, 'r') as f:
+                    self.display_widget.setPlainText(f.read())
+                    self.path = ''
 
     def setPlainText(self, text):
         self.text_handler.setPlainText(text)
