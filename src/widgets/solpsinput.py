@@ -189,7 +189,7 @@ class SolpsInput(QTabWidget):
                         self.editors[filename].path = stencil_path_1 if \
                             os.path.exists(stencil_path_1) else stencil_path_2
                     else:
-                        msg += "Start typing here.!"
+                        msg += "Start typing here!"
                 else:
                     msg = "File cannot be saved in " + self.rundir
                 plainTextEdit.setPlaceholderText(msg)

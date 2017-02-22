@@ -431,7 +431,7 @@ class RetrieveRunsFolderInfo(QThread):
         Args:
             directory (str): Directory to scan
         Returns:
-            time, status (str, str), static_data : Tuple that is at
+            time, state (str, str), static_data : Tuple that is at
                 least directory time and empty string. Otherwise it returns
                 extracted status string and modification time of the file
                 that string was retrieved from and other static data from

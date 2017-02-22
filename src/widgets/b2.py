@@ -7,13 +7,14 @@ import logging
 import b2_tooltips
 import textwrap
 
-b2_tooltips = {'b2mn.dat': b2_tooltips.b2mn_tooltips,
-               'b2ag.dat': b2_tooltips.b2ag_tooltips,
-               'b2ah.dat': b2_tooltips.b2ah_tooltips,
-               'b2ar.dat': b2_tooltips.b2ar_tooltips,
-               'b2ai.dat': b2_tooltips.b2ai_tooltips,
-               'parameters' : b2_tooltips.b2parameter_tooltips,
-               }
+b2_tooltips = {
+                'b2mn.dat': b2_tooltips.b2mn_tooltips,
+                'b2ag.dat': b2_tooltips.b2ag_tooltips,
+                'b2ah.dat': b2_tooltips.b2ah_tooltips,
+                'b2ar.dat': b2_tooltips.b2ar_tooltips,
+                'b2ai.dat': b2_tooltips.b2ai_tooltips,
+                'parameters' : b2_tooltips.b2parameter_tooltips,
+              }
 
 
 
@@ -42,8 +43,17 @@ class HighlightingRule():
 
 
 class B2PlainTextEdit(QPlainTextEdit):
+    """This is the QPlainTextEdit that contains the text, activates highlights 
+    and tooltips for all the switches and parameters that have description,
+    category, default values and other notes.
+    """
+
     def __init__(self, parent=None, rules=list()):
         super(B2PlainTextEdit, self).__init__(parent)
+        font = QFont()
+        font.setFamily('Monospace')
+        font.setPixelSize(12)
+        self.setFont(font)
         self.tooltips = dict()
         self.old_text = None
         self.modified = False
@@ -149,6 +159,14 @@ class B2Handler:
         return self.display_widget.modified
 
 class B2Edit(QWidget):
+    """This is the editor for all input files that are part of B2. If the input
+    file has any tooltips, that describes the switch or parameter, they will
+    be aplied. Otherwise it acts as a normal editor.
+
+    If there is a .stencil provided in the run folder or in the ../baserun 
+    folder, it can be loaded by using the F2 key.
+    """
+
     def __init__(self, parent=None, filename=''):
         super(B2Edit, self).__init__(parent)
         self.path = ''
@@ -156,7 +174,8 @@ class B2Edit(QWidget):
             tooltips = b2_tooltips[filename]
         else:       
             tooltips = b2_tooltips['parameters']
-        # Importing additional tooltips from b2mn tooltips
+
+        # Importing additional tooltips from b2mn tooltips since switches 
         for switch_name in b2_tooltips['b2mn.dat']:
             if switch_name not in tooltips and \
                 switch_name[:4] == filename[:4]:
@@ -188,7 +207,7 @@ class B2Edit(QWidget):
         return
 
     def setPlaceholderText(self, text):
-        self.text_handler.setPlainText(text)
+        self.display_widget.setPlaceholderText(text)
 
     def document(self):
         return self.text_handler
@@ -206,10 +225,13 @@ if __name__ == '__main__':
             self.editor = B2Edit(self)
             self.plaintextedit = B2PlainTextEdit(self)
             self.setCentralWidget(self.b2)
-
-    mainwindow = Standalone()
-    mainwindow.b2.document().readInput('/home/simicg/Documents\
-                                        /eirene-gui/b2ag.dat')
-    mainwindow.b2.setPlainText
-    mainwindow.show()
+    if len(sys.argv) > 1:
+        input_filename = sys.argv[1]
+        mainwindow = Standalone()
+        mainwindow.b2.document().readInput(input_filename)
+        mainwindow.b2.setPlainText()
+        mainwindow.show()
+        
+    else:
+        print("File path doesn't exist.")
     sys.exit(app.exec_())

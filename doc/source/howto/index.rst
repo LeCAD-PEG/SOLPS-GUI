@@ -13,10 +13,11 @@ Currently, the HOWTOs are:
 .. toctree::
    :maxdepth: 1
 
+   submit.rst
+   catalyst/index.rst
+   cpo2ids/index.rst
+   input-editor.rst
    tunneling.rst
    style.rst
-   submit.rst
    plugin.rst
-   cpo2ids/index.rst
-   catalyst/index.rst
 
