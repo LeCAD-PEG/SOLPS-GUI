@@ -1,4 +1,5 @@
-***********
+***********Some parameters change the structure of the input file and this has not been
+#implemented yet in the eirene editor.
  Tutorials
 ***********
 
@@ -12,6 +13,7 @@
    dashboard.rst
    catalyst.rst
    edgeualplugin/index.rst
+   editors.rst
 
 
 

@@ -224,12 +224,41 @@ if __name__ == '__main__':
             super(Standalone, self).__init__(parent)
             self.editor = B2Edit(self)
             self.plaintextedit = B2PlainTextEdit(self)
-            self.setCentralWidget(self.b2)
+            self.setCentralWidget(self.editor.display_widget)
+
+        def read_and_set_text(self, path):
+            self.path = path
+            if os.path.isfile(path):
+                filename = path.split('/')[-1] # For unix
+                with open(path, 'r') as f:
+                    text = f.read()
+                self.editor = B2Edit(self, filename)
+                self.setCentralWidget(self.editor.display_widget)
+                self.editor.setPlainText(text)
+            else:
+                print('File does not exist')
+
+        def closeEvent(self):
+            self.documentSave()
+            super(Standalone, self).closeEvent(e)
+
+        def documentSave(self):
+            if self.editor.text_handler.isModified():
+                if os.path.exists(self.path):
+                    try:
+                        with open(path, 'w') as f:
+                            f.write(self.editor.display_widget.toPlainText())
+                    except PermissionError as e:
+                        print('Permission error.')
+                else:
+                    print('The path to file does not exist!')
+
+
+
     if len(sys.argv) > 1:
         input_filename = sys.argv[1]
         mainwindow = Standalone()
-        mainwindow.b2.document().readInput(input_filename)
-        mainwindow.b2.setPlainText()
+        mainwindow.read_and_set_text(input_filename)
         mainwindow.show()
         
     else:

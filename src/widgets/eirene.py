@@ -3190,7 +3190,7 @@ class MyValidator(QValidator):
             return string
 
     def validate(self, string, pos):
-        """The overloaded validate fucntion from QValidator class. Any illegal
+        """The overloaded validate function from QValidator class. Any illegal
         changes are rejected: String length changed, added/removed element,
         type changed of the element.
 
@@ -4151,6 +4151,7 @@ class EireneEdit(QTreeWidget):
 
         return arguments
 
+    @pyqtSlot()
     def changed(self):
         """This function is called whenever an item is modified in the editor.
         It does not accept or return anything, since it only changes a boolean
@@ -4272,6 +4273,8 @@ class Eirene(QWidget):
     def resizeEvent(self, event):
         self.splitter.resize(event.size())
 
+    @pyqtSlot()
+    @pyqtSlot(str)
     def show_help(self, parameter='EDIT_HELP'):
         if parameter == '': 
             self.help.clear()
@@ -4280,8 +4283,8 @@ class Eirene(QWidget):
             if self.tree.selectedItems():
                 item = self.tree.selectedItems()[0]
                 card_data = item.data(0, Qt.UserRole)
-                type_of_card = card_data[0]
-                if type_of_card:
+                if card_data and card_data[0]:
+                    type_of_card = card_data[0]
                     card_variables = card_data[2]
                     text = '<p>' + type_of_card + " :" +\
                            " ".join(card_variables) + '</p>'

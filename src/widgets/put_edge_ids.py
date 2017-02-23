@@ -1,6 +1,10 @@
 #Python 3.5
 
-import imas
+try:
+    import imas
+except Exception as e:
+    print("Required IMAS support library not available on this system.")
+
 import getopt
 import sys
 
