@@ -41,13 +41,13 @@ class AddMenu(QMenu):
 
             for parameter in b2menu.b2mn_menu[category]:
                 ( name, param_type, data, description ) = parameter
-                if param_type == 'paramgroup':
-                    paramgroup = QMenu(category_menu)
-                    paramgroup.setTitle(name)
-                    action = category_menu.addAction(paramgroup.menuAction())
+                if param_type == 'switchgroup':
+                    switchgroup = QMenu(category_menu)
+                    switchgroup.setTitle(name)
+                    action = category_menu.addAction(switchgroup.menuAction())
                     for parameter in data:
                         (name, param_type, default, short_desc) = parameter
-                        action = paramgroup.addAction(name)
+                        action = switchgroup.addAction(name)
                         sd_formatted= self.dedent(short_desc)
                         if len(sd_formatted):
                             sd_formatted = '<br/><b>' + sd_formatted +'</b>'

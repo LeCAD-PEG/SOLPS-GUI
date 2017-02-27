@@ -7,15 +7,6 @@ import logging
 import b2_tooltips
 import textwrap
 
-b2_tooltips = {
-                'b2mn.dat': b2_tooltips.b2mn_tooltips,
-                'b2ag.dat': b2_tooltips.b2ag_tooltips,
-                'b2ah.dat': b2_tooltips.b2ah_tooltips,
-                'b2ar.dat': b2_tooltips.b2ar_tooltips,
-                'b2ai.dat': b2_tooltips.b2ai_tooltips,
-                'parameters' : b2_tooltips.b2parameter_tooltips,
-              }
-
 
 
 def dedent(description):
@@ -170,16 +161,17 @@ class B2Edit(QWidget):
     def __init__(self, parent=None, filename=''):
         super(B2Edit, self).__init__(parent)
         self.path = ''
-        if filename in b2_tooltips:
-            tooltips = b2_tooltips[filename]
+        if filename in b2_tooltips.tooltips:
+            tooltips = b2_tooltips.tooltips[filename]
         else:       
-            tooltips = b2_tooltips['parameters']
+            tooltips = b2_tooltips.tooltips['b2.parameters']
 
         # Importing additional tooltips from b2mn tooltips since switches 
-        for switch_name in b2_tooltips['b2mn.dat']:
+        for switch_name in b2_tooltips.tooltips['b2mn.dat']:
             if switch_name not in tooltips and \
                 switch_name[:4] == filename[:4]:
-                tooltips[switch_name] = b2_tooltips['b2mn.dat'][switch_name]
+                tooltips[switch_name] = \
+                    b2_tooltips.tooltips['b2mn.dat'][switch_name]
         self.display_widget = B2PlainTextEdit(self, tooltips)
         self.text_handler = B2Handler(self, self.display_widget)
         self.text_handler.highlighter.prepare_rules(tooltips)
