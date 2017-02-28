@@ -46,7 +46,9 @@ from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
                           QSortFilterProxyModel, QRegExp, QObject, QRect,
                           QSize, QProcess)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
-                             QFileDialog, QStyle, QStyledItemDelegate)
+                             QFileDialog, QStyle, QStyledItemDelegate,
+                             QLineEdit, QToolButton, QGridLayout, QLabel,
+                             QDialogButtonBox)
 from PyQt5.QtGui import (QStandardItemModel, QFontMetrics, QPen)
 from PyQt5.uic import loadUi
 from enum import IntEnum
@@ -57,7 +59,7 @@ from addmenu import AddMenu
 REDIRECT_STDOUT_TO_LOG = False
 
 class Column:
-    """Column enumeration for Runs treeview.
+    """Column enumeration for Runs treeview.parent
 
         First column `name` cannot be moved and is short name.
 
@@ -142,96 +144,95 @@ class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
         return self.has_accepted_children(index)
 
 
-class RunsSettings(QDialog):
-    """ Runs settings dialog described in runs.ui configures several
-        directories with SOLPS "runs". Each directory may have its own
-        SOLPSTOP environment and can also be from other users that one
-        wants to explore or monitor.
-    """
-    runDirsChanged = pyqtSignal()
+class MyLineEdit(QLineEdit):
+    def __init__(self, name, row, column):
+        super(MyLineEdit, self).__init__(name)
+        self.i = row
+        self.j = column
 
+class MyToolButton(QToolButton):
+    def __init__(self, row, column):
+        super(MyToolButton, self).__init__()
+        self.i = row
+        self.j = column
+
+class RunsSettings(QDialog):
     def __init__(self, parent=None):
         super(RunsSettings, self).__init__()
-        prefix = os.path.dirname(os.path.abspath(__file__))
-        loadUi(prefix + '/runs.ui', self)
-        # get GUI settings
+        self.setModal(True)
+        self.main_layout = QGridLayout(self)
+        self.setWindowTitle('Runs directories')
         settings = QSettings("ITER", "solps-gui")
         settings.beginGroup("RunDirectories")
-        rundir1 = settings.value("runDir1", os.path.expanduser("~"))
-        self.lineEdit_rundir1.setText(rundir1)
-        rundir2 = settings.value("runDir2", "")
-        self.lineEdit_rundir2.setText(rundir2)
-        rundir3 = settings.value("runDir3", "")
-        self.lineEdit_rundir3.setText(rundir3)
-        rundir4 = settings.value("runDir4", "")
-        self.lineEdit_rundir4.setText(rundir4)
-        rundir5 = settings.value("runDir5", "")
-        self.lineEdit_rundir5.setText(rundir5)
-        self.lineEdit_alias1.setText(settings.value("Alias1", "local_1"))
-        self.lineEdit_alias2.setText(settings.value("Alias2", "local_2"))
-        self.lineEdit_alias3.setText(settings.value("Alias3", "local_3"))
-        self.lineEdit_alias4.setText(settings.value("Alias4", "local_4"))
-        self.lineEdit_alias5.setText(settings.value("Alias5", "local_5"))
+
+        self.alias_base = 'Alias'
+        self.runDir_base = 'runDir'
+
+        label_1 = QLabel('Runs Alias')
+        label_2 = QLabel('Runs Directory')
+        self.main_layout.addWidget(label_1, 0, 0, Qt.AlignCenter)
+        self.main_layout.addWidget(label_2, 0, 1, Qt.AlignLeft)
+
+        for i in range(5):
+            entry_1 = MyLineEdit(settings.value('Alias'+str(i+1)), i, 0)
+            entry_1.setAlignment(Qt.AlignCenter)
+
+            entry_2 = MyLineEdit(settings.value('runDir'+str(i+1)), i, 1)
+            entry_2.setMinimumWidth(350)
+
+            button_1 = MyToolButton(i, 2)
+            button_1.setText('...')
+            button_1.clicked.connect(self.dialog_action)
+
+            self.main_layout.addWidget(entry_1, i+1, 0, Qt.AlignCenter)
+            self.main_layout.addWidget(entry_2, i+1, 1)
+            self.main_layout.addWidget(button_1, i+1, 2, Qt.AlignCenter)
         settings.endGroup()
+        # Adding the Ok and Cancel button.
+        dialog_button_box = QDialogButtonBox()
+        dialog_button_box.setStandardButtons(QDialogButtonBox.Ok|
+                                             QDialogButtonBox.Cancel)
+        dialog_button_box.accepted.connect(self.accept)
+        dialog_button_box.rejected.connect(self.reject)
+        self.main_layout.addWidget(dialog_button_box, 6, 1)
+        self.setLayout(self.main_layout)
 
+    @pyqtSlot()
+    def dialog_action(self):
+        """ When the tool button is clicked a directory browser is opened. If
+        a new directory is opened, the new value is then assigned to the 
+        correct alias and runDir setting.
+        """
+        widget = self.sender()
+        i = widget.i # row
+        j = widget.j # column
+        current_dir = self.main_layout.itemAt(2+i*3+j-1).widget().text()
 
-
-        self.toolButtonView1.clicked.connect(self.showdir1)
-        self.toolButtonView2.clicked.connect(self.showdir2)
-        self.toolButtonView3.clicked.connect(self.showdir3)
-        self.toolButtonView4.clicked.connect(self.showdir4)
-        self.toolButtonView5.clicked.connect(self.showdir5)
-
-    def update_dir(self, line_edit):
-        current_dir = line_edit.text()
         if current_dir == "":
             current_dir = os.path.expanduser("~")
+
         new_dir = QFileDialog.getExistingDirectory(self,
                                                    "Select Directory",
                                                    current_dir,
                                                    QFileDialog.ShowDirsOnly)
+
         if new_dir:
+            line_edit = self.main_layout.itemAt(2+i*3+j-1).widget()
             line_edit.setText(new_dir)
 
-    def setRunsSettings(self):
-        """ Save Runs directories into settings and emits that the directories
-            were changed and are needed to be completely rescanned.
-        """
-        settings = QSettings("ITER", "solps-gui")
-        settings.beginGroup("RunDirectories")
-        settings.setValue("runDir1", self.lineEdit_rundir1.text())
-        settings.setValue("runDir2", self.lineEdit_rundir2.text())
-        settings.setValue("runDir3", self.lineEdit_rundir3.text())
-        settings.setValue("runDir4", self.lineEdit_rundir4.text())
-        settings.setValue("runDir5", self.lineEdit_rundir5.text())
-        settings.setValue("Alias1", self.lineEdit_alias1.text())
-        settings.setValue("Alias2", self.lineEdit_alias2.text())
-        settings.setValue("Alias3", self.lineEdit_alias3.text())
-        settings.setValue("Alias4", self.lineEdit_alias4.text())
-        settings.setValue("Alias5", self.lineEdit_alias5.text())
+    def on_close(self):
+        settings = QSettings('ITER', 'solps-gui')
+        settings.beginGroup('RunDirectories')
+        for i in range(5):
+            alias_name = self.alias_base + str(i+1)
+            value = self.main_layout.itemAt(2 + i*3).widget().text()
+            settings.setValue(alias_name, value)
+
+            runDir_name = self.runDir_base + str(i+1)
+            value = self.main_layout.itemAt(2 + i*3 + 1).widget().text()
+            settings.setValue(runDir_name, value)
         settings.endGroup()
-        self.runDirsChanged.emit()
 
-    # Choose run directory
-    @pyqtSlot()
-    def showdir1(self):
-        self.update_dir(self.lineEdit_rundir1)
-
-    @pyqtSlot()
-    def showdir2(self):
-        self.update_dir(self.lineEdit_rundir2)
-
-    @pyqtSlot()
-    def showdir3(self):
-        self.update_dir(self.lineEdit_rundir3)
-
-    @pyqtSlot()
-    def showdir4(self):
-        self.update_dir(self.lineEdit_rundir4)
-
-    @pyqtSlot()
-    def showdir5(self):
-        self.update_dir(self.lineEdit_rundir5)
 
 class Preferences():
     """
@@ -1378,7 +1379,7 @@ class SOLPS_MainWindow(QMainWindow):
     def show_runs_dialog(self):
         dialog = RunsSettings()
         if dialog.exec_():
-            dialog.setRunsSettings()
+            dialog.on_close()
             if self.model.RetrieveRunsFolderInfoThread.isRunning() or \
                     self.model.scanFileSystemThread.isRunning():
                 msg = "Runs layout changed in the middle of the update." \
