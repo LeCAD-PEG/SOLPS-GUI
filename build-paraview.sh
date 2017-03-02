@@ -1,8 +1,9 @@
 #!/bin/sh -x
 
-PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.2.0}
+PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.3.0-RC2}
 QT_VERSION=${QT_VERSION:-4.8.7}
-CMAKE_VERSION=3.6.1
+CMAKE_VERSION=3.7.2
+
 case $(hostname -f) in
   *.iter.org) 
 	module purge
@@ -13,11 +14,13 @@ case $(hostname -f) in
 	export CXX=g++
 	MAKE_JOBS=${MAKE_JOBS:-8}
 	;;
-  *.marconi.cineca.it)
-	. /etc/profile.d.gw/modules.sh
-        module unload itm-gcc/6.1.0 gnu/6.1.0
-	module switch itm-python/2.7.13.b1 #itm-python/2.7kos
+  *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
+	#. /etc/profile.d.gw/modules.sh
+	#module unload itm-gcc/6.1.0 gnu/6.1.0
+	#module switch itm-python/2.7.13.b1 #itm-python/2.7kos
 	MAKE_JOBS=${MAKE_JOBS:-36}
+	export CXXFLAGS=-fpermissive
+	PARAVIEW_EXTRA_FLAGS="-DPARAVIEW_USE_MPI:BOOL=ON"
 	;;
   *)
 	;;
@@ -88,7 +91,9 @@ if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
   tar xzf ${DOWNLOAD_DIR}/${QT_TAR} 
   
   cd ${QT_SOURCE_DIR}
-  ./configure --prefix=${STAGING_QT} -no-webkit -opensource -confirm-license
+  ./configure --prefix=${STAGING_QT}  -opensource -confirm-license \
+      -no-javascript-jit -no-webkit -no-script -no-scripttools \
+      -no-sql-sqlite3 -no-accessibility
   make -j ${MAKE_JOBS}
   make install 
   touch ${QT_SOURCE_DIR}/.built
@@ -126,37 +131,38 @@ fi
 
 #Configure and build paraview
 if [ ! -e   ${PARAVIEW_BUILD}/.built ]; then
-rm -rf ${PARAVIEW_BUILD}
-install -d ${PARAVIEW_BUILD}
-cd ${PARAVIEW_BUILD}
+    rm -rf ${PARAVIEW_BUILD}
+    install -d ${PARAVIEW_BUILD}
+    cd ${PARAVIEW_BUILD}
 
-install -d ${STAGING_PARAVIEW}
-${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Release \
-		-DVTK_RENDERING_BACKEND:STRING=OpenGL \
-                -DBUILD_SHARED_LIBS:BOOL=ON  \
-                -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
-                -DBUILD_TESTING:BOOL=OFF \
-                -DPARAVIEW_ENABLE_PYTHON:BOOL=ON \
-                -DCMAKE_Fortran_COMPILER:STRING=ifort \
-                -DPARAVIEW_USE_MPI:BOOL=OFF \
-                -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_QT}/bin/qmake \
-                -DCMAKE_EXE_LINKER_FLAGS:STRING="-L${STAGING_QT}/lib" \
-                -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
-		 ${PARAVIEW_SOURCE_DIR}
-find .  -name link.txt -exec \
-    sed -i -e "s|-lQt|-L${STAGING_QT}/lib -lQt|" \
-           -e "s|-L${STAGING_QT}/lib|-L${STAGING_QT}/lib -lQtCore -lQtGui|" {} \;
+    install -d ${STAGING_PARAVIEW}
+    ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Release \
+	-DVTK_RENDERING_BACKEND:STRING=OpenGL \
+        -DBUILD_SHARED_LIBS:BOOL=ON  \
+        -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
+        -DBUILD_TESTING:BOOL=OFF \
+        -DPARAVIEW_ENABLE_PYTHON:BOOL=ON \
+        -DCMAKE_Fortran_COMPILER:STRING=ifort \
+        -DPARAVIEW_USE_MPI:BOOL=OFF \
+        -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_QT}/bin/qmake \
+        -DCMAKE_EXE_LINKER_FLAGS:STRING="-L${STAGING_QT}/lib" \
+        -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
+	${PARAVIEW_EXTRA_FLAGS} ${PARAVIEW_SOURCE_DIR}
+    find .  -name link.txt -exec \
+	sed -i -e "s|-lQt|-L${STAGING_QT}/lib -lQt|" \
+        -e "s|-L${STAGING_QT}/lib|-L${STAGING_QT}/lib -lQtCore -lQtGui|" {} \;
 
-LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} \
-make -j ${MAKE_JOBS} VERBOSE=0
-make install
+    LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} \
+	make -j ${MAKE_JOBS} VERBOSE=0
+    make install
+    touch .built
 fi
 
 STAGING_DOC=${STAGING_PARAVIEW}/share/paraview-${PARAVIEW_MAJOR_VERSION}/doc
 install -d ${STAGING_DOC}
-for file in ParaViewGettingStarted-${PARAVIEW_VERSION}.pdf \
-    ParaViewTutorial.pdf  ParaViewGuide-${PARAVIEW_VERSION}.pdf \
-    ParaViewCatalystGuide-${PARAVIEW_VERSION}.pdf  ; do
+for file in ParaViewGettingStarted-${PARAVIEW_VERSION%-*}.pdf \
+    ParaViewTutorial.pdf  ParaViewGuide-${PARAVIEW_VERSION%-*}.pdf \
+    ParaViewCatalystGuide-${PARAVIEW_VERSION%-*}.pdf  ; do
     if [ ! -f ${DOWNLOAD_DIR}/${file} ]; then
          wget -O ${DOWNLOAD_DIR}/${file} --no-check-certificate \
              ${PARAVIEW_DOWNLOAD}/${file}
@@ -168,5 +174,6 @@ for file in ParaViewGettingStarted-${PARAVIEW_VERSION}.pdf \
     install -m 444 ${DOWNLOAD_DIR}/${file} ${STAGING_DOC}/${target}
 done    
 
-touch .built
+
+
 

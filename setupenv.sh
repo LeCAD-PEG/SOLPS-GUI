@@ -1,6 +1,6 @@
 # source this bash file for local environment if PyQT is provided locally
 export QTDIR="${PWD}/staging/qt/5.7.1"
-export PARAVIEW_PREFIX="${PWD}/staging/paraview/5.2.0"
+export PARAVIEW_PREFIX="${PWD}/staging/paraview/5.3.0-RC2"
 export PATH="${PWD}/staging/bin:${QTDIR}/bin:${PARAVIEW_PREFIX}/bin:${PATH}"
 export LD_LIBRARY_PATH="${PWD}/staging/lib:${QTDIR}/lib:${LD_LIBRARY_PATH}"
 export LD_LIBRARY_PATH="${PWD}/staging/qt/4.8.7/lib:${LD_LIBRARY_PATH}"
