@@ -24,8 +24,7 @@ case $(hostname -f) in
                         -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK}
 	;;
   # SLES 11.4 WPCD Gateway (incompatible XCB, Xlib and GL libraries)
-  g0[1234].itm.rzg.mpg.de \
-  | tok*.bc.rzg.mpg.de) # IPP MPG 
+  tok*.bc.rzg.mpg.de) # IPP MPG 
         MAKE_JOBS=${MAKE_JOBS:-16}
 	USE_QT_XCB="NO"
 	BUILD_XCB="YES"
@@ -35,21 +34,23 @@ case $(hostname -f) in
 					 -skip qtvirtualkeyboard}
 	;;
 
-  *.marconi.cineca.it) # CentOS 7, 
+  *.marconi.cineca.it) # EU-IM Gateway CentOS 7 with GCC 6.1
         MAKE_JOBS=${MAKE_JOBS:-16}
-	. /etc/profile.d.gw/modules.sh
+	#. /etc/profile.d.gw/modules.sh
 	# module unload itm-gcc/6.1.0 itm-python/2.7
-	module switch itm-python/2.7.13.b1
-	module unload itm-gcc/6.1.0 gcc/6.1.0
+	#module switch itm-python/2.7.13.b1
+	#module unload itm-gcc/6.1.0 gcc/6.1.0
 	USE_QT_XCB="NO"
 	BUILD_XCB="NO"
 	BUILD_XLIB="NO"
+	export CXXFLAGS="-fpermissive"
+	QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:--no-sql-sqlite}
 	;;
 
 esac
 
 MAKE_JOBS=${MAKE_JOBS:-4}    # Safe default nowadays
-USE_QT_XCB=${USE_QT_XCB:-NO} # Use -qt-xcb for all except RHEL5 if possible
+USE_QT_XCB=${USE_QT_XCB:-NO} # Use Qt provided XCB. Not for RHEL5
 BUILD_XCB=${BUILD_XCB:-NO}   # YES if having problems with -qt-xcb
 BUILD_XLIB=${BUILD_XLIB:-NO} # If having libX11-xcb < 1.3.2
 
@@ -187,7 +188,7 @@ if [ ! -e ${QT_SOURCE_DIR}/.configured ]; then # Configuring Qt
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-no-offscreen.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
   patch -p 1 -d ${QT_SOURCE_DIR}<${PATCH_DIR}/qglxintegration-glx-context.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qxcbconnection.patch
+  #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qxcbconnection.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qbenchmarkperfevents.patch
   #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qsimd.cpp-gcc4.2.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qdbusinternalfilters.patch
