@@ -83,19 +83,20 @@ List of hot-keys:
 
 	:kbd:`Control-k` Deletes row at current cursor location.
 
-Be advised!!!
+.. note::
 
-Eirene editor does not change the structure of the input file when a relevant
-flag has been changed!!!
+   Eirene editor does not change the structure of the input file when
+   a relevant flag has been changed!
 
-To use the eirene editor in stand alone version call
+To use the Eirene editor in a stand alone version call
 
 .. code-block:: bash
 
 	cd solps-gui
 	source setupenv.sh
-	cd src/widgets
-	python3 eirene.py /Path/to/your/input/file
+	python3 src/widgets/eirene.py /path/to/your/input.dat
+
+or use ``eirene /path/to/your/input.dat`` alias.
 
 The stand alone version is the same with one exception. It has a status bas
 on the bottom of the main window. The status bar shows us on which line we are
@@ -146,23 +147,21 @@ added that their name is inserted at the current cursor location along with the
 default values the parameter or switch holds. 
 
 To run the B2 editor in stand alone mode, you have to call first go to the 
-folder where the B2 editor is. It is in 
+folder where the B2 editor is. It is provided with
+``solps-gui/src/widgets/b2.py`` file.
 
-.. code-block:: bash
-	
-	cd solps-gui/src/widgets
-
-The python file is called b2.py. To run it stand alone, call:
+To run it as standalone, call:
 
 .. code-block:: bash
 	
 	cd solps-gui
 	source setupenv.sh
-	cd src/widgets/
-	python3 b2.py /path/to/b2/input/file
+	python3 src/widgets/b2.py /path/to/b2*.dat
 	
-Note: This opens only one window with tool-tip highlight help. You have to
-manually add parameters and switches.
+.. note::
+
+        This opens only one window with tool-tip highlight help.
+        You have to manually add parameters and switches.
 
 
 Extra resources
@@ -171,5 +170,5 @@ Extra resources
 	| Demonstration video for stand-alone Eirene editor: EireneDemo_
 	| Demonstration video for both editors: EireneB2Demo_
 
-.. _EireneDemo : https://youtu.be/OTfdsTBTyUo
-.. _EireneB2Demo : https://youtu.be/w2hZ4PbZJhg
+.. _EireneDemo: https://youtu.be/OTfdsTBTyUo
+.. _EireneB2Demo: https://youtu.be/w2hZ4PbZJhg

@@ -218,7 +218,17 @@ Use 127.0.0.1 only for localsubmit.</string>
     </item>
     <item>
      <property name="text">
+      <string extracomment="Local submission script that puts nohup batch job">localsubmit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string>itmsubmit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>ippitmsubmit</string>
      </property>
     </item>
     <item>
@@ -228,7 +238,12 @@ Use 127.0.0.1 only for localsubmit.</string>
     </item>
     <item>
      <property name="text">
-      <string extracomment="Local submission script that puts nohup batch job">localsubmit</string>
+      <string>mephisubmit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>spbstusubmit</string>
      </property>
     </item>
     <item>

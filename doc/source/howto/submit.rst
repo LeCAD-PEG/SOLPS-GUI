@@ -12,16 +12,18 @@ SOLPS-ITER is primarily scripted within ``tcsh`` shell. For run submission,
 environment with all libraries paths on different sites needs to be
 encapsulated.
 
-The following SOLPS-ITER environments are available as of December 2015:
+The following SOLPS-ITER environments are available as of January 2016:
 
  * ASIPP, CCFE,  default, ENEA, FZJ, GA, IFERC, IN-DA, IPP, IPR, ITER,
-   ITM, JET, KEIO, KSTAR, LEUVEN, ORNL, PPPL, SWIP, UNKNOWN WM
+   IPPITM, IPR, TM, JET, KEIO, KSTAR, LEUVEN, MEPHI, ORNL, PPPL, SWIP,
+   UNKNOWN, WM.
 
 Different **job submission** methods (:abbr:`LSF (Load Sharing Facility)`,
 :abbr:`SGE (Son of Grid Engine)`, PBS, TORQUE, ...), are available depending
 on the cluster where the code is being run.
 
 Scripts that ease submission are site dependent:
+ * ippitmsubmit
  * itersubmit
  * itmsubmit
  * jetsubmit

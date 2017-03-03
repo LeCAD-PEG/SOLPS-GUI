@@ -3,21 +3,13 @@
 
 .. highlight:: csh
    
-==============================
-Editing B2.5 and Eierene HOWTO
-==============================
+==================
+Input editor HOWTO
+==================
 
 :Author: Gregor Simič, University of Ljubljana
 
-.. only:: html
-
-   .. contents::
-
-
-Introduction
-============
-
-This howto describes how b2 and eirene editors work and explains the structure
+This howto describes how B2 and Eirene editors work and explains the structure
 of b2input.xml.
 
 Eirene editor
@@ -59,8 +51,8 @@ and parameters are highlighted if they are described in the b2input.xml. Note
 that the highlight apply is case sensitive, so a switch might not be 
 highlighted but the highlight pop-up still shows up!
 
-Editing b2input.xml schema
-==========================
+``b2input.xml`` schema
+======================
 
 This is a .xml file that contains the switches and parameters as well as the
 description, category, default values and notes of them.
@@ -81,21 +73,21 @@ The element of a switch or parameter is:
 		</description>
 	</switch>
 
-The description is normal text. For special characters use hexcodes or symbols
-instead. e.g.::
+The description is normal text. For special characters use hexcodes or
+symbols instead. e.g.
 
-		&ge; instead of >=
-		&gt; instead of >
-		&lt; instead of <
-		&amp; isntead of &
-		&#39; insead of '
-		&quot instead of "
+| ``&ge;`` instead of ``>=``
+| ``&gt;`` instead of ``>``
+| ``&lt;`` instead of ``<``
+| ``&amp;`` instead of ``&``
+| ``&#39;`` insead of ``'``
+| ``&quot;`` instead of ``"``
 
-The reason for this is that xslt are used for parsing and transforming the xml
-files into other desired files. For this it does not tolerate arrows.
+The reason for this is that above escapes are used in XSLT for parsing and
+transforming the XML files into other desired files.
 
-When a group of switches contains the same description, a switchgroup should be
-made:
+When a group of switches contains the same description, a switchgroup
+should be made:
 
 .. code-block:: xml
 
@@ -175,10 +167,9 @@ The root of the xml file contains all the modules.
 		</module>
 	</b2>
 
-The purpose of the xml is to have a 
+The purpose of the XML is to have all modules input available for
+translation into documentation, tooltips and source code.
 
-Optional
---------
 
 Additionally you can add comments within the root element e.g.:
 
