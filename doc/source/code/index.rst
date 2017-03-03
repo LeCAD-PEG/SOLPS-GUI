@@ -95,6 +95,13 @@ Eirene input editor
 .. automodule:: eirene
    :members:
 
+---------------
+B2 input editor
+---------------
+
+.. automodule:: b2
+   :members:
+
 --------
 Add menu
 --------

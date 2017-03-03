@@ -15,12 +15,13 @@ case $(hostname -f) in
 	MAKE_JOBS=${MAKE_JOBS:-8}
 	;;
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
-	#. /etc/profile.d.gw/modules.sh
-	#module unload itm-gcc/6.1.0 gnu/6.1.0
-	#module switch itm-python/2.7.13.b1 #itm-python/2.7kos
+	. /etc/profile.d.gw/modules.sh
+	module unload itm-gcc gnu
+	module switch itm-python/2.7.13.b4
 	MAKE_JOBS=${MAKE_JOBS:-36}
 	export CXXFLAGS=-fpermissive
-	PARAVIEW_EXTRA_FLAGS="-DPARAVIEW_USE_MPI:BOOL=ON"
+	PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-
+                               -DPARAVIEW_USE_MPI:BOOL=ON}
 	;;
   *)
 	;;
@@ -143,7 +144,6 @@ if [ ! -e   ${PARAVIEW_BUILD}/.built ]; then
         -DBUILD_TESTING:BOOL=OFF \
         -DPARAVIEW_ENABLE_PYTHON:BOOL=ON \
         -DCMAKE_Fortran_COMPILER:STRING=ifort \
-        -DPARAVIEW_USE_MPI:BOOL=OFF \
         -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_QT}/bin/qmake \
         -DCMAKE_EXE_LINKER_FLAGS:STRING="-L${STAGING_QT}/lib" \
         -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
