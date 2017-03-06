@@ -1,5 +1,5 @@
 
-from PyQt5.QtCore import QRegExp, QEvent, Qt, pyqtSlot
+from PyQt5.QtCore import QRegExp, QEvent, Qt, pyqtSlot, QSize
 from PyQt5.QtWidgets import QWidget, QPlainTextEdit, QVBoxLayout, QToolTip
 from PyQt5.QtGui import (QSyntaxHighlighter, QTextCursor, QTextCharFormat,
                          QFont, QBrush)
@@ -23,8 +23,14 @@ def dedent(description):
     description = textwrap.dedent(description[trim_start : ])
     lines = description.splitlines()
     output = ''
+
+    wrap = 70 if len(description) < 800 else 150
     for line in lines:
-        output += textwrap.fill(line, 70) + '\n'
+        if line.startswith('\t'):
+            output += '  ' + '\n     '.join(textwrap.wrap(line[1:], wrap)) +\
+                      '\n'
+        else:
+            output += textwrap.fill(line, wrap) + '\n'
     return output[0:-1] # remove last newline
 
 class HighlightingRule():
@@ -76,6 +82,9 @@ class B2PlainTextEdit(QPlainTextEdit):
 
     def insert_line(self, line):
         self.insertPlainText(line)
+
+    def sizeHint(self):
+        return QSize(600, 400)
 
     @pyqtSlot()
     def isModified(self):
@@ -364,7 +373,6 @@ if __name__ == '__main__':
         title_name = input_filename.split('/')[-1]
         mainwindow.setWindowTitle(title_name)
         mainwindow.read_and_set_text(input_filename)
-        mainwindow.showMaximized()
         mainwindow.show()
         sys.exit(app.exec_())
         

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  xmlns:exslt="http://exslt.org/common">
 
-<xsl:output method="text" />
+<xsl:output method="html"/>
 
 <xsl:template match = "/b2">
 tooltips = {
@@ -10,8 +10,9 @@ tooltips = {
       <xsl:for-each select="category">
          <xsl:call-template name="switches"/>
       </xsl:for-each>
-      }
+      },
    </xsl:for-each>
+}
 </xsl:template>
 
 
