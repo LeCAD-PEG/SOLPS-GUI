@@ -48,6 +48,7 @@ class B2PlainTextEdit(QPlainTextEdit):
         self.tooltips = dict()
         self.old_text = None
         self.modified = False
+        self.textChanged.connect(self.isModified)
         for key in rules:
             category, param_type, description, default_value = rules[key]
             tooltip = '<font color=blue><b>' + key \
@@ -70,14 +71,18 @@ class B2PlainTextEdit(QPlainTextEdit):
         return super(B2PlainTextEdit, self).event(event)
 
     def setPlainText(self, text):
-        if self.old_text is None:
-            self.old_text = text
-        elif self.old_text != text:
-            self.modified = True
+        self.old_text = text
         return super(B2PlainTextEdit, self).setPlainText(text)
 
     def insert_line(self, line):
         self.insertPlainText(line)
+
+    @pyqtSlot()
+    def isModified(self):
+        print('test')
+        if self.modified == False and self.toPlainText() != self.old_text:
+            self.modified = True
+
 
 
 class B2Highlighter(QSyntaxHighlighter):
@@ -337,13 +342,13 @@ if __name__ == '__main__':
 
         def closeEvent(self, e):
             self.documentSave()
-            super(Standalone, self).closeEvent(e)
+            return super(Standalone, self).closeEvent(e)
 
         def documentSave(self):
             if self.editor.text_handler.isModified():
                 if os.path.exists(self.path):
                     try:
-                        with open(path, 'w') as f:
+                        with open(self.path, 'w') as f:
                             f.write(self.editor.display_widget.toPlainText())
                     except PermissionError as e:
                         print('Permission error.')
