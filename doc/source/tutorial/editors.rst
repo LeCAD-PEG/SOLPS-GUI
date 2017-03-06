@@ -157,11 +157,22 @@ To run it as standalone, call:
 	cd solps-gui
 	source setupenv.sh
 	python3 src/widgets/b2.py /path/to/b2*.dat
-	
+
+or use ``b2 /path/to/b2*.dat`` alias.
+
 .. note::
 
-        This opens only one window with tool-tip highlight help.
-        You have to manually add parameters and switches.
+        This opens only one window with tool-tip highlight help and an add
+        menu for switches and parameters.
+        To have full functionality you need the following files:
+        	-b2.py
+        		Main program.
+        	-b2_tooltips.py
+        		Tooltips data. Without it there is no highlighting and 
+        		tooltip help
+       		-b2menu.py
+       			Add menu data. Without it there is no bar for adding switches
+       			or parameters.
 
 
 Extra resources

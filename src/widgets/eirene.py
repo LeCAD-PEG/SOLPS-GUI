@@ -4403,7 +4403,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         input_dat = sys.argv[1]
     else:
-        input_dat = 'input.dat'
+        print('Provide path to Eirene input file!')
+        sys.exit()
         #input_dat='input_2.dat'
     mainwindow = Standalone()
     mainwindow.eirene.tree.readInput(os.path.expanduser(input_dat))

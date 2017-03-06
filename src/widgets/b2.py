@@ -207,16 +207,115 @@ class B2Edit(QWidget):
 if __name__ == '__main__':
     import sys
     import os
-    from PyQt5.QtWidgets import (QApplication, QMainWindow)
+    from PyQt5.QtWidgets import (QApplication, QMainWindow, QMenuBar, QMenu,)
+    from PyQt5.QtCore import pyqtSignal, QRect
+    import functools
 
     app = QApplication(sys.argv)
+
+    # Add menu functionality
+    add_menu_functionality = 1
+    try:
+        import b2menu
+    except ImportError:
+        add_menu_functionality = 0
+        prtin('No add menu functionality!')
+
+    class AddMenu(QMenu):
+        """ AddMenu(QMenu)
+        
+            Provides a custom widget for inserting B2mn parameters into editor.
+        """
+
+        output = pyqtSignal(str)
+        
+        def __init__(self, parent=None):
+            '''
+            Toooltips work on QMenu as a whole but not on actions!
+            For this reason we connect action's hover and set the tooltip
+            to the menu.
+            '''
+            super(AddMenu, self).__init__(parent)
+            self.setTitle("Add")
+            parent.addAction(self.menuAction())
+            self.hovered.connect(self.handleMenuHovered)
+            #self.setEnabled(False)
+
+            for category in sorted(b2menu.b2mn_menu):
+                category_menu = QMenu(self)
+                category_menu.setTitle(category)
+                self.addAction(category_menu.menuAction())
+
+                for parameter in b2menu.b2mn_menu[category]:
+                    ( name, param_type, data, description ) = parameter
+                    if param_type == 'switchgroup':
+                        switchgroup = QMenu(category_menu)
+                        switchgroup.setTitle(name)
+                        action = category_menu.addAction(\
+                                                    switchgroup.menuAction())
+                        for parameter in data:
+                            (name, param_type, default, short_desc) = parameter
+                            action = switchgroup.addAction(name)
+                            sd_formatted= self.dedent(short_desc)
+                            if len(sd_formatted):
+                                sd_formatted = '<br/><b>'+sd_formatted+'</b>'
+                            tooltip = '<pre><font color=blue><b>'+name+'</b>'\
+                                      + 'Type: <b>' + param_type + '</b>, '\
+                                      + 'Default: <b>'+default+'</b></font>'\
+                                      + '<br/>' + self.dedent(description)\
+                                      + sd_formatted + '</pre>'
+                            action.setToolTip(tooltip)
+                            line = "'" + name + "'       '" + default + "'"
+                            pfn = functools.partial(self.handleMenuTriggered, line)
+                            action.triggered.connect(pfn)
+
+                    else:
+                        action = category_menu.addAction(name)
+                        tooltip = '<pre><font color=blue><b>' + name + '</b> '\
+                                  + 'Type: <b>' + param_type + '</b>, ' \
+                                  + 'Default: <b>' + data + '</b></font><br/>'\
+                                  + self.dedent(description) + '</pre>'
+                        action.setToolTip(tooltip)
+                        line = "'" + name + "'       '" + data + "'"
+                        pfn = functools.partial(self.handleMenuTriggered, line)
+                        action.triggered.connect(pfn)
+
+        def handleMenuHovered(self, action):
+            """ Instead of showing tooltip on hover we rather setup a new 
+                tool-tip to the parent and wait to be shown.
+            """
+            action.parent().setToolTip(action.toolTip())
+
+        def handleMenuTriggered(self, line):
+            #action.parent().setToolTip(action.toolTip())
+            print("Emmiting: " + line)
+            self.output.emit(line)
+
+
+        def dedent(self, description):
+            """ Removes first empty line from description and any leading tabs
+                from the next line before the description and any following lines.
+                First lines are wrapped to 70 characters.
+
+            :param description(string): from the XML generated tooltips dictionary
+            :return: formatted output for the tooltip
+            """
+            trim_start = 0  # Remove any leading newline that affects dedent
+            while trim_start < len(description) and \
+                  description[trim_start] == '\n':
+                trim_start += 1
+            description = textwrap.dedent(description[trim_start : ])
+            lines = description.splitlines()
+            output = ''
+            for line in lines:
+                output += textwrap.fill(line, 80) + '\n'
+            return output[0:-1] # remove last newline
+
+
 
     class Standalone(QMainWindow):
         def __init__(self, parent=None):
             super(Standalone, self).__init__(parent)
-            self.editor = B2Edit(self)
-            self.plaintextedit = B2PlainTextEdit(self)
-            self.setCentralWidget(self.editor.display_widget)
 
         def read_and_set_text(self, path):
             self.path = path
@@ -227,10 +326,16 @@ if __name__ == '__main__':
                 self.editor = B2Edit(self, filename)
                 self.setCentralWidget(self.editor.display_widget)
                 self.editor.setPlainText(text)
+                if add_menu_functionality:
+                    menu_bar = QMenuBar(self)
+                    addMenu = AddMenu(menu_bar)
+                    addMenu.output.connect(\
+                                        self.editor.display_widget.insert_line)
+                    self.setMenuBar(menu_bar)
             else:
                 print('File does not exist')
 
-        def closeEvent(self):
+        def closeEvent(self, e):
             self.documentSave()
             super(Standalone, self).closeEvent(e)
 
@@ -250,9 +355,13 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         input_filename = sys.argv[1]
         mainwindow = Standalone()
+        title_name = input_filename.split('/')[-1]
+        mainwindow.setWindowTitle(title_name)
         mainwindow.read_and_set_text(input_filename)
+        mainwindow.showMaximized()
         mainwindow.show()
+        sys.exit(app.exec_())
         
     else:
-        print("File path doesn't exist.")
-    sys.exit(app.exec_())
+        print("Provide path to B2 input file.")
+        sys.exit()
