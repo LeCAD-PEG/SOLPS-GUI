@@ -79,7 +79,6 @@ class B2PlainTextEdit(QPlainTextEdit):
 
     @pyqtSlot()
     def isModified(self):
-        print('test')
         if self.modified == False and self.toPlainText() != self.old_text:
             self.modified = True
 
@@ -156,8 +155,8 @@ class B2Handler:
 
 class B2Edit(QWidget):
     """This is the editor for all input files that are part of B2. If the input
-    file has any tooltips, that describes the switch or parameter, they will
-    be aplied. Otherwise it acts as a normal editor.
+    file has any tool-tips, that describes the switch or parameter, they will
+    be applied. Otherwise it acts as a normal editor.
 
     If there is a .stencil provided in the run folder or in the ../baserun 
     folder, it can be loaded by using the F2 key.
@@ -271,7 +270,8 @@ if __name__ == '__main__':
                                       + sd_formatted + '</pre>'
                             action.setToolTip(tooltip)
                             line = "'" + name + "'       '" + default + "'"
-                            pfn = functools.partial(self.handleMenuTriggered, line)
+                            pfn = functools.partial(self.handleMenuTriggered, 
+                                                    line)
                             action.triggered.connect(pfn)
 
                     else:
@@ -299,10 +299,11 @@ if __name__ == '__main__':
 
         def dedent(self, description):
             """ Removes first empty line from description and any leading tabs
-                from the next line before the description and any following lines.
-                First lines are wrapped to 70 characters.
+                from the next line before the description and any following 
+                lines. First lines are wrapped to 70 characters.
 
-            :param description(string): from the XML generated tooltips dictionary
+            :param description(string): from the XML generated tooltips 
+                dictionary
             :return: formatted output for the tooltip
             """
             trim_start = 0  # Remove any leading newline that affects dedent
