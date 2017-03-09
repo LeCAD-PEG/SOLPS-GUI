@@ -10,6 +10,10 @@ b2mn_menu = {
 #         or ( parametergroup, 'paramgroup', [(name, type, default, description)...], description)
   <xsl:call-template name="block">
     <xsl:with-param name="module">b2mn.dat</xsl:with-param>
+    <xsl:with-param name="category">Naming</xsl:with-param>
+  </xsl:call-template> 
+  <xsl:call-template name="block">
+    <xsl:with-param name="module">b2mn.dat</xsl:with-param>
     <xsl:with-param name="category">Run</xsl:with-param>
   </xsl:call-template> 
   <xsl:call-template name="block">

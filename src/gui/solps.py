@@ -69,11 +69,68 @@ class Column:
         date : Last status update of the directory. Uses LC_TIME environment.
         status : Status retrieved from status & log files or via network update
         label : One line description of the run from b2mn.dat
+        comment : User comment on simulation.
+        device : Device name.
+        shot : Number for shot.
+        run : Number for run.
     """
-    name, path, date, status, label = range(5)
+    name, path, date, status, label, comment, device, shot, run, user = \
+    range(10)
+
+def extract_value(line):
+    if len(line.split()) == 1:
+        return ''
+    else:
+        return line.split()[-1].strip("'")
+
+def read_identification_parameters(directory):
+    """ Reads the identification parameters of the experiment.
+
+    Args:
+        dir (str): The directory of the experiment input files
+    Returns:
+
+    """
+    path = directory + '/b2mn.dat'
+    label = run = shot = user = device = ''
+    N = 2        # The number N is for shot and run, since they can be in the 
+    counter = 0  # b2md.dat file
+
+    if os.path.exists(path):
+        try:
+            with open(path) as file:
+                lines = file.read(512).splitlines()
+            for i, line in enumerate(lines):
+                if 'label' in line:
+                    label = lines[i+1].strip("'")
+                elif 'b2mndr_run_number' in line:
+                    run = extract_value(line)
+                    counter += 1
+                elif 'b2mndr_shot_number' in line:
+                    shot = extract_value(line)
+                    counter += 1
+                elif 'b2mndr_user' in line:
+                    user = extract_value(line)
+                elif 'b2mndr_device' in line:
+                    device = extract_value(line)
+        except OSError:
+            label = run = shot = user = device = 'b2mn.dat unreadable'
 
 
-
+    path = directory + '/b2md.dat'
+    if (not shot or not run) and os.path.exists(path):
+        try:
+            with open(path) as file:
+                lines = file.read()
+            for i, line in enumerate(lines):
+                if 'shot' in line:
+                    shot = extract_value(line)
+                elif 'run' in line:
+                    run = extract_value(line)
+        except OSError:
+            shot = 'b2md.dat unreadable' if shot == '' else shot
+            run = 'b2md.dat unreadable' if run == '' else run
+    return label, run, shot, user, device
 
 class RunsSortFilterProxyModel(QSortFilterProxyModel):
     def __init__(self, archive_dirs, parent=None):
@@ -439,20 +496,10 @@ class RetrieveRunsFolderInfo(QThread):
                 various files.
         """
         # Firstly try to extract label from the beginning of b2mn.dat
-        path = directory + '/b2mn.dat'
-        label = ''
-        if os.path.exists(path):
-            try:
-                with open(path) as file:
-                    lines = file.read(512).splitlines()  # just one sector
-                for i, line in enumerate(lines):
-                    if 'label' in line:
-                        label = lines[i+1].strip("' ")
-                        break
-            except OSError:
-                label = 'b2mn.dat unreadable'
 
-        static_data = label
+
+        # IF there is no SHOT, RUN in b2mn try b2md
+        static_data = read_identification_parameters(directory)
 
 
         # Parse run.log
@@ -526,15 +573,19 @@ class RetrieveRunsFolderInfo(QThread):
             if self.isInterruptionRequested():
                 logging.warning("Status update interrupted!")
                 break
-            (data, date_index, status_index, label_index) = \
+            (data, date_index, status_index, label_index, device_index, \
+             run_index, comment_index, shot_index) = \
                 self.model.column_index[path]
             data[Column.date], data[Column.status], static_data = \
                 self.retrieve_folder_state(path)
+            data[Column.label], data[Column.run], data[Column.shot], \
+            data[Column.user], data[Column.device] = static_data
+            #data[Column.label] = static_data[0]
             # Simulate delays with self.msleep(100)
             # Fill in static data into the columns that follow
-            data[Column.label] = static_data
+
             # Emit the range of columns that changed in the model
-            self.statusChanged.emit(date_index, label_index)
+            self.statusChanged.emit(date_index, shot_index)
             self.progress.emit(path)
         msg = "Updating run statuses finished. " \
                 + str(len(self.model.column_index)) + " directories scanned."
@@ -567,7 +618,8 @@ class FileSystemScan(QThread):
         for dir, subdirs, files in os.walk(rootdir):
             if dir == rootdir:  # replace name with alias
                 date = QDateTime().fromTime_t(os.stat(dir).st_mtime)
-                data = [alias, dir, date, None, None]  # TODO number of columns
+                data = [alias, dir, date, None, None, None, None, None, None, \
+                None]  # TODO number of columns
                 parents[0].appendChild(TreeItem(data, parent))
                 continue
 
@@ -589,7 +641,8 @@ class FileSystemScan(QThread):
             # Append a new item to the current parent's list of children.
             date = QDateTime().fromTime_t(os.stat(dir).st_mtime)
             # TODO Size data to number of columns in use
-            data = [os.path.basename(dir), dir, date, None, None]
+            data = [os.path.basename(dir), dir, date, None, None, None, None, \
+            None, None, None]
             parents[-1].appendChild(TreeItem(data, parents[-1]))
 
     def run(self):
@@ -747,7 +800,7 @@ class RunsModel(QAbstractItemModel):
         self.startRunsStatusServer()
 
         self.headerdata = ['Name', 'Path', 'Date', 'Status', 'Label',
-                           'Comment', 'Device', 'Shot', 'Run']
+                           'Comment', 'Device', 'Shot', 'Run', 'User']
         self.columns = len(self.headerdata)
         self.rootItem = TreeItem(self.headerdata)
         self.scanFileSystemThread = FileSystemScan(self)
@@ -844,20 +897,56 @@ class RunsModel(QAbstractItemModel):
         item = self.getItem(index)
         result = item.setData(index.column(), value)
 
-        if result:
+        file = '/b2mn.dat'
+        if column == Column.run:
+            switch_name = 'b2mndr_run_number'
+        elif column == Column.shot:
+            switch_name = 'b2mndr_shot_number'
+        elif column == Column.user:
+            switch_name = 'b2mndr_user'
+        elif column == Column.device:
+            switch_name = 'b2mndr_device'
+        elif column == Column.label:
+            switch_name = 'label'
+        else:
+            switch_name = ''
+
+        # LABEL to b2mn, USER, SHOT, RUN to b2md
+
+        if value:
             self.dataChanged.emit(index, index)
-            if column == Column.label:  # set the label in b2mn.dat
+            if switch_name:  # set the label in b2mn.dat
                 directory = item.data(Column.path)
                 path = directory + '/b2mn.dat'
                 try:
                     with open(path) as file:
-                        lines = file.read().splitlines()  # whole file
-                    for i, line in enumerate(lines):
-                        if '*label' in line:
-                            lines[i+1] = " '" + value + "'"
-                            with open(path, 'w') as f:
-                                f.write('\n'.join(lines))
-                            break
+                        lines = file.read()  # whole file
+                    if switch_name in lines:
+                        lines = lines.split('\n') 
+                        for i, line in enumerate(lines):
+                            if switch_name in line:
+                                if column == Column.label:
+                                    lines[i+1] = " '" + value + "'"
+                                else:
+                                    value_to_replace =\
+                                        lines[i].split()[-1].strip("'")
+                                    lines[i] = \
+                                    lines[i].replace(value_to_replace, value)
+                                with open(path, 'w') as f:
+                                    f.write('\n'.join(lines))
+                                break
+                    else:
+                        lines = lines.split('\n')
+                        for i, line in enumerate(lines):
+                            if line.startswith('*endphy'):
+                                new_line = "'" + switch_name + \
+                                           "'     '" + value + "'"
+                                lines.insert(i+1, new_line)
+                                with open(path, 'w') as f:
+                                    f.write('\n'.join(lines))
+
+
+
                 except OSError:
                     QMessageBox.warning(None, "Permission problem",
                                         "Can't update " + path)
@@ -936,9 +1025,16 @@ class RunsModel(QAbstractItemModel):
                 date_index = self.createIndex(row, Column.date, childItem)
                 status_index = self.createIndex(row, Column.status, childItem)
                 label_index = self.createIndex(row, Column.label, childItem)
+                device_index = self.createIndex(row, Column.device, childItem)
+                run_index = self.createIndex(row, Column.run, childItem)
+                comment_index = self.createIndex(row, Column.comment, 
+                                                 childItem)
+                shot_index = self.createIndex(row, Column.shot, childItem)
                 path = childItem.data(Column.path)
                 self.column_index[path] = (childItem.itemData,  date_index,
-                                           status_index, label_index)
+                                           status_index, label_index, 
+                                           device_index, run_index, 
+                                           comment_index, shot_index)
                 if childItem.childItems:
                     child_items.append(childItem.childItems)
 
@@ -995,8 +1091,8 @@ class RunsModel(QAbstractItemModel):
         try:
             name, path, status = message.split(maxsplit=2)
             try:
-                itemData, date_index, status_index, label_index = \
-                    self.column_index[path]
+                itemData, date_index, status_index, label_index, device_index,\
+                 run_index, comment_index, shot_index = self.column_index[path]
                 itemData[Column.status] = status
                 itemData[Column.date] = QDateTime().currentDateTime()
                 self.dataChanged.emit(date_index, status_index)

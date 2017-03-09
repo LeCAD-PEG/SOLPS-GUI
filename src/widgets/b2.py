@@ -53,8 +53,6 @@ class B2PlainTextEdit(QPlainTextEdit):
         self.setFont(font)
         self.tooltips = dict()
         self.old_text = None
-        self.modified = False
-        self.textChanged.connect(self.isModified)
         for key in rules:
             category, param_type, description, default_value = rules[key]
             tooltip = '<font color=blue><b>' + key \
@@ -77,21 +75,15 @@ class B2PlainTextEdit(QPlainTextEdit):
         return super(B2PlainTextEdit, self).event(event)
 
     def setPlainText(self, text):
-        self.old_text = text
-        return super(B2PlainTextEdit, self).setPlainText(text)
+        result = super(B2PlainTextEdit, self).setPlainText(text)
+        self.old_text = self.toPlainText()
+        return result
 
     def insert_line(self, line):
         self.insertPlainText(line)
 
     def sizeHint(self):
         return QSize(600, 400)
-
-    @pyqtSlot()
-    def isModified(self):
-        if self.modified == False and self.toPlainText() != self.old_text:
-            self.modified = True
-
-
 
 class B2Highlighter(QSyntaxHighlighter):
     def __init__(self, parent):
@@ -160,7 +152,9 @@ class B2Handler:
         return self.display_widget.toPlainText()
 
     def isModified(self):
-        return self.display_widget.modified
+        old_text = self.display_widget.old_text
+        last_text = self.display_widget.toPlainText()
+        return old_text != last_text
 
 class B2Edit(QWidget):
     """This is the editor for all input files that are part of B2. If the input

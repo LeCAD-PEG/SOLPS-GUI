@@ -198,7 +198,7 @@ class SolpsInput(QTabWidget):
     def insert_line(self, line):
         if type(self.currentWidget()) == type(B2Edit()):
             self.currentWidget().display_widget.insert_line(line)
-        print('Reemmiting' + line)
+            print("Emmiting: " + line)
         
 
     @pyqtSlot()
@@ -218,6 +218,7 @@ class SolpsInput(QTabWidget):
                             f.write(plainTextEdit.toPlainText())
                         print("Saving " + filename)
                     except OSError as error:
+                        print('error')
                         logging.error(error)
 
     if __name__ == "__main__":

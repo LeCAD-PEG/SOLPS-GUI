@@ -80,7 +80,7 @@ class AddMenu(QMenu):
 
     def handleMenuTriggered(self, line):
         #action.parent().setToolTip(action.toolTip())
-        print("Emmiting: " + line)
+        #print("Emmiting: " + line)
         self.output.emit(line)
 
 
