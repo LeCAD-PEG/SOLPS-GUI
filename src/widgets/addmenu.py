@@ -93,13 +93,18 @@ class AddMenu(QMenu):
         :return: formatted output for the tooltip
         """
         trim_start = 0  # Remove any leading newline that affects dedent
-        while trim_start < len(description) and description[trim_start] == '\n':
+        while trim_start < len(description) and description[trim_start] =='\n':
             trim_start += 1
         description = textwrap.dedent(description[trim_start : ])
         lines = description.splitlines()
         output = ''
+
+        wrap = 70 if len(description) < 800 else 150
         for line in lines:
-            output += textwrap.fill(line, 80) + '\n'
+            if line.startswith('\t'):
+                output += '\n     '.join(textwrap.wrap(line[1:], wrap)) + '\n'
+            else:
+                output += textwrap.fill(line, wrap) + '\n'
         return output[0:-1] # remove last newline
 
 

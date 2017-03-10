@@ -27,8 +27,7 @@ def dedent(description):
     wrap = 70 if len(description) < 800 else 150
     for line in lines:
         if line.startswith('\t'):
-            output += '  ' + '\n     '.join(textwrap.wrap(line[1:], wrap)) +\
-                      '\n'
+            output += '\n     '.join(textwrap.wrap(line[1:], wrap)) + '\n'
         else:
             output += textwrap.fill(line, wrap) + '\n'
     return output[0:-1] # remove last newline
