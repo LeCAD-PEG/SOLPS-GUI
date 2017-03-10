@@ -7,15 +7,14 @@ is called though selected tab index signal.
 
 Tooltips are created in solps-iter/doc with::
 
-  xsltproc create-tooltips.xslt solps-input.xml > ~/solps-gui/src/widgets/tooltips.py
+  make
 """
 
 from PyQt5.QtCore import (QSize, QEvent, QRegExp, Qt,
                           pyqtProperty,  pyqtSignal, pyqtSlot, QSettings)
 from PyQt5.QtWidgets import (QTabWidget, QPlainTextEdit, QSizePolicy,
                              QGridLayout, QToolTip)
-from PyQt5.QtGui import (QFont, QTextCursor, QSyntaxHighlighter,
-                         QTextCharFormat, QBrush)
+from PyQt5.QtGui import (QFont, QSyntaxHighlighter, QTextCharFormat, QBrush)
 
 import os
 import logging

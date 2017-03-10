@@ -5,7 +5,6 @@
 from PyQt5.QtCore import (QSize, pyqtSignal, QSettings,
                           pyqtSlot, pyqtProperty)
 from PyQt5.QtWidgets import QMenu, QToolTip
-from PyQt5.QtGui import QCursor
 
 import logging
 import os
@@ -38,26 +37,36 @@ class AddMenu(QMenu):
             category_menu = QMenu(self)
             category_menu.setTitle(category)
             self.addAction(category_menu.menuAction())
-
-            for parameter in b2menu.b2mn_menu[category]:
-                ( name, param_type, data, description ) = parameter
+            assoc = b2menu.b2mn_menu[category][0]
+            if assoc:
+                start = ''
+                association = '='
+                end = ','
+            else:
+                start = "'"
+                association = "'       '"
+                end = "'"
+            for parameter in b2menu.b2mn_menu[category][1:]:
+                ( name, param_type, data, description) = parameter
                 if param_type == 'switchgroup':
                     switchgroup = QMenu(category_menu)
                     switchgroup.setTitle(name)
                     action = category_menu.addAction(switchgroup.menuAction())
                     for parameter in data:
                         (name, param_type, default, short_desc) = parameter
+                        #if assoc:
+
                         action = switchgroup.addAction(name)
                         sd_formatted= self.dedent(short_desc)
                         if len(sd_formatted):
                             sd_formatted = '<br/><b>' + sd_formatted +'</b>'
-                        tooltip = '<pre><font color=blue><b>' + name + '</b> ' \
+                        tooltip = '<pre><font color=blue><b>' + name + '</b> '\
                                   + 'Type: <b>' + param_type + '</b>, ' \
                                   + 'Default: <b>' + default + '</b></font>' \
                                   + '<br/>' + self.dedent(description)  \
                                   + sd_formatted + '</pre>'
                         action.setToolTip(tooltip)
-                        line = "'" + name + "'       '" + default + "'"
+                        line = start + name + association + default + end
                         pfn = functools.partial(self.handleMenuTriggered, line)
                         action.triggered.connect(pfn)
 
@@ -68,7 +77,7 @@ class AddMenu(QMenu):
                               + 'Default: <b>' + data + '</b></font><br/>' \
                               + self.dedent(description) + '</pre>'
                     action.setToolTip(tooltip)
-                    line = "'" + name + "'       '" + data + "'"
+                    line = start + name + association + data + end
                     pfn = functools.partial(self.handleMenuTriggered, line)
                     action.triggered.connect(pfn)
 

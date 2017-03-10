@@ -1,14 +1,11 @@
 # Generated with create-addmenu.xslt
 # xsltproc create-addmenu.xslt solps-input.xml &gt; ../../solps-gui/src/widgets/b2menu.py
+
 b2mn_menu = {
 # Category : ( parameter, type, default, description )
 #         or ( parametergroup, 'paramgroup', [(name, type, default, description)...], description)
   
-  'Naming': [
-  
-   ],
-
-  'Run': [
+  'Run': [ '',
   
       ( 'b2mndr_id', 'switchgroup', [
         
@@ -247,7 +244,7 @@ b2mn_menu = {
       
    ],
 
-  'Output': [
+  'Output': [ '',
   
          ( 'b2mndr_b2time', 'integer', '1', """
 					Specifies the number of timesteps between writes of the time-dependent file. If b2time.gt.0, always writes out on the last timestep.
@@ -439,7 +436,7 @@ b2mn_menu = {
       
    ],
 
-  'Physics': [
+  'Physics': [ '',
   
          ( 'b2siav_addvis', 'real', '0.0', """
 					Multiplier to heat flux contribution to divergence of viscosity tensor in the momentum equation.
@@ -1061,7 +1058,7 @@ b2mn_menu = {
       
    ],
 
-  'Atomic Physics': [
+  'Atomic Physics': [ '',
   
          ( 'b2ardr_fix_cx', 'integer', '1', """
 					It is used to 'correct' the CX data
@@ -1112,7 +1109,7 @@ b2mn_menu = {
 				"""),
    ],
 
-  'Geometry': [
+  'Geometry': [ '',
   
          ( 'b2agfs_geometry', '', 'upgrade.geometry', """
 					local_sonnet - character string.
@@ -1299,7 +1296,7 @@ b2mn_menu = {
 				"""),
    ],
 
-  'Atomic Physics': [
+  'Atomic Physics': [ '',
   
          ( 'b2ardr_fix_cx', 'integer', '1', """
 					It is used to 'correct' the CX data
@@ -1350,7 +1347,7 @@ b2mn_menu = {
 				"""),
    ],
 
-  'b2ai params': [
+  'b2ai params': [ 'namelist',
   
          ( 'dimens', 'None', 'None', """
 					the number of charge states
@@ -1372,7 +1369,7 @@ b2mn_menu = {
       
    ],
 
-  'b2ah params': [
+  'b2ah params': [ 'namelist',
   
          ( 'dimens', '', 'None', """
 					the number of charge states
@@ -1440,7 +1437,7 @@ b2mn_menu = {
       
    ],
 
-  'b2ag params': [
+  'b2ag params': [ 'namelist',
   
          ( 'dimens', 'None', 'None', """
 					specifies the size of the grid first pair is NX &amp; NY of the grid you want to produce second pair is the size of the grid that was originally created each needs to be an integer multiple of the corresponding entry of the first pair. Note that for double-null cases, the interior guard cells corresponding to the top divertor boundaries should not be multiplied.
@@ -1452,7 +1449,7 @@ b2mn_menu = {
       
    ],
 
-  'b2.neutrals.parameters': [
+  'b2.neutrals.parameters': [ 'namelist',
   
          ( 'NSTRAI', 'integer', '0', """
 					Number of neutral sources, or 'strata'. Must not be larger than DEF_NSTRA from $(SOLPSTOP)/include(.local)/DIMENSIONS.F file. 
@@ -1777,7 +1774,7 @@ b2mn_menu = {
       
    ],
 
-  'b2.wall_save.parameters': [
+  'b2.wall_save.parameters': [ 'namelist',
   
          ( 'NDEPTH_NML', 'integer', '1', """
 					Dimension NDEPTH used for the arrays within this namelist. Represents the number of depth layer discretising the wall elements for the wall model. If using the 0-D model or the time-independent 1-D model, will contain 1 (default). Should not exceed the value of the parameter NDEPTH declared in b2mod_wall.F.
@@ -1905,7 +1902,7 @@ b2mn_menu = {
       
    ],
 
-  'b2md.dat': [
+  'b2md.dat': [ 'namelist',
   
          ( 'EXP', 'character*128', 'NOT_SET', """
 					Name of the experiment being modelled.
@@ -1946,7 +1943,7 @@ b2mn_menu = {
       
    ],
 
-  'b2.boundary.parameters': [
+  'b2.boundary.parameters': [ 'namelist',
   
          ( 'NBC', 'integer', '0', """Number of boundary segments."""),
       
@@ -2224,7 +2221,7 @@ b2mn_menu = {
       
    ],
 
-  'b2.feedback_save.parameters': [
+  'b2.feedback_save.parameters': [ 'namelist',
   
          ( 'SAVED_CBSHE_CORE', 'real*8', '0.0', """
 					Last value used for the core electron energy radial flux feedback.
@@ -2256,7 +2253,7 @@ b2mn_menu = {
       
    ],
 
-  'b2.feedback_control.parameters': [
+  'b2.feedback_control.parameters': [ 'namelist',
   
          ( 'VACUUM_COMMUNICATION', 'Integer', '0', """
 					If &gt; 0, allows for a
@@ -2387,7 +2384,7 @@ b2mn_menu = {
       
    ],
 
-  'b2.transport.inputfile': [
+  'b2.transport.inputfile': [ 'namelist',
   
          ( 'NDATA', 'integer array of size (NKIND_DATA,NCOEF,0:NS)', '0', """
 					Number of points over which the source profile of (kind_data,kind_coef,is) is defined. Should not exceed NY+2.
@@ -2478,7 +2475,7 @@ b2mn_menu = {
       
    ],
 
-  'b2.neutrals_save.parameters': [
+  'b2.neutrals_save.parameters': [ 'namelist',
   
          ( 'SAVED_VOLREC', 'real*8 array of size (NSTRAT)', '0.0', """
 					Contains the last value of the strength of volume recombination sources from stratum (istra).
@@ -2486,7 +2483,7 @@ b2mn_menu = {
       
    ],
 
-  'b2.numerics.parameters': [
+  'b2.numerics.parameters': [ 'namelist',
   
          ( 'DTCO', 'real*8 array of size (0:NS-1,0:NREG)', '1.0', """
 					Multiplier to the time used in solving the continuity equation of species (is) in region (ireg).
@@ -2554,7 +2551,7 @@ b2mn_menu = {
       
    ],
 
-  'b2.transport_models_save.parameters': [
+  'b2.transport_models_save.parameters': [ 'namelist',
   
          ( 'ETA_HCE_MULT', 'real*8 array of size (-1:NY)', '1.0', """
 					Used by the user specified set_transport_eta transport model. See code for details.
@@ -2562,7 +2559,7 @@ b2mn_menu = {
       
    ],
 
-  'b2.neutrals.parameters': [
+  'b2.neutrals.parameters': [ 'namelist',
   
          ( 'NSTRAI', 'integer', '0', """
 					Number of neutral sources, or 'strata'. Must not be larger than DEF_NSTRA from $(SOLPSTOP)/include(.local)/DIMENSIONS.F file. 
@@ -2887,7 +2884,7 @@ b2mn_menu = {
       
    ],
 
-  'b2.transport.parameters': [
+  'b2.transport.parameters': [ 'namelist',
   
       ( 'FLAG*', 'switchgroup', [
         
@@ -3022,4 +3019,6 @@ b2mn_menu = {
 
 
 }
+
+
 

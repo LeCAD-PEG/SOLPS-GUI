@@ -79,7 +79,8 @@ class B2PlainTextEdit(QPlainTextEdit):
         return result
 
     def insert_line(self, line):
-        self.insertPlainText(line)
+        self.moveCursor(QTextCursor.StartOfLine, QTextCursor.MoveAnchor)
+        self.insertPlainText(line+'\n')
 
     def sizeHint(self):
         return QSize(600, 400)

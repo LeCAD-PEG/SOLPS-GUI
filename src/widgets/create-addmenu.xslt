@@ -5,13 +5,10 @@
 
 <xsl:template match="/"># Generated with create-addmenu.xslt
 # xsltproc create-addmenu.xslt solps-input.xml > ../../solps-gui/src/widgets/b2menu.py
+
 b2mn_menu = {
 # Category : ( parameter, type, default, description )
 #         or ( parametergroup, 'paramgroup', [(name, type, default, description)...], description)
-  <xsl:call-template name="block">
-    <xsl:with-param name="module">b2mn.dat</xsl:with-param>
-    <xsl:with-param name="category">Naming</xsl:with-param>
-  </xsl:call-template> 
   <xsl:call-template name="block">
     <xsl:with-param name="module">b2mn.dat</xsl:with-param>
     <xsl:with-param name="category">Run</xsl:with-param>
@@ -98,13 +95,15 @@ b2mn_menu = {
   </xsl:call-template>
 
 }
+
+
 </xsl:template>
 
 
 <xsl:template name="block">
   <xsl:param name = "category" />
   <xsl:param name = "module" />
-  '<xsl:value-of select="$category"/>': [
+  '<xsl:value-of select="$category"/>': [ '<xsl:value-of select="b2/module[@name=$module]/@type"/>',
   <xsl:for-each select="b2/module[@name=$module]/category[@name=$category]/switch | b2/module[@name=$module]/category[@name=$category]/switchgroup">
 	   <xsl:choose><xsl:when test="name(.)='switchgroup'">
       ( '<xsl:value-of select="name"/>', 'switchgroup', [
