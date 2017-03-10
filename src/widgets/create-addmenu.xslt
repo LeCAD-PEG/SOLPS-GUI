@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-
-<xsl:output method="text" />
+  <!-- See for serializing content of node: http://stackoverflow.com/questions/13362291/xslcopy-of-just-the-content-without-the-node-->
+<xsl:output method="html" />
 
 <xsl:template match="/"># Generated with create-addmenu.xslt
 # xsltproc create-addmenu.xslt solps-input.xml > ../../solps-gui/src/widgets/b2menu.py
@@ -109,11 +109,11 @@ b2mn_menu = {
 	   <xsl:choose><xsl:when test="name(.)='switchgroup'">
       ( '<xsl:value-of select="name"/>', 'switchgroup', [
         <xsl:for-each select="switch">
-               ('<xsl:value-of select="name"/>', '<xsl:value-of select="type"/>', '<xsl:value-of select="default"/>','''<xsl:value-of select="description"/>'''), 
+               ('<xsl:value-of select="name"/>', '<xsl:value-of select="type"/>', '<xsl:value-of select="default"/>','''<xsl:copy-of select="description/node()"/>'''), 
         </xsl:for-each>],
-         """<xsl:value-of select="description"/>"""),</xsl:when>
+         """<xsl:copy-of select="description/node()"/>"""),</xsl:when>
       <xsl:otherwise>
-         ( '<xsl:value-of select="name"/>', '<xsl:value-of select="type"/>', '<xsl:value-of select="default"/>', """<xsl:value-of select="description"/>"""),
+         ( '<xsl:value-of select="name"/>', '<xsl:value-of select="type"/>', '<xsl:value-of select="default"/>', """<xsl:copy-of select="description/node()"/>"""),
       </xsl:otherwise>
      </xsl:choose>
    </xsl:for-each>
