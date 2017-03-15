@@ -9,6 +9,7 @@
    :maxdepth: 2
 
    runstatus.rst
+   b2input.rst
 
 =======================
 Python code description
