@@ -27,9 +27,9 @@ on 2.7.x python version and 3.5, 3.6 versions.
 
 .. code-block:: bash
 
-	cd solps-gui
-	source setupenv.sh
-	solps
+   cd solps-gui
+   source setupenv.sh
+   solps
 
 This will open solps-gui with the default tab set on Runs. 
 
@@ -61,7 +61,7 @@ the line and you can start editing the line. The help description will show you
 which parameter you are currently editing and its description.
 
 .. image:: editors_7.png
-	:align: center
+   :align: center
 
 The format of the cards are called:
 - I for Integer
@@ -75,13 +75,13 @@ is rejected and the value of the card is returned to the previous valid value.
 This can be checked on the youtube link. !YoutubeLink
 
 List of hot-keys:
-	:kbd:`Up or Down` Travel up or down the lines.
+   :kbd:`Up or Down` Travel up or down the lines.
 
-	:kbd:`Right or Left` Expand or collapse lines. 
+   :kbd:`Right or Left` Expand or collapse lines. 
 
-	:kbd:`Control-i` Inserts a comment row at current cursor location.
+   :kbd:`Control-i` Inserts a comment row at current cursor location.
 
-	:kbd:`Control-k` Deletes row at current cursor location.
+   :kbd:`Control-k` Deletes row at current cursor location.
 
 .. note::
 
@@ -92,9 +92,9 @@ To use the Eirene editor in a stand alone version call
 
 .. code-block:: bash
 
-	cd solps-gui
-	source setupenv.sh
-	python3 src/widgets/eirene.py /path/to/your/input.dat
+   cd solps-gui
+   source setupenv.sh
+   python3 src/widgets/eirene.py /path/to/your/input.dat
 
 or use ``eirene /path/to/your/input.dat`` alias.
 
@@ -115,9 +115,9 @@ directory and click Edit button.
 
 .. code-block::bash
 
-	cd solps-gui
-	source setupenv.sh
-	solps 
+   cd solps-gui
+   source setupenv.sh
+   solps 
 
 Then you have to change to the Input tab.
 
@@ -153,33 +153,29 @@ folder where the B2 editor is. It is provided with
 To run it as standalone, call:
 
 .. code-block:: bash
-	
-	cd solps-gui
-	source setupenv.sh
-	python3 src/widgets/b2.py /path/to/b2*.dat
+    
+   cd solps-gui
+   source setupenv.sh
+   python3 src/widgets/b2.py /path/to/b2*.dat
 
 or use ``b2 /path/to/b2*.dat`` alias.
 
 .. note::
 
-        This opens only one window with tool-tip highlight help and an add
-        menu for switches and parameters.
-        To have full functionality you need the following files:
-        	-b2.py
-        		Main program.
-        	-b2_tooltips.py
-        		Tooltips data. Without it there is no highlighting and 
-        		tooltip help
-       		-b2menu.py
-       			Add menu data. Without it there is no bar for adding switches
-       			or parameters.
+   This opens only one window with tool-tip highlight help and an add
+   menu for switches and parameters.
+   To have full functionality you need the following files:
+   
+   1. ``b2.py`` Main program.
+   2. ``b2_tooltips.py`` Tooltips data. Without it there is no highlighting and tooltip help.
+   3. ``b2menu.py`` Add menu data. Without it there is no bar for adding switches or parameters.
 
 
 Extra resources
 ---------------
 
-	| Demonstration video for stand-alone Eirene editor: EireneDemo_
-	| Demonstration video for both editors: EireneB2Demo_
+   | Demonstration video for stand-alone Eirene editor: EireneDemo_
+   | Demonstration video for both editors: EireneB2Demo_
 
 .. _EireneDemo: https://youtu.be/OTfdsTBTyUo
 .. _EireneB2Demo: https://youtu.be/w2hZ4PbZJhg
