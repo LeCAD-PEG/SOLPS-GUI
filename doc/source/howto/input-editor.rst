@@ -55,7 +55,7 @@ highlighted but the highlight pop-up still shows up!
 ======================
 
 For editing b2input.xml it is recommended to have an editor that uses ``\t``
-for delimiter and handles markup languages well.
+for indenting and handles markup languages well.
 
 Recommended editors:
    - Emacs version 24+
