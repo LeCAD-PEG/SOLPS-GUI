@@ -22,7 +22,6 @@ def dedent(description):
     description = textwrap.dedent(description[trim_start:])
     return description
 
-
 def get_default_and_type(node):
     second_line = ''
     switch_type = node.findtext('type')
@@ -100,10 +99,14 @@ def add_description(node, prefix=''):
                 start = 1
             reST_text += '    ' + line.lstrip() + '\n' 
 
-def add_switch(node, prefix='', name_prefix='``'):
+def add_switch(node, prefix='', name_prefix='``', index=True):
     global reST_text
 
-    name = node.findtext('name')
+
+    name = node.findtext('name')    
+    
+    if index:
+        reST_text += ".. index:: "   + name + "\n\n"
 
     reST_text += prefix + name_prefix + name + name_prefix
 
@@ -117,12 +120,28 @@ def add_switch(node, prefix='', name_prefix='``'):
 def add_switchgroup(node):
     global reST_text
 
-    name = node.findtext('name')
-    reST_text += "``" + name + "``\n"
+    name = node.findtext('name') 
+    sub_names = [e.findtext("name") for e in node.findall('switch')]
+
+
+
+    reST_text += ".. index:: "+ name + '\n\n'
+    reST_text += ".. index:: " + ", ".join(sub_names) + "\n.. c\n\n"
+    reST_text += "``" + name + "``\n\n"
+    
     for element in node.findall('switch'):
-        add_switch(element, prefix='  - ', name_prefix='``')
+        add_switch(element, prefix='  - ', name_prefix='``', index=False)
+        if reST_text[-2] != "\n":
+            reST_text += '\n'
     reST_text += '\n'
+
     add_description(node)
+
+
+    reST_text += ".. index::\n"
+    for sub_name in sub_names:
+        reST_text += "   single: " + name + "; " + sub_name + '\n'
+    reST_text += '\n\n'
 
 
 
@@ -160,12 +179,29 @@ for module in root:
     body(module.attrib['name'], '*', with_outline=True)
 
     for category in module.findall('category'):
-        body(category.attrib['name'], '=')
 
+
+        reST_text += ".. index:: " + category.attrib['name'] + "\n\n"
+        reST_text
+        body(category.attrib['name'], '=')
+        names = []
         for element in category:
+            
             if element.tag == "switch":
+                names.append(element.findtext('name'))
                 add_switch(element)
+                if reST_text[-2] != '\n':
+                    reST_text+='\n'
             elif element.tag == "switchgroup":
+                names.append(element.findtext('name'))
                 add_switchgroup(element)
+
+
+        reST_text += ".. index:: \n"
+        for name in names:
+            reST_text += "   single: " + category.attrib['name'] +'; '+ name + '\n'
+
+        reST_text += "\n"
+
 
 print(reST_text)

@@ -54,13 +54,85 @@ highlighted but the highlight pop-up still shows up!
 ``b2input.xml`` schema
 ======================
 
-For editing b2input.xml it is recommended to have an editor that uses ``\t``
+For editing b2input.xml it is recommended to have an editor that uses ``TABS``
 for indenting and handles markup languages well.
 
 Recommended editors:
    - Emacs version 24+
    - Sublime Text 2/3
-   - oXygen
+   - oXygen XML editor
+
+**Emacs version 24+:**
+
+It is an open source, lightweight, editor, well featured but has a steep 
+learning curve at the beginning of usage.
+
+Emacs is rich with key-commands, which provides high operability and control
+over editing files.
+   
+Be sure to have package nxml installed, as b2input.xml has settings at the 
+bottom.
+
+   .. code-block:: xml
+
+      <!--
+          Local variables:
+          indent-tabs-mode: t
+          tab-width: 4
+          mode: nxml
+          eval: (adaptive-wrap-prefix-mode t)
+          nxml-child-indent: 4
+          nxml-attribute-indent: 4
+          nxml-slash-auto-complete-flag: t
+          End:
+          To install adaptive-wrap do: M-x package-install RET adaptive-wrap RET
+          eval: (visual-line-mode t)
+      -->
+
+Otherwise you have to manually set ``tab-width`` setting and adaptive wrappings
+ for optimal editing.
+
+**Sublime text 3:**
+
+It is a visually and user friendly editor that comes with a lot of features.
+
+You can install a package manager and add packages if needed, but it handles
+XML files, and others, nicely on it's own.
+
+**oXygen XML editor:**
+
+It is a full-stack IDE studio for editing and verifying XML files. It also
+comes with .xslt support so you can write and execute the 
+xsl-transformations inside the editor.
+
+It is rich in function so reading the manual is a must for optimal editing. The
+only downside is that it has a license you must buy and it does not come cheap.
+
+Pros and cons for the recommended editors:
+
+- Emacs:
+   - **Pros**:
+      - Open source
+      - Highly customizable
+      - Lightweight
+   - **Cons**:
+      - Steep learning curve
+
+- Sublime text:
+   - **Pros**:
+      - User friendly
+      - Highly customizable
+      - Lightweight
+   - **Cons**:
+      - Proprietary, but free to use
+
+- oXygen XML editor:
+   - **Pros**:
+      - Robust when it comes to handling .XML files
+      - Full stack IDE for .XML and .XSLT
+   - **Cons**:
+      - Expensive
+
 
 b2input.xml is a file that contains the switches and parameters as well as the
 description, category, default values and notes of them.
