@@ -54,7 +54,15 @@ highlighted but the highlight pop-up still shows up!
 ``b2input.xml`` schema
 ======================
 
-This is a .xml file that contains the switches and parameters as well as the
+For editing b2input.xml it is recommended to have an editor that uses ``\t``
+for delimiter and handles markup languages well.
+
+Recommended editors:
+   - Emacs version 24+
+   - Sublime Text 2/3
+   - oXygen
+
+b2input.xml is a file that contains the switches and parameters as well as the
 description, category, default values and notes of them.
 
 For indenting it uses tabs as \\t and not white spaces.
