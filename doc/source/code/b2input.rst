@@ -350,7 +350,8 @@ Geometry
 
 .. index:: b2agfs_pit_rescale
 
-``b2agfs_pit_rescale``    type: ``real*8``    default: ``1.0``
+``b2agfs_pit_rescale``    type: ``real``    default: ``1.0``
+    pit\_rescale - real\*8. 
     The magnetic field line pitch will be multiplied by pit\_rescale. 
     This means that the poloidal field component is multiplied by pit\_rescale, while the toroidal field component is left unchanged. To reverse the plasma current direction, set pit\_rescale to -1.0. 
     The sign convention used is that a positive poloidal field points in the direction of increasing <ix>. Be mindful however that, when inverting the sign of the poloidal magnetic field, you are also inverting the direction of the parallel velocity. You will then need to use the 'b2mndr\_inverse\_ua' switch to correct for that. To be used in b2ag.dat.
@@ -1237,26 +1238,29 @@ Physics
   - ``b2stbr_redep_alpha``  -     type: ``real``    default: ``0.00``
 
 
-    Sputtering model switches. See the code in b2stbr and the b2mod\_sputter module for specific implementation details and references. 
-    The default values represent the case of Graphite plates. Sput\_src is the atomic number of the plasma species which causes chemical sputtering. 
-    Sput\_dst (when .ge.0) is the species index of the destination species produced by physical sputtering, chemical sputtering and/or RES. If either of the latter two processes are included, the production chemical sputtering and RES rate calculations provided in the code assume that sput\_dst points to a Carbon species. 
-    Sput\_dst2 and sput\_dst3 (when .ge.0) represent other species produced by wall interactions for mixed materials scenarios. 
-    Sput\_frac\_flag is the switch to turn on mixed materials scenarios (when sput\_frac\_flag.eq.1). 
-    Plate\_model.eq.0 means the 0-D time-independent plate heating model while plate\_model.eq.1 indicates the 1-D time-dependent plate heating treatment. Plate\_model.eq.2 gives acces to a 2-D time-dependent model. Plate\_option chooses the initialisation of the plate temperature profile. If plate\_option.eq.1, the profile is set to the constant given in plate\_temp. If plate\_option.eq.2, the profile is computed to be the 0-D equilibrium profile. If plate\_option.eq.3, the profile is read from results of the previous run.
-    Sput\_phys\_model is a switch for choosing between the TRIM tables (model 1, default) or an empirical formula (model 0). When TRIM data is not available, the empirical formula is automatically used. Extrapolations of low and high energy ranges beyond the TRIM table data is done using the same physical dependencies as the empirical formula. Sput\_chem\_model is a switch for the chemical sputtering model used. 
-    If sput\_chem\_model.eq.0 (default), the empirical formula is used. 
-    If sput\_chem\_model.eq.1, a constant with a low energy cut-off is used. 
-    The cutoff occurs at approximately sput\_chem\_cutoff\_alpha and the width is determined by sput\_chem\_cutoff\_beta (the larger the value, the narrower the width over which the transition from 0 to 1 occurs). 
-    For model 0, sput\_frc is a multiplier to the empirical formula, while for model 1, sput\_frc is the constant chemical sputtering yield. 
-    Sput\_frc is superseded by the chem\_sput array from b2.neutrals.namelist if the latter is used. 
-    For neutrals species, we add a factor of alpha\*na\*vbar to the particle flux to the plate (used to compute chemical and RES sputtering), where vbar is the average neutral particle speed. 
-    Sput\_phys turns on physical sputtering when sput\_phys.gt.0.0 and contains a (real) multiplier for the physical sputtering rate looked up in the TRIM tables. It is superseded by the phys\_sput array in b2.neutrals.parameters if the latter is used. 
-    sput\_phys\_col indicates which column to use in the TRIM table; the default (3) corresponds to 30 degrees incidence. The columns are for
-    0 15 30 45 55 65 75 80 85 degrees. This angle is also used in the empirical formula. Plate\_temp is the temperature (in Kelvin) of the COOLED end of the divertor plates. The surface temperature is computed self-consistently (using a 1-D description) according to the incident heat fluxes from the plasma. The plate is assumed to have a thickness of plate\_thick, measured in meters. When plate\_thick.eq.0 (default), the plate surface temperature is assumed to be the same as plate\_temp. Sput\_res turns on radiation enhanced sublimation (RES) when .gt.0.0 and is a multiplier to the RES rate. 
-    The switch sputter\_energy\_on turns on the energy contribution from the sputtered particles (physical and chemical). If sputter\_energy\_on.eq.0, the particles are sputtered cold, with no energy contribution to the ion heat equation. 
-    If sputter\_energy\_on.ne.0 (default), the chemically sputtered particles are re-introduced into the plasma with the thermal energy corresponding to the surface temperature of the material, while physically sputtered particles are re-introduced with the TRIM-calculated energy sputtering yield (if the TRIM model is used). 
-    Therm\_evap turns on thermal evaporation when .gt.0.0 and is a multiplier to the thermal evaporation rate. 
-    Redep\_alpha is the multiplier to the reduction of the sputtering yield due to prompt redeposition. The promptly redeposited species is counted as eroded-then-deposited species.
+
+    |					Sputtering model switches. See the code in b2stbr and the b2mod\_sputter module for specific implementation details and references. 
+    |					The default values represent the case of Graphite plates. Sput\_src is the atomic number of the plasma species which causes chemical sputtering. 
+    |					Sput\_dst (when .ge.0) is the species index of the destination species produced by physical sputtering, chemical sputtering and/or RES. If either of the latter two processes are included, the production chemical sputtering and RES rate calculations provided in the code assume that sput\_dst points to a Carbon species. 
+    |					Sput\_dst2 and sput\_dst3 (when .ge.0) represent other species produced by wall interactions for mixed materials scenarios. 
+    |					Sput\_frac\_flag is the switch to turn on mixed materials scenarios (when sput\_frac\_flag.eq.1). 
+    |					Plate\_model.eq.0 means the 0-D time-independent plate heating model while plate\_model.eq.1 indicates the 1-D time-dependent plate heating treatment. Plate\_model.eq.2 gives acces to a 2-D time-dependent model. Plate\_option chooses the initialisation of the plate temperature profile. If plate\_option.eq.1, the profile is set to the constant given in plate\_temp. If plate\_option.eq.2, the profile is computed to be the 0-D equilibrium profile. If plate\_option.eq.3, the profile is read from results of the previous run.
+    |					Sput\_phys\_model is a switch for choosing between the TRIM tables (model 1, default) or an empirical formula (model 0). When TRIM data is not available, the empirical formula is automatically used. Extrapolations of low and high energy ranges beyond the TRIM table data is done using the same physical dependencies as the empirical formula. Sput\_chem\_model is a switch for the chemical sputtering model used. 
+    |					If sput\_chem\_model.eq.0 (default), the empirical formula is used. 
+    |					If sput\_chem\_model.eq.1, a constant with a low energy cut-off is used. 
+    |					The cutoff occurs at approximately sput\_chem\_cutoff\_alpha and the width is determined by sput\_chem\_cutoff\_beta (the larger the value, the narrower the width over which the transition from 0 to 1 occurs). 
+    |					For model 0, sput\_frc is a multiplier to the empirical formula, while for model 1, sput\_frc is the constant chemical sputtering yield. 
+    |					Sput\_frc is superseded by the chem\_sput array from b2.neutrals.namelist if the latter is used. 
+    |					For neutrals species, we add a factor of alpha\*na\*vbar to the particle flux to the plate (used to compute chemical and RES sputtering), where vbar is the average neutral particle speed. 
+    |					Sput\_phys turns on physical sputtering when sput\_phys.gt.0.0 and contains a (real) multiplier for the physical sputtering rate looked up in the TRIM tables. It is superseded by the phys\_sput array in b2.neutrals.parameters if the latter is used. 
+    |					sput\_phys\_col indicates which column to use in the TRIM table; the default (3) corresponds to 30 degrees incidence. The columns are for
+    |                      0 15 30 45 55 65 75 80 85
+    |                    degrees. This angle is also used in the empirical formula. Plate\_temp is the temperature (in Kelvin) of the COOLED end of the divertor plates. The surface temperature is computed self-consistently (using a 1-D description) according to the incident heat fluxes from the plasma. The plate is assumed to have a thickness of plate\_thick, measured in meters. When plate\_thick.eq.0 (default), the plate surface temperature is assumed to be the same as plate\_temp. Sput\_res turns on radiation enhanced sublimation (RES) when .gt.0.0 and is a multiplier to the RES rate. 
+    |					The switch sputter\_energy\_on turns on the energy contribution from the sputtered particles (physical and chemical). If sputter\_energy\_on.eq.0, the particles are sputtered cold, with no energy contribution to the ion heat equation. 
+    |					If sputter\_energy\_on.ne.0 (default), the chemically sputtered particles are re-introduced into the plasma with the thermal energy corresponding to the surface temperature of the material, while physically sputtered particles are re-introduced with the TRIM-calculated energy sputtering yield (if the TRIM model is used). 
+    |					Therm\_evap turns on thermal evaporation when .gt.0.0 and is a multiplier to the thermal evaporation rate. 
+    |					Redep\_alpha is the multiplier to the reduction of the sputtering yield due to prompt redeposition. The promptly redeposited species is counted as eroded-then-deposited species.
+
     
 .. index::
    single: b2stbr_sputtering...; b2stbr_plate_model
@@ -2123,11 +2127,12 @@ Output
 
   - ``b2stbr_b2wall_netcdf``  -     type: ``integer``    default: ``0``
 
-  - ``balance_netcdf``  -     default: ``0``
+  - ``balance_netcdf``  -     type: ``integer``    default: ``0``
 
 
     If tallies\_netcdf.ne.0, the file 'b2tallies.nc' is created, which contains the regional tallies in CDF format.
     If b2wall\_netcdf.ne.0, the file 'b2wall.nc' is created, which contains the wall tallies in CDF format [written every b2wall\_netcdf 'main calls'].
+    If balance\_netcdf.ne.0, the file 'balance.nc' is created, which contains the 2-point model analysis balance tallies in CDF format.
     
 .. index::
    single: b2stbr_*_netcdf; tallies_netcdf
