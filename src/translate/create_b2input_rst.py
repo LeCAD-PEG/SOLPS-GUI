@@ -128,7 +128,7 @@ def add_switchgroup(node):
     reST_text += ".. index:: "+ name + '\n\n'
     reST_text += ".. index:: " + ", ".join(sub_names) + "\n.. c\n\n"
     reST_text += "``" + name + "``\n\n"
-    
+
     for element in node.findall('switch'):
         add_switch(element, prefix='  - ', name_prefix='``', index=False)
         if reST_text[-2] != "\n":
@@ -147,11 +147,34 @@ def add_switchgroup(node):
 
 
 import sys
-if sys.argv[1]:
-    tree = etree.parse(sys.argv[1])
-    root = tree.getroot()
-else:
+
+try:
+    xml_name = sys.argv[1]
+    dtd_name = sys.argv[2]
+except Exception as e:
     sys.exit()
+
+xml_entities = '<!ENTITY % symbols SYSTEM "xhtml-symbol.ent" > %symbols;'
+
+f = open(xml_name, 'r')
+xml_text = f.read()
+f.close()
+
+# Inserting DTD entities inside xml
+f = open(dtd_name, 'r')
+dtd_text = f.read()
+f.close()
+
+
+text_to_process = xml_text.replace(xml_entities, dtd_text)
+f = open('test.xml', 'w')
+f.write(text_to_process)
+f.close()
+print(text_to_process)
+tree = etree.ElementTree(etree.fromstring(text_to_process))
+
+root = tree.getroot()
+
 
 
 head = 'B2.5 input'

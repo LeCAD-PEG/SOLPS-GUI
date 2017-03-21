@@ -253,7 +253,7 @@ if __name__ == '__main__':
                 category_menu.setTitle(category)
                 self.addAction(category_menu.menuAction())
 
-                for parameter in b2menu.b2mn_menu[category]:
+                for parameter in b2menu.b2mn_menu[category][1:]:
                     ( name, param_type, data, description ) = parameter
                     if param_type == 'switchgroup':
                         switchgroup = QMenu(category_menu)
