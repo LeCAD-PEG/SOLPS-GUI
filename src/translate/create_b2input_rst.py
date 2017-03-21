@@ -167,10 +167,6 @@ f.close()
 
 
 text_to_process = xml_text.replace(xml_entities, dtd_text)
-f = open('test.xml', 'w')
-f.write(text_to_process)
-f.close()
-print(text_to_process)
 tree = etree.ElementTree(etree.fromstring(text_to_process))
 
 root = tree.getroot()
