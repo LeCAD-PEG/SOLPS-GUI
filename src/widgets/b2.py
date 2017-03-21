@@ -302,22 +302,25 @@ if __name__ == '__main__':
 
         def dedent(self, description):
             """ Removes first empty line from description and any leading tabs
-                from the next line before the description and any following 
-                lines. First lines are wrapped to 70 characters.
+                from the next line before the description and any following lines.
+                First lines are wrapped to 70 characters.
 
-            :param description(string): from the XML generated tooltips 
-                dictionary
+            :param description(string): from the XML generated tooltips dictionary
             :return: formatted output for the tooltip
             """
             trim_start = 0  # Remove any leading newline that affects dedent
-            while trim_start < len(description) and \
-                  description[trim_start] == '\n':
+            while trim_start < len(description) and description[trim_start] == '\n':
                 trim_start += 1
             description = textwrap.dedent(description[trim_start : ])
             lines = description.splitlines()
             output = ''
+
+            wrap = 70 if len(description) < 800 else 150
             for line in lines:
-                output += textwrap.fill(line, 80) + '\n'
+                if line.startswith('\t'):
+                    output += '\n     '.join(textwrap.wrap(line[1:], wrap)) + '\n'
+                else:
+                    output += textwrap.fill(line, wrap) + '\n'
             return output[0:-1] # remove last newline
 
 
