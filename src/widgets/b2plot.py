@@ -150,6 +150,7 @@ class B2plot(QLabel):
                 self.convert_args =  ['+antialias', '-resize', str(self.width())
                                       + 'x' + str(self.height()), 'b2plot.ps[' +
                                       str(self.b2plot_page) + ']', 'png:-']
+                self.convert.setWorkingDirectory(self.rundir)
                 self.convert.start(self.convert_path, self.convert_args)
             else:
                 msg ="b2plot.ps file not created from " + self.b2plot_command
@@ -238,7 +239,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = B2plot()
     window.show()
-    rundir = "~/solps-iter-devel/runs/ITER_535_D+He+Ar/my_new_run" 
+    rundir = "~/solps-iter/runs/demo3/ITER_535_D+He+Ar/my_new_run" 
     window.setRundir(os.path.expanduser(rundir))
     window.setB2plotCommand("echo phys a4p ti te m/ surf | b2plot")
     window.executeB2plotCommand()
