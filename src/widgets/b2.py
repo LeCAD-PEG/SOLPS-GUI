@@ -51,7 +51,8 @@ class B2PlainTextEdit(QPlainTextEdit):
         font.setPixelSize(12)
         self.setFont(font)
         self.tooltips = dict()
-        self.old_text = None
+        self.old_text = ''
+
         for key in rules:
             category, param_type, description, default_value = rules[key]
             tooltip = '<font color=blue><b>' + key \
@@ -154,7 +155,9 @@ class B2Handler:
     def isModified(self):
         old_text = self.display_widget.old_text
         last_text = self.display_widget.toPlainText()
-        return old_text != last_text
+        if last_text and old_text != last_text:
+            return True
+        return False
 
 class B2Edit(QWidget):
     """This is the editor for all input files that are part of B2. If the input
