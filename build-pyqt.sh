@@ -151,7 +151,8 @@ for url in ${URLS}; do
   rm -rf ${pkgdir}
   tar xf ${DOWNLOAD_DIR}/${file}
   cd ${pkgdir}
-  if [ "${pkgdir%%-*}" = "libxml2" ]; then configopt="--without-python"
+  if [ "${pkgdir%%-*}" = "libxml2" ]
+  then configopt="--without-python --without-zlib"
   else configopt=
   fi
   PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH} \
