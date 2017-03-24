@@ -15,12 +15,12 @@ import b2menu
 
 class AddMenu(QMenu):
     """ AddMenu(QMenu)
-    
+
         Provides a custom widget for inserting B2mn parameters into editor.
     """
 
     output = pyqtSignal(str)
-    
+
     def __init__(self, parent=None):
         '''
         Toooltips work on QMenu as a whole but not on actions!
@@ -36,6 +36,7 @@ class AddMenu(QMenu):
         for category in sorted(b2menu.b2mn_menu):
             category_menu = QMenu(self)
             category_menu.setTitle(category)
+
             self.addAction(category_menu.menuAction())
             assoc = b2menu.b2mn_menu[category][0]
             if assoc:
@@ -116,7 +117,35 @@ class AddMenu(QMenu):
                 output += textwrap.fill(line, wrap) + '\n'
         return output[0:-1] # remove last newline
 
-
+    @pyqtSlot(str)
+    def editorChanged(self, filename):
+        if filename == 'b2mn.dat':
+            for action in self.actions():
+                if action.text().startswith('b2'):
+                    action.setEnabled(False)
+                else:
+                    action.setEnabled(True)
+        elif filename == 'input.dat':
+            [action.setEnabled(False) for action in self.actions()]
+        elif filename == 'b2ar.dat':
+            # Find action with name 'Atomic Physics'
+            for action in self.actions():
+                if action.text() == 'Atomic Physics':
+                    action.setEnabled(True)
+                    for a in action.menu().actions():
+                        if a.text().startswith('b2ar'):
+                            a.setEnabled(True)
+                        else:
+                            a.setEnabled(False)
+                else:
+                    action.setEnabled(False)
+        else:
+            actions = self.actions()
+            for action in actions:
+                if filename[:-4] in action.text():
+                    action.setEnabled(True)
+                else:
+                    action.setEnabled(False)
 
 
 if __name__ == "__main__":

@@ -1213,6 +1213,7 @@ class SOLPS_MainWindow(QMainWindow):
 
         self.addMenu = AddMenu(self.menubar)
         self.addMenu.output.connect(self.solpsinput.insert_line)
+        self.solpsinput.editorChanged.connect(self.addMenu.editorChanged)
 
         self.preferences = Preferences()
         self.preferences.read()

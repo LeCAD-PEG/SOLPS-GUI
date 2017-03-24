@@ -1,9 +1,10 @@
 
 # -*- coding: utf-8 -*-
+
 tooltips = {
-   
-   'b2ai.dat' : {
-      
+
+'b2ai.dat' : {
+
       'dimens' : ('b2ai params', 'None', """
 					the number of charge states
 				""", 'None'),
@@ -22,10 +23,10 @@ tooltips = {
 					initial ion and electron temperatures, in eV
 				""", 'None'),
    
-      },
-   
-   'b2ah.dat' : {
-      
+},
+
+'b2ah.dat' : {
+
       'dimens' : ('b2ah params', '', """
 					the number of charge states
 				""", 'None'),
@@ -90,10 +91,10 @@ tooltips = {
 					[unused] (1 line per species)
 				""", 'None'),
    
-      },
-   
-   'b2ag.dat' : {
-      
+},
+
+'b2ag.dat' : {
+
       'dimens' : ('b2ag params', 'None', """
 					specifies the size of the grid first pair is NX &amp; NY of the grid you want to produce second pair is the size of the grid that was originally created each needs to be an integer multiple of the corresponding entry of the first pair. Note that for double-null cases, the interior guard cells corresponding to the top divertor boundaries should not be multiplied.
 				""", 'None'),
@@ -102,10 +103,10 @@ tooltips = {
 					at least 100 additional numbers, of which only the first is relevant for us -1.0 read the mesh data using the "simplified" Carre format -2.0 read the mesh data using the Sonnet format
 				""", 'None'),
    
-      },
-   
-   'b2mn.dat' : {
-      
+},
+
+'b2mn.dat' : {
+
       'b2stbc_coreregno' : ('', 'integer', """
 					coreregno, coreregn2 - integers. coreregno is the boundary index of the core boundary in the input files b2ah.dat and b2mn.dat. For a standard single-null case, coreregno is 1. For a straight geometry or limiter case, it is likely that coreregno need be set to 0, depending on the actual geometry details. 
 					coreregn2 is the boundary index of the second core boundary in case of a double-null geometry, and is not used otherwise.
@@ -3223,26 +3224,10 @@ tooltips = {
 					*** Use with caution! ***
 				""", '0'),
    
-      'label' : ('', 'string', """
-					Specifies, on the next line, a label for the run.
-				""", ''),
-   
-      'b2cmpa' : ('', '', """
-					Specifies a block of basic parameters, overriding those specified in the block of the same name in b2ah.dat
-				""", ''),
-   
-      'b2cmpb' : ('', '', """
-					Specifies a block of boundary conditions, overriding those specified in the block of the same name in b2ah.dat
-				""", ''),
-   
-      'b2cmpt' : ('', '', """
-					specifies a block of transport coefficients, overriding those specified in the block of the same name in b2ah.dat
-				""", ''),
-   
-      },
-   
-   'b2.parameters' : {
-      
+},
+
+'b2.neutrals.parameters' : {
+
       'NSTRAI' : ('b2.neutrals.parameters', 'integer', """
 					Number of neutral sources, or 'strata'. Must not be larger than DEF_NSTRA from $(SOLPSTOP)/include(.local)/DIMENSIONS.F file. 
 					Need not include the time-dependent stratum. If a time-dependent stratum is used, is incremented internally as needed. The incremented value is referred to as NSTRAT below.
@@ -3563,7 +3548,11 @@ tooltips = {
       'ISSPUT_CHEMICAL' : ('b2.neutrals.parameters', 'integer', """
 					Passed to Eirene. Mass*100 + nuclear charge of the sputtered particle. Defaults to 0, internally changed to 1206 = carbon.
 				""", '0'),
-   
+    
+},
+
+'b2.wall_save.parameters' : {
+
       'NDEPTH_NML' : ('b2.wall_save.parameters', 'integer', """
 					Dimension NDEPTH used for the arrays within this namelist. Represents the number of depth layer discretising the wall elements for the wall model. If using the 0-D model or the time-independent 1-D model, will contain 1 (default). Should not exceed the value of the parameter NDEPTH declared in b2mod_wall.F.
 				""", '1'),
@@ -3687,7 +3676,11 @@ tooltips = {
       'LAYER_NRELCONSTITUENTS' : ('b2.wall_save.parameters', 'real*8 array of size (NWALL,6+NTRACK)', """
 					Contains the relative atomic abundances of the various elements present within the surface layer of wall element (iwall). Defaults to 1.0 for the first value, 0.0 otherwise.
 				""", ''),
-   
+    
+},
+
+'b2md.dat' : {
+
       'EXP' : ('b2md.dat', 'character*128', """
 					Name of the experiment being modelled.
 				""", 'NOT_SET'),
@@ -3724,7 +3717,11 @@ tooltips = {
 					Indicate the shot number to overwrite (to be used only when updating an already saved run with 'resave_mds' script).
 					Defaults to the last number found in shotnumber.history, or 0 if the file is not found.
 				""", ''),
-   
+    
+},
+
+'b2.boundary.parameters' : {
+
       'NBC' : ('b2.boundary.parameters', 'integer', """Number of boundary segments.""", '0'),
    
       'BCCHAR' : ('b2.boundary.parameters', 'character*1 array of length (NBC)', """
@@ -3999,7 +3996,11 @@ tooltips = {
       'WRITE_NML_BND' : ('b2.boundary.parameters', 'logical', """
 					If .true. (default), writes the content of the namelist to stdout after it has been read.
 				""", '.true.'),
-   
+    
+},
+
+'b2.feedback_save.parameters' : {
+
       'SAVED_CBSHE_CORE' : ('b2.feedback_save.parameters', 'real*8', """
 					Last value used for the core electron energy radial flux feedback.
 				""", '0.0'),
@@ -4027,7 +4028,11 @@ tooltips = {
       'SAVED_CBSNA_SOL' : ('b2.feedback_save.parameters', 'real*8', """
 					Last value used for the radial particle flux feedback in the SOL. Corresponds to 'isfeedback' B2 species.
 				""", '0.0'),
-   
+    
+},
+
+'b2.feedback_control.parameters' : {
+
       'VACUUM_COMMUNICATION' : ('b2.feedback_control.parameters', 'Integer', """
 					If &gt; 0, allows for a
 					communication of particle fluxes across vacuum regions. This option only applies to neutrals. The density boundary condition is based on the difference between the average pressure and the local pressure.
@@ -4154,7 +4159,11 @@ tooltips = {
       'NA_FEEDBACK_OVERSHOOT' : ('b2.feedback_control.parameters', 'Real*8 array of size (0:NSPECIES-1)', """
 					If the density is larger than target*overshoot, the gas puff is turned off.
 				""", '0.0'),
-   
+    
+},
+
+'b2.sources.profile' : {
+
       'NSDATA' : ('b2.sources.profile', 'integer array of size (NKIND_DATA,NKIND_SOURCE,0:NS)', """
 					Number of points over which the source profile of (kind_data,kind_source,is) is defined. Should not exceed NY+2.
 						If KIND_DATA=1, the data is expressed as a profile in physical distance from the separatrix (in metres) along the outer midplane.
@@ -4200,7 +4209,11 @@ tooltips = {
       'SOURCES_TIME_SWITCH' : ('b2.sources.profile', 'real*8', """
 					Time (in seconds) within an ELM cycle after which a new /PROFILE/ namelist is read.
 				""", '0.0'),
-   
+    
+},
+
+'b2.transport.inputfile' : {
+
       'NDATA' : ('b2.transport.inputfile', 'integer array of size (NKIND_DATA,NCOEF,0:NS)', """
 					Number of points over which the source profile of (kind_data,kind_coef,is) is defined. Should not exceed NY+2.
 					If KIND_DATA=1, the data is expressed as a profiles in physical distance from the separatrix (in metres).
@@ -4287,11 +4300,19 @@ tooltips = {
       'ELM_IX_END' : ('b2.transport.inputfile', 'integer', """
 					Poloidal position at which the ELM profile ends being applied.
 				""", '-2'),
-   
+    
+},
+
+'b2.neutrals_save.parameters' : {
+
       'SAVED_VOLREC' : ('b2.neutrals_save.parameters', 'real*8 array of size (NSTRAT)', """
 					Contains the last value of the strength of volume recombination sources from stratum (istra).
 				""", '0.0'),
-   
+    
+},
+
+'b2.numerics.parameters' : {
+
       'DTCO' : ('b2.numerics.parameters', 'real*8 array of size (0:NS-1,0:NREG)', """
 					Multiplier to the time used in solving the continuity equation of species (is) in region (ireg).
 				""", '1.0'),
@@ -4355,11 +4376,19 @@ tooltips = {
       'WRITE_NML_NUM' : ('b2.numerics.parameters', 'logical', """
 					If .true. (default), writes the content of the namelist to stdout after it has been read.
 				""", '.true.'),
-   
+    
+},
+
+'b2.transport_models_save.parameters' : {
+
       'ETA_HCE_MULT' : ('b2.transport_models_save.parameters', 'real*8 array of size (-1:NY)', """
 					Used by the user specified set_transport_eta transport model. See code for details.
 				""", '1.0'),
-   
+    
+},
+
+'b2.transport.parameters' : {
+
       'FLAG_DNA' : ('', 'integer', """
 					All flags follow:
 					FLAG=0: Use model from b2ah.dat and b2mn.dat. Default.
@@ -4508,7 +4537,11 @@ tooltips = {
       'WRITE_NML_TRANSP' : ('b2.transport.parameters', 'logical', """
 					If .true. (default), writes the content of the namelist to stdout after it has been read.
 				""", '.true.'),
-   
+    
+},
+
+'b2.user.parameters' : {
+
       'LHETRGTS' : ('b2.user.parameters', 'integer array of size (NLIM)', """
 					List of surface indices (EIRENE notation) which are used for calculation of helium enrichment.
 				""", '-2 for the first element, -3 for the second element and 0 otherwise'),
@@ -4604,7 +4637,11 @@ tooltips = {
       'USER_FILENAME' : ('b2.user.parameters', 'character*80', """
 					Filename where /USER/ namelist is stored.
 				""", 'b2.user.parameters'),
-   
+    
+},
+
+'b2.sputter_save.parameters' : {
+
       'NX_SP' : ('b2.sputter_save.parameters', 'integer', """
 					Array dimension NX used in this namelist.
 				""", 'nx'),
@@ -4624,7 +4661,11 @@ tooltips = {
       'SPUTTER_YIELD2' : ('b2.sputter_save.parameters', 'real*8 array of size (-1:NX,-1:NY,0:NS-1,1:2)', """
 					Contains the energy physical sputtering yield of species (is) at position (ix,iy) in element (:,:,:,1) and the energy chemical sputtering yield in element(:,:,:,2).
 				""", '0.0'),
-   
+    
+},
+
+'b2.atomic_physics_rescale.parameters' : {
+
       'RESCALE_SA' : ('b2.atomic_physics_rescale.parameters', 'real*8 array of size(0:NS-1)', """
 					Scaling factors for rtsa: ionisation rates of species (is).
 				""", '1.0'),
@@ -4648,8 +4689,8 @@ tooltips = {
       'RESCALE_BR' : ('b2.atomic_physics_rescale.parameters', 'real*8 array of size(0:NS-1)', """
 					Scaling factors for rtbr: bremsstrahlung radiation rates of species (is).
 				""", '1.0'),
-   
-      },
-   
+    
+},
+
 }
 

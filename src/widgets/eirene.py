@@ -3421,6 +3421,7 @@ class EireneEdit(QTreeWidget):
         way that if there is a pattern in the input file, the work needed
         to add more help description parameters should be easy.
         """
+        self.old_text = text
         self.text = text.splitlines()
         self.text_size = len(self.text)
         self.row = 0
@@ -3735,6 +3736,9 @@ class EireneEdit(QTreeWidget):
         self.getline(['L', 'NLTRIM'])
         self.getline(['S', 'A_on_B'])
         line = self.getline()
+        while '_' in line:
+            self.getline(['S', 'A_on_B'])
+            line = self.getline()
         while 'path' in line or 'PATH' in line:
             self.getline(['S', 'PATH CARD'])
 
@@ -3951,7 +3955,7 @@ class EireneEdit(QTreeWidget):
         self.getline(['I', 'NAINB', 'NCOPIB', 'NCOPEB'])
 
         for i in range(1, self.values['NAINB'] + 1):
-            self.getline(['I', 'I', 'NAINS', 'NAINT', 'TXTPLS', 'TXTPSP', 
+            self.getline(['I', 'I', 'NAINS', 'NAINT', 'TXTPLS', 'TXTPSP',
                                'TXTPUN'])
         self.getline(['I', 'NAOTB'])
 
@@ -3960,7 +3964,7 @@ class EireneEdit(QTreeWidget):
 
     def block_15(self):
         line = self.getline()
-        if 'GENERAL' in line or 'BIASED_GARCHING' in line:
+        if 'GENERAL' in line:
             self.row += 1
             self.getline('I', 'NADMOD', 'NASMOD', 'NORMOD')
             for i in range(1, self.values['NADMOD'] + 1):
@@ -3969,7 +3973,14 @@ class EireneEdit(QTreeWidget):
                 self.getline(['S', 'NAS', 'IPUNKT', 'NSSIR', 'NSSIP'])
             for i in range(1, self.values['NORMOD']):
                 self.getline(['S', 'IDIR', 'IR', 'IP'])
-
+        elif 'BIASED_GARCHING' in line:
+            self.row += 1
+            for i in range(max(1, int(self.values['NPPLG']/3)) * 4):
+                line = self.getline().split()
+                if int(line[1]) < 0:
+                    role = ['S', 'NRS', 'IPUNKT', 'XPOLPOS', 'YPOLPOS']
+                else:
+                    role = ['I', 'NRS', 'IPUNKT']
         else:
             self.getline(['I', 'NADMOD', 'NASMOD'])
             for i in range(1, self.values['NADMOD'] + 1):
@@ -4160,6 +4171,10 @@ class EireneEdit(QTreeWidget):
         self.TextModified = True
 
     def isModified(self):
+        if len(self.old_text) != len(self.toPlainText()):
+            return False
+        if self.old_text != self.toPlainText():
+            return True
         return self.TextModified
 
     def toPlainText(self):

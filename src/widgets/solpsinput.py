@@ -31,6 +31,7 @@ class SolpsInput(QTabWidget):
     editing before starting the run.
     """
     lineInsert = pyqtSignal(str)
+    editorChanged = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(SolpsInput, self).__init__(parent)
@@ -39,7 +40,7 @@ class SolpsInput(QTabWidget):
         self.rundir = None
         self.currently_viewing = None
         self.editors = dict()
-
+        self.currentChanged.connect(self.editor_tab_changed)
     def restore_tab_positions(self):
         """ Get tabs ordering from settings and restore the to saved position.
         """
@@ -69,24 +70,24 @@ class SolpsInput(QTabWidget):
         font = QFont()
         font.setFamily('Monospace')
         for filename, tooltip in solps_input_files:            
-            plainTextEdit = QPlainTextEdit(self)
-            plainTextEdit.setObjectName(filename)
-            plainTextEdit.setFont(font)
-            plainTextEdit.setLineWrapMode(QPlainTextEdit.NoWrap)
-            tab_index = self.addTab(plainTextEdit, filename)
-
-            self.editors[filename] = plainTextEdit
             if filename == 'input.dat':
                 eirene = Eirene()
-                self.removeTab(tab_index)
                 tab_index = self.addTab(eirene, filename)
                 self.editors[filename] = eirene
             elif filename.startswith('b2'):
                 editor = B2Edit(filename=filename)
                 self.lineInsert.connect(editor.display_widget.insert_line)
-                self.removeTab(tab_index)
                 tab_index = self.addTab(editor, filename)
                 self.editors[filename] = editor
+            else:
+                # Plain text editor
+                plainTextEdit = QPlainTextEdit(self)
+                plainTextEdit.setObjectName(filename)
+                plainTextEdit.setFont(font)
+                plainTextEdit.setLineWrapMode(QPlainTextEdit.NoWrap)
+                tab_index = self.addTab(plainTextEdit, filename)
+                self.editors[filename] = plainTextEdit
+
             self.setTabToolTip(tab_index, tooltip)
         self.restore_tab_positions()
 
@@ -198,7 +199,6 @@ class SolpsInput(QTabWidget):
         if type(self.currentWidget()) == type(B2Edit()):
             self.currentWidget().display_widget.insert_line(line)
             print("Emmiting: " + line)
-        
 
     @pyqtSlot()
     def save_modified_input_files(self):
@@ -219,6 +219,24 @@ class SolpsInput(QTabWidget):
                     except OSError as error:
                         print('error')
                         logging.error(error)
+
+    @pyqtSlot(int)
+    def editor_tab_changed(self, tab_index):
+        """This event disables the actions to add switches in the wrong input
+        file.
+
+        Args:
+            tab_index(int) : Currently selected editor tab.
+        """
+
+        # print("Current index", tab_index)
+        # print("Current widget", self.widget(tab_index))
+        # print("Current widget window title", self.tabText(tab_index))
+        filename = self.tabText(tab_index)
+        for filename_and_descr in solps_input_files:
+            if filename == filename_and_descr[0]:
+                self.editorChanged.emit(filename)
+                break
 
     if __name__ == "__main__":
         def closeEvent(self, event):
