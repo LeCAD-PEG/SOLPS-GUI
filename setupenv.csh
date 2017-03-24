@@ -1,6 +1,6 @@
 # source this csh file for local setup environment if PyQT is provided locally
 setenv QTDIR "${PWD}/staging/qt/5.7.1"
-setenv PARAVIEW_PREFIX ${PWD}/staging/paraview/5.3.0-RC2
+setenv PARAVIEW_PREFIX ${PWD}/staging/paraview/5.3.0
 setenv PATH "${PWD}/staging/bin:${QTDIR}/bin:${PARAVIEW_PREFIX}/bin:${PATH}"
 setenv SOLPSGUI "${PWD}/src/gui"
 
