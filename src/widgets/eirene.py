@@ -23,9 +23,9 @@ has help description, it also has a validation for editing.
 
 from PyQt5.QtCore import Qt, QSize, pyqtSignal, pyqtSlot, QEvent
 from PyQt5.QtGui import QFont, QValidator
-from PyQt5.QtWidgets import (QWidget, QSplitter, QTreeWidget, QTextBrowser,\
-                             QTreeWidgetItem, QAbstractItemView,\
-                             QStyledItemDelegate, QLineEdit, \
+from PyQt5.QtWidgets import (QWidget, QSplitter, QTreeWidget, QTextBrowser,
+                             QTreeWidgetItem, QAbstractItemView,
+                             QStyledItemDelegate, QLineEdit,
                              QAbstractItemView)
 import logging
 import re
@@ -3156,6 +3156,30 @@ processors.</dd>
 </dl>""",
 }
 
+class FFormat:
+    """Class holding the species card spacing format. 
+    If there is a dictionary, that only means that there can be
+    optional flags. [e.g. Reactions Cards]
+    """
+    ReactionsCard = {
+        'IR': 3,
+        'FILNAM': 6,
+        'H123': 4,
+        'REAC': 9,
+        'FTFLAG':9,
+        'CRC': 3,
+        'MASSP': 3,
+        'MASST': 3,
+        'DP': 12,
+        'RMN1': 12,
+        'RMX1': 12
+    }
+    NeutralsAndMolecules = [
+        2, 8, 2, 2, 2 ,2 ,2 ,2 ,2, 2, 2, 2, 2
+    ]
+    PlasmaBackground = [
+        2, 9, 2, 2, 2, 2, 2, 2, 2, 2, 2
+    ]
 
 class MyValidator(QValidator):
     """This is a custom validator for the Delegator editors. Depending on the
@@ -3173,16 +3197,29 @@ class MyValidator(QValidator):
             self.length = self.n + int(self.n/5)
             self.n = self.length
             self.mask = "T|F|t|f|\s"
-        elif type == 'R':
+        elif type == 'R5':
             self.length = self.n * 12
             self.mask = "-?\d\.\d\d\d\d\dE(\+|\-)\d\d"
+        elif type == 'R4':
+            self.length = self.n * 10
+            self.mask = "-?\d\.\d\d\d\dE(\+|\-)\d\d"
         elif type == 'I':
             self.length = self.n * 6
             self.mask = "-?[0-9]+"
         elif type == 'S':
             self.length = self.n
-            self.mask = "."
-
+            self.mask = '.'
+        else:
+            #Reactions card...
+            self.length = self.n
+            self.mask = '.'
+        #elif type == 'RC':
+        #    self.length = self.n
+        #    self.mask = '.'
+        #elif type == 'NC':
+        #    self.length = self.n
+        #    self.mask = '.'
+        #...
     def fixup(self, string):
         if self.old_text:
             return self.old_text
@@ -3262,9 +3299,9 @@ class MyLineEdit(QLineEdit):
                     self.parameter_description.append(' ')
                 self.parameter_description.append(param_name)
                 i += 1
-        elif card_type == 'R':
+        elif card_type == 'R5':
             for param_name in variables_name:
-                for j in range(13):
+                for j in range(12):
                         self.parameter_description.append(param_name)
         elif card_type == 'S':
             for param_name in variables_name:
@@ -3272,6 +3309,22 @@ class MyLineEdit(QLineEdit):
                 N = N if N is not None else number_of_args
                 for i in range(N):
                     self.parameter_description.append(param_name)
+        elif card_type == 'RC':
+            for el in variables_name:
+                for i in range(FFormat.ReactionsCard[el]):
+                    self.parameter_description.append(el)
+                self.parameter_description.append(' ')
+        elif card_type == 'CN' or card_type == 'MC' or card_type =='IC' or\
+             card_type == 'PC':
+            for i,el in enumerate(variables_name):
+                for j in range(FFormat.NeutralsAndMolecules[i]):
+                    self.parameter_description.append(el)
+                self.parameter_description.append(' ')
+        elif card_type == 'PB':
+            for i,el in enumerate(variables_name):
+                for j in range(FFormat.PlasmaBackground[i]):
+                    self.parameter_description.append(el)
+                self.parameter_description.append(' ')
 
     def focusInEvent(self, e):
         """This overloaded function causes the editor to de-highlight the curr-
@@ -3437,7 +3490,8 @@ class EireneEdit(QTreeWidget):
                 self.blocks[i]()
                 self.dummy_block()
             except Exception as e:
-                continue
+                print(e)
+                pass
         self.setCurrentItem(self.topLevelItem(0))
 
     def looks_like_boolean_card(self, line):
@@ -3501,19 +3555,19 @@ class EireneEdit(QTreeWidget):
 
                 if self.values['NLSLB'] or self.values['NLCRC'] or \
                    self.values['NLELL'] or self.values['NLTRI']:
-                    self.getline(['R', 'RIA', 'RGA', 'RAA', 'RRA'])
+                    self.getline(['R5', 'RIA', 'RGA', 'RAA', 'RRA'])
 
                     if self.values['NLELL'] or self.values['NLTRI']:
-                        self.getline(['R', 'ER1IN', 'EP1OT', 'EP1CH', 'EXEP1'])
-                        self.getline(['R', 'ELLIN', 'ELLOT', 'ELLCH', 'EXELL'])
+                        self.getline(['R5', 'ER1IN', 'EP1OT', 'EP1CH', 'EXEP1'])
+                        self.getline(['R5', 'ELLIN', 'ELLOT', 'ELLCH', 'EXELL'])
                         if self.values['NLTRI']:
-                            self.getline(['R', 'TRIIN', 'TRIOT', 'TRICH',
+                            self.getline(['R5', 'TRIIN', 'TRIOT', 'TRICH',
                                                'EXTRI'])
 
                     elif self.values['NLPLG']:
-                        self.getline(['R', 'XPCOR', 'YPCOR', 'ZPCOR',
+                        self.getline(['R5', 'XPCOR', 'YPCOR', 'ZPCOR',
                                       'PLREFL'])
-                        role = ['R']
+                        role = ['R5']
                         for k in range(1, self.values['NPPLG'] + 1):
                             role.append('NPOINT(1,' + str(k) + ')')
                             role.append('NPOINT(2,' + str(k) + ')')
@@ -3521,7 +3575,7 @@ class EireneEdit(QTreeWidget):
                             self.getline(role)
 
                         for i in range(1, self.values['NR1ST'] + 1):
-                            role = ['R']
+                            role = ['R5']
                             for j in range(1, self.values['NRPLG'] + 1):
                                 role.append('XPOL(' + str(self.counter) + ',' +
                                             str(j) + ')')
@@ -3530,27 +3584,27 @@ class EireneEdit(QTreeWidget):
                             if len(role) > 1:
                                 self.getline(role)
                     elif self.values['NLFEM'] or self.values['NLTET']:
-                        self.getline(['R', 'XPCOR', 'YPCOR', 'ZPCOR'])
+                        self.getline(['R5', 'XPCOR', 'YPCOR', 'ZPCOR'])
 
             elif self.values['INGRD(1)'] == 6:
                 if self.values['NLSLB'] or self.values['NLCRC'] or \
                    self.values['NLELL'] or self.values['NLTRI']:
-                    self.getline(['R', 'RIA', 'RGA', 'RAA'])
+                    self.getline(['R5', 'RIA', 'RGA', 'RAA'])
                 elif self.values['NLPLG'] or self.values['NLFEM'] or\
                 self.values['NLTET']:
-                    self.getline(['R', 'XPCOR', 'YPCOR', 'ZPCOR'])
+                    self.getline(['R5', 'XPCOR', 'YPCOR', 'ZPCOR'])
 
         self.getline(['L', 'NLPOL'])
         self.getline(['L', 'NLPLY', 'NLPLA', 'NLPLP'])
         self.getline(['I', 'NP2ND', 'NPSEP', 'NPPLA', 'NPPER'])
         if self.values['INGRD(2)'] < 5:
-            self.getline(['R', 'YIA', 'YGA', 'YAA', 'YYA'])
+            self.getline(['R5', 'YIA', 'YGA', 'YAA', 'YYA'])
 
         self.getline(['L', 'NLTOR'])
         self.getline(['L', 'NLTRZ', 'NLTRA', 'NLTRT'])
         self.getline(['I', 'NT3RD', 'NTSEP', 'NTTRA', 'NTPER'])
         if self.values['INGRD(3)'] < 5:
-            self.getline(['R', 'ZIA', 'ZGA', 'ZAA', 'ZZA', 'ROA'])
+            self.getline(['R5', 'ZIA', 'ZGA', 'ZAA', 'ZZA', 'ROA'])
 
         self.getline(['L', 'NLMLT'])
         # Sometimes even though NLMLt is false the next line can still
@@ -3561,14 +3615,14 @@ class EireneEdit(QTreeWidget):
             self.getline(['I', 'NBLMT'])
 
         if self.values['NLMLT']:
-            role = ['R']
+            role = ['R5']
             for i in range(1, self.values['NBLMT'] + 1):
                 role.append('VOLCOR(' + str(i) + ')')
             self.getline(role)
         # 2e. Data for additional cells outside standard mesh
         self.getline(['L', 'NLADD'])
         self.getline(['I', 'NRADD'])
-        role = ['R']
+        role = ['R5']
         for i in range(1, int(self.values['NRADD']) + 1):
             role.append('VOLADD(' + str(i) + ')')
         if len(role) != 1:
@@ -3593,11 +3647,11 @@ class EireneEdit(QTreeWidget):
             elif self.values['ILIIN'] > 0:
                 # Optional
                 self.getline(['I', 'ILREF', 'ILSPT', 'ISRS', 'ISRC'])
-                self.getline(['R', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)',
+                self.getline(['R5', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)',
                                    'TRANSP(2,N)', 'FSHEAT'])
-                self.getline(['R', 'RECYCF', 'RECYCT', 'RECPRM', 'EXPPL',
+                self.getline(['R5', 'RECYCF', 'RECYCT', 'RECPRM', 'EXPPL',
                               'EXPEL', 'EXPIL'])
-                self.getline(['R', 'RECYCS', 'RECYCC', 'SPTRM', 'ESPUTS',
+                self.getline(['R5', 'RECYCS', 'RECYCC', 'SPTRM', 'ESPUTS',
                               'ESPUTC'])
 
     def block_3b(self):
@@ -3618,18 +3672,18 @@ class EireneEdit(QTreeWidget):
             self.getline(['S', 'CH-card'])
             line = self.getline()
         for i in range(self.values['NLIMI']):
-            self.getline(['R', 'RLBND', 'RLARE', 'RLWMN', 'RLWMX'])
+            self.getline(['R5', 'RLBND', 'RLARE', 'RLWMN', 'RLWMX'])
             self.getline(['I', 'ILIIN', 'ILSIDE', 'ILSWCH', 'ILEQUI', 'ILTOR',
                           'ILCOL', 'ILFIT', 'ILCELL', 'ILBOX', 'ILPLG'])
 
             if self.values['RLBND'] < 2:
-                self.getline(['R', 'A0LM', 'A1LM', 'A2LM', 'A3LM', 'A4LM',
+                self.getline(['R5', 'A0LM', 'A1LM', 'A2LM', 'A3LM', 'A4LM',
                               'A5LM', 'A6LM', 'A7LM', 'A8LM', 'A9LM'])
                 if self.values['RLBND'] > 0:
-                    self.getline(['R', 'XLIMS1', 'YLIMS1', 'ZLIMS1',
+                    self.getline(['R5', 'XLIMS1', 'YLIMS1', 'ZLIMS1',
                                   'XLIMS2', 'YLIMS2', 'ZLIMS2'])
             elif self.values['RLBND'] >= 2:
-                self.getline(['R', 'P1(1,..)', 'P1(2,..)', 'P1(3,..)',
+                self.getline(['R5', 'P1(1,..)', 'P1(2,..)', 'P1(3,..)',
                              'P2(1,..)', 'P2(2,..)', 'P2(3,..)'])
 
                 # Cannot determine K!
@@ -3637,11 +3691,11 @@ class EireneEdit(QTreeWidget):
             if self.values['ILIIN'] > 0 and line.split()[0].isdigit():
                 #Optional!
                 self.getline(['I', 'ILREF', 'ILSPT', 'ISRS', 'ISRC'])
-                self.getline(['R', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)',
+                self.getline(['R5', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)',
                                    'TRANSP(2,N)', 'FSHEAT'])
-                self.getline(['R', 'RECYCF', 'RECYCT', 'RECPRM', 'EXPPL',
+                self.getline(['R5', 'RECYCF', 'RECYCT', 'RECPRM', 'EXPPL',
                               'EXPEL', 'EXPIL'])
-                self.getline(['R', 'RECYCS', 'RECYCC', 'SPTRM', 'ESPUTS',
+                self.getline(['R5', 'RECYCS', 'RECYCC', 'SPTRM', 'ESPUTS',
                               'ESPUTC'])
                 line = self.getline()
             if 'SU' in line:
@@ -3654,31 +3708,155 @@ class EireneEdit(QTreeWidget):
             return
         #  Reactions
         self.getline(['I', 'NATMI'])
-        line = self.getline()
-        while not line.startswith('**'):
-            self.getline(['S', 'Reactions card'])
-            line = self.getline()
 
+        optional = ['FTFLAG']
+        tail = ['REAC', 'CRC', 'MASSP', 'MASST', 'DP', 'RMN1', 'RMX1']
+        while 1:
+            role = ['RC', 'IR', 'FILNAM', 'H123']
+            # Reactions card:
+            # IR FILNAME H123 FTFLAG CRC MASST DP RMN1 RMNX
+            # at least one space between the flags
+            flags = self.getline().split()
+            IR = int(flags[0])
+            FILNAM = flags[1]
+            if flags[3].startswith('FT'):
+                tail = optional + tail
+            role = role + tail[:len(flags[3:])]
+
+            self.getline(role) # Assigning role to the card
+
+            # Checking if there are additional sub-cards
+            if FILNAM == 'ADAS':
+                self.getline(['S', 'ELNAME', 'IZ'])
+            elif FILNAM =='PHOTON':
+                line = self.getline()
+                self.getline(['S', 'IPRFTYPE', 'IPLSC3', 'IMESS', 'IFREMD', 
+                                   'NRJPRT'])
+                for j in range(int(line.split()[3])):
+                    self.getline(['S', 'II', 'KENN', 'IK6']) # This should be
+                                                             # checked
+            elif FILNAM == 'CONST':
+                # 12 Numbers in two lines, but only 
+                self.getline(['R4', 'F1', 'F2', 'F3', 'F4', 'F5'])
+                self.getline(['R4', 'F6', 'F7', 'F8'])
+
+            N = len(flags)
+            # Awkward way of seeing if there are additional lines when
+            # RMN1 .gt. 0 nd RMX1 .g. 0
+            if N >= 9:
+                if float(flags[8]) > 0:
+                    self.getline(['S', 'IFEXMN', 'FPARM(1)', 'FPARM(2)', 
+                                       'FPARM(3)'])
+            if N == 10:
+                if float(flags[9]) > 0:
+                    self.getline(['S', 'IFEXMN', 'FPARM(4)', 'FPARM(5)', 
+                                       'FPARM(6)'])
+            if IR == self.values['NATMI']:
+                break
         # **4a.   Neutral atom species
         self.getline(['I', 'NREACI'])
-        line = self.getline()
-        while not line.startswith('**'):
-            self.getline(['S', 'Neutral atom species card'])
-            line = self.getline()
+        for j in range(self.values['NREACI']):
+            # The first line contains
+            # NC type is NEUTRAL ATOMS SPECIES CARDS
+            line = self.getline().split()
+            self.getline(['NC', 'I', 'TEXTS(ISPZ)', 'NMASSA(IATM)', 
+                          'NCHARA(IATM)', 'NDUMM1', 'NDUMM2', 'ISRF(ISPZ,1)',
+                          'ISRT(ISPZ,1)', 'NUMSEC', 'NRCA(IATM)', 
+                          'NFOLA(IATM)', 'NGENA(IATM)', 'NHSTS(ISPZ)'])
+            NRCA_IATM = int(line[9])
+            NUMSEC = int(line[8])
+            for i in range(NRCA_IATM):
+                if NUMSEC < 3:
+                    self.getline(['I', 'IREACA(IATM,K)', 'IBULKA(IATM,K)', 
+                                  'ISCD1A(IATM,K)', 'ISCD2A(IATM,K', 
+                                  'ISCDEA(IATM,K)', 'IESTMA(IATM,K)', 
+                                  'IBKA(IATM,K)']) 
+                elif NUMSEC == 3:
+                    self.getline(['I', 'IREACA(IATM,K)', 'IBULKA(IATM,K)', 
+                                  'ISCD1A(IATM,K)', 'ISCD2A(IATM,K)', 
+                                  'ISCD3A(IATM,K)', 'ISCDEA(IATM,K)', 
+                                  'IEASTMA(IATM,K)', 'IBGKA(IATM,K)'])
+                elif NUMSEC == 4:
+                    self.getline(['I', 'IREACA(IATM,K)', 'IBULKA(IATM,K)',
+                                  'ISCD1A(IATM,K)', 'ISCD2A(IATM,K)', 
+                                  'ISCD3A(IATM,K)', 'ISCD4A(IATM,K)', 
+                                  'ISCDEA(IATM,K)', 'IESTMA(IATM,K)',
+                                  'IBGKA(IATM,K)'])
+                # Reading mandatory line containing EELEC, EBULKA,...
+
+                self.getline(['R5', 'EELECA(IATM,K)', 'EBULKA(IATM,K)', 
+                              'ESCD1A(IATM,K)', 'ESCD2A', 'FREACA(IATM,K)',
+                              'FLDLMA(IATM,K)'])
 
         # **4b.   Neutral molecule species
         self.getline(['I', 'NMOLI'])
-        line = self.getline()
-        while not line.startswith('**'):
-            self.getline(['S', 'Neutral molecule species card'])
-            line = self.getline()
+
+        for j in range(self.values['NMOLI']):
+            line = self.getline().split()
+            self.getline(['MC', 'I', 'TEXTS(ISPZ)', 'NMASSM(IMOL)', 
+                          'NCHARM(IMOL)', 'NPRT(ISPZ)', 'NDUMM', 
+                          'ISRF(ISPZ,1)', 'ISRT(ISPZ,1)', 'NUMSEC', 
+                          'NRCM(IMOL)', 'NFOLM(IMOL)', 'NGENM(IMOL)',
+                          'NHSTS(ISPC)', 'lkindm(imol)'])
+
+            NRCM_IMOL = int(line[9])
+            NUMSEC = int(line[8])
+            for i in range(NRCM_IMOL):
+                if NUMSEC < 3:
+                    # Some cards have less than 7 integers
+                    self.getline(['I', 'IREACM(IMOL,K)', 'IBULKM(IMOL,K)',
+                                  'ISCD1M(IMOL,K)', 'ISCD2M(IMOL,K)', 
+                                  'ISCDEM(IMOL,K)', 'IESTMM(IMOL,K)', 
+                                  'IBGKM(IMOL,K)'])
+                elif NUMSEC == 3:
+                    self.getline(['I', 'IREACM(IMOL,K)', 'IBULKM(IMOL,K)',
+                                  'ISCD1M(IMOL,K)', 'ISCD2M(IMOL,K)',
+                                  'ICSD3M(IMOL,K)',
+                                  'ISCDEM(IMOL,K)', 'IESTMM(IMOL,K)', 
+                                  'IBGKM(IMOL,K)'])
+                elif NUMSEC == 4:
+                     self.getline(['I', 'IREACM(IMOL,K)', 'IBULKM(IMOL,K)',
+                                  'ISCD1M(IMOL,K)', 'ISCD2M(IMOL,K)',
+                                  'ICSD3M(IMOL,K)', 'ISCD4M(IMOL,K)',
+                                  'ISCDEM(IMOL,K)', 'IESTMM(IMOL,K)', 
+                                  'IBGKM(IMOL,K)']) 
+                self.getline(['R5', 'EELECM(IMOL,K)', 'EBULKM(IMOL,K)', 
+                              'ESCD1M(IMOL,K)', 'ESCD2M, FREACM(IMOL,K)'])             
 
         # **4c.   Test ion species
         self.getline(['I', 'NIONI'])
-        line = self.getline()
-        while not line.startswith('**'):
-            self.getline(['S', 'Test ion species card'])
-            line = self.getline()
+        for j in range(self.values['NIONI']):
+            # Reading first line... yet again
+            line = self.getline().split()
+            self.getline(['IC', 'I', 'TEXTS(ISPZ)', 'NMASSI(ION)', 
+                          'NCHARI(IION)', 'NPRT(ISPZ)', 'NCHRGI(IION)',
+                          'ISRF(ISPZ,1)', 'ISRT(ISPZ,1)', 'NUMSEC', 
+                          'NRCI(IION)', 'NFOLI(IION)', 'NGENI(IION)', 
+                          'NHSTS(ISPZ)', 'lkindi(iion)'])
+            NRCI_IION = int(line[9])
+            NUMSEC = int(line[8])
+            for i in range(NRCI_IION):
+                # Number of arguments on the following lines may not be the 
+                # same as the number of switches...
+                if NUMSEC < 3:
+                    self.getline(['I', 'IREACI(IION,K)', 'IBULKI(IION,K)', 
+                                  'ISC1I(IION,K)', 'ISCD2I(IION,K)', 
+                                  'ISCDEI(IION,K)', 'IESTMI(IION,K)', 
+                                  'IBGKI(IION,K)'])
+                elif NUMSEC == 3:
+                    self.getline(['I', 'IREACI(IION,K)', 'IBULKI(IION,K)', 
+                                  'ISC1I(IION,K)', 'ISCD2I(IION,K)', 
+                                  'ISCD3I(IION,K)',
+                                  'ISCDEI(IION,K)', 'IESTMI(IION,K)', 
+                                  'IBGKI(IION,K)'])
+                elif NUMSEC == 4:
+                    self.getline(['I', 'IREACI(IION,K)', 'IBULKI(IION,K)', 
+                                  'ISC1I(IION,K)', 'ISCD2I(IION,K)', 
+                                  'ISCD3I(IION,K)', 'ISCD4I(IION,K)',
+                                  'ISCDEI(IION,K)', 'IESTMI(IION,K)', 
+                                  'IBGKI(IION,K)'])
+                self.getline(['R5', 'EELECI(IION,K)', 'EBULKI(IION,K)', 
+                              'ESCD1I(IION,K)', 'ESCD2I', 'FREACI(IION,K)'])
 
         # **4d. Photon species
 
@@ -3687,13 +3865,68 @@ class EireneEdit(QTreeWidget):
             return
         else:
             self.getline(['I', 'NPHOTI'])
-            line = self.getline()
-            while not line.startswith('**'):
-                self.getline(['S', 'Test ion species card'])
-                line = self.getline()
+            for j in range(self.values['NPHOTI']):
+                line = self.getline().split()
+                self.getline(['PC', 'I', 'TEXTS(ISPZ)', 'NDUMM1', 'NDUMM2',
+                              'NDUMM3', 'NDUMM4', 'ISRF(ISPZ,1)', 
+                              'ISRT(ISPZ,1)', 'NUMSEC', 'NRCPH(IPHOT)',
+                              'NFOLPH(IPHOT)', 'NGENPH(IPHOT)', 'NHSTS(ISPZ)'])
+                NUMSEC = int(line[8])
+                NRCPH_IPHOT = int(line[9])
+
+                for i in range(NRCPH_IPHOT):
+                    if NUMSEC < 3:
+                        self.getline(['I', 'IREACPH(IPHOT,K)', 
+                                      'IBULKPH(IPHOT,K)', 'ISCD1PH(IPHOT,K)',
+                                      'ISCD2PH(IPHOT,K)',
+                                      'ISCDEPH(IPHOT,K)', 'IESTMPH(IPHOT,K)',
+                                      'IBGKPH(IPHOT,K)'])
+                    if NUMSEC == 3:
+                        self.getline(['I', 'IREACPH(IPHOT,K)', 
+                                      'IBULKPH(IPHOT,K)', 'ISCD1PH(IPHOT,K)',
+                                      'ISCD2PH(IPHOT,K)', 'ISCD3PH(IPHOT,K)',
+                                      'ISCDEPH(IPHOT,K)', 'IESTMPH(IPHOT,K)',
+                                      'IBGKPH(IPHOT,K)'])
+                    if NUMSEC == 4:
+                        self.getline(['I', 'IREACPH(IPHOT,K)', 
+                                      'IBULKPH(IPHOT,K)', 'ISCD1PH(IPHOT,K)',
+                                      'ISCD2PH(IPHOT,K)', 'ISCD3PH(IPHOT,K)',
+                                      'ISCD4PH(IPHOT,K)',
+                                      'ISCDEPH(IPHOT,K)', 'IESTMPH(IPHOT,K)',
+                                      'IBGKPH(IPHOT,K)'])
+                    self.getline(['R5', 'EELECPH(IPHOT,K)', 'EBULKPH(IPHOT,K)',
+                                  'ESCD1PH(IPHOT,K)', 'ESCD2PH', 
+                                  'FREACPH(IPHOT,K)', 'FLDLMPH(IPHOT,K)'])
 
     def block_5(self):
         self.getline(['I', 'NPLSI'])
+        for i in range(self.values['NPLSI']):
+            line = self.getline().split()
+            self.getline(['PB', 'I', 'TEXTS(ISPZ)', 'NMASSP(IPLS)', 
+                           'NCHARP(IPLS)', 'NPRT(ISPZ)', 'NCHRGP(IPLS)',
+                           'ISRF(ISPZ,1)', 'ISRT(ISPZ,1)', 'NUMSEC', 
+                           'NRCP(IPLS)', 'NDUMM1', 'NDUMM2', 'NHSTS(ISPZ)',
+                           'NDUMM4', 'CDENMODEL(IPLS)', 'NRE'])
+            NRCP_IPLS = int(line[9])
+            NUMSEC = int(line[8])
+
+            for j in range(NRCP_IPLS):
+                if NUMSEC < 3:
+                    self.getline(['I', 'IREACP(IPLS,K)', 'IBULKP(IPLS,K)',
+                                  'ISCD1P(IPLS,K)', 'ISCD2P(IPLS,K)', 
+                                  'ISCDEP(IPLS,K)'])
+                elif NUMSEC == 3:
+                    self.getline(['I', 'IREACP(IPLS,K)', 'IBULKP(IPLS,K)',
+                                  'ISCD1P(IPLS,K)', 'ISCD2P(IPLS,K)', 
+                                  'ISCD3P(IPLS,K)', 'ISCDEP(IPLS,K)'])
+                elif NUMSEC == 4:
+                    self.getline(['I', 'IREACP(IPLS,K)', 'IBULKP(IPLS,K)',
+                                  'ISCD1P(IPLS,K)', 'ISCD2P(IPLS,K)', 
+                                  'ISCD3P(IPLS,K)', 'ISCD4P(IPLS,K)',
+                                  'ISCDEP(IPLS,K)'])
+                self.getline(['R5', 'EELECP(IPLS,K)', 'EBULKP(IPLS,K)', 
+                              'ESCD1P(IPLS,K)', 'ESCD2P', 'FREACP(IPLS,K)'])
+
         line = self.getline()
         while not line.startswith('**'):
             self.getline(['S', 'Plasma species card'])
@@ -3703,34 +3936,34 @@ class EireneEdit(QTreeWidget):
         self.getline(['I'] + ['INDPRO(' + str(i) + ')' for i in range(1, 13)])
 
         if self.values['INDPRO(1)'] <= 5:
-            self.getline(['R', 'TE0', 'TE1', 'TE2', 'TE3', 'TE4', 'TE5'])
+            self.getline(['R5', 'TE0', 'TE1', 'TE2', 'TE3', 'TE4', 'TE5'])
         elif self.values['INDPRO(2)'] <= 5:
             for i in range(1, self.values['NPLSI'] + 1):
-                self.getline(['R', 'TI0(' + str(i) + ')', 'TI1(' + str(i) +')',
+                self.getline(['R5', 'TI0(' + str(i) + ')', 'TI1(' + str(i) +')',
                               'TI2(' + str(i) + ')', 'TI3(' + str(i) + ')',
                               'TI4(' + str(i) + ')', 'TI5(' + str(i) + ')'])
         elif self.values['INDPRO(3)'] <= 5:
             for i in range(1, self.values['NPLSI'] + 1):
-                self.getline(['R', 'DI0(' + str(i) + ')', 'DI1(' + str(i) +')',
+                self.getline(['R5', 'DI0(' + str(i) + ')', 'DI1(' + str(i) +')',
                               'DI2(' + str(i) + ')', 'DI3(' + str(i) + ')',
                               'DI4(' + str(i) + ')', 'DI5(' + str(i) + ')'])
         elif self.values['INDPRO(4)'] <= 5:
             for i in range(1, self.values['NPLSI'] + 1):
-                self.getline(['R', 'VX0(' + str(i) + ')', 'VX1(' + str(i) +')',
+                self.getline(['R5', 'VX0(' + str(i) + ')', 'VX1(' + str(i) +')',
                               'VX2(' + str(i) + ')', 'VX3(' + str(i) + ')',
                               'VX4(' + str(i) + ')', 'VX5(' + str(i) + ')'])
             for i in range(1, self.values['NPLSI'] + 1):
-                self.getline(['R', 'VY0(' + str(i) + ')', 'VY1(' + str(i) +')',
+                self.getline(['R5', 'VY0(' + str(i) + ')', 'VY1(' + str(i) +')',
                               'VY2(' + str(i) + ')', 'VY3(' + str(i) + ')',
                               'VY4(' + str(i) + ')', 'VY5(' + str(i) + ')'])
             for i in range(1, self.values['NPLSI'] + 1):
-                self.getline(['R', 'VZ0(' + str(i) + ')', 'VZ1(' + str(i) +')',
+                self.getline(['R5', 'VZ0(' + str(i) + ')', 'VZ1(' + str(i) +')',
                               'VZ2(' + str(i) + ')', 'VZ3(' + str(i) + ')',
                               'VZ4(' + str(i) + ')', 'VZ5(' + str(i) + ')'])
         elif self.values['INDPRO(5)'] <= 5:
-            self.getline(['R', 'B0', 'B1', 'B2', 'B3', 'B4', 'B5'])
+            self.getline(['R5', 'B0', 'B1', 'B2', 'B3', 'B4', 'B5'])
         elif self.values['INDPRO(12)'] <= 5:
-            self.getline(['R', 'VL0', 'VL1', 'VL2', 'VL3', 'VL4', 'VL5'])
+            self.getline(['R5', 'VL0', 'VL1', 'VL2', 'VL3', 'VL4', 'VL5'])
 
     def block_6(self):
         self.getline(['L', 'NLTRIM'])
@@ -3742,29 +3975,29 @@ class EireneEdit(QTreeWidget):
         while 'path' in line or 'PATH' in line:
             self.getline(['S', 'PATH CARD'])
 
-        self.getline(['R'] + ['DATD(' + str(i) + ')' for i in
+        self.getline(['R5'] + ['DATD(' + str(i) + ')' for i in
                      range(1, self.values['NATMI'] + 1)])
-        self.getline(['R'] + ['DMLD(' + str(i) + ')' for i in
+        self.getline(['R5'] + ['DMLD(' + str(i) + ')' for i in
                      range(1, self.values['NMOLI'] + 1)])
-        self.getline(['R'] + ['DIOD(' + str(i) + ')' for i in
+        self.getline(['R5'] + ['DIOD(' + str(i) + ')' for i in
                      range(1, self.values['NIONI'] + 1)])
-        self.getline(['R'] + ['DPLD(' + str(i) + ')' for i in
+        self.getline(['R5'] + ['DPLD(' + str(i) + ')' for i in
                      range(1, self.values['NPLSI'] + 1)])
         if self.values['NPHOTI'] > 0:
-            self.getline(['R'] + ['DPHT(' + str(i) + ')' for i in
+            self.getline(['R5'] + ['DPHT(' + str(i) + ')' for i in
                  range(1, self.values['NPLSI'] + 1)])
-        self.getline(['R', 'ERMIN', 'ERCUT', 'RPROB0', 'RINTEG', 'EINTEG',
+        self.getline(['R5', 'ERMIN', 'ERCUT', 'RPROB0', 'RINTEG', 'EINTEG',
                       'AINTEG'])
 
         line = self.getline()
         while line[:3] != '***':
             self.getline(['S', 'SURFMOD'])
             self.getline(['I', 'ILREF', 'ILSPT', 'ISRS', 'ISRC'])
-            self.getline(['R', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)', 
+            self.getline(['R5', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)', 
                           'TRANSP(2,N)', 'FSHEAT'])
-            self.getline(['R', 'RECYCF', 'RECYCT', 'RECPRM', 'EXPPL', 'EXPEL', 
+            self.getline(['R5', 'RECYCF', 'RECYCT', 'RECPRM', 'EXPPL', 'EXPEL', 
                           'EXPIL'])
-            self.getline(['R', 'RECYCS', 'RECYCC', 'SPTPRM', 'ESPUTS', 
+            self.getline(['R5', 'RECYCS', 'RECYCC', 'SPTPRM', 'ESPUTS', 
                           'ESPUTC'])
             line = self.getline()
 
@@ -3772,7 +4005,7 @@ class EireneEdit(QTreeWidget):
         self.getline(['I', 'NSTRAI'])
         self.getline(['I'] + ['INDSRC('+str(i)+')' for i in
                      range(1, self.values['NSTRAI'] + 1)])
-        self.getline(['R', 'ALLOC', 'AMPTS'])
+        self.getline(['R5', 'ALLOC', 'AMPTS'])
 
         for i in range(1, self.values['NSTRAI'] + 1):
             line = self.getline()
@@ -3792,15 +4025,15 @@ class EireneEdit(QTreeWidget):
                 self.getline(['I', 'INUM', 'INDIM', 'INSOR', 'INGRDA(1)',
                               'INGRDE(1)', 'INGRDA(2)', 'INGRDE(2)',
                               'INGRDA(3)', 'INGRDE(3)'])
-                self.getline(['R', 'SORWGT', 'SORLIM', 'SORIND',
+                self.getline(['R5', 'SORWGT', 'SORLIM', 'SORIND',
                               'SOREXP', 'SORIFL'])
                 self.getline(['I', 'NRSOR', 'NPSOR', 'NTSOR', 'NBSOR',
                               'NASOR', 'NISOR'])
-                self.getline(['R', 'SORAD1', 'SORAD2', 'SORAD3', 'SORAD4',
+                self.getline(['R5', 'SORAD1', 'SORAD2', 'SORAD3', 'SORAD4',
                               'SORAD5', 'SORAD6'])
-                self.getline(['R', 'SORENI', 'SORENE', 'SORVDX', 'SORVDY',
+                self.getline(['R5', 'SORENI', 'SORENE', 'SORVDX', 'SORVDY',
                               'SORVDZ'])
-                self.getline(['R', 'SORCOS', 'SORMAX', 'SORCTX', 'SORCTY',
+                self.getline(['R5', 'SORCOS', 'SORMAX', 'SORCTX', 'SORCTY',
                               'SORCTZ'])
 
     def block_8(self):
@@ -3818,34 +4051,34 @@ class EireneEdit(QTreeWidget):
         self.getline(['I', 'NPRCSF'])
         self.getline(['I', 'MAXLEV', 'MAXRAD', 'MAXPOL', 'MAXTOR', 'MAXADD'])
         for i in range(1, self.values['MAXLEV'] + 1):
-            self.getline(['R', 'ID', 'NSSPL(' + str(i) + ')', 'PRMSPL(' +
+            self.getline(['R5', 'ID', 'NSSPL(' + str(i) + ')', 'PRMSPL(' +
                           str(i) + ')'])
         for i in range(1, self.values['MAXPOL'] + 1):
-            self.getline(['R', 'ID', 'NSSPL(' + str(self.values['N1ST'] + i) +
+            self.getline(['R5', 'ID', 'NSSPL(' + str(self.values['N1ST'] + i) +
                          ')', 'PRMSPL(' + str(self.values['N1ST'] + i) + ')'])
         for i in range(1, self.values['MAXTOR'] + 1):
-            self.getline(['R', 'ID', 'NSSPL(' + str(self.values['N1ST'] +
+            self.getline(['R5', 'ID', 'NSSPL(' + str(self.values['N1ST'] +
                           self.values['N2ST'] + i) + ')',
                           'PRMSPL(' + str(self.values['N1ST'] +
                                           self.values['N1ST'] + i) + ')'])
         for i in range(1, self.values['MAXADD'] + 1):
-            self.getline(['R', 'ID', 'NSSPL(' + str(self.values['N1ST'] +
+            self.getline(['R5', 'ID', 'NSSPL(' + str(self.values['N1ST'] +
                                                     self.values['N2ND'] +
                                                     self.values['N3RD'] + i) +
                                ')',
                           'PRMSPL(' + str(self.values['N1ST'] +
                                           self.values['N1ST'] +
                                           self.values['N3RD'] + i) + ')'])
-        self.getline(['R', 'WMINV', 'WMINS', 'WMINC', 'WMINL'])
-        self.getline(['R', 'SPLPAR'])
+        self.getline(['R5', 'WMINV', 'WMINS', 'WMINC', 'WMINL'])
+        self.getline(['R5', 'SPLPAR'])
         self.getline(['I', 'NSIGVI', 'NSIGSI', 'NSIGCI', 'NSIGI_BGK',
                       'NSIGI_COP', 'NSIGI_SPC'])
         for i in range(1, self.values['NSIGVI'] + 1):
-            self.getline(['R', 'IGH', 'IIH'])
+            self.getline(['R5', 'IGH', 'IIH'])
         for i in range(1, self.values['NSIGSI'] + 1):
-            self.getline(['R', 'IGHW', 'IIHW'])
+            self.getline(['R5', 'IGHW', 'IIHW'])
         for i in range(1, self.values['NSIGCI'] + 1):
-            self.getline(['R'] + ['IGHC(1,' + str(i) + ')',
+            self.getline(['R5'] + ['IGHC(1,' + str(i) + ')',
                                   'IIHC(1,' + str(i) + ')',
                                   'IGHC(2,' + str(i) + ')',
                                   'IIHC(2,' + str(i) + ')'])
@@ -3854,7 +4087,7 @@ class EireneEdit(QTreeWidget):
         self.getline(['I', 'NADVI', 'NCLVI', 'NALVI', 'NADSI', 'NALSI',
                       'NADSPC'])
         for i in range(1, self.values['NADVI'] + 1):
-            self.getline(['R', 'IADVE(' + str(i) + ')',
+            self.getline(['R5', 'IADVE(' + str(i) + ')',
                                'IADVS(' + str(i) + ')',
                                'IADVT(' + str(i) + ')',
                                'IADVR(' + str(i) + ')',
@@ -3863,7 +4096,7 @@ class EireneEdit(QTreeWidget):
                                'TXTUNT(' + str(i) + ',NTALA)'])
 
         for i in range(1, self.values['NCLVI'] + 1):
-            self.getline(['R', 'ICLVE(' + str(i) + ')',
+            self.getline(['R5', 'ICLVE(' + str(i) + ')',
                                'ICLVS(' + str(i) + ')',
                                'ICLVT(' + str(i) + ')',
                                'ICLVR(' + str(i) + ')',
@@ -3871,12 +4104,12 @@ class EireneEdit(QTreeWidget):
                                'TXTSPC(' + str(i) + ',NTALC)',
                                'TXTUNT(' + str(i) + ',NTALC)'])
         for i in range(1, self.values['NALVI'] + 1):
-            self.getline(['R', 'ALSTRNG',
+            self.getline(['R5', 'ALSTRNG',
                                'TXTTAL(' + str(i) + ',NTALR)',
                                'TXTSPC(' + str(i) + ',NTALR)',
                                'TXTUNT(' + str(i) + ',NTALR)'])
         for i in range(1, self.values['NADSI'] + 1):
-            self.getline(['R', 'IADSE(' + str(i) + ')',
+            self.getline(['R5', 'IADSE(' + str(i) + ')',
                                'IADSS(' + str(i) + ')',
                                'IADST(' + str(i) + ')',
                                'IADSR(' + str(i) + ')',
@@ -3884,7 +4117,7 @@ class EireneEdit(QTreeWidget):
                                'TXTSPC(' + str(i) + ',NTLSA)',
                                'TXTUNT(' + str(i) + ',NTLSA)'])
         for i in range(1, self.values['NALSI'] + 1):
-            self.getline(['R', 'ALSTRNG', 'TXTTAL(' + str(i) + ',NTLSR)',
+            self.getline(['R5', 'ALSTRNG', 'TXTTAL(' + str(i) + ',NTLSR)',
                           'TXTSPC(' + str(i) + ',NTLSR)',
                           'TXTUNT(' + str(i) + ',NTLSR)'])
 
@@ -3893,11 +4126,17 @@ class EireneEdit(QTreeWidget):
                            'TRCGRD', 'TRCSUR', 'TRCREF', 'TRCFLE', 'TRCAMD',
                            'TRCINT', 'TRCLST', 'TRCSOU', 'TRCREC', 'TRCTIM',
                            'TRCBLA', 'TRCBLM', 'TRCBLI', 'TRCBLP', 'TRCBLE',
-                           'TRCBLPH', 'TRCTAL', 'TRCOCT', 'TRCCEN', 'TRCDUMM'])
+                           'TRCBLPH', 'TRCTAL', 'TRCOCT', 'TRCCEN', 'TRCDUMM',
+                           'TRCDBG2', 'TRCDBGE', 'TRCDBGM', 'TRCDBGF', 
+                           'TRCDBGL', 'TRCDBGS', 'TRCDBGG', 'TRCDBGMPI', 
+                           'TRCDBGC'])
+        # Some reading involving NSTRA
+        # A for loop going from 0 to NSTRA with a step of 60
+        role = ['L']
+        for i in range(self.values['NSTRAI']):
+            role += ['TRCSRC(' + str(i+1) + ')']
+        self.getline(role)
 
-        # Following booleans not in use
-        self.getline(['L', 'TRCDBG2', 'TRCDBGE', 'TRCDBGM', 'TRCDBGF',
-                      'TRCDBGL', 'TRCDBGS', 'TRCDBGG', 'TRCDBGMPI', 'TRCDBGC'])
 
         # Following lines are not sufficiently described in manual or in
         # input.f.
@@ -3926,7 +4165,7 @@ class EireneEdit(QTreeWidget):
             self.values['NPRNLI'] = 100
         if self.values['NPRNLI'] > 0:
             self.getline(['I', 'NPTST', 'NTMSTP'])
-            self.getline(['R', 'DTIMV', 'TIME0'])
+            self.getline(['R5', 'DTIMV', 'TIME0'])
         self.getline(['I', 'NSNVI'])
         if self.values['NSNVI'] > 0:
             self.dummy_block()  # No additional descritpion in the manual
@@ -3951,7 +4190,7 @@ class EireneEdit(QTreeWidget):
                                    'NIFLG', 'NPTC', 'NPTCM', 'NSPZI', 'NSPZE',
                                    'NEMOD'])
 
-        self.getline(['R', 'CHGP', 'CHGEE', 'CHGEI', 'CHGMOM'])
+        self.getline(['R5', 'CHGP', 'CHGEE', 'CHGEI', 'CHGMOM'])
         self.getline(['I', 'NAINB', 'NCOPIB', 'NCOPEB'])
 
         for i in range(1, self.values['NAINB'] + 1):
@@ -4062,7 +4301,7 @@ class EireneEdit(QTreeWidget):
         """
         if self.row >= self.text_size:
             raise IndexError
-        line = self.text[self.row].rstrip()
+        line = self.text[self.row]
         if role is None:
             return line
 
@@ -4149,16 +4388,26 @@ class EireneEdit(QTreeWidget):
             for char in line:
                 if char != ' ':
                     arguments.append(True if char == 'T' else False)
-        elif type == 'R':
+        elif type == 'R5':
             arguments = []
             for i in range(len(line) // 12):
                 arguments.append(float(line[12 * i:12 * (i + 1)]))
+        elif type == 'R4':
+            arguments = [float(e) for e in line.replace('E ', 'E+').split()]
         elif type == 'I':
             arguments = []
             for i in range(len(line) // 6):
                 arguments.append(int(line[i * 6:(i + 1) * 6]))
         elif type == 'S':
             arguments = ''.join([char for char in line])
+        else:
+            # Reactions card
+            arguments = line.split()
+        #elif type == 'RC':
+        #    arguments = line.split()
+        #elif type == 'NC':
+        #    arguments = line.split()
+        #...
 
         return arguments
 
@@ -4173,7 +4422,7 @@ class EireneEdit(QTreeWidget):
     def isModified(self):
         if len(self.old_text) != len(self.toPlainText()):
             return False
-        if self.old_text != self.toPlainText():
+        elif self.old_text != self.toPlainText():
             return True
         return self.TextModified
 
