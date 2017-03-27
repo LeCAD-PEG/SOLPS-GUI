@@ -34,13 +34,13 @@ no_description_in_manual = """No description in manual."""
 
 point_example = """Coordinate for corner of a triangle.
 <p>Example:</p>
-<p>plane triangle defined by the corners P<sub>1</sub> , P<sub>2</sub> , 
+<p>plane triangle defined by the corners P<sub>1</sub> , P<sub>2</sub> ,
 P<sub>3</sub></p>
 <p>P 1 =(P1(1),P1(2),P1(3))</p>
 <p>P 2 =(P2(1),P2(2),P2(3))</p>
 <p>P 3 =(P3(1),P3(2),P3(3))</p>"""
 
-eirene_params = { 
+eirene_params = {
 
 '*** 1. Data for operating mode' : """The variables in this
 block control some of the more general options in EIRENE such as over- all
@@ -355,14 +355,14 @@ input card the "geometry - level" variable LEVGEO is set internally.
   <dt>LEVGEO=1 </dt><dd>cartesian coordinates x (and y)</dd>
   <dt>LEVGEO=2 </dt><dd>polar coordinates r (and &Theta;)</dd>
   <dt>LEVGEO=3 </dt><dd>general curvilinear coordinates: a full 2D mesh
-                        (polygonal coordinate lines) is used in the x - y 
+                        (polygonal coordinate lines) is used in the x - y
                         plane. Grid cuts are permitted in the y-direction.
                         </dd>
   <dt>LEVGEO=4 </dt><dd>a 2D "finite element" mesh of triangles is used in the
                           x - y plane</dd>
   <dt>LEVGEO=5 </dt><dd>a 3D "finite volume" mesh of tetrahedrons used</dd>
-  <dt>LEVGEO=10</dt><dd>a general, user defined geometry block is used. All 
-                        geometrical calculations are performed in problem 
+  <dt>LEVGEO=10</dt><dd>a general, user defined geometry block is used. All
+                        geometrical calculations are performed in problem
                         specific routine VOLUSR, TIMUSR, ...etc.</dd>
 </dl>
 <p>If NLRAD=.FALSE., then no spatial grid is defined and the default
@@ -386,12 +386,12 @@ area inside surface number I. Thus for this option one has
 again:RHOSRF(I)=RSURF(I), I=1, NR1ST. </p>""",
 
 'NLELL' : """
-<p>Geometry level: LEVGEO = 2</p> 
+<p>Geometry level: LEVGEO = 2</p>
 <p>Mesh of nested, but
 not necessarily concentric or confocal elliptical flux surfaces. The equation
 for the "radial" surface is <em>(x-EP)<sup>2</sup> + (y/EL)<sup>2</sup> =
 r<sup>2</sup></em>. The radial coordinate <em>r</em> is discretized  by
-setting <em>r<sub>I</sub></em>=RSURF(I) I=1, NR1ST.</p> 
+setting <em>r<sub>I</sub></em>=RSURF(I) I=1, NR1ST.</p>
 <p>EP and EL may vary
 with coordinate <em>r</em>. These parameters are stored in the arrays
 EP(I),EL(I), I=1,NR1ST which now are used in addition to RSURF to define one
@@ -738,7 +738,7 @@ block 11), this major radius offset ROA of poloidal cross sections has to be
 taken into account when defining plot- frames.</p> <p>(Defaults: NLTRA =
 FALSE, ZIA = 0 , ZAA = 1)</p>""",
 
-'NLMLT' : """<p>the complete "Standard Mesh" data are copied NBMLT 
+'NLMLT' : """<p>the complete "Standard Mesh" data are copied NBMLT
 times</p>""",
 
 'NBMLT' : """<p>Number of identical copies of the standard mesh. Transition
@@ -760,7 +760,7 @@ flights in these zones has to be specified explicitly by making use of the
 ILSWCH, ILCELL parameters (block 3B)</p> <p>(Default: NRADD = 0 ).</p>""",
 
 'VOLADD' : """<p>Volume (<em>cm<sup>-3</sup></em>) of each additional zone as
-seen by the test-particles.</p>""", 
+seen by the test-particles.</p>""",
 
 #2.3 Block 3
 
@@ -813,7 +813,7 @@ grid option or for the general 3D grids of tetrahedra) all surfaces are
 referred to as 1st grid (x or radial) surfaces, by abuse of language.</p>""",
 
 'INUMP' : """<p>Number of the surface in mesh RSURF, PSURF or TSURF
-respectively</p>""", 
+respectively</p>""",
 
 'IRPTA' : """<p>Only a subregion of the surface acts by the &ldquo;non-default
 options&rdquo; specified for this particular surface. This subregion is defined
@@ -870,80 +870,80 @@ surface&rdquo;) <on the printout file/p>""",
 surface</p>
 <dl>
 <dt>RLBND = 0</dt>
-<dd>No boundary inequalities specified, i.e. the whole surface is seen by the 
+<dd>No boundary inequalities specified, i.e. the whole surface is seen by the
 test particles.</dd>
 <dt>0< RLBND < 2</dt>
-<dd>= 1 Only that part of the surface, which lies inside the right 
-parallelepiped defined by the two vectors (XLIMS1, YLIMS1, ZLIMS1) and 
-(XLIMS2, YLIMS2, ZLIMS2), is seen by the particles. I.e. the three 
+<dd>= 1 Only that part of the surface, which lies inside the right
+parallelepiped defined by the two vectors (XLIMS1, YLIMS1, ZLIMS1) and
+(XLIMS2, YLIMS2, ZLIMS2), is seen by the particles. I.e. the three
 inequalities</dd><br>
 <dd>= 1.5   Complement to RLBND = 1.
 Only the surface element outside the parallelepiped is seen by the particles.
 </dd>
 <dt>RLBND &ge; 2</dt>
 <dd>In this case the surface will be defined by the input of the coordinates of
-at least 2 and at highest 5 points on a plane surface. If there are only 2 
-points, the surface is parallel to one axis.&nbsp;&nbsp; If there are 3 or 
-more points,&nbsp; then the boundary of this plane surface is a closed 
-polygon (<em>P<sub>1</sub></em><em>, ..., P <sub>n</sub></em><em>, 
-P<sub>1</sub></em>). Therefore, the correct order of points at input is 
-relevant.&nbsp; The orientation of the positive surface normal vector is 
-defined by the first&nbsp; 3 points, and it is given by the vector product 
-(<em>P3 </em>- <em>P1 </em>)x(<em>P3</em>- <em>P2 </em>). Thus, the&nbsp; 
-orientation can be reversed e.g. by interchanging <em>P<sub>2</sub></em>&nbsp; 
+at least 2 and at highest 5 points on a plane surface. If there are only 2
+points, the surface is parallel to one axis.&nbsp;&nbsp; If there are 3 or
+more points,&nbsp; then the boundary of this plane surface is a closed
+polygon (<em>P<sub>1</sub></em><em>, ..., P <sub>n</sub></em><em>,
+P<sub>1</sub></em>). Therefore, the correct order of points at input is
+relevant.&nbsp; The orientation of the positive surface normal vector is
+defined by the first&nbsp; 3 points, and it is given by the vector product
+(<em>P3 </em>- <em>P1 </em>)x(<em>P3</em>- <em>P2 </em>). Thus, the&nbsp;
+orientation can be reversed e.g. by interchanging <em>P<sub>2</sub></em>&nbsp;
 and <em>P<sub>3</sub></em>.</dd><br>
-<dd>2.1 plane surface parallel to z axis. The surface equation of this plane 
-eads ax+by+c=0 with the coefficients a,b and c such that the points 
-<em>P<sub>1</sub></em><em>, P<sub>2</sub></em> lie on this surface and the 
-valid part of that surface ranges from <em>P<sub>1</sub></em> to 
-<em>P<sub>2</sub></em> in the xy-plane. The z-coordinates of these two points 
+<dd>2.1 plane surface parallel to z axis. The surface equation of this plane
+eads ax+by+c=0 with the coefficients a,b and c such that the points
+<em>P<sub>1</sub></em><em>, P<sub>2</sub></em> lie on this surface and the
+valid part of that surface ranges from <em>P<sub>1</sub></em> to
+<em>P<sub>2</sub></em> in the xy-plane. The z-coordinates of these two points
 define the boundaries in z direction</dd><br>
 <dd>>= 2.2 Complement to RLBND = 2.1</dd><br>
-<dd>>= 2.4 as RLBND=2.1 option, but with z and y exchanged. I.e., now the y 
-coordinates of the points <em>P<sub>1</sub></em>, <em>P<sub>2</sub></em> are 
+<dd>>= 2.4 as RLBND=2.1 option, but with z and y exchanged. I.e., now the y
+coordinates of the points <em>P<sub>1</sub></em>, <em>P<sub>2</sub></em> are
 the boundaries of the surface ax+bz+c=0 in y direction.</dd><br>
 <dd>>= 2.5Complement to RLBND = 2.4</dd><br>
-<dd>>= 2.7 as RLBND=2.1 option, but with z and x exchanged. I.e., now the x 
-coordinates of the points <em>P<sub>1</sub></em>, <em>P<sub>2</sub></em> are 
+<dd>>= 2.7 as RLBND=2.1 option, but with z and x exchanged. I.e., now the x
+coordinates of the points <em>P<sub>1</sub></em>, <em>P<sub>2</sub></em> are
 the boundaries of the surface ay+bz+c+0 in x direction.</dd><br>
 <dd>>= 2.8 Complement to RLBND = 2.7</dd><br>
-<dd>>= 3 plane triangle defined by the corners style="text-indent: 25px;", 
+<dd>>= 3 plane triangle defined by the corners style="text-indent: 25px;",
 P<sub>2</sub><em>, P<sub>3</sub></em><p><em>P</em>1=(P1(1),P1(2),P1(3))</p>
 <p><em>P</em>2=(P2(1),P2(2),P2(3))</p>
 <p><em>P</em>3=(P3(1),P3(2),P3(3))</p></dd><br>
-<dd>= 3.5 complement to RLBND = 3; only The plane surface outside the triangle 
+<dd>= 3.5 complement to RLBND = 3; only The plane surface outside the triangle
 is seen by the test particles.</dd><br>
 <dd>>= 4 plane quadrangle; surface inside the polygon</p>
-<p>(<em>P<sub>1</sub></em> , <em>P<sub>2</sub></em> , <em>P<sub>4</sub></em> , 
-<em>P<sub>3</sub></em> , <em>P<sub>1</sub></em> ).</p> <p>Here 
-<em>P<sub>1</sub></em> , <em>P<sub>2</sub></em> , 
-<em>P<sub>3</sub></em> are as in the RLBND=3 option, and 
-<em>P<sub>4</sub></em> = (P4(1), P4(2), P4(3)) Thus this surface is the union 
+<p>(<em>P<sub>1</sub></em> , <em>P<sub>2</sub></em> , <em>P<sub>4</sub></em> ,
+<em>P<sub>3</sub></em> , <em>P<sub>1</sub></em> ).</p> <p>Here
+<em>P<sub>1</sub></em> , <em>P<sub>2</sub></em> ,
+<em>P<sub>3</sub></em> are as in the RLBND=3 option, and
+<em>P<sub>4</sub></em> = (P4(1), P4(2), P4(3)) Thus this surface is the union
 of the triangles with vertices <em>P<sub>1</sub></em> , <em>P<sub>2</sub></em>,
 <em>P<sub>3</sub></em> and <em>P<sub>2</sub></em> , <em>P<sub>4</sub></em> ,
 <em>P<sub>3</sub></em> respectively.</dd><br>
-<dd>= 4.5 complement to RLBND = 4; only the part of the plane surface outside 
+<dd>= 4.5 complement to RLBND = 4; only the part of the plane surface outside
 the quad- rangle is seen by the test particles</dd><br>
 <dd>= 5 plane quint-angle; surface inside the polygon (<em>P<sub>1</sub></em> ,
-<em>P<sub>2</sub></em> , <em>P<sub>4</sub></em> , <em>P<sub>5</sub></em> , 
-<em>P<sub>3</sub></em> , <em>P<sub>1</sub></em>) <em>P<sub>1</sub></em> , 
-<em>P<sub>2</sub></em> , <em>P<sub>3</sub></em> , <em>P<sub>4</sub></em> 
+<em>P<sub>2</sub></em> , <em>P<sub>4</sub></em> , <em>P<sub>5</sub></em> ,
+<em>P<sub>3</sub></em> , <em>P<sub>1</sub></em>) <em>P<sub>1</sub></em> ,
+<em>P<sub>2</sub></em> , <em>P<sub>3</sub></em> , <em>P<sub>4</sub></em>
 as RLBND=4, and <em>P<sub>5</sub></em> = (P5(1), P5(2), P5(3))</dd><br>
-<dd>= 5.5 complement to RLBND = 5; only the part of the plane surface outside 
+<dd>= 5.5 complement to RLBND = 5; only the part of the plane surface outside
 the quint- angle is seen by the test particles.</dd><br>
 <dt>RLBND &lt; 0</dt>
 <dd>-KL</dd><br>
-<dd>The surface is bounded by L linear inequalities and by K second order 
+<dd>The surface is bounded by L linear inequalities and by K second order
 inequalities.</dd><br>
-<dd><em>ALIMS </em>+ <em>XLIMS </em>&middot; <em>x </em>+ <em>Y LIMS 
-</em>&middot; <em>y </em>+ <em>ZLIMS </em>&middot; <em>z </em>&le; 0 
+<dd><em>ALIMS </em>+ <em>XLIMS </em>&middot; <em>x </em>+ <em>Y LIMS
+</em>&middot; <em>y </em>+ <em>ZLIMS </em>&middot; <em>z </em>&le; 0
 (L inequalities)</dd><br>
-<dd><em>ALIMS</em>0&nbsp; +&nbsp;&nbsp; <em>XLIMS</em>1 &middot; <em>x 
-</em>+ <em>Y LIMS</em>1 &middot; <em>y </em>+ <em>ZLIMS</em>1 &middot; 
-<em>z</em></p> <p>+&nbsp;&nbsp; <em>XLIMS</em>2 &middot; <em>x<sup>2</sup>; 
+<dd><em>ALIMS</em>0&nbsp; +&nbsp;&nbsp; <em>XLIMS</em>1 &middot; <em>x
+</em>+ <em>Y LIMS</em>1 &middot; <em>y </em>+ <em>ZLIMS</em>1 &middot;
+<em>z</em></p> <p>+&nbsp;&nbsp; <em>XLIMS</em>2 &middot; <em>x<sup>2</sup>;
 </em>+ <em>YLIMS</em>2 &middot; <em>y<sup>2</sup>; </em>+ <em>ZLIMS</em>2
- &middot; <em>z <sup>2</sup></em></p><p>+ <em>XLIMS</em>3 &middot; <em>xy 
- </em>+ <em>YLIMS</em>3 &middot; <em>xz </em>+ <em>ZLIMS</em>3 &middot; 
+ &middot; <em>z <sup>2</sup></em></p><p>+ <em>XLIMS</em>3 &middot; <em>xy
+ </em>+ <em>YLIMS</em>3 &middot; <em>xz </em>+ <em>ZLIMS</em>3 &middot;
  <em>yz </em>&le; 0(K inequalities)
  </dd><br>
 </dl>
@@ -963,7 +963,7 @@ state zero, i.e., neutral particles. By abuse of language, we refer to them as
 &quot;bulk ionsd&quot; as well, but we mean in this case: heavy background
 particles, i.e. more general objects.""",
 
-'NREACI' : """Total number of different reactions to be read.</p> 
+'NREACI' : """Total number of different reactions to be read.</p>
 <dl> <dd><p>The next block has different meanings for &ldquo;real
 particles&rdquo; and &ldquo;photons&rdquo;. Cross section and rate coefficients
 are specified for particles, but emission and absorbtion line shapes are
@@ -1078,9 +1078,9 @@ such files currently available see again section 1.4.</dd> </dl>""",
 
 'DATD' : """<dl> <dd> distribution for sampling the species index of reflected
 or otherwise emitted atoms. <dd>The NATMI relative   <dd>frequencies DATD(IATM)
-IATM = 1,NATMI</dd> 
+IATM = 1,NATMI</dd>
 <dd>are used to produce the corresponding cumulative distribution DATM in order
-to facil- itate sampling (inversion method). Normalization of DATD such 
+to facil- itate sampling (inversion method). Normalization of DATD such
 that</dd>
 <dd><em>&sum;<sub>IATM</sub> </em><em>DATD</em>(<em>IATM</em> ) = 1</dd> <dd>is
 carried out internally.</dd>""",
@@ -1111,16 +1111,16 @@ crossing the surface in positive direction. (not in use)</p>""",
 <dl>
   <dt>&gt; 0 non-transparent surface</dt>
 <dl>
-<dt>= 1 reflecting, partly or purely absorbing surface. local reflection model 
-has to be specified unless default model is to be used; all surface tallies  
+<dt>= 1 reflecting, partly or purely absorbing surface. local reflection model
+has to be specified unless default model is to be used; all surface tallies
 are updated and a switch can be operated.</dt><p></p>
-<dt>= 2 purely absorbing surface ;. surface tallies for incident fluxes are 
+<dt>= 2 purely absorbing surface ;. surface tallies for incident fluxes are
 updated and the particle history is stopped then.</dt><p></p>
-<dt>= 3 mirror for incident test particles. I.e., specular reflection for 
+<dt>= 3 mirror for incident test particles. I.e., specular reflection for
 neutral test particles, and for charged test particles the sign of the velocity
  component parallel to the B-field is reversed.</t><p></p>
-<dt>=m4 periodicity surface, with regard to x, y, or z coordinate, depending 
-upon whether this surface is a standard x, y, or z grid surface, respectively. 
+<dt>=m4 periodicity surface, with regard to x, y, or z coordinate, depending
+upon whether this surface is a standard x, y, or z grid surface, respectively.
 Move particle to x / radial grid surface no. m, m integer (or to y / poloidal
  or to z / toroidal surface no. m, respectively) and continue track from there
   with otherwise identical particle parameters. <br />This option is currently
@@ -1130,27 +1130,27 @@ Move particle to x / radial grid surface no. m, m integer (or to y / poloidal
  author for the current status of your particular version.</dt><p></p>
 </dl>
   <dt>&le; 0 transparent surface (for example: hole in one of the other
- "additional surfaces"). Particle and energy fluxes onto and from these 
+ "additional surfaces"). Particle and energy fluxes onto and from these
  surfaces do not contribute to global balances.</dt><dd>IBM</dd>
 <dl>
 <dt>= 0 Particle history is not interrupted
 No surface tallies are updated, no switches can be operated. Fastest option.
 </dt><p></p>
-<dt>= -1 Particle history will be stopped and restarted. A switch can be 
-operated. I.e., this surface is used only for switching (see below: ILSWCH) 
-or reinitializing the particle's track at the point of intersection. 
+<dt>= -1 Particle history will be stopped and restarted. A switch can be
+operated. I.e., this surface is used only for switching (see below: ILSWCH)
+or reinitializing the particle's track at the point of intersection.
 No surface tallies are updated.</dt><p></p>
-<dt>>= -2 as -1, and, additionally:<p> if a particle is crossing the surface in 
-the positive direction, (one sided-) sur- face tallies are updated, e.g., by 
-default: partial particle and energy currents <em>J<sup>+</sup></em> (Amp) and 
-<em>K<sup>+</sup></em> (Watt). These are stored in the POT... and EOT... 
-tallies of Table. If the paed in the PRF... and ERF... tallies of Table 5.3 
-.article crosses the surface in the direction opposite to the surface normal, 
-then negative partial particle and energy currents <em>J<sup>-</sup></em>; 
-(Amp) and <em>K<sup>-</sup></em>; (Watt) are updated. These are stored in the 
+<dt>>= -2 as -1, and, additionally:<p> if a particle is crossing the surface in
+the positive direction, (one sided-) sur- face tallies are updated, e.g., by
+default: partial particle and energy currents <em>J<sup>+</sup></em> (Amp) and
+<em>K<sup>+</sup></em> (Watt). These are stored in the POT... and EOT...
+tallies of Table. If the paed in the PRF... and ERF... tallies of Table 5.3
+.article crosses the surface in the direction opposite to the surface normal,
+then negative partial particle and energy currents <em>J<sup>-</sup></em>;
+(Amp) and <em>K<sup>-</sup></em>; (Watt) are updated. These are stored in the
 PRF... and ERF... tallies of Table.<p></dt><p></p>
-<dt>= -3 Net currents (e.g. J+ -J-), are evaluated, and stored on the POT... 
-and EOT... tallies (see Table 5.3 ). The PRF... and ERF... tallies are empty 
+<dt>= -3 Net currents (e.g. J+ -J-), are evaluated, and stored on the POT...
+and EOT... tallies (see Table 5.3 ). The PRF... and ERF... tallies are empty
 for these surfaces.</dt><p></p>
 <dt> -4 Not in use. Currently: same as ILIIN=-2 option.</dt><p></p>
 </dl>
@@ -1159,17 +1159,17 @@ for these surfaces.</dt><p></p>
 'ILSIDE' : """<dl>
 <dt>=  0 both sides of the surface act as described by ILIIN option (default).
 </dt>
-<dt>=  1 particles incident on the surface in the negative direction will be 
+<dt>=  1 particles incident on the surface in the negative direction will be
 absorbed (i.e., ILIIN = 2 option from that side).</dt>
-<dt>=  2 particles incident on the surface in the negative direction will be 
+<dt>=  2 particles incident on the surface in the negative direction will be
 killed and the message</dt>
-<dd>"ERROR IN ADDCOL"<br> or <br> "ERROR IN STDCOL" <br> will be printed. The 
-contribution of these particles to the particle- and energy flux balances will 
-be called PTRASH and ETRASH respectively. This option should be used for 
-geometry testing whenever the user expects particles incident only from one 
+<dd>"ERROR IN ADDCOL"<br> or <br> "ERROR IN STDCOL" <br> will be printed. The
+contribution of these particles to the particle- and energy flux balances will
+be called PTRASH and ETRASH respectively. This option should be used for
+geometry testing whenever the user expects particles incident only from one
 side.</dd>
-<dt>=  3 particles incident on the surface in the negative direction will 
-not see the surface, i.e., this surface acts like a (semi) transparent surface 
+<dt>=  3 particles incident on the surface in the negative direction will
+not see the surface, i.e., this surface acts like a (semi) transparent surface
 (ILIIN = 0 option) from that side.</dt>
 <dt>= -1 as 1, but with the opposite direction of the surface normal</dt>
 <dt>= -2 as 2, but with the opposite direction of the surface normal</dt>
@@ -1181,55 +1181,55 @@ not see the surface, i.e., this surface acts like a (semi) transparent surface
 <dt>= 0 no switch is operated</dt>
 <dt>N EIRENE flag ITIME</dt><dd><p>N = 1   The calculation of the step sizes in
  the standard mesh is abandoned for a
-particle which crosses the surface in the positive direction, and is 
+particle which crosses the surface in the positive direction, and is
 reactivated,
 if the particle strikes in the negative direction</p><p>
-N = 2   as 1, but with the direction of the surface normal reversed for this 
+N = 2   as 1, but with the direction of the surface normal reversed for this
 option.</p></dd>
-<dt>M EIRENE flag IFPATH</dt><dd><p>M = 1   Abandon the calculation of the 
+<dt>M EIRENE flag IFPATH</dt><dd><p>M = 1   Abandon the calculation of the
 collision rates (entry into the vacuum) for
-a particle which is striking the surface in the direction of the surface 
+a particle which is striking the surface in the direction of the surface
 normal.
-For particles incident from the other direction, evaluation of collision rates 
+For particles incident from the other direction, evaluation of collision rates
 is
 reactivated.</p><p>M = 2 as 1, but with the direction of the surface normal
  reversed.</p></dd>
-<dt>L EIRENE flag IUPDTE</dt><dd><p>L = 1   Abandon the updating of 
+<dt>L EIRENE flag IUPDTE</dt><dd><p>L = 1   Abandon the updating of
 volume-averaged tallies for a particle which is
-striking the surface in the direction of the surface normal. For particles 
-incident from the other direction, updating of volume averaged tallies is 
-reactivated.</p><p>L = 2 as 1, but with the direction of the surface normal 
+striking the surface in the direction of the surface normal. For particles
+incident from the other direction, updating of volume averaged tallies is
+reactivated.</p><p>L = 2 as 1, but with the direction of the surface normal
 reversed for this option.</p></dd>
-<dt>I,J,K flags for switching cell numbers at transition into a different mesh 
+<dt>I,J,K flags for switching cell numbers at transition into a different mesh
 cell.</dt>
-<dt>K for particles in an additional cell, i.e., not in one of the "standard 
-mesh" blocks:</dt><dd><p>K = 1   Increase the actual additional cell number 
-NACELL for a particle striking the surface in the direction of the surface 
-normal by ILACLL. Decrease NACELL by ILACLL if the particle is striking in the 
-negative direction. Specification of ILACLL is via the input variable ILCELL, 
+<dt>K for particles in an additional cell, i.e., not in one of the "standard
+mesh" blocks:</dt><dd><p>K = 1   Increase the actual additional cell number
+NACELL for a particle striking the surface in the direction of the surface
+normal by ILACLL. Decrease NACELL by ILACLL if the particle is striking in the
+negative direction. Specification of ILACLL is via the input variable ILCELL,
 see below.</p><p>
-K = 2   as K = 1,  but with the direction of the surface normal reversed for 
+K = 2   as K = 1,  but with the direction of the surface normal reversed for
 this
-option.</p><p>for particles inside the "standard mesh ", i.e., not in the 
+option.</p><p>for particles inside the "standard mesh ", i.e., not in the
 "additional cell region"</p><p>K = 1   Increase the standard mesh block number
  NBLOCK for a particle strik-
 ing the surface in the direction of the surface normal by ILBLCK. Decrease
-NBLOCK  by  ILBLCK  if  the  particle  is  striking  in  the  negative  
+NBLOCK  by  ILBLCK  if  the  particle  is  striking  in  the  negative
 direction.
 Specification of ILBLCK is via the input variable ILCELL, see below.</p><p>K
  = 2 as K = 1, but with the direction of the surface normal reversed.</p></dd>
 <dt>J for particles at the boundary between "additional" and "standard" mesh
- regions.</dt><br><dd> = 1   entrance into standard mesh, block no. 
-NBLOCK = ILBLCK or exit from standard mesh into additional cell NACELL = 
+ regions.</dt><br><dd> = 1   entrance into standard mesh, block no.
+NBLOCK = ILBLCK or exit from standard mesh into additional cell NACELL =
 ILACLL.
 Specification of ILACLL and ILBLCK is via the input variable ILCELL, see
 below.  If ILACLL = 0, then no switch to additional cell is operated.  (E.g.:
-for surfaces which are reflecting from this side).</dd><br><dd>J = 2 as J = 1. 
+for surfaces which are reflecting from this side).</dd><br><dd>J = 2 as J = 1.
 The direction of the surface normal does not matter here.</dd><br>
-<dt>I similar to J-flag, i.e., for transitions between standard and additional 
+<dt>I similar to J-flag, i.e., for transitions between standard and additional
 meshes, but
-different cell number switching.</dt><br><dd>I = 1   Entrance into standard 
-mesh, block no. NBLOCK = NACELL+ILBLCK, if the particle is striking in the 
+different cell number switching.</dt><br><dd>I = 1   Entrance into standard
+mesh, block no. NBLOCK = NACELL+ILBLCK, if the particle is striking in the
 positive direction, or
 NBLOCK = NACELL-ILBLCK,
 if the particle is striking in the negative direction.  Exit from standard mesh
@@ -1239,13 +1239,13 @@ for a particle striking the surface in the positive direction, or
 NACELL = NBLOCK-ILACLL,
 if the particle is striking in the negative direction.
 Specification of ILACLL and ILBLCK is via the input variable ILCELL, see
-below.</dd><br><dd>I = 2 as I = 1, but with the direction of the surface 
+below.</dd><br><dd>I = 2 as I = 1, but with the direction of the surface
 normal reversed.</dd>
-<dd>If a test particle history starts from a surface (NLSRF option), then 
+<dd>If a test particle history starts from a surface (NLSRF option), then
 ILSWCH acts as if
-this particle had struck the surface prior to the birth process in the 
+this particle had struck the surface prior to the birth process in the
 positive direction.
-This default setting is only available for ILSIDE 6=0 and can (must) be 
+This default setting is only available for ILSIDE 6=0 and can (must) be
 overruled by
 the SORIFL flag , e.g.  if a surface source needs to be defined on a
 surface with ILSIDE = 0.</dd>
@@ -1312,19 +1312,19 @@ element grids can be combined with the regular grids by using the problem
 specific geometry routines (see section 3) or the code interfacing routines
 INFCOP (see section 4).</p>""",
 
-'RINTEG' : """<dl> 
+'RINTEG' : """<dl>
 <dt>>0</dt>
-<dd> Fixed (independent of energy and angle ofincidence) particle 
-reflection co- efficient. <br>The fast particle reflection probabilities 
-RPROBF are set to <em>p<sub>f</sub>= MIN(1 - p<sub>a</sub>,RINTEG)</em>, 
-regardless of the reflection model selected by the flag ILREF in block 6B.  
-<em>p<sub>a</sub></em> is kept as specified, and <em>p<sub>t</sub></em> is 
-then recomputed as <em>p<sub>t</sub> = 1 - p<sub>f</sub> - p<sub>a</sub></em>. 
-<em>RINTEG &ge; 1 - p<sub>a</sub></em> enforces the fast particle reflection 
-model for all un-pumped incident particles, i.e., RINTEG is internally reset 
-<em>to 1 - p<sub>a</sub></em>.</dd><br> 
-<dt>=0</dt> 
-<dd>Default: fast particle 
+<dd> Fixed (independent of energy and angle ofincidence) particle
+reflection co- efficient. <br>The fast particle reflection probabilities
+RPROBF are set to <em>p<sub>f</sub>= MIN(1 - p<sub>a</sub>,RINTEG)</em>,
+regardless of the reflection model selected by the flag ILREF in block 6B.
+<em>p<sub>a</sub></em> is kept as specified, and <em>p<sub>t</sub></em> is
+then recomputed as <em>p<sub>t</sub> = 1 - p<sub>f</sub> - p<sub>a</sub></em>.
+<em>RINTEG &ge; 1 - p<sub>a</sub></em> enforces the fast particle reflection
+model for all un-pumped incident particles, i.e., RINTEG is internally reset
+<em>to 1 - p<sub>a</sub></em>.</dd><br>
+<dt>=0</dt>
+<dd>Default: fast particle
 reflection probability as defined by the reflection model chosen.
 </dd><br>
 <dt><0</dt>
@@ -1337,9 +1337,9 @@ set to 1.0, i.e., even pump- ing is turned off (as distinct from the choice
 
 'EINTEG' : """<dl>
 <dt>>0</dt>
-<dd> Fixed (independent of energy and angle of incidence) energy reflection 
-coefficient. 
-<br>particle reflection model by an reflection assumption: <em>E<sub>out</sub> 
+<dd> Fixed (independent of energy and angle of incidence) energy reflection
+coefficient.
+<br>particle reflection model by an reflection assumption: <em>E<sub>out</sub>
 = E<sub>in</sub> &middot. EINTEG.</em>
 </dd><br>
 <dt>=0</dt>
@@ -1347,8 +1347,8 @@ coefficient.
  fast particle reflection.
 </dd><br>
 <dt><0</dt>
-<dd>elastic <em>(E<sub>out</sub> = E<sub>in</sub>)</em> reflection for all 
-particles reflected according to the fast particle reflection model. Hence: 
+<dd>elastic <em>(E<sub>out</sub> = E<sub>in</sub>)</em> reflection for all
+particles reflected according to the fast particle reflection model. Hence:
 same as <em>EINTEG=1.0.</em>
 </dd>
 </dl>""",
@@ -1356,18 +1356,18 @@ same as <em>EINTEG=1.0.</em>
 'AINTEG' : """<dl>
 <dt>>0</dt>
 <dd> (not ready to use) <br>
-Fixed (independent of energy and angle of incidence) momentum reflection 
+Fixed (independent of energy and angle of incidence) momentum reflection
 coefficient.<br>
 This choice replaces the angle random sampling procedure in the fast particle
 reflection model by a momentum reflection assumption such that, on average:
 <em>v&#772;<sub>out</sub> = v<sub>in</sub> &middot; AINTEG</em>.
 </dd><br>
 <dt>=0</dt>
-<dd>Default: no modification of angular distributions in reflection model for 
+<dd>Default: no modification of angular distributions in reflection model for
 fast particle reflection.
 </dd><br>
 <dt><0</dt>
-<dd>specular reflection for all particles reflected according to the fast 
+<dd>specular reflection for all particles reflected according to the fast
 particle reflection model.</em>
 </dd>
 </dl>
@@ -1408,7 +1408,7 @@ only for E<sub>in</sub> > ERCUT and for normal incidence &theta;<sub>in</sub> =
 coefficient p<sub>f</sub>(E<sub>in</sub> , &theta;<sub>in</sub> = 0) is
 replaced by a smooth cubic interpolation curve p<sub>f</sub>(E<sub>in</sub>)
 such that p<sub>f</sub>(0) = RPROBF .</p>
-<p>The original <quote>Behrisch Matrix</quote> is recovered by setting ERCUT 
+<p>The original <quote>Behrisch Matrix</quote> is recovered by setting ERCUT
 &le; <0./p>""",
 
 'RPROB0' : """<p>These variables may be used to modify the default
@@ -1420,7 +1420,7 @@ only for E<sub>in</sub> > ERCUT and for normal incidence &theta;<sub>in</sub> =
 coefficient p<sub>f</sub>(E<sub>in</sub> , &theta;<sub>in</sub> = 0) is
 replaced by a smooth cubic interpolation curve p<sub>f</sub>(E<sub>in</sub>)
 such that p<sub>f</sub>(0) = RPROBF .</p>
-<p>The original <quote>Behrisch Matrix</quote> is recovered by setting ERCUT 
+<p>The original <quote>Behrisch Matrix</quote> is recovered by setting ERCUT
 &le; <0./p>""",
 
 'ILREF' : """Flag for choice of local reflection model
@@ -1435,8 +1435,8 @@ such that p<sub>f</sub>(0) = RPROBF .</p>
 Default: ILREF = 2""",
 
 'ILSPT' : """Flag for choice of local sputtering model.<br>
-Let ILSPT = MN, with M and N single digit integers each. Then N controls the 
-options for physical sputtering, and M controls chemical sputtering. See 
+Let ILSPT = MN, with M and N single digit integers each. Then N controls the
+options for physical sputtering, and M controls chemical sputtering. See
 subroutine SPUTER.
 <dl>
 <dt>N=0</dt>
@@ -1444,7 +1444,7 @@ subroutine SPUTER.
 <dt>N=1</dt>
 <dd>constant physical sputtering rate (see parameter RECYCS below)</dd>
 <dt>N=2</dt>
-<dd>modified Roth-Bogdansky formula for sputter yield, Thompson energy 
+<dd>modified Roth-Bogdansky formula for sputter yield, Thompson energy
 distribution  and cosine angular distribution for emitted particles.</dd>
 <dt>N=9</dt>
 <dd>(was option N=3 in Eirene-2004 and older)<br>
@@ -1455,7 +1455,7 @@ REFUSR)</dd>
 <dt>M=1</dt>
 <dd>constant chemical sputtering rate</dd>
 <dt>M=2</dt>
-<dd>"Roth formula" for chemical sputter yield, thermal distribution for 
+<dd>"Roth formula" for chemical sputter yield, thermal distribution for
 emitted particles , "weak flux dependence option A6".</dd>
 <dt>M=3</dt>
 <dd>"Roth formula" for chemical sputter yield, thermal distribution for emitted
@@ -1468,7 +1468,7 @@ emitted particles , "weak flux dependence option A6".</dd>
 <dt>M=6</dt>
 <dd>"Haasz-Davis 1998 formula" for chemical sputter yield</dd>
 <dt>M=7</dt>
-<dd>"Haasz-Davis 1998 formula" for chemical sputter yield, and multiplicative 
+<dd>"Haasz-Davis 1998 formula" for chemical sputter yield, and multiplicative
 factor for flux dependence (Roth, 2004).</dd>
 <dt>M=9</dt>
 <dd>(was option N=3 in Eirene-2004 and older)
@@ -1480,63 +1480,63 @@ Default: ILSPT=0""",
 'ISRS' : """sputtered particle species flag (physical sputtering).
 <dl>
 <dt>>0</dt>
-<dd>both the sputtered particle and the reflected particle (if any) will be 
+<dd>both the sputtered particle and the reflected particle (if any) will be
 followed. Their contribution to surface particle and energy fluxes is stored in
  surface averaged tallies 1 to 24, i.e., sputtered particles are not explicitly
- distinguished from reflected particles in the particle and energy balances. 
-Furthermore the "sputtered flux surface tallies" 33 to 37 (5.1.2 in older 
-versions before 2002, and on tallies 51 to 81, (5.1.1) else, are also updated. 
-The species index of the sputtered particle (atom) is IATM=ISRS. Hence, on 
+ distinguished from reflected particles in the particle and energy balances.
+Furthermore the "sputtered flux surface tallies" 33 to 37 (5.1.2 in older
+versions before 2002, and on tallies 51 to 81, (5.1.1) else, are also updated.
+The species index of the sputtered particle (atom) is IATM=ISRS. Hence, on
 input, one must have 1 &le; ISRS &le; NATMI, otherwise: error exit.</dd>
 <dt>&le;0</dt>
-<dd>Same as ISRS > 0, however, the species index of the sputtered particle is 
-determined automatically from comparing the charge and mass numbers of the 
-available atomic species (input block 4a) with the corresponding surface 
-material (nuclear mass and charge) data of the surface element. If no suitable 
-atomic test particle is is found, then only sputter tallies are scored, but no 
+<dd>Same as ISRS > 0, however, the species index of the sputtered particle is
+determined automatically from comparing the charge and mass numbers of the
+available atomic species (input block 4a) with the corresponding surface
+material (nuclear mass and charge) data of the surface element. If no suitable
+atomic test particle is is found, then only sputter tallies are scored, but no
 sputtered particles are then subsequently traced.</dd>
 <dt>=0</dt>
 <dd>same as ISRS &le; 0, but in this case a sputtered particle is NOT followed,
- even if its atomic test particle species could be identified. Only the 
-reflected particles are followed. and only their contribution to surface 
-particle and energy fluxes is stored in regular surface averaged tallies 1 to 
+ even if its atomic test particle species could be identified. Only the
+reflected particles are followed. and only their contribution to surface
+particle and energy fluxes is stored in regular surface averaged tallies 1 to
 24. Sputter tallies are still scored.</dd>
 </dl>
-Note: ISRS=ISRS(ISPZ,MSURF), so the above described options for sputtered 
-particle species, as well as for either only scoring fluxes or even tracing 
-these sputtered particles, can be made dependent on the incident species index 
+Note: ISRS=ISRS(ISPZ,MSURF), so the above described options for sputtered
+particle species, as well as for either only scoring fluxes or even tracing
+these sputtered particles, can be made dependent on the incident species index
 ISPZ.""",
 
 'ISRC' : """sputtered particle species flag (physical sputtering).
 <dl>
 <dt>>0</dt>
-<dd>both the sputtered particle and the reflected particle (if any) will be 
+<dd>both the sputtered particle and the reflected particle (if any) will be
 followed. Their contribution to surface particle and energy fluxes is stored in
  surface averaged tallies 1 to 24, i.e., sputtered particles are not explicitly
- distinguished from reflected particles in the balances. Furthermore the 
+ distinguished from reflected particles in the balances. Furthermore the
 "sputtered flux surface tallies" 25 to 28 are updated. The species index of the
- sputtered particle (atom) is IATM=ISRC, if ISRC&le;NATMI, or (molecules) IMOL, 
+ sputtered particle (atom) is IATM=ISRC, if ISRC&le;NATMI, or (molecules) IMOL,
 if ISRC = NATMI+IMOL and NATMI < ISRC &le; NATMI+NMOLI. Hence, on input, ISRC
 &le; NATMI+NMOLI.</dd>
 <dt>&le;0</dt>
-<dd>There is no chemical sputtering for the particular surface element and 
+<dd>There is no chemical sputtering for the particular surface element and
 incident species (note: ISRC=ISRC(ISPZ,MSURF), i.e., p<sub>c</sub> = 0 here.
-Only the reflected particles are followed. Their contribution to surface 
+Only the reflected particles are followed. Their contribution to surface
 particle and energy fluxes is stored in surface averaged tallies 1 to 24.</dd>
 <dt>=0</dt>
-<dd>Same as ISRC > 0, however, the species index of the sputtered particle is 
-determined automatically from comparing the charge and mass numbers of the 
-atomic species (input block 4a) with the corresponding data of the surface 
-element. I.e., in case of Carbon surfaces the sputtered particle is a C-atom, 
+<dd>Same as ISRC > 0, however, the species index of the sputtered particle is
+determined automatically from comparing the charge and mass numbers of the
+atomic species (input block 4a) with the corresponding data of the surface
+element. I.e., in case of Carbon surfaces the sputtered particle is a C-atom,
 if such an atom has been specified in input block 4a</dd>
 </dl>""",
 
 'ZNML' : """= KLMN (4 digits)
 <dl>
 <dt>KL</dt>
-<dd>atomic weight of wall material. Note: the nearest integer of the mass 
-number in the TRIM runs is used. For example, a copper target is specified in 
-the TRIM files with an atomic weight of 63.54, and the corresponding TRIM file 
+<dd>atomic weight of wall material. Note: the nearest integer of the mass
+number in the TRIM runs is used. For example, a copper target is specified in
+the TRIM files with an atomic weight of 63.54, and the corresponding TRIM file
 is used for surfaces with KL=64.</dd>
 <dt>MN</dt>
 <dd>nuclear charge number of wall material</dd>
@@ -1548,8 +1548,8 @@ Default: ZNML = 5.626E3 (stands for Fe).""",
 
 'EWALL' : """<dl>
 <dt><0</dt>
-<dd>-EWALL = TW is a (surface-) temperature (eV) in a Maxwellian flux 
-distribution for the thermal particle energy. The resulting mean energy is 
+<dd>-EWALL = TW is a (surface-) temperature (eV) in a Maxwellian flux
+distribution for the thermal particle energy. The resulting mean energy is
 E<sub>mean</sub>= 2 &middot; T W .</dd>
 <dt>> 0</dt>
 <dd>+EWALL = Energy of mono-energetic (thermal) particles.
@@ -1561,78 +1561,78 @@ below) as parameter for the surface binding energy</dd>
 </dl>
 Default: EWALL = +0.0388 ( TW &cong; 0.026 eV &cong; 300 K)<br>
 Note that the EW ALL > 0 option enables EIRENE to include boundary conditions
-in "one speed transport equation" approximations, which often are of great 
+in "one speed transport equation" approximations, which often are of great
 interest in general linear transport theory.""",
 
-'EWBIN' : """see EWALL = 0 option.<br>Default: EWBIN = 0.0 (irrelevant for 
+'EWBIN' : """see EWALL = 0 option.<br>Default: EWBIN = 0.0 (irrelevant for
 "Default Model")""",
 
-'TRANSP(1,N)' : """Semi-transparency for particles incident from the positive 
-side. Renders a nontransparent surface (ILIIN > 0) semi-transparent. The 
-probability for passing through the surface is TRANSP. Hence: the probability 
+'TRANSP(1,N)' : """Semi-transparency for particles incident from the positive
+side. Renders a nontransparent surface (ILIIN > 0) semi-transparent. The
+probability for passing through the surface is TRANSP. Hence: the probability
 for reflection/re-emission etc. is 1-TRANSP.<br>
 Default: 0.0 (i.e., fully reflecting surface).<br>
 Irrelevant for transparent surfaces.""",
 
-'TRANSP(2,N)' : """Semi-transparency for particles incident from the negative 
+'TRANSP(2,N)' : """Semi-transparency for particles incident from the negative
 side on a non-transparent surface.<br>
 Default: 0.0 (i.e., fully reflecting surface).<br>
 Irrelevant for transparent surfaces.""",
 
-'FSHEAT' : """surface sheath potential factor. The sheath potential is 
-<em>FSHEAT &middot; T<sub>e</sub></em> with T<sub>e</sub> the electron 
-temperature at the point of incidence. This sheath potential is applied if 
-ions (test ions or bulk ions) hit a non-transparent surface.<br> 
-If FSHEAT &le; 0.0, then a sheath potential computed from the local background 
-plasma flow conditions is used (function SHEATH), assuming ambi-polar flow, a 
-Boltzmann distribution for electrons and zero secondary electron emission. 
+'FSHEAT' : """surface sheath potential factor. The sheath potential is
+<em>FSHEAT &middot; T<sub>e</sub></em> with T<sub>e</sub> the electron
+temperature at the point of incidence. This sheath potential is applied if
+ions (test ions or bulk ions) hit a non-transparent surface.<br>
+If FSHEAT &le; 0.0, then a sheath potential computed from the local background
+plasma flow conditions is used (function SHEATH), assuming ambi-polar flow, a
+Boltzmann distribution for electrons and zero secondary electron emission.
 See section 1.5. In case of zero (undefined) background plasma flow velocity at
- the place of incidence, a default of FSHEAT = 2.8 is used (corresponding to 
-T<sub>e</sub> = T<sub>i</sub>, and a single ion species D<sup>+</sup> plasma 
+ the place of incidence, a default of FSHEAT = 2.8 is used (corresponding to
+T<sub>e</sub> = T<sub>i</sub>, and a single ion species D<sup>+</sup> plasma
 flowing at ion acoustic speed parallel to the B-field into the sheath.<br>
 Default: FSHEAT=0.0""",
 
 'RECYCF' : """<p>Multiplier for reflection probability RPROBF:</p>
-<p<>Particles can be re-emitted from surfaces by either the "fast reflection" 
+<p<>Particles can be re-emitted from surfaces by either the "fast reflection"
 model or by a "thermal emission" model. Flag RECYCF controls (scales) the "fast
  particle reflection" probability p<sub>f</sub> .</p>
-<p>The probability <em>p<sub>f</sub> = RPROBF (E<sub>in</sub> , 
-&theta;<sub>in</sub> , ispez, wall)</em> for the "fast" particle reflection 
+<p>The probability <em>p<sub>f</sub> = RPROBF (E<sub>in</sub> ,
+&theta;<sub>in</sub> , ispez, wall)</em> for the "fast" particle reflection
 model, as specified by other flags for this surface, is modified to<br>
-<em>RPROBF (E<sub>in</sub> , &theta;<sub>in</sub> , ispez, wall) = AMIN 
+<em>RPROBF (E<sub>in</sub> , &theta;<sub>in</sub> , ispez, wall) = AMIN
 (RECYCF &middot; RPROBF, RECYCT )</em>,<br>
-where RPROBF was evaluated from the reflection model specified by ILREF. 
+where RPROBF was evaluated from the reflection model specified by ILREF.
 Note the cut-off at recycling coefficient RECYCT (defined below).</p>
-<p>The total recycling coefficient RECYCT = p<sub>f</sub> + p<sub>t</sub> is 
+<p>The total recycling coefficient RECYCT = p<sub>f</sub> + p<sub>t</sub> is
 unchanged by flag RECYCF.</p>
-<p>Hence, by the use of RECYCF not only the fast particle reflection 
-probability, but also the probability for thermal particle emission 
-p<sub>t</sub> is altered to maintain a total recycling coefficient at this 
+<p>Hence, by the use of RECYCF not only the fast particle reflection
+probability, but also the probability for thermal particle emission
+p<sub>t</sub> is altered to maintain a total recycling coefficient at this
 surface of RECYCT.</p>
 Default: RECYCF = 1 for incident atoms, test ions and bulk ions.<br>
 Default: RECYCF = RPROBF = 0 for incident molecules.""",
 
 'RECYCT' : """Recycling coefficient (must not be negative):<br>
-<p>A flux RECYCT &middot; Influx is re-emitted from a surface, for any Influx 
-of particles of any species, where all fluxes are measured as "atomic fluxes" 
-(=fluxes of nuclei). RECYCT hence defines the sticking probability p a [and 
-hence also the pumping speed (6.7)] of any surface in EIRENE, for all incident 
+<p>A flux RECYCT &middot; Influx is re-emitted from a surface, for any Influx
+of particles of any species, where all fluxes are measured as "atomic fluxes"
+(=fluxes of nuclei). RECYCT hence defines the sticking probability p a [and
+hence also the pumping speed (6.7)] of any surface in EIRENE, for all incident
 species.</p>
-<p>The fraction p<sub>a</sub> = (1 - RECYCT) of incident (atomic) flux will be 
-absorbed at the surface. The non-sticking, i.e. the re-emitted fraction 
+<p>The fraction p<sub>a</sub> = (1 - RECYCT) of incident (atomic) flux will be
+absorbed at the surface. The non-sticking, i.e. the re-emitted fraction
 RECYCT = 1 - p<sub>a</sub> is split into a "fast" and a "thermal" component.
 </p>
-<p>A fraction p<sub>f</sub>= RPROBF [see (6.6)] of the incident particles is 
-reflected as described by the "fast particle reflection model". However, by 
-relation (6.6) it is ensured that RPROBF is always less than or equal to 
+<p>A fraction p<sub>f</sub>= RPROBF [see (6.6)] of the incident particles is
+reflected as described by the "fast particle reflection model". However, by
+relation (6.6) it is ensured that RPROBF is always less than or equal to
 RECYCT.</p>
-<p>The fraction p<sub>t</sub> = RPROBT = (RECYCT - RPROBF) will be re-emitted 
-by the "thermal particle reflection model". This flag is to be used to define 
+<p>The fraction p<sub>t</sub> = RPROBT = (RECYCT - RPROBF) will be re-emitted
+by the "thermal particle reflection model". This flag is to be used to define
 an effective pumping speed at certain surfaces, see paragraph 2.6.1 below.</p>
 Note: RPROBF = 0 for incident molecules (ITYP=2) by default.<br>
 Default: RECYCT = 1. , i.e. p a = 0""",
 
-'RECPRM' : """free model parameter for user supplied recycling models ILREF = 
+'RECPRM' : """free model parameter for user supplied recycling models ILREF =
 9. Default: RECPRM = 0.""",
 
 'EXPPL' : """(only for ILREF = 2 option)<br>
@@ -1652,20 +1652,20 @@ Default: EXPPL = 1. (recommended from a comparison with the TRIM database)""",
 Default: EXPEL = 0.5 (recommended from a comparison with the TRIM database). e2
 = EXPEL, see equations 4.61 and 4.62""",
 
-'EXPIL' : """Index for angular distribution of re-emitted atom or molecule; 
+'EXPIL' : """Index for angular distribution of re-emitted atom or molecule;
 affects both models ILREF = 1 and ILREF = 2<br>
 <dl><dt>EXPIL=0</dt>
-<dd>cosine distribution, independent of choice of fast particle reflection 
+<dd>cosine distribution, independent of choice of fast particle reflection
 model</dd>
 <dt>EXPIL > 0</dt>
 <dd>mixed cosine-specular model.<br>
 In case of ILREF=1 the angular distribution given by the database is used.<br>
 In case of ILREF=2 the specular contribution increases according to equations
-4.63 with angle of incidence &Theta; and with e3 = EXPIL (recommended: EXP IL 
+4.63 with angle of incidence &Theta; and with e3 = EXPIL (recommended: EXP IL
 &le;1).</dd></dl>
 Default: EXPIL = 0.""",
 
-'RECYCS' : """The meaning of this flag for the "physical sputtering" options 
+'RECYCS' : """The meaning of this flag for the "physical sputtering" options
 depends upon the value of the first digit N of ILSPT:<br>
 <dl><dt>N=0</dt>
 <dd>no physical sputtering, YIELD1 = 0. RECYCS is irrelevant.</dd>
@@ -1682,7 +1682,7 @@ YIELD1 = RECY S &middot; YIELD1.</dd>
 sputter model for any particular surface element.</dd></dl>
 Default: RECYCS = 1.""",
 
-'RECYCC' : """The meaning of this flag for the "chemical sputtering" options 
+'RECYCC' : """The meaning of this flag for the "chemical sputtering" options
 depends upon the mvalue of the second digit M of ILSPT:<br>
 <dl><dt>M=0</dt>
 <dd>no chemical sputtering, YIELD2 = 0. RECYCC is irrelevant.</dd>
@@ -1698,18 +1698,18 @@ from subroutine SPUTER is modified to YIELD2 = RECYCC &middot; YIELD2.</dd>
 sputter model for any particular surface element.</dd></dl>
 Default: RECYCC = 1.""",
 
-'SPTPRM' : """free model parameter for user supplied sputtering models N=3, 
+'SPTPRM' : """free model parameter for user supplied sputtering models N=3,
 M=3.<br> Default: SPTPRM = 0.""",
 
-'ESPUTC' : """(new: March 2015) parameter (flag) for energy of chemically 
-sputtered particle. By default: chemically sputtered particles are released 
-from the wall by the "thermal surface emission model", as also used for the 
-recycling/reflection thermal emission, i.e. with wall temperature 
-(as specified by EWALL parameter, see above) and either a cosine 
+'ESPUTC' : """(new: March 2015) parameter (flag) for energy of chemically
+sputtered particle. By default: chemically sputtered particles are released
+from the wall by the "thermal surface emission model", as also used for the
+recycling/reflection thermal emission, i.e. with wall temperature
+(as specified by EWALL parameter, see above) and either a cosine
 (for monoenergetic emission at EWALL = 1.5 TWALL) angular distribution, or
 sampling from a stationary Maxwellian flux distribution at -EWALL = TWALL.<br>
-If ESPUTC .GT. 0, then the the chemically sputtered particles are released with 
- a monoenergetic distribution at E0 = ESPUTC, and a cosine angular 
+If ESPUTC .GT. 0, then the the chemically sputtered particles are released with
+ a monoenergetic distribution at E0 = ESPUTC, and a cosine angular
 distribution.<br>Default: ESPUTC = 0.""",
 
 'ESPUTS' : """(new: March 2015) parameter (flag) for energy of physically
@@ -1730,16 +1730,16 @@ sources&quot;. The first four are uniform in a time-interval (or time-
 independent), and the fifth one is an initial distribution (in volume) at a
 given point in time.""",
 
-'NSTRAI' : """Number of different sources ("Strata"), which are computed one 
+'NSTRAI' : """Number of different sources ("Strata"), which are computed one
 after the other and are linearly superimposed at the end of the run.<br>
 (NSTRAI &le: NSTRA, see "Parameter-Statements")""",
 
-'INDSRC' : """<p>INDSRC(ISTRA)=0-5 the input data for stratum ISTRA are read 
-here, but may be modified in some user routine (SAMUSR) or interface routine 
+'INDSRC' : """<p>INDSRC(ISTRA)=0-5 the input data for stratum ISTRA are read
+here, but may be modified in some user routine (SAMUSR) or interface routine
 (INFCOP, at entry IF2COP(ISTRA))</p>
-<p/INDSRC(ISTRA)=6 no input data for stratum ISTRA are read here. The 
-definition of this stratum must be entirely in some problem specific routine 
-(IF2COP, etc.). See section 3.4 for one such example, namely the default 
+<p/INDSRC(ISTRA)=6 no input data for stratum ISTRA are read here. The
+definition of this stratum must be entirely in some problem specific routine
+(IF2COP, etc.). See section 3.4 for one such example, namely the default
 surface recycling source model as specified in coupled B2-EIRENE runs.</p><p>
 INDSRC(ISTRA)=-1 the input data for stratum ISTRA are read here, and no attempt
 is made to modify these. I.e. IF2COP(ISTRA) is not called.</p>""",
@@ -1747,12 +1747,12 @@ is made to modify these. I.e. IF2COP(ISTRA) is not called.</p>""",
 'ALLOC' : """Allocation of CPU-time to stratum weighted as
 (1-ALLOC)*NPTS+ALLOC*FLUX""",
 
-'AMPTS' : """(available since 2014 in master version) Multiplier, used 
-simultaneously for permitted total CPU time NTCPU (input block 1), and for 
-specified number of MC histories NPTS(ISTRA) (see below). Default: 
+'AMPTS' : """(available since 2014 in master version) Multiplier, used
+simultaneously for permitted total CPU time NTCPU (input block 1), and for
+specified number of MC histories NPTS(ISTRA) (see below). Default:
 AMPTS=1.0""",
 
-'TXTSOU' : """Text to characterize the stratum (name of the source) on the 
+'TXTSOU' : """Text to characterize the stratum (name of the source) on the
 printout file.""",
 
 'NLAVRP' : """= .TRUE. not in use""",
@@ -1760,9 +1760,9 @@ printout file.""",
 'NLAVRT' : """= .TRUE. not in use""",
 
 'NLSYMP' : """= .TRUE.<br>
-Symmetrize profiles with respect to poloidal (y-) co-ordinate x<sup>2</sup> , 
-i.e., with respect to the poloidal surface x<sup>2</sup> = PSURF((NP2ND+1)/2) 
-in case NP2ND is an odd integer, or with respect to the cell center 
+Symmetrize profiles with respect to poloidal (y-) co-ordinate x<sup>2</sup> ,
+i.e., with respect to the poloidal surface x<sup>2</sup> = PSURF((NP2ND+1)/2)
+in case NP2ND is an odd integer, or with respect to the cell center
 x<sup>2</sup> = PZONE(NP2ND/2) in case NP2ND is an even integer.""",
 
 'NLSYMT' : """same as NLSYMP, but for toroidal (z-) co-ordinate, i.e., for
@@ -1771,33 +1771,33 @@ toroidal surface TSURF((NT3RD+1)/2) or TZONE(NT3RD/2) respectively.""",
 'NPTS' : """<dl>
 <dt>> 0</dt>
 <dd> Maximum number of test particle histories.<br>
-If there is more than one stratum (NSTRAI > 1) then the total CPU-time NTIME 
-(input block 1) will be distributed proportional to NPTS to the single strata. 
-NPTS is the maximum number of test-particles only if sufficient CPU time is 
-available. Otherwise a message "NO FURTHER COMPUTATION TIME FOR THIS STRATUM" 
+If there is more than one stratum (NSTRAI > 1) then the total CPU-time NTIME
+(input block 1) will be distributed proportional to NPTS to the single strata.
+NPTS is the maximum number of test-particles only if sufficient CPU time is
+available. Otherwise a message "NO FURTHER COMPUTATION TIME FOR THIS STRATUM"
 is printed and the particle loop for the respective stratum is stopped.</dd>
 <dt>= 0</dt><dd>: this stratum is "turned off".</dd>
-<dt>< 0</dt><dd>: no limitation in the number of particles. The entire CPU time 
-assigned to this stratum will be used up. (NPTS is reset to the largest 
-integer on the machine. Hence: some care is needed here in case of multiple 
-strata, in combination with the ALLOC-options to assign CPU time to individual 
+<dt>< 0</dt><dd>: no limitation in the number of particles. The entire CPU time
+assigned to this stratum will be used up. (NPTS is reset to the largest
+integer on the machine. Hence: some care is needed here in case of multiple
+strata, in combination with the ALLOC-options to assign CPU time to individual
 strata).<dd>""",
 
 'NINITL' : """<dl>
 <dt>>0</dt>
-<dd>seed for initialization of random number generator. The results for all 
+<dd>seed for initialization of random number generator. The results for all
 those individual strata can be reproduced exactly for which the same number of
 test-flights is computed as in a previous run.<dd>
 <dt>=0</dt>
-<dd>no initialization of random numbers for the particular stratum. In case of 
-the first stratum, the default initialization is used. Runs can only be 
-reproduced, if the same number of test-flights is computed for each stratum. 
-Somewhat weakened correlation between subsequent runs as compared to the 
+<dd>no initialization of random numbers for the particular stratum. In case of
+the first stratum, the default initialization is used. Runs can only be
+reproduced, if the same number of test-flights is computed for each stratum.
+Somewhat weakened correlation between subsequent runs as compared to the
 NINITL > 0 option.</dd>
 <dt><0</dt>
-<dd>truly random initialization (determined by machine clock). These runs 
-cannot be reproduced exactly. Subsequent runs are uncorrelated. (E.g.: 
-recommended for stochastic approximation procedures in nonlinear 
+<dd>truly random initialization (determined by machine clock). These runs
+cannot be reproduced exactly. Subsequent runs are uncorrelated. (E.g.:
+recommended for stochastic approximation procedures in nonlinear
 applications.</d>""",
 
 'NEMODS' : """Flag to select one of the preprogrammed source energy conditional
@@ -1887,12 +1887,12 @@ function STEP(ISTEP,ISPZ,...) selected by the flags SORLIM and SORIND (=ISTEP)
 <dt>SCALV=0 (default) FLUX = Source strength in Ampere.</dt>
 <dd>FLUX is the scaling factor for all surface- or volume averaged tallies.<br>
 FLUX is an "atomic flux" (or: an "atomic ion flux"). Each source particle may
-carry a different flux NPRT(ISPZ) (initial weight) depending on the species 
+carry a different flux NPRT(ISPZ) (initial weight) depending on the species
 ISPZ (see: distribution for the species index). NPRT is specified in the blocks
-4 and 5. The total "atomic" source particle flux for each stratum is scaled to 
+4 and 5. The total "atomic" source particle flux for each stratum is scaled to
 be FLUX. For example, a H 2 molecule source, with NPRT <sub>H<sub>2</sub></sub>
- = 2, is treated as if a flux of FLUX/1.602E-19/2 H<sub>2</sub> -molecules per 
-second is emitted, resulting in an equivalent "atomic flux" FLUX/1.602E-19 per 
+ = 2, is treated as if a flux of FLUX/1.602E-19/2 H<sub>2</sub> -molecules per
+second is emitted, resulting in an equivalent "atomic flux" FLUX/1.602E-19 per
 second.</dd>
 <dt>SCALV &ne; 0</dt>
 <dd>The default scaling of tallies with FLUX can be overruled by this flag. The
@@ -1907,7 +1907,7 @@ interactions.</dd></dl>
 <dl><dt>=1</dt><dd>
 The following ISCL..-flags select one particular volume averaged tally</dd>
 <dt>=2</dt>
-<dd>The following ISCL..-flags select one particular surface averaged 
+<dd>The following ISCL..-flags select one particular surface averaged
 tally</dd></dl>
 <b>ISCLS</b>
 <p>species index of selected tally</p>
@@ -1938,7 +1938,7 @@ the starting points for this stratum are distributed (corresponds to
 <quote>sub- strata<quote> option for surface and volume sources, there to
 facilitate sampling  of spatial coordinates).</p>
 <p>Total number of different surfaces, or surface segments, over which the
-starting points for this stratum are distributed (<quote>sub-strata<quote>, 
+starting points for this stratum are distributed (<quote>sub-strata<quote>,
 to facilitate sampling of spatial coordinates).</p>""",
 
 'INUM' : """irrelevant; labelling index for sub-strata""",
@@ -1947,9 +1947,9 @@ to facilitate sampling of spatial coordinates).</p>""",
 SORWGT for all NPNTSI points is normalized to one internally.""",
 
 'NRSOR' : """<p> 0 x- or radial cell number NRCELL of the zone containing the
-point source.</p> 
+point source.</p>
 <p>= 0 NRCELL is found automatically from the <quote>standard mesh<quote>
-zoning.</p> 
+zoning.</p>
 <p>< 0 only for surface sources (NLSRF), see below.</p>""",
 
 'NPSOR' : """ditto from NRSOR, for y- or poloidal cell number NPCELL""",
@@ -2055,7 +2055,7 @@ flags M and L.</p>
 the flag L=0 has to be set (is redundant).</p>
 <p>L,M,N = 1 &delta;-distribution at (a+b)/2</p>
 <p>L,M,N = 2 Uniform distribution on the interval [a,b]</p>
-<p>L,M,N = 3 Truncated exponential decay with decay length &lambda; on the 
+<p>L,M,N = 3 Truncated exponential decay with decay length &lambda; on the
 interval [a,b]. I.e. the sampling distribution reads:<dd>
 f(x) = c &middot; exp(-x/&lambda;) if x &isin; [a, b] and f (x) = 0 elsewhere,
 </dd><br>
@@ -2067,7 +2067,7 @@ one of either L or M or N should be 4)</p>
 function source in time for the kinetic equation in integral form corresponds
 to an initial condition for time-dependent linear kinetic integro-differential
 equation).</p>
-<p>K = 2 Uniform distribution in [TIME0,TIME0+DTIMV] for time of particle 
+<p>K = 2 Uniform distribution in [TIME0,TIME0+DTIMV] for time of particle
 birth.
 Default: K=2 in time-dependent mode (NTIME >0) and K=1, TIME0=0 in time-
 independent mode (NTIME = 0), see section 2.1.</p>""",
@@ -2108,24 +2108,24 @@ P = SORCOS and Q = SORMAX.</p>
 <dl><dt>NAMODS = 1</dt>
 <dd><p>The polar angle &theta; against the unit vector (C = C<sub>X</sub>,
 C<sub>Y</sub>, C<sub>Z</sub>) of the source particle's velocity is sampled
-from a cosine**P distribution around the <quote>inner normal vector<quote> 
-(-1.0) &middot;C, i.e., f (&theta;)d&theta; ~ sin(&theta;) &middot; 
+from a cosine**P distribution around the <quote>inner normal vector<quote>
+(-1.0) &middot;C, i.e., f (&theta;)d&theta; ~ sin(&theta;) &middot;
 cos<sup>p</sup> (&theta;)d&theta;.</p>
 <p>Important special cases:</p>
 <p>P = 0 isotropic distribution</p>
 <p>P = 1 cosine distribution</p>
-<p>P &#8811; 1 close to &delta;-distribution around vector -&delta; &middot; 
+<p>P &#8811; 1 close to &delta;-distribution around vector -&delta; &middot;
 C</p></dd>
 <dt>NAMODS = 2</dt>
-<dd>The polar angle against -1 &middot; C is sampled from a Gaussian 
-distribution with zero mean value, and the parameter P now is used for the 
+<dd>The polar angle against -1 &middot; C is sampled from a Gaussian
+distribution with zero mean value, and the parameter P now is used for the
 standard deviation (degree) of that distribution.</dd></dl>
 <p>The second parameter Q is the cut-off angle (degree) for the polar angle
 <distribution/p>
 <p>note:</p>
 <dl><dt>Q &le; 180° is enforced internally</dt>
 <dt>Q &le; 90° is enforced internally for surface sources</dt>
-<dt>Q = 0 for a beam, i.e., for an angular &delta;-distribution at -1 &middot; 
+<dt>Q = 0 for a beam, i.e., for an angular &delta;-distribution at -1 &middot;
 C</dt></dl""",
 
 'SORMAX' : """<p>Depending upon the value of the flag NAMODS various different
@@ -2134,24 +2134,24 @@ P = SORCOS and Q = SORMAX.</p>
 <dl><dt>NAMODS = 1</dt>
 <dd><p>The polar angle &theta; against the unit vector (C = C<sub>X</sub>,
 C<sub>Y</sub>, C<sub>Z</sub>) of the source parti- cle's velocity is sampled
-from a cosine**P distribution around the <quote>inner normal vector<quote> 
-(-1.0) &middot;C, i.e., f (&theta;)d&theta; ~ sin(&theta;) &middot; 
+from a cosine**P distribution around the <quote>inner normal vector<quote>
+(-1.0) &middot;C, i.e., f (&theta;)d&theta; ~ sin(&theta;) &middot;
 cos<sup>p</sup> (&theta;)d&theta;.</p>
 <p>Important special cases:</p>
 <p>P = 0 isotropic distribution</p>
 <p>P = 1 cosine distribution</p>
-<p>P &#8811; 1 close to &delta;-distribution around vector -&delta; &middot; 
+<p>P &#8811; 1 close to &delta;-distribution around vector -&delta; &middot;
 C</p></dd>
 <dt>NAMODS = 2</dt>
-<dd>The polar angle against -1 &middot; C is sampled from a Gaussian 
-distribution with zero mean value, and the parameter P now is used for the 
+<dd>The polar angle against -1 &middot; C is sampled from a Gaussian
+distribution with zero mean value, and the parameter P now is used for the
 standard deviation (degree) of that distribution.</dd></dl>
 <p>The second parameter Q is the cut-off angle (degree) for the polar angle
 <distribution/p>
 <p>note:</p>
 <dl><dt>Q &le; 180° is enforced internally</dt>
 <dt>Q &le; 90° is enforced internally for surface sources</dt>
-<dt>Q = 0 for a beam, i.e., for an angular &delta;-distribution at -1 &middot; 
+<dt>Q = 0 for a beam, i.e., for an angular &delta;-distribution at -1 &middot;
 C</dt></dl""",
 
 'SORCTX' : """<p>The unit vector C mentioned above is given by normalization of
@@ -2224,7 +2224,7 @@ flags in this block.""",
 'NLPRCA' : """conditional expectation estimator (eq. 3.22) is used for atom
 species IATM""",
 
-'NLPRCM' : """conditional expectation estimator is used for molecule species 
+'NLPRCM' : """conditional expectation estimator is used for molecule species
 IMOL""",
 
 'NLPRCI' : """conditional expectation estimator is used for test ion species
@@ -2235,7 +2235,7 @@ IPHOT (in versions 2004 and younger)""",
 
 'IPRSF' : """<p>conditional expectation estimator is used, if trajectory points
 towards additional sur- face IPRSF. IPRSF &le; NLIMI, the total number of
-additional surfaces read in input block 3B.</p>  
+additional surfaces read in input block 3B.</p>
 <p>NPRCSF surfaces have that property of <quote>attracting
 trajectories<quote>.</p>""",
 
@@ -2248,8 +2248,8 @@ trajectories<quote>""",
 &le; NR1ST)</p>
 
 <dl><dt>MAXRAD < 0</dt>
-<dd>-MAXRAD is used, the position of the radial splitting surfaces is 
-automatically defined, and a constant splitting parameter (SPLPAR, see below) 
+<dd>-MAXRAD is used, the position of the radial splitting surfaces is
+automatically defined, and a constant splitting parameter (SPLPAR, see below)
 is used for radial splitting and RR.</dd>
 <dt>MAXRAD > 0</dt>
 <dd>radial surfaces with numbers NSSPL(IN), IN=1,MAXRAD are S&R-surfaces.
@@ -2369,19 +2369,19 @@ surface averaged tallies""",
 
 'NADSPC' : """Total number of surface or cell averaged energy spectra""",
 
-'IADVE' : """flag for scaling factor for this tally (carried out in subroutine 
+'IADVE' : """flag for scaling factor for this tally (carried out in subroutine
 MCARLO)
 <dl><dt>=1</dt><dd>scale tally per unit volume [1/cm<sup>3</sup> ]. The tally
 is printed and plotted in the units [1/cm<sup>3</sup>] &middot; [units of
 g<sup>∗</sup>] &middot; [cm] &middot; [source strength FLUX] however, with FLUX
 converted to units [1/s] (rather than input units [Ampere]). For the definition
 of the detector functions g and g ∗ see section 3.2, the variable FLUX is
-explained in input block no. 2.7. This scaling is default for <quote>density 
+explained in input block no. 2.7. This scaling is default for <quote>density
 tallies<quote> of particles, momentum and energy.</dd>
 <dt>=2</dt><dd>scale tally per unit cell. Same units as above, however not per
 cm<sup>3</sup> but per cell instead.</dd>
 <dt>=3</dt><dd>same as IADVE = 1, but with FLUX in Ampere, rather than 1/s.
-This scaling is default for <quote>source rate tallies<quote>, 
+This scaling is default for <quote>source rate tallies<quote>,
 e.g. for particle, momentum and energy sources.</dd>
 <dt>=4</dt>same as IADVE = 2, but with FLUX in Ampere, rather than 1/s.</dd>
 </dl>
@@ -2433,7 +2433,7 @@ linear combi- nations of tallies it is, in principle, possible to obtain also
 the standard deviations, this evaluation of error estimates for such
 combinations of tally is, however, is currently carried out only in a
 proprietary code segment (available from the author).</p>
-<p>E.g., the total electron particle source due to test particle - plasma 
+<p>E.g., the total electron particle source due to test particle - plasma
 interaction in units:#/s/m<sup>3<sup>can be obtained by the line:</p>
 <p>(<1,7> + <1,12> + <1,17>)*<1.e6>/<1.6022e-19></p>
 <p>in code versions older than 2002 (see tables in section 5.1.2), and the same
@@ -2634,10 +2634,10 @@ versions 2011 and older)</dd>
 which side-on spectrum is to be computed (NSPSPZ = 0: sum over photon species
 index, not ready)</p>""",
 
-'NSPINI' : """only for NSPTAL=1: 
+'NSPINI' : """only for NSPTAL=1:
 <p>Multipliers for the maximum ion temperature
-Ti<sub>max</sub> found along line of sight, for tem- perature fitting. The CX 
-ion temperature is fitted from the CX line of side spectrum in the interval 
+Ti<sub>max</sub> found along line of sight, for tem- perature fitting. The CX
+ion temperature is fitted from the CX line of side spectrum in the interval
 [NSPINI × Ti<sub>max</sub> , NSPEND × Ti<sub>max</sub> ]</p>""",
 
 'NSPBLC' : """Standard mesh block number of 2nd point on line of sight.""",
@@ -2645,8 +2645,8 @@ ion temperature is fitted from the CX line of side spectrum in the interval
 'NSPADD' : """Additional cell number of 2nd point on line of sight.
 <p>If NSPADD = 0 , then this 2nd point must lie in standard mesh block
 <NSPBLC./p>
-<p>If NSPADD &ne; 0, then the block number NSPBLC must be NSPBLC = NBMLT+1, 
-i.e. the second point on the line of sight is in the <quote>additional cell 
+<p>If NSPADD &ne; 0, then the block number NSPBLC must be NSPBLC = NBMLT+1,
+i.e. the second point on the line of sight is in the <quote>additional cell
 regionq<quote>.</p>""",
 
 'EMIN1' : """<p>for NSPTAL=1,3,10: minimum and maximum energy for spectral
@@ -2672,7 +2672,7 @@ data files.</p>""",
 'ESHIFT' : """(for NSPTAL=1, 3, 10 options only)
 <p>energy shift for spectral resolution in printout, and plot</p>""",
 
-'IPIVOT' : """(only needed for NLTRA option, <quote>toroidal 
+'IPIVOT' : """(only needed for NLTRA option, <quote>toroidal
 approximation<quote>, sub-block2c)
 <dl><dt>1 &le; IPIVOT &le; NTTRA-1 (currently no available, error exit)</dt>
 <dd>number of local toroidal co-ordinate system (NTTRA: see sub-block 2c), in
@@ -3149,7 +3149,7 @@ processors.</dd>
 version 3.0.5. In that strategy, each processor is handed either part of a
 large stratum or one or several full smaller strata. This strategy works well
 if the number of processors is larger than the number of strata, but is not
-recommended if the number of strata is larger than the number of 
+recommended if the number of strata is larger than the number of
 processors.</dd>
 <dt>AUTOMATIC_DISTRIBUTION</dt>
 <dd>tells the code to use the current default, whatever it may be.</dd>
@@ -3157,23 +3157,13 @@ processors.</dd>
 }
 
 class FFormat:
-    """Class holding the species card spacing format. 
+    """Class holding the species card spacing format.
     If there is a dictionary, that only means that there can be
     optional flags. [e.g. Reactions Cards]
     """
-    ReactionsCard = {
-        'IR': 3,
-        'FILNAM': 6,
-        'H123': 4,
-        'REAC': 9,
-        'FTFLAG':9,
-        'CRC': 3,
-        'MASSP': 3,
-        'MASST': 3,
-        'DP': 12,
-        'RMN1': 12,
-        'RMX1': 12
-    }
+    ReactionsCard = [
+        3, 6, 4, 11, 3, 3, 3, 11, 11, 11
+    ]
     NeutralsAndMolecules = [
         2, 8, 2, 2, 2 ,2 ,2 ,2 ,2, 2, 2, 2, 2
     ]
@@ -3211,8 +3201,8 @@ class MyValidator(QValidator):
             self.mask = '.'
         else:
             #Reactions card...
-            self.length = self.n
-            self.mask = '.'
+            self.length = len(self.old_text)
+            self.mask = '\S+'
         #elif type == 'RC':
         #    self.length = self.n
         #    self.mask = '.'
@@ -3310,10 +3300,11 @@ class MyLineEdit(QLineEdit):
                 for i in range(N):
                     self.parameter_description.append(param_name)
         elif card_type == 'RC':
-            for el in variables_name:
-                for i in range(FFormat.ReactionsCard[el]):
+            for i, el in enumerate(variables_name):
+                for j in range(FFormat.ReactionsCard[i]):
                     self.parameter_description.append(el)
-                self.parameter_description.append(' ')
+                if el != 'H123':
+                    self.parameter_description.append(' ')
         elif card_type == 'CN' or card_type == 'MC' or card_type =='IC' or\
              card_type == 'PC':
             for i,el in enumerate(variables_name):
@@ -3349,6 +3340,11 @@ class MyLineEdit(QLineEdit):
         return super(MyLineEdit, self).event(ev)
 
     def determine_format_of_free_type(self, variables):
+        """ This function tries to determine the spacings in free format cards.
+        Important: There is no fixed spacings for type, e.g.: integer
+        can be 3 characters or up to 6 characters long, so this function should
+        be used only on cards that have a mixed default type cards.
+        """
         for variable in variables:
             if variable.startswith('LG') or variable.startswith('TRC') or \
                variable.startswith('NL'):
@@ -3390,8 +3386,8 @@ class CardEditDelegate(QStyledItemDelegate):
         self.lineEdit = None
 
     def createEditor(self, parent, option, index):
-        """The overloaded function from QStyledItemDelegate that creates a cu-
-        stom editor, handles data for help description to it and changing
+        """The overloaded function from QStyledItemDelegate that creates a
+        custom editor, handles data for help description to it and changing
         some geometrics for the editor.
 
         Args:
@@ -3413,6 +3409,7 @@ class CardEditDelegate(QStyledItemDelegate):
             variables_name = index.data(Qt.UserRole)[2]
             self.lineEdit.set_card_help(card_type, variables_name,
                                         number_of_args)
+
             if card_type:
                 val = MyValidator(self.lineEdit, number_of_args, card_type,
                                   index.data(Qt.DisplayRole))
@@ -3454,10 +3451,10 @@ class EireneEdit(QTreeWidget):
         self.setItemDelegate(self.card_edit_delegate)
         self.setCurrentIndex(self.model().index(0, 0))
         self.values = {}
-        self.blocks = [self.block_1, self.block_2, self.block_3a, 
+        self.blocks = [self.block_1, self.block_2, self.block_3a,
                        self.block_3b, self.block_4, self.block_5, self.block_6,
                        self.block_7, self.block_8, self.block_9, self.block_10,
-                       self.block_11, self.block_12, self.block_13, 
+                       self.block_11, self.block_12, self.block_13,
                        self.block_14, self.block_15, self.block_16]
         self.number_of_blocks = len(self.blocks)
         self.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -3465,12 +3462,12 @@ class EireneEdit(QTreeWidget):
         self.setIndentation(20)
 
     def setPlainText(self, text):
-        """This function sets the text from the input configuration file for 
+        """This function sets the text from the input configuration file for
         EIRENE into the tree. The way it works is that we have block functions
         and dummy block functions.
 
         The block functions have the predetermined help description parameters
-        set to lines of the input file. The block functions are written in a 
+        set to lines of the input file. The block functions are written in a
         way that if there is a pattern in the input file, the work needed
         to add more help description parameters should be easy.
         """
@@ -3617,14 +3614,14 @@ class EireneEdit(QTreeWidget):
         if self.values['NLMLT']:
             role = ['R5']
             for i in range(1, self.values['NBLMT'] + 1):
-                role.append('VOLCOR(' + str(i) + ')')
+                role.append('VOLCOR(i)')
             self.getline(role)
         # 2e. Data for additional cells outside standard mesh
         self.getline(['L', 'NLADD'])
         self.getline(['I', 'NRADD'])
         role = ['R5']
         for i in range(1, int(self.values['NRADD']) + 1):
-            role.append('VOLADD(' + str(i) + ')')
+            role.append('VOLADD(i)')
         if len(role) != 1:
             self.getline(role)
 
@@ -3707,12 +3704,13 @@ class EireneEdit(QTreeWidget):
             # Omit the next functions
             return
         #  Reactions
-        self.getline(['I', 'NATMI'])
+        self.getline(['I', 'NREACI'])
 
+        role = ['RC', 'IR', 'FILNAM', 'H123']
         optional = ['FTFLAG']
         tail = ['REAC', 'CRC', 'MASSP', 'MASST', 'DP', 'RMN1', 'RMX1']
         while 1:
-            role = ['RC', 'IR', 'FILNAM', 'H123']
+
             # Reactions card:
             # IR FILNAME H123 FTFLAG CRC MASST DP RMN1 RMNX
             # at least one space between the flags
@@ -3721,22 +3719,21 @@ class EireneEdit(QTreeWidget):
             FILNAM = flags[1]
             if flags[3].startswith('FT'):
                 tail = optional + tail
-            role = role + tail[:len(flags[3:])]
 
-            self.getline(role) # Assigning role to the card
+            self.getline(role + tail[:len(flags[3:])]) # Assigning role to the card
 
             # Checking if there are additional sub-cards
             if FILNAM == 'ADAS':
                 self.getline(['S', 'ELNAME', 'IZ'])
             elif FILNAM =='PHOTON':
                 line = self.getline()
-                self.getline(['S', 'IPRFTYPE', 'IPLSC3', 'IMESS', 'IFREMD', 
+                self.getline(['S', 'IPRFTYPE', 'IPLSC3', 'IMESS', 'IFREMD',
                                    'NRJPRT'])
                 for j in range(int(line.split()[3])):
                     self.getline(['S', 'II', 'KENN', 'IK6']) # This should be
                                                              # checked
             elif FILNAM == 'CONST':
-                # 12 Numbers in two lines, but only 
+                # 12 Numbers in two lines, but only
                 self.getline(['R4', 'F1', 'F2', 'F3', 'F4', 'F5'])
                 self.getline(['R4', 'F6', 'F7', 'F8'])
 
@@ -3745,46 +3742,46 @@ class EireneEdit(QTreeWidget):
             # RMN1 .gt. 0 nd RMX1 .g. 0
             if N >= 9:
                 if float(flags[8]) > 0:
-                    self.getline(['S', 'IFEXMN', 'FPARM(1)', 'FPARM(2)', 
+                    self.getline(['S', 'IFEXMN', 'FPARM(1)', 'FPARM(2)',
                                        'FPARM(3)'])
             if N == 10:
                 if float(flags[9]) > 0:
-                    self.getline(['S', 'IFEXMN', 'FPARM(4)', 'FPARM(5)', 
+                    self.getline(['S', 'IFEXMN', 'FPARM(4)', 'FPARM(5)',
                                        'FPARM(6)'])
-            if IR == self.values['NATMI']:
+            if IR == self.values['NREACI']:
                 break
         # **4a.   Neutral atom species
-        self.getline(['I', 'NREACI'])
-        for j in range(self.values['NREACI']):
+        self.getline(['I', 'NATMI'])
+        for j in range(self.values['NATMI']):
             # The first line contains
             # NC type is NEUTRAL ATOMS SPECIES CARDS
             line = self.getline().split()
-            self.getline(['NC', 'I', 'TEXTS(ISPZ)', 'NMASSA(IATM)', 
+            self.getline(['NC', 'I', 'TEXTS(ISPZ)', 'NMASSA(IATM)',
                           'NCHARA(IATM)', 'NDUMM1', 'NDUMM2', 'ISRF(ISPZ,1)',
-                          'ISRT(ISPZ,1)', 'NUMSEC', 'NRCA(IATM)', 
+                          'ISRT(ISPZ,1)', 'NUMSEC', 'NRCA(IATM)',
                           'NFOLA(IATM)', 'NGENA(IATM)', 'NHSTS(ISPZ)'])
             NRCA_IATM = int(line[9])
             NUMSEC = int(line[8])
             for i in range(NRCA_IATM):
                 if NUMSEC < 3:
-                    self.getline(['I', 'IREACA(IATM,K)', 'IBULKA(IATM,K)', 
-                                  'ISCD1A(IATM,K)', 'ISCD2A(IATM,K', 
-                                  'ISCDEA(IATM,K)', 'IESTMA(IATM,K)', 
-                                  'IBKA(IATM,K)']) 
+                    self.getline(['I', 'IREACA(IATM,K)', 'IBULKA(IATM,K)',
+                                  'ISCD1A(IATM,K)', 'ISCD2A(IATM,K',
+                                  'ISCDEA(IATM,K)', 'IESTMA(IATM,K)',
+                                  'IBKA(IATM,K)'])
                 elif NUMSEC == 3:
-                    self.getline(['I', 'IREACA(IATM,K)', 'IBULKA(IATM,K)', 
-                                  'ISCD1A(IATM,K)', 'ISCD2A(IATM,K)', 
-                                  'ISCD3A(IATM,K)', 'ISCDEA(IATM,K)', 
+                    self.getline(['I', 'IREACA(IATM,K)', 'IBULKA(IATM,K)',
+                                  'ISCD1A(IATM,K)', 'ISCD2A(IATM,K)',
+                                  'ISCD3A(IATM,K)', 'ISCDEA(IATM,K)',
                                   'IEASTMA(IATM,K)', 'IBGKA(IATM,K)'])
                 elif NUMSEC == 4:
                     self.getline(['I', 'IREACA(IATM,K)', 'IBULKA(IATM,K)',
-                                  'ISCD1A(IATM,K)', 'ISCD2A(IATM,K)', 
-                                  'ISCD3A(IATM,K)', 'ISCD4A(IATM,K)', 
+                                  'ISCD1A(IATM,K)', 'ISCD2A(IATM,K)',
+                                  'ISCD3A(IATM,K)', 'ISCD4A(IATM,K)',
                                   'ISCDEA(IATM,K)', 'IESTMA(IATM,K)',
                                   'IBGKA(IATM,K)'])
                 # Reading mandatory line containing EELEC, EBULKA,...
 
-                self.getline(['R5', 'EELECA(IATM,K)', 'EBULKA(IATM,K)', 
+                self.getline(['R5', 'EELECA(IATM,K)', 'EBULKA(IATM,K)',
                               'ESCD1A(IATM,K)', 'ESCD2A', 'FREACA(IATM,K)',
                               'FLDLMA(IATM,K)'])
 
@@ -3793,9 +3790,9 @@ class EireneEdit(QTreeWidget):
 
         for j in range(self.values['NMOLI']):
             line = self.getline().split()
-            self.getline(['MC', 'I', 'TEXTS(ISPZ)', 'NMASSM(IMOL)', 
-                          'NCHARM(IMOL)', 'NPRT(ISPZ)', 'NDUMM', 
-                          'ISRF(ISPZ,1)', 'ISRT(ISPZ,1)', 'NUMSEC', 
+            self.getline(['MC', 'I', 'TEXTS(ISPZ)', 'NMASSM(IMOL)',
+                          'NCHARM(IMOL)', 'NPRT(ISPZ)', 'NDUMM',
+                          'ISRF(ISPZ,1)', 'ISRT(ISPZ,1)', 'NUMSEC',
                           'NRCM(IMOL)', 'NFOLM(IMOL)', 'NGENM(IMOL)',
                           'NHSTS(ISPC)', 'lkindm(imol)'])
 
@@ -3805,57 +3802,57 @@ class EireneEdit(QTreeWidget):
                 if NUMSEC < 3:
                     # Some cards have less than 7 integers
                     self.getline(['I', 'IREACM(IMOL,K)', 'IBULKM(IMOL,K)',
-                                  'ISCD1M(IMOL,K)', 'ISCD2M(IMOL,K)', 
-                                  'ISCDEM(IMOL,K)', 'IESTMM(IMOL,K)', 
+                                  'ISCD1M(IMOL,K)', 'ISCD2M(IMOL,K)',
+                                  'ISCDEM(IMOL,K)', 'IESTMM(IMOL,K)',
                                   'IBGKM(IMOL,K)'])
                 elif NUMSEC == 3:
                     self.getline(['I', 'IREACM(IMOL,K)', 'IBULKM(IMOL,K)',
                                   'ISCD1M(IMOL,K)', 'ISCD2M(IMOL,K)',
                                   'ICSD3M(IMOL,K)',
-                                  'ISCDEM(IMOL,K)', 'IESTMM(IMOL,K)', 
+                                  'ISCDEM(IMOL,K)', 'IESTMM(IMOL,K)',
                                   'IBGKM(IMOL,K)'])
                 elif NUMSEC == 4:
                      self.getline(['I', 'IREACM(IMOL,K)', 'IBULKM(IMOL,K)',
                                   'ISCD1M(IMOL,K)', 'ISCD2M(IMOL,K)',
                                   'ICSD3M(IMOL,K)', 'ISCD4M(IMOL,K)',
-                                  'ISCDEM(IMOL,K)', 'IESTMM(IMOL,K)', 
-                                  'IBGKM(IMOL,K)']) 
-                self.getline(['R5', 'EELECM(IMOL,K)', 'EBULKM(IMOL,K)', 
-                              'ESCD1M(IMOL,K)', 'ESCD2M, FREACM(IMOL,K)'])             
+                                  'ISCDEM(IMOL,K)', 'IESTMM(IMOL,K)',
+                                  'IBGKM(IMOL,K)'])
+                self.getline(['R5', 'EELECM(IMOL,K)', 'EBULKM(IMOL,K)',
+                              'ESCD1M(IMOL,K)', 'ESCD2M, FREACM(IMOL,K)'])
 
         # **4c.   Test ion species
         self.getline(['I', 'NIONI'])
         for j in range(self.values['NIONI']):
             # Reading first line... yet again
             line = self.getline().split()
-            self.getline(['IC', 'I', 'TEXTS(ISPZ)', 'NMASSI(ION)', 
+            self.getline(['IC', 'I', 'TEXTS(ISPZ)', 'NMASSI(ION)',
                           'NCHARI(IION)', 'NPRT(ISPZ)', 'NCHRGI(IION)',
-                          'ISRF(ISPZ,1)', 'ISRT(ISPZ,1)', 'NUMSEC', 
-                          'NRCI(IION)', 'NFOLI(IION)', 'NGENI(IION)', 
+                          'ISRF(ISPZ,1)', 'ISRT(ISPZ,1)', 'NUMSEC',
+                          'NRCI(IION)', 'NFOLI(IION)', 'NGENI(IION)',
                           'NHSTS(ISPZ)', 'lkindi(iion)'])
             NRCI_IION = int(line[9])
             NUMSEC = int(line[8])
             for i in range(NRCI_IION):
-                # Number of arguments on the following lines may not be the 
+                # Number of arguments on the following lines may not be the
                 # same as the number of switches...
                 if NUMSEC < 3:
-                    self.getline(['I', 'IREACI(IION,K)', 'IBULKI(IION,K)', 
-                                  'ISC1I(IION,K)', 'ISCD2I(IION,K)', 
-                                  'ISCDEI(IION,K)', 'IESTMI(IION,K)', 
+                    self.getline(['I', 'IREACI(IION,K)', 'IBULKI(IION,K)',
+                                  'ISC1I(IION,K)', 'ISCD2I(IION,K)',
+                                  'ISCDEI(IION,K)', 'IESTMI(IION,K)',
                                   'IBGKI(IION,K)'])
                 elif NUMSEC == 3:
-                    self.getline(['I', 'IREACI(IION,K)', 'IBULKI(IION,K)', 
-                                  'ISC1I(IION,K)', 'ISCD2I(IION,K)', 
+                    self.getline(['I', 'IREACI(IION,K)', 'IBULKI(IION,K)',
+                                  'ISC1I(IION,K)', 'ISCD2I(IION,K)',
                                   'ISCD3I(IION,K)',
-                                  'ISCDEI(IION,K)', 'IESTMI(IION,K)', 
+                                  'ISCDEI(IION,K)', 'IESTMI(IION,K)',
                                   'IBGKI(IION,K)'])
                 elif NUMSEC == 4:
-                    self.getline(['I', 'IREACI(IION,K)', 'IBULKI(IION,K)', 
-                                  'ISC1I(IION,K)', 'ISCD2I(IION,K)', 
+                    self.getline(['I', 'IREACI(IION,K)', 'IBULKI(IION,K)',
+                                  'ISC1I(IION,K)', 'ISCD2I(IION,K)',
                                   'ISCD3I(IION,K)', 'ISCD4I(IION,K)',
-                                  'ISCDEI(IION,K)', 'IESTMI(IION,K)', 
+                                  'ISCDEI(IION,K)', 'IESTMI(IION,K)',
                                   'IBGKI(IION,K)'])
-                self.getline(['R5', 'EELECI(IION,K)', 'EBULKI(IION,K)', 
+                self.getline(['R5', 'EELECI(IION,K)', 'EBULKI(IION,K)',
                               'ESCD1I(IION,K)', 'ESCD2I', 'FREACI(IION,K)'])
 
         # **4d. Photon species
@@ -3868,7 +3865,7 @@ class EireneEdit(QTreeWidget):
             for j in range(self.values['NPHOTI']):
                 line = self.getline().split()
                 self.getline(['PC', 'I', 'TEXTS(ISPZ)', 'NDUMM1', 'NDUMM2',
-                              'NDUMM3', 'NDUMM4', 'ISRF(ISPZ,1)', 
+                              'NDUMM3', 'NDUMM4', 'ISRF(ISPZ,1)',
                               'ISRT(ISPZ,1)', 'NUMSEC', 'NRCPH(IPHOT)',
                               'NFOLPH(IPHOT)', 'NGENPH(IPHOT)', 'NHSTS(ISPZ)'])
                 NUMSEC = int(line[8])
@@ -3876,35 +3873,35 @@ class EireneEdit(QTreeWidget):
 
                 for i in range(NRCPH_IPHOT):
                     if NUMSEC < 3:
-                        self.getline(['I', 'IREACPH(IPHOT,K)', 
+                        self.getline(['I', 'IREACPH(IPHOT,K)',
                                       'IBULKPH(IPHOT,K)', 'ISCD1PH(IPHOT,K)',
                                       'ISCD2PH(IPHOT,K)',
                                       'ISCDEPH(IPHOT,K)', 'IESTMPH(IPHOT,K)',
                                       'IBGKPH(IPHOT,K)'])
                     if NUMSEC == 3:
-                        self.getline(['I', 'IREACPH(IPHOT,K)', 
+                        self.getline(['I', 'IREACPH(IPHOT,K)',
                                       'IBULKPH(IPHOT,K)', 'ISCD1PH(IPHOT,K)',
                                       'ISCD2PH(IPHOT,K)', 'ISCD3PH(IPHOT,K)',
                                       'ISCDEPH(IPHOT,K)', 'IESTMPH(IPHOT,K)',
                                       'IBGKPH(IPHOT,K)'])
                     if NUMSEC == 4:
-                        self.getline(['I', 'IREACPH(IPHOT,K)', 
+                        self.getline(['I', 'IREACPH(IPHOT,K)',
                                       'IBULKPH(IPHOT,K)', 'ISCD1PH(IPHOT,K)',
                                       'ISCD2PH(IPHOT,K)', 'ISCD3PH(IPHOT,K)',
                                       'ISCD4PH(IPHOT,K)',
                                       'ISCDEPH(IPHOT,K)', 'IESTMPH(IPHOT,K)',
                                       'IBGKPH(IPHOT,K)'])
                     self.getline(['R5', 'EELECPH(IPHOT,K)', 'EBULKPH(IPHOT,K)',
-                                  'ESCD1PH(IPHOT,K)', 'ESCD2PH', 
+                                  'ESCD1PH(IPHOT,K)', 'ESCD2PH',
                                   'FREACPH(IPHOT,K)', 'FLDLMPH(IPHOT,K)'])
 
     def block_5(self):
         self.getline(['I', 'NPLSI'])
         for i in range(self.values['NPLSI']):
             line = self.getline().split()
-            self.getline(['PB', 'I', 'TEXTS(ISPZ)', 'NMASSP(IPLS)', 
+            self.getline(['PB', 'I', 'TEXTS(ISPZ)', 'NMASSP(IPLS)',
                            'NCHARP(IPLS)', 'NPRT(ISPZ)', 'NCHRGP(IPLS)',
-                           'ISRF(ISPZ,1)', 'ISRT(ISPZ,1)', 'NUMSEC', 
+                           'ISRF(ISPZ,1)', 'ISRT(ISPZ,1)', 'NUMSEC',
                            'NRCP(IPLS)', 'NDUMM1', 'NDUMM2', 'NHSTS(ISPZ)',
                            'NDUMM4', 'CDENMODEL(IPLS)', 'NRE'])
             NRCP_IPLS = int(line[9])
@@ -3913,18 +3910,18 @@ class EireneEdit(QTreeWidget):
             for j in range(NRCP_IPLS):
                 if NUMSEC < 3:
                     self.getline(['I', 'IREACP(IPLS,K)', 'IBULKP(IPLS,K)',
-                                  'ISCD1P(IPLS,K)', 'ISCD2P(IPLS,K)', 
+                                  'ISCD1P(IPLS,K)', 'ISCD2P(IPLS,K)',
                                   'ISCDEP(IPLS,K)'])
                 elif NUMSEC == 3:
                     self.getline(['I', 'IREACP(IPLS,K)', 'IBULKP(IPLS,K)',
-                                  'ISCD1P(IPLS,K)', 'ISCD2P(IPLS,K)', 
+                                  'ISCD1P(IPLS,K)', 'ISCD2P(IPLS,K)',
                                   'ISCD3P(IPLS,K)', 'ISCDEP(IPLS,K)'])
                 elif NUMSEC == 4:
                     self.getline(['I', 'IREACP(IPLS,K)', 'IBULKP(IPLS,K)',
-                                  'ISCD1P(IPLS,K)', 'ISCD2P(IPLS,K)', 
+                                  'ISCD1P(IPLS,K)', 'ISCD2P(IPLS,K)',
                                   'ISCD3P(IPLS,K)', 'ISCD4P(IPLS,K)',
                                   'ISCDEP(IPLS,K)'])
-                self.getline(['R5', 'EELECP(IPLS,K)', 'EBULKP(IPLS,K)', 
+                self.getline(['R5', 'EELECP(IPLS,K)', 'EBULKP(IPLS,K)',
                               'ESCD1P(IPLS,K)', 'ESCD2P', 'FREACP(IPLS,K)'])
 
         line = self.getline()
@@ -3933,33 +3930,33 @@ class EireneEdit(QTreeWidget):
             line = self.getline()
 
         # ** 5b. Plasma background data
-        self.getline(['I'] + ['INDPRO(' + str(i) + ')' for i in range(1, 13)])
+        self.getline(['I'] + ['INDPRO(' + str(i) +')' for i in range(1, 13)])
 
         if self.values['INDPRO(1)'] <= 5:
             self.getline(['R5', 'TE0', 'TE1', 'TE2', 'TE3', 'TE4', 'TE5'])
         elif self.values['INDPRO(2)'] <= 5:
             for i in range(1, self.values['NPLSI'] + 1):
-                self.getline(['R5', 'TI0(' + str(i) + ')', 'TI1(' + str(i) +')',
-                              'TI2(' + str(i) + ')', 'TI3(' + str(i) + ')',
-                              'TI4(' + str(i) + ')', 'TI5(' + str(i) + ')'])
+                self.getline(['R5', 'TI0(i)', 'TI1(' + str(i) +')',
+                              'TI2(i)', 'TI3(i)',
+                              'TI4(i)', 'TI5(i)'])
         elif self.values['INDPRO(3)'] <= 5:
             for i in range(1, self.values['NPLSI'] + 1):
-                self.getline(['R5', 'DI0(' + str(i) + ')', 'DI1(' + str(i) +')',
-                              'DI2(' + str(i) + ')', 'DI3(' + str(i) + ')',
-                              'DI4(' + str(i) + ')', 'DI5(' + str(i) + ')'])
+                self.getline(['R5', 'DI0(i)', 'DI1(' + str(i) +')',
+                              'DI2(i)', 'DI3(i)',
+                              'DI4(i)', 'DI5(i)'])
         elif self.values['INDPRO(4)'] <= 5:
             for i in range(1, self.values['NPLSI'] + 1):
-                self.getline(['R5', 'VX0(' + str(i) + ')', 'VX1(' + str(i) +')',
-                              'VX2(' + str(i) + ')', 'VX3(' + str(i) + ')',
-                              'VX4(' + str(i) + ')', 'VX5(' + str(i) + ')'])
+                self.getline(['R5', 'VX0(i)', 'VX1(' + str(i) +')',
+                              'VX2(i)', 'VX3(i)',
+                              'VX4(i)', 'VX5(i)'])
             for i in range(1, self.values['NPLSI'] + 1):
-                self.getline(['R5', 'VY0(' + str(i) + ')', 'VY1(' + str(i) +')',
-                              'VY2(' + str(i) + ')', 'VY3(' + str(i) + ')',
-                              'VY4(' + str(i) + ')', 'VY5(' + str(i) + ')'])
+                self.getline(['R5', 'VY0(i)', 'VY1(' + str(i) +')',
+                              'VY2(i)', 'VY3(i)',
+                              'VY4(i)', 'VY5(i)'])
             for i in range(1, self.values['NPLSI'] + 1):
-                self.getline(['R5', 'VZ0(' + str(i) + ')', 'VZ1(' + str(i) +')',
-                              'VZ2(' + str(i) + ')', 'VZ3(' + str(i) + ')',
-                              'VZ4(' + str(i) + ')', 'VZ5(' + str(i) + ')'])
+                self.getline(['R5', 'VZ0(i)', 'VZ1(' + str(i) +')',
+                              'VZ2(i)', 'VZ3(i)',
+                              'VZ4(i)', 'VZ5(i)'])
         elif self.values['INDPRO(5)'] <= 5:
             self.getline(['R5', 'B0', 'B1', 'B2', 'B3', 'B4', 'B5'])
         elif self.values['INDPRO(12)'] <= 5:
@@ -3975,16 +3972,16 @@ class EireneEdit(QTreeWidget):
         while 'path' in line or 'PATH' in line:
             self.getline(['S', 'PATH CARD'])
 
-        self.getline(['R5'] + ['DATD(' + str(i) + ')' for i in
+        self.getline(['R5'] + ['DATD(i)' for i in
                      range(1, self.values['NATMI'] + 1)])
-        self.getline(['R5'] + ['DMLD(' + str(i) + ')' for i in
+        self.getline(['R5'] + ['DMLD(i)' for i in
                      range(1, self.values['NMOLI'] + 1)])
-        self.getline(['R5'] + ['DIOD(' + str(i) + ')' for i in
+        self.getline(['R5'] + ['DIOD(i)' for i in
                      range(1, self.values['NIONI'] + 1)])
-        self.getline(['R5'] + ['DPLD(' + str(i) + ')' for i in
+        self.getline(['R5'] + ['DPLD(i)' for i in
                      range(1, self.values['NPLSI'] + 1)])
         if self.values['NPHOTI'] > 0:
-            self.getline(['R5'] + ['DPHT(' + str(i) + ')' for i in
+            self.getline(['R5'] + ['DPHT(i)' for i in
                  range(1, self.values['NPLSI'] + 1)])
         self.getline(['R5', 'ERMIN', 'ERCUT', 'RPROB0', 'RINTEG', 'EINTEG',
                       'AINTEG'])
@@ -3993,11 +3990,11 @@ class EireneEdit(QTreeWidget):
         while line[:3] != '***':
             self.getline(['S', 'SURFMOD'])
             self.getline(['I', 'ILREF', 'ILSPT', 'ISRS', 'ISRC'])
-            self.getline(['R5', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)', 
+            self.getline(['R5', 'ZNML', 'EWALL', 'EWBIN', 'TRANSP(1,N)',
                           'TRANSP(2,N)', 'FSHEAT'])
-            self.getline(['R5', 'RECYCF', 'RECYCT', 'RECPRM', 'EXPPL', 'EXPEL', 
+            self.getline(['R5', 'RECYCF', 'RECYCT', 'RECPRM', 'EXPPL', 'EXPEL',
                           'EXPIL'])
-            self.getline(['R5', 'RECYCS', 'RECYCC', 'SPTPRM', 'ESPUTS', 
+            self.getline(['R5', 'RECYCS', 'RECYCC', 'SPTPRM', 'ESPUTS',
                           'ESPUTC'])
             line = self.getline()
 
@@ -4051,7 +4048,7 @@ class EireneEdit(QTreeWidget):
         self.getline(['I', 'NPRCSF'])
         self.getline(['I', 'MAXLEV', 'MAXRAD', 'MAXPOL', 'MAXTOR', 'MAXADD'])
         for i in range(1, self.values['MAXLEV'] + 1):
-            self.getline(['R5', 'ID', 'NSSPL(' + str(i) + ')', 'PRMSPL(' +
+            self.getline(['R5', 'ID', 'NSSPL(i)', 'PRMSPL(' +
                           str(i) + ')'])
         for i in range(1, self.values['MAXPOL'] + 1):
             self.getline(['R5', 'ID', 'NSSPL(' + str(self.values['N1ST'] + i) +
@@ -4078,48 +4075,33 @@ class EireneEdit(QTreeWidget):
         for i in range(1, self.values['NSIGSI'] + 1):
             self.getline(['R5', 'IGHW', 'IIHW'])
         for i in range(1, self.values['NSIGCI'] + 1):
-            self.getline(['R5'] + ['IGHC(1,' + str(i) + ')',
-                                  'IIHC(1,' + str(i) + ')',
-                                  'IGHC(2,' + str(i) + ')',
-                                  'IIHC(2,' + str(i) + ')'])
+            self.getline(['R5'] + ['IGHC(1,i)',
+                                  'IIHC(1,i)',
+                                  'IGHC(2,i)',
+                                  'IIHC(2,i)'])
 
     def block_10(self):
         self.getline(['I', 'NADVI', 'NCLVI', 'NALVI', 'NADSI', 'NALSI',
                       'NADSPC'])
         for i in range(1, self.values['NADVI'] + 1):
-            self.getline(['R5', 'IADVE(' + str(i) + ')',
-                               'IADVS(' + str(i) + ')',
-                               'IADVT(' + str(i) + ')',
-                               'IADVR(' + str(i) + ')',
-                               'TXTTAL(' + str(i) + ',NTALA)',
-                               'TXTSPC(' + str(i) + ',NTALA)',
-                               'TXTUNT(' + str(i) + ',NTALA)'])
+            self.getline(['R5', 'IADVE(i)', 'IADVS(i)', 'IADVT(i)', 'IADVR(i)',
+                               'TXTTAL(i,NTALA)', 'TXTSPC(i,NTALA)',
+                               'TXTUNT(i,NTALA)'])
 
         for i in range(1, self.values['NCLVI'] + 1):
-            self.getline(['R5', 'ICLVE(' + str(i) + ')',
-                               'ICLVS(' + str(i) + ')',
-                               'ICLVT(' + str(i) + ')',
-                               'ICLVR(' + str(i) + ')',
-                               'TXTTAL(' + str(i) + ',NTALC)',
-                               'TXTSPC(' + str(i) + ',NTALC)',
-                               'TXTUNT(' + str(i) + ',NTALC)'])
+            self.getline(['R5', 'ICLVE(i)', 'ICLVS(i)', 'ICLVT(i)', 'ICLVR(i)',
+                               'TXTTAL(i,NTALC)', 'TXTSPC(i,NTALC)',
+                               'TXTUNT(i,NTALC)'])
         for i in range(1, self.values['NALVI'] + 1):
-            self.getline(['R5', 'ALSTRNG',
-                               'TXTTAL(' + str(i) + ',NTALR)',
-                               'TXTSPC(' + str(i) + ',NTALR)',
-                               'TXTUNT(' + str(i) + ',NTALR)'])
+            self.getline(['R5', 'ALSTRNG', 'XTTAL(i,NTALR)', 'TXTSPC(i,NTALR)',
+                               'TXTUNT(i,NTALR)'])
         for i in range(1, self.values['NADSI'] + 1):
-            self.getline(['R5', 'IADSE(' + str(i) + ')',
-                               'IADSS(' + str(i) + ')',
-                               'IADST(' + str(i) + ')',
-                               'IADSR(' + str(i) + ')',
-                               'TXTTAL(' + str(i) + ',NTLSA)',
-                               'TXTSPC(' + str(i) + ',NTLSA)',
-                               'TXTUNT(' + str(i) + ',NTLSA)'])
+            self.getline(['R5', 'IADSE(i)','IADSS(i)', 'IADST(i)', 'IADSR(i)',
+                               'TXTTAL(i,NTLSA)', 'TXTSPC(i,NTLSA)',
+                               'TXTUNT(i,NTLSA)'])
         for i in range(1, self.values['NALSI'] + 1):
-            self.getline(['R5', 'ALSTRNG', 'TXTTAL(' + str(i) + ',NTLSR)',
-                          'TXTSPC(' + str(i) + ',NTLSR)',
-                          'TXTUNT(' + str(i) + ',NTLSR)'])
+            self.getline(['R5', 'ALSTRNG', 'TXTTAL(i,NTLSR)',
+                                'TXTSPC(i,NTLSR)', 'TXTUNT(i,NTLSR)'])
 
     def block_11(self):
         self.getline(['L', 'TRCPLT', 'TRCHST', 'TRCNAL', 'TRCREA', 'TRCSIG',
@@ -4127,15 +4109,118 @@ class EireneEdit(QTreeWidget):
                            'TRCINT', 'TRCLST', 'TRCSOU', 'TRCREC', 'TRCTIM',
                            'TRCBLA', 'TRCBLM', 'TRCBLI', 'TRCBLP', 'TRCBLE',
                            'TRCBLPH', 'TRCTAL', 'TRCOCT', 'TRCCEN', 'TRCDUMM',
-                           'TRCDBG2', 'TRCDBGE', 'TRCDBGM', 'TRCDBGF', 
-                           'TRCDBGL', 'TRCDBGS', 'TRCDBGG', 'TRCDBGMPI', 
-                           'TRCDBGC'])
+                           'TRCDBG2', 'TRCDBGE', 'TRCDBGM', 'TRCDBGF',
+                           'TRCDBGL', 'TRCDBGS', 'TRCDBGG', 'TRCDBGMPI',                           'TRCDBGC'])
         # Some reading involving NSTRA
         # A for loop going from 0 to NSTRA with a step of 60
         role = ['L']
-        for i in range(self.values['NSTRAI']):
-            role += ['TRCSRC(' + str(i+1) + ')']
+        for i in range(self.values['NSTRAI']+1):
+            role += ['TRCSRC(i)']
         self.getline(role)
+
+        self.getline(['I', 'NVOLPR', 'NVLPR'])
+
+        for i in range(self.values['NVOLPR']):
+            sel.getline(['I', 'NTLV', 'NFLGV', 'NSPZV1', 'NSPZV2', 'NTLVF'])
+
+        self.getline(['I', 'NSURPR'])
+
+        for i in range(self.values['NSURPR']):
+            self.getline(['I', 'NSRF', 'NTLS', 'NFLGS', 'NSPZS1', 'NSPZS2',
+                               'NTLSF'])
+
+        line = self.getline() # Reading the line to see if there are either
+                              # logicals or numbers inside
+
+        if not self.looks_like_boolean_card(line):
+            self.getline(['I', 'NTLVOUT'])
+            NTLVOUT = self.values['NTLVOUT']
+            ITLVOUT = 0
+            while NTLVOUT > 0 and ITLVOUT < NTLVOUT:
+                self.getline(['I', 'NUMTAL(1)', 'NUMTAL(2)', 'NUMTAL(3)',
+                                   'NUMTAL(4)', 'NUMTAL(5)', 'NUMTAL(6)',
+                                   'NUMTAL(7)', 'NUMTAL(8)', 'NUMTAL(9)',
+                                   'NUMTAL(10)', 'NUMTAL(11)', 'NUMTAL(12)'])
+                ITLVOUT += 12
+
+
+            self.getline(['I', 'NTLSOUT'])
+            NTLSOUT = self.values['NTLSOUT']
+            ITLSOUT = 0
+            while NTLSOUT > 0 and ITLSOUT < NTLSOUT:
+                self.getline(['I', 'NUMTAL(1)', 'NUMTAL(2)', 'NUMTAL(3)',
+                                   'NUMTAL(4)', 'NUMTAL(5)', 'NUMTAL(6)',
+                                   'NUMTAL(7)', 'NUMTAL(8)', 'NUMTAL(9)',
+                                   'NUMTAL(10)', 'NUMTAL(11)', 'NUMTAL(12)'])
+                ITLSOUT += 12
+
+        # Reading logicals
+        self.getline(['L', 'PL1ST', 'PL2ND', 'PL3RD', 'PLADD', 'PLHST',
+                           'PLCUT(1)', 'PLCUT(2)', 'PLCUT(3)', 'PLBOX',
+                           'PLSTOR', 'PLNUMV', 'PLNUMS', 'PLARR', 'LRPSCUT',
+                           'PLIDL'])
+        # Reading integers
+        self.getline(['I', 'NPLINR', 'NPLOTR', 'NPLDLR', 'NPLINL', 'NPLOTP',
+                           'NPLDLP', 'NPLINT', 'NPLOTT', 'NPLDLT', 'nsrflcs'])
+        for j in range(abs(self.values['nsrflcs'])):
+            self.getline(['I', 'msrfcls(j)'])
+            msrfcls_j = self.values['msrfcls(j)']
+            if msrfcls_j:
+                role = ['I']
+                for i in range(1, msrfcls_j + 1):
+                    role.append(['lsrfcls(i,j)'])
+                self.getline(role)
+
+        # Reading 5 lines
+        # 6662
+        for j in range(1, 6):
+            line = self.getline()
+            if len(line.split()) == 2:
+                self.getline(['S', 'PL3A(j) IPLTS(j)'])
+            else:
+                self.getline(['S', 'These are settings for graphical output for standalone eirene runs!'])
+        for j in range(1, 4):
+            line = self.getline()
+            if len(line.split()) == 2:
+                self.getline(['S', 'PL3A(j) IPLTS(j)'])
+            else:
+                self.getline(['S', 'These are settings for graphical output for standalone eirene runs!'])
+
+
+        self.getline(['R5', 'CH2MX', 'CH2MY', 'CH2X0', 'CH2Y0', 'CH2Z0'])
+        self.getline(['R5', 'CH3MX', 'CH3MY', 'CH3MZ', 'CH3Y0', 'CH3Z'])
+        self.getline(['R5', 'ANGLE1', 'ANGLE2', 'ANGLE3'])
+        role = ['I', 'I1TRC', 'I2TRC',]
+        for i in range(1, 9):
+            role.append('ISYPLT(i)')
+        role.append('ILINIE')
+        self.getline(role)
+
+        self.getline(['I', 'NVOLPL'])
+        if  self.values['NVOLPL'] <= 0:
+            return
+        """
+        for i in range(self.values['NSTRAI'] % 60):
+            role = ['L']
+            line = self.getline()
+            logicals = sum([1 if char in 'fFtT' else 0 for char in line])
+            for j in range(logicals):
+                role.append('PLTSRC(j)')
+            self.getline(role)
+
+        if self.values['LRPSCUT']:
+            self.getline(['R', '1', '2', '3', '4', '5', '6'])
+
+        for j in range(1, self.values['NVOLPL']):
+            self.getline(['I', 'NSP'])
+            self.getline(['L', 'PLTL2D(j)',
+                               'PLTLLG(j)',
+                               'PLTLER(j)',])
+            self.getline(['R5', 'TALZMI(j)', 'TALZMA(j)', 'TALXMI(j)',
+                                'TALXMA(j)', 'TALYMI(j)', 'TALYMA(j)'])
+            if self.values['PLTL2D(j)']:
+                self.getline(['L', 'LHIST2(j)', 'LSMOT2(j)'])
+        """
 
 
         # Following lines are not sufficiently described in manual or in
@@ -4152,7 +4237,7 @@ class EireneEdit(QTreeWidget):
             for i in range(1, self.values['NCHORI']+1):
                 self.getline(['S', 'TXTSIG'])
                 self.getline(['I', 'NSPTAL', 'NSPSCL', 'NSPNEW', 'NSPCHR'])
-                self.getline(['I', 'NSPSTR', 'NSPSPZ', 'NSPINI', 'NSPEND', 
+                self.getline(['I', 'NSPSTR', 'NSPSPZ', 'NSPINI', 'NSPEND',
                               'NSPBLC', 'NSPADD'])
                 self.getline(['I', 'EMIN1', 'EMAX1', 'ESHIFT'])
                 self.getline(['I', 'IPIVOT', 'XPIVOT', 'YPIVOT', 'ZPIVOT'])
@@ -4181,11 +4266,11 @@ class EireneEdit(QTreeWidget):
 
         role = ['I']
         for i in range(1, self.values['NTARGI'] + 1):
-            role.append('NTGPRT(' + str(i) + ')')
+            role.append('NTGPRT(i)')
         self.getline(role)
 
         for i in range(1, self.values['NTARGI'] + 1):
-            for j in range(1, self.values['NTGPRT(' + str(i) + ')'] + 1):
+            for j in range(1, self.values['NTGPRT(i)'] + 1):
                 self.getline(['I', 'I', 'NDT', 'NINCT', 'NIXY', 'NTIN', 'NTEN',
                                    'NIFLG', 'NPTC', 'NPTCM', 'NSPZI', 'NSPZE',
                                    'NEMOD'])
@@ -4308,7 +4393,7 @@ class EireneEdit(QTreeWidget):
         parent = self.curr_par
         group = self.grup_par
 
-        self.row += 1 
+        self.row += 1
 
         if line[:3] == '***':
             block_item = self.createItem(self, line)
@@ -4517,9 +4602,9 @@ class Eirene(QWidget):
         super(Eirene, self).__init__(parent)
         # The following array contains the variables, that are numbered
         # in the settings file but has the same description!
-        self.group_cards = ['NTGPRT', 'INDSRC', 'INDPRO', 'NLPRCA', 'PRMSPL', 
+        self.group_cards = ['NTGPRT', 'INDSRC', 'INDPRO', 'NLPRCA', 'PRMSPL',
                             'INGRDA', 'INGRDE', 'DPLD', 'DIOD', 'DMLD', 'DATD',
-                            'VL', 
+                            'VL',
                             'P1', 'P2', 'P3', 'P4', 'P5']
         self.splitter = QSplitter(self)
         self.splitter.setOrientation(Qt.Vertical)
@@ -4540,7 +4625,7 @@ class Eirene(QWidget):
     @pyqtSlot()
     @pyqtSlot(str)
     def show_help(self, parameter='EDIT_HELP'):
-        if parameter == '': 
+        if parameter == '':
             self.help.clear()
         elif parameter == 'EDIT_HELP':
             text = ''
