@@ -41,7 +41,31 @@ and  ``shot: 1; run: 1`` [3]_
 .. [3] ``user: kosl; tokamak: aug; version: 4.10a``. IDS database for
        now doesn't take in those three parameters as the CPO database does.
 
-To copy examples in his tutorial issue the following commands::
+Using ParaView and plugin on ITER cluster
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Precompiled ParaView 5.2 exists on ITER cluster. What is needed is to load
+precompiled ``libReadUALEdge.so`` plugin from
+``/home/ITER/kosl/solps-gui/staging/paraview-plugins/5.2.0`` directory.
+To launch the paraview use the following commands::
+
+   module purge
+   module load imas/3.7.0/ual/3.3.13 blitz/0.10
+   imasdb solps-iter
+   module load paraview/5.2.0
+   paraview
+
+and then find ``/home/ITER/kosl/solps-gui/staging/paraview-plugins/5.2.0``
+directory  with :menuselection:`Tools --> Manage Plugins --> Load New` and
+select ``libReadUALEdge.so`` plugin that should appear under 
+:menuselection:`Sources --> IMAS` and then follow the rest of the tutorial
+on the use of plugin.
+
+Development use of ParaView
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For *standalone* use on cluster when having compiled ParaView by your own
+then you can copy examples in this tutorial by the following commands::
 
  % install -d ~/public/imasdb
  % cp -r ~kosl/public/imasdb/solps-iter ~/public/imasdb/
@@ -60,6 +84,8 @@ Additional commands to check available modules::
 
  % module avail imas
  % module display imas/develop/3/ual/develop
+
+
 
 Loading the plugin
 ------------------
