@@ -3477,6 +3477,7 @@ class EireneEdit(QTreeWidget):
         self.row = 0
         self.clear()
         self.curr_par = self.grup_par =self
+        self.successful_reading = 1
         # Initiator
         try:
             self.dummy_block()
@@ -3487,8 +3488,9 @@ class EireneEdit(QTreeWidget):
                 self.blocks[i]()
                 self.dummy_block()
             except Exception as e:
-                print(e)
-                pass
+                # print(e)
+                self.successful_reading = 0
+
         self.setCurrentItem(self.topLevelItem(0))
 
     def looks_like_boolean_card(self, line):
@@ -4505,6 +4507,8 @@ class EireneEdit(QTreeWidget):
         self.TextModified = True
 
     def isModified(self):
+        if self.successful_reading == 0:
+            return False
         if len(self.old_text) != len(self.toPlainText()):
             return False
         elif self.old_text != self.toPlainText():
