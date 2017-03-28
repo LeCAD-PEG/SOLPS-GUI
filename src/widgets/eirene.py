@@ -3488,8 +3488,12 @@ class EireneEdit(QTreeWidget):
                 self.blocks[i]()
                 self.dummy_block()
             except Exception as e:
-                # print(e)
-                self.successful_reading = 0
+                if type(e) == IndexError:
+                    pass
+                else:
+                    print('Error type:', type(e))
+                    print('Error:', e)
+                    self.successful_reading = 0
 
         self.setCurrentItem(self.topLevelItem(0))
 
@@ -4190,7 +4194,8 @@ class EireneEdit(QTreeWidget):
 
 
         self.getline(['R5', 'CH2MX', 'CH2MY', 'CH2X0', 'CH2Y0', 'CH2Z0'])
-        self.getline(['R5', 'CH3MX', 'CH3MY', 'CH3MZ', 'CH3Y0', 'CH3Z'])
+        self.getline(['R5', 'CH3MX', 'CH3MY', 'CH3MZ', 'CH3X0', 'CH3Y0',
+                            'CH3Z0'])
         self.getline(['R5', 'ANGLE1', 'ANGLE2', 'ANGLE3'])
         role = ['I', 'I1TRC', 'I2TRC',]
         for i in range(1, 9):
@@ -4509,10 +4514,6 @@ class EireneEdit(QTreeWidget):
     def isModified(self):
         if self.successful_reading == 0:
             return False
-        if len(self.old_text) != len(self.toPlainText()):
-            return False
-        elif self.old_text != self.toPlainText():
-            return True
         return self.TextModified
 
     def toPlainText(self):
