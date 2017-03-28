@@ -3,13 +3,13 @@
 MAKE_JOBS=${MAKE_JOBS:-4}
 BUILDROOT="${PWD}"
 BUILD_DIR="${BUILDROOT}/build"
-PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.3.0-RC2}
+PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.3.0}
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 STAGING_PARAVIEW="${STAGING_DIR}/paraview/${PARAVIEW_VERSION}"
 STAGING_PLUGINS="${STAGING_DIR}/paraview-plugins/${PARAVIEW_VERSION}/${IMAS_VERSION}"
 
 
-case $(hostname) in
+case $(hostname -f) in
   *.iter.org) 
 	module purge
 	module load imas/3.7.0/ual/3.3.13 blitz/0.10 binutils/2.25
@@ -18,6 +18,15 @@ case $(hostname) in
 	export CXX=g++
 	MAKE_JOBS=${MAKE_JOBS:-8}
 	;;
+
+  *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
+	. /etc/profile.d.gw/modules.sh
+	module load imas/3.7.4/ual/3.4.0 
+	module switch itm-python/2.7.13.b7
+	MAKE_JOBS=${MAKE_JOBS:-36}
+	export CXXFLAGS=-fpermissive
+	;;
+  
   *)
 	;;
 esac

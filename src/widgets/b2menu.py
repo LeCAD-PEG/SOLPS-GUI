@@ -3023,6 +3023,184 @@ b2mn_menu = {
 				"""),
    ],
 
+  'b2.atomic_physics_rescale.parameters': [ 'namelist',
+  
+         ( 'RESCALE_SA', 'real*8 array of size(0:NS-1)', '1.0', """
+					Scaling factors for rtsa: ionisation rates of species (is).
+				"""),
+      
+         ( 'RESCALE_RA', 'real*8 array of size(0:NS-1)', '1.0', """
+					Scaling factors for rtra: recombination rates of species (is).
+				"""),
+      
+         ( 'RESCALE_QA', 'real*8 array of size(0:NS-1)', '1.0', """
+					Scaling factors for rtqa: electron cooling rates of species (is).
+				"""),
+      
+         ( 'RESCALE_CX', 'real*8 array of size(0:NS-1)', '1.0', """
+					Scaling factors for rtcx: charge exchange rates of species (is).
+				"""),
+      
+         ( 'RESCALE_RD', 'real*8 array of size(0:NS-1)', '1.0', """
+					Scaling factors for rtrd: line radiation rates of species (is).
+				"""),
+      
+         ( 'RESCALE_BR', 'real*8 array of size(0:NS-1)', '1.0', """
+					Scaling factors for rtbr: bremsstrahlung radiation rates of species (is).
+				"""),
+      
+   ],
+
+  'b2.user.parameters': [ 'namelist',
+  
+         ( 'LHETRGTS', 'integer array of size (NLIM)', '-2 for the first element, -3 for the second element and 0 otherwise', """
+					List of surface indices (EIRENE notation) which are used for calculation of helium enrichment.
+				"""),
+      
+         ( 'LPFRB_I', 'integer', '0', """
+					B2 x-cell index corresponding to the first edge of the bypass between the inner and outer divertor (inner divertor, edge closest to target). If non-positive, counted backwards from the X-point location in the lower PFR, from the inner upper target in the upper PFR, from the lower outer target in the outer SOL, and from the inner upper target in the inner SOL.
+				"""),
+      
+         ( 'LPFRB_O', 'integer', '0', """
+					B2 x-cell index corresponding to the first edge of the bypass between the inner and outer divertor (outer divertor, edge closest to target). If non-positive, counted backwards from the outer lower target in the lower PFR, from the lower outer target in the outer SOL, from the upper outer target in the upper PFR, and from the inner upper target in the inner SOL.
+				"""),
+      
+         ( 'LPFRT_I', 'integer', '0', """
+					B2 x-cell index corresponding to the second edge of the bypass between the inner and outer divertor (inner side, edge furthest to target). If non-positive, counted backwards from the X-point location in the PFR, from the outer target in the outer SOL for a SN, from the top targets in the SOL for a DN.
+				"""),
+      
+         ( 'LPFRT_O', 'integer', '0', """
+					B2 x-cell index corresponding to the second edge of the bypass between the inner and outer divertor (outer divertor, edge furthest to target). If non-positive, counted backwards from the X-point location in the PFR, from the outer target in the outer SOL for a SN, from the top targets in the SOL for a DN.
+				"""),
+      
+         ( 'J_HE_AT', 'integer', '', """
+					Species index of the helium atoms in Eirene. The code attempts to find a match by default.
+				"""),
+      
+         ( 'J_NE_AT', 'integer', '', """
+					Species index of the neon atoms in Eirene. The code attempts to find a match by default.
+				"""),
+      
+         ( 'J_H_AT', 'integer', '', """
+					Species index of the hydrogen atoms in Eirene. The code attempts to find a match by default.
+				"""),
+      
+         ( 'L_H_MOL', 'integer array of size (NMOL)', '', """
+					Species index of the hydrogen molecules in Eirene. The code attempts to find a match by default.
+				"""),
+      
+         ( 'FUSION_POWER', 'real*8', '0.0', """
+					Fusion power occuring in core (including neutrons, in Megawatts).
+				"""),
+      
+         ( 'SPMP_HE_TO_D', 'real*8', '1.0', """
+					Ratio of He to DT pumping speeds (typically, 0.8).
+				"""),
+      
+         ( 'LPFRS_PMP', 'integer', '0', """
+					Location of the pump. 0 no pump at all (default), 1 - lower PFR, 2 - outer SOL, 3 - upper PFR, 4 - inner SOL
+				"""),
+      
+         ( 'NPFRGRP', 'integer', '0', """
+					Actual number of surface groups for PFR flows.
+				"""),
+      
+         ( 'LPFRGRP', 'integer array of size (NLIM)', '', """
+					List of surface segments for PFR flows.
+				"""),
+      
+         ( 'IPFRGRP', 'integer array of size (NPFRGRP)', '0', """
+					First positions in this list for each group.
+				"""),
+      
+         ( 'JPFRGRP', 'integer array of size (NPFRGRP)', '0', """
+					Last positions in this list for each group.
+				"""),
+      
+         ( 'GPFRGRP', 'character*8 array of size (NPFRGRP)', ' ', """
+					Labels for surface groups for PFR flows.
+				"""),
+      
+         ( 'NNTRGRP', 'integer', '', """
+					Actual number of surface groups for neutral data.
+				"""),
+      
+         ( 'LNTRGRP', 'integer array of size (NLIM)', '', """
+					List of surface segments for neutral data.
+				"""),
+      
+         ( 'INTRGRP', 'integer array of size (NNTRGRP)', '', """
+					First positions in this list for each group.
+				"""),
+      
+         ( 'JNTRGRP', 'integer array of size (NNTRGRP)', '', """
+					Last positions in this list for each group.
+				"""),
+      
+         ( 'GNTRGRP', 'character*8 array of size (NNTRGRP)', '', """
+					Labels for the neutral data surface groups.
+				"""),
+      
+         ( 'SPMP_NOM', 'real*8', '0.0', """
+					Nominal pumping speed.
+				"""),
+      
+         ( 'USER_FILENAME', 'character*80', 'b2.user.parameters', """
+					Filename where /USER/ namelist is stored.
+				"""),
+      
+   ],
+
+  'b2.sources.profile': [ 'namelist',
+  
+         ( 'NSDATA', 'integer array of size (NKIND_DATA,NKIND_SOURCE,0:NS)', '0', """
+					Number of points over which the source profile of (kind_data,kind_source,is) is defined. Should not exceed NY+2.
+						If KIND_DATA=1, the data is expressed as a profile in physical distance from the separatrix (in metres) along the outer midplane.
+						The user can change this default reference location by use of the 'set_transport_i[xy]ref' switches.
+						If KIND_DATA=2, the data is expressed as a profile in flux distance from the separatrix (not yet available).
+				"""),
+      
+         ( 'SDATA', 'real*8 data of size (2,NY+2,NKIND_SOURCE,0:NS)', '0.0', """
+					For (i,ir,ik,is) in (1:2,1:NY+2,1:NKIND_SOURCE,0:NS),
+					SDATA(1,ir,:,:) contains the radial location of the profile point (ir).
+					SDATA(2,ir,:,:) contains the source profile value at point (ir).
+					KIND_SOURCE=1 means particle source of species (is) (in particles/m3)
+					KIND_SOURCE=2 means parallel momentum source for species (is) (in kg.m/s/m3)
+					KIND_SOURCE=3 means electron heat source (in Watts/m3)
+					KIND_SOURCE=4 means ion heat source (in Watts/m3)
+					KIND_SOURCE=5 means electric charge source (in Coulombs/m3)
+					KIND_SOURCE=6 means non-ambipolar electron particle source (in e/m3)
+				"""),
+      
+         ( 'NXDATA', 'integer array of size (NKIND_DATA,NKIND_SOURCE,0:NS)', '', """
+					Number of points over which the axial profile of (kind_data,kind_source,is) is defined. Should not exceed NX+2. Defaults to 0.
+					If KIND_DATA=1, the data is expressed as a profile in physical distance, here connection length, rescaled from 0.0 to 1.0.
+					For closed field lines, the reference location for the zero of distance is set by use of the 'set_transport_i[xy]ref' switches.
+					If KIND_DATA=2, the data is expressed as a profile in (ix) cell index, again normalized from 0.0 to 1.0 to match the [0:nx-1] interval.
+				"""),
+      
+         ( 'XDATA', 'real*8 data of size (2,NY+2,NKIND_SOURCE,0:NS)', '1.0', """
+					Multiplier to the poloidal source profile in the axial direction. Same convention for KIND_SOURCE as above.
+				"""),
+      
+         ( 'DIVHEAT', 'real*8', '0.0', """
+					Additional divertor ion heat source (in Watts/m3)
+				"""),
+      
+         ( 'SOURCES_FILENAME', 'character*256', 'b2.sources.profile', """
+					Name of the next file to use for reading a new /PROFILE/ namelist. Quantities not present in the new file will be inherited from the old one.
+				"""),
+      
+         ( 'SOURCES_TIME_MOD', 'real*8', '0.0', """
+					When the B2 run simulation time, in seconds, modulo(SOURCES_TIME_MOD),exceeds SOURCES_TIME_SWITCH, reads the new namelist from SOURCES_FILENAME. Also switches to the new namelist if the ELM count (here time/SOURCES_TIME_MOD) changes. Only active if SOURCES_TIME_MOD is greater than 0.
+				"""),
+      
+         ( 'SOURCES_TIME_SWITCH', 'real*8', '0.0', """
+					Time (in seconds) within an ELM cycle after which a new /PROFILE/ namelist is read.
+				"""),
+      
+   ],
+
 
 }
 

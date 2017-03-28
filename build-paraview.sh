@@ -1,6 +1,6 @@
 #!/bin/sh -x
 
-PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.3.0-RC2}
+PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.3.0}
 QT_VERSION=${QT_VERSION:-4.8.7}
 CMAKE_VERSION=3.7.2
 
@@ -16,8 +16,8 @@ case $(hostname -f) in
 	;;
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
 	. /etc/profile.d.gw/modules.sh
-	module unload itm-gcc gnu
-	module switch itm-python/2.7.13.b4
+	#module unload itm-gcc gnu
+	module switch itm-python/2.7.13.b7
 	MAKE_JOBS=${MAKE_JOBS:-36}
 	export CXXFLAGS=-fpermissive
 	PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-

@@ -334,11 +334,9 @@ if __name__ == "__main__":
                     "baserun "
                     "--shot=1000 --run=1 --user=tomsicp --device=solps-iter "
                     "--version=3")
-                try:
-                    filepath, shot, run, user, device, version
-                except:
-                    sys.exit()
+                sys.exit()
 
+        filepath, shot, run, user, device, version
     except getopt.GetoptError:
         print ('Supplied option not recognized!')
         print ('For help: b2read -h / --help')

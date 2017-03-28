@@ -93,6 +93,18 @@ b2mn_menu = {
     <xsl:with-param name="module">b2.parameters</xsl:with-param>
     <xsl:with-param name="category">b2.transport.parameters</xsl:with-param>
   </xsl:call-template>
+  <xsl:call-template name="block">
+    <xsl:with-param name="module">b2.parameters</xsl:with-param>
+    <xsl:with-param name="category">b2.atomic_physics_rescale.parameters</xsl:with-param>
+  </xsl:call-template>
+  <xsl:call-template name="block">
+    <xsl:with-param name="module">b2.parameters</xsl:with-param>
+    <xsl:with-param name="category">b2.user.parameters</xsl:with-param>
+  </xsl:call-template>
+  <xsl:call-template name="block">
+    <xsl:with-param name="module">b2.parameters</xsl:with-param>
+    <xsl:with-param name="category">b2.sources.profile</xsl:with-param>
+  </xsl:call-template>
 
 }
 

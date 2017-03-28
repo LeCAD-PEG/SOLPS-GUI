@@ -105,9 +105,11 @@ class B2Highlighter(QSyntaxHighlighter):
         keywords = []
         for key in tooltip:
             keywords.append(key)
-
+        # Setting prefixes, so words inside quotes, other words do not get
+        # highlighted, thus getting partially highlighted words
+        prefix = '^(\'| ||\*)'
         for word in keywords:
-            pattern = QRegExp(word, Qt.CaseInsensitive)
+            pattern = QRegExp(prefix + word, Qt.CaseInsensitive)
             rule = HighlightingRule(pattern, self.keyword)
             self.highlightingRules.append(rule)
 
@@ -171,17 +173,23 @@ class B2Edit(QWidget):
     def __init__(self, parent=None, filename=''):
         super(B2Edit, self).__init__(parent)
         self.path = ''
-        if filename in b2_tooltips.tooltips:
-            tooltips = b2_tooltips.tooltips[filename]
-        else:       
-            tooltips = b2_tooltips.tooltips['b2.parameters']
 
-        # Importing additional tooltips from b2mn tooltips since switches 
-        for switch_name in b2_tooltips.tooltips['b2mn.dat']:
-            if switch_name not in tooltips and \
-                switch_name[:4] == filename[:4]:
-                tooltips[switch_name] = \
-                    b2_tooltips.tooltips['b2mn.dat'][switch_name]
+        if filename == 'b2mn.dat':
+            tooltips = dict()
+            [tooltips.update(b2_tooltips.tooltips[d]) for d in 
+             b2_tooltips.tooltips]
+        elif filename == 'b2ar.dat':
+            tooltips = b2_tooltips.tooltips['b2mn.dat']
+        elif filename in b2_tooltips.tooltips:
+            tooltips = b2_tooltips.tooltips[filename]
+        else:
+            tooltips = {}
+
+        # for switch_name in b2_tooltips.tooltips['b2mn.dat']:
+        #     if switch_name not in tooltips and \
+        #         switch_name[:4] == filename[:4]:
+        #         tooltips[switch_name] = \
+        #             b2_tooltips.tooltips['b2mn.dat'][switch_name]
         self.display_widget = B2PlainTextEdit(self, tooltips)
         self.text_handler = B2Handler(self, self.display_widget)
         self.text_handler.highlighter.prepare_rules(tooltips)
@@ -326,9 +334,39 @@ if __name__ == '__main__':
                     output += textwrap.fill(line, wrap) + '\n'
             return output[0:-1] # remove last newline
 
+        @pyqtSlot(str)
+        def editorChanged(self, filename):
+            if filename == 'b2mn.dat':
+                for action in self.actions():
+                    if action.text().startswith('b2'):
+                        action.setEnabled(False)
+                    else:
+                        action.setEnabled(True)
+            elif filename == 'input.dat':
+                [action.setEnabled(False) for action in self.actions()]
+            elif filename == 'b2ar.dat':
+                # Find action with name 'Atomic Physics'
+                for action in self.actions():
+                    if action.text() == 'Atomic Physics':
+                        action.setEnabled(True)
+                        for a in action.menu().actions():
+                            if a.text().startswith('b2ar'):
+                                a.setEnabled(True)
+                            else:
+                                a.setEnabled(False)
+                    else:
+                        action.setEnabled(False)
+            else:
+                actions = self.actions()
+                for action in actions:
+                    if filename[:-4] in action.text():
+                        action.setEnabled(True)
+                    else:
+                        action.setEnabled(False)
 
 
     class Standalone(QMainWindow):
+        editorChanged = pyqtSignal(str)
         def __init__(self, parent=None):
             super(Standalone, self).__init__(parent)
 
@@ -346,6 +384,8 @@ if __name__ == '__main__':
                     addMenu = AddMenu(menu_bar)
                     addMenu.output.connect(\
                                         self.editor.display_widget.insert_line)
+                    self.editorChanged.connect(addMenu.editorChanged)
+                    self.editorChanged.emit(filename)
                     self.setMenuBar(menu_bar)
             else:
                 print('File does not exist')
