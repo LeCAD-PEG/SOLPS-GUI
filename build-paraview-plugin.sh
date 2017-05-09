@@ -3,7 +3,7 @@
 MAKE_JOBS=${MAKE_JOBS:-4}
 BUILDROOT="${PWD}"
 BUILD_DIR="${BUILDROOT}/build"
-PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.3.0}
+PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.2.0}
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 STAGING_PARAVIEW="${STAGING_DIR}/paraview/${PARAVIEW_VERSION}"
 STAGING_PLUGINS="${STAGING_DIR}/paraview-plugins/${PARAVIEW_VERSION}/${IMAS_VERSION}"
@@ -12,7 +12,7 @@ STAGING_PLUGINS="${STAGING_DIR}/paraview-plugins/${PARAVIEW_VERSION}/${IMAS_VERS
 case $(hostname -f) in
   *.iter.org) 
 	module purge
-	module load imas/3.7.0/ual/3.3.13 blitz/0.10 binutils/2.25
+	module load imas/3.7.4/ual/3.4.0 blitz/0.10 binutils/2.25
         module load python/2.7/11
 	export CC=gcc
 	export CXX=g++
