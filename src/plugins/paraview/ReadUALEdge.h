@@ -11,56 +11,54 @@
 #include "vtkUnstructuredGridAlgorithm.h"
 #include <vtkMultiBlockDataSetAlgorithm.h>
 
-using namespace std; 
+using namespace std;
 
-std::vector<std::string> findShotRun(std::string userIMASShotRunDir, std::string user);
+std::vector<std::string> findShotRun(
+    std::string userIMASShotRunDir, std::string user);
 
 class ReadUALEdge : public vtkMultiBlockDataSetAlgorithm
 {
- public:
- 
-  vtkTypeMacro(ReadUALEdge, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
- 
-  static ReadUALEdge *New();
+    public:
 
-  vtkGetMacro(Shot,int);
-  vtkSetMacro(Shot,int);
-  
-  vtkGetMacro(Run,int);
-  vtkSetMacro(Run,int);
+    vtkTypeMacro(ReadUALEdge, vtkMultiBlockDataSetAlgorithm);
+    void PrintSelf(ostream& os, vtkIndent indent);
 
-  vtkGetMacro(CPOLoad,int);
-  vtkSetMacro(CPOLoad,int);
- 
-  vtkSetStringMacro(User);
-  vtkGetStringMacro(User);
-  
-  vtkSetStringMacro(Device);
-  vtkGetStringMacro(Device);
+    static ReadUALEdge *New();
 
-	// virtual vtkStringArray * FillShotRunList();
+    vtkGetMacro(Shot,int);
+    vtkSetMacro(Shot,int);
+
+    vtkGetMacro(Run,int);
+    vtkSetMacro(Run,int);
+
+    vtkGetMacro(CPOLoad,int);
+    vtkSetMacro(CPOLoad,int);
+
+    vtkSetStringMacro(User);
+    vtkGetStringMacro(User);
+
+    vtkSetStringMacro(Device);
+    vtkGetStringMacro(Device);
 
 protected:
-  ReadUALEdge();
-  ~ReadUALEdge(){}
+    ReadUALEdge();
+    ~ReadUALEdge(){}
 
-  int Shot;
-  int Run;
-  int RefRun;
-  int CPOLoad;
-  char * User;
-  char * Device;
-  char * Version;
-	vtkSmartPointer<vtkStringArray> stringArray; 
+    int Shot;
+    int Run;
+    int RefRun;
+    int CPOLoad;
+    char * User;
+    char * Device;
+    char * Version;
+    vtkSmartPointer<vtkStringArray> stringArray;
 
-  int RequestData(vtkInformation *, vtkInformationVector **,
-                  vtkInformationVector *);
+    int RequestData(vtkInformation *, vtkInformationVector **,
+                    vtkInformationVector *);
 
 private:
-  ReadUALEdge(const ReadUALEdge&);  // Not implemented.
-  void operator=(const ReadUALEdge&);  // Not implemented.
- 
+    ReadUALEdge(const ReadUALEdge&);  // Not implemented.
+    void operator=(const ReadUALEdge&);  // Not implemented.
 };
 
 #endif
