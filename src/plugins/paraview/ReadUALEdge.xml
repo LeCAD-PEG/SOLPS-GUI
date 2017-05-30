@@ -1,94 +1,94 @@
 <ServerManagerConfiguration>
-  <ProxyGroup name="sources">
-  	<SourceProxy name="UAL Edge" class="ReadUALEdge" label="UAL Edge IDS">
-    	<Documentation
-				long_help="Read an Edge IDS"
-				short_help="Read an Edge IDS">
-      </Documentation>
+    <ProxyGroup name="sources">
+        <SourceProxy name="UAL Edge" class="ReadUALEdge" label="UAL Edge IDS">
+            <Documentation
+                long_help="Read an Edge IDS"
+                short_help="Read an Edge IDS">
+            </Documentation>
 
-			<IntVectorProperty
-				name="Shot"
-				command="SetShot"
-				number_of_elements="1"
-				default_values="16151"
-				panel_visibility="default" >
-				<IntRangeDomain name="range"/>
-        <Documentation>
-          The values of this property sets the Shot number.
-        </Documentation>
-      </IntVectorProperty>
+            <IntVectorProperty
+                name="Shot"
+                command="SetShot"
+                number_of_elements="1"
+                default_values="16151"
+                panel_visibility="default" >
+                <IntRangeDomain name="range"/>
+                <Documentation>
+                    The values of this property sets the Shot number.
+                </Documentation>
+            </IntVectorProperty>
 
-      <IntVectorProperty
-        name="Run"
-        command="SetRun"
-        number_of_elements="1"
-        default_values="1000"
-        panel_visibility="default" >
-        <IntRangeDomain name="range"/>
-        <Documentation>
-          The values of this property sets the Run number.
-        </Documentation>
-      </IntVectorProperty>
+            <IntVectorProperty
+                name="Run"
+                command="SetRun"
+                number_of_elements="1"
+                default_values="1000"
+                panel_visibility="default" >
+                <IntRangeDomain name="range"/>
+                <Documentation>
+                    The values of this property sets the Run number.
+                </Documentation>
+            </IntVectorProperty>
 
-			<StringVectorProperty
-				name="User"
+            <StringVectorProperty
+                name="User"
 				label="User"
 				command="SetUser"
 				number_of_elements="1"
 				default_values="kosl"
 				panel_visibility="default"
-        immediate_update="true">
-        <Documentation>
-          This property specifies the user for the UAL Database. 
-        </Documentation>
-     	</StringVectorProperty>
+                immediate_update="true">
+                <Documentation>
+                    This property specifies the user for the UAL Database. 
+                </Documentation>
+            </StringVectorProperty>
 
-     	<StringVectorProperty
+            <StringVectorProperty
 				name="Device"
-       	label="Device"
-       	command="SetDevice"
-       	number_of_elements="1"
-       	default_values="solps-iter"
-       	panel_visibility="default">
-        <Documentation>
-          This property specifies the Device for the UAL Database. 
-        </Documentation>
-     	</StringVectorProperty>
+       	        label="Device"
+       	        command="SetDevice"
+       	        number_of_elements="1"
+       	        default_values="solps-iter"
+       	        panel_visibility="default">
+                <Documentation>
+                    This property specifies the Device for the UAL Database. 
+                </Documentation>
+            </StringVectorProperty>
 		 
-	 	<Property name="Refresh" command="Modified" panel_widget="command_button" width="5"/>
+            <Property name="Refresh" command="Modified" panel_widget="command_button" width="5"/>
 
-		<IntVectorProperty
-			name="CPOLoad"
-			label="List Shot/Runs"
-			command="SetCPOLoad"
-			number_of_elements="1"
-			default_values="0"
-			panel_visibility="default" >
-		 	<BooleanDomain name="bool"/>
-		 	<Documentation>
-				This checkbox opens the IDS list for specified user.
-		 	</Documentation>
-	 	</IntVectorProperty>
+            <IntVectorProperty
+                name="CPOLoad"
+                label="List Shot/Runs"
+                command="SetCPOLoad"
+                number_of_elements="1"
+                default_values="0"
+                panel_visibility="default" >
+		 	    <BooleanDomain name="bool"/>
+		 	    <Documentation>
+				    This checkbox opens the IDS list for specified user.
+		 	    </Documentation>
+            </IntVectorProperty>
 		
-	 	<StringVectorProperty
-			name="ShotRunList"
-			label="IDS Shot/Runs"
-			number_of_elements="0"
-			number_of_elements_per_command="2"
-			element_types="2"
-			repeat_command ="1"
-			panel_visibility="default">
-		 	<Documentation>
-			 	List of avaiable Shot/Run-s for specified user.
-		 	</Documentation>
-		 	<Hints>
-			 	<WidgetHeight number_of_rows="12" />
-			 	<PropertyWidgetDecorator type="my_decorator"/>
-		 	</Hints>
-	 	</StringVectorProperty>
-    <Hints>
-      <ShowInMenu category="IMAS" />
-    </Hints>
-    </SourceProxy>
-  </ProxyGroup>
+            <StringVectorProperty
+                name="ShotRunList"
+                label="IDS Shot/Runs"
+                number_of_elements="0"
+                number_of_elements_per_command="2"
+                element_types="2"
+                repeat_command ="1" 
+                panel_visibility="default">
+		 	    <Documentation>
+    			 	List of avaiable Shot/Run-s for specified user.
+		 	    </Documentation>
+		 	    <Hints>
+			 	   <WidgetHeight number_of_rows="12" />
+			 	   <PropertyWidgetDecorator type="my_decorator"/>
+		 	    </Hints>
+            </StringVectorProperty>
+            <Hints>
+                <ShowInMenu category="IMAS" />
+            </Hints>
+        </SourceProxy>
+    </ProxyGroup>
 </ServerManagerConfiguration>

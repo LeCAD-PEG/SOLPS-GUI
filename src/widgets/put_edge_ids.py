@@ -1,4 +1,21 @@
+#! /usr/bin/env python
 #Python 3.5
+#> Legend:
+#>      #> .............. variables description, additional (helpful)
+#>                            information etc.
+#>      # ............... Commented part of code  
+
+#> -----------------------------------------------------------------------------
+#> DESCRIPTION
+#> This Python script is used to read geometry from b2fgmtry file together with
+#> electron density, electron temperature and ion temperature scalars from 
+#> b2fstati file. The same data is then written to IDS together by 
+#> creating "Cells" and "Nodes" grid subsets.
+#>
+#> Basic environment settings (terminal commands on hpc iter.org)
+#> $ module load imas/3.7.4/ual/3.4.0
+#> $ imasdb solps-iter
+#> -----------------------------------------------------------------------------
 
 try:
     import BytesIO
@@ -57,15 +74,15 @@ def getB2path(dir_path, file_name):
         return ''
 
 def readB2fgmtry(file_path):
-    # Reading geometry from file b2fgmtry (x and y coordinates of nodes)
-    # and inserting them into array for later use
+    #> Read geometry from file b2fgmtry (x and y coordinates of nodes)
+    #> and insert them into array for later use
 
     crx = []
     cry = []
 
-    found_nxyx = 0
-    found_crx = 0
-    found_cry = 0
+    found_nxyx  = 0
+    found_crx   = 0
+    found_cry   = 0
     with open(file_path + "/b2fgmtry", 'r') as infile:
         for line in infile:
             lineSplit = line.split()    #line split in form
@@ -152,7 +169,7 @@ def readB2fstati(file_path):
                         te.append(float(lineSplit[j].split('E')[0]) * \
                                   pow(10, int(lineSplit[j].split('E')[1])))
             if (found_ne == 0 and found_te == 0 and found_ti == 1):
-            # start writing coorindates between 'ti' and next 'cf*:' to ti array
+            # Write coorindates between 'ti' and next 'cf*:' to ti array
                 for j in range(len(lineSplit)):
                     if lineSplit[j] == "*cf:":
                         found_ne = 0
@@ -308,53 +325,80 @@ def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti,
                 cellId+2*numCellsX*numCellsY] = cellId+3*numCellsX*numCellsY+1
             cellId += 1
 
-    ## WRITING VALUES (ne, te, ti) for "Cells" subgrid
-    # Writing ne (electron density)
-    num_ne_subgrid = 1
+    #> Set (IDS substructure shortcut variable) subgridDaseData for 
+    #> Cells grid subset
+    gridSubsetBaseData = \
+        imas_obj.edge_profiles.ggd[0].grid.grid_subset[gridSubset_index - 1]
+    #> Put base grid subset data/parameters (name, index)
+    gridSubsetBaseData.identifier.name = gridSubset_name
+    gridSubsetBaseData.identifier.index = gridSubset_index
+    #> Put grid subset element and element object data
+    gridSubsetBaseData.element.resize(num_obj_2D)
+    for i in range(num_obj_2D):
+        gridSubsetBaseData.element[i].object.resize(1)
+        gridSubsetBaseData.element[i].object[0].space = 0 + 1
+        gridSubsetBaseData.element[i].object[0].dimension = gridSubset_dim_index
+        gridSubsetBaseData.element[i].object[0].index = i + 1
+
+    #> PUT VALUES (ne, te, ti) for "Cells" grid subset
+    # Put ne (electron density)
+    num_ne_gridSubset = 1
     num_ne_values = len(ne)
-    imas_obj.edge_profiles.ggd[0].electrons.density.resize(num_ne_subgrid)
-    nePath = imas_obj.edge_profiles.ggd[0].electrons.density[num_ne_subgrid - 1]
-    nePath.grid_subset_index = subgrid_base_index
+    imas_obj.edge_profiles.ggd[0].electrons.density.resize(num_ne_gridSubset)
+    nePath = \
+        imas_obj.edge_profiles.ggd[0].electrons.density[num_ne_gridSubset - 1]
+    nePath.grid_subset_index = gridSubset_index
     nePath.values.resize(num_ne_values)
     for n in range(num_ne_values):
         nePath.values[n] = ne[n]
 
-    # Writing te (electron temperature)
-    num_te_subgrid = 1
+    # Put te (electron temperature)
+    num_te_gridSubset = 1
     num_te_values = len(te)
-    imas_obj.edge_profiles.ggd[0].electrons.temperature.resize(num_te_subgrid)
-    tePath=imas_obj.edge_profiles.ggd[0].electrons.temperature[num_te_subgrid-1]
-    tePath.grid_subset_index = subgrid_base_index
+    imas_obj.edge_profiles.ggd[0].electrons.temperature.resize(num_te_gridSubset)
+    tePath = \
+        imas_obj.edge_profiles.ggd[0].electrons.temperature[num_te_gridSubset - 1]
+    tePath.grid_subset_index = gridSubset_index
     tePath.values.resize(num_te_values)
     for n in range(num_te_values):
-        # converting to eV (1 J = 6.242e18 eV)
+        # convert to eV (1 J = 6.242e18 eV)
         tePath.values[n] = te[n] *(6.242e18)
 
-
-    # Writing ti (ion temperature)
-    num_ti_subgrid = 1
+    # Put ti (ion temperature)
+    num_ti_gridSubset = 1
     num_ti_values = len(ti)
     num_ti_species = 1  # Number of ion species, as in
                         # number of different ion charges.
     ion_specie = 1
-    # This regards mostly the ion density of each ion charge,
-    # as ion temperature is taken as the same for all ion charges.
+    #> Ion specie is linked with the ion density of each ion charge,
+    #> as ion temperature is taken as the same for all ion charges.
     imas_obj.edge_profiles.ggd[0].ion.resize(num_ti_species)
     imas_obj.edge_profiles.ggd[0].ion[ion_specie - 1].temperature.\
-        resize(num_ti_subgrid)
-    tiPath = imas_obj.edge_profiles.ggd[0].ion[ion_specie-1]. \
-        temperature[num_ti_subgrid - 1]
-    tiPath.grid_subset_index = subgrid_base_index
+        resize(num_ti_gridSubset)
+    tiPath = imas_obj.edge_profiles.ggd[0].ion[ion_specie - 1]. \
+        temperature[num_ti_gridSubset - 1]
+    tiPath.grid_subset_index = gridSubset_index
     tiPath.values.resize(num_ti_values)
     for n in range(num_ti_values):
-        # converting to eV (1 J = 6.242e18 eV)
+        # convert to eV (1 J = 6.242e18 eV)
         tiPath.values[n] = ti[n] * (6.242e18)
 
+<<<<<<< HEAD
     imas_obj.edge_profiles.put()
+=======
+    #> Write all put data do IDS
+    imas_obj.edge_profiles.putSlice()
+>>>>>>> abfe7f44f60da7c10f5963f5cf91e36a865ff2ed
 
+    #> Close IDS
     imas_obj.close()
+<<<<<<< HEAD
     print("Closing IDS.")
     return 1
+=======
+    print("IDS write finished")
+    print("IDS closed")
+>>>>>>> abfe7f44f60da7c10f5963f5cf91e36a865ff2ed
 
 if __name__ == "__main__":
     try:
@@ -371,7 +415,7 @@ if __name__ == "__main__":
         for opt, arg in opts:
             #print opt, arg
             if opt in ("-fp", "--dirpath"):
-                filepath = arg
+                dirpath = arg
             elif opt in ("-s", "--shot"):
                 shot = int(arg)
             elif opt in ("-r", "--run"):
@@ -388,13 +432,18 @@ if __name__ == "__main__":
                     "device and version variables must be defined."
                     "Example (terminal): "
                     "python3.5 put_edge_ids.py "
-                    "--dirpath=/home/ITER/tomsicp/solps-iter/runs/AUG_16151_D/"
+                    "--dirpath=/home/ITER/penkod/solps-iter/runs/AUG_16151_D/"
                     "baserun "
-                    "--shot=1000 --run=1 --user=tomsicp --device=solps-iter "
+                    "--shot=1000 --run=1 --user=penkod --device=solps-iter "
                     "--version=3")
                 sys.exit()
 
+<<<<<<< HEAD
     except Exception:
+=======
+        dirpath, shot, run, user, device, version
+    except getopt.GetoptError:
+>>>>>>> abfe7f44f60da7c10f5963f5cf91e36a865ff2ed
         print ('Supplied option not recognized!')
         print ('For help: b2read -h / --help')
         sys.exit(2)
@@ -402,6 +451,7 @@ if __name__ == "__main__":
     # few paths to example files for testing
     # /home/ITER/tomsicp/solps-iter/runs/AUG_16151_D/baserun
     # /home/ITER/tomsicp/solps-iter-devel/runs/ITER_535_D+He+Ar/baserun
+<<<<<<< HEAD
     # run: "imasdb solps-iter"
     # Example command:
     """
@@ -413,4 +463,11 @@ python3.5 put_edge_ids.py --dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun --u
     # code_parameters = r'test\x00test'
     print(code_parameters[:50])
     B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti, code_parameters)
+=======
+
+    xc, yc, nx, ny = readB2fgmtry(dirpath)
+    ne, te, ti = readB2fstati(dirpath)
+
+    B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti)
+>>>>>>> abfe7f44f60da7c10f5963f5cf91e36a865ff2ed
 

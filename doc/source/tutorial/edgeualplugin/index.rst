@@ -50,7 +50,7 @@ precompiled ``libReadUALEdge.so`` plugin from
 To launch the paraview use the following commands::
 
    module purge
-   module load imas/3.7.0/ual/3.3.13 blitz/0.10
+   module load imas/3.9.1/ual/3.5.3 blitz/0.10
    imasdb solps-iter
    module load paraview/5.2.0
    paraview
