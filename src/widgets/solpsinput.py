@@ -26,7 +26,7 @@ from b2 import B2Edit
 
 class SolpsInput(QTabWidget):
     """SolpsInput(QTabWidget)
-    
+
     Provides a custom widget that holds all SOLPS input files available for
     editing before starting the run.
     """
@@ -69,7 +69,7 @@ class SolpsInput(QTabWidget):
         """
         font = QFont()
         font.setFamily('Monospace')
-        for filename, tooltip in solps_input_files:            
+        for filename, tooltip in solps_input_files:
             if filename == 'input.dat':
                 eirene = Eirene()
                 tab_index = self.addTab(eirene, filename)

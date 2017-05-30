@@ -3486,15 +3486,17 @@ class EireneEdit(QTreeWidget):
         for i in range(self.number_of_blocks):
             try:
                 self.blocks[i]()
-                self.dummy_block()
             except Exception as e:
-                if type(e) == IndexError:
-                    pass
-                else:
-                    print('Error type:', type(e))
-                    print('Error:', e)
+
+                #print('Error type:', type(e))
+                #print('Error:', e)
+                if type(e) != IndexError:
                     self.successful_reading = 0
 
+            try:
+                self.dummy_block()
+            except IndexError as e:
+                pass
         self.setCurrentItem(self.topLevelItem(0))
 
     def looks_like_boolean_card(self, line):
@@ -4127,7 +4129,7 @@ class EireneEdit(QTreeWidget):
         self.getline(['I', 'NVOLPR', 'NVLPR'])
 
         for i in range(self.values['NVOLPR']):
-            sel.getline(['I', 'NTLV', 'NFLGV', 'NSPZV1', 'NSPZV2', 'NTLVF'])
+            self.getline(['I', 'NTLV', 'NFLGV', 'NSPZV1', 'NSPZV2', 'NTLVF'])
 
         self.getline(['I', 'NSURPR'])
 

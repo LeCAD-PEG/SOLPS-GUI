@@ -39,7 +39,7 @@ class HighlightingRule():
 
 
 class B2PlainTextEdit(QPlainTextEdit):
-    """This is the QPlainTextEdit that contains the text, activates highlights 
+    """This is the QPlainTextEdit that contains the text, activates highlights
     and tooltips for all the switches and parameters that have description,
     category, default values and other notes.
     """
@@ -94,6 +94,12 @@ class B2Highlighter(QSyntaxHighlighter):
         self.keyword.setForeground(Qt.darkBlue)
         self.keyword.setFontWeight(QFont.Bold)
 
+        self.keywordRed = QTextCharFormat()
+        self.keywordRed.setForeground(Qt.darkRed)
+        self.keywordRed.setFontWeight(QFont.Bold)
+
+        self.highlightingSwitches = []
+
         comment = QTextCharFormat()
         brush = QBrush(Qt.darkGreen, Qt.SolidPattern)
         pattern = QRegExp("^\*[^\n]*")
@@ -103,15 +109,18 @@ class B2Highlighter(QSyntaxHighlighter):
 
     def prepare_rules(self, tooltip):
         keywords = []
+        self.counter = {}
         for key in tooltip:
             keywords.append(key)
         # Setting prefixes, so words inside quotes, other words do not get
         # highlighted, thus getting partially highlighted words
         prefix = '^(\'| ||\*)'
         for word in keywords:
+            self.counter[word] = 0
             pattern = QRegExp(prefix + word, Qt.CaseInsensitive)
             rule = HighlightingRule(pattern, self.keyword)
-            self.highlightingRules.append(rule)
+            self.counter[word] = 0
+            self.highlightingSwitches.append((rule, word))
 
     def highlightBlock(self, text):
         for rule in self.highlightingRules:
@@ -121,7 +130,31 @@ class B2Highlighter(QSyntaxHighlighter):
                 length = expression.matchedLength()
                 self.setFormat(index, length, rule.format)
                 index = text.find(str(expression), index + length)
+
+        for rule, word in self.highlightingSwitches:
+            expression = QRegExp(rule.pattern)
+            index = expression.indexIn(text)
+            to_highlight = []
+            while index >= 0:
+                length = expression.matchedLength()
+                to_highlight.append((index, length, rule.format))
+                self.counter[word] += 1
+                index = text.find(str(expression), index + length)
+            if to_highlight:
+                if self.counter[word] > 1:
+                    self.multiple_counters(to_highlight)
+                else:
+                    self.setFormat(to_highlight[-1][0], to_highlight[-1][1],
+                                   to_highlight[-1][2])
         self.setCurrentBlockState(0)
+
+
+    def multiple_counters(self, duplicates):
+        """ When we have duplicated switches. """
+        text = self.document()
+        print(text)
+
+
 
 
 class B2Handler:
@@ -166,7 +199,7 @@ class B2Edit(QWidget):
     file has any tool-tips, that describes the switch or parameter, they will
     be applied. Otherwise it acts as a normal editor.
 
-    If there is a .stencil provided in the run folder or in the ../baserun 
+    If there is a .stencil provided in the run folder or in the ../baserun
     folder, it can be loaded by using the F2 key.
     """
 
@@ -176,7 +209,7 @@ class B2Edit(QWidget):
 
         if filename == 'b2mn.dat':
             tooltips = dict()
-            [tooltips.update(b2_tooltips.tooltips[d]) for d in 
+            [tooltips.update(b2_tooltips.tooltips[d]) for d in
              b2_tooltips.tooltips]
         elif filename == 'b2ar.dat':
             tooltips = b2_tooltips.tooltips['b2mn.dat']
@@ -199,7 +232,7 @@ class B2Edit(QWidget):
         self.setLayout(layout)
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_F2: 
+        if event.key() == Qt.Key_F2:
             if self.path:
                 # No checks are required since the solpsinput.py have
                 # checked if stensils exist
@@ -241,12 +274,12 @@ if __name__ == '__main__':
 
     class AddMenu(QMenu):
         """ AddMenu(QMenu)
-        
+
             Provides a custom widget for inserting B2mn parameters into editor.
         """
 
         output = pyqtSignal(str)
-        
+
         def __init__(self, parent=None):
             '''
             Toooltips work on QMenu as a whole but not on actions!
@@ -284,7 +317,7 @@ if __name__ == '__main__':
                                       + sd_formatted + '</pre>'
                             action.setToolTip(tooltip)
                             line = "'" + name + "'       '" + default + "'"
-                            pfn = functools.partial(self.handleMenuTriggered, 
+                            pfn = functools.partial(self.handleMenuTriggered,
                                                     line)
                             action.triggered.connect(pfn)
 
@@ -300,7 +333,7 @@ if __name__ == '__main__':
                         action.triggered.connect(pfn)
 
         def handleMenuHovered(self, action):
-            """ Instead of showing tooltip on hover we rather setup a new 
+            """ Instead of showing tooltip on hover we rather setup a new
                 tool-tip to the parent and wait to be shown.
             """
             action.parent().setToolTip(action.toolTip())
@@ -415,7 +448,7 @@ if __name__ == '__main__':
         mainwindow.read_and_set_text(input_filename)
         mainwindow.show()
         sys.exit(app.exec_())
-        
+
     else:
         print("Provide path to B2 input file.")
         sys.exit()

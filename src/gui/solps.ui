@@ -25,7 +25,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_8">
-    <item row="0" column="1">
+    <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -310,6 +310,12 @@ self.output.emit(&quot;ls -ld run*&quot;)</string>
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="maximumSize">
+           <size>
+            <width>75</width>
+            <height>16777215</height>
+           </size>
+          </property>
           <property name="toolTip">
            <string>Imports existing run from elsewhere (with possible conversion) and puts it under selected tree.</string>
           </property>
@@ -318,36 +324,16 @@ self.output.emit(&quot;ls -ld run*&quot;)</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QPushButton" name="pushButton_Archive">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="toolTip">
-           <string>Moves the selected tree into Archive</string>
-          </property>
-          <property name="text">
-           <string>Archive</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QPushButton" name="pushButton_Run">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="toolTip">
-           <string>Starts the run with the method selected in Preferences</string>
-          </property>
-          <property name="text">
-           <string>Run</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="3">
          <widget class="QPushButton" name="pushButton_Stop">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>16777215</height>
+           </size>
           </property>
           <property name="toolTip">
            <string>Creates b2mn.exe.dir/.quit that
@@ -358,55 +344,105 @@ should eventually stop the run.</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="4">
-         <widget class="QPushButton" name="pushButton_Continue">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="toolTip">
-           <string>Copies b2fstate to b2fstati
-and starts the run</string>
-          </property>
-          <property name="text">
-           <string>Continue</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="5">
          <widget class="QPushButton" name="pushButton_Edit">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>53</width>
+            <height>16777215</height>
+           </size>
           </property>
           <property name="text">
            <string>Edit</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="0" column="2">
+         <widget class="QPushButton" name="pushButton_Run">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Starts the run with the method selected in Preferences</string>
+          </property>
+          <property name="text">
+           <string>Run</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="7">
+         <widget class="QPushButton" name="pushButton_GetIds">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>53</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Get IDS</string>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>false</bool>
+          </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="6">
+         <widget class="QPushButton" name="pushButton_PutIds">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>53</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Put IDS</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
          <widget class="QComboBox" name="comboBoxRunFilterType"/>
         </item>
-        <item row="1" column="1" colspan="2">
-         <widget class="QCheckBox" name="filterCaseSensitivityCheckBox">
+        <item row="0" column="1">
+         <widget class="QPushButton" name="pushButton_Archive">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>75</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Moves the selected tree into Archive</string>
+          </property>
           <property name="text">
-           <string>Case sensitive filter</string>
+           <string>Archive</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="3" colspan="2">
-         <widget class="QLineEdit" name="lineEditRunFilter">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="5">
-         <widget class="QPushButton" name="pushButton_Filter">
-          <property name="text">
-           <string>Filter</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="6">
+        <item row="4" column="0" colspan="7">
          <widget class="QTreeView" name="treeViewRuns">
           <property name="dragEnabled">
            <bool>false</bool>
@@ -416,6 +452,47 @@ and starts the run</string>
           </property>
           <property name="textElideMode">
            <enum>Qt::ElideRight</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1" colspan="2">
+         <widget class="QCheckBox" name="filterCaseSensitivityCheckBox">
+          <property name="text">
+           <string>Case sensitive filter</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3">
+         <widget class="QLineEdit" name="lineEditRunFilter">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="4">
+         <widget class="QPushButton" name="pushButton_Filter">
+          <property name="text">
+           <string>Filter</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4">
+         <widget class="QPushButton" name="pushButton_Continue">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>75</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Copies b2fstate to b2fstati
+and starts the run</string>
+          </property>
+          <property name="text">
+           <string>Continue</string>
           </property>
          </widget>
         </item>
@@ -479,7 +556,7 @@ and starts the run</string>
             <property name="runDir" stdset="0">
              <string>/home/ITER/kosl/solps-iter/runs/AUG_16151_D/run1</string>
             </property>
-            <property name="solpsPlotCommand">
+            <property name="solpsPlotCommand" stdset="0">
              <string>energy_analysis</string>
             </property>
            </widget>
@@ -535,7 +612,7 @@ and starts the run</string>
             <pointsize>7</pointsize>
            </font>
           </property>
-          <property name="tcshCommand">
+          <property name="tcshCommand" stdset="0">
            <string>b2fstate_OK</string>
           </property>
           <property name="solpsTop" stdset="0">
@@ -685,7 +762,7 @@ and starts the run</string>
      <x>0</x>
      <y>0</y>
      <width>678</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

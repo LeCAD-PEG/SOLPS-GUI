@@ -1,12 +1,60 @@
 #Python 3.5
 
 try:
-    import imas
-except Exception as e:
-    print("Required IMAS support library not available on this system.")
+    import BytesIO
+except:
+    from io import BytesIO
 
 import getopt
 import sys
+import os
+import tarfile
+
+input_files = [
+    'input.dat',
+    'b2mn.dat',
+    'b2ag.dat',
+    'b2ah.dat',
+    'b2ai.dat',
+    'b2ar.dat',
+    'b2md.dat',
+    'b2.boundary.parameters',
+    'b2.neutrals.parameters',
+    'b2.numerics.parameters',
+    'b2.transport.parameters',
+    'b2.wall_save.parameters',
+    'b2.feedback_control.parameters',
+    'b2.sources.profile',
+    'b2.transport.inputfile',
+    'b2.user.parameters',
+    'b2.atomic_physics_rescale.parameters'
+]
+
+
+def tarInputFiles(dir_path):
+    tf = BytesIO()
+    tar = tarfile.TarFile(mode='w', fileobj=tf)
+    for filename in input_files:
+        name = getB2path(dir_path, filename)
+        if name:
+            os.chdir(dir_path)
+            tar.add(name)
+
+    bstring = tf.getvalue()
+    bstring = bstring.replace(b'\x00', b'\x01')
+    return bstring.decode()
+
+def getB2path(dir_path, file_name):
+    filepath = dir_path + '/' + file_name
+    filepath_base = dir_path + '/../baserun/' + file_name
+    if os.path.isfile(filepath):
+        return file_name
+
+    elif os.path.isfile(filepath_base):
+        return '../baserun/' + file_name
+
+    else:
+        return ''
 
 def readB2fgmtry(file_path):
     # Reading geometry from file b2fgmtry (x and y coordinates of nodes)
@@ -132,7 +180,8 @@ def readB2fstati(file_path):
                     break
     return ne, te, ti
 
-def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti):
+def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti,
+            code_paramaters):
     # Writing previously found data in b2fgmtry and b2fstati to IDS database
     print('Writing IDS: ')
     time = 1
@@ -148,7 +197,7 @@ def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti):
         print('Creation of data entry OK!')
     else:
         print('Creation of data entry FAILED!')
-        sys.exit()
+        return 0
 
     # --Basic IDS space allocation--
     imas_obj.edge_profiles.profiles_1d.resize(1)
@@ -156,7 +205,12 @@ def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti):
     imas_obj.edge_profiles.putNonTimed()
     imas_obj.edge_profiles.ggd[0].grid.space.resize(1)
     imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension.resize(3)
-    imas_obj.edge_profiles.ids_properties.homogeneous_time = 1  
+    imas_obj.edge_profiles.ids_properties.homogeneous_time = 1 # !
+    #
+
+    # Writing code parameters
+    imas_obj.edge_profiles.code.parameters = code_parameters
+    # Homogeneous time: Synchronised data over same time array
 
     num_coord = len(xc) + len(yc)  # Number of all available coordinates
     num_subgrids = 2  # Number of subgrid to write (Cells and Nodes)
@@ -168,19 +222,19 @@ def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti):
 
     ## --WRITING DATA FOR SUBGRID "Nodes"
     # (subgrid base id : 2, subgrid class : 1) --
-    # Note that writing of all data in form of indices is done in Fortran index 
-    # counting (starting with 1), not in C++/python index counting 
+    # Note that writing of all data in form of indices is done in Fortran index
+    # counting (starting with 1), not in C++/python index counting
     # (starts with 0)!
-    # But we must have in mind, that currently we're working with Python 
+    # But we must have in mind, that currently we're working with Python
     # ( Python_Index == Fortran_Index -1)!
     num_nodes = int(num_coord / 2)  # We have 2D coordinates, P(x,y)
-    subgrid_base_index = 2  # Subgrid index of subgrid Nodes 
+    subgrid_base_index = 2  # Subgrid index of subgrid Nodes
                         # (Indexing of subgrids is as in shot: 1, run:1,
                         # device:iter; and shot:16151, run:1000; device:aug
     subgrid_name = "Nodes"
-    subgrid_class = 1   # Subgrid Nodes consists of points -> subgrid class 1 
+    subgrid_class = 1   # Subgrid Nodes consists of points -> subgrid class 1
                         # (edges -> class 2; cells -> class 3)
-    obj_class_1_id = 1  # Index used to identify between the subgrids under the 
+    obj_class_1_id = 1  # Index used to identify between the subgrids under the
                         # same subgrid-class group
 
     # Writing base subgrid data/parameters
@@ -190,7 +244,7 @@ def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti):
         .objects_per_dimension[subgrid_class - 1]
 
     subgridGeoData.object.resize(1)
-    
+
     subgridBaseData.identifier.name = subgrid_name
     subgridBaseData.identifier.index = subgrid_base_index
     subgridBaseData.element.resize(1)
@@ -296,20 +350,24 @@ def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti):
         # converting to eV (1 J = 6.242e18 eV)
         tiPath.values[n] = ti[n] * (6.242e18)
 
-    imas_obj.edge_profiles.putSlice()
+    imas_obj.edge_profiles.put()
 
     imas_obj.close()
     print("Closing IDS.")
+    return 1
 
 if __name__ == "__main__":
-
+    try:
+        import imas
+    except Exception as e:
+        print("Required IMAS support library not available on this system.")
+        sys.exit()
     # For launching python script directly from treminal with python command
     try:
         opts, args = getopt.getopt(sys.argv[1:], "srutvh", ["dirpath=",
                                                             "shot=", "run=",
                                                             "user=", "device=",
                                                             "version=", "help"])
-
         for opt, arg in opts:
             #print opt, arg
             if opt in ("-fp", "--dirpath"):
@@ -336,8 +394,7 @@ if __name__ == "__main__":
                     "--version=3")
                 sys.exit()
 
-        filepath, shot, run, user, device, version
-    except getopt.GetoptError:
+    except Exception:
         print ('Supplied option not recognized!')
         print ('For help: b2read -h / --help')
         sys.exit(2)
@@ -345,9 +402,15 @@ if __name__ == "__main__":
     # few paths to example files for testing
     # /home/ITER/tomsicp/solps-iter/runs/AUG_16151_D/baserun
     # /home/ITER/tomsicp/solps-iter-devel/runs/ITER_535_D+He+Ar/baserun
-
+    # run: "imasdb solps-iter"
+    # Example command:
+    """
+python3.5 put_edge_ids.py --dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun --user=simicg --run=1001 --shot=1001 --device=solps-iter --version=3
+    """
     xc, yc, nx, ny = readB2fgmtry(filepath)
     ne, te, ti = readB2fstati(filepath)
-
-    B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti)
+    code_parameters = tarInputFiles(filepath)
+    # code_parameters = r'test\x00test'
+    print(code_parameters[:50])
+    B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti, code_parameters)
 

@@ -48,13 +48,19 @@ from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QFileDialog, QStyle, QStyledItemDelegate,
                              QLineEdit, QToolButton, QGridLayout, QLabel,
-                             QDialogButtonBox)
+                             QDialogButtonBox, QInputDialog)
 from PyQt5.QtGui import (QStandardItemModel, QFontMetrics, QPen)
 from PyQt5.uic import loadUi
 from enum import IntEnum
 
 
 from addmenu import AddMenu
+
+import put_edge_ids
+import get_edge_ids
+import IDdialog
+import tarfile
+
 
 REDIRECT_STDOUT_TO_LOG = False
 
@@ -93,7 +99,7 @@ def read_identification_parameters(directory):
     """
     path = directory + '/b2mn.dat'
     label = run = shot = user = device = ''
-    N = 2        # The number N is for shot and run, since they can be in the 
+    N = 2        # The number N is for shot and run, since they can be in the
     counter = 0  # b2md.dat file
 
     if os.path.exists(path):
@@ -131,6 +137,7 @@ def read_identification_parameters(directory):
             shot = 'b2md.dat unreadable' if shot == '' else shot
             run = 'b2md.dat unreadable' if run == '' else run
     return label, run, shot, user, device
+
 
 class RunsSortFilterProxyModel(QSortFilterProxyModel):
     def __init__(self, archive_dirs, parent=None):
@@ -257,7 +264,7 @@ class RunsSettings(QDialog):
     @pyqtSlot()
     def dialog_action(self):
         """ When the tool button is clicked a directory browser is opened. If
-        a new directory is opened, the new value is then assigned to the 
+        a new directory is opened, the new value is then assigned to the
         correct alias and runDir setting.
         """
         widget = self.sender()
@@ -922,7 +929,7 @@ class RunsModel(QAbstractItemModel):
                     with open(path) as file:
                         lines = file.read()  # whole file
                     if switch_name in lines:
-                        lines = lines.split('\n') 
+                        lines = lines.split('\n')
                         for i, line in enumerate(lines):
                             if switch_name in line:
                                 if column == Column.label:
@@ -1027,13 +1034,13 @@ class RunsModel(QAbstractItemModel):
                 label_index = self.createIndex(row, Column.label, childItem)
                 device_index = self.createIndex(row, Column.device, childItem)
                 run_index = self.createIndex(row, Column.run, childItem)
-                comment_index = self.createIndex(row, Column.comment, 
+                comment_index = self.createIndex(row, Column.comment,
                                                  childItem)
                 shot_index = self.createIndex(row, Column.shot, childItem)
                 path = childItem.data(Column.path)
                 self.column_index[path] = (childItem.itemData,  date_index,
-                                           status_index, label_index, 
-                                           device_index, run_index, 
+                                           status_index, label_index,
+                                           device_index, run_index,
                                            comment_index, shot_index)
                 if childItem.childItems:
                     child_items.append(childItem.childItems)
@@ -1342,8 +1349,19 @@ class SOLPS_MainWindow(QMainWindow):
         self.solpsinput.setup_input_tabs()
         self.tab_Input.setEnabled(False)
 
+        # Activate or deactivate PutIds/GetIds
+        try:
+            import imas
+            self.pushButton_PutIds.setEnabled(True)
+            self.pushButton_GetIds.setEnabled(True)
+        except:
+            self.pushButton_PutIds.setEnabled(True)
+            self.pushButton_GetIds.setEnabled(True)
+            # Leave them disabled
+            pass
 
-        self.actionRuns.triggered.connect(self.show_runs_dialog)
+        self.pushButton_PutIds.clicked.connect(self.click_put_ids)
+        self.actionRuns.triggered.connect(self.click_get_ids)
         self.actionPreferences.triggered.connect(self.show_preferences_dialog)
         self.treeViewRuns.selectionModel().selectionChanged.connect(
             self.run_selected)
@@ -1504,6 +1522,80 @@ class SOLPS_MainWindow(QMainWindow):
                        self.preferences.bind_address, self.preferences.port)
                 QMessageBox.warning(None, "SOLPS-GUI Status server", msg,
                                     QMessageBox.Ok)
+    @pyqtSlot()
+    def click_put_ids(self):
+        index = self.treeViewRuns.selectionModel().currentIndex()
+        model = self.proxyModel
+        index_path = model.index(index.row(), Column.path, index.parent())
+        path = model.data(index_path, Qt.DisplayRole)
+
+        # Run, shot, name, machine, version!
+        run = self.model.data(Column.Run, Qt.DisplayRole)
+        shot = self.model.data(Column.Run, Qt.DisplayRole)
+        name = self.model.data(Column.Run, Qt.DisplayRole)
+        device = 'solps-iter'
+        version = imas.print_function.getMandatoryRelease()[0]
+
+        # run, shot, name mandatory
+        if name:
+            pass
+        else:
+            name = os.getenv('USER')
+
+        if run == '' or run == None or shot == '' or shot == None:
+            # Mandatory settings not found
+
+            QMessageBox(None, 'Mandatory settings missing for either shot or'
+                              ' run!')
+            return
+
+        # We apparently are having  all files
+
+        b2fstati = put_edge_ids.getB2path(path, 'b2fstati')
+        b2fgmtry = put_edge_ids.getB2path(path, 'b2fgmtry')
+        if b2fstati == '' or b2fgmtry == '':
+            QMessageBox(None, 'No outpuf files for b2fstati b2fgmtry!')
+            return
+
+        xc, yc, nx, ny = put_edge_ids.readB2fgmtry(b2fgmtry)
+        ne, te, ti = put_edge_ids.readB2fstati(filepath)
+        code_parameters = put_edge_ids.tarInputFiles(path)
+        put_edge_ids.B2toIDS(shot, run, user, device, version,
+                             xc, yc, nx, ny, ne, te, ti, code_parameters)
+
+    @pyqtSlot()
+    def click_get_ids(self):
+        index = self.treeViewRuns.selectionModel().currentIndex()
+        model = self.proxyModel
+        index_path = model.index(index.row(), Column.path, index.parent())
+        path = model.data(index_path, Qt.DisplayRole)
+        # Getting the current model
+        # Run and shot will have to be specified
+        dialog = IDdialog.GetDialog()
+        if dialog._exec():
+            SHOT, RUN, USER, MACHINE, VERSION = dialog.on_close()
+
+            ids_obj = get_edge_ids.GetIDS(SHOT, RUN, USER, MACHINE, VERSION)
+            if ids_state:
+                code_parameters = ids_obj.read_code_parameters()
+                tf = BytesIO(code_parameters.encode('iso-8859-1'))
+                tar = tarfile.TarFile(mode='r', fileobj=tf)
+                files = []
+                try:
+                    for member in tar:
+                        name = member.name
+                        file = tar.extractfile(member).read().decode()
+                        with open(path + name, 'w') as f:
+                            f.write(file)
+                except PermissionError:
+                    QMessageBox(None, "Permission error in current folder")
+            else:
+                QMessageBox(None, 'Connecting to IDS failed!')
+        else:
+            pass
+
+
+        print('Clicket getting from ids')
 
     def closeEvent(self, event):
         """ Save GUI state at exit.
