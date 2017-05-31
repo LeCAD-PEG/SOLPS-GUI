@@ -1,11 +1,12 @@
 
-from PyQt5.QtCore import QRegExp, QEvent, Qt, pyqtSlot, QSize
+from PyQt5.QtCore import QRegExp, QEvent, Qt, pyqtSlot, QSize, QRegularExpression
 from PyQt5.QtWidgets import QWidget, QPlainTextEdit, QVBoxLayout, QToolTip
 from PyQt5.QtGui import (QSyntaxHighlighter, QTextCursor, QTextCharFormat,
                          QFont, QBrush)
 import logging
 import b2_tooltips
 import textwrap
+import re
 
 
 
@@ -94,18 +95,23 @@ class B2Highlighter(QSyntaxHighlighter):
         self.keyword.setForeground(Qt.darkBlue)
         self.keyword.setFontWeight(QFont.Bold)
 
+        self.keywordGreen = QTextCharFormat()
+        self.keywordGreen.setForeground(Qt.green)
+        self.keywordGreen.setFontWeight(QFont.Bold)
+
         self.keywordRed = QTextCharFormat()
-        self.keywordRed.setForeground(Qt.darkRed)
+        self.keywordRed.setForeground(Qt.red)
         self.keywordRed.setFontWeight(QFont.Bold)
 
         self.highlightingSwitches = []
 
         comment = QTextCharFormat()
+
+        self.comment_pattern = QRegularExpression("^\*[^\n]*")
+        self.keywordComment = QTextCharFormat()
         brush = QBrush(Qt.darkGreen, Qt.SolidPattern)
-        pattern = QRegExp("^\*[^\n]*")
-        comment.setForeground(brush)
-        rule = HighlightingRule(pattern, comment)
-        self.highlightingRules.append(rule)
+        self.keywordComment.setForeground(brush)
+        self.keywordComment.setFontWeight(QFont.Bold)
 
     def prepare_rules(self, tooltip):
         keywords = []
@@ -116,46 +122,38 @@ class B2Highlighter(QSyntaxHighlighter):
         # highlighted, thus getting partially highlighted words
         prefix = '^(\'| ||\*)'
         for word in keywords:
-            self.counter[word] = 0
-            pattern = QRegExp(prefix + word, Qt.CaseInsensitive)
-            rule = HighlightingRule(pattern, self.keyword)
-            self.counter[word] = 0
-            self.highlightingSwitches.append((rule, word))
+            pattern = QRegularExpression(prefix + word)
+            # rule = HighlightingRule(pattern, self.keyword)
+            self.highlightingSwitches.append((pattern, word))
 
     def highlightBlock(self, text):
-        for rule in self.highlightingRules:
-            expression = QRegExp(rule.pattern)
-            index = expression.indexIn(text)
-            while index >= 0:
-                length = expression.matchedLength()
-                self.setFormat(index, length, rule.format)
-                index = text.find(str(expression), index + length)
+        whole_text =self.document().toPlainText()
+        position = self.currentBlock().position()
 
-        for rule, word in self.highlightingSwitches:
-            expression = QRegExp(rule.pattern)
-            index = expression.indexIn(text)
-            to_highlight = []
-            while index >= 0:
-                length = expression.matchedLength()
-                to_highlight.append((index, length, rule.format))
-                self.counter[word] += 1
-                index = text.find(str(expression), index + length)
-            if to_highlight:
-                if self.counter[word] > 1:
-                    self.multiple_counters(to_highlight)
+        match = self.comment_pattern.match(text)
+        if match.hasMatch():
+            index = match.capturedStart()
+            length = match.capturedLength()
+            self.setFormat(index, length, self.keywordComment)
+
+        for p, word in self.highlightingSwitches:
+            match = p.match(text)
+            if match.hasMatch():
+                index = match.capturedStart()
+                length = match.capturedLength()
+                p.setPattern(word + '(\'|\s)')
+                if p.match(whole_text[position + length:]).hasMatch():
+                    highlight_format = self.keywordRed
+                elif p.match(whole_text[:position]).hasMatch():
+                    highlight_format = self.keywordGreen
                 else:
-                    self.setFormat(to_highlight[-1][0], to_highlight[-1][1],
-                                   to_highlight[-1][2])
+                    highlight_format = self.keyword
+
+                self.setFormat(index, length, highlight_format)
+
+
+
         self.setCurrentBlockState(0)
-
-
-    def multiple_counters(self, duplicates):
-        """ When we have duplicated switches. """
-        text = self.document()
-        print(text)
-
-
-
 
 class B2Handler:
     def __init__(self, parent, display_widget):
