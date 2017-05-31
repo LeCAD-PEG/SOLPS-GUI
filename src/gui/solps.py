@@ -1355,8 +1355,8 @@ class SOLPS_MainWindow(QMainWindow):
             self.pushButton_PutIds.setEnabled(True)
             self.pushButton_GetIds.setEnabled(True)
         except:
-            self.pushButton_PutIds.setEnabled(True)
-            self.pushButton_GetIds.setEnabled(True)
+            self.pushButton_PutIds.setEnabled(False)
+            self.pushButton_GetIds.setEnabled(False)
             # Leave them disabled
             pass
 
@@ -1530,12 +1530,17 @@ class SOLPS_MainWindow(QMainWindow):
         path = model.data(index_path, Qt.DisplayRole)
 
         # Run, shot, name, machine, version!
-        run = self.model.data(Column.Run, Qt.DisplayRole)
-        shot = self.model.data(Column.Run, Qt.DisplayRole)
-        name = self.model.data(Column.Run, Qt.DisplayRole)
+        run = self.model.data(model.index(index.row(),
+                                          Column.run,
+                                          index.parent()), Qt.DisplayRole)
+        shot = self.model.data(model.index(index.row(),
+                                          Column.shot,
+                                          index.parent()), Qt.DisplayRole)
+        name = self.model.data(model.index(index.row(),
+                                          Column.name,
+                                          index.parent()), Qt.DisplayRole)
         device = 'solps-iter'
         version = imas.print_function.getMandatoryRelease()[0]
-
         # run, shot, name mandatory
         if name:
             pass

@@ -3,13 +3,13 @@
 #> Legend:
 #>      #> .............. variables description, additional (helpful)
 #>                            information etc.
-#>      # ............... Commented part of code  
+#>      # ............... Commented part of code
 
 #> -----------------------------------------------------------------------------
 #> DESCRIPTION
 #> This Python script is used to read geometry from b2fgmtry file together with
-#> electron density, electron temperature and ion temperature scalars from 
-#> b2fstati file. The same data is then written to IDS together by 
+#> electron density, electron temperature and ion temperature scalars from
+#> b2fstati file. The same data is then written to IDS together by
 #> creating "Cells" and "Nodes" grid subsets.
 #>
 #> Basic environment settings (terminal commands on hpc iter.org)
@@ -325,7 +325,7 @@ def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti,
                 cellId+2*numCellsX*numCellsY] = cellId+3*numCellsX*numCellsY+1
             cellId += 1
 
-    #> Set (IDS substructure shortcut variable) subgridDaseData for 
+    #> Set (IDS substructure shortcut variable) subgridDaseData for
     #> Cells grid subset
     gridSubsetBaseData = \
         imas_obj.edge_profiles.ggd[0].grid.grid_subset[gridSubset_index - 1]
@@ -383,22 +383,13 @@ def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti,
         # convert to eV (1 J = 6.242e18 eV)
         tiPath.values[n] = ti[n] * (6.242e18)
 
-<<<<<<< HEAD
-    imas_obj.edge_profiles.put()
-=======
-    #> Write all put data do IDS
-    imas_obj.edge_profiles.putSlice()
->>>>>>> abfe7f44f60da7c10f5963f5cf91e36a865ff2ed
 
-    #> Close IDS
+    imas_obj.edge_profiles.put()
+
+    # Close IDS
     imas_obj.close()
-<<<<<<< HEAD
     print("Closing IDS.")
     return 1
-=======
-    print("IDS write finished")
-    print("IDS closed")
->>>>>>> abfe7f44f60da7c10f5963f5cf91e36a865ff2ed
 
 if __name__ == "__main__":
     try:
@@ -438,12 +429,7 @@ if __name__ == "__main__":
                     "--version=3")
                 sys.exit()
 
-<<<<<<< HEAD
     except Exception:
-=======
-        dirpath, shot, run, user, device, version
-    except getopt.GetoptError:
->>>>>>> abfe7f44f60da7c10f5963f5cf91e36a865ff2ed
         print ('Supplied option not recognized!')
         print ('For help: b2read -h / --help')
         sys.exit(2)
@@ -451,7 +437,6 @@ if __name__ == "__main__":
     # few paths to example files for testing
     # /home/ITER/tomsicp/solps-iter/runs/AUG_16151_D/baserun
     # /home/ITER/tomsicp/solps-iter-devel/runs/ITER_535_D+He+Ar/baserun
-<<<<<<< HEAD
     # run: "imasdb solps-iter"
     # Example command:
     """
@@ -463,11 +448,3 @@ python3.5 put_edge_ids.py --dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun --u
     # code_parameters = r'test\x00test'
     print(code_parameters[:50])
     B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti, code_parameters)
-=======
-
-    xc, yc, nx, ny = readB2fgmtry(dirpath)
-    ne, te, ti = readB2fstati(dirpath)
-
-    B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti)
->>>>>>> abfe7f44f60da7c10f5963f5cf91e36a865ff2ed
-
