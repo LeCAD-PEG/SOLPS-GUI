@@ -26,6 +26,7 @@ import getopt
 import sys
 import os
 import tarfile
+import base64
 
 input_files = [
     'input.dat',
@@ -58,8 +59,8 @@ def tarInputFiles(dir_path):
             tar.add(name)
 
     bstring = tf.getvalue()
-    bstring = bstring.replace(b'\x00', b'\x01')
-    return bstring.decode()
+    bstring = base64.b64encode(bstring).decode()
+    return bstring
 
 def getB2path(dir_path, file_name):
     filepath = dir_path + '/' + file_name
@@ -198,131 +199,126 @@ def readB2fstati(file_path):
     return ne, te, ti
 
 def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti,
-            code_paramaters):
-    # Writing previously found data in b2fgmtry and b2fstati to IDS database
+            code_paramaters, dirpath):
+    #> Write previously found data in b2fgmtry and b2fstati to IDS database
     print('Writing IDS: ')
     time = 1
     interp = 1
 
-    # --Creating IDS database--
+    #> --Create IDS database--
     imas_obj = imas.ids(shot, run, shot, run)
 
-    # imas_obj.create()  # Create the data entry
+    # imas_obj.create()  #> Create the data entry
     imas_obj.create_env(user, device, version)
 
     if imas_obj.isConnected():
         print('Creation of data entry OK!')
     else:
         print('Creation of data entry FAILED!')
-        return 0
+        sys.exit()
 
-    # --Basic IDS space allocation--
+    #> --Basic IDS space allocation--
     imas_obj.edge_profiles.profiles_1d.resize(1)
     imas_obj.edge_profiles.ggd.resize(1)
     imas_obj.edge_profiles.putNonTimed()
-    imas_obj.edge_profiles.ggd[0].grid.space.resize(1)
-    imas_obj.edge_profiles.ggd[0].grid.space[0].objects_per_dimension.resize(3)
-    imas_obj.edge_profiles.ids_properties.homogeneous_time = 1 # !
-    #
+    imas_obj.edge_profiles.time.resize(1)
+    imas_obj.edge_profiles.time[0] = 1
+    imas_obj.edge_profiles.ids_properties.homogeneous_time = 1
 
     # Writing code parameters
     imas_obj.edge_profiles.code.parameters = code_parameters
     # Homogeneous time: Synchronised data over same time array
 
-    num_coord = len(xc) + len(yc)  # Number of all available coordinates
-    num_subgrids = 2  # Number of subgrid to write (Cells and Nodes)
+    #> Set IDS grid description
+    grid_description = "This is IDS" + \
+        " shot=" + str(shot) + " run=" + str(run) + " user=" + str(user) + \
+        " device=" + str(device) + " version=" + str(version) + \
+        " written by put_edge_ids using b2fgmtry and b2fstati files found " +\
+        "in directory" + dirpath + "."
+    #> Put IDS grid description
+    imas_obj.edge_profiles.ggd[0].grid.identifier.description = grid_description
+    imas_obj.edge_profiles.ggd[0].grid.space.resize(1)
+    #> Set (IDS substructure shortcut variable) space0
+    space0 = imas_obj.edge_profiles.ggd[0].grid.space[0]
+    space0.objects_per_dimension.resize(3)
 
-    imas_obj.edge_profiles.time.resize(num_coord)
-    imas_obj.edge_profiles.ggd[0].grid.space[0].coordinates_type.resize(1)
+    num_obj_0D = len(xc) #> Number of nodes (len(xc) == len(yc))
+                        #> # have 2D coordinates, P(x,y)
+    num_coord = len(xc) + len(yc)  #> Number of all available coordinates
+    num_gridSubsets = 2  #> Number of grid subsets to write (Cells and Nodes)
 
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset.resize(num_subgrids)
+    space0.coordinates_type.resize(2)
+    space0.coordinates_type[0] = 1 #> X
+    space0.coordinates_type[1] = 2 #> Y
 
-    ## --WRITING DATA FOR SUBGRID "Nodes"
-    # (subgrid base id : 2, subgrid class : 1) --
-    # Note that writing of all data in form of indices is done in Fortran index
-    # counting (starting with 1), not in C++/python index counting
-    # (starts with 0)!
-    # But we must have in mind, that currently we're working with Python
-    # ( Python_Index == Fortran_Index -1)!
-    num_nodes = int(num_coord / 2)  # We have 2D coordinates, P(x,y)
-    subgrid_base_index = 2  # Subgrid index of subgrid Nodes
-                        # (Indexing of subgrids is as in shot: 1, run:1,
-                        # device:iter; and shot:16151, run:1000; device:aug
-    subgrid_name = "Nodes"
-    subgrid_class = 1   # Subgrid Nodes consists of points -> subgrid class 1
-                        # (edges -> class 2; cells -> class 3)
-    obj_class_1_id = 1  # Index used to identify between the subgrids under the
-                        # same subgrid-class group
+    imas_obj.edge_profiles.ggd[0].grid.grid_subset.resize(num_gridSubsets)
 
-    # Writing base subgrid data/parameters
-    subgridBaseData = \
-        imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index-1]
-    subgridGeoData = imas_obj.edge_profiles.ggd[0].grid.space[0] \
-        .objects_per_dimension[subgrid_class - 1]
+    #> -- Put DATA FOR GRID SUBSET "Nodes" --
+    #> (grid subset index: 2, objects forming the grid subset: nodes, 0D)
+    #> Note:  All indices must be put in Fortran index notation
+    #> (starting with 1), not in C++/python index notation(starts with 0)!
+    #> So in our case: Python_Index == Fortran_Index -1 !
 
-    subgridGeoData.object.resize(1)
+    gridSubset_index = 2    #> grid subset index of grid subset Nodes
+                            #> (Indexing of grid subsets follows the IDS
+                            #> examples :
+                            #> shot: 1, run:1, # device: iter; and
+                            #> shot: 16151, run: 1000; device: aug
+    gridSubset_name = "Nodes"
+    gridSubset_dim_index = 1    #> Grid subset Nodes consists of
+                                #> points -> 0D objects -> dimension index = 1
+                                #> (edges -> 1D objects -> dimension index = 2
+                                #> cells  -> 2D objects -> dimension index = 3)
 
-    subgridBaseData.identifier.name = subgrid_name
-    subgridBaseData.identifier.index = subgrid_base_index
-    subgridBaseData.element.resize(1)
-    subgridBaseData.element[0].object.resize(1)
-    subgridBaseData.element[0].object[0].space = 0 + 1
-    subgridBaseData.element[0].object[0].dimension = subgrid_class
 
-    # --Allocating space and writing to IDS:
-    # Geometry and Nodes for class 1 -> Nodes -- #
-    subgridGeoData.object.resize(1)
-    subgridBaseData.element[0].object[0].index = obj_class_1_id
-    subgridGeoData.object[obj_class_1_id - 1].geometry.resize(num_coord)
-    subgridGeoData.object[obj_class_1_id - 1].nodes.resize(num_nodes)
+    #> Write all available 0D objects (all of them form the grid subset Nodes
+    #> Set (IDS substructure shortcut variable) dim0
+    dim0 = space0.objects_per_dimension[gridSubset_dim_index - 1]
+    dim0.object.resize(num_obj_0D)
+    for i in range(num_obj_0D):
+        dim0.object[i].nodes.resize(1)
+        dim0.object[i].nodes[0] = i
+        dim0.object[i].geometry.resize(2)
+        dim0.object[i].geometry[0] = xc[i]
+        dim0.object[i].geometry[1] = yc[i]
 
-    for n in range(num_nodes):
-        # There are num_nodes geometry entries.
-        # [x1, x2, ... xn, y1, y2, ...yn] -> Fortran notation
-        subgridGeoData.object[obj_class_1_id - 1].geometry[n] = xc[n]
-        subgridGeoData.object[obj_class_1_id - 1].geometry[num_nodes + n]=yc[n]
-        subgridGeoData.object[obj_class_1_id - 1].nodes[n] = n + 1
-        imas_obj.edge_profiles.time[n] = time
+    #> Set(IDS substructure shortcut variable) gridSubsetBaseData
+    gridSubsetBaseData = \
+        imas_obj.edge_profiles.ggd[0].grid.grid_subset[gridSubset_index-1]
+    #> Put base grid subset data/parameters (name, index)
+    gridSubsetBaseData.identifier.name = gridSubset_name
+    gridSubsetBaseData.identifier.index = gridSubset_index
+    #> Put grid subset element and element object data
+    gridSubsetBaseData.element.resize(num_obj_0D)
+    for i in range(num_obj_0D):
+        gridSubsetBaseData.element[i].object.resize(1)
+        gridSubsetBaseData.element[i].object[0].space = 0 + 1
+        gridSubsetBaseData.element[i].object[0].dimension = gridSubset_dim_index
+        gridSubsetBaseData.element[i].object[0].index = i + 1
 
-    ## --WRITING DATA FOR SUBGRID "Cells" (base subgrid id = 1; subgrid class 3)
+    #> -- Put DATA FOR GRUD SUBSET "Cells"
+    #> (grid subset index: 1, objects forming the grid subset: cells, 2D)
+
     numCellsX = nx + 2
     numCellsY = ny + 2
     num_cells = numCellsX * numCellsY
-    subgrid_base_index = 1
-    subgrid_name = "Cells"
-    subgrid_class = 3
-    obj_class_3_id = 1
+    num_obj_2D = num_cells
+    gridSubset_index = 1
+    gridSubset_name = "Cells"
+    gridSubset_dim_index = 3
 
-    # setting subgridDaseData and subgridGeoData for Cells subgrid
-    subgridBaseData = \
-        imas_obj.edge_profiles.ggd[0].grid.grid_subset[subgrid_base_index - 1]
-    subgridGeoData = imas_obj.edge_profiles.ggd[0].grid.space[0] \
-        .objects_per_dimension[subgrid_class - 1]
-
-    subgridBaseData.identifier.name = subgrid_name
-    subgridBaseData.identifier.index = subgrid_base_index
-    subgridBaseData.element.resize(1)
-    subgridBaseData.element[0].object.resize(1)
-    subgridBaseData.element[0].object[0].space = 0 + 1
-    subgridBaseData.element[0].object[0].dimension = subgrid_class
-
-    subgridGeoData.object.resize(1)
-    subgridBaseData.element[0].object[0].index = obj_class_3_id
-    subgridGeoData.object[obj_class_3_id - 1].nodes.resize(
-        num_cells * 4)  # each cell consists of 4 nodes
-
-    # Writing cells geometry for Cells subgrid
-    cellId  = 0
+    #> Write all available 2D objects (all of them form the grid subset Cells
+    dim2 = space0.objects_per_dimension[gridSubset_dim_index - 1]
+    dim2.object.resize(num_obj_2D)
+    for i in range(num_obj_2D):
+        dim2.object[i].nodes.resize(4)
+    cellId  = 1
     for j in range(numCellsY):
         for i in range(numCellsX):
-            subgridGeoData.object[obj_class_3_id - 1].nodes[
-                cellId+0*numCellsX*numCellsY] = cellId+0*numCellsX*numCellsY+1
-            subgridGeoData.object[obj_class_3_id - 1].nodes[
-                cellId+1*numCellsX*numCellsY] = cellId+1*numCellsX*numCellsY+1
-            subgridGeoData.object[obj_class_3_id - 1].nodes[
-                cellId+3*numCellsX*numCellsY] = cellId+2*numCellsX*numCellsY+1
-            subgridGeoData.object[obj_class_3_id - 1].nodes[
-                cellId+2*numCellsX*numCellsY] = cellId+3*numCellsX*numCellsY+1
+            dim2.object[cellId - 1].nodes[0] = cellId+0*numCellsX*numCellsY
+            dim2.object[cellId - 1].nodes[1] = cellId+1*numCellsX*numCellsY
+            dim2.object[cellId - 1].nodes[2] = cellId+3*numCellsX*numCellsY
+            dim2.object[cellId - 1].nodes[3] = cellId+2*numCellsX*numCellsY
             cellId += 1
 
     #> Set (IDS substructure shortcut variable) subgridDaseData for
@@ -383,13 +379,13 @@ def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti,
         # convert to eV (1 J = 6.242e18 eV)
         tiPath.values[n] = ti[n] * (6.242e18)
 
-
+    #> Write all put data do IDS
     imas_obj.edge_profiles.put()
 
-    # Close IDS
+    #> Close IDS
     imas_obj.close()
-    print("Closing IDS.")
-    return 1
+    print("IDS write finished")
+    print("IDS closed")
 
 if __name__ == "__main__":
     try:
@@ -406,7 +402,7 @@ if __name__ == "__main__":
         for opt, arg in opts:
             #print opt, arg
             if opt in ("-fp", "--dirpath"):
-                dirpath = arg
+                filepath = arg
             elif opt in ("-s", "--shot"):
                 shot = int(arg)
             elif opt in ("-r", "--run"):
@@ -445,6 +441,6 @@ python3.5 put_edge_ids.py --dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun --u
     xc, yc, nx, ny = readB2fgmtry(filepath)
     ne, te, ti = readB2fstati(filepath)
     code_parameters = tarInputFiles(filepath)
-    # code_parameters = r'test\x00test'
-    print(code_parameters[:50])
-    B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti, code_parameters)
+    #code_parameters = 'test\x00test'
+    print(code_parameters)
+    B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti, code_parameters, filepath)

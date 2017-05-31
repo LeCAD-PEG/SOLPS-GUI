@@ -3,6 +3,8 @@
 import getopt
 import sys
 import tarfile
+import base64
+
 try:
     import BytesIO
 except ImportError as e:
@@ -32,18 +34,23 @@ class GetIDS:
 
     def read_code_parameters(self):
         self.ids.edge_profiles.get()
-        parameter_string = self.ids.edge_profiles.code.parameters.encode()
-        return parameter_string.replace(b'\x01', b'\x00').decode()
+        parameter_string = self.ids.edge_profiles.code.parameters
+        bstring = base64.b64decode(parameter_string)
+        print(bstring)
+        return bstring
 
     def extract_files(self):
-        bstr = self.read_code_parameters().encode()
+        bstring = self.read_code_parameters()
 
         tf = BytesIO()
-        tf.write(bstr)
-        tar = tarfile.TarFile(mode='r', fileobj=tf)
-        print(tar.list(verbose=False))
-        for member in tar:
-            print('Member: ', member.name)
+        if tf.writable():
+            tf.write(bstring)
+            tf.seek(0)
+            tar = tarfile.TarFile(mode='r', fileobj=tf)
+            members = tar.getmembers()
+            for member in members:
+                print(member)
+                #f = tar.extractfile(member)
 
 
 
@@ -118,6 +125,6 @@ python3.5 get_edge_ids.py --dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun --u
     ids = GetIDS(shot, run, user, device, version)
     if ids.state == False:
         sys.exit()
-    string = ids.read_code_parameters()
-    print(string[:500])
     ids.extract_files()
+    string = ids.read_code_parameters()
+    print(string)
