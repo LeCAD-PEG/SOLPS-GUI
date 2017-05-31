@@ -8,8 +8,9 @@ try:
 except ImportError as e:
     from io import BytesIO, StringIO
 
-class GetIds:
+class GetIDS:
     def __init__(self, shot, run, user, machine, version):
+
         self.shot = shot
         self.run = run
         self.user = user
@@ -64,7 +65,7 @@ if __name__ == '__main__':
     # shot = 1005
     # machine = "solps-iter"
     # version = "3"
-    # x = GetIds(shot, run, user, machine, version)
+    # x = GetIDS(shot, run, user, machine, version)
     # if x.state == 'False':
     #     sys.exit()
     # string = x.read_code_parameters()
@@ -114,7 +115,7 @@ if __name__ == '__main__':
     """
 python3.5 get_edge_ids.py --dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun --user=simicg --run=1001 --shot=1001 --device=solps-iter --version=3
     """
-    ids = GetIds(shot, run, user, device, version)
+    ids = GetIDS(shot, run, user, device, version)
     if ids.state == False:
         sys.exit()
     string = ids.read_code_parameters()

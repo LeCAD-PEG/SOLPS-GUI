@@ -17,7 +17,7 @@ class Row:
     names = ['shot', 'run', 'user', 'machine']
 
 class GetDialog(QDialog):
-    """Dialog Demanding the shot, run, name and device for getting the data
+    """Dialog Demanding the shot, run, name and device for getting the data
     from IDS.
     """
     def __init__(self, parent=None):

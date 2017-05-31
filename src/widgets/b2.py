@@ -1,5 +1,5 @@
 
-from PyQt5.QtCore import QRegExp, QEvent, Qt, pyqtSlot, QSize, QRegularExpression
+from PyQt5.QtCore import QEvent, Qt, pyqtSlot, QSize, QRegularExpression
 from PyQt5.QtWidgets import QWidget, QPlainTextEdit, QVBoxLayout, QToolTip
 from PyQt5.QtGui import (QSyntaxHighlighter, QTextCursor, QTextCharFormat,
                          QFont, QBrush)
@@ -123,7 +123,8 @@ class B2Highlighter(QSyntaxHighlighter):
         prefix = '^(\'| ||\*)'
         for word in keywords:
             pattern = QRegularExpression(prefix + word)
-            # rule = HighlightingRule(pattern, self.keyword)
+            pattern.setPatternOptions(pattern.patternOptions() |
+                                      QRegularExpression.CaseInsensitiveOption)
             self.highlightingSwitches.append((pattern, word))
 
     def highlightBlock(self, text):
@@ -150,8 +151,6 @@ class B2Highlighter(QSyntaxHighlighter):
                     highlight_format = self.keyword
 
                 self.setFormat(index, length, highlight_format)
-
-
 
         self.setCurrentBlockState(0)
 

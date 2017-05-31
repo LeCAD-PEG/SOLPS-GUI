@@ -58,7 +58,7 @@ from addmenu import AddMenu
 
 import put_edge_ids
 import get_edge_ids
-import IDdialog
+from IDdialog import GetDialog
 import tarfile
 
 
@@ -1354,6 +1354,8 @@ class SOLPS_MainWindow(QMainWindow):
             import imas
             self.pushButton_PutIds.setEnabled(True)
             self.pushButton_GetIds.setEnabled(True)
+            self.actionRuns.triggered.connect(self.click_get_ids)
+
         except:
             self.pushButton_PutIds.setEnabled(False)
             self.pushButton_GetIds.setEnabled(False)
@@ -1361,7 +1363,7 @@ class SOLPS_MainWindow(QMainWindow):
             pass
 
         self.pushButton_PutIds.clicked.connect(self.click_put_ids)
-        self.actionRuns.triggered.connect(self.click_get_ids)
+
         self.actionPreferences.triggered.connect(self.show_preferences_dialog)
         self.treeViewRuns.selectionModel().selectionChanged.connect(
             self.run_selected)
@@ -1576,8 +1578,8 @@ class SOLPS_MainWindow(QMainWindow):
         path = model.data(index_path, Qt.DisplayRole)
         # Getting the current model
         # Run and shot will have to be specified
-        dialog = IDdialog.GetDialog()
-        if dialog._exec():
+        dialog = GetDialog(self)
+        if dialog.exec_():
             SHOT, RUN, USER, MACHINE, VERSION = dialog.on_close()
 
             ids_obj = get_edge_ids.GetIDS(SHOT, RUN, USER, MACHINE, VERSION)
