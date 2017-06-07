@@ -24,7 +24,7 @@ class GetDialog(QDialog):
         super(GetDialog, self).__init__(parent)
         self.setModal(True)
         self.main_layout = QGridLayout(self)
-        self.setWindowTitle('Run config')
+        self.setWindowTitle('Get IDS')
 
         self.main_layout.addWidget(QLabel('SHOT'), 0, 0, Qt.AlignLeft)
         shot = QLineEdit('1001')
