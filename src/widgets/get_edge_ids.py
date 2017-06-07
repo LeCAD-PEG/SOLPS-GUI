@@ -10,6 +10,12 @@ try:
 except ImportError as e:
     from io import BytesIO, StringIO
 
+try:
+    import imas
+except ImportError as e:
+    pass
+
+
 class GetIDS:
     def __init__(self, shot, run, user, machine, version):
 
@@ -35,11 +41,11 @@ class GetIDS:
     def read_code_parameters(self):
         self.ids.edge_profiles.get()
         parameter_string = self.ids.edge_profiles.code.parameters
+        # print(self.ids.edge_profiles.ggd[0])
         bstring = base64.b64decode(parameter_string)
-        print(bstring)
         return bstring
 
-    def extract_files(self):
+    def extract_files(self, path):
         bstring = self.read_code_parameters()
 
         tf = BytesIO()
@@ -51,9 +57,6 @@ class GetIDS:
             for member in members:
                 print(member)
                 #f = tar.extractfile(member)
-
-
-
 
 
 if __name__ == '__main__':
@@ -125,6 +128,5 @@ python3.5 get_edge_ids.py --dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun --u
     ids = GetIDS(shot, run, user, device, version)
     if ids.state == False:
         sys.exit()
-    ids.extract_files()
     string = ids.read_code_parameters()
     print(string)

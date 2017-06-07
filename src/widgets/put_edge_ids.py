@@ -1,26 +1,32 @@
 #! /usr/bin/env python
 #Python 3.5
-#> Legend:
-#>      #> .............. variables description, additional (helpful)
-#>                            information etc.
-#>      # ............... Commented part of code
+# Legend:
+#      # .............. variables description, additional (helpful)
+#                            information etc.
+#      # ............... Commented part of code
 
-#> -----------------------------------------------------------------------------
-#> DESCRIPTION
-#> This Python script is used to read geometry from b2fgmtry file together with
-#> electron density, electron temperature and ion temperature scalars from
-#> b2fstati file. The same data is then written to IDS together by
-#> creating "Cells" and "Nodes" grid subsets.
-#>
-#> Basic environment settings (terminal commands on hpc iter.org)
-#> $ module load imas/3.7.4/ual/3.4.0
-#> $ imasdb solps-iter
-#> -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# DESCRIPTION
+# This Python script is used to read geometry from b2fgmtry file together with
+# electron density, electron temperature and ion temperature scalars from
+# b2fstati file. The same data is then written to IDS together by
+# creating "Cells" and "Nodes" grid subsets.
+#
+# Basic environment settings (terminal commands on hpc iter.org)
+# $ module load imas/3.7.4/ual/3.4.0
+# $ imasdb solps-iter
+# -----------------------------------------------------------------------------
 
 try:
     import BytesIO
 except:
     from io import BytesIO
+
+try:
+    import imas
+except ImportError as e:
+    pass
+
 
 import getopt
 import sys
@@ -75,8 +81,10 @@ def getB2path(dir_path, file_name):
         return ''
 
 def readB2fgmtry(file_path):
-    #> Read geometry from file b2fgmtry (x and y coordinates of nodes)
-    #> and insert them into array for later use
+    # Read geometry from file b2fgmtry (x and y coordinates of nodes)
+    # and insert them into array for later use
+    if file_path == '':
+        return [], [], [], []
 
     crx = []
     cry = []
@@ -139,6 +147,9 @@ def readB2fstati(file_path):
     te = []
     ti = []
 
+    if file_path == '':
+        return ne, te, ti
+
     found_ne = 0
     found_te = 0
     found_ti = 0
@@ -200,15 +211,15 @@ def readB2fstati(file_path):
 
 def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti,
             code_paramaters, dirpath):
-    #> Write previously found data in b2fgmtry and b2fstati to IDS database
+    # Write previously found data in b2fgmtry and b2fstati to IDS database
     print('Writing IDS: ')
     time = 1
     interp = 1
 
-    #> --Create IDS database--
+    # --Create IDS database--
     imas_obj = imas.ids(shot, run, shot, run)
 
-    # imas_obj.create()  #> Create the data entry
+    # imas_obj.create()  # Create the data entry
     imas_obj.create_env(user, device, version)
 
     if imas_obj.isConnected():
@@ -217,7 +228,7 @@ def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti,
         print('Creation of data entry FAILED!')
         sys.exit()
 
-    #> --Basic IDS space allocation--
+    # --Basic IDS space allocation--
     imas_obj.edge_profiles.profiles_1d.resize(1)
     imas_obj.edge_profiles.ggd.resize(1)
     imas_obj.edge_profiles.putNonTimed()
@@ -226,163 +237,165 @@ def B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti,
     imas_obj.edge_profiles.ids_properties.homogeneous_time = 1
 
     # Writing code parameters
-    imas_obj.edge_profiles.code.parameters = code_parameters
+    imas_obj.edge_profiles.code.parameters = code_paramaters
     # Homogeneous time: Synchronised data over same time array
+    if xc and yc and nx and ny and ne and te and ti:
+        # Set IDS grid description
+        grid_description = "This is IDS" + \
+            " shot=" + str(shot) + " run=" + str(run) + " user=" + str(user) + \
+            " device=" + str(device) + " version=" + str(version) + \
+            " written by put_edge_ids using b2fgmtry and b2fstati files found " +\
+            "in directory" + dirpath + "."
+        # Put IDS grid description
+        imas_obj.edge_profiles.ggd[0].grid.identifier.description = grid_description
+        imas_obj.edge_profiles.ggd[0].grid.space.resize(1)
+        # Set (IDS substructure shortcut variable) space0
+        space0 = imas_obj.edge_profiles.ggd[0].grid.space[0]
+        space0.objects_per_dimension.resize(3)
 
-    #> Set IDS grid description
-    grid_description = "This is IDS" + \
-        " shot=" + str(shot) + " run=" + str(run) + " user=" + str(user) + \
-        " device=" + str(device) + " version=" + str(version) + \
-        " written by put_edge_ids using b2fgmtry and b2fstati files found " +\
-        "in directory" + dirpath + "."
-    #> Put IDS grid description
-    imas_obj.edge_profiles.ggd[0].grid.identifier.description = grid_description
-    imas_obj.edge_profiles.ggd[0].grid.space.resize(1)
-    #> Set (IDS substructure shortcut variable) space0
-    space0 = imas_obj.edge_profiles.ggd[0].grid.space[0]
-    space0.objects_per_dimension.resize(3)
+        num_obj_0D = len(xc) # Number of nodes (len(xc) == len(yc))
+                            # # have 2D coordinates, P(x,y)
+        num_coord = len(xc) + len(yc)  # Number of all available coordinates
+        num_gridSubsets = 2  # Number of grid subsets to write (Cells and Nodes)
 
-    num_obj_0D = len(xc) #> Number of nodes (len(xc) == len(yc))
-                        #> # have 2D coordinates, P(x,y)
-    num_coord = len(xc) + len(yc)  #> Number of all available coordinates
-    num_gridSubsets = 2  #> Number of grid subsets to write (Cells and Nodes)
+        space0.coordinates_type.resize(2)
+        space0.coordinates_type[0] = 1 # X
+        space0.coordinates_type[1] = 2 # Y
 
-    space0.coordinates_type.resize(2)
-    space0.coordinates_type[0] = 1 #> X
-    space0.coordinates_type[1] = 2 #> Y
+        imas_obj.edge_profiles.ggd[0].grid.grid_subset.resize(num_gridSubsets)
 
-    imas_obj.edge_profiles.ggd[0].grid.grid_subset.resize(num_gridSubsets)
+        # -- Put DATA FOR GRID SUBSET "Nodes" --
+        # (grid subset index: 2, objects forming the grid subset: nodes, 0D)
+        # Note:  All indices must be put in Fortran index notation
+        # (starting with 1), not in C++/python index notation(starts with 0)!
+        # So in our case: Python_Index == Fortran_Index -1 !
 
-    #> -- Put DATA FOR GRID SUBSET "Nodes" --
-    #> (grid subset index: 2, objects forming the grid subset: nodes, 0D)
-    #> Note:  All indices must be put in Fortran index notation
-    #> (starting with 1), not in C++/python index notation(starts with 0)!
-    #> So in our case: Python_Index == Fortran_Index -1 !
-
-    gridSubset_index = 2    #> grid subset index of grid subset Nodes
-                            #> (Indexing of grid subsets follows the IDS
-                            #> examples :
-                            #> shot: 1, run:1, # device: iter; and
-                            #> shot: 16151, run: 1000; device: aug
-    gridSubset_name = "Nodes"
-    gridSubset_dim_index = 1    #> Grid subset Nodes consists of
-                                #> points -> 0D objects -> dimension index = 1
-                                #> (edges -> 1D objects -> dimension index = 2
-                                #> cells  -> 2D objects -> dimension index = 3)
+        gridSubset_index = 2    # grid subset index of grid subset Nodes
+                                # (Indexing of grid subsets follows the ITM CPO
+                                # edge examples :
+                                # shot: 1, run:1, # device: iter; and
+                                # shot: 16151, run: 1000; device: aug
+        gridSubset_name = "Nodes"
+        gridSubset_dim_index = 1 # Grid subset Nodes consists of
+                                 # points -> 0D objects -> dimension index = 1
+                                 # (edges -> 1D objects -> dimension index = 2
+                                 # cells  -> 2D objects -> dimension index = 3)
 
 
-    #> Write all available 0D objects (all of them form the grid subset Nodes
-    #> Set (IDS substructure shortcut variable) dim0
-    dim0 = space0.objects_per_dimension[gridSubset_dim_index - 1]
-    dim0.object.resize(num_obj_0D)
-    for i in range(num_obj_0D):
-        dim0.object[i].nodes.resize(1)
-        dim0.object[i].nodes[0] = i
-        dim0.object[i].geometry.resize(2)
-        dim0.object[i].geometry[0] = xc[i]
-        dim0.object[i].geometry[1] = yc[i]
+        # Write all available 0D objects (all of them form the grid subset
+        # Nodes
+        # Set (IDS substructure shortcut variable) dim0
+        dim0 = space0.objects_per_dimension[gridSubset_dim_index - 1]
+        dim0.object.resize(num_obj_0D)
+        for i in range(num_obj_0D):
+            dim0.object[i].nodes.resize(1)
+            dim0.object[i].nodes[0] = i
+            dim0.object[i].geometry.resize(2)
+            dim0.object[i].geometry[0] = xc[i]
+            dim0.object[i].geometry[1] = yc[i]
 
-    #> Set(IDS substructure shortcut variable) gridSubsetBaseData
-    gridSubsetBaseData = \
-        imas_obj.edge_profiles.ggd[0].grid.grid_subset[gridSubset_index-1]
-    #> Put base grid subset data/parameters (name, index)
-    gridSubsetBaseData.identifier.name = gridSubset_name
-    gridSubsetBaseData.identifier.index = gridSubset_index
-    #> Put grid subset element and element object data
-    gridSubsetBaseData.element.resize(num_obj_0D)
-    for i in range(num_obj_0D):
-        gridSubsetBaseData.element[i].object.resize(1)
-        gridSubsetBaseData.element[i].object[0].space = 0 + 1
-        gridSubsetBaseData.element[i].object[0].dimension = gridSubset_dim_index
-        gridSubsetBaseData.element[i].object[0].index = i + 1
+        # Set(IDS substructure shortcut variable) gridSubsetBaseData
+        gridSubsetBaseData = \
+            imas_obj.edge_profiles.ggd[0].grid.grid_subset[gridSubset_index-1]
+        # Put base grid subset data/parameters (name, index)
+        gridSubsetBaseData.identifier.name = gridSubset_name
+        gridSubsetBaseData.identifier.index = gridSubset_index
+        # Put grid subset element and element object data
+        gridSubsetBaseData.element.resize(num_obj_0D)
+        for i in range(num_obj_0D):
+            gridSubsetBaseData.element[i].object.resize(1)
+            gridSubsetBaseData.element[i].object[0].space = 0 + 1
+            gridSubsetBaseData.element[i].object[0].dimension = gridSubset_dim_index
+            gridSubsetBaseData.element[i].object[0].index = i + 1
 
-    #> -- Put DATA FOR GRUD SUBSET "Cells"
-    #> (grid subset index: 1, objects forming the grid subset: cells, 2D)
+        # -- Put DATA FOR GRUD SUBSET "Cells"
+        # (grid subset index: 1, objects forming the grid subset: cells, 2D)
 
-    numCellsX = nx + 2
-    numCellsY = ny + 2
-    num_cells = numCellsX * numCellsY
-    num_obj_2D = num_cells
-    gridSubset_index = 1
-    gridSubset_name = "Cells"
-    gridSubset_dim_index = 3
+        numCellsX = nx + 2
+        numCellsY = ny + 2
+        num_cells = numCellsX * numCellsY
+        num_obj_2D = num_cells
+        gridSubset_index = 1
+        gridSubset_name = "Cells"
+        gridSubset_dim_index = 3
 
-    #> Write all available 2D objects (all of them form the grid subset Cells
-    dim2 = space0.objects_per_dimension[gridSubset_dim_index - 1]
-    dim2.object.resize(num_obj_2D)
-    for i in range(num_obj_2D):
-        dim2.object[i].nodes.resize(4)
-    cellId  = 1
-    for j in range(numCellsY):
-        for i in range(numCellsX):
-            dim2.object[cellId - 1].nodes[0] = cellId+0*numCellsX*numCellsY
-            dim2.object[cellId - 1].nodes[1] = cellId+1*numCellsX*numCellsY
-            dim2.object[cellId - 1].nodes[2] = cellId+3*numCellsX*numCellsY
-            dim2.object[cellId - 1].nodes[3] = cellId+2*numCellsX*numCellsY
-            cellId += 1
+        # Write all available 2D objects (all of them form the grid subset
+        # Cells
+        dim2 = space0.objects_per_dimension[gridSubset_dim_index - 1]
+        dim2.object.resize(num_obj_2D)
+        for i in range(num_obj_2D):
+            dim2.object[i].nodes.resize(4)
+        cellId  = 1
+        for j in range(numCellsY):
+            for i in range(numCellsX):
+                dim2.object[cellId - 1].nodes[0] = cellId+0*numCellsX*numCellsY
+                dim2.object[cellId - 1].nodes[1] = cellId+1*numCellsX*numCellsY
+                dim2.object[cellId - 1].nodes[2] = cellId+3*numCellsX*numCellsY
+                dim2.object[cellId - 1].nodes[3] = cellId+2*numCellsX*numCellsY
+                cellId += 1
 
-    #> Set (IDS substructure shortcut variable) subgridDaseData for
-    #> Cells grid subset
-    gridSubsetBaseData = \
-        imas_obj.edge_profiles.ggd[0].grid.grid_subset[gridSubset_index - 1]
-    #> Put base grid subset data/parameters (name, index)
-    gridSubsetBaseData.identifier.name = gridSubset_name
-    gridSubsetBaseData.identifier.index = gridSubset_index
-    #> Put grid subset element and element object data
-    gridSubsetBaseData.element.resize(num_obj_2D)
-    for i in range(num_obj_2D):
-        gridSubsetBaseData.element[i].object.resize(1)
-        gridSubsetBaseData.element[i].object[0].space = 0 + 1
-        gridSubsetBaseData.element[i].object[0].dimension = gridSubset_dim_index
-        gridSubsetBaseData.element[i].object[0].index = i + 1
+        # Set (IDS substructure shortcut variable) subgridDaseData for
+        # Cells grid subset
+        gridSubsetBaseData = \
+            imas_obj.edge_profiles.ggd[0].grid.grid_subset[gridSubset_index - 1]
+        # Put base grid subset data/parameters (name, index)
+        gridSubsetBaseData.identifier.name = gridSubset_name
+        gridSubsetBaseData.identifier.index = gridSubset_index
+        # Put grid subset element and element object data
+        gridSubsetBaseData.element.resize(num_obj_2D)
+        for i in range(num_obj_2D):
+            gridSubsetBaseData.element[i].object.resize(1)
+            gridSubsetBaseData.element[i].object[0].space = 0 + 1
+            gridSubsetBaseData.element[i].object[0].dimension = gridSubset_dim_index
+            gridSubsetBaseData.element[i].object[0].index = i + 1
 
-    #> PUT VALUES (ne, te, ti) for "Cells" grid subset
-    # Put ne (electron density)
-    num_ne_gridSubset = 1
-    num_ne_values = len(ne)
-    imas_obj.edge_profiles.ggd[0].electrons.density.resize(num_ne_gridSubset)
-    nePath = \
-        imas_obj.edge_profiles.ggd[0].electrons.density[num_ne_gridSubset - 1]
-    nePath.grid_subset_index = gridSubset_index
-    nePath.values.resize(num_ne_values)
-    for n in range(num_ne_values):
-        nePath.values[n] = ne[n]
+        # PUT VALUES (ne, te, ti) for "Cells" grid subset
+        # Put ne (electron density)
+        num_ne_gridSubset = 1
+        num_ne_values = len(ne)
+        imas_obj.edge_profiles.ggd[0].electrons.density.resize(num_ne_gridSubset)
+        nePath = \
+            imas_obj.edge_profiles.ggd[0].electrons.density[num_ne_gridSubset - 1]
+        nePath.grid_subset_index = gridSubset_index
+        nePath.values.resize(num_ne_values)
+        for n in range(num_ne_values):
+            nePath.values[n] = ne[n]
 
-    # Put te (electron temperature)
-    num_te_gridSubset = 1
-    num_te_values = len(te)
-    imas_obj.edge_profiles.ggd[0].electrons.temperature.resize(num_te_gridSubset)
-    tePath = \
-        imas_obj.edge_profiles.ggd[0].electrons.temperature[num_te_gridSubset - 1]
-    tePath.grid_subset_index = gridSubset_index
-    tePath.values.resize(num_te_values)
-    for n in range(num_te_values):
-        # convert to eV (1 J = 6.242e18 eV)
-        tePath.values[n] = te[n] *(6.242e18)
+        # Put te (electron temperature)
+        num_te_gridSubset = 1
+        num_te_values = len(te)
+        imas_obj.edge_profiles.ggd[0].electrons.temperature.resize(num_te_gridSubset)
+        tePath = \
+            imas_obj.edge_profiles.ggd[0].electrons.temperature[num_te_gridSubset - 1]
+        tePath.grid_subset_index = gridSubset_index
+        tePath.values.resize(num_te_values)
+        for n in range(num_te_values):
+            # convert to eV (1 J = 6.242e18 eV)
+            tePath.values[n] = te[n] *(6.242e18)
 
-    # Put ti (ion temperature)
-    num_ti_gridSubset = 1
-    num_ti_values = len(ti)
-    num_ti_species = 1  # Number of ion species, as in
-                        # number of different ion charges.
-    ion_specie = 1
-    #> Ion specie is linked with the ion density of each ion charge,
-    #> as ion temperature is taken as the same for all ion charges.
-    imas_obj.edge_profiles.ggd[0].ion.resize(num_ti_species)
-    imas_obj.edge_profiles.ggd[0].ion[ion_specie - 1].temperature.\
-        resize(num_ti_gridSubset)
-    tiPath = imas_obj.edge_profiles.ggd[0].ion[ion_specie - 1]. \
-        temperature[num_ti_gridSubset - 1]
-    tiPath.grid_subset_index = gridSubset_index
-    tiPath.values.resize(num_ti_values)
-    for n in range(num_ti_values):
-        # convert to eV (1 J = 6.242e18 eV)
-        tiPath.values[n] = ti[n] * (6.242e18)
+        # Put ti (ion temperature)
+        num_ti_gridSubset = 1
+        num_ti_values = len(ti)
+        num_ti_species = 1  # Number of ion species, as in
+                            # number of different ion charges.
+        ion_specie = 1
+        # Ion specie is linked with the ion density of each ion charge,
+        # as ion temperature is taken as the same for all ion charges.
+        imas_obj.edge_profiles.ggd[0].ion.resize(num_ti_species)
+        imas_obj.edge_profiles.ggd[0].ion[ion_specie - 1].temperature.\
+            resize(num_ti_gridSubset)
+        tiPath = imas_obj.edge_profiles.ggd[0].ion[ion_specie - 1]. \
+            temperature[num_ti_gridSubset - 1]
+        tiPath.grid_subset_index = gridSubset_index
+        tiPath.values.resize(num_ti_values)
+        for n in range(num_ti_values):
+            # convert to eV (1 J = 6.242e18 eV)
+            tiPath.values[n] = ti[n] * (6.242e18)
 
-    #> Write all put data do IDS
+    # Write all put data do IDS
     imas_obj.edge_profiles.put()
 
-    #> Close IDS
+    # Close IDS
     imas_obj.close()
     print("IDS write finished")
     print("IDS closed")
@@ -442,5 +455,5 @@ python3.5 put_edge_ids.py --dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun --u
     ne, te, ti = readB2fstati(filepath)
     code_parameters = tarInputFiles(filepath)
     #code_parameters = 'test\x00test'
-    print(code_parameters)
+    print(code_parameters[:10])
     B2toIDS(shot, run, user, device, version, xc, yc, nx, ny, ne, te, ti, code_parameters, filepath)

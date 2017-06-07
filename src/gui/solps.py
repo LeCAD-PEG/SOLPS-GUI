@@ -61,6 +61,10 @@ import get_edge_ids
 from IDdialog import GetDialog
 import tarfile
 
+try:
+    import BytesIO
+except:
+    from io import BytesIO
 
 REDIRECT_STDOUT_TO_LOG = False
 
@@ -105,7 +109,7 @@ def read_identification_parameters(directory):
     if os.path.exists(path):
         try:
             with open(path) as file:
-                lines = file.read(512).splitlines()
+                lines = file.read(1024).splitlines()
             for i, line in enumerate(lines):
                 if 'label' in line:
                     label = lines[i+1].strip("'")
@@ -561,9 +565,6 @@ class RetrieveRunsFolderInfo(QThread):
             return qtime, '', static_data
         except OSError:
             return QDateTime().currentDateTime(), 'no access', static_data
-
-
-
 
     def run(self):
         """ Thread scans each listed directory of the Runs model.
@@ -1349,22 +1350,11 @@ class SOLPS_MainWindow(QMainWindow):
         self.solpsinput.setup_input_tabs()
         self.tab_Input.setEnabled(False)
 
-        # Activate or deactivate PutIds/GetIds
-        try:
-            import imas
-            self.pushButton_PutIds.setEnabled(True)
-            self.pushButton_GetIds.setEnabled(True)
-            self.actionRuns.triggered.connect(self.click_get_ids)
-
-        except:
-            self.pushButton_PutIds.setEnabled(False)
-            self.pushButton_GetIds.setEnabled(False)
-            # Leave them disabled
-            pass
-
         self.pushButton_PutIds.clicked.connect(self.click_put_ids)
+        self.pushButton_GetIds.clicked.connect(self.click_get_ids)
 
         self.actionPreferences.triggered.connect(self.show_preferences_dialog)
+        self.actionRuns.triggered.connect(self.show_runs_dialog)
         self.treeViewRuns.selectionModel().selectionChanged.connect(
             self.run_selected)
         self.treeViewArchive.selectionModel().selectionChanged.connect(
@@ -1526,34 +1516,37 @@ class SOLPS_MainWindow(QMainWindow):
                                     QMessageBox.Ok)
     @pyqtSlot()
     def click_put_ids(self):
+
         index = self.treeViewRuns.selectionModel().currentIndex()
         model = self.proxyModel
-        index_path = model.index(index.row(), Column.path, index.parent())
-        path = model.data(index_path, Qt.DisplayRole)
 
-        # Run, shot, name, machine, version!
-        run = self.model.data(model.index(index.row(),
-                                          Column.run,
-                                          index.parent()), Qt.DisplayRole)
-        shot = self.model.data(model.index(index.row(),
-                                          Column.shot,
-                                          index.parent()), Qt.DisplayRole)
-        name = self.model.data(model.index(index.row(),
-                                          Column.name,
-                                          index.parent()), Qt.DisplayRole)
+        index_path = model.index(index.row(), Column.path, index.parent())
+        index_run = model.index(index.row(), Column.run, index.parent())
+        index_shot = model.index(index.row(), Column.shot, index.parent())
+        index_user = model.index(index.row(), Column.user, index.parent())
+
+        path = model.data(index_path, Qt.DisplayRole)
+        user = model.data(index_user, Qt.DisplayRole)
+
+        try:
+            run = int(model.data(index_run, Qt.DisplayRole))
+            shot = int(model.data(index_shot, Qt.DisplayRole))
+        except:
+            shot = ''
+            run = ''
         device = 'solps-iter'
-        version = imas.print_function.getMandatoryRelease()[0]
-        # run, shot, name mandatory
-        if name:
+        version = str(imas.print_function.getMandatoryRelease()[0])
+        # run, shot, user mandatory
+        if user:
             pass
         else:
-            name = os.getenv('USER')
+            user = os.getenv('USER')
 
-        if run == '' or run == None or shot == '' or shot == None:
+        if run == '' or run is None or shot == '' or shot is None:
             # Mandatory settings not found
 
-            QMessageBox(None, 'Mandatory settings missing for either shot or'
-                              ' run!')
+            QMessageBox.warning(self, 'Warning!', 'Mandatory settings missing'
+                                'for either shot or run!')
             return
 
         # We apparently are having  all files
@@ -1561,14 +1554,18 @@ class SOLPS_MainWindow(QMainWindow):
         b2fstati = put_edge_ids.getB2path(path, 'b2fstati')
         b2fgmtry = put_edge_ids.getB2path(path, 'b2fgmtry')
         if b2fstati == '' or b2fgmtry == '':
-            QMessageBox(None, 'No outpuf files for b2fstati b2fgmtry!')
-            return
-
-        xc, yc, nx, ny = put_edge_ids.readB2fgmtry(b2fgmtry)
-        ne, te, ti = put_edge_ids.readB2fstati(filepath)
+            QMessageBox.warning(self,  'Warning!', 'No outpuf files for '
+                                'b2fstati b2fgmtry!')
+            xc, yc, nx, ny = [], [], 0, 0
+            ne, te, ti = [], [], []
+        else:
+            xc, yc, nx, ny = put_edge_ids.readB2fgmtry(b2fgmtry)
+            ne, te, ti = put_edge_ids.readB2fstati(b2fstati)
         code_parameters = put_edge_ids.tarInputFiles(path)
+        print(user, device, version, run, shot)
         put_edge_ids.B2toIDS(shot, run, user, device, version,
-                             xc, yc, nx, ny, ne, te, ti, code_parameters)
+                             xc, yc, nx, ny, ne, te, ti, code_parameters,
+                             path)
 
     @pyqtSlot()
     def click_get_ids(self):
@@ -1580,29 +1577,36 @@ class SOLPS_MainWindow(QMainWindow):
         # Run and shot will have to be specified
         dialog = GetDialog(self)
         if dialog.exec_():
-            SHOT, RUN, USER, MACHINE, VERSION = dialog.on_close()
+            SHOT, RUN, USER, MACHINE, VERSION, RUN_NAME = dialog.on_close()
+            run_dirname = path + '/' + RUN_NAME
+            if os.path.exists(run_dirname):
+                QMessageBox.warning(self, 'Warning!', "Run dir with that name"
+                                    " already exists")
+                return
+            else:
+                os.mkdir(run_dirname)
 
             ids_obj = get_edge_ids.GetIDS(SHOT, RUN, USER, MACHINE, VERSION)
-            if ids_state:
+            if ids_obj.state:
                 code_parameters = ids_obj.read_code_parameters()
-                tf = BytesIO(code_parameters.encode('iso-8859-1'))
+                tf = BytesIO(code_parameters)
                 tar = tarfile.TarFile(mode='r', fileobj=tf)
-                files = []
                 try:
                     for member in tar:
                         name = member.name
                         file = tar.extractfile(member).read().decode()
-                        with open(path + name, 'w') as f:
+                        print("Writing to ", run_dirname + '/' + name)
+                        with open(run_dirname + '/' + name, 'w') as f:
                             f.write(file)
+                    self.model.startThreads()
                 except PermissionError:
-                    QMessageBox(None, "Permission error in current folder")
+                    QMessageBox.warning(self, 'Warning!', "Permission error in"
+                                        " current folder")
             else:
-                QMessageBox(None, 'Connecting to IDS failed!')
+                QMessageBox.warning(self, 'Warning!', 'Connecting to IDS '
+                                    'failed!')
         else:
             pass
-
-
-        print('Clicket getting from ids')
 
     def closeEvent(self, event):
         """ Save GUI state at exit.
@@ -1877,5 +1881,16 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     # app.setStyle("windows")
     main_window = SOLPS_MainWindow()
+    # Activate or deactivate PutIds/GetIds
+    try:
+        import imas
+        main_window.pushButton_PutIds.setEnabled(True)
+        main_window.pushButton_GetIds.setEnabled(True)
+
+    except:
+        main_window.pushButton_PutIds.setEnabled(False)
+        main_window.pushButton_GetIds.setEnabled(False)
+        # Leave them disabled
+        pass
     main_window.show()
     sys.exit(app.exec_())

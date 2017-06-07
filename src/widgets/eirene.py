@@ -3487,7 +3487,6 @@ class EireneEdit(QTreeWidget):
             try:
                 self.blocks[i]()
             except Exception as e:
-
                 #print('Error type:', type(e))
                 #print('Error:', e)
                 if type(e) != IndexError:
@@ -3524,7 +3523,7 @@ class EireneEdit(QTreeWidget):
                       'NITER', 'NTIME0', 'NTIME'])
 
         line = self.getline()
-        if  not self.looks_like_boolean_card(line):
+        if not self.looks_like_boolean_card(line):
             role = ['I', 'NOPTIM', 'NOPTM1', 'NGEOM_USR', 'NCOUP_INPUT',
                     'NSMSTRA', 'NSTORAM', 'NGSTAL', 'NRTAL', 'NREAC_ADD']
             self.getline(role)
@@ -4396,6 +4395,7 @@ class EireneEdit(QTreeWidget):
         if self.row >= self.text_size:
             raise IndexError
         line = self.text[self.row]
+
         if role is None:
             return line
 
@@ -4481,7 +4481,7 @@ class EireneEdit(QTreeWidget):
             arguments = []
             for char in line:
                 if char != ' ':
-                    arguments.append(True if char == 'T' else False)
+                    arguments.append(True if char in 'tT' else False)
         elif type == 'R5':
             arguments = []
             for i in range(len(line) // 12):
