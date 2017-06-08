@@ -34,6 +34,12 @@ import os
 import tarfile
 import base64
 
+from PyQt5.QtCore import pyqtSlot, Qt, QSize, QThread
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QDialog, QLineEdit,
+                             QGridLayout, QLabel, QDialogButtonBox,
+                             QPushButton)
+from PyQt5.QtGui import QIntValidator
+
 input_files = [
     'input.dat',
     'b2mn.dat',
@@ -53,6 +59,89 @@ input_files = [
     'b2.user.parameters',
     'b2.atomic_physics_rescale.parameters'
 ]
+
+
+class PutDialog(QDialog):
+    """Dialog Demanding the shot, run, name and device for getting the data
+    from IDS.
+    """
+
+    def __init__(self, parent=None, title='Get IDS'):
+        super(PutDialog, self).__init__(parent)
+
+    def prepareWidgets(self, shot='1001', run='1001', user=os.getenv('USER'),
+                       machine='solps-iter', version='3',
+                       title='Put IDS', path=os.path.expanduser('~')):
+        self.main_layout = QGridLayout(self)
+        self.setWindowTitle(title)
+
+        self.main_layout.addWidget(QLabel('SHOT'), 0, 0, Qt.AlignLeft)
+        shot = QLineEdit(shot)
+        shot.setValidator(QIntValidator())
+        self.main_layout.addWidget(shot, 0, 1, Qt.AlignCenter)
+
+        self.main_layout.addWidget(QLabel('RUN'), 1, 0, Qt.AlignLeft)
+        run = QLineEdit(run)
+        run.setValidator(QIntValidator())
+        self.main_layout.addWidget(run, 1, 1, Qt.AlignCenter)
+
+        self.main_layout.addWidget(QLabel('USER'), 2, 0, Qt.AlignLeft)
+        self.main_layout.addWidget(QLineEdit(os.getenv('USER')), 2, 1,
+                                   Qt.AlignCenter)
+
+        self.main_layout.addWidget(QLabel('MACHINE'), 3, 0, Qt.AlignLeft)
+        self.main_layout.addWidget(QLineEdit('solps-iter'),
+                                   3, 1, Qt.AlignCenter)
+
+        self.main_layout.addWidget(QLabel('VERSION'), 4, 0, Qt.AlignLeft)
+        self.main_layout.addWidget(QLineEdit('3'), 4, 1, Qt.AlignCenter)
+
+        self.main_layout.addWidget(QLabel('PATH'), 4, 0, Qt.AlignLeft)
+        self.main_layout.addWidget(path, 4, 1, Qt.AlignCenter)
+
+        # Adding the Ok and Cancel button.
+        dialog_button_box = QDialogButtonBox()
+        dialog_button_box.setStandardButtons(QDialogButtonBox.Ok |
+                                             QDialogButtonBox.Cancel)
+        dialog_button_box.accepted.connect(self.accept)
+        dialog_button_box.rejected.connect(self.reject)
+        self.main_layout.addWidget(dialog_button_box, 6, 1)
+
+    def sizeHint(self):
+        return QSize(100, 100)
+
+    def on_close(self):
+        # Returning the values
+        # SHOT, RUN, USER, MACINE, VERSION, run_name exclusively.
+        try:
+            SHOT = int(self.main_layout.itemAt(1).widget().text())
+            RUN = int(self.main_layout.itemAt(3).widget().text())
+        except ValueError as e:
+            SHOT = -1
+            RUN = -1
+
+        USER = self.main_layout.itemAt(5).widget().text()
+        MACHINE = self.main_layout.itemAt(7).widget().text()
+        VERSION = self.main_layout.itemAt(9).widget().text()
+        RUN_NAME = self.main_layout.itemAt(11).widget().text()
+
+        return SHOT, RUN, USER, MACHINE, VERSION, RUN_NAME
+
+
+class PutIDS(QThread):
+
+    def __init__(self, parent=None):
+        super(PutIDS, self).__init__(parent)
+        self.prepare_input()
+
+    def prepare_input(self):
+        parent = self.parent()
+        self.dialog = PutDialog(parent)
+
+    def start(self):
+        if self.dialog.exec_(self):
+            SHOT, RUN, USER, MACHINE, VERSION, RUN_NAME = \
+                self.dialog.on_close()
 
 
 def tarInputFiles(dir_path):

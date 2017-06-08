@@ -1350,6 +1350,8 @@ class SOLPS_MainWindow(QMainWindow):
         self.solpsinput.setup_input_tabs()
         self.tab_Input.setEnabled(False)
 
+        # Initialize the Put and Get widgets
+        test = put_edge_ids.PutIDS(self)
         self.pushButton_PutIds.clicked.connect(self.click_put_ids)
         self.pushButton_GetIds.clicked.connect(self.click_get_ids)
 
@@ -1562,7 +1564,6 @@ class SOLPS_MainWindow(QMainWindow):
             xc, yc, nx, ny = put_edge_ids.readB2fgmtry(b2fgmtry)
             ne, te, ti = put_edge_ids.readB2fstati(b2fstati)
         code_parameters = put_edge_ids.tarInputFiles(path)
-        print(user, device, version, run, shot)
         put_edge_ids.B2toIDS(shot, run, user, device, version,
                              xc, yc, nx, ny, ne, te, ti, code_parameters,
                              path)
@@ -1578,6 +1579,10 @@ class SOLPS_MainWindow(QMainWindow):
         dialog = GetDialog(self)
         if dialog.exec_():
             SHOT, RUN, USER, MACHINE, VERSION, RUN_NAME = dialog.on_close()
+            if path is None:
+                QMessageBox.warning(self, 'Warning!', "No top dir selected!")
+                return
+
             run_dirname = path + '/' + RUN_NAME
             if os.path.exists(run_dirname):
                 QMessageBox.warning(self, 'Warning!', "Run dir with that name"
@@ -1596,7 +1601,15 @@ class SOLPS_MainWindow(QMainWindow):
                         name = member.name
                         file = tar.extractfile(member).read().decode()
                         print("Writing to ", run_dirname + '/' + name)
-                        with open(run_dirname + '/' + name, 'w') as f:
+                        abs_filename = run_dirname + '/' + name
+                        if not os.path.exists(os.path.dirname(abs_filename)):
+                            try:
+                                os.makedirs(os.path.dirname(abs_filename))
+                            except OSError:
+                                QMessageBox.warning(self, "Warning!",
+                                                    "Cannot create directory."
+                                                    " Permission denied.")
+                        with open(abs_filename, 'w') as f:
                             f.write(file)
                     self.model.startThreads()
                 except PermissionError:

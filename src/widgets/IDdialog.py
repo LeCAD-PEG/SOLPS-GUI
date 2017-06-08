@@ -1,30 +1,22 @@
-from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
-                          pyqtSignal, QThread, QAbstractItemModel, QVariant,
-                          QSortFilterProxyModel, QRegExp, QObject, QRect,
-                          QSize, QProcess)
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
-                             QFileDialog, QStyle, QStyledItemDelegate,
-                             QLineEdit, QToolButton, QGridLayout, QLabel,
-                             QDialogButtonBox, QInputDialog, QPushButton)
+from PyQt5.QtCore import pyqtSlot, Qt, QSize
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QDialog, QLineEdit,
+                             QGridLayout, QLabel, QDialogButtonBox,
+                             QPushButton)
 from PyQt5.QtGui import QIntValidator
 import os
 import sys
 
-N = 4
-
-class Row:
-    shot, run, user, machine = range(N)
-    names = ['shot', 'run', 'user', 'machine']
 
 class GetDialog(QDialog):
     """Dialog Demanding the shot, run, name and device for getting the data
     from IDS.
     """
-    def __init__(self, parent=None):
+
+    def __init__(self, parent=None, title='Get IDS'):
         super(GetDialog, self).__init__(parent)
         self.setModal(True)
         self.main_layout = QGridLayout(self)
-        self.setWindowTitle('Get IDS')
+        self.setWindowTitle(title)
 
         self.main_layout.addWidget(QLabel('SHOT'), 0, 0, Qt.AlignLeft)
         shot = QLineEdit('1001')
@@ -47,20 +39,19 @@ class GetDialog(QDialog):
         self.main_layout.addWidget(QLabel('VERSION'), 4, 0, Qt.AlignLeft)
         self.main_layout.addWidget(QLineEdit('3'), 4, 1, Qt.AlignCenter)
 
-        self.main_layout.addWidget(QLabel('Run name'), 5, 0, Qt.AlignLeft)
-        self.main_layout.addWidget(QLineEdit('new_run', ), 5, 1,
-                                   Qt.AlignCenter)
+        self.main_layout.addWidget(QLabel('RUN NAME'), 5, 0, Qt.AlignLeft)
+        self.main_layout.addWidget(QLineEdit('new_run'), 5, 1, Qt.AlignCenter)
 
         # Adding the Ok and Cancel button.
         dialog_button_box = QDialogButtonBox()
-        dialog_button_box.setStandardButtons(QDialogButtonBox.Ok|
+        dialog_button_box.setStandardButtons(QDialogButtonBox.Ok |
                                              QDialogButtonBox.Cancel)
         dialog_button_box.accepted.connect(self.accept)
         dialog_button_box.rejected.connect(self.reject)
         self.main_layout.addWidget(dialog_button_box, 6, 1)
 
     def sizeHint(self):
-        return QSize(100,100)
+        return QSize(100, 100)
 
     def on_close(self):
         # Returning the values
@@ -78,8 +69,11 @@ class GetDialog(QDialog):
         RUN_NAME = self.main_layout.itemAt(11).widget().text()
 
         return SHOT, RUN, USER, MACHINE, VERSION, RUN_NAME
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+
     class MainWindow(QMainWindow):
         def __init__(self, parent=None):
             super(MainWindow, self).__init__(parent)
