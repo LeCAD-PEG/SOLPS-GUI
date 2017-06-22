@@ -58,8 +58,6 @@ from addmenu import AddMenu
 
 import put_edge_ids
 import get_edge_ids
-from IDdialog import GetDialog
-import tarfile
 
 try:
     import BytesIO
@@ -95,10 +93,23 @@ def extract_value(line):
 
 def read_identification_parameters(directory):
     """ Reads the identification parameters of the experiment.
+    The identification parameters of the experiment are defined inside b2mn.dat
+    under the **b2mndr_*id**. In b2md.dat are the switches for the shot and run
+    parameters.
+
+    This function scans both files and tries to find these parameters. If they
+    are defined inside the b2md.dat or b2mn.dat, these values are then showed
+    in the ``run browser`` in SOLPS-GUI.
 
     Args:
-        dir (str): The directory of the experiment input files
+        directory (str): The directory of the experiment input files
+
     Returns:
+        label (str): The string which is labeled as label in b2mn.dat.
+        run (str): The string which is labeled as run in b2mn.dat.
+        shot (str): The string which is labeled as shot in b2mn.dat.
+        user (str): The string which is labeled as user in b2mn.dat
+        device (str): The string which is labeled as device in b2mn.dat
 
     """
     path = directory + '/b2mn.dat'
@@ -890,12 +901,20 @@ class RunsModel(QAbstractItemModel):
         return parentItem.childCount()
 
     def setData(self, index, value, role=Qt.EditRole):
+        """This is the overloaded function for QAbstractItemModel. When the
+        user change certain columns in the RunsTreeView, these parameters will
+        be saved to the b2mn.dat file, if able, in the form of identification
+        switches.
+
+        Otherwise, if some columns were to be changed, i.e. the part to the
+        run directories etc... the changes will be rejected.
+        """
         if role != Qt.EditRole:
             return False
 
         column = index.column()
 
-        if  column == Column.path or column == Column.date:
+        if column == Column.path or column == Column.date:
             return False
 
         # disalow changing 'name' except for aliased names (not saved)
@@ -1024,7 +1043,8 @@ class RunsModel(QAbstractItemModel):
         return self.createIndex(parentItem.row(), 0, parentItem)
 
     def create_indices_for_columns(self):
-        "Create hashed dictionary for updating columns specified by path"
+        """Create hashed dictionary for updating columns specified by path.
+        """
         self.column_index = dict()  # path : (itemData, status, date, label)
         child_items = [self.rootItem.childItems]
         while child_items:
@@ -1350,10 +1370,23 @@ class SOLPS_MainWindow(QMainWindow):
         self.solpsinput.setup_input_tabs()
         self.tab_Input.setEnabled(False)
 
-        # Initialize the Put and Get widgets
-        test = put_edge_ids.PutIDS(self)
         self.pushButton_PutIds.clicked.connect(self.click_put_ids)
         self.pushButton_GetIds.clicked.connect(self.click_get_ids)
+
+        # Initialize the Put and Get widgets
+
+        self.putIDSthread = put_edge_ids.PutIDS(parent=self)
+        # Setting push button for enabling/disabling and the status bar for
+        # updating the message.
+        self.putIDSthread.emitMessage.connect(self.statusbar.showMessage)
+        self.putIDSthread.startFlag.connect(self.pushButton_PutIds.setEnabled)
+
+        self.getIDSthread = get_edge_ids.GetIDS()
+        # Setting push button for enabling/disabling and the status bar for
+        # updating the message.
+        self.getIDSthread.emitMessage.connect(self.statusbar.showMessage)
+        self.getIDSthread.startFlag.connect(self.pushButton_GetIds.setEnabled)
+        self.getIDSthread.finished.connect(self.model.scanFileSystemThread.start)
 
         self.actionPreferences.triggered.connect(self.show_preferences_dialog)
         self.actionRuns.triggered.connect(self.show_runs_dialog)
@@ -1518,6 +1551,9 @@ class SOLPS_MainWindow(QMainWindow):
                                     QMessageBox.Ok)
     @pyqtSlot()
     def click_put_ids(self):
+        """ This function saves contents of the selected run in the
+        RunsTreeView to an IDS with the identification parameters the run have.
+        """
 
         index = self.treeViewRuns.selectionModel().currentIndex()
         model = self.proxyModel
@@ -1533,7 +1569,7 @@ class SOLPS_MainWindow(QMainWindow):
         try:
             run = int(model.data(index_run, Qt.DisplayRole))
             shot = int(model.data(index_shot, Qt.DisplayRole))
-        except:
+        except ValueError as e:
             shot = ''
             run = ''
         device = 'solps-iter'
@@ -1551,22 +1587,8 @@ class SOLPS_MainWindow(QMainWindow):
                                 'for either shot or run!')
             return
 
-        # We apparently are having  all files
-
-        b2fstati = put_edge_ids.getB2path(path, 'b2fstati')
-        b2fgmtry = put_edge_ids.getB2path(path, 'b2fgmtry')
-        if b2fstati == '' or b2fgmtry == '':
-            QMessageBox.warning(self,  'Warning!', 'No outpuf files for '
-                                'b2fstati b2fgmtry!')
-            xc, yc, nx, ny = [], [], 0, 0
-            ne, te, ti = [], [], []
-        else:
-            xc, yc, nx, ny = put_edge_ids.readB2fgmtry(b2fgmtry)
-            ne, te, ti = put_edge_ids.readB2fstati(b2fstati)
-        code_parameters = put_edge_ids.tarInputFiles(path)
-        put_edge_ids.B2toIDS(shot, run, user, device, version,
-                             xc, yc, nx, ny, ne, te, ti, code_parameters,
-                             path)
+        self.putIDSthread.setParameters(path, run, shot, device, version, user)
+        self.putIDSthread.start(QThread.LowestPriority)
 
     @pyqtSlot()
     def click_get_ids(self):
@@ -1576,50 +1598,9 @@ class SOLPS_MainWindow(QMainWindow):
         path = model.data(index_path, Qt.DisplayRole)
         # Getting the current model
         # Run and shot will have to be specified
-        dialog = GetDialog(self)
-        if dialog.exec_():
-            SHOT, RUN, USER, MACHINE, VERSION, RUN_NAME = dialog.on_close()
-            if path is None:
-                QMessageBox.warning(self, 'Warning!', "No top dir selected!")
-                return
-
-            run_dirname = path + '/' + RUN_NAME
-            if os.path.exists(run_dirname):
-                QMessageBox.warning(self, 'Warning!', "Run dir with that name"
-                                    " already exists")
-                return
-            else:
-                os.mkdir(run_dirname)
-
-            ids_obj = get_edge_ids.GetIDS(SHOT, RUN, USER, MACHINE, VERSION)
-            if ids_obj.state:
-                code_parameters = ids_obj.read_code_parameters()
-                tf = BytesIO(code_parameters)
-                tar = tarfile.TarFile(mode='r', fileobj=tf)
-                try:
-                    for member in tar:
-                        name = member.name
-                        file = tar.extractfile(member).read().decode()
-                        print("Writing to ", run_dirname + '/' + name)
-                        abs_filename = run_dirname + '/' + name
-                        if not os.path.exists(os.path.dirname(abs_filename)):
-                            try:
-                                os.makedirs(os.path.dirname(abs_filename))
-                            except OSError:
-                                QMessageBox.warning(self, "Warning!",
-                                                    "Cannot create directory."
-                                                    " Permission denied.")
-                        with open(abs_filename, 'w') as f:
-                            f.write(file)
-                    self.model.startThreads()
-                except PermissionError:
-                    QMessageBox.warning(self, 'Warning!', "Permission error in"
-                                        " current folder")
-            else:
-                QMessageBox.warning(self, 'Warning!', 'Connecting to IDS '
-                                    'failed!')
-        else:
-            pass
+        self.getIDSthread.setParameters(dirpath=path)
+        if self.getIDSthread.checkParameters():
+            self.getIDSthread.start()
 
     def closeEvent(self, event):
         """ Save GUI state at exit.
