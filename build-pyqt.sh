@@ -1,11 +1,11 @@
 #!/bin/sh -x
 ## Building PyQt with Python3 and Qt5
 ## Minimum GCC supported version for building Qt5 is 4.7
- 
+
 PYTHON_VERSION=3.6.0
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
 QT_VERSION=5.7.1
-PyQT_VERSION=5.7.1 # should be the same as Qt 
+PyQT_VERSION=5.7.1 # should be the same as Qt
 SIP_VERSION=4.19
 
 # Site specific defaults
@@ -24,7 +24,7 @@ case $(hostname -f) in
                         -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK}
 	;;
   # SLES 11.4 WPCD Gateway (incompatible XCB, Xlib and GL libraries)
-  tok*.bc.rzg.mpg.de) # IPP MPG 
+  tok*.bc.rzg.mpg.de) # IPP MPG
         MAKE_JOBS=${MAKE_JOBS:-16}
 	USE_QT_XCB="NO"
 	BUILD_XCB="YES"
@@ -75,7 +75,7 @@ PYTHON_SRC="Python-${PYTHON_VERSION}.tgz"
 PYTHON_SITE="https://www.python.org/ftp/python"
 PYTHON_DOWNLOAD="${PYTHON_SITE}/${PYTHON_VERSION}/${PYTHON_SRC}"
 
-if [ ! -f ${DOWNLOAD_DIR}/${PYTHON_SRC} ]; then 
+if [ ! -f ${DOWNLOAD_DIR}/${PYTHON_SRC} ]; then
     wget  -O ${DOWNLOAD_DIR}/${PYTHON_SRC} ${PYTHON_DOWNLOAD}
 fi
 
@@ -103,12 +103,12 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
     LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
     ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
       Cython mpi4py scipy luigi tornado deap decorator liac-arff ecdsa \
-      netaddr paramiko paycheck # netifaces 
+      netaddr paramiko paycheck # netifaces
   fi
   touch ${PYTHON_SRC_DIR}/.built
 fi
 
-XCB_FLAGS="-xcb -no-xcb-xlib" # XCB is mandatory for Linux 
+XCB_FLAGS="-xcb -no-xcb-xlib" # XCB is mandatory for Linux
 if [ "${USE_QT_XCB}" = "YES" ]; then # build QT with QT-provided XCB libs
   XCB_FLAGS="${XCB_FLAGS} -qt-xcb"
 fi
@@ -136,7 +136,7 @@ if [ "${BUILD_XCB}" = "YES" ]; then
   XCB_FLAGS="${XCB_FLAGS} ${XCB_INCLUDES} ${XCB_LIBS}"
 fi
 
-if [ "${BUILD_XLIB}" = "YES" ] ; then 
+if [ "${BUILD_XLIB}" = "YES" ] ; then
   URLS="${URLS} http://www.x.org/releases/X11R7.7/src/lib/libX11-1.5.0.tar.gz"
 fi
 
@@ -179,9 +179,9 @@ fi
 
 
 if [ ! -e ${QT_SOURCE_DIR}/.configured ]; then # Configuring Qt
-  rm -rf ${QT_SOURCE_DIR} ${STAGING_QT} 
+  rm -rf ${QT_SOURCE_DIR} ${STAGING_QT}
   cd ${BUILD_DIR}
-  tar xzf ${DOWNLOAD_DIR}/${QT_TAR} 
+  tar xzf ${DOWNLOAD_DIR}/${QT_TAR}
   cd ${QT_SOURCE_DIR}
   sed -i.orig -e 's/-Wno-error=return-type//' \
       qtlocation/src/3rdparty/poly2tri/poly2tri.pro
@@ -228,7 +228,7 @@ SIP_SRC="sip-${SIP_VERSION}.tar.gz"
 SIP_SITE="http://sourceforge.net/projects/pyqt/files/sip"
 SIP_DOWNLOAD="${SIP_SITE}/sip-${SIP_VERSION}/${SIP_SRC}/download"
 
-if [ ! -f ${DOWNLOAD_DIR}/${SIP_SRC} ]; then 
+if [ ! -f ${DOWNLOAD_DIR}/${SIP_SRC} ]; then
     wget -O ${DOWNLOAD_DIR}/${SIP_SRC} --no-check-certificate \
           ${SIP_DOWNLOAD}
 fi
@@ -246,7 +246,7 @@ if [ ! -e   ${SIP_SRC_DIR}/.built ]; then
   LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
   ${PYTHON} configure.py
   make -j ${MAKE_JOBS}
-  make install 
+  make install
   touch ${SIP_SRC_DIR}/.built
 fi
 
@@ -258,7 +258,7 @@ PyQT_SITE="http://sourceforge.net/projects/pyqt/files/PyQt5"
 PyQT_DOWNLOAD="${PyQT_SITE}/PyQt-${PyQT_VERSION}/${PyQT_SRC}/download"
 
 
-if [ ! -f ${DOWNLOAD_DIR}/${PyQT_SRC} ]; then 
+if [ ! -f ${DOWNLOAD_DIR}/${PyQT_SRC} ]; then
     wget  -O ${DOWNLOAD_DIR}/${PyQT_SRC} --no-check-certificate \
         ${PyQT_DOWNLOAD}
 fi
@@ -276,6 +276,6 @@ if [ ! -e   ${PyQT_SRC_DIR}/.built ]; then
       --qmake=${STAGING_DIR}/qt/${QT_VERSION}/bin/qmake \
       --sip=${STAGING_DIR}/bin/sip
   make -j ${MAKE_JOBS}
-  make install 
+  make install
   touch ${PyQT_SRC_DIR}/.built
 fi

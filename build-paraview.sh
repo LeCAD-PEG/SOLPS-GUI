@@ -1,6 +1,6 @@
 #!/bin/sh -x
 
-PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.3.0}
+PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.0}
 QT_VERSION=${QT_VERSION:-4.8.7}
 CMAKE_VERSION=3.7.2
 
@@ -45,8 +45,10 @@ install -d ${STAGING_DIR}
 
 set -e
 
-# We need recent CMAKE for building ParaView 5.1
-if [ $(cmake --version | sed 's/[^0-9]//g;s/^\(.\{2\}\).*/\1/' ) -ge 35 ]
+# We need recent CMAKE for building ParaView 5.x
+CMAKE_TEST=$(hash cmake 2> /dev/null && cmake --version \
+			| sed 's/[^0-9]//g;s/^\(.\{2\}\).*/\1/')
+if test "${CMAKE_TEST}0" -ge 350
  then CMAKE=cmake
  else CMAKE=${STAGING_DIR}/bin/cmake
 fi
