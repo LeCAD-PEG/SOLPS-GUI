@@ -7,7 +7,8 @@
 //> DESCRIPTION
 //> ParaView ReadUALEdge plugin is a tool used to visualize and analyze data, 
 //> obtained by fusion simulations (electron temperature/density, ion 
-//> temperature/density) stored in CPO and/or IDS database. 
+//> temperature/density) stored in CPO and/or IDS database.
+//> The focus of plugin development is on data stored in IDS "edge_profiles".
 //>-----------------------------------------------------------------------------
 
 #include <iostream>
@@ -151,22 +152,142 @@ std::vector<std::string> findShotRun(   std::string userIMASShotRunDir,
     return availableShotRun;
 }
 
-vtkSmartPointer<vtkDoubleArray> fCreateNewDoubleArray(int ndarray_num_tuples,
-                                                      std::string ndarray_name,
-                                                      int ndarray_id = -1)
+vtkSmartPointer<vtkPoints> fSetVtkPoints(
+    class IdsNs::IDS::edge_profiles::ggd::grid::space& space)
+{   
+    //> Function used to get the geometry/coordinates of all 0D objects/points 
+    //> P[R, Z] forming this grid
+    class IdsNs::IDS::edge_profiles::ggd::grid::space::objects_per_dimension&
+        dim_obj_0D = space.objects_per_dimension(0);
+    //> Get number of 0D objects / points
+    int num_obj_0D = dim_obj_0D.object.extent(0);
+    vtkSmartPointer<vtkPoints> pointsArray =
+        vtkSmartPointer<vtkPoints>::New(); 
+    for(int i=0; i < num_obj_0D; ++i){
+    pointsArray->InsertNextPoint(
+        dim_obj_0D.object(i).geometry(0),
+        dim_obj_0D.object(i).geometry(1), 
+        0.0);
+    }
+    return pointsArray;
+}
+
+vtkSmartPointer<vtkDoubleArray> fSetValuesArrayBase(    
+    int ndarray_num_tuples,
+    std::string ndarray_label)
 {
-    //> Function used to create vtk double arrays
+    //> Function used to set vtkDoubleArray size and label
     vtkSmartPointer<vtkDoubleArray> newDoubleArray =
         vtkSmartPointer<vtkDoubleArray>::New();
     newDoubleArray->SetNumberOfComponents(1);
     newDoubleArray->SetNumberOfTuples(ndarray_num_tuples);
-    std::string set_name = ndarray_name;
-    if (ndarray_id != -1)
-    {
-        set_name = set_name + SSTR(ndarray_id + 1);
-    }
+    std::string set_name = ndarray_label;
     newDoubleArray->SetName(set_name.c_str());
     return newDoubleArray;
+}
+
+template <typename T>
+void fValues2UnstructuredGrid(  
+    //> Function used to fill predefined (size, label...) vtkDoubleArray with 
+    //> quantity values and assign it to vtkUnstructuredGrid.
+    //> (after each full vtkDoubleArray definition process is required 
+    //> to assign it to vtkUnstructuredGrid)
+    std::string values_array_label,
+    vtkSmartPointer<vtkUnstructuredGrid> inputVtkUnstructuredGrid,
+    T const& loc_quantity,
+    int gridSubset_index,
+    int num_gridSubset_el)
+{
+    int quantity_gridSubset_index = loc_quantity.grid_subset_index;
+    int num_values = loc_quantity.values.extent(0);
+    if (gridSubset_index == quantity_gridSubset_index &&
+        num_gridSubset_el == num_values)
+    {
+        // Define vtkDoubleArray and set its label and size 
+        vtkSmartPointer<vtkDoubleArray> newVtkDoubleArray =
+            fSetValuesArrayBase(    num_gridSubset_el, 
+                                    values_array_label);
+        //> In correctly written IDS the number of grid subset 
+        //> objects and grid subset values (scalars) is equal
+        newVtkDoubleArray->
+            SetNumberOfValues(num_gridSubset_el);
+        for (int j = 0; j < num_gridSubset_el; j++)
+        {
+            newVtkDoubleArray->SetComponent(
+                j,0, loc_quantity.values(j));
+        }
+        //> Set new vtkDoubleArray, containing data field, to vtkUnstructuredGrid
+        inputVtkUnstructuredGrid->GetCellData()->AddArray(
+            newVtkDoubleArray);
+        return;
+    }
+}
+
+template <typename V>
+vtkSmartPointer<vtkCellArray> fSetCellArray( 
+    V const& el_data_type,
+    class IdsNs::IDS::edge_profiles::ggd::grid::grid_subset& loc_gridSubset,
+    class IdsNs::IDS::edge_profiles::ggd::grid& grid)
+{
+    vtkSmartPointer<vtkCellArray> newCellArray =
+        vtkSmartPointer<vtkCellArray>::New();
+
+    //> Get size/number of elements forming current grid subset  
+    //> Currently ReadUALEdge works only with elements containing one object
+    //> (one scalar value is provided per element).
+    int num_gridSubset_el = loc_gridSubset.element.extent(0);
+
+    //> Get dimension of the objects forming this grid subset
+    //> NOTE :  Each grid subset is formed with objects of the same 
+    //>         dimension
+    //>         (either only 0D nodes, 1D edges, 2D cells...). 
+    //>         So in that case is enough to read only the dimension of 
+    //>         the first object forming the grid subset.
+    int obj_dimension = loc_gridSubset.element(0).object(0).dimension;
+
+    for (int j = 0; j < num_gridSubset_el; j++)
+    {
+        //> Get objects space index, dimension and index
+        //> Note that in IDS indices are written in Fortran notation 
+        //> (1,2,3,...) while C++ notation starts with 0 (0,1,2,...)
+        //> so c++_index = fortran_index - 1
+
+        //> Get space index of the object
+        int obj_space = loc_gridSubset.element(j).object(0).space;
+
+        //> Get object index of the object
+        int obj_index = loc_gridSubset.element(j).object(0).index;
+
+        //> Get number of nodes/points forming the object
+        int num_obj_nodes = grid.space(obj_space - 1).
+            objects_per_dimension(obj_dimension - 1).
+            object(obj_index - 1).nodes.extent(0);
+
+        //> Fill the el_data_type (it must be either vtkVertex, 
+        //> vtkLine, vtkTriangle or vtkQuad data type)
+        for(int k = 0; k < num_obj_nodes; k++)
+        {
+            int node_ind = grid.space(obj_space - 1).
+                objects_per_dimension(obj_dimension - 1).
+                object(obj_index - 1).nodes(k);
+            el_data_type->GetPointIds()->
+                SetId(k, node_ind - 1);
+        }
+        //> Assign the <el_data_type> list of data types to vtkCellArray
+        newCellArray->InsertNextCell(el_data_type);
+    }
+    return newCellArray;
+}
+
+void fAddBlock2MultiBlock(  vtkSmartPointer<vtkMultiBlockDataSet> MB,
+                            vtkSmartPointer<vtkUnstructuredGrid>  UG,
+                            std::string gridSubset_name)
+{
+     //> Function to add unstructured grid to main multiblock
+    int num_blocks = MB->GetNumberOfBlocks();
+    MB->SetBlock(num_blocks, UG);
+    MB->GetMetaData((unsigned int) num_blocks)->Set(
+        vtkCompositeDataSet::NAME(), gridSubset_name.c_str());
 }
 
 int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
@@ -196,6 +317,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
     int num_ggd_slices = db._edge_profiles.ggd.extent(0);
     std::clog << "Number of GGD slices:" << num_ggd_slices << std::endl;
+
     if (num_ggd_slices == 0)
     {
         std::clog << "ERROR! Either selected database doesn't exist "
@@ -236,15 +358,10 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
     vtkSmartPointer<vtkMultiBlockDataSet> mainMB =
         vtkSmartPointer<vtkMultiBlockDataSet>::New();
-    vtkSmartPointer<vtkPoints> nodes_0D_vtkArray =
-        vtkSmartPointer<vtkPoints>::New();
 
     //> Get the geometry/coordinates of all nodes/points N[R, Z] 
     //> forming this grid
-    for(int i=0; i < num_obj_0D; ++i){
-        nodes_0D_vtkArray->InsertNextPoint(dim_obj_0D.object(i).geometry(0),
-            dim_obj_0D.object(i).geometry(1), 0.0);
-    }
+    vtkSmartPointer<vtkPoints> obj_0D_vtkPointsArray = fSetVtkPoints(space);
 
     //> Get number of grid subsets
     int num_gridSubset = grid.grid_subset.extent(0);
@@ -257,86 +374,31 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         int gridSubset_index = grid_subset.identifier.index;
 
         //> Get size/number of elements forming current grid subset  
-        //> (that information is needed later, because vtkDoubleArrays,
-        //> which take size as one of parameters, must be defined inside this
-        //> loop, not later!)
-        //> Currently ReadUALEdge works only with elements containing one object
-        //> (one scalar value is provided per element).
-        int num_gridSubset_el = 0;
-        num_gridSubset_el = grid_subset.element.extent(0);
+        int num_gridSubset_el = grid_subset.element.extent(0);
 
         std::clog << "num_gridSubset_el: " << num_gridSubset_el << 
             " gridSubset_name: "<< gridSubset_name << std::endl;
 
-        //> Create ELECTRON TEMPERATURE array
-        vtkSmartPointer<vtkDoubleArray> electronTemperatureArray =
-            fCreateNewDoubleArray(num_gridSubset_el, "Electron Temperature");
-
-        //> Create ELECTRON DENSITY array
-        vtkSmartPointer<vtkDoubleArray> electronDensityArray =
-            fCreateNewDoubleArray(num_gridSubset_el, "Electron Density");
-
         //> Get dimension of the objects forming this grid subset
-        //> NOTE :  Each grid subset is formed with objects of the same 
-        //>         dimension
-        //>         (either only 0D nodes, 1D edges, 2D cells...). 
-        //>         So in that case is enough to read only the dimension of 
-        //>         the first object forming the grid subset.
-        int obj_dimension = grid_subset.element(0).object(0).dimension;
-
-        int gridSubset_obj_dim = obj_dimension;
-
+        int gridSubset_obj_dim = grid_subset.element(0).object(0).dimension;
+        
         //> ------ SET POINTS/NODES -----
         if (gridSubset_obj_dim == 1)
         {
+            //> Set vtkUnstructuredGrid dataset
             vtkSmartPointer<vtkUnstructuredGrid> gridSubsetPointsUnstructuredGrid =
                 vtkSmartPointer<vtkUnstructuredGrid>::New();
 
-            //> Set vtk array for nodes/points
-            vtkSmartPointer<vtkCellArray> gridSubsetVertices =
-                vtkSmartPointer<vtkCellArray>::New();
             vtkSmartPointer<vtkVertex> gridSubsetVertex =
                 vtkSmartPointer<vtkVertex>::New();
-            int num_gridSubset_el = grid_subset.element.extent(0);
-            for (int j = 0; j < num_gridSubset_el; j++)
-            {
-                //> Get objects space index, dimension and index
-                //> Note that in IDS indices are written in Fortran notation 
-                //> (1,2,3,...) while C++ notation starts with 0 (0,1,2,...)
-                //> so c++_index = fortran_index - 1
 
-                //> Get space index of the object
-                int obj_space = grid_subset.element(j).object(0).space;
-                // int obj_space = grid_subset.element(j).object(0).space;
+            //> Set vtkCellArray for nodes/points
+            vtkSmartPointer<vtkCellArray> gridSubsetVertices =
+                vtkSmartPointer<vtkCellArray>::New();
+            gridSubsetVertices = fSetCellArray(gridSubsetVertex, grid_subset, grid);
 
-                //> Get dimension of the object
-                //> NOTE :  Each grid subset is formed with objects of the same 
-                //>         dimension
-                //>         (either only 0D nodes, 1D edges, 2D cells...). 
-                //>         So in that case is enough to read only the dimension of 
-                //>         the first object forming the grid subset.
-                // int obj_dimension = grid_subset.element(e).object(0).dimension;
-
-                //> Get object index of the object
-                int obj_index = grid_subset.element(j).object(0).index;
-                // int obj_index = grid_subset.element(j).object(0).index;
- 
-                //> Get number of nodes of the object
-                int num_obj_nodes = grid.space(obj_space - 1).
-                    objects_per_dimension(obj_dimension - 1).
-                    object(obj_index - 1).nodes.extent(0);
-
-                for(int k = 0; k < num_obj_nodes; k++)
-                {
-                    int node_ind = grid.space(obj_space - 1).
-                        objects_per_dimension(obj_dimension - 1).
-                        object(obj_index - 1).nodes(k);
-                    gridSubsetVertex->GetPointIds()->
-                        SetId(k, node_ind - 1);
-                    gridSubsetVertices->InsertNextCell(gridSubsetVertex);
-                }
-            }
-            gridSubsetPointsUnstructuredGrid->SetPoints(nodes_0D_vtkArray);
+            //> Assign vtkCellArray to vtkUnstructuredGrid
+            gridSubsetPointsUnstructuredGrid->SetPoints(obj_0D_vtkPointsArray);
             gridSubsetPointsUnstructuredGrid->SetCells(
                 VTK_VERTEX, gridSubsetVertices);
 
@@ -348,55 +410,20 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             //> grid subsets objects (vertices)
             for (int n = 0; n < te_gridSubsets_num; n++)
             {
-                int te_gridSubset_index = ggd.electrons.temperature(n).
-                    grid_subset_index;
-                int num_te_scalars = 
-                    ggd.electrons.temperature(n).values.extent(0);
-
-                if (gridSubset_index == te_gridSubset_index && 
-                    num_gridSubset_el == num_te_scalars)
-                {
-                    //> In correctly written IDS the number of grid subset 
-                    //> objects and grid subset values (scalars) is 
-                    //> the same 
-                    electronTemperatureArray->
-                        SetNumberOfValues(num_gridSubset_el);
-                    for (int j = 0; j < num_gridSubset_el; j++)
-                    {
-                        electronTemperatureArray->SetComponent(
-                            j,0, ggd.electrons.temperature(n).values(j));
-                    }
-                    //> Set Electron Temperature array to UnstructuredGrid
-                    gridSubsetPointsUnstructuredGrid->GetCellData()->AddArray(
-                        electronTemperatureArray);
-                    break;
-                }
+                fValues2UnstructuredGrid("Electron Temperature", 
+                    gridSubsetPointsUnstructuredGrid,
+                    ggd.electrons.temperature(n), gridSubset_index, 
+                    num_gridSubset_el);
             }
 
             //> Assign values found in Electron Density substructure to 
             //> grid subsets objects (vertices)
             for (int n = 0; n < ne_gridSubsets_num; n++)
             {
-                int ne_gridSubset_index = 
-                    ggd.electrons.density(n).grid_subset_index;
-                if (gridSubset_index == ne_gridSubset_index && 
-                    num_gridSubset_el == ggd.electrons.
-                    density(n).values.extent(0))
-                {
-                    //> In correctly written IDS the number of grid subset 
-                    //> objects and grid subset values (scalars) is 
-                    //> the same 
-                    electronDensityArray->SetNumberOfValues(num_gridSubset_el);
-                    for (int j = 0; j < num_gridSubset_el; j++)
-                    {
-                        electronDensityArray->SetComponent(
-                            j,0, ggd.electrons.density(n).values(j));
-                    }
-                    //> Set Electron Density array to UnstructuredGrid
-                    gridSubsetPointsUnstructuredGrid->GetCellData()->AddArray(
-                        electronDensityArray);
-                    break;
-                }
+                fValues2UnstructuredGrid("Electron Density", 
+                    gridSubsetPointsUnstructuredGrid,
+                    ggd.electrons.density(n), gridSubset_index, 
+                    num_gridSubset_el);
             }
 
             //> Assign values to grid subsets objects (vertices) using scalars
@@ -411,32 +438,10 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 //> grid subsets objects (vertices)
                 for (int n = 0; n < num_ti_gridSubsets; n++)
                 {
-                    vtkSmartPointer<vtkDoubleArray> ionTemperatureArray =
-                        fCreateNewDoubleArray(num_gridSubset_el, 
-                            "Ion Temperature" + k);
-                    int ti_gridSubset_index =
-                        ggd.ion(k).temperature(n).grid_subset_index;
-                    int num_ti_gridSubset_values = 
-                        ggd.ion(k).temperature(n).values.extent(0);
-                    if (gridSubset_index == ti_gridSubset_index &&
-                        num_gridSubset_el == num_ti_gridSubset_values)
-                    {
-                        //> In correctly written IDS the number of grid subset 
-                        //> objects and grid subset values (scalars) is 
-                        //> the same 
-                        ionTemperatureArray->
-                            SetNumberOfValues(num_ti_gridSubset_values);
-                        for (int j = 0; j < num_ti_gridSubset_values; j++)
-                        {
-                            ionTemperatureArray->SetComponent(
-                                j,0, ggd.ion(k).temperature(n).values(j));
-                        }
-                        //> Set Ion Temperature array to UnstructuredGrid
-                        gridSubsetPointsUnstructuredGrid->
-                            GetCellData()->AddArray(ionTemperatureArray);
-                        break;
-                    }
-
+                    fValues2UnstructuredGrid("Ion Temperature" + k, 
+                        gridSubsetPointsUnstructuredGrid,
+                        ggd.ion(k).temperature(n), gridSubset_index, 
+                        num_gridSubset_el);
                 }
                 //> Assign values found in Ion Density substructure to grid 
                 //> subsets objects (vertices) 
@@ -446,106 +451,48 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                     stringstream ni_species_num2str;
                     ni_species_num2str << k+1;
                     string ni_species_num_str = ni_species_num2str.str();
-                    std::string ni_array_string;
+                    std::string ni_array_label;
                     if (k < 9)
                     {
-                        ni_array_string = "Ion Density 0" +
+                        ni_array_label = "Ion Density 0" +
                             ni_species_num_str + ion_charge;
                     } else 
                     {
-                        ni_array_string = "Ion Density " +
+                        ni_array_label = "Ion Density " +
                             ni_species_num_str + ion_charge;
                     }
-                    vtkSmartPointer<vtkDoubleArray> ionDensityArray =
-                        fCreateNewDoubleArray(num_gridSubset_el, ni_array_string);
-                    int ni_gridSubset_index =
-                        ggd.ion(k).density(n).grid_subset_index;
-                    int num_ni_gridSubset_values = 
-                        ggd.ion(k).density(n).values.extent(0);
-                    if (gridSubset_index == ni_gridSubset_index &&
-                        num_gridSubset_el == num_ni_gridSubset_values)
-                    {
-                        //> In correctly written IDS the number of grid subset 
-                        //> objects and grid subset values (scalars) is 
-                        //> the same 
-                        ionDensityArray->
-                            SetNumberOfValues(num_ni_gridSubset_values);
-                        for (int j = 0; j < num_ni_gridSubset_values; j++)
-                        {
-                            ionDensityArray->SetComponent(
-                                j,0, ggd.ion(k).density(n).values(j));
-                        }
-                        //> Set Ion Density array to UnstructuredGrid
-                        gridSubsetPointsUnstructuredGrid->
-                            GetCellData()->AddArray(ionDensityArray);
-                        break;
-                    }
+                    fValues2UnstructuredGrid(ni_array_label, 
+                        gridSubsetPointsUnstructuredGrid,
+                        ggd.ion(k).density(n), gridSubset_index, 
+                        num_gridSubset_el);
                 }
             }
 
-            //> Add grid subset to main block
-            int num_blocks = mainMB->GetNumberOfBlocks();
-            mainMB->SetBlock(num_blocks, gridSubsetPointsUnstructuredGrid);
-            mainMB->GetMetaData((unsigned int) num_blocks)->Set(
-                vtkCompositeDataSet::NAME(), gridSubset_name.c_str());
+            //> Add unstructured grid to main block
+            fAddBlock2MultiBlock(mainMB, gridSubsetPointsUnstructuredGrid, 
+                gridSubset_name );
         }
         //> ------ SET LINES -----
         else if (gridSubset_obj_dim == 2)
         {
-            //> Set vtk array for edges
             vtkSmartPointer<vtkUnstructuredGrid> gridSubsetLinesUnstructuredGrid =
                 vtkSmartPointer<vtkUnstructuredGrid>::New();
+
+            //> Set vtkCellArray for edges
             vtkSmartPointer<vtkCellArray> gridSubsetLinesArray =
                 vtkSmartPointer<vtkCellArray>::New();
+            vtkSmartPointer<vtkLine> gridSubsetLine =
+                vtkSmartPointer<vtkLine>::New();
+            gridSubsetLinesArray = fSetCellArray(gridSubsetLine, grid_subset, grid);
 
-            for (int j = 0; j < num_gridSubset_el; j++)
-            {
-                //> Get objects space index, dimension and index
-                //> Note that in IDS indices are written in Fortran notation 
-                //> (1,2,3,...) while C++ notation starts with 0 (0,1,2,...)
-                //> so c++_index = fortran_index - 1
-
-                //> Get space index of the object
-                int obj_space = grid_subset.element(j).object(0).space;
-
-                //> Get dimension of the object
-                //> NOTE :  Each grid subset is formed with objects of the same 
-                //>         dimension
-                //>         (either only 0D nodes, 1D edges, 2D cells...). 
-                //>         So in that case is enough to read only the dimension of 
-                //>         the first object forming the grid subset.
-                // int obj_dimension = grid_subset.element(0).object(0).dimension;
-
-                //> get object index of the object
-                int obj_index = grid_subset.element(j).object(0).index;
- 
-                int num_obj_nodes = grid.space(obj_space - 1).
-                    objects_per_dimension(obj_dimension - 1).
-                    object(obj_index - 1).nodes.extent(0);
-
-                vtkSmartPointer<vtkLine> gridSubsetLine =
-                    vtkSmartPointer<vtkLine>::New();
-
-                for(int k = 0; k < num_obj_nodes; k++)
-                {
-                    // Construct lines
-                    int node_ind = grid.space(obj_space - 1).
-                        objects_per_dimension(obj_dimension - 1).
-                        object(obj_index - 1).nodes(k) ;
-                    gridSubsetLine ->GetPointIds()->SetId(k, node_ind - 1);
-                }
-                gridSubsetLinesArray->InsertNextCell(gridSubsetLine);
-            }
-
-            gridSubsetLinesUnstructuredGrid->SetPoints(nodes_0D_vtkArray);
+            //> Assign vtkCellArray to vtkUnstructuredGrid
+            gridSubsetLinesUnstructuredGrid->SetPoints(obj_0D_vtkPointsArray);
             gridSubsetLinesUnstructuredGrid->SetCells(
                 VTK_LINE, gridSubsetLinesArray);
 
-            //> Add grid subset to main block
-            int num_blocks = mainMB->GetNumberOfBlocks();
-            mainMB->SetBlock(num_blocks, gridSubsetLinesUnstructuredGrid);
-            mainMB->GetMetaData((unsigned int) num_blocks)->Set(
-                vtkCompositeDataSet::NAME(), gridSubset_name.c_str());
+            //> Add unstructured grid to main block
+            fAddBlock2MultiBlock(mainMB, gridSubsetLinesUnstructuredGrid, 
+                gridSubset_name );
         }
         //> ------ SET 2D CELLS -----
         else if (gridSubset_obj_dim == 3)
@@ -559,7 +506,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 vtkSmartPointer<vtkTriangle>::New();
             vtkSmartPointer<vtkCellArray> gridSubsetCellArray =
                 vtkSmartPointer<vtkCellArray>::New();
-            int num_obj_nodes = 0;
 
             //> Get number of nodes of the first 2D cell in order to find out 
             //> whether they are triangles or quad (all other 2D cells of the 
@@ -570,86 +516,20 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             //> Cells-Triangles
             if (num_obj_nodes_first == 3)
             {
-                for (int j = 0; j < num_gridSubset_el; j++)
-                {
-                    //> Get objects space index, dimension and index
-                    //> Note that in IDS indices are written in Fortran notation 
-                    //> (1,2,3,...) while C++ notation starts with 0 (0,1,2,...)
-                    //> so c++_index = fortran_index - 1
+                gridSubsetCellArray = fSetCellArray(gridSubsetTriangle, grid_subset, grid);
 
-                    //> Get space index of the object
-                    int obj_space = grid_subset.element(j).object(0).space;
-
-                    //> Get dimension of the object
-                    //> NOTE :  Each grid subset is formed with objects of  
-                    //>         the same dimension
-                    //>         (either only 0D nodes, 1D edges, 2D cells...). 
-                    //>         So in that case is enough to read only the  
-                    //>         dimension of the first object forming the 
-                    //          grid subset.
-                    // int obj_dimension = grid_subset.element(0).object(0).dimension;
-
-                    //> get object index of the object
-                    int obj_index = grid_subset.element(j).object(0).index;
-     
-                    num_obj_nodes = grid.space(obj_space - 1).
-                        objects_per_dimension(obj_dimension - 1).
-                        object(obj_index - 1).nodes.extent(0);
-
-                    for(int k = 0; k < num_obj_nodes; k++)
-                    {
-                        // Construct cells
-                        int node_ind = grid.space(obj_space - 1).
-                            objects_per_dimension(obj_dimension - 1).
-                            object(obj_index - 1).nodes(k) ;
-                            gridSubsetTriangle->GetPointIds()->SetId(k, node_ind - 1);
-                    }
-                    gridSubsetCellArray->InsertNextCell(gridSubsetTriangle);
-                }
-                gridSubsetCellsUnstructuredGrid->SetPoints(nodes_0D_vtkArray);
+                //> Assign vtkCellArray to vtkUnstructuredGrid
+                gridSubsetCellsUnstructuredGrid->SetPoints(obj_0D_vtkPointsArray);
                 gridSubsetCellsUnstructuredGrid->SetCells(
                     VTK_TRIANGLE, gridSubsetCellArray);
             }
             //> Cells-Quad
             else if (num_obj_nodes_first == 4)
             {
-                for (int j = 0; j < num_gridSubset_el; j++)
-                {
-                    //> Get objects space index, dimension and index
-                    //> Note that in IDS indices are written in Fortran notation 
-                    //> (1,2,3,...) while C++ notation starts with 0 (0,1,2,...)
-                    //> so c++_index = fortran_index - 1
+                gridSubsetCellArray = fSetCellArray(gridSubsetQuad, grid_subset, grid);
 
-                    //> Get space index of the object
-                    int obj_space = grid_subset.element(j).object(0).space;
-
-                    //> Get dimension of the object
-                    //> NOTE :  Each grid subset is formed with objects of  
-                    //>         the same dimension
-                    //>         (either only 0D nodes, 1D edges, 2D cells...). 
-                    //>         So in that case is enough to read only the  
-                    //>         dimension of the first object forming the 
-                    //          grid subset.
-                    // int obj_dimension = grid_subset.element(0).object(0).dimension;
-
-                    //> get object index of the object
-                    int obj_index = grid_subset.element(j).object(0).index;
-     
-                    num_obj_nodes = grid.space(obj_space - 1).
-                        objects_per_dimension(obj_dimension - 1).
-                        object(obj_index - 1).nodes.extent(0);
-
-                    for(int k = 0; k < num_obj_nodes; k++)
-                    {
-                        // Construct cells
-                        int node_ind = grid.space(obj_space - 1).
-                            objects_per_dimension(obj_dimension - 1).
-                            object(obj_index - 1).nodes(k) ;
-                        gridSubsetQuad->GetPointIds()->SetId(k, node_ind - 1);
-                    }
-                    gridSubsetCellArray->InsertNextCell(gridSubsetQuad);
-                }
-                gridSubsetCellsUnstructuredGrid->SetPoints(nodes_0D_vtkArray);
+                //> Assign vtkCellArray to vtkUnstructuredGrid
+                gridSubsetCellsUnstructuredGrid->SetPoints(obj_0D_vtkPointsArray);
                 gridSubsetCellsUnstructuredGrid->SetCells(
                     VTK_QUAD, gridSubsetCellArray);
             }
@@ -662,54 +542,20 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             //> grid subsets objects (2D cells)
             for (int n = 0; n < te_gridSubsets_num; n++)
             {
-                int te_gridSubset_index = ggd.electrons.temperature(n).
-                    grid_subset_index;
-                int num_te_scalars = 
-                    ggd.electrons.temperature(n).values.extent(0);
+                fValues2UnstructuredGrid("Electron Temperature", 
+                    gridSubsetCellsUnstructuredGrid,
+                    ggd.electrons.temperature(n), gridSubset_index, 
+                    num_gridSubset_el);
 
-                if (gridSubset_index == te_gridSubset_index && 
-                    num_gridSubset_el == num_te_scalars)
-                {
-                    //> In correctly written IDS the number of grid subset 
-                    //> objects and grid subset values (scalars) is 
-                    //> the same 
-                    electronTemperatureArray->
-                        SetNumberOfValues(num_gridSubset_el);
-                    for (int j = 0; j < num_gridSubset_el; j++)
-                    {
-                        electronTemperatureArray->SetComponent(
-                            j,0, ggd.electrons.temperature(n).values(j));
-                    }
-                    //> Set Electron Temperature array to UnstructuredGrid
-                    gridSubsetCellsUnstructuredGrid->GetCellData()->AddArray(
-                        electronTemperatureArray);
-                    break;
-                }
             }
             //> Assign values found in Electron Density substructure to grid 
             //> subsets objects (2D cells)
             for (int n = 0; n < ne_gridSubsets_num; n++)
             {
-                int ne_gridSubset_index = 
-                    ggd.electrons.density(n).grid_subset_index;
-                int num_ne_scalars = ggd.electrons.density(n).values.extent(0);
-                if (gridSubset_index == ne_gridSubset_index && 
-                    num_gridSubset_el == num_ne_scalars)
-                {
-                    //> In correctly written IDS the number of grid subset 
-                    //> objects and grid subset values (scalars) is 
-                    //> the same 
-                    electronDensityArray->SetNumberOfValues(num_gridSubset_el);
-                    for (int j = 0; j < num_gridSubset_el; j++)
-                    {
-                        electronDensityArray->SetComponent(
-                            j,0, ggd.electrons.density(n).values(j));
-                    }
-                    //> Set Electron Density array to UnstructuredGrid
-                    gridSubsetCellsUnstructuredGrid->GetCellData()->AddArray(
-                        electronDensityArray);
-                    break;
-                }
+                fValues2UnstructuredGrid("Electron Density", 
+                    gridSubsetCellsUnstructuredGrid,
+                    ggd.electrons.density(n), gridSubset_index, 
+                    num_gridSubset_el);
             }
 
             //> Assign values found in Ion substructure to grid subsets 
@@ -724,81 +570,41 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 //> grid subsets objects (2D cells)
                 for (int n = 0; n < num_ti_gridSubsets; n++)
                 {
-                    vtkSmartPointer<vtkDoubleArray> ionTemperatureArray =
-                        fCreateNewDoubleArray(
-                        num_gridSubset_el, "Ion Temperature" + k);
-                    int ti_gridSubset_index =
-                        ggd.ion(k).temperature(n).grid_subset_index;
-                    int num_ti_gridSubset_values = 
-                        ggd.ion(k).temperature(n).values.extent(0);
-                    if (gridSubset_index == ti_gridSubset_index &&
-                        num_gridSubset_el == num_ti_gridSubset_values)
-                    {
-                        //> In correctly written IDS the number of grid subset 
-                        //> objects and grid subset values (scalars) is 
-                        //> the same 
-                        ionTemperatureArray->
-                            SetNumberOfValues(num_ti_gridSubset_values);
-                        for (int j = 0; j < num_ti_gridSubset_values; j++)
-                        {
-                            ionTemperatureArray->SetComponent(
-                                j,0, ggd.ion(k).temperature(n).values(j));
-                        }
-                        //> Set Ion Temperature array to UnstructuredGrid
-                        gridSubsetCellsUnstructuredGrid->
-                            GetCellData()->AddArray(ionTemperatureArray);
-                        break;
-                    }
+                    fValues2UnstructuredGrid("Ion Temperature" + k, 
+                        gridSubsetCellsUnstructuredGrid,
+                        ggd.ion(k).temperature(n), gridSubset_index, 
+                        num_gridSubset_el);
                 }
                 //> Assign values found in Ion Density substructure to grid 
                 //> subsets objects (2D cells)
                 for (int n = 0; n < num_ni_gridSubsets; n++)
                 {
+                    // Set label 
                     std::string ion_charge= ggd.ion(k).label;
                     stringstream ni_species_num2str;
                     ni_species_num2str << k+1;
                     string ni_species_num_str = ni_species_num2str.str();
-                    std::string ni_array_string;
+                    std::string ni_array_label;
                     if (k < 9)
                     {
-                        ni_array_string = "Ion Density 0" +
+                        ni_array_label = "Ion Density 0" +
                             ni_species_num_str + ion_charge;
                     } else 
                     {
-                        ni_array_string = "Ion Density " +
+                        ni_array_label = "Ion Density " +
                             ni_species_num_str + ion_charge;
                     }
-                    vtkSmartPointer<vtkDoubleArray> ionDensityArray =
-                        fCreateNewDoubleArray(num_gridSubset_el, ni_array_string);
-                    int ni_gridSubset_index =
-                        ggd.ion(k).density(n).grid_subset_index;
-                    int num_ni_gridSubset_values = 
-                        ggd.ion(k).density(n).values.extent(0);
-                    if (gridSubset_index == ni_gridSubset_index &&
-                        num_gridSubset_el == num_ni_gridSubset_values)
-                    {
-                        //> In correctly written IDS the number of grid subset 
-                        //> objects and grid subset values (scalars) is 
-                        //> the same 
-                        ionDensityArray->
-                            SetNumberOfValues(num_ni_gridSubset_values);
-                        for (int j = 0; j < num_ni_gridSubset_values; j++)
-                        {
-                            ionDensityArray->SetComponent(
-                                j,0, ggd.ion(k).density(n).values(j));
-                        }
-                        //> Set Ion Density array to UnstructuredGrid
-                        gridSubsetCellsUnstructuredGrid->
-                            GetCellData()->AddArray(ionDensityArray);
-                        break;
-                    }
+
+                    fValues2UnstructuredGrid(ni_array_label, 
+                        gridSubsetCellsUnstructuredGrid,
+                        ggd.ion(k).density(n), gridSubset_index, 
+                        num_gridSubset_el);
                 }
             }
-            //> Add grid subset to main block
-            int num_blocks = mainMB->GetNumberOfBlocks();
-            mainMB->SetBlock(num_blocks, gridSubsetCellsUnstructuredGrid);
-            mainMB->GetMetaData((unsigned int) num_blocks)->Set(
-                vtkCompositeDataSet::NAME(), gridSubset_name.c_str());
+            
+            //> Add unstructured grid to main block
+            fAddBlock2MultiBlock(mainMB, gridSubsetCellsUnstructuredGrid, 
+                gridSubset_name );
         }
     }
 
@@ -1005,15 +811,15 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
         //> ELECTRON TEMPERATURE creating array
         vtkSmartPointer<vtkDoubleArray> electronTemperatureArray =
-            fCreateNewDoubleArray(size, "Electron Temperature");
+            fSetValuesArrayBase(size, "Electron Temperature");
 
         //> ELECTRON DENSITY creating array
         vtkSmartPointer<vtkDoubleArray> electronDensityArray =
-            fCreateNewDoubleArray(size, "Electron Density");
+            fSetValuesArrayBase(size, "Electron Density");
 
         //> ELECTRIC POTENTIAL creating array
         vtkSmartPointer<vtkDoubleArray> electricPotentialArray =
-            fCreateNewDoubleArray(size, "Electric Potential");
+            fSetValuesArrayBase(size, "Electric Potential");
 
         if(subgrid_class == 0)
         {
@@ -1096,18 +902,18 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 stringstream ni_species_num2str;
                 ni_species_num2str << k+1;
                 string ni_species_num_str = ni_species_num2str.str();
-                std::string ni_array_string;
+                std::string ni_array_label;
                 if (k < 9)
                 {
-                    ni_array_string = "Ion Density 0" + ni_species_num_str +
+                    ni_array_label = "Ion Density 0" + ni_species_num_str +
                         ion_charge;
                 } else
                 {
-                    ni_array_string = "Ion Density " + ni_species_num_str +
+                    ni_array_label = "Ion Density " + ni_species_num_str +
                         ion_charge;
                 }
                 vtkSmartPointer<vtkDoubleArray> ionDensityArray =
-                    fCreateNewDoubleArray(size, ni_array_string);
+                    fSetValuesArrayBase(size, ni_array_label);
                 int ni_subgrid_num = edge.fluid.ni(k).value.extent(0);
                 for(int n = 0; n < ni_subgrid_num; n++)
                 {
@@ -1146,7 +952,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             for(int k = 0; k < num_ti_species; k++)
             {
                 vtkSmartPointer<vtkDoubleArray> ionTemperatureArray =
-                    fCreateNewDoubleArray(size, "Ion Temperature");
+                    fSetValuesArrayBase(size, "Ion Temperature");
                 int ti_subgrid_num = edge.fluid.ti(k).value.extent(0);
                 for(int n = 0; n < ti_subgrid_num; n++)
                 {
@@ -1260,18 +1066,18 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 stringstream ni_species_num2str;
                 ni_species_num2str << k+1;
                 string ni_species_num_str = ni_species_num2str.str();
-                std::string ni_array_string;
+                std::string ni_array_label;
                 if (k < 9)
                 {
-                    ni_array_string = "Ion Density 0" + ni_species_num_str +
+                    ni_array_label = "Ion Density 0" + ni_species_num_str +
                         ion_charge;
                 } else 
                 {
-                    ni_array_string = "Ion Density " + ni_species_num_str +
+                    ni_array_label = "Ion Density " + ni_species_num_str +
                         ion_charge;
                 }
                 vtkSmartPointer<vtkDoubleArray> ionDensityArray =
-                    fCreateNewDoubleArray(size, ni_array_string);
+                    fSetValuesArrayBase(size, ni_array_label);
                 for(int j =0; j < size; j++)
                 {
                     ionDensityArray->SetComponent(j, 0,
@@ -1285,7 +1091,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             for(int k = 0; k < num_ti_species; k++)
             {
                 vtkSmartPointer<vtkDoubleArray> ionTemperatureArray =
-                    fCreateNewDoubleArray(size, "Ion Temperature");
+                    fSetValuesArrayBase(size, "Ion Temperature");
                 for(int j =0; j < size; j++)
                 {
                     ionTemperatureArray->SetComponent(j, 0,
