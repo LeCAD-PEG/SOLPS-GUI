@@ -15,9 +15,9 @@ case $(hostname -f) in
 	MAKE_JOBS=${MAKE_JOBS:-8}
 	;;
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
-	. /etc/profile.d.gw/modules.sh
+	#. /etc/profile.d.gw/modules.sh
 	#module unload itm-gcc gnu
-	module switch itm-python/2.7.13.b7
+	#module switch itm-python/2.7.13.b7
 	MAKE_JOBS=${MAKE_JOBS:-36}
 	export CXXFLAGS=-fpermissive
 	PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-
@@ -141,6 +141,7 @@ if [ ! -e   ${PARAVIEW_BUILD}/.built ]; then
     install -d ${STAGING_PARAVIEW}
     ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Release \
 	-DVTK_RENDERING_BACKEND:STRING=OpenGL \
+	-DPARAVIEW_QT_VERSION:STRING=4 \
         -DBUILD_SHARED_LIBS:BOOL=ON  \
         -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
         -DBUILD_TESTING:BOOL=OFF \

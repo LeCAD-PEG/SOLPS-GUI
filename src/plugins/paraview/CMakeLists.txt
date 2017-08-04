@@ -29,6 +29,7 @@ else()
    link_directories(${IMASCPP_LIBRARY_DIRS})
    link_directories(${IMASLL_LIBRARY_DIRS})
    link_directories($ENV{MDSPLUS_DIR}/lib)
+   link_directories($ENV{BLITZ_DIR}/lib)
 
 #SET(IMASCPP_INCLUDE_DIRS $ENV{IMAS_PREFIX}/include)
 #SET(IMASLL_INCLUDE_DIRS $ENV{IMAS_PREFIX}/include)
