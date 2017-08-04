@@ -13,8 +13,7 @@ STAGING_PLUGINS="${STAGING_DIR}/paraview-plugins/${PARAVIEW_VERSION}/${IMAS_VERS
 case $(hostname -f) in
   *.iter.org) 
 	module purge
-	module load imas/3.9.1/ual/3.5.3 blitz/0.10 binutils/2.25
-	module unload pyqt
+	module load imas/3.10.1/ual/3.6.0 blitz/0.10 binutils/2.25
 	export CC=gcc
 	export CXX=g++
 	MAKE_JOBS=${MAKE_JOBS:-8}
