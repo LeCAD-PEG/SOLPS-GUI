@@ -7,9 +7,7 @@ CMAKE_VERSION=3.7.2
 case $(hostname -f) in
   *.iter.org) 
 	module purge
-#	module load MVAPICH2/2.2b-GCC-4.9.3-2.25
-	module load GCC/4.8.3 binutils/2.25
-	module load python/2.7/11 intel/12.0.2 
+	module load imas/3.10.1/ual/3.6.0 blitz/0.10 binutils/2.25
 	export CC=gcc
 	export CXX=g++
 	MAKE_JOBS=${MAKE_JOBS:-8}
