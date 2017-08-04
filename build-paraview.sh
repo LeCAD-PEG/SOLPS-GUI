@@ -43,15 +43,15 @@ install -d ${BUILD_DIR}
 install -d ${DOWNLOAD_DIR}
 install -d ${STAGING_DIR}
 
-set -e
-
 # We need recent CMAKE for building ParaView 5.x
 CMAKE_TEST=$(hash cmake 2> /dev/null && cmake --version \
-			| sed 's/[^0-9]//g;s/^\(.\{2\}\).*/\1/')
-if test "${CMAKE_TEST}0" -ge 350
+             | sed -e 's/[^0-9]//g;s/^\(.\{2\}\).*/\1/')
+if [ "${CMAKE_TEST}0" -ge 350 ]
  then CMAKE=cmake
  else CMAKE=${STAGING_DIR}/bin/cmake
 fi
+
+set -e
 
 # Install cmake as needed
 CMAKE_SRC_DIR="${BUILD_DIR}/cmake-${CMAKE_VERSION}"
