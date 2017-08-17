@@ -13,6 +13,8 @@ case $(hostname -f) in
 	export CXX=g++
         CMAKE_EXTRA_FLAGS=${CMAKE_EXTRA_FLAGS:-\
           -DCMAKE_EXE_LINKER_FLAGS:STRING=-L${EBROOTOPENSSL}/lib}
+	PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-\
+                  -DPARAVIEW_ENABLE_PYTHON:BOOL=OFF}
 	MAKE_JOBS=${MAKE_JOBS:-8}
 	;;
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2

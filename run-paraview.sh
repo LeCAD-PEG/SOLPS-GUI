@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.0}
 QT_VERSION=${QT_VERSION:-4.8.7}
