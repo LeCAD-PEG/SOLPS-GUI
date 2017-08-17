@@ -5,13 +5,13 @@ QT_VERSION=${QT_VERSION:-4.8.7}
 CMAKE_VERSION=3.9.1
 
 case $(hostname -f) in
-  *.iter.org) 
+  *.iter.org)
 	module purge
 	module load imas/3.10.1/ual/3.6.0 blitz/0.10 binutils/2.25
         module load OpenSSL/1.0.2g-GCC-4.8.3
 	export CC=gcc
 	export CXX=g++
-        CMAKE_EXTRA_FLAGS=${CMAKE_EXTRA_FLAGS:-
+        CMAKE_EXTRA_FLAGS=${CMAKE_EXTRA_FLAGS:-\
           -DCMAKE_EXE_LINKER_FLAGS:STRING=-L${EBROOTOPENSSL}/lib}
 	MAKE_JOBS=${MAKE_JOBS:-8}
 	;;
@@ -21,7 +21,7 @@ case $(hostname -f) in
 	#module switch itm-python/2.7.13.b7
 	MAKE_JOBS=${MAKE_JOBS:-36}
 	export CXXFLAGS=-fpermissive
-	PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-
+	PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-\
                         -DPARAVIEW_USE_MPI:BOOL=ON}
 	;;
   *)
@@ -92,14 +92,14 @@ if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
   #Building QT
   rm -rf ${QT_SOURCE_DIR}
   cd ${BUILD_DIR}
-  tar xzf ${DOWNLOAD_DIR}/${QT_TAR} 
-  
+  tar xzf ${DOWNLOAD_DIR}/${QT_TAR}
+
   cd ${QT_SOURCE_DIR}
   ./configure --prefix=${STAGING_QT}  -opensource -confirm-license \
       -no-javascript-jit -no-webkit -no-script -no-scripttools \
       -no-sql-sqlite3 -no-accessibility
   make -j ${MAKE_JOBS}
-  make install 
+  make install
   touch ${QT_SOURCE_DIR}/.built
 fi
 
@@ -176,7 +176,7 @@ for file in ParaViewGettingStarted-${PARAVIEW_VERSION%-*}.pdf \
     noPdf=${noVersion%.pdf}
     target=${noPdf}.pdf
     install -m 444 ${DOWNLOAD_DIR}/${file} ${STAGING_DOC}/${target}
-done    
+done
 
 
 
