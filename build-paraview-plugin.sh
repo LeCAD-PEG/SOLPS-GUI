@@ -13,10 +13,11 @@ STAGING_PLUGINS="${STAGING_DIR}/paraview-plugins/${PARAVIEW_VERSION}/${IMAS_VERS
 case $(hostname -f) in
   *.iter.org) 
 	module purge
-	module load imas/3.10.1/ual/3.6.0 blitz/0.10 binutils/2.25
+        module load imas/3.10.1/ual/3.6.0 blitz/0.10 binutils/2.25
+        module load OpenSSL/1.0.2g-GCC-4.8.3
 	export CC=gcc
 	export CXX=g++
-	MAKE_JOBS=${MAKE_JOBS:-8}
+	MAKE_JOBS=${MAKE_JOBS:-4}
 	;;
 
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2

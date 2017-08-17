@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.0}
 QT_VERSION=${QT_VERSION:-4.8.7}
@@ -6,11 +6,9 @@ QT_VERSION=${QT_VERSION:-4.8.7}
 case $(hostname -f) in
   *.iter.org) 
 	module purge
-	# module load MVAPICH2/2.2b-GCC-4.9.3-2.25 python/2.7/11
-	# module load GCC/4.8.3
 	# The following modules are needed for IMAS plugins
-	module load imas/3.9.1/ual/3.5.3 blitz/0.10
-  module load python/2.7/11
+        module load imas/3.10.1/ual/3.6.0 blitz/0.10 binutils/2.25
+        module load OpenSSL/1.0.2g-GCC-4.8.3
 	imasdb solps-iter
 	imasdb
 	;;
@@ -35,7 +33,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 STAGING_QT=${STAGING_QT:-${STAGING_DIR}/qt/${QT_VERSION}}
 STAGING_PARAVIEW=${STAGING_PARAVIEW:-$STAGING_DIR/paraview/$PARAVIEW_VERSION}
 
-install -d /tmp/${USER}
+#install -d /tmp/${USER}
 
 LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} ${STAGING_PARAVIEW}/bin/paraview $@
 

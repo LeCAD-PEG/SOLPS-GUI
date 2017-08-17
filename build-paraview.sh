@@ -2,14 +2,17 @@
 
 PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.0}
 QT_VERSION=${QT_VERSION:-4.8.7}
-CMAKE_VERSION=3.7.2
+CMAKE_VERSION=3.9.1
 
 case $(hostname -f) in
   *.iter.org) 
 	module purge
 	module load imas/3.10.1/ual/3.6.0 blitz/0.10 binutils/2.25
+        module load OpenSSL/1.0.2g-GCC-4.8.3
 	export CC=gcc
 	export CXX=g++
+        CMAKE_EXTRA_FLAGS=${CMAKE_EXTRA_FLAGS:-
+          -DCMAKE_EXE_LINKER_FLAGS:STRING=-L${EBROOTOPENSSL}/lib}
 	MAKE_JOBS=${MAKE_JOBS:-8}
 	;;
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
@@ -19,7 +22,7 @@ case $(hostname -f) in
 	MAKE_JOBS=${MAKE_JOBS:-36}
 	export CXXFLAGS=-fpermissive
 	PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-
-                               -DPARAVIEW_USE_MPI:BOOL=ON}
+                        -DPARAVIEW_USE_MPI:BOOL=ON}
 	;;
   *)
 	;;
@@ -67,8 +70,8 @@ if [ ${CMAKE} != cmake -a  ! -e  ${CMAKE_SRC_DIR}/.built ]; then
   cd ${BUILD_DIR}
   tar xzf ${DOWNLOAD_DIR}/${CMAKE_SRC}
   cd ${CMAKE_SRC_DIR}
-  ./bootstrap --prefix=${STAGING_DIR}
-  make -j ${MAKE_JOBS}
+  ./bootstrap --prefix=${STAGING_DIR} -- ${CMAKE_EXTRA_FLAGS}
+  make -j ${MAKE_JOBS} VERBOSE=1
   make install
   touch ${CMAKE_SRC_DIR}/.built
 fi
