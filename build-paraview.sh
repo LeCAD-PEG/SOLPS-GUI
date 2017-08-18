@@ -9,12 +9,13 @@ case $(hostname -f) in
 	module purge
 	module load imas/3.10.1/ual/3.6.0 blitz/0.10 binutils/2.25
         module load OpenSSL/1.0.2g-GCC-4.8.3
+        module load Python/2.7.9-goolf-1.5.16 # overwrite Anaconda
 	export CC=gcc
 	export CXX=g++
         CMAKE_EXTRA_FLAGS=${CMAKE_EXTRA_FLAGS:-\
           -DCMAKE_EXE_LINKER_FLAGS:STRING=-L${EBROOTOPENSSL}/lib}
-	PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-\
-                  -DPARAVIEW_ENABLE_PYTHON:BOOL=OFF}
+	#PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-\
+        #          -DPARAVIEW_ENABLE_PYTHON:BOOL=OFF}
 	MAKE_JOBS=${MAKE_JOBS:-8}
 	;;
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2

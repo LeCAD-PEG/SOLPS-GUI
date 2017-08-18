@@ -9,6 +9,7 @@ case $(hostname -f) in
 	# The following modules are needed for IMAS plugins
         module load imas/3.10.1/ual/3.6.0 blitz/0.10 binutils/2.25
         module load OpenSSL/1.0.2g-GCC-4.8.3
+        module load Python/2.7.9-goolf-1.5.16 # overwrite Anaconda
 	imasdb solps-iter
 	imasdb
 	;;
