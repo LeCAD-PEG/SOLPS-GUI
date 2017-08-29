@@ -159,7 +159,7 @@ class RunsSortFilterProxyModel(QSortFilterProxyModel):
         super(RunsSortFilterProxyModel, self).__init__(parent)
         self.archive_dirs = archive_dirs
 
-    " Parent of accepted children needs to be accepted too for treeviews. "
+    # Parent of accepted children needs to be accepted too for treeviews. "
     def has_accepted_children(self, source_index):
         item = source_index.internalPointer()
         items = item.childItems.copy()
@@ -1353,6 +1353,7 @@ class SOLPS_MainWindow(QMainWindow):
         elide_left_delegate = TextElideLeftDelegate(self.treeViewRuns)
         self.treeViewRuns.setItemDelegate(elide_left_delegate)
 
+        #self.treeViewRuns.setTextElideMode(Qt.ElideLeft)
         self.lineEditRunFilter.returnPressed.connect(self.textFilterChanged)
 
         # Tree view for archived run directories
@@ -1375,13 +1376,13 @@ class SOLPS_MainWindow(QMainWindow):
 
         # Initialize the Put and Get widgets
 
-        self.putIDSthread = put_edge_ids.PutIDS(parent=self)
+        self.putIDSthread = put_edge_ids.PutIDSQThread(parent=self)
         # Setting push button for enabling/disabling and the status bar for
         # updating the message.
         self.putIDSthread.emitMessage.connect(self.statusbar.showMessage)
         self.putIDSthread.startFlag.connect(self.pushButton_PutIds.setEnabled)
 
-        self.getIDSthread = get_edge_ids.GetIDS()
+        self.getIDSthread = get_edge_ids.GetIDSQThread(parent=self)
         # Setting push button for enabling/disabling and the status bar for
         # updating the message.
         self.getIDSthread.emitMessage.connect(self.statusbar.showMessage)

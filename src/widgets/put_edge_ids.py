@@ -19,7 +19,7 @@
 
 try:
     import BytesIO
-except:
+except Exception as e:
     from io import BytesIO
 
 try:
@@ -41,6 +41,7 @@ from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit,
                              QPushButton)
 from PyQt5.QtGui import QIntValidator
 
+
 input_files = [
     'input.dat',
     'b2mn.dat',
@@ -61,12 +62,107 @@ input_files = [
     'b2.atomic_physics_rescale.parameters'
 ]
 
+class putIDS(QPushButton):
+    """Widget representation of the PutIDS functionality. A normal QPushButton
+    that encapsulates the PutIDS QThread that does the putting data to the IDS.
+    """
+
+    def __init__(self, parent=None):
+        super(putIDS, self).__init__(parent)
+        self.setText("Put IDS")
+        self.clicked.connect(self.putToIDS)
+        self._rundir = ''
+        self._user = ''
+        self._shot = ''
+        self._device = ''
+        self._version = ''
+        self._run = ''
+
+        self.thread = PutIDSQThread(self)
+        self.clicked.connect(self.putToIDS)
+
+    @pyqtSlot(str)
+    def setRunDir(self, rundir):
+        self._rundir = rundir
+
+    def getRunDir(self):
+        return self._rundir
+
+    runDir = pyqtProperty(str, getRunDir, setRunDir)
+
+    @pyqtSlot(str)
+    def setUser(self, user):
+        self._user = user
+
+    def getUser(self):
+        return self._user
+
+    user = pyqtProperty(str, getUser, setUser)
+
+    @pyqtSlot(str)
+    def setDevice(self, device):
+        self._device = device
+
+    def getDevice(self):
+        return self._device
+
+    device = pyqtProperty(str, getDevice, setDevice)
+
+    @pyqtSlot(str)
+    def setVersion(self, version):
+        self._version = version
+
+    def getVersion(self):
+        return self._version
+
+    version = pyqtProperty(str, getVersion, setVersion)
+
+    @pyqtSlot(str)
+    def setRun(self, run):
+        self._run = run
+
+    def getRun(self):
+        return self._run
+
+    runNumber = pyqtProperty(str, getRun, setRun)
+
+    @pyqtSlot(str)
+    def setShot(self, shot):
+        self._shot = shot
+
+    def getShot(self):
+        return self._shot
+
+    shotNumber = pyqtProperty(str, getShot, setShot)
+
+    @pyqtSlot()
+    def putToIDS(self):
+        if self._rundir and self._shot and self._user and self._version and \
+           self._device and self._run:
+            pass
+
+        else:
+            # Not all variables are set
+            dialog = PutDialog(self, title='Put IDS')
+            dialog.prepareWidgets(shot=self._shot, run=self._run,
+                                  user=self._user, device=self._device,
+                                  version=self._version, path=self._rundir)
+            if dialog.exec_():
+                self._shot, self._run, self._user, self._device, \
+                    self._version, self._rundir = dialog.on_close()
+
+        self.thread.setParameters(self._rundir, int(self._run),
+                                  int(self._shot), self._device, self._version,
+                                  self._user)
+        self.thread.start()
+
+
 class PutDialog(QDialog):
     """Dialog Demanding the shot, run, name and device for getting the data
     from IDS.
     """
 
-    def __init__(self, parent=None, title='Get IDS'):
+    def __init__(self, parent=None):
         super(PutDialog, self).__init__(parent)
 
     def prepareWidgets(self, shot='1001', run='1001', user=os.getenv('USER'),
@@ -95,6 +191,9 @@ class PutDialog(QDialog):
 
         self.main_layout.addWidget(QLabel('VERSION'), 4, 0, Qt.AlignLeft)
         self.main_layout.addWidget(QLineEdit('3'), 4, 1, Qt.AlignCenter)
+
+        self.main_layout.addWidget(QLabel('RUN PATH'), 5, 0, Qt.AlignLeft)
+        self.main_layout.addWidget(QLineEdit(path), 5, 1, Qt.AlignCenter)
 
         # Adding the Ok and Cancel button.
         dialog_button_box = QDialogButtonBox()
@@ -133,8 +232,9 @@ class PutDialog(QDialog):
         USER = self.main_layout.itemAt(5).widget().text()
         DEVICE = self.main_layout.itemAt(7).widget().text()
         VERSION = self.main_layout.itemAt(9).widget().text()
+        PATH = self.main_layout.itemAt(11).widget().text()
 
-        return SHOT, RUN, USER, DEVICE, VERSION
+        return SHOT, RUN, USER, DEVICE, VERSION, PATH
 
 
 def tarInputFiles(dir_path):
@@ -174,140 +274,53 @@ def getB2path(dir_path, file_name):
         return ''
 
 
-def readB2fgmtry(file_path):
-    """Reads the output file b2fmtry from the run directory.
+def readB2output(file_path, file_name, variables):
+    """This function reads the B2 output file and according to input variables
+    it returns values for those variables.
+
+    The way the file is written is that every line that starts with **\*cf**,
+    tells us two things, the type of the variable and the name of the variable.
+
+    Therefore instead of writing numerous functions for reading specific
+    variables, the user needs only provide which variables needs to be read
+    from the output file and the result comes in the form of a dictionary, with
+    the variable names being the keys for arrays.
+
+    Arguments:
+        file_path (str): Run directory.
+        file_name (str): b2output file name.
+        variables (array): Array of variables to read from the b2output file.
+
+    Returns:
+        arrays (dict): A dictionary containing the values read from the
+          b2output file for each variable in the array variables.
     """
-    # Read geometry from file b2fgmtry (R and Z coordinates of nodes)
-    # and insert them into array for later use
-    if file_path == '' or not os.path.exists(file_path + "/b2fgmtry"):
-        return [], [], 0, 0
 
-    crx = []
-    cry = []
+    arrays = {el: [] for el in variables}
+    with open(file_path + '/' + file_name, 'r') as f:
 
-    found_nxyx  = 0
-    found_crx   = 0
-    found_cry   = 0
+        while 1:
+            line = f.readline()
+            if not line:
+                break
 
-    with open(file_path + "/b2fgmtry", 'r') as infile:
-        for line in infile:
-            lineSplit = line.split()    #line split in form
-                                        # ['*cf:', 'int', '2', 'nx,ny']
-            if len(lineSplit) >= 4:
-                if lineSplit[3] == "nx,ny":
-                    found_nxyx = 1
+            if line.startswith('*cf'):
+                splitLine = line.strip()
+
+                if any([splitLine.endswith(key) for key in arrays]):
+                    ar = arrays[splitLine.split()[-1]]
+
+                    N = int(splitLine.split()[-2])
+
+                    counter = 0
+                    while counter < N:
+                        line = f.readline().split()
+                        counter += len(line)
+                        ar += [float(el) for el in line]
+                else:
                     continue
-            if (found_nxyx == 1):
-                nx = int(lineSplit[0])
-                ny = int(lineSplit[1])
-                found_nxyx = 0
 
-            if (found_crx == 1 and found_cry == 0):
-            #start writing coorindates between 'crx' and next 'cf*:' to crx array
-                for j in range(len(lineSplit)):
-                    if lineSplit[j] == "*cf:":
-                        found_crx = 0
-                        found_cry = 0
-                        break
-                    else:
-                        crx.append(float(lineSplit[j].split('E')[0]) * \
-                                   pow(10, int(lineSplit[j].split('E')[1])))
-            if (found_crx == 0 and found_cry == 1):
-            #start writing coorindates between 'cry' and next 'cf*:' to cry array
-                for j in range(len(lineSplit)):
-                    if lineSplit[j] == "*cf:":
-                        found_crx = 0
-                        found_cry = 0
-                        break
-                    else:
-                        cry.append(float(lineSplit[j].split('E')[0]) * \
-                                   pow(10, int(lineSplit[j].split('E')[1])))
-            for i in range(len(lineSplit)):
-                if lineSplit[i] == "crx":
-                    found_crx = 1
-                    found_cry = 0
-                    break
-                if lineSplit[i] == "cry":
-                    found_crx = 0
-                    found_cry = 1
-                    break
-    print("nx: %d | ny: %d" % (nx,ny))
-
-    return crx, cry, nx, ny
-
-def readB2fstati(file_path):
-    """Reads the b2fstati output file from the run directory.
-    """
-    # Reading values from file b2fstati
-    # (electron density (ne), electron temperature(te), ion temperature(ti))
-    # and inserting them into array for later use
-
-    ne = []
-    te = []
-    ti = []
-
-    if file_path == '' or not os.path.exists(file_path + "/b2fstati"):
-        return ne, te, ti
-
-
-    found_ne = 0
-    found_te = 0
-    found_ti = 0
-
-    with open(file_path + "/b2fstati", 'r') as infile:
-        for line in infile:
-            lineSplit = line.split()    #line split in form
-                                        # ['*cf:', 'int', '2', 'nx,ny']
-            if (found_ne == 1 and found_te == 0 and found_ti == 0):
-            #start writing values between 'ne' and next 'cf*:' to ne array
-                for j in range(len(lineSplit)):
-                    if lineSplit[j] == "*cf:":
-                        found_ne = 0
-                        found_te = 0
-                        found_ti = 0
-                        break
-                    else:
-                        ne.append(float(lineSplit[j].split('E')[0]) * \
-                                  pow(10, int(lineSplit[j].split('E')[1])))
-            if (found_ne == 0 and found_te == 1 and found_ti == 0):
-            #start writing values between 'te' and next 'cf*:' to te array
-                for j in range(len(lineSplit)):
-                    if lineSplit[j] == "*cf:":
-                        found_ne = 0
-                        found_te = 0
-                        found_ti = 0
-                        break
-                    else:
-                        te.append(float(lineSplit[j].split('E')[0]) * \
-                                  pow(10, int(lineSplit[j].split('E')[1])))
-            if (found_ne == 0 and found_te == 0 and found_ti == 1):
-            # Write values between 'ti' and next 'cf*:' to ti array
-                for j in range(len(lineSplit)):
-                    if lineSplit[j] == "*cf:":
-                        found_ne = 0
-                        found_te = 0
-                        found_ti = 0
-                        break
-                    else:
-                        ti.append(float(lineSplit[j].split('E')[0]) * \
-                                  pow(10, int(lineSplit[j].split('E')[1])))
-            for i in range(len(lineSplit)):
-                if lineSplit[i] == "ne":
-                    found_ne = 1
-                    found_te = 0
-                    found_ti = 0
-                    break
-                if lineSplit[i] == "te":
-                    found_ne = 0
-                    found_te = 1
-                    found_ti = 0
-                    break
-                if lineSplit[i] == "ti":
-                    found_ne = 0
-                    found_te = 0
-                    found_ti = 1
-                    break
-    return ne, te, ti
+    return arrays
 
 
 class PutIDSwrapper:
@@ -320,7 +333,8 @@ class PutIDSwrapper:
 
     Note that for now the function **imas.ids.create_env** is very CPU
     intensive, so first we check whether an IDS with the same address already
-    exists.
+    exists. If it does, then the write finishes quickly, otherwise the creation
+    of a new entry will take some time.
     """
 
     def __init__(self, user, device, shot, run, version):
@@ -373,13 +387,13 @@ class PutIDSwrapper:
             grid_description
 
     def writeCodeParameters(self, code_parameters):
-        """ Writing code parameters, which is basically tarballed input files
+        """ Writing code parameters, which is basically tar-balled input files
         for SOLPS run and then encoded with base64 to avoid null terminations.
         """
         print('Writing code parameters.')
         self.imas_obj.edge_profiles.code.parameters = code_parameters
 
-    def writeCoordinates(self, rC, zC, nR, nZ):
+    def writeCoordinates(self, rC, zC, dimR, dimZ):
         """ Writing R, Z coordinates to IDS. ``Coordinates`` are stored in
         **Nodes** and the ``cells`` are storred in **Cells**.
         The functions used for this are **writeNodes** and **writeCells**.
@@ -400,7 +414,7 @@ class PutIDSwrapper:
         self.imas_obj.edge_profiles.ggd[0].grid.grid_subset.resize(num_gridSubsets)
 
         self.writeNodes(rC, zC)
-        self.writeCells(nR, nZ)
+        self.writeCells(dimR, dimZ)
 
     def writeNodes(self, rC, zC):
         """Writes points (0D elements) to Nodes inside the IDS.
@@ -454,15 +468,15 @@ class PutIDSwrapper:
                 gridSubset_dim_index
             gridSubsetBaseData.element[i].object[0].index = i + 1
 
-    def writeCells(self, nR, nZ):
+    def writeCells(self, dimR, dimZ):
         """Writes cells (2D elements) to Cells inside the IDS.
         """
         print('Writing cells.')
         # -- Put DATA FOR GRUD SUBSET "Cells"
         # (grid subset index: 1, objects forming the grid subset: cells, 2D)
         space0 = self.imas_obj.edge_profiles.ggd[0].grid.space[0]
-        numCellsX = nR + 2
-        numCellsY = nZ + 2
+        numCellsX = dimR + 2
+        numCellsY = dimZ + 2
         num_cells = numCellsX * numCellsY
         num_obj_2D = num_cells
         gridSubset_index = 1
@@ -557,7 +571,7 @@ class PutIDSwrapper:
             # Closing the IDS
             self.imas_obj.close()
 
-class PutIDS(QThread):
+class PutIDSQThread(QThread):
     """QThread for storing data to IDS. Note that it gets the attributes
     necessary to open an IDS and create a data entry, from PushIDS instances.
 
@@ -577,7 +591,7 @@ class PutIDS(QThread):
 
     def __init__(self, dirpath='', run='', shot='', device='', version='',
                  user='', parent=None):
-        super(PutIDS, self).__init__(parent)
+        super(PutIDSQThread, self).__init__(parent)
         self.setParameters(dirpath, run, shot, device, version, user)
         self.started.connect(self.on_start)
         self.finished.connect(self.on_finish)
@@ -586,6 +600,8 @@ class PutIDS(QThread):
         self.status_bar = None
 
     def setParameters(self, dirpath, run, shot, device, version, user):
+        """ Setting the parameters for the IDS data entry.
+        """
         self.rundir = dirpath
         self.runNumber = run
         self.shot = shot
@@ -594,11 +610,17 @@ class PutIDS(QThread):
         self.user = user
 
     def run(self):
+        """Threaded run function that writes the data of the B2 output files
+        and input files to the given IDS entry.
+        """
+
         self.emitMessage.emit("Reading files")
-        rC, zC, nR, nZ = readB2fgmtry(self.rundir)
-        self.emitMessage.emit("B2fmtry read...")
-        ne, te, ti = readB2fstati(self.rundir)
-        self.emitMessage.emit("B2fstati read...")
+        coorAr = readB2output(self.rundir, 'b2fgmtry',
+                                         variables=['nx,ny', 'crx', 'cry'])
+        self.emitMessage.emit("B2fmtry read.")
+        tempAr = readB2output(self.rundir, 'b2fstati',
+                              variables=['ne', 'te', 'ti'])
+        self.emitMessage.emit("B2fstati read.")
         code_parameters = tarInputFiles(self.rundir)
         self.emitMessage.emit("Code parameters read.")
         self.emitMessage.emit("Creating IDS object.")
@@ -611,11 +633,12 @@ class PutIDS(QThread):
         self.emitMessage.emit("Description added.")
         ids.writeCodeParameters(code_parameters)
         self.emitMessage.emit("Code parameters added.")
-        ids.writeCoordinates(rC, zC, nR, nZ)
+        ids.writeCoordinates(coorAr['crx'], coorAr['cry'],
+                             int(coorAr['nx,ny'][0]), int(coorAr['nx,ny'][1]))
         self.emitMessage.emit("Coordinates written added.")
-        ids.writeTe(te)
-        ids.writeTi(ti)
-        ids.writeNe(ne)
+        ids.writeTe(tempAr['te'])
+        ids.writeTi(tempAr['ti'])
+        ids.writeNe(tempAr['ne'])
         self.emitMessage.emit("Te, Ti and Ne written.")
         self.emitMessage.emit("Now saving data entry.")
         ids.save()
@@ -632,94 +655,6 @@ class PutIDS(QThread):
         self.emitMessage.emit("Finished putting.")
         self.startFlag.emit(True)
 
-
-class PushIDS(QPushButton):
-    """Widget representation of the PutIDS functionality.
-    """
-
-    def __init__(self, parent=None):
-        super(PushIDS, self).__init__(self)
-        self.clicked.connect(self.putToIDS)
-        self.rundir = ''
-        self.user = ''
-        self.shot = ''
-        self.device = ''
-        self.version = ''
-        self.run = ''
-
-        self.Thread = PutIDS(self)
-
-    @pyqtSlot(str)
-    def setRunDir(self, rundir):
-        self.rundir = rundir
-
-    def getRunDir(self):
-        return self.rundir
-
-    @pyqtSlot(str)
-    def setUser(self, user):
-        self.user = user
-
-    def getUser(self):
-        return self.user
-
-    @pyqtSlot(str)
-    def setDevice(self, device):
-        self.device = device
-
-    def getDevice(self):
-        return self.device
-
-    @pyqtSlot(str)
-    def setVersion(self, version):
-        self.version = version
-
-    def getVersion(self):
-        return self.version
-
-    version = pyqtProperty(str, getVersion, setVersion)
-
-    @pyqtSlot(str)
-    def setRun(self, run):
-        self.run = run
-
-    def getRun(self):
-        return self.run
-
-    runNumber = pyqtProperty(str, getRun, setRun)
-
-    @pyqtSlot(str)
-    def setShot(self, shot):
-        self.shot = shot
-
-    def getShot(self):
-        return self.shot
-
-    shotNumber = pyqtProperty(str, getShot, setShot)
-
-    def putToIDS(self):
-        if self.rundir and self.shot and self.user and self.version and \
-           self.device and self.run:
-            pass
-
-        else:
-            # Not all variables are set
-            dialog = PutDialog(self, title='Put IDS')
-            dialog.prepareWidgets(shot=self.shot, run=self.run, user=self.user,
-                                  device=self.device, version=self.version,
-                                  path=self.rundir)
-            if dialog.exec_():
-                self.shot, self.run, self.user, self.device, self.version,\
-                    self.rundir = dialog.on_close()
-
-        self.thread.rundir = self.rundir
-        self.thread.runNumber = self.run
-        self.thread.shot = self.shot
-        self.thread.user = self.user
-        self.thread.device = self.device
-        self.thread.version = self.version
-        self.thread.start()
-
 if __name__ == "__main__":
     try:
         import imas
@@ -730,7 +665,7 @@ if __name__ == "__main__":
 
     # For launching python script directly from treminal with python command
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "srutvh", ["dirpath=",
+        opts, args = getopt.getopt(sys.argv[1:], "srudvh", ["dirpath=",
                                                             "shot=", "run=",
                                                             "user=", "device=",
                                                             "version=", "help"])
@@ -749,32 +684,23 @@ if __name__ == "__main__":
             elif opt in ("-v", "--version"):
                 version = arg
 
-            if opt in ("-h", "--help"):
-                print("In order to run b2read file path, shot, run, user,"
+            elif opt in ("-h", "--help"):
+                print("In order to run put_edge file path, shot, run, user,"
                     "device and version variables must be defined."
                     "Example (terminal): "
                     "python3 put_edge_ids.py "
-                    "--dirpath=/home/ITER/penkod/solps-iter/runs/AUG_16151_D/"
-                    "baserun "
-                    "--shot=1000 --run=1 --user=penkod --device=solps-iter "
+                    "--dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun "
+                    "--shot=1001 --run=1001 --user=simicg --device=solps-iter "
                     "--version=3")
                 sys.exit()
 
     except Exception:
         print ('Supplied option not recognized!')
-        print ('For help: b2read -h / --help')
+        print ('For help: -h / --help')
         sys.exit(2)
 
-    # few paths to example files for testing
-    # /home/ITER/tomsicp/solps-iter/runs/AUG_16151_D/baserun
-    # /home/ITER/tomsicp/solps-iter-devel/runs/ITER_535_D+He+Ar/baserun
-    # run: "imasdb solps-iter"
-    # Example command:
-    """
-    python3.5 put_edge_ids.py --dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun --user=simicg --run=1001 --shot=1001 --device=solps-iter --version=3
-    """
     app = QApplication(sys.argv)
-    t = PutIDS(dirpath, run, shot, device, version, user)
+    t = PutIDSQThread(dirpath, run, shot, device, version, user)
     t.finished.connect(app.exit)
     t.start()
     sys.exit(app.exec_())

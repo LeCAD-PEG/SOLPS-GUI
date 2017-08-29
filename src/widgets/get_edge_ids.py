@@ -1,4 +1,4 @@
-# Python 3.5
+#!/usr/bin/python3
 
 import getopt
 import sys
@@ -6,11 +6,10 @@ import tarfile
 import base64
 import os
 
-from PyQt5.QtCore import pyqtSlot, Qt, QSize, QThread, pyqtSignal
-from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit,
+from PyQt5.QtCore import pyqtSlot, Qt, QSize, QThread, pyqtSignal, pyqtProperty
+from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit, QPushButton,
                              QGridLayout, QLabel, QDialogButtonBox, )
 from PyQt5.QtGui import QIntValidator
-
 try:
     import BytesIO
 except ImportError as e:
@@ -25,18 +24,126 @@ except ImportError as e:
     else:
         pass
 
+
+class getIDS(QPushButton):
+    """ Push button used for plugin."""
+
+    def __init__(self, parent=None):
+        super(getIDS, self).__init__(parent)
+        self.setText("Get IDS")
+        self.clicked.connect(self.getFromIDS)
+        self._RunName = ''
+        self._user = ''
+        self._shot = ''
+        self._device = ''
+        self._version = ''
+        self._run = ''
+        self._runName = ''
+        self._dirPAth = ''
+
+        self.thread = GetIDSQThread(self)
+
+    @pyqtSlot(str)
+    def setUser(self, user):
+        self._user = user
+
+    def getUser(self):
+        return self._user
+
+    user = pyqtProperty(str, getUser, setUser)
+
+    @pyqtSlot(str)
+    def setDevice(self, device):
+        self._device = device
+
+    def getDevice(self):
+        return self._device
+
+    device = pyqtProperty(str, getDevice, setDevice)
+
+    @pyqtSlot(str)
+    def setVersion(self, version):
+        self._version = version
+
+    def getVersion(self):
+        return self._version
+
+    version = pyqtProperty(str, getVersion, setVersion)
+
+    @pyqtSlot(str)
+    def setRun(self, run):
+        self._run = run
+
+    def getRun(self):
+        return self._run
+
+    runNumber = pyqtProperty(str, getRun, setRun)
+
+    @pyqtSlot(str)
+    def setShot(self, shot):
+        self._shot = shot
+
+    def getShot(self):
+        return self._shot
+
+    shotNumber = pyqtProperty(str, getShot, setShot)
+
+    @pyqtSlot(str)
+    def setDirPath(self, savedir):
+        self._dirPAth = savedir
+
+    def getDirPath(self):
+        return self._dirPAth
+
+    dirPath = pyqtProperty(str, getDirPath, setDirPath)
+
+    @pyqtSlot(str)
+    def setRunName(self, name):
+        self._runName = name
+
+    def getRunName(self):
+        return self._runName
+
+    runName = pyqtProperty(str, getRunName, setRunName)
+
+    @pyqtSlot()
+    def getFromIDS(self):
+        if self._runName and self._shot and self._user and self._version and \
+           self._device and self._run:
+            pass
+
+        else:
+            # Not all variables are set
+            dialog = GetDialog(self)
+            dialog.prepareWidgets(shot=self._shot, run=self._run,
+                                  user=self._user, device=self._device,
+                                  version=self._version, path=self._runName)
+            if dialog.exec_():
+                self._shot, self._run, self._user, self._device, \
+                self._version, self._runName, self._dirPath = dialog.on_close()
+
+        self.thread.setParameters(dirpath=self._dirPath, run=int(self._run),
+                                  shot=int(self._shot), device=self._device,
+                                  version=self._version, user=self._user,
+                                  runName=self._runName)
+        self.thread.start()
+
+
 class GetDialog(QDialog):
     """Dialog Demanding the shot, run, name and device for getting the data
     from IDS.
     """
-
-    def __init__(self, parent=None, shot='1001', run='1001',
-                 user=os.getenv('USER'), device='solps-iter', version='3',
-                 runName='new_run', dirpath=os.path.expanduser('~')):
+    def __init__(self, parent=None):
         super(GetDialog, self).__init__(parent)
+
+    def prepareWidgets(self, shot='1001', run='1001', title='Get IDS',
+                       user=os.getenv('USER'), device='solps-iter',
+                       version='3', runName='new_run',
+                       path=os.path.expanduser('~')):
+
         self.setModal(True)
         self.main_layout = QGridLayout(self)
-        self.setWindowTitle('Get IDS')
+        self.setWindowTitle(title)
 
         self.main_layout.addWidget(QLabel('SHOT'), 0, 0, Qt.AlignLeft)
         shot = QLineEdit(str(shot))
@@ -63,7 +170,7 @@ class GetDialog(QDialog):
         self.main_layout.addWidget(QLineEdit(runName), 5, 1, Qt.AlignCenter)
 
         self.main_layout.addWidget(QLabel('DIR PATH'), 6, 0, Qt.AlignLeft)
-        self.main_layout.addWidget(QLineEdit(dirpath), 6, 1, Qt.AlignCenter)
+        self.main_layout.addWidget(QLineEdit(path), 6, 1, Qt.AlignCenter)
 
         # Adding the Ok and Cancel button.
         dialog_button_box = QDialogButtonBox()
@@ -95,14 +202,14 @@ class GetDialog(QDialog):
         return SHOT, RUN, USER, DEVICE, VERSION, RUN_NAME, DIR_PATH
 
 
-class GetIDS(QThread):
+class GetIDSQThread(QThread):
     """QThread for getting data from an IDS from a separate thread.
     """
     emitMessage = pyqtSignal(str)
     startFlag = pyqtSignal(bool)
 
     def __init__(self, parent=None):
-        super(GetIDS, self).__init__(parent)
+        super(GetIDSQThread, self).__init__(parent)
         self.parent = parent
         self.shot = None
         self.runNumber = None
@@ -124,7 +231,7 @@ class GetIDS(QThread):
     def setPushButton(self, push_button):
         self.push_button = push_button
 
-    def setParameters(self, shot='', run='', user='', device='', version='',
+    def setParameters(self, shot=0, run=0, user='', device='', version='',
                       dirpath='', runName=''):
         """Function that sets the parameters.
         """
@@ -136,9 +243,14 @@ class GetIDS(QThread):
         self.dirpath = dirpath
         self.runName = runName
 
-
     def checkParameters(self):
-        """Function that checks if all parameter are defined to open an ids."""
+        """Function that checks if all parameter are defined to open an IDS.
+        If not all parameters are provided, a QDialog will open and asking for
+        other parameters, necessary to open an IDS.
+
+        If you use the GetIDS from a CLI this usually doesn't happen, but if it
+        is implemented in a GUI, usually a user will expect some sort of dialog
+        to provide the parameters."""
 
         if self.shot and self.runNumber and self.user and self.device and \
            self.version:
@@ -164,7 +276,10 @@ class GetIDS(QThread):
                             self.device, self.version, self.dirpath,
                             self.runName)
         # Data is saved if the self.dirpath and self.runName were provided.
-        ids.saveData()
+        if ids.state:
+            ids.saveData()
+        else:
+            print('IDS did not open correctly.')
 
     @pyqtSlot()
     def on_start(self):
@@ -184,6 +299,9 @@ class GetIDSWrapper:
 
     You provide the necessary id parameters so the IDS can be accessed, then
     the data is written to the directory you specify.
+
+    Attributes:
+
     """
     def __init__(self, shot='', run='', user='', machine='', version='',
                  dirpath='', runName=''):
@@ -263,30 +381,13 @@ class GetIDSWrapper:
             print('Warning!, No permission in the current directory!')
 
 if __name__ == '__main__':
-    """
-    python3.5 put_edge_ids.py --dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun\
-    <--user=simicg --run=1001 --shot=1001 --device=solps-iter --version=3
-    """
-
-    # user = "simicg"
-    # run = 1005dir_path
-    # shot = 1005
-    # machine = "solps-iter"
-    # version = "3"
-    # x = GetIDS(shot, run, user, machine, version)
-    # if x.state == 'False':
-    #     sys.exit()
-    # string = x.readCodeParameters()
-    # print(string)
-    # print(x.ids.edge_profiles)
-
 
     # For launching python script directly from treminal with python command
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "srutvh", ["dirpath=",
+        opts, args = getopt.getopt(sys.argv[1:], "srudvh", ["dirpath=",
                                                             "shot=", "run=",
                                                             "user=", "device=",
-                                                            "version=", "help"])
+                                                           "version=", "help"])
         for opt, arg in opts:
             #print opt, arg
             if opt in ("-s", "--shot"):
@@ -301,30 +402,22 @@ if __name__ == '__main__':
                 version = arg
 
             if opt in ("-h", "--help"):
-                print("In order to run b2read file path, shot, run, user,"
+                print("In order to run get_edge file path, shot, run, user,"
                     "device and version variables must be defined."
                     "Example (terminal): "
-                    "python3.5 put_edge_ids.py "
-                    "baserun "
-                    "--shot=1000 --run=1 --user=tomsicp --device=solps-iter "
-                    "--version=3")
+                    "python3.5 get_edge_ids.py "
+                    "--dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun "
+                    "--shot=1001 --run=1001 --user=simicg "
+                    "--device=solps-iter --version=3")
                 sys.exit()
 
     except Exception:
         print ('Supplied option not recognized!')
-        print ('For help: b2read -h / --help')
+        print ('For help: -h / --help')
         sys.exit(2)
 
-    # few paths to example files for testing
-    # /home/ITER/tomsicp/solps-iter/runs/AUG_16151_D/baserun
-    # /home/ITER/tomsicp/solps-iter-devel/runs/ITER_535_D+He+Ar/baserun
-    # run: "imasdb solps-iter"
-    # Example command:
-    """
-python3.5 get_edge_ids.py --dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun --user=simicg --run=1001 --shot=1001 --device=solps-iter --version=3
-    """
     app = QApplication(sys.argv)
-    t = GetIDS()
+    t = GetIDSQThread()
     t.setParameters(shot=shot, run=run, user=user, device=device,
                     version=version)
     t.finished.connect(app.exit)
