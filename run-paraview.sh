@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.0}
+PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.1}
 QT_VERSION=${QT_VERSION:-4.8.7}
 
 case $(hostname -f) in
@@ -16,7 +16,7 @@ case $(hostname -f) in
 
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
 	. /etc/profile.d.gw/modules.sh
-	module load imas/3.7.4/ual/3.4.0 blitz/0.10
+	module load imas/3.9.1/ual/3.5.3 blitz/0.10
 	module switch itm-python/2.7.13.b7
 	imasdb solps-iter
 	imasdb	
