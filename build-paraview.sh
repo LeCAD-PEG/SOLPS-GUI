@@ -1,15 +1,22 @@
 #!/bin/sh -x
 
-PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.0}
+PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.1}
 QT_VERSION=${QT_VERSION:-4.8.7}
 CMAKE_VERSION=3.9.1
 
 case $(hostname -f) in
   *.iter.org)
 	module purge
-	module load imas/3.10.1/ual/3.6.0 blitz/0.10 binutils/2.25
-        module load OpenSSL/1.0.2g-GCC-4.8.3
-        module load Python/2.7.9-goolf-1.5.16 # overwrite Anaconda
+	module load GCC/4.8.3 binutils/2.25 intel/12.0.2 
+	module load Python/2.7.3-goolf-1.5.16
+	module load OpenSSL/1.0.2g-GCC-4.8.3
+	#module load Python/2.7.9-gompi-1.5.16-bare
+	#module load imas/3.10.1/ual/3.6.0 blitz/0.10 binutils/2.25
+        #module load OpenSSL/1.0.2g-GCC-4.8.3
+        #module load Python/2.7.9-goolf-1.5.16 # overwrite Anaconda
+	#module load libpng/1.6.12-goolf-1.5.16 # needed for Qt4.8.7
+	#module load freetype/2.6.2-goolf-1.5.16
+	#module load fontconfig/2.11.94-goolf-1.5.16
 	export CC=gcc
 	export CXX=g++
         CMAKE_EXTRA_FLAGS=${CMAKE_EXTRA_FLAGS:-\
@@ -165,11 +172,12 @@ if [ ! -e   ${PARAVIEW_BUILD}/.built ]; then
     touch .built
 fi
 
+PARAVIEW_DOC_VERSION=${PARAVIEW_DOC_VERSION:-${PARAVIEW_VERSION}}
 STAGING_DOC=${STAGING_PARAVIEW}/share/paraview-${PARAVIEW_MAJOR_VERSION}/doc
 install -d ${STAGING_DOC}
-for file in ParaViewGettingStarted-${PARAVIEW_VERSION%-*}.pdf \
-    ParaViewTutorial.pdf  ParaViewGuide-${PARAVIEW_VERSION%-*}.pdf \
-    ParaViewCatalystGuide-${PARAVIEW_VERSION%-*}.pdf  ; do
+for file in ParaViewGettingStarted-${PARAVIEW_DOC_VERSION%-*}.pdf \
+    ParaViewTutorial.pdf  ParaViewGuide-${PARAVIEW_DOC_VERSION%-*}.pdf \
+    ParaViewCatalystGuide-${PARAVIEW_DOC_VERSION%-*}.pdf  ; do
     if [ ! -f ${DOWNLOAD_DIR}/${file} ]; then
          wget -O ${DOWNLOAD_DIR}/${file} --no-check-certificate \
              ${PARAVIEW_DOWNLOAD}/${file}
