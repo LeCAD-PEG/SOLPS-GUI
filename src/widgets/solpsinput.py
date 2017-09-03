@@ -30,7 +30,6 @@ class SolpsInput(QTabWidget):
     Provides a custom widget that holds all SOLPS input files available for
     editing before starting the run.
     """
-    lineInsert = pyqtSignal(str)
     editorChanged = pyqtSignal(str)
 
     def __init__(self, parent=None):
@@ -76,7 +75,6 @@ class SolpsInput(QTabWidget):
                 self.editors[filename] = eirene
             elif filename.startswith('b2'):
                 editor = B2Edit(filename=filename)
-                self.lineInsert.connect(editor.display_widget.insert_line)
                 tab_index = self.addTab(editor, filename)
                 self.editors[filename] = editor
             else:
@@ -197,14 +195,14 @@ class SolpsInput(QTabWidget):
     @pyqtSlot(str)
     def insert_line(self, line):
         if type(self.currentWidget()) == type(B2Edit()):
-            self.currentWidget().display_widget.insert_line(line)
+            self.currentWidget().plainTextWidget.insert_line(line)
             print("Emmiting: " + line)
 
     @pyqtSlot()
     def save_modified_input_files(self):
         """ Saves modified input files when Input tab losts its focus.
-            At the same time it saves arrangement of the tabs that can be
-            freely moved by the user.
+        At the same time it saves arrangement of the tabs that can be
+        freely moved by the user.
         """
         if self.rundir:
             self.store_tabs_position()

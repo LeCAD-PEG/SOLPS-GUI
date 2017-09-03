@@ -1,5 +1,6 @@
 
-from PyQt5.QtCore import QEvent, Qt, pyqtSlot, QSize, QRegularExpression
+from PyQt5.QtCore import (QEvent, Qt, pyqtSlot, QSize, QRegularExpression,
+                          pyqtSignal)
 from PyQt5.QtWidgets import QWidget, QPlainTextEdit, QVBoxLayout, QToolTip
 from PyQt5.QtGui import (QSyntaxHighlighter, QTextCursor, QTextCharFormat,
                          QFont, QBrush)
@@ -105,9 +106,7 @@ class B2Highlighter(QSyntaxHighlighter):
 
         self.highlightingSwitches = []
 
-        comment = QTextCharFormat()
-
-        self.comment_pattern = QRegularExpression("^\*[^\n]*")
+        self.commentPattern = QRegularExpression("^\*[^\n]*")
         self.keywordComment = QTextCharFormat()
         brush = QBrush(Qt.darkGreen, Qt.SolidPattern)
         self.keywordComment.setForeground(brush)
@@ -128,10 +127,10 @@ class B2Highlighter(QSyntaxHighlighter):
             self.highlightingSwitches.append((pattern, word))
 
     def highlightBlock(self, text):
-        whole_text =self.document().toPlainText()
+        whole_text = self.document().toPlainText()
         position = self.currentBlock().position()
-
-        match = self.comment_pattern.match(text)
+        #print(position, text)
+        match = self.commentPattern.match(text)
         if match.hasMatch():
             index = match.capturedStart()
             length = match.capturedLength()
@@ -144,52 +143,18 @@ class B2Highlighter(QSyntaxHighlighter):
                 length = match.capturedLength()
                 p.setPattern(word + '(\'|\s)')
                 if p.match(whole_text[position + length:]).hasMatch():
+                    match = p.match(whole_text[position + length:])
+                    #print(match.capturedStart(), match.capturedLength())
+                    #print(index, length)
                     highlight_format = self.keywordRed
                 elif p.match(whole_text[:position]).hasMatch():
                     highlight_format = self.keywordGreen
                 else:
                     highlight_format = self.keyword
-
                 self.setFormat(index, length, highlight_format)
 
-        self.setCurrentBlockState(0)
+        # self.setCurrentBlockState(0)
 
-class B2Handler:
-    def __init__(self, parent, display_widget):
-        self.parent = parent
-        self.display_widget = display_widget
-        self.highlighter = B2Highlighter(self.display_widget.document())
-        return
-
-    def readInput(self, path):
-        if os.path.exists(path):
-            try:
-                with open(path) as file:
-                    self.filename = path
-                    self.text = file.read()
-                    self.setPlainText()
-            except PermissionError as error:
-                logging.error(str(error))
-        else:
-            msg = path + " does not exist"
-            logging.error(msg)
-        return
-
-    def setPlainText(self, text=None):
-        if text is None:
-            self.display_widget.setPlainText(self.text)
-        else:
-            self.display_widget.setPlainText(text)
-
-    def toPlainText(self):
-        return self.display_widget.toPlainText()
-
-    def isModified(self):
-        old_text = self.display_widget.old_text
-        last_text = self.display_widget.toPlainText()
-        if last_text and old_text != last_text:
-            return True
-        return False
 
 class B2Edit(QWidget):
     """This is the editor for all input files that are part of B2. If the input
@@ -220,11 +185,12 @@ class B2Edit(QWidget):
         #         switch_name[:4] == filename[:4]:
         #         tooltips[switch_name] = \
         #             b2_tooltips.tooltips['b2mn.dat'][switch_name]
-        self.display_widget = B2PlainTextEdit(self, tooltips)
-        self.text_handler = B2Handler(self, self.display_widget)
-        self.text_handler.highlighter.prepare_rules(tooltips)
+        self.plainTextWidget = B2PlainTextEdit(self, tooltips)
+        self.highlighter = B2Highlighter(self.plainTextWidget.document())
+        self.highlighter.prepare_rules(tooltips)
+
         layout = QVBoxLayout()
-        layout.addWidget(self.display_widget)
+        layout.addWidget(self.plainTextWidget)
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
@@ -234,29 +200,31 @@ class B2Edit(QWidget):
                 # No checks are required since the solpsinput.py have
                 # checked if stensils exist
                 with open(self.path, 'r') as f:
-                    self.display_widget.setPlainText(f.read())
+                    self.plainTextWidget.setPlainText(f.read())
                     self.path = ''
+        elif event.key() == Qt.Key_F5:
+            # Refresh the highlighter
+            self.highlighter.rehighlight()
 
     def setPlainText(self, text):
-        self.text_handler.setPlainText(text)
+        self.plainTextWidget.setPlainText(text)
 
     def toPlainText(self):
-        return self.display_widget.toPlainText()
+        return self.plainTextWidget.toPlainText()
 
     def setReadOnly(self, state):
         return
 
     def setPlaceholderText(self, text):
-        self.display_widget.setPlaceholderText(text)
+        self.plainTextWidget.setPlaceholderText(text)
 
     def document(self):
-        return self.text_handler
+        return self.plainTextWidget.document()
 
 if __name__ == '__main__':
     import sys
     import os
     from PyQt5.QtWidgets import (QApplication, QMainWindow, QMenuBar, QMenu,)
-    from PyQt5.QtCore import pyqtSignal, QRect
     import functools
 
     app = QApplication(sys.argv)
@@ -267,7 +235,7 @@ if __name__ == '__main__':
         import b2menu
     except ImportError:
         add_menu_functionality = 0
-        prtin('No add menu functionality!')
+        print('No add menu functionality!')
 
     class AddMenu(QMenu):
         """ AddMenu(QMenu)
@@ -407,13 +375,13 @@ if __name__ == '__main__':
                 with open(path, 'r') as f:
                     text = f.read()
                 self.editor = B2Edit(self, filename)
-                self.setCentralWidget(self.editor.display_widget)
+                self.setCentralWidget(self.editor)
                 self.editor.setPlainText(text)
                 if add_menu_functionality:
                     menu_bar = QMenuBar(self)
                     addMenu = AddMenu(menu_bar)
                     addMenu.output.connect(\
-                                        self.editor.display_widget.insert_line)
+                                    self.editor.plainTextWidget.insert_line)
                     self.editorChanged.connect(addMenu.editorChanged)
                     self.editorChanged.emit(filename)
                     self.setMenuBar(menu_bar)
@@ -425,11 +393,12 @@ if __name__ == '__main__':
             return super(Standalone, self).closeEvent(e)
 
         def documentSave(self):
-            if self.editor.text_handler.isModified():
+            if self.editor.document().isModified():
                 if os.path.exists(self.path):
                     try:
                         with open(self.path, 'w') as f:
-                            f.write(self.editor.display_widget.toPlainText())
+                            f.write(self.editor.plainTextWidget.toPlainText())
+                        print('File', self.path, 'saved.')
                     except PermissionError as e:
                         print('Permission error.')
                 else:
