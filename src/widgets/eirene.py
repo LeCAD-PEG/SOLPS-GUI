@@ -4117,7 +4117,7 @@ class EireneEdit(QTreeWidget):
                            'TRCBLA', 'TRCBLM', 'TRCBLI', 'TRCBLP', 'TRCBLE',
                            'TRCBLPH', 'TRCTAL', 'TRCOCT', 'TRCCEN', 'TRCDUMM',
                            'TRCDBG2', 'TRCDBGE', 'TRCDBGM', 'TRCDBGF',
-                           'TRCDBGL', 'TRCDBGS', 'TRCDBGG', 'TRCDBGMPI',                           'TRCDBGC'])
+                           'TRCDBGL', 'TRCDBGS', 'TRCDBGG', 'TRCDBGMPI', 'TRCDBGC'])
         # Some reading involving NSTRA
         # A for loop going from 0 to NSTRA with a step of 60
         role = ['L']

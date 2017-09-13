@@ -37,7 +37,7 @@ job submission options but ideally, single submit command in the directory
 should be sufficient for a submission script to figure out run type such as:
 
   * standalone
-  * coulped with EIRENE
+  * coupled with EIRENE
   * compressed logs
 
 Local submission
@@ -71,7 +71,7 @@ one can replace with ``at now`` and simply ignore the ``atd`` limit and
 maintain the system load manually. Although ``localsubmit`` is primarily
 intended for single users, it can handle multi-users without significantly
 impact regular work as it will not go over the "system" specified load.
-Results of the ``localsubmit`` diadnostic output can be read by system
+Results of the ``localsubmit`` diagnostic output can be read by system
 ``mail``. If *mail* is not desired then all ``b2mn`` output should be
 redirected with ``>&!`` instead of just ``>!`` and then empty mails will
 not be sent.
@@ -90,7 +90,7 @@ environment variables it not really important if they are escaped or not. But
 for variables that are used inside the script at the time of execution
 (e.g. ``msg``) they need to be escaped.
 
-If ``atd`` supports (was patched against) SHELL evironment variable then one
+If ``atd`` supports (was patched against) SHELL environment variable then one
 can use ``tcsh`` also for ``atd`` script that is usually run by ``/bin/sh``::
 
     #!/usr/bin/env tcsh
@@ -128,11 +128,11 @@ the time of execution. For more advanced local submission script revise
 
 Submission on a cluster
 ^^^^^^^^^^^^^^^^^^^^^^^
-Various submission scripts can be created due to large veriety of cluster
+Various submission scripts can be created due to large variety of cluster
 configurations and job schedulers. Essentially, one needs to send UDP message
 to the GUI run status server from compute node. For a start let's show required
 update of sample ``itersubmit`` script that is actually executed at the
-login node and may serve a as first check of network monitoring functionallity:
+login node and may serve a as first check of network monitoring functionality:
 
 .. code-block:: diff
    :caption: QSUB.iter_coupled.orig QSUB.iter_coupled

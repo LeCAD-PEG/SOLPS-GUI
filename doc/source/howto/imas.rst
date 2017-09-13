@@ -56,8 +56,8 @@ run number, user name, machine, version number and for a new run name.
 
 The run name is the name for the directory to which the data is saved. Be
 careful though, to have your runs directory cleaned you should first select one
-of the top dirs of your runs. This way a new directory is created inside the
-top dir and not inside another runs directory.
+of the top directory of your runs. This way a new directory is created inside
+the top dir and not inside another runs directory.
 
 When you click ok, the data is fetched and saved to the directory with the run
 name you provided inside the dialog.

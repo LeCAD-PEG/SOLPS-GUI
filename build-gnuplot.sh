@@ -1,8 +1,8 @@
 #!/bin/sh -x
-
+source setupenv.sh
 MAKE_JOBS=${MAKE_JOBS:-4}
-GNUPLOT_VERSION=5.0.1
-QT_VERSION=5.5.1
+GNUPLOT_VERSION=5.2.0
+QT_VERSION=5.7.1
 
 BUILDROOT=${PWD}
 BUILD_DIR=${BUILDROOT}/build
@@ -28,7 +28,7 @@ GNUPLOT_SRC="gnuplot-${GNUPLOT_VERSION}.tar.gz"
 GNUPLOT_SITE="http://sourceforge.net/projects/gnuplot/files/gnuplot"
 GNUPLOT_DOWNLOAD="${GNUPLOT_SITE}/${GNUPLOT_VERSION}/${GNUPLOT_SRC}/download"
 
-if [ ! -f ${DOWNLOAD_DIR}/${GNUPLOT_SRC} ]; then 
+if [ ! -f ${DOWNLOAD_DIR}/${GNUPLOT_SRC} ]; then
     wget  -O ${DOWNLOAD_DIR}/${GNUPLOT_SRC} ${GNUPLOT_DOWNLOAD}
 fi
 
@@ -40,9 +40,11 @@ if [ ! -e   ${GNUPLOT_SRC_DIR}/.built ]; then
   cd ${BUILD_DIR}
   tar xzf ${DOWNLOAD_DIR}/${GNUPLOT_SRC}
   cd ${GNUPLOT_SRC_DIR}
-  ./configure --enable-qt --without-cairo --prefix=${STAGING_DIR}
+  libtoolize
+  export CXXFLAGS=" -std=c++11"
+  ./configure --without-cairo --prefix=${STAGING_DIR} --with-qt=qt5
   make -j ${MAKE_JOBS}
-  make install 
+  make install
   touch ${GNUPLOT_SRC_DIR}/.built
 fi
 

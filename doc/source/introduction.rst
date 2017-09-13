@@ -4,9 +4,9 @@
 
     by *Xavier Bonnin* and *Richard Pitts*
 
-    The design of the ITER divertor and estimates of the required fuelling
+    The design of the ITER divertor and estimates of the required fueling
     throughput have relied for many years on simulations performed by use of
-    the SOLPS plasma edge modelling tool, more specifically its versions 4.0,
+    the SOLPS plasma edge modeling tool, more specifically its versions 4.0,
     4.2 and 4.3. However, the SOLPS code base has been developed independently
     by other research groups among the ITER Members’ institutions, most notably
     in IPP-Garching (EU) and St. Petersburg (RF), leading ultimately to
@@ -31,7 +31,7 @@
     organized at the ITER Headquarters on April 13th-17th, 2015.
 
     The ambition of the SOLPS-ITER effort is to make this last code version
-    become the new standard used across the ITER Parties for modelling not
+    become the new standard used across the ITER Parties for modeling not
     only ITER, but any other tokamaks and linear plasma devices wherever
     applicable.
     In order to facilitate user adoption of SOLPS-ITER and migration from
@@ -62,7 +62,7 @@ for the SOLPS GUI. These custom widgets are in similar environments called
 and then they pass results further in a scientific workflow. Custom widgets
 for SOLPS are operating in a similar fashion in a way that they receive and
 send the signals to other widgets for further operation. In principle, no
-programming is needed by users to create their own *Dashboard* for analysing
+programming is needed by users to create their own *Dashboard* for analyzing
 and controlling the SOLPS simulations. Graphical workflow "design" is done
 with `Qt designer <http://doc.qt.io/qt-5/qtdesigner-manual.html>`_.
 In contrast to scientific workflow engines such as
@@ -277,7 +277,7 @@ weak in radial direction. In addition to that the coordinate system also
 takes advantage of tokamak’s shape. Its rotational symmetry allows
 three-dimensional problem to be reduced into two dimensions. Poloidal
 cut through the torus, in :numref:coordinates`, shows the cells are
-quadtrilaterally shaped and either aligned with or perpendicular to the
+quadrilateral shaped and either aligned with or perpendicular to the
 magnetic field lines.
 
 Because of the reasons mentioned earlier, the following coordinate
@@ -428,11 +428,11 @@ workflow engines cover "task" dependencies well by creating *direct acyclic
 graphs* they provide little support for interactive tasks in preparing the
 input data. Physics code monitoring and visualisation is another aspect
 that is not covered sufficiently and extensions are required to provide
-progress evidence to users. Visualisation pipeline that is often neglected
+progress evidence to users. Visualization pipeline that is often neglected
 in many workflow systems is primary point of VisTrails workflow system that
-concentrates in data exploration where complex 3D visualisations are
-needed. Building visualisation pipeline on top of VTK toolkit is also
-possible with interactive 3D visualisation tools such as ParaView or VisIt
+concentrates in data exploration where complex 3D visualizations are
+needed. Building visualization pipeline on top of VTK toolkit is also
+possible with interactive 3D visualization tools such as ParaView or VisIt
 that are ubiquitously used among HPC community. Important aspect for
 day-to-day users is tailoring GUI to preferences while using the physics
 code(s) so that they can interactively explore compute progress. For that
@@ -443,8 +443,8 @@ standalone ParaView application for *in situ* instrumentation.
 
 SOLPS is a package of codes developed over many years and was started as
 an evaluation tool for engineers but then developed into an essential
-tool that allowed combining the design and modelling process of the
-divertor, with synthesising different pieces of information from the
+tool that allowed combining the design and modeling process of the
+divertor, with synthesizing different pieces of information from the
 theoretical analysis, experimental studies and engineering intuition.
 Several versions of SOLPS code exist to date. The newly developed
 SOLPS-ITER  suite of codes comprise a grid generator CARRE , a tool for
@@ -454,7 +454,7 @@ Carlo code Eirene , and in addition to that a bundle of plotting tools
 and scripts used for post-processing.
 
 The ambition of the SOLPS-ITER effort is to become the new standard used
-across the ITER Parties for modelling not only ITER, but any other
+across the ITER Parties for modeling not only ITER, but any other
 tokamaks and linear plasma devices wherever applicable. In order to
 facilitate user adoption of SOLPS-ITER and migration from earlier
 versions, it has therefore been decided to include as part of the
@@ -476,7 +476,7 @@ and in contrast to other scientific workflow engines, provides the
 dashboard as the front end to users solving the workflow monitoring problem
 in user friendly way. The sharing of a complex dashboard design is
 possible among users and is more oriented towards monitoring and graphical
-presentation, with full visualisation support. Having all these features in
+presentation, with full visualization support. Having all these features in
 mind, we would like to highlight that the approach presented in
 continuation is significantly advanced for users with similar physics codes
 that need to be put inside a dashboard for easy handling, coupling,

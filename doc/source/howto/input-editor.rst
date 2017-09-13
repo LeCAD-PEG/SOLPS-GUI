@@ -2,7 +2,7 @@
 .. _input-editor-howto:
 
 .. highlight:: csh
-   
+
 ==================
 Input editor HOWTO
 ==================
@@ -15,13 +15,13 @@ of b2input.xml.
 Eirene editor
 =============
 
-The Eirene input file is basically lines and lines of values with almost no 
-indicators for which parameters the values are. The Eirene editor helps the 
-user by showing the description of parameters and the content of lines in the 
+The Eirene input file is basically lines and lines of values with almost no
+indicators for which parameters the values are. The Eirene editor helps the
+user by showing the description of parameters and the content of lines in the
 editor.
 
 The eirene editor is a tree-view based editor for the eirene input file. It has
-two windows, one with the tree-style displayed text and the second holds the 
+two windows, one with the tree-style displayed text and the second holds the
 help description.
 
 The tree-style is used for easier navigation. While you navigate through the
@@ -33,7 +33,7 @@ Currently the parameters are determined by reading the input file line by line.
 There is no model that would auto-update itself if there are changes to flags
 or parameters that influence on the structure of the input file.
 
-The Eirene editor is capable of running in stand alone mode by passing the 
+The Eirene editor is capable of running in stand alone mode by passing the
 path of the input file to the Eirene editor .py file. e.g.:
 
 .. code-block:: bash
@@ -43,12 +43,12 @@ path of the input file to the Eirene editor .py file. e.g.:
 B2 editor
 =========
 
-The B2 editor is a plaintext editor with the addition of having tool tips for
+The B2 editor is a plain-text editor with the addition of having tool tips for
 parameters and switches for the b2 input files.
 
 When a b2 input file is loaded it loads the tool tips for the file. The switches
 and parameters are highlighted if they are described in the b2input.xml. Note
-that the highlight apply is case sensitive, so a switch might not be 
+that the highlight apply is case sensitive, so a switch might not be
 highlighted but the highlight pop-up still shows up!
 
 ``b2input.xml`` schema
@@ -64,13 +64,13 @@ Recommended editors:
 
 **Emacs version 24+:**
 
-It is an open source, lightweight, editor, well featured but has a steep 
+It is an open source, lightweight, editor, well featured but has a steep
 learning curve at the beginning of usage.
 
 Emacs is rich with key-commands, which provides high operability and control
 over editing files.
-   
-Be sure to have package nxml installed, as b2input.xml has settings at the 
+
+Be sure to have package ``nxml`` installed, as b2input.xml has settings at the
 bottom.
 
    .. code-block:: xml
@@ -102,7 +102,7 @@ XML files, and others, nicely on it's own.
 **oXygen XML editor:**
 
 It is a full-stack IDE studio for editing and verifying XML files. It also
-comes with .xslt support so you can write and execute the 
+comes with .xslt support so you can write and execute the
 xsl-transformations inside the editor.
 
 It is rich in function so reading the manual is a must for optimal editing. The
@@ -209,8 +209,8 @@ separate elements. There can be an arbitrary number of routine elements:
        <introduction>
    </routine>
 
-All of the previous elements are stored in module element, which has an 
-attribute ``name`` containing the name of the input file and ``type`` if the 
+All of the previous elements are stored in module element, which has an
+attribute ``name`` containing the name of the input file and ``type`` if the
 input file is a fortran namelist.
 
 If the input file is not a fortran namelist, then the attribute ``type`` **must
@@ -235,7 +235,7 @@ Example of a module node:
 The root of the xml file contains all the modules.
 
 .. code-block:: xml
-    
+
    <b2>
        <module name="module 1">
        ...
@@ -259,14 +259,14 @@ But do not edit or add comments outside of the root element
 Writing description in b2input.xml
 ==================================
 
-Text describing parameters and switches is normal plain text with some format 
+Text describing parameters and switches is normal plain text with some format
 rules.
 
 Indentation
 -----------
 
-It's important to repeat that each line of description starts with ``5 tabs`` 
-or ``\t\t\t\t\t``. Having whitespaces instead of tabs will break the format in 
+It's important to repeat that each line of description starts with ``5 tabs``
+or ``\t\t\t\t\t``. Having whitespaces instead of tabs will break the format in
 which the description will be showcased in solps-gui or documentation. e.g.:
 
 .. code-block:: xml
@@ -297,7 +297,7 @@ which the description will be showcased in solps-gui or documentation. e.g.:
                        <type>...</type>
                        <description>
                        In some cases when a switch contains additional descr-
-                       iption which only matters to this particular switch 
+                       iption which only matters to this particular switch
                        then you indent it as well with only FIVE!! tabs.
                        </description>
                    </switch>
@@ -311,11 +311,11 @@ which the description will be showcased in solps-gui or documentation. e.g.:
 Special symbols handling
 ------------------------
 
-The next step is handling special symbols, e.g.: ``LOGICAL OPERATORS`` and 
+The next step is handling special symbols, e.g.: ``LOGICAL OPERATORS`` and
 ``MATH SYMBOLS``.
 
-The reason for the rules is that the programs that are parsing the b2input.xml 
-are sensitive to markup signs, e.g. ``>`` or ``<``. And these signs are of 
+The reason for the rules is that the programs that are parsing the b2input.xml
+are sensitive to markup signs, e.g. ``>`` or ``<``. And these signs are of
 course used for logical statements.
 
 Current rules list for symbols:
@@ -332,22 +332,22 @@ The next is a current list of rules for subscripts and superscripts:
 - ``x<sup>2</sup>`` instead of ``$x^2$``
 - ``x<sub>2</sub>`` instead of ``$x_2$``
 
-The reason behind this is that in solps-gui qt can render html code and for 
+The reason behind this is that in solps-gui qt can render html code and for
 generating documentation it is easier to handle markup instead of latex code.
 
 Documentation generation
 ------------------------
 
-For generating documentation [and solps-gui help files] we use a python and 
-xslt programs to parse and create the desired format. I will only concentrate 
-on generating documentation files as user should not meddle with xslt 
+For generating documentation [and solps-gui help files] we use a python and
+xslt programs to parse and create the desired format. I will only concentrate
+on generating documentation files as user should not meddle with xslt
 generators for solps-gui.
 
 Currently there are two python files names ``b2cdci.py`` and ``b2cdcn.py`` that
 generate ``b2cdci.F`` and ``b2cdcn.F`` respectively.
 
 There can be some introduction or some explanation text that gives us a summary
-of either some switches or a category of switches. For that you can use the 
+of either some switches or a category of switches. For that you can use the
 following markups:
 
 Routine markup
@@ -365,7 +365,7 @@ An example from b2input.xml:
            <routine name="b2cdcn">
                <purpose>
                    B2CDCN provides information about namelists of the b2 code.
-                   No computation is performed in this routine. 
+                   No computation is performed in this routine.
 
                    The namelists are listed in no particular order. Each description will begin with the file from which the code expects to read the namelist and its general purpose. Then, each namelist variable will be listed with its use and size.
                </purpose>
@@ -377,5 +377,5 @@ An example from b2input.xml:
        ...
    </b2>
 
-The content of ``<purpose>`` holds the text for the introduction in the 
+The content of ``<purpose>`` holds the text for the introduction in the
 ``b2cdcn.F`` file.

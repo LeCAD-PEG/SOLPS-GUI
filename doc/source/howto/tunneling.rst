@@ -11,8 +11,8 @@ SOLPS-GUI Tunneling HOWTO
 GUI is designed to run in a graphical environment on a local workstation or
 on a cluster with X11 environment. However, some cluster don't provide X11
 desktop on a login node and for that running SOLPS-GUI is not native. If X11,
-necesary Python and PyQt libraries are available on login node then the GUI
-can be simply tunelled by adding ``-X`` or ``-Y`` switch when connecting to
+necessary Python and PyQt libraries are available on login node then the GUI
+can be simply tunneled by adding ``-X`` or ``-Y`` switch when connecting to
 login node with ``ssh``. Running SOLPS-GUI on a local machine for monitoring
 purposes is possible too by tunneling UDP messages sent from compute nodes to
 login node. In this HOWTO we'll access login node's network internal services
@@ -24,7 +24,7 @@ tools, only openssh and netcat. Here we are assuming that the SOLPS-GUI
 is listening for UDP datagrams on non-privileged port 49406 which may
 already be occupied by another user. In such situation on needs to select next
 free port. Similar situation may occur when tunneling ports through ``ssh``.
-That's why it is necessary for users to understand the tunelling and remote
+That's why it is necessary for users to understand the tunneling and remote
 execution.
 
 Tunnelling Run status updates to local machine

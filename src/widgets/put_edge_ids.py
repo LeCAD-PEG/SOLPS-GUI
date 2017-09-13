@@ -573,7 +573,7 @@ class PutIDSwrapper:
 
 class PutIDSQThread(QThread):
     """QThread for storing data to IDS. Note that it gets the attributes
-    necessary to open an IDS and create a data entry, from PushIDS instances.
+    necessary to open an IDS and create a data entry, from PutIDS instances.
 
     The threading is required since it takes sometime for everything to be
     written to an IDS so in order avoid from freezing the GUI, QThread is used.

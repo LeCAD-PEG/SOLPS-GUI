@@ -66,7 +66,7 @@ consist of:
    command-line driven plotting utility Gnuplot that has been encapsulated
    inside the SOLPS-ITER GUI as shown in :numref:`fig-runs-9` on a default
    *Dashboard*. Custom widgets were created that communicate and trigger
-   plotting of desired scripts. The default dashboard, that has a resizable
+   plotting of desired scripts. The default dashboard, that has a re-sizable
    layout, is kept minimal in size and complexity to the users. However,
    the dashboard is completely user configurable and designed with
    graphical programming tool in a workflow-style manner, described in Sec.
@@ -85,12 +85,12 @@ consist of:
    that purpose data from multiple runs is stored in the IMAS database;
    allowing also inclusion of a SOLPS actor in Kepler workflows. The new
    *UAL Edge reader plugin* for ParaView delivers essentially the same
-   visualisation and analysis possibilities as the *Catalyst*
+   visualization and analysis possibilities as the *Catalyst*
    instrumentation, shown in :numref:`fig-runs-8`, except that it
    allows post-processing of multiple runs in one window at once and
    *comparative views*. The PDM for *edge profiles* IDS allows
    comparison with experimental data and other codes too. The grid and
-   mapped field data is modelled with *General Grid Description*  (GGD)
+   mapped field data is modeled with *General Grid Description*  (GGD)
    that is used within EU-IM and ITER community as a common way to
    describe grids. For the converting existing results, stored as Edge CPO a
    utility *cpo2ids* was written as part of the GUI to allow transition
@@ -104,11 +104,11 @@ the GUI asynchronous scan of the monitored run-trees provides code
 status derived from the log files inside *runs*.
 
 Physics codes such as SOLPS, developed over may years, are using
-specialised plotting scripts (e.g. *b2plot*) that cannot easily be
-replaced with "modern" visualisation tools. However, the aim of the GUI
+specialized plotting scripts (e.g. *b2plot*) that cannot easily be
+replaced with "modern" visualization tools. However, the aim of the GUI
 is to encapsulate those utilities and provide user-friendly interface
 for new users and attract SOLPS experts to simplify daily use and share
-*dashboards* among them. The SOLPS-ITER GUI is written with PyQt5 
+*dashboards* among them. The SOLPS-ITER GUI is written with PyQt5
 application programming interface (API) that brings Python portability
 and scripting to advanced users. Applicability of the SOLPS GUI is
 therefore wide and is proven to run on many clusters as well as on
@@ -172,7 +172,7 @@ dashboard* with most of the widgets freely "removable" from the dashboard.
 The Dashboard Designer
 ----------------------
 
-            
+
 The PyQt5 framework  provides *Qt designer* application that is normally
 used for graphically designing Qt  applications and generate
 corresponding widget-layout code. *PyQt* can compile and interpret with
@@ -234,10 +234,10 @@ approach allows us to create *workflows* within the *SOLPS dashboard
 designer*. It should be noted that such graphical-only programming is
 possible only if the widgets used on the dashboard are able to exchange
 compatible signals. The compatibility is assured when same the basic
-types are signalled to the widget *slots*. The :guilabel:`Signal/Slot Editor`
+types are signaled to the widget *slots*. The :guilabel:`Signal/Slot Editor`
 [see :numref:`Fig. %s (f)<fig-dashboard-9>`] allows creation
 of such signal--slot pairs.
-However, for signalling, there is also possibility to route
+However, for signaling, there is also possibility to route
 widget signals graphically with a *Workflow designer* that is part of
 the *Dashboard designer* when we switch into "signal design" mode.
 Besides the design mode there is also "run mode" where one can test the
@@ -248,7 +248,7 @@ users could design the dashboard from the scratch and use only graphical
 programming. Such GUI design is certainly possible. However, the
 SOLPS-ITER GUI design selected to provide *Settings*, *Runs*, *Archive*
 and *Log* view as built-in functionality; the rest is fully
-"redesignable".
+"re-designable".
 
 The Workflow Designer
 ---------------------
