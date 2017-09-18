@@ -5,7 +5,7 @@ SOLPS-ITER GUI
 
 Prepare Python 3, PyQt and ParaView with GCC 4.7+
 
-    ./build-pyqt.sh 
+    ./build-pyqt.sh
     ./build-paraview.sh
 
 One can modify the following environment variables to change
@@ -13,13 +13,13 @@ default build procedure:
 
  - MAKE_JOBS  number of parallel jobs to make
  - STAGING_PREFIX installation destination
- - USE_QT_XCB for newer distros lacking full XCB support 
+ - USE_QT_XCB for newer distros lacking full XCB support
 
 Source the setupenv.[c]sh for locally built PyQt with
 
     $ source setupenv.sh
 
-or 
+or
 
     $ source setupenv.csh
 
@@ -39,7 +39,7 @@ or
 ## ITER cluster specifics
 ### CentOS 5.x and xcb
 Qt5.x requires XCB library for X11 rendering instead of Xlib.
-On RHEL5 XCB is built from sources and put into staging/lib. 
+On RHEL5 XCB is built from sources and put into staging/lib.
 
 ### IMAS build environment
 IMAS is not required to build the SOLPS GUI.
@@ -54,7 +54,7 @@ XCB development libraries are required for building Qt5.x
     apt-cache search libxcb
     sudo apt-get install libxcb.*-dev
     sudo apt-get install libudev-dev libxi-dev
-   
+
 ## PIP3 packages
 
    apt-get install libssl-dev liblzma-dev
@@ -81,14 +81,27 @@ clearing the preferences.
 ### Clearing user preferences on Linux
 
     rm ${HOME}/.config/ITER/solps-gui.conf
-   
+
 ### Clearing user preferences on OS X
 
     rm ${HOME}/Library/Preferences/com.iter.solps-gui.plist
-    killall -u $USER cfprefsd 
+    killall -u $USER cfprefsd
 
 ## Building on RHEL6 clusters
-Some RHEL6 clusters lack full XCB devel support and for that we recommend the 
+Some RHEL6 clusters lack full XCB devel support and for that we recommend the
 following option to building pyqt:
 
     USE_QT_XCB=YES ./build-pyqt.sh
+
+## Building Qt (using build-pyqt.sh or build-paravies.sh) on debian stretch (9)
+Older versions of Qt ( < 5.9.0) do not support OpenSSL-1.1.0, which is the
+only available package for debian stretch to get via command:
+
+    apt-get install openssl
+
+For this you have to install the development packages for older version of
+openssl (1.0.x):
+
+    apt-get install libssl1.0-dev
+
+This installs the development files for openSSL version 1.0.2.
