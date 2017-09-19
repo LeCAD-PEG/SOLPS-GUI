@@ -561,12 +561,15 @@ class RetrieveRunsFolderInfo(QThread):
             try:
                 with open(path) as file:
                     lines = file.read().splitlines()
-                last_status_line = lines[-1]
-                # detect crashed that 'Started' without run.log present
-                if time.time() - mtime > 60 and 'Started' in last_status_line:
-                    return qtime, 'CRASHED? ' + last_status_line, static_data
+                if len(lines):
+                    last_status_line = lines[-1]
+                    # detect crashed that 'Started' without run.log present
+                    if time.time() - mtime > 60 and 'Started' in last_status_line:
+                       return qtime, 'CRASHED? ' + last_status_line, static_data
+                    else:
+                       return qtime, last_status_line, static_data
                 else:
-                    return qtime, last_status_line, static_data
+                    return qtime, '.status empty', static_data
             except OSError:
                 return qtime, '.status permission denied', static_data
 
