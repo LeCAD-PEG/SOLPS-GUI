@@ -1,0 +1,42 @@
+#%Module1.0#####################################################################
+##
+## $name modulefile
+##
+set ver [lrange [split [ module-info name ] / ] 1 1 ]
+set name [lrange [split [ module-info name ] / ] 0 0 ]
+#set imas_home $::env(IMAS_HOME)
+set imas_home /work/imas
+set loading [module-info mode load]
+set desc [join [read [ open "$imas_home/etc/modulefiles/$name/.desc" ] ] ]
+proc ModulesHelp { } {
+puts stderr "\tThis module sets the environment for $name v$ver"
+}
+conflict $name
+module-whatis "$desc (v$ver)"
+
+# Requires imas, python3 and pyqt5.7.1
+# The imas distribution already carries to necessary python
+if { ! [ is-loaded imas/3.10.2/ual/3.6.1  ] } {
+  module load imas/3.10.2/ual/3.6.1 
+}
+
+if { ! [ is-loaded edge-plugin/readUALEdge ] } {
+  module load paraview-plugin-edge/dev
+}
+
+set solpsguihome /home/ITER/kosl/solps-gui
+
+setenv SOLPSGUI $solpsguihome/src/gui
+
+prepend-path PYTHONPATH $solpsguihome/src/widgets
+prepend-path PYQTDESIGNERPATH $solpsguihome/src/plugins/designer
+
+setenv LD_PRELOAD /usr/lib64/libfontconfig.so.1
+
+prepend-path PYTHONPATH $::env(IMAS_PREFIX)/python/lib/imas
+
+set-alias solps {python3 \$SOLPSGUI/solps.py $*}
+
+set-alias solps_doc "xdg-open $solpsguihome/doc/build/html/index.html"
+set-alias eirene "python3 -m eirene $*"
+set-alias b2 "python3 -m b2 $*"

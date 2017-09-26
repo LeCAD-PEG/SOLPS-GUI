@@ -1,0 +1,31 @@
+#%Module1.0#####################################################################
+##
+## $name modulefile
+##
+set ver [lrange [split [ module-info name ] / ] 1 1 ]
+set name [lrange [split [ module-info name ] / ] 0 0 ]
+#set imas_home $::env(IMAS_HOME)
+set imas_home /work/imas
+
+set loading [module-info mode load]
+set desc [join [read [ open "$imas_home/etc/modulefiles/$name/.desc" ] ] 
+]
+proc ModulesHelp { } {
+puts stderr "\tThis module sets the environment for $name v$ver"
+}
+conflict $name
+module-whatis "$desc (v$ver)"
+
+# Requires Qt
+if { ! [ is-loaded qt/4.8.7 ] } {
+  module load qt/4.8.7
+}
+
+# require python
+if { ! [ is-loaded OpenSSL/1.0.2g-GCC-4.8.3 ] } {
+  module load OpenSSL/1.0.2g-GCC-4.8.3
+}
+
+setenv PARAVIEW_VERSION $ver
+prepend-path LD_LIBRARY_PATH /work/imas/opt/EasyBuild/software/Python/2.7.9-goolf-1.5.16/lib
+prepend-path PATH /home/ITER/simicg/solps-gui/staging/paraview/$ver/bin
