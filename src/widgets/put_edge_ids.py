@@ -613,14 +613,21 @@ class PutIDSQThread(QThread):
         """Threaded run function that writes the data of the B2 output files
         and input files to the given IDS entry.
         """
+        self.emitMessage.emit("Reading files...")
+        b2out=False
+        if os.path.exists(self.rundir + '/' + 'b2fgmtry') and \
+           os.path.exists(self.rundir + '/' + 'b2fstati'):
+            coorAr = readB2output(self.rundir, 'b2fgmtry',
+                                  variables=['nx,ny', 'crx', 'cry'])
+            self.emitMessage.emit("B2fmtry read.")
+            tempAr = readB2output(self.rundir, 'b2fstati',
+                                  variables=['ne', 'te', 'ti'])
+            self.emitMessage.emit("B2fstati read.")
+            b2out = True
+        else:
+            self.emitMessage.emit('No b2ouput files found, skipping writing'
+                                  ' output files to IDS.')
 
-        self.emitMessage.emit("Reading files")
-        coorAr = readB2output(self.rundir, 'b2fgmtry',
-                                         variables=['nx,ny', 'crx', 'cry'])
-        self.emitMessage.emit("B2fmtry read.")
-        tempAr = readB2output(self.rundir, 'b2fstati',
-                              variables=['ne', 'te', 'ti'])
-        self.emitMessage.emit("B2fstati read.")
         code_parameters = tarInputFiles(self.rundir)
         self.emitMessage.emit("Code parameters read.")
         self.emitMessage.emit("Creating IDS object.")
@@ -633,13 +640,15 @@ class PutIDSQThread(QThread):
         self.emitMessage.emit("Description added.")
         ids.writeCodeParameters(code_parameters)
         self.emitMessage.emit("Code parameters added.")
-        ids.writeCoordinates(coorAr['crx'], coorAr['cry'],
-                             int(coorAr['nx,ny'][0]), int(coorAr['nx,ny'][1]))
-        self.emitMessage.emit("Coordinates written added.")
-        ids.writeTe(tempAr['te'])
-        ids.writeTi(tempAr['ti'])
-        ids.writeNe(tempAr['ne'])
-        self.emitMessage.emit("Te, Ti and Ne written.")
+
+        if b2out:
+            ids.writeCoordinates(coorAr['crx'], coorAr['cry'],
+                                 int(coorAr['nx,ny'][0]), int(coorAr['nx,ny'][1]))
+            self.emitMessage.emit("Coordinates written added.")
+            ids.writeTe(tempAr['te'])
+            ids.writeTi(tempAr['ti'])
+            ids.writeNe(tempAr['ne'])
+            self.emitMessage.emit("Te, Ti and Ne written.")
         self.emitMessage.emit("Now saving data entry.")
         ids.save()
 

@@ -258,9 +258,11 @@ class GetIDSQThread(QThread):
         else:
             self.emitMessage.emit("Not all parameters are specified!")
             print("Not all parameters are specified!")
-            dialog = GetDialog(self.parent, self.shot, self.runNumber,
-                               self.user, self.device, self.version,
-                               self.runName, self.dirpath)
+            dialog = GetDialog(self.parent)
+            dialog.prepareWidgets(shot=self.shot, run=self.runNumber,
+                                  user=self.user, device=self.device,
+                                  version=self.version, path=self.dirpath)
+
             if dialog.exec_():
                 self.shot, self.runNumber, self.user, self.device, \
                   self.version, self.runName, self.dirpath = dialog.on_close()
