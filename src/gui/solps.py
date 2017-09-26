@@ -1577,7 +1577,7 @@ class SOLPS_MainWindow(QMainWindow):
             shot = ''
             run = ''
         device = 'solps-iter'
-        version = str(imas.print_function.getMandatoryRelease()[0])
+        version = '3'
         # run, shot, user mandatory
         if user:
             pass
