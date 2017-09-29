@@ -7,3 +7,4 @@ sippyQtGnuplotcmodule.cpp
 sippyQtGnuplotgnuplotWidget.cpp
 *.o
 *.so
+moc*.cpp

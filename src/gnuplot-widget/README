@@ -1,0 +1,32 @@
+This created the python module pyQtGnuplot, which contains embedded gnuplot
+in PyQt.
+
+To build it run:
+
+    ./build-gnuplot-widget.sh
+
+To do it by hand:
+
+    # First you have to moc the *.h header files.
+    moc QtGnuplotApplication.h -o moc_QtGnuplotApplication.cpp
+    moc QtGnuplotEvent.h -o moc_QtGnuplotEvent.cpp
+    moc QtGnuplotInstance.h -o moc_QtGnuplotInstance.cpp
+    moc QtGnuplotScene.h -o moc_QtGnuplotScene.cpp
+    moc QtGnuplotWidget.h -o moc_QtGnuplotWidget.cpp
+    moc QtGnuplotWindow.h -o moc_QtGnuplotWindow.cpp
+    moc gnuplotWidget.h -o moc_gnuplotWidget.cpp
+
+    # Run configure.py
+    python3 configure.py --verbose
+
+    # Compile and install the module
+    make
+    make install
+
+
+The installation folder is in $(HOME)/solps-gui/staging/lib/site-packages/. To
+change settings edit the configure.py file.
+
+To import and use the module right away, either sorce setupenv.sh from solps-gui
+root dir or append the path to ~/solps-gui/staging/lib/site-packages to
+variable PYTHONPATH.
