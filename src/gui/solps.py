@@ -38,9 +38,6 @@ import sys
 import queue
 import time
 
-
-
-
 from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
                           pyqtSignal, QThread, QAbstractItemModel, QVariant,
                           QSortFilterProxyModel, QRegExp, QObject, QRect,
@@ -48,10 +45,9 @@ from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QFileDialog, QStyle, QStyledItemDelegate,
                              QLineEdit, QToolButton, QGridLayout, QLabel,
-                             QDialogButtonBox, QInputDialog)
-from PyQt5.QtGui import (QStandardItemModel, QFontMetrics, QPen)
+                             QDialogButtonBox)
+from PyQt5.QtGui import (QFontMetrics, QPen)
 from PyQt5.uic import loadUi
-from enum import IntEnum
 
 
 from addmenu import AddMenu
@@ -59,12 +55,8 @@ from addmenu import AddMenu
 import put_edge_ids
 import get_edge_ids
 
-try:
-    import BytesIO
-except:
-    from io import BytesIO
-
 REDIRECT_STDOUT_TO_LOG = False
+
 
 class Column:
     """Column enumeration for Runs treeview.parent
@@ -83,7 +75,7 @@ class Column:
         run : Number for run.
     """
     name, path, date, status, label, comment, device, shot, run, user = \
-    range(10)
+        range(10)
 
 def extract_value(line):
     if len(line.split()) == 1:
@@ -114,8 +106,6 @@ def read_identification_parameters(directory):
     """
     path = directory + '/b2mn.dat'
     label = run = shot = user = device = ''
-    N = 2        # The number N is for shot and run, since they can be in the
-    counter = 0  # b2md.dat file
 
     if os.path.exists(path):
         try:
@@ -123,20 +113,17 @@ def read_identification_parameters(directory):
                 lines = file.read(1024).splitlines()
             for i, line in enumerate(lines):
                 if 'label' in line:
-                    label = lines[i+1].strip("'")
+                    label = lines[i + 1].strip("'")
                 elif 'b2mndr_run_number' in line:
                     run = extract_value(line)
-                    counter += 1
                 elif 'b2mndr_shot_number' in line:
                     shot = extract_value(line)
-                    counter += 1
                 elif 'b2mndr_user' in line:
                     user = extract_value(line)
                 elif 'b2mndr_device' in line:
                     device = extract_value(line)
         except OSError:
             label = run = shot = user = device = 'b2mn.dat unreadable'
-
 
     path = directory + '/b2md.dat'
     if (not shot or not run) and os.path.exists(path):
@@ -200,7 +187,8 @@ class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
                 return None
         return super(ArchiveSortFilterProxyModel, self).data(index, role)
 
-    " Parent of accepted children needs to be accepted too for treeviews. "
+    # Parent of accepted children needs to be accepted too for treeviews.
+
     def has_accepted_children(self, source_index):
         item = source_index.internalPointer()
         items = item.childItems.copy()
@@ -229,11 +217,13 @@ class MyLineEdit(QLineEdit):
         self.i = row
         self.j = column
 
+
 class MyToolButton(QToolButton):
     def __init__(self, row, column):
         super(MyToolButton, self).__init__()
         self.i = row
         self.j = column
+
 
 class RunsSettings(QDialog):
     def __init__(self, parent=None):
@@ -253,23 +243,23 @@ class RunsSettings(QDialog):
         self.main_layout.addWidget(label_2, 0, 1, Qt.AlignLeft)
 
         for i in range(5):
-            entry_1 = MyLineEdit(settings.value('Alias'+str(i+1)), i, 0)
+            entry_1 = MyLineEdit(settings.value('Alias' + str(i + 1)), i, 0)
             entry_1.setAlignment(Qt.AlignCenter)
 
-            entry_2 = MyLineEdit(settings.value('runDir'+str(i+1)), i, 1)
+            entry_2 = MyLineEdit(settings.value('runDir' + str(i + 1)), i, 1)
             entry_2.setMinimumWidth(350)
 
             button_1 = MyToolButton(i, 2)
             button_1.setText('...')
             button_1.clicked.connect(self.dialog_action)
 
-            self.main_layout.addWidget(entry_1, i+1, 0, Qt.AlignCenter)
-            self.main_layout.addWidget(entry_2, i+1, 1)
-            self.main_layout.addWidget(button_1, i+1, 2, Qt.AlignCenter)
+            self.main_layout.addWidget(entry_1, i + 1, 0, Qt.AlignCenter)
+            self.main_layout.addWidget(entry_2, i + 1, 1)
+            self.main_layout.addWidget(button_1, i + 1, 2, Qt.AlignCenter)
         settings.endGroup()
         # Adding the Ok and Cancel button.
         dialog_button_box = QDialogButtonBox()
-        dialog_button_box.setStandardButtons(QDialogButtonBox.Ok|
+        dialog_button_box.setStandardButtons(QDialogButtonBox.Ok |
                                              QDialogButtonBox.Cancel)
         dialog_button_box.accepted.connect(self.accept)
         dialog_button_box.rejected.connect(self.reject)
@@ -283,8 +273,8 @@ class RunsSettings(QDialog):
         correct alias and runDir setting.
         """
         widget = self.sender()
-        i = widget.i # row
-        j = widget.j # column
+        i = widget.i  # row
+        j = widget.j  # column
         current_dir = self.main_layout.itemAt(2+i*3+j-1).widget().text()
 
         if current_dir == "":
@@ -956,7 +946,7 @@ class RunsModel(QAbstractItemModel):
                         for i, line in enumerate(lines):
                             if switch_name in line:
                                 if column == Column.label:
-                                    lines[i+1] = " '" + value + "'"
+                                    lines[i + 1] = " '" + value + "'"
                                 else:
                                     value_to_replace =\
                                         lines[i].split()[-1].strip("'")
@@ -971,11 +961,9 @@ class RunsModel(QAbstractItemModel):
                             if line.startswith('*endphy'):
                                 new_line = "'" + switch_name + \
                                            "'     '" + value + "'"
-                                lines.insert(i+1, new_line)
+                                lines.insert(i + 1, new_line)
                                 with open(path, 'w') as f:
                                     f.write('\n'.join(lines))
-
-
 
                 except OSError:
                     QMessageBox.warning(None, "Permission problem",
