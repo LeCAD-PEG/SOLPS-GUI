@@ -34,7 +34,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -813,7 +813,7 @@ and starts the run</string>
      <x>0</x>
      <y>0</y>
      <width>722</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -877,7 +877,7 @@ and starts the run</string>
   </customwidget>
   <customwidget>
    <class>Gnuplot</class>
-   <extends>QLabel</extends>
+   <extends>QWidget</extends>
    <header>gnuplot</header>
   </customwidget>
   <customwidget>
@@ -927,8 +927,8 @@ and starts the run</string>
    <slot>executeTcshCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>83</x>
-     <y>76</y>
+     <x>255</x>
+     <y>295</y>
     </hint>
     <hint type="destinationlabel">
      <x>206</x>
@@ -943,8 +943,8 @@ and starts the run</string>
    <slot>setTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>58</x>
-     <y>74</y>
+     <x>69</x>
+     <y>295</y>
     </hint>
     <hint type="destinationlabel">
      <x>206</x>
@@ -963,8 +963,8 @@ and starts the run</string>
      <y>115</y>
     </hint>
     <hint type="destinationlabel">
-     <x>102</x>
-     <y>82</y>
+     <x>192</x>
+     <y>322</y>
     </hint>
    </hints>
   </connection>
@@ -975,12 +975,12 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>191</x>
-     <y>95</y>
+     <x>699</x>
+     <y>293</y>
     </hint>
     <hint type="destinationlabel">
-     <x>271</x>
-     <y>165</y>
+     <x>524</x>
+     <y>222</y>
     </hint>
    </hints>
   </connection>
@@ -991,12 +991,12 @@ and starts the run</string>
    <slot>setSolpsPlotCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>196</x>
-     <y>93</y>
+     <x>450</x>
+     <y>292</y>
     </hint>
     <hint type="destinationlabel">
-     <x>271</x>
-     <y>165</y>
+     <x>524</x>
+     <y>222</y>
     </hint>
    </hints>
   </connection>
@@ -1007,12 +1007,12 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>196</x>
-     <y>93</y>
+     <x>450</x>
+     <y>292</y>
     </hint>
     <hint type="destinationlabel">
-     <x>271</x>
-     <y>165</y>
+     <x>524</x>
+     <y>222</y>
     </hint>
    </hints>
   </connection>
@@ -1023,12 +1023,12 @@ and starts the run</string>
    <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>46</x>
-     <y>81</y>
+     <x>57</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
-     <x>271</x>
-     <y>165</y>
+     <x>524</x>
+     <y>222</y>
     </hint>
    </hints>
   </connection>
@@ -1039,8 +1039,8 @@ and starts the run</string>
    <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>46</x>
-     <y>81</y>
+     <x>57</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
      <x>206</x>
@@ -1055,12 +1055,12 @@ and starts the run</string>
    <slot>triggerTextChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>46</x>
-     <y>81</y>
+     <x>57</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
-     <x>196</x>
-     <y>93</y>
+     <x>450</x>
+     <y>292</y>
     </hint>
    </hints>
   </connection>
@@ -1071,12 +1071,12 @@ and starts the run</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>46</x>
-     <y>81</y>
+     <x>57</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
-     <x>102</x>
-     <y>82</y>
+     <x>192</x>
+     <y>322</y>
     </hint>
    </hints>
   </connection>
@@ -1087,12 +1087,12 @@ and starts the run</string>
    <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>46</x>
-     <y>81</y>
+     <x>57</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
-     <x>102</x>
-     <y>71</y>
+     <x>101</x>
+     <y>76</y>
     </hint>
    </hints>
   </connection>
@@ -1107,8 +1107,8 @@ and starts the run</string>
      <y>45</y>
     </hint>
     <hint type="destinationlabel">
-     <x>102</x>
-     <y>71</y>
+     <x>101</x>
+     <y>76</y>
     </hint>
    </hints>
   </connection>
@@ -1119,12 +1119,12 @@ and starts the run</string>
    <slot>run()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>452</x>
-     <y>78</y>
+     <x>101</x>
+     <y>64</y>
     </hint>
     <hint type="destinationlabel">
-     <x>300</x>
-     <y>150</y>
+     <x>199</x>
+     <y>124</y>
     </hint>
    </hints>
   </connection>
@@ -1135,12 +1135,12 @@ and starts the run</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>46</x>
-     <y>81</y>
+     <x>57</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
-     <x>353</x>
-     <y>304</y>
+     <x>101</x>
+     <y>79</y>
     </hint>
    </hints>
   </connection>
@@ -1151,12 +1151,12 @@ and starts the run</string>
    <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>46</x>
-     <y>81</y>
+     <x>57</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
-     <x>490</x>
-     <y>200</y>
+     <x>258</x>
+     <y>124</y>
     </hint>
    </hints>
   </connection>
@@ -1167,12 +1167,12 @@ and starts the run</string>
    <slot>setAndExecuteTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>280</x>
-     <y>196</y>
+     <x>199</x>
+     <y>124</y>
     </hint>
     <hint type="destinationlabel">
-     <x>404</x>
-     <y>199</y>
+     <x>258</x>
+     <y>124</y>
     </hint>
    </hints>
   </connection>

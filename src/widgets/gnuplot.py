@@ -5,22 +5,30 @@
 from PyQt5.QtCore import (Qt, QProcess, QProcessEnvironment, QSize, pyqtSignal,
                           QSettings, pyqtSlot, pyqtProperty)
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QLabel, QFrame
-
+from PyQt5.QtWidgets import QLabel, QFrame, QVBoxLayout, QWidget
 
 import logging
 import os
 import tempfile
 
-class Gnuplot(QLabel):
-    """ Gnuplot(QWidget)
-    
-        Provides a custom widget to display a gnuplot with properties and slots
-        that can be used to customize its appearance.
+try:
+    from pyQtGnuplot import gnuplotWidget
+    GNUPLOT_WIDGET = True
+except ImportError as e:
+    GNUPLOT_WIDGET = False
+
+class Gnuplot(QWidget):
+    """Gnuplot(QWidget)
+    Provides a custom widget to display a gnuplot with properties and slots
+    that can be used to customize its appearance.
     """
 
     stderrOutput = pyqtSignal(str)
-    
+    TERMINAL = 'gif'
+    if GNUPLOT_WIDGET:
+        send_command = pyqtSignal(str)
+        TERMINAL = 'qt'
+
     def __init__(self, parent=None):
         super(Gnuplot, self).__init__(parent)
         settings = QSettings('ITER', 'solps-gui')
@@ -33,17 +41,31 @@ class Gnuplot(QLabel):
         self.gnuplot_cmdfile = None
         self.gnuplot_datafile = None
 
-        self.setAlignment(Qt.AlignCenter)
-        self.setFrameStyle(QFrame.StyledPanel)
-        self.setMinimumSize(QSize(180, 100))
-        self.setText("Gnuplot widget for SOLPS")
+        layout = QVBoxLayout()
 
-        self.gnuplot = QProcess()
+        if GNUPLOT_WIDGET:
+            self.gnuplot = gnuplotWidget(self)
+            print(self.gnuplot)
+            self.send_command.connect(self.gnuplot.cmd)
+            layout.addWidget(self.gnuplot)
+        else:
+
+            self.gnuplot = QProcess()
+
+            self.gnuplot.finished.connect(self.show_plot)
+            self.gnuplot.started.connect(self.write_commands_to_gnuplot)
+            self.gnuplot.error.connect(self.show_error)
+
+            self.label = QLabel()
+            layout.addWidget(self.label)
+            self.label.setAlignment(Qt.AlignCenter)
+            self.label.setFrameStyle(QFrame.StyledPanel)
+            self.label.setMinimumSize(QSize(180, 100))
+            self.label.setText("Gnuplot widget for SOLPS")
+
+        self.setLayout(layout)
+
         self.tcsh = QProcess()
-
-        self.gnuplot.finished.connect(self.show_plot)
-        self.gnuplot.started.connect(self.write_commands_to_gnuplot)
-        self.gnuplot.error.connect(self.show_error)
         self.tcsh.readyReadStandardOutput.connect(self.read_tcsh_stdout)
         self.tcsh.readyReadStandardError.connect(self.print_tcsh_stderr)
 
@@ -53,26 +75,32 @@ class Gnuplot(QLabel):
     @pyqtSlot(str)
     def plot(self, plot_command):
         """ Starts gnuplot process and sends plot commands through the
-            standard input. Everything after # is truncated
+        standard input. Everything after # is truncated
         """
-        if self.gnuplot.state() != QProcess.NotRunning:
+
+        if not GNUPLOT_WIDGET and self.gnuplot.state() != QProcess.NotRunning:
             logging.warning("Gnuplot process still running. Command ignored!")
             #  self.process.terminate()
             return
 
-        self.gnuplot_cmd = 'set terminal gif size ' \
+        self.gnuplot_cmd = 'set terminal ' + self.TERMINAL + ' size ' \
             + str(self.width()) + ', ' + str(self.height()) + '\n' \
-            + 'plot ' + plot_command.split('#', 1)[0]  + '\nquit\n'
+            + 'plot ' + plot_command.split('#', 1)[0]
         # print(self.gnuplot_cmd)
-        self.gnuplot.start(self.gnuplot_path)
-        if not self.gnuplot.waitForStarted():
-            logging.error(self.gnuplot.program() + " not started")
-            return
+
+        if GNUPLOT_WIDGET:
+            self.send_command.emit(self.gnuplot_cmd)
+        else:
+            self.gnuplot_cmd += '\nquit\n'
+            self.gnuplot.start(self.gnuplot_path)
+            if not self.gnuplot.waitForStarted():
+                logging.error(self.gnuplot.program() + " not started")
+                return
 
     @pyqtSlot()
     def write_commands_to_gnuplot(self):
         """ After gnuplot process has started send the commands to the pipe.
-            We rather wait to start than immediately write the pipe.
+        We rather wait to start than immediately write the pipe.
         """
         # print("Gnuplot process started.")
         chars = self.gnuplot.write(bytearray(self.gnuplot_cmd, 'utf8'))
@@ -84,25 +112,28 @@ class Gnuplot(QLabel):
             to start.
         """
         errors = ['Failed to Start', 'Crashed', 'Timedout', 'WriteError',
-            'ReadError', 'UnknownError']
+                  'ReadError', 'UnknownError']
         msg = 'Gnuplot process: ' + errors[error]
         logging.error(msg)
-        self.setText(msg)
+        self.label.setText(msg)
 
     @pyqtSlot(int)
     def show_plot(self, exit_status):
-        if exit_status == 0:
-            data = self.gnuplot.readAll()
-            image = QImage()
-            image.loadFromData(data)
-            self.setPixmap(QPixmap.fromImage(image))
+        if GNUPLOT_WIDGET:
+            pass
         else:
-            msg = 'Process finished unexpectedly!\nExit status = '
-            if exit_status == 1:
-                msg += ' 1 [EXIT_FAILURE]'
+            if exit_status == 0:
+                data = self.gnuplot.readAll()
+                image = QImage()
+                image.loadFromData(data)
+                self.label.setPixmap(QPixmap.fromImage(image))
             else:
-                msg += str(exit_status)
-            self.setText(msg)
+                msg = 'Process finished unexpectedly!\nExit status = '
+                if exit_status == 1:
+                    msg += ' 1 [EXIT_FAILURE]'
+                else:
+                    msg += str(exit_status)
+                self.label.setText(msg)
         # Tempfiles cleanup
         if self.gnuplot_cmdfile and os.path.exists(self.gnuplot_cmdfile):
             os.unlink(self.gnuplot_cmdfile)
@@ -145,8 +176,8 @@ class Gnuplot(QLabel):
 
     @pyqtSlot()
     def print_tcsh_stderr(self):
-        error_data=self.tcsh.readAllStandardError()
-        error_text=bytearray(error_data).decode('utf8')
+        error_data = self.tcsh.readAllStandardError()
+        error_text = bytearray(error_data).decode('utf8')
         self.stderrOutput.emit(str(error_text))
 
     @pyqtSlot()
@@ -155,18 +186,24 @@ class Gnuplot(QLabel):
         text = str(bytearray(data).decode('utf8'))
         if 'PLOT FINISHED' in text:
             self.gnuplot_cmd = 'cd "' + self.runDir + '"\n' \
-                'set terminal gif size ' \
+                'set terminal ' + self.TERMINAL + ' size ' \
                 + str(self.width()) + ', ' + str(self.height()) + '\n' \
-                + 'load "' + self.gnuplot_cmdfile + '"\nquit\n'
-            #print(self.gnuplot_cmd)
-            self.gnuplot.start(self.gnuplot_path)
+                + 'load "' + self.gnuplot_cmdfile
+            # print(self.gnuplot_cmd)
+            if GNUPLOT_WIDGET:
+                print(self.gnuplot_cmd)
+                self.send_command.emit(self.gnuplot_cmd)
+            else:
+                self.gnuplot_cmd += '\nquit\n'
+                self.gnuplot.start(self.gnuplot_path)
 
     def find_solps_top(self, directory):
         """ Searches for setup.csh or SOLPSTOP file in the directory hierarchy.
-            Arguments:
-                run_directory (str): run_directory
-            Returns:
-                solps_top(str): if found stup.csh or SOLPSTOP file. Else None
+        Arguments:
+            run_directory (str): run_directory
+
+        Returns:
+            solps_top(str): if found stup.csh or SOLPSTOP file. Else None
         """
         solps_top = directory
 
@@ -219,7 +256,7 @@ class Gnuplot(QLabel):
                 return
             logging.info("Gnuplot TCSH started in " + self.solps_top)
             cmd += "cd " + self.solps_top \
-                  + '\nsource setup.csh\necho TCSH READY\n'
+                   + '\nsource setup.csh\necho TCSH READY\n'
         if self.solps_plot_command and self.rundir:
             fd, self.gnuplot_cmdfile = tempfile.mkstemp('.cmd', 'gnuplot')
             os.close(fd)
@@ -236,12 +273,50 @@ class Gnuplot(QLabel):
 
 
 if __name__ == "__main__":
-
     import sys
-    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit
+
+    class CmdInput(QLineEdit):
+        sendCmd = pyqtSignal(str)
+        def __init__(self, parent=None):
+            super(CmdInput, self).__init__(parent)
+            self.returnPressed.connect(self.sendCommand)
+
+        @pyqtSlot()
+        def sendCommand(self):
+            text = self.text()
+            self.sendCmd.emit(text)
+            self.clear()
+
+
 
     app = QApplication(sys.argv)
+    main = QMainWindow()
+    widget = QWidget()
+    layout = QVBoxLayout()
+
     window = Gnuplot()
-    window.show()
-    window.plot('sin(x)')
+    input_w = CmdInput()
+    input_w.sendCmd.connect(window.plot)
+
+    layout.addWidget(window)
+    layout.addWidget(input_w)
+
+    if GNUPLOT_WIDGET:
+        from PyQt5.QtWidgets import QPlainTextEdit
+        class Output(QPlainTextEdit):
+            def __init__(self, parent=None):
+                super(Output, self).__init__(parent)
+
+            @pyqtSlot(str)
+            def updateLog(self, str):
+                self.appendPlainText(str)
+
+
+        output = Output()
+        layout.addWidget(output)
+        window.gnuplot.gnuplotOutput.connect(output.updateLog)
+    widget.setLayout(layout)
+    main.setCentralWidget(widget)
+    main.show()
     sys.exit(app.exec_())
