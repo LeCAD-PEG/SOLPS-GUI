@@ -1,0 +1,9 @@
+.qmake.stash
+Makefile
+pyQtGnuplot.exp
+pyQtGnuplot.pro
+sipAPIpyQtGnuplot.h
+sippyQtGnuplotcmodule.cpp
+sippyQtGnuplotgnuplotWidget.cpp
+*.o
+*.so
