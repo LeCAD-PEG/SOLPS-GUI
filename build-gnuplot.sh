@@ -11,6 +11,16 @@ DOWNLOAD_DIR=${BUILDROOT}/download
 STAGING_DIR=${BUILDROOT}/staging
 STAGING_QT=${STAGING_DIR}/qt/${QT_VERSION}
 
+case $(hostname -f) in
+  *.iter.org)
+    source setupenv.sh
+    module load libcerf
+    #This loads gcc 4.9.3 as well.
+    ;;
+  *)
+    ;;
+esac
+
 set -e
 
 #Initialize directories
@@ -29,7 +39,7 @@ GNUPLOT_SITE="http://sourceforge.net/projects/gnuplot/files/gnuplot"
 GNUPLOT_DOWNLOAD="${GNUPLOT_SITE}/${GNUPLOT_VERSION}/${GNUPLOT_SRC}/download"
 
 if [ ! -f ${DOWNLOAD_DIR}/${GNUPLOT_SRC} ]; then
-    wget  -O ${DOWNLOAD_DIR}/${GNUPLOT_SRC} ${GNUPLOT_DOWNLOAD}
+    wget  -O ${DOWNLOAD_DIR}/${GNUPLOT_SRC} ${GNUPLOT_DOWNLOAD} --no-check-certificate
 fi
 
 GNUPLOT_SRC_DIR="${BUILD_DIR}/gnuplot-${GNUPLOT_VERSION}"

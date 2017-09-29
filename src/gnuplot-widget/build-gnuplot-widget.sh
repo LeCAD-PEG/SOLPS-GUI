@@ -6,7 +6,10 @@ for file in $FILES
 do
     moc $file -o moc_$(basename $file .h).cpp
 done
-python3 configure.py --verbose --sipdir="/home/simicg/solps-gui/staging/share/sip/PyQt5"
+if [ ! -d "$HOME/solps-gui/staging/share/sip/PyQt5" ]; then
+  mkdir $HOME/solps-gui/staging/share/sip/PyQt5
+fi
+python3 configure.py --verbose --sipdir="$HOME/solps-gui/staging/share/sip/PyQt5"
 
 make
 make install
