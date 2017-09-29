@@ -13,12 +13,13 @@ STAGING_QT=${STAGING_DIR}/qt/${QT_VERSION}
 
 case $(hostname -f) in
   *.iter.org)
-    source setupenv.sh
-    module load libcerf
-    #This loads gcc 4.9.3 as well.
-    ;;
+	module purge
+	module load GCC
+	MAKE_JOBS=${MAKE_JOBS:-4}
+	;;
+
   *)
-    ;;
+	;;
 esac
 
 set -e
@@ -52,7 +53,7 @@ if [ ! -e   ${GNUPLOT_SRC_DIR}/.built ]; then
   cd ${GNUPLOT_SRC_DIR}
   libtoolize
   export CXXFLAGS=" -std=c++11"
-  ./configure --without-cairo --prefix=${STAGING_DIR} --with-qt=qt5
+  ./configure --without-cairo --prefix=${STAGING_DIR} --with-qt=qt5 --without-libcerf
   make -j ${MAKE_JOBS}
   make install
   touch ${GNUPLOT_SRC_DIR}/.built
