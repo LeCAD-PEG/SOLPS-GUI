@@ -17,7 +17,7 @@ To do it by hand:
     moc gnuplotWidget.h -o moc_gnuplotWidget.cpp
 
     # Run configure.py
-    python3 configure.py --verbose
+    python3 configure.py --verbose --sipdir="/home/simicg/solps-gui/staging/share/sip/PyQt5"
 
     # Compile and install the module
     make
