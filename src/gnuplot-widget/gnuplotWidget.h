@@ -20,9 +20,11 @@ public:
 public slots:
     void cmd(const QString command);
     void _output_delegate(const QString output);
+    void _plotDone();
 
 signals:
     void gnuplotOutput(const QString output);
+    void plotDone();
 
 private:
     QtGnuplotInstance gp;

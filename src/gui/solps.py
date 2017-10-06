@@ -1388,7 +1388,6 @@ class SOLPS_MainWindow(QMainWindow):
             self.enable_restore_button)
 
         # Configure Dashboard
-
         #self.gnuplot.plot("sin(3*x)/x")
         #self.runSelected.connect(self.label_7.setText)
         self.runSelected.connect(self.director.setRundir)

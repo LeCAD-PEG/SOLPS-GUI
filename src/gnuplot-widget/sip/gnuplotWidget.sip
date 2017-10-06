@@ -17,4 +17,5 @@ public slots:
 
 signals:
     void output(const QString output);
+    void plotDone();
 };

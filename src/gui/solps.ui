@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>722</width>
-    <height>365</height>
+    <width>1145</width>
+    <height>476</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,7 +25,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_8">
-    <item row="0" column="0">
+    <item row="0" column="1">
      <widget class="QTabWidget" name="tabWidget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -34,7 +34,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>8</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -610,6 +610,9 @@ and starts the run</string>
             <property name="solpsPlotCommand">
              <string>energy_analysis</string>
             </property>
+            <property name="numberOfRows" stdset="0">
+             <number>5</number>
+            </property>
            </widget>
           </item>
          </layout>
@@ -802,6 +805,146 @@ and starts the run</string>
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_15">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Plots</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_12">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="gridLayout_11">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetMaximumSize</enum>
+          </property>
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item row="1" column="6" rowspan="3" colspan="2">
+           <widget class="Gnuplot" name="gnuplot_7">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="solpsPlotCommand">
+             <string>energy_analysis</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="Gnuplot" name="gnuplot_3">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="solpsPlotCommand">
+             <string>energy_analysis</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" colspan="3">
+           <widget class="Gnuplot" name="gnuplot_4">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="solpsPlotCommand">
+             <string>energy_analysis</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="5" colspan="2">
+           <widget class="Gnuplot" name="gnuplot_5">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="solpsPlotCommand">
+             <string>energy_analysis</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="7">
+           <widget class="Gnuplot" name="gnuplot_8">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="solpsPlotCommand">
+             <string>energy_analysis</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" rowspan="3">
+           <widget class="B2plot" name="b2plot">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="b2plotCommand">
+             <string>echo phys a4p ti te m/ surf | b2plot</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QPushButton" name="pushButton_8">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Plot</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" rowspan="3">
+           <widget class="Gnuplot" name="gnuplot_2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="solpsPlotCommand">
+             <string>energy_analysis</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2" rowspan="3" colspan="4">
+           <widget class="Gnuplot" name="gnuplot_6">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="solpsPlotCommand">
+             <string>energy_analysis</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -812,8 +955,8 @@ and starts the run</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>722</width>
-     <height>20</height>
+     <width>1145</width>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -871,6 +1014,11 @@ and starts the run</string>
  </widget>
  <customwidgets>
   <customwidget>
+   <class>B2plot</class>
+   <extends>QLabel</extends>
+   <header>b2plot</header>
+  </customwidget>
+  <customwidget>
    <class>Director</class>
    <extends>QCheckBox</extends>
    <header>director</header>
@@ -879,6 +1027,7 @@ and starts the run</string>
    <class>Gnuplot</class>
    <extends>QWidget</extends>
    <header>gnuplot</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>Script</class>
@@ -927,8 +1076,8 @@ and starts the run</string>
    <slot>executeTcshCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>255</x>
-     <y>295</y>
+     <x>317</x>
+     <y>619</y>
     </hint>
     <hint type="destinationlabel">
      <x>206</x>
@@ -943,12 +1092,28 @@ and starts the run</string>
    <slot>setTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>69</x>
-     <y>295</y>
+     <x>79</x>
+     <y>620</y>
     </hint>
     <hint type="destinationlabel">
      <x>206</x>
      <y>115</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_9</sender>
+   <signal>clicked()</signal>
+   <receiver>gnuplot</receiver>
+   <slot>executeSolpsPlotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1429</x>
+     <y>618</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>524</x>
+     <y>222</y>
     </hint>
    </hints>
   </connection>
@@ -963,36 +1128,36 @@ and starts the run</string>
      <y>115</y>
     </hint>
     <hint type="destinationlabel">
-     <x>192</x>
-     <y>322</y>
+     <x>281</x>
+     <y>645</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_9</sender>
-   <signal>clicked()</signal>
-   <receiver>gnuplot</receiver>
-   <slot>executeSolpsPlotCommand()</slot>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>tcsh</receiver>
+   <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>699</x>
-     <y>293</y>
+     <x>67</x>
+     <y>645</y>
     </hint>
     <hint type="destinationlabel">
-     <x>524</x>
-     <y>222</y>
+     <x>206</x>
+     <y>115</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>solpsplots</sender>
-   <signal>editTextChanged(QString)</signal>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
    <receiver>gnuplot</receiver>
-   <slot>setSolpsPlotCommand(QString)</slot>
+   <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>450</x>
-     <y>292</y>
+     <x>67</x>
+     <y>645</y>
     </hint>
     <hint type="destinationlabel">
      <x>524</x>
@@ -1007,8 +1172,8 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>450</x>
-     <y>292</y>
+     <x>700</x>
+     <y>617</y>
     </hint>
     <hint type="destinationlabel">
      <x>524</x>
@@ -1017,50 +1182,18 @@ and starts the run</string>
    </hints>
   </connection>
   <connection>
-   <sender>director</sender>
-   <signal>rundir_passthrough(QString)</signal>
+   <sender>solpsplots</sender>
+   <signal>editTextChanged(QString)</signal>
    <receiver>gnuplot</receiver>
-   <slot>setRundir(QString)</slot>
+   <slot>setSolpsPlotCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>57</x>
-     <y>322</y>
+     <x>700</x>
+     <y>617</y>
     </hint>
     <hint type="destinationlabel">
      <x>524</x>
      <y>222</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>director</sender>
-   <signal>rundir_passthrough(QString)</signal>
-   <receiver>tcsh</receiver>
-   <slot>setRundir(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>57</x>
-     <y>322</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>206</x>
-     <y>115</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>director</sender>
-   <signal>rundir_checktrigger()</signal>
-   <receiver>solpsplots</receiver>
-   <slot>triggerTextChanged()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>57</x>
-     <y>322</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>450</x>
-     <y>292</y>
     </hint>
    </hints>
   </connection>
@@ -1071,12 +1204,28 @@ and starts the run</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>57</x>
-     <y>322</y>
+     <x>67</x>
+     <y>645</y>
     </hint>
     <hint type="destinationlabel">
-     <x>192</x>
-     <y>322</y>
+     <x>281</x>
+     <y>645</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_checktrigger()</signal>
+   <receiver>solpsplots</receiver>
+   <slot>triggerTextChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>67</x>
+     <y>645</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>700</x>
+     <y>617</y>
     </hint>
    </hints>
   </connection>
@@ -1087,12 +1236,12 @@ and starts the run</string>
    <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>57</x>
-     <y>322</y>
+     <x>67</x>
+     <y>645</y>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
-     <y>76</y>
+     <y>74</y>
     </hint>
    </hints>
   </connection>
@@ -1108,23 +1257,7 @@ and starts the run</string>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
-     <y>76</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>initializeRuns</sender>
-   <signal>clicked()</signal>
-   <receiver>script_sequence</receiver>
-   <slot>run()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>101</x>
-     <y>64</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>199</x>
-     <y>124</y>
+     <y>74</y>
     </hint>
    </hints>
   </connection>
@@ -1135,12 +1268,12 @@ and starts the run</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>57</x>
-     <y>322</y>
+     <x>67</x>
+     <y>645</y>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
-     <y>79</y>
+     <y>632</y>
     </hint>
    </hints>
   </connection>
@@ -1151,12 +1284,28 @@ and starts the run</string>
    <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>57</x>
-     <y>322</y>
+     <x>67</x>
+     <y>645</y>
     </hint>
     <hint type="destinationlabel">
-     <x>258</x>
-     <y>124</y>
+     <x>522</x>
+     <y>170</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>initializeRuns</sender>
+   <signal>clicked()</signal>
+   <receiver>script_sequence</receiver>
+   <slot>run()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>366</x>
+     <y>61</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>197</x>
+     <y>170</y>
     </hint>
    </hints>
   </connection>
@@ -1167,12 +1316,252 @@ and starts the run</string>
    <slot>setAndExecuteTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>199</x>
-     <y>124</y>
+     <x>197</x>
+     <y>170</y>
     </hint>
     <hint type="destinationlabel">
-     <x>258</x>
-     <y>124</y>
+     <x>522</x>
+     <y>170</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_8</sender>
+   <signal>clicked()</signal>
+   <receiver>b2plot</receiver>
+   <slot>executeB2plotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>113</x>
+     <y>632</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>249</x>
+     <y>334</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_8</sender>
+   <signal>clicked()</signal>
+   <receiver>gnuplot_3</receiver>
+   <slot>executeSolpsPlotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>101</x>
+     <y>637</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>510</x>
+     <y>205</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_8</sender>
+   <signal>clicked()</signal>
+   <receiver>gnuplot_4</receiver>
+   <slot>executeSolpsPlotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>80</x>
+     <y>637</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>766</x>
+     <y>243</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_8</sender>
+   <signal>clicked()</signal>
+   <receiver>gnuplot_5</receiver>
+   <slot>executeSolpsPlotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>74</x>
+     <y>639</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1049</x>
+     <y>210</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_8</sender>
+   <signal>clicked()</signal>
+   <receiver>gnuplot_8</receiver>
+   <slot>executeSolpsPlotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>113</x>
+     <y>643</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1239</x>
+     <y>215</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_8</sender>
+   <signal>clicked()</signal>
+   <receiver>gnuplot_2</receiver>
+   <slot>executeSolpsPlotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>635</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>492</x>
+     <y>550</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_8</sender>
+   <signal>clicked()</signal>
+   <receiver>gnuplot_6</receiver>
+   <slot>executeSolpsPlotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>71</x>
+     <y>628</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>872</x>
+     <y>426</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_8</sender>
+   <signal>clicked()</signal>
+   <receiver>gnuplot_7</receiver>
+   <slot>executeSolpsPlotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>67</x>
+     <y>635</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1179</x>
+     <y>576</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>gnuplot_2</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>635</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>493</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>gnuplot_4</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>635</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>735</x>
+     <y>193</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>gnuplot_5</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>635</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1020</x>
+     <y>193</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>gnuplot_6</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>635</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>885</x>
+     <y>493</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>gnuplot_7</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>635</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1255</x>
+     <y>493</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>gnuplot_8</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>635</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1305</x>
+     <y>193</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>gnuplot_3</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>635</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>465</x>
+     <y>193</y>
     </hint>
    </hints>
   </connection>

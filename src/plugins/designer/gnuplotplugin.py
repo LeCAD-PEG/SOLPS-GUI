@@ -8,14 +8,97 @@ A gnuplot http://www.gnuplot.info/ custom widget plugin for Qt Designer.
 """
 
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
+from PyQt5.QtDesigner import (QPyDesignerCustomWidgetPlugin,
+                              QPyDesignerTaskMenuExtension,
+                              QExtensionFactory,
+                              QDesignerFormWindowInterface,
+                              QDesignerTaskMenuExtension)
+from PyQt5.QtWidgets import (QAction, QDialog, QDialogButtonBox, QSpinBox,
+                             QLabel, QGridLayout)
+from PyQt5.QtCore import QVariant
 
 from gnuplot import Gnuplot
 
 
+class GnuplotDialog(QDialog):
+    def __init__(self, widget, parent=None):
+        super(GnuplotDialog, self).__init__(parent)
+
+        self.widget = widget
+
+        buttonBox = QDialogButtonBox()
+        okButton = buttonBox.addButton(buttonBox.Ok)
+        cancelButton = buttonBox.addButton(buttonBox.Cancel)
+
+        self.rowSpin = QSpinBox()
+        self.rowSpin.setMinimum(1)
+
+        self.columnSpin = QSpinBox()
+        self.columnSpin.setMinimum(1)
+
+        okButton.clicked.connect(self.updateProperties)
+        cancelButton.clicked.connect(self.reject)
+
+        layout = QGridLayout()
+
+        layout.addWidget(QLabel(self.tr('# of Rows:')), 0, 0)
+        layout.addWidget(self.rowSpin, 0, 1)
+        layout.addWidget(QLabel(self.tr('# of Columns:')), 1, 0)
+        layout.addWidget(self.columnSpin, 1, 1)
+        layout.addWidget(buttonBox, 2, 0, 1, 2)
+        self.setLayout(layout)
+        self.setWindowTitle(self.tr("Update row and column properties"))
+
+    def updateProperties(self):
+        formWindow = QDesignerFormWindowInterface.findFormWindow(self.widget)
+
+        if formWindow:
+            formWindow.cursor().setProperty("numberOfRows",
+                                            self.rowSpin.value())
+            formWindow.cursor().setProperty("numberOfColumns",
+                                            self.columnSpin.value())
+
+        self.accept()
+
+
+class GnuplotMenuEntry(QPyDesignerTaskMenuExtension):
+
+    def __init__(self, widget, parent):
+        super(GnuplotMenuEntry, self).__init__(parent)
+        self.widget = widget
+        self.editNumOfWidgets = QAction(self.tr("# of Gnuplots..."), self)
+        self.editNumOfWidgets.triggered.connect(self.changeNumberOfPlots)
+
+    def preferredEditAction(self):
+        return self.editNumOfWidgets
+
+    def taskActions(self):
+        return [self.editNumOfWidgets]
+
+    def changeNumberOfPlots(self):
+        dialog = GnuplotDialog(self.widget)
+        dialog.exec_()
+
+
+class GnuplotTaskMenuFactory(QExtensionFactory):
+
+    def __init__(self, parent=None):
+        super(GnuplotTaskMenuFactory, self).__init__(parent)
+
+    def createExtension(self, obj, ID, parent):
+        if ID != "solps.TaskMenu":
+            return None
+
+        if isinstance(obj, Gnuplot):
+            print('instanced')
+            return GnuplotMenuEntry(obj, parent)
+
+        return None
+
+
 class GnuplotPlugin(QPyDesignerCustomWidgetPlugin):
     """GnuplotPlugin(QPyDesignerCustomWidgetPlugin)
-    
+
     Provides a Python custom plugin for Qt Designer by implementing the
     QDesignerCustomWidgetPlugin via a PyQt-specific custom plugin class.
     """
@@ -23,7 +106,7 @@ class GnuplotPlugin(QPyDesignerCustomWidgetPlugin):
     # The __init__() method is only used to set up the plugin and define its
     # initialized variable.
     def __init__(self, parent=None):
-    
+
         super(GnuplotPlugin, self).__init__(parent)
 
         self.initialized = False
@@ -31,11 +114,15 @@ class GnuplotPlugin(QPyDesignerCustomWidgetPlugin):
     # The initialize() and isInitialized() methods allow the plugin to set up
     # any required resources, ensuring that this can only happen once for each
     # plugin.
-    def initialize(self, core):
+    def initialize(self, formEditor):
 
         if self.initialized:
             return
-
+        manager = formEditor.extensionManager()
+        if manager:
+            self.factory = GnuplotTaskMenuFactory(manager)
+            manager.registerExtensions(self.factory,
+                                       "solps.TaskMenu")
         self.initialized = True
 
     def isInitialized(self):
@@ -76,7 +163,7 @@ class GnuplotPlugin(QPyDesignerCustomWidgetPlugin):
     # need to provide an implementation of the QDesignerContainerExtension
     # interface if they need to add custom editing support to Qt Designer.
     def isContainer(self):
-        return False
+        return True
 
     # Returns an XML description of a custom widget instance that describes
     # default values for its properties. Each custom widget created by this

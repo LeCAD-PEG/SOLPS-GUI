@@ -5,7 +5,7 @@
 from PyQt5.QtCore import (Qt, QProcess, QProcessEnvironment, QSize, pyqtSignal,
                           QSettings, pyqtSlot, pyqtProperty)
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QLabel, QFrame, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QLabel, QFrame, QVBoxLayout, QWidget, QGridLayout
 
 import logging
 import os
@@ -16,6 +16,14 @@ try:
     GNUPLOT_WIDGET = True
 except ImportError as e:
     GNUPLOT_WIDGET = False
+
+def cleanTempFiles(*files):
+    print('Deleting temp files.')
+    for file in files:
+        print('File: ', file)
+        if file and os.path.exists(file):
+            os.unlink(file)
+            print('Deletng file: ', file)
 
 class Gnuplot(QWidget):
     """Gnuplot(QWidget)
@@ -34,6 +42,7 @@ class Gnuplot(QWidget):
         settings = QSettings('ITER', 'solps-gui')
         self.tcsh_path = settings.value('tcsh_path', '/bin/tcsh')
         self.gnuplot_path = settings.value('gnuplot_path', '/usr/bin/gnuplot')
+        self.numPlots = 1
         self.solps_top = None
         self.solps_top_changed = False
         self.rundir = None
@@ -41,13 +50,16 @@ class Gnuplot(QWidget):
         self.gnuplot_cmdfile = None
         self.gnuplot_datafile = None
 
-        layout = QVBoxLayout()
+        self.previous_event = None
+
+        layout = QGridLayout()
+        layout.setSpacing(0)
 
         if GNUPLOT_WIDGET:
             self.gnuplot = gnuplotWidget(self)
-            print(self.gnuplot)
             self.send_command.connect(self.gnuplot.cmd)
-            layout.addWidget(self.gnuplot)
+            self.gnuplot.plotDone.connect(self.show_plot)
+            layout.addWidget(self.gnuplot, 0, 0)
         else:
 
             self.gnuplot = QProcess()
@@ -57,7 +69,7 @@ class Gnuplot(QWidget):
             self.gnuplot.error.connect(self.show_error)
 
             self.label = QLabel()
-            layout.addWidget(self.label)
+            layout.addWidget(self.label, 0, 0)
             self.label.setAlignment(Qt.AlignCenter)
             self.label.setFrameStyle(QFrame.StyledPanel)
             self.label.setMinimumSize(QSize(180, 100))
@@ -68,6 +80,13 @@ class Gnuplot(QWidget):
         self.tcsh = QProcess()
         self.tcsh.readyReadStandardOutput.connect(self.read_tcsh_stdout)
         self.tcsh.readyReadStandardError.connect(self.print_tcsh_stderr)
+
+    def setNumberOfPlots(self, numPlots):
+        self.numPlots = numPlots
+
+    def getNumberOfPlots(self):
+        return self.numPlots
+    numberOfPlots = pyqtProperty(int, getNumberOfPlots, setNumberOfPlots)
 
     def sizeHint(self):
         return QSize(320, 200)
@@ -85,13 +104,15 @@ class Gnuplot(QWidget):
 
         self.gnuplot_cmd = 'set terminal ' + self.TERMINAL + ' size ' \
             + str(self.width()) + ', ' + str(self.height()) + '\n' \
-            + 'plot ' + plot_command.split('#', 1)[0]
+            + 'set terminal ' + self.TERMINAL + ' noenhanced \n' \
         # print(self.gnuplot_cmd)
 
         if GNUPLOT_WIDGET:
+            self.gnuplot_cmd += plot_command.split('#', 1)[0]
             self.send_command.emit(self.gnuplot_cmd)
         else:
             self.gnuplot_cmd += '\nquit\n'
+            self.gnuplot_cmd += 'plot ' + plot_command.split('#', 1)[0]
             self.gnuplot.start(self.gnuplot_path)
             if not self.gnuplot.waitForStarted():
                 logging.error(self.gnuplot.program() + " not started")
@@ -118,9 +139,13 @@ class Gnuplot(QWidget):
         self.label.setText(msg)
 
     @pyqtSlot(int)
-    def show_plot(self, exit_status):
+    @pyqtSlot()
+    def show_plot(self, exit_status=0):
+
         if GNUPLOT_WIDGET:
-            pass
+            # Do not remove the temporary files, since gnuplot needs it for
+            # interactivity!
+            return
         else:
             if exit_status == 0:
                 data = self.gnuplot.readAll()
@@ -135,12 +160,9 @@ class Gnuplot(QWidget):
                     msg += str(exit_status)
                 self.label.setText(msg)
         # Tempfiles cleanup
-        if self.gnuplot_cmdfile and os.path.exists(self.gnuplot_cmdfile):
-            os.unlink(self.gnuplot_cmdfile)
-        if self.gnuplot_datafile and os.path.exists(self.gnuplot_datafile):
-            os.unlink(self.gnuplot_datafile)
+        cleanTempFiles(self.gnuplot_cmdfile, self.gnuplot_datafile)
 
-    @pyqtSlot(int)
+    @pyqtSlot(str)
     def setGnuplotPath(self, gnuplot_path):
         """ Executable requires absolute path. No ${PATH} possible!
         """
@@ -188,6 +210,7 @@ class Gnuplot(QWidget):
             self.gnuplot_cmd = 'cd "' + self.runDir + '"\n' \
                 'set terminal ' + self.TERMINAL + ' size ' \
                 + str(self.width()) + ', ' + str(self.height()) + '\n' \
+                + 'set terminal ' + self.TERMINAL + ' noenhanced\n' \
                 + 'load "' + self.gnuplot_cmdfile
             # print(self.gnuplot_cmd)
             if GNUPLOT_WIDGET:
@@ -237,13 +260,15 @@ class Gnuplot(QWidget):
             else:
                 msg = "Could not find readable SOLPSTOP for run"
                 logging.error(msg)
-            self.setText(msg)
+            if not GNUPLOT_WIDGET:
+                self.setText(msg)
             return
 
         if rundir_solps_top != self.solps_top:  # we have new SOLPSTOP
             self.tcsh.kill()
             self.tcsh.waitForFinished()
             self.solps_top = rundir_solps_top
+        cleanTempFiles(self.gnuplot_cmdfile, self.gnuplot_datafile)
 
         cmd = ''
         if self.tcsh.state() != QProcess.Running:
@@ -271,6 +296,16 @@ class Gnuplot(QWidget):
         else:
             logging.warning("No plot command or run directory")
 
+    def event(self, e):
+        # Workaround hack to remove temporary files when SOLPS-GUI is closed.
+        if e.type() == 18 and self.previous_event == 25:
+            # Deactivate and hidden event
+            cleanTempFiles(self.gnuplot_cmdfile, self.gnuplot_datafile)
+            # Deactivate gnuplot widget
+            # TODO: Unlink fifo in /tmp
+        else:
+            self.previous_event = e.type()
+        return super(Gnuplot, self).event(e)
 
 if __name__ == "__main__":
     import sys
@@ -308,14 +343,19 @@ if __name__ == "__main__":
             def __init__(self, parent=None):
                 super(Output, self).__init__(parent)
 
+            @pyqtSlot()
             @pyqtSlot(str)
-            def updateLog(self, str):
-                self.appendPlainText(str)
+            def updateLog(self, text='PLOT_DONE'):
+                if text != "PLOT_DONE":
+                    self.appendPlainText(text)
+                else:
+                    self.appendPlainText(text)
 
 
         output = Output()
         layout.addWidget(output)
         window.gnuplot.gnuplotOutput.connect(output.updateLog)
+        window.gnuplot.plotDone.connect(output.updateLog)
     widget.setLayout(layout)
     main.setCentralWidget(widget)
     main.show()
