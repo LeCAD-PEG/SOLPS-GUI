@@ -1201,6 +1201,7 @@ class SOLPS_MainWindow(QMainWindow):
 
     def __init__(self, *args):
         super(SOLPS_MainWindow, self).__init__(*args)
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         prefix = os.path.dirname(os.path.abspath(__file__))
         ui_path = prefix + '/solps.ui'
         try:
@@ -1878,4 +1879,6 @@ if __name__ == '__main__':
         # Leave them disabled
         pass
     main_window.show()
-    sys.exit(app.exec_())
+    code = app.exec_()
+    app.quit()
+    sys.exit(code)

@@ -3,12 +3,13 @@
 """
 
 from PyQt5.QtCore import (Qt, QProcess, QProcessEnvironment, QSize, pyqtSignal,
-                          QSettings, pyqtSlot, pyqtProperty)
+                          QSettings, pyqtSlot, pyqtProperty, QTemporaryDir)
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QLabel, QFrame, QVBoxLayout, QWidget, QGridLayout
 
 import logging
 import os
+import shutil
 import tempfile
 
 try:
@@ -18,12 +19,9 @@ except ImportError as e:
     GNUPLOT_WIDGET = False
 
 def cleanTempFiles(*files):
-    print('Deleting temp files.')
     for file in files:
-        print('File: ', file)
         if file and os.path.exists(file):
             os.unlink(file)
-            print('Deletng file: ', file)
 
 class Gnuplot(QWidget):
     """Gnuplot(QWidget)
@@ -81,6 +79,10 @@ class Gnuplot(QWidget):
         self.tcsh.readyReadStandardOutput.connect(self.read_tcsh_stdout)
         self.tcsh.readyReadStandardError.connect(self.print_tcsh_stderr)
 
+        # Creating temporary folder.
+        self.temp_dir = QTemporaryDir('/tmp/gnuplot')
+        self.destroyed.connect(self.temp_dir.remove)
+
     def setNumberOfPlots(self, numPlots):
         self.numPlots = numPlots
 
@@ -105,7 +107,6 @@ class Gnuplot(QWidget):
         self.gnuplot_cmd = 'set terminal ' + self.TERMINAL + ' size ' \
             + str(self.width()) + ', ' + str(self.height()) + '\n' \
             + 'set terminal ' + self.TERMINAL + ' noenhanced \n' \
-        # print(self.gnuplot_cmd)
 
         if GNUPLOT_WIDGET:
             self.gnuplot_cmd += plot_command.split('#', 1)[0]
@@ -214,7 +215,6 @@ class Gnuplot(QWidget):
                 + 'load "' + self.gnuplot_cmdfile
             # print(self.gnuplot_cmd)
             if GNUPLOT_WIDGET:
-                print(self.gnuplot_cmd)
                 self.send_command.emit(self.gnuplot_cmd)
             else:
                 self.gnuplot_cmd += '\nquit\n'
@@ -283,33 +283,30 @@ class Gnuplot(QWidget):
             cmd += "cd " + self.solps_top \
                    + '\nsource setup.csh\necho TCSH READY\n'
         if self.solps_plot_command and self.rundir:
-            fd, self.gnuplot_cmdfile = tempfile.mkstemp('.cmd', 'gnuplot')
+            fd, self.gnuplot_cmdfile = tempfile.mkstemp(prefix='gnuplot',
+                                                        suffix='.cmd',
+                                                      dir=self.temp_dir.path())
             os.close(fd)
-            fd, self.gnuplot_datafile = tempfile.mkstemp('.dat', 'gnuplot')
+            fd, self.gnuplot_datafile = tempfile.mkstemp(prefix='gnuplot',
+                                                         suffix='.dat',
+                                                      dir=self.temp_dir.path())
             os.close(fd)
             cmd += 'cd ' + self.rundir + '\n'
-            cmd += 'setenv GNUPLOT_CMD ' + self.gnuplot_cmdfile + '\n'
-            cmd += 'setenv GNUPLOT_DATA ' + self.gnuplot_datafile + '\n'
+            cmd_file = self.gnuplot_cmdfile.split('/')[-1]
+            dat_file = self.gnuplot_datafile.split('/')[-1]
+            cmd += 'setenv GNUPLOT_CMD ' + cmd_file + '\n'
+            cmd += 'setenv GNUPLOT_DATA ' + dat_file + '\n'
+            cmd += 'setenv GNUPLOT_TMP ' + self.temp_dir.path() + '\n'
             cmd += self.solps_plot_command + '\n'
             cmd += 'echo PLOT FINISHED\n'
             self.tcsh.write(bytearray(cmd, 'utf8'))
         else:
             logging.warning("No plot command or run directory")
 
-    def event(self, e):
-        # Workaround hack to remove temporary files when SOLPS-GUI is closed.
-        if e.type() == 18 and self.previous_event == 25:
-            # Deactivate and hidden event
-            cleanTempFiles(self.gnuplot_cmdfile, self.gnuplot_datafile)
-            # Deactivate gnuplot widget
-            # TODO: Unlink fifo in /tmp
-        else:
-            self.previous_event = e.type()
-        return super(Gnuplot, self).event(e)
-
 if __name__ == "__main__":
     import sys
     from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit
+    from PyQt5.QtCore import Qt
 
     class CmdInput(QLineEdit):
         sendCmd = pyqtSignal(str)
@@ -327,6 +324,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     main = QMainWindow()
+    main.setAttribute(Qt.WA_DeleteOnClose)
     widget = QWidget()
     layout = QVBoxLayout()
 
@@ -359,4 +357,6 @@ if __name__ == "__main__":
     widget.setLayout(layout)
     main.setCentralWidget(widget)
     main.show()
-    sys.exit(app.exec_())
+    code = app.exec_()
+    app.quit()
+    sys.exit(code)

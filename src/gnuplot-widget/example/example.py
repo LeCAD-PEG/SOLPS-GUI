@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication, QLineEdit, QMainWindow, QVBoxLayout, QWidget, QPlainTextEdit
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
 from pyQtGnuplot import gnuplotWidget
 import sys
 
@@ -28,6 +28,7 @@ class Output(QPlainTextEdit):
 app = QApplication(sys.argv)
 
 main = QMainWindow()
+main.setAttribute(Qt.WA_DeleteOnClose)
 inputWidget = CmdInput()
 gpw = gnuplotWidget()
 gpw.setWindowTitle('Window title')
