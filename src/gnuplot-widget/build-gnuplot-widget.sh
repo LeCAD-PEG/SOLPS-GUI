@@ -11,5 +11,15 @@ if [ ! -d "$HOME/solps-gui/staging/share/sip/PyQt5" ]; then
 fi
 python3 configure.py --verbose --sipdir="$HOME/solps-gui/staging/share/sip/PyQt5"
 
-make
+case $(hostname -f) in
+  *.iter.org)
+	module purge
+	module load GCC
+	MAKE_JOBS=${MAKE_JOBS:-4}
+	;;
+  *)
+	;;
+esac
+
+make -j $MAKE_JOBS
 make install

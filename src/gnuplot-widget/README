@@ -21,9 +21,11 @@ To do it by hand:
     # otherwise create it.
     python3 configure.py --verbose --sipdir="$HOME/solps-gui/staging/share/sip/PyQt5"
 
+    # If on ITER load GCC module, so the newer gcc is loaded
+    module load GCC
     # Compile and install the module
     make
-    make install
+    make install -j 4
 
 
 The installation folder is in $(HOME)/solps-gui/staging/lib/site-packages/. To
