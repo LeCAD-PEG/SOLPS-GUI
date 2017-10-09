@@ -14,7 +14,7 @@ import tempfile
 
 class B2plot(QLabel):
     """ B2plot(QWidget)
-    
+
         Provides a custom widget to display a b2plot with properties and slots
         that can be used to customize its appearance.
 
@@ -26,7 +26,7 @@ class B2plot(QLabel):
     stderrOutput = pyqtSignal(str)
 
     convertFinished = pyqtSignal()
-    
+
     def __init__(self, parent=None):
         super(B2plot, self).__init__(parent)
         settings = QSettings('ITER', 'solps-gui')
@@ -219,6 +219,7 @@ class B2plot(QLabel):
             logging.info("B2plot TCSH started in " + self.solps_top)
             cmd += 'cd ' + self.solps_top + '\n'
             cmd += 'source setup.csh\necho TCSH READY\n'
+            cmd += 'module load libpng\n'
             cmd += 'setenv B2PLOT_DEV "ps"\n'
         if self.b2plot_command and self.rundir:
             cmd += 'cd ' + self.rundir + '\n'
@@ -239,7 +240,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = B2plot()
     window.show()
-    rundir = "~/solps-iter/runs/demo3/ITER_535_D+He+Ar/my_new_run" 
+    rundir = "/home/ITER/simicg/solps-iter/runs/RUNS/plot_runs/my_new_run"
     window.setRundir(os.path.expanduser(rundir))
     window.setB2plotCommand("echo phys a4p ti te m/ surf | b2plot")
     window.executeB2plotCommand()

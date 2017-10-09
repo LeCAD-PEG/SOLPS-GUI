@@ -1444,6 +1444,22 @@ and starts the run</string>
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>b2plot</receiver>
+   <slot>setRundir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>28</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>101</x>
+     <y>311</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <designerdata>
   <property name="gridDeltaX">
