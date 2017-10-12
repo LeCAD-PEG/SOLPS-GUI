@@ -21,7 +21,6 @@ if { ! [ is-loaded blitz/10 ] } {
   module load blitz/0.10
 }
 
-
 set PARAVIEW_VERSION $::env(PARAVIEW_VERSION)
 
-prepend-path PV_PLUGIN_PATH /home/ITER/kosl/solps-gui/staging/paraview-plugins/$PARAVIEW_VERSION
+prepend-path PV_PLUGIN_PATH /work/imas/opt/paraview-plugins/$PARAVIEW_VERSION
