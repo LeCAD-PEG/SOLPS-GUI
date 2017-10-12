@@ -8,6 +8,8 @@ Prepare Python 3, PyQt and ParaView with GCC 4.7+
     ./build-pyqt.sh
     ./build-paraview.sh
 
+
+
 One can modify the following environment variables to change
 default build procedure:
 
@@ -22,6 +24,14 @@ Source the setupenv.[c]sh for locally built PyQt with
 or
 
     $ source setupenv.csh
+
+Optionally after building  PyQt you can build gnuplot 5.2 and embedded gnuplot
+in Qt with the following commands:
+
+    source setupenv.sh
+    ./build-gnuplot.sh
+    cd /src/gnuplot-widget
+    ./build-gnuplot-widget.sh
 
 ## Running UI
 
@@ -93,7 +103,7 @@ following option to building pyqt:
 
     USE_QT_XCB=YES ./build-pyqt.sh
 
-## Building Qt (using build-pyqt.sh or build-paravies.sh) on debian stretch (9)
+## Building Qt (using build-pyqt.sh or build-paraview.sh) on debian stretch (9)
 Older versions of Qt ( < 5.9.0) do not support OpenSSL-1.1.0, which is the
 only available package for debian stretch to get via command:
 
