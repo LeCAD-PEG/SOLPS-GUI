@@ -16,15 +16,15 @@ module-whatis "$desc (v$ver)"
 
 # Requires imas, python3 and pyqt5.7.1
 # The imas distribution already carries to necessary python
-if { ! [ is-loaded imas/3.10.2/ual/3.6.1  ] } {
-  module load imas/3.10.2/ual/3.6.1 
+if { ! [ is-loaded imas  ] } {
+  module load imas 
 }
 
 if { ! [ is-loaded edge-plugin/readUALEdge ] } {
   module load paraview-plugin-edge/dev
 }
 
-set solpsguihome /home/ITER/kosl/solps-gui
+set solpsguihome $imas_home/opt/solps-gui
 
 setenv SOLPSGUI $solpsguihome/src/gui
 

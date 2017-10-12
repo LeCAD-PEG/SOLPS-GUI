@@ -66,7 +66,7 @@ set -e
 
 # Install cmake as needed
 CMAKE_SRC_DIR="${BUILD_DIR}/cmake-${CMAKE_VERSION}"
-CMAKE_INSTALL_DIR="${STAGING_DIR}"
+CMAKE_INSTALL_DIR="${STAGING_DIR}"/cmake/${CMAKE_VERSION}
 if [ ${CMAKE} != cmake -a  ! -e  ${CMAKE_SRC_DIR}/.built ]; then
   CMAKE_SRC="cmake-${CMAKE_VERSION}.tar.gz"
   CMAKE_MAIN_VERSION=${CMAKE_VERSION%.*}

@@ -28,4 +28,4 @@ if { ! [ is-loaded OpenSSL/1.0.2g-GCC-4.8.3 ] } {
 
 setenv PARAVIEW_VERSION $ver
 prepend-path LD_LIBRARY_PATH /work/imas/opt/EasyBuild/software/Python/2.7.9-goolf-1.5.16/lib
-prepend-path PATH /home/ITER/simicg/solps-gui/staging/paraview/$ver/bin
+prepend-path PATH $imas_home/opt/paraview/$ver/bin
