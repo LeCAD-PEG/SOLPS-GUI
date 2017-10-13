@@ -35,7 +35,7 @@ import tarfile
 import base64
 
 from PyQt5.QtCore import (pyqtSlot, Qt, QSize, QThread, pyqtProperty,
-                          pyqtSignal, QObject)
+                          pyqtSignal)
 from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit,
                              QGridLayout, QLabel, QDialogButtonBox,
                              QPushButton)
@@ -61,6 +61,7 @@ input_files = [
     'b2.user.parameters',
     'b2.atomic_physics_rescale.parameters'
 ]
+
 
 class putIDS(QPushButton):
     """Widget representation of the PutIDS functionality. A normal QPushButton
@@ -305,12 +306,13 @@ def readB2output(file_path, file_name, variables):
                 break
 
             if line.startswith('*cf'):
-                splitLine = line.strip()
+                stripLine = line.strip()
 
-                if any([splitLine.endswith(key) for key in arrays]):
-                    ar = arrays[splitLine.split()[-1]]
+                if any([stripLine.endswith(key) for key in arrays]):
+                    splitLine = stripLine.split()
+                    ar = arrays[splitLine[-1]]
 
-                    N = int(splitLine.split()[-2])
+                    N = int(splitLine[-2])
 
                     counter = 0
                     while counter < N:
@@ -379,8 +381,8 @@ class PutIDSwrapper:
         """Writing simple description to IDS."""
 
         grid_description = "IDS:" + " shot=" + str(self.shot) + " run=" + \
-                            str(self.run) + " user=" + str(self.user) + \
-                            " device=" + str(self.device) + \
+                           str(self.run) + " user=" + str(self.user) + \
+                           " device=" + str(self.device) + \
                            " version=" + str(self.version) + msg
         # Put IDS grid description
         self.imas_obj.edge_profiles.ggd[0].grid.identifier.description = \
@@ -399,19 +401,20 @@ class PutIDSwrapper:
         The functions used for this are **writeNodes** and **writeCells**.
         """
         print('Writing coordinates.')
-        self.imas_obj.edge_profiles.ggd[0].grid.space.resize(1)
+        grid = self.imas_obj.edge_profiles.ggd[0].grid
+        grid.space.resize(1)
         # Set (IDS substructure shortcut variable) space0
-        space0 = self.imas_obj.edge_profiles.ggd[0].grid.space[0]
+        space0 = grid.space[0]
         space0.objects_per_dimension.resize(3)  # Allocation
 
-        num_gridSubsets = 2  # Number of grid subsets to write (Cells and Nodes)
+        num_gridSubsets = 2 # Number of grid subsets to write (Cells and Nodes)
 
         space0.coordinates_type.resize(2)
         space0.coordinates_type[0] = 4  # R
         space0.coordinates_type[1] = 5  # Z
 
         # Allocating grid subsets. 2 are allocated for Nodes and Cells
-        self.imas_obj.edge_profiles.ggd[0].grid.grid_subset.resize(num_gridSubsets)
+        grid.grid_subset.resize(num_gridSubsets)
 
         self.writeNodes(rC, zC)
         self.writeCells(dimR, dimZ)
@@ -436,8 +439,8 @@ class PutIDSwrapper:
                                  # points -> 0D objects -> dimension index = 1
                                  # (edges -> 1D objects -> dimension index = 2
                                  # cells  -> 2D objects -> dimension index = 3)
-
-        space0 = self.imas_obj.edge_profiles.ggd[0].grid.space[0]
+        grid = self.imas_obj.edge_profiles.ggd[0].grid
+        space0 = grid.space[0]
         num_obj_0D = len(rC)  # Number of nodes (len(rC) == len(zC))
                               # have 2D coordinates, P(x,y)
         # Write all available 0D objects (all of them form the grid subset
@@ -453,7 +456,7 @@ class PutIDSwrapper:
             dim0.object[i].geometry[1] = zC[i]
 
         # Set(IDS substructure shortcut variable) gridSubsetBaseData
-        gridSubsetBaseData = self.imas_obj.edge_profiles.ggd[0].grid.grid_subset[gridSubset_index - 1]
+        gridSubsetBaseData = grid.grid_subset[gridSubset_index - 1]
         # Put base grid subset data/parameters (name, index)
         gridSubsetBaseData.identifier.name = gridSubset_name
         gridSubsetBaseData.identifier.index = gridSubset_index
@@ -474,7 +477,8 @@ class PutIDSwrapper:
         print('Writing cells.')
         # -- Put DATA FOR GRUD SUBSET "Cells"
         # (grid subset index: 1, objects forming the grid subset: cells, 2D)
-        space0 = self.imas_obj.edge_profiles.ggd[0].grid.space[0]
+        grid = self.imas_obj.edge_profiles.ggd[0].grid
+        space0 = grid.space[0]
         numCellsX = dimR + 2
         numCellsY = dimZ + 2
         num_cells = numCellsX * numCellsY
@@ -489,28 +493,29 @@ class PutIDSwrapper:
         dim2.object.resize(num_obj_2D)
         for i in range(num_obj_2D):
             dim2.object[i].nodes.resize(4)
-        cellId  = 1
+        Id = 1  # Cell ID.
         for j in range(numCellsY):
             for i in range(numCellsX):
-                dim2.object[cellId - 1].nodes[0] = cellId+0*numCellsX*numCellsY
-                dim2.object[cellId - 1].nodes[1] = cellId+1*numCellsX*numCellsY
-                dim2.object[cellId - 1].nodes[2] = cellId+3*numCellsX*numCellsY
-                dim2.object[cellId - 1].nodes[3] = cellId+2*numCellsX*numCellsY
-                cellId += 1
+                dim2.object[Id - 1].nodes[0] = Id + 0 * numCellsX * numCellsY
+                dim2.object[Id - 1].nodes[1] = Id + 1 * numCellsX * numCellsY
+                dim2.object[Id - 1].nodes[2] = Id + 3 * numCellsX * numCellsY
+                dim2.object[Id - 1].nodes[3] = Id + 2 * numCellsX * numCellsY
+                Id += 1
 
         # Set (IDS substructure shortcut variable) subgridDaseData for
         # Cells grid subset
-        gridSubsetBaseData = self.imas_obj.edge_profiles.ggd[0].grid.grid_subset[gridSubset_index - 1]
+        gridSubsetBaseData = grid.grid_subset[gridSubset_index - 1]
         # Put base grid subset data/parameters (name, index)
         gridSubsetBaseData.identifier.name = gridSubset_name
         gridSubsetBaseData.identifier.index = gridSubset_index
         # Put grid subset element and element object data
         gridSubsetBaseData.element.resize(num_obj_2D)
         for i in range(num_obj_2D):
-            gridSubsetBaseData.element[i].object.resize(1)
-            gridSubsetBaseData.element[i].object[0].space = 0 + 1
-            gridSubsetBaseData.element[i].object[0].dimension = gridSubset_dim_index
-            gridSubsetBaseData.element[i].object[0].index = i + 1
+            element = gridSubsetBaseData.element[i]
+            element.object.resize(1)
+            element.object[0].space = 0 + 1
+            element.object[0].dimension = gridSubset_dim_index
+            element.object[0].index = i + 1
 
     def writeTe(self, te):
         """Writes the electron temperature to the IDS. These values colors the
@@ -518,8 +523,9 @@ class PutIDSwrapper:
         """
         num_te_gridSubset = 1
         num_te_values = len(te)
-        self.imas_obj.edge_profiles.ggd[0].electrons.temperature.resize(num_te_gridSubset)
-        tePath = self.imas_obj.edge_profiles.ggd[0].electrons.temperature[num_te_gridSubset - 1]
+        el = self.imas_obj.edge_profiles.ggd[0].electrons
+        el.temperature.resize(num_te_gridSubset)
+        tePath = el.temperature[num_te_gridSubset - 1]
         tePath.grid_subset_index = 1  # gridSubset_index for Cells.
         tePath.values.resize(num_te_values)
         for n in range(num_te_values):
@@ -537,9 +543,10 @@ class PutIDSwrapper:
         ion_specie = 1
         # Ion specie is linked with the ion density of each ion charge,
         # as ion temperature is taken as the same for all ion charges.
-        self.imas_obj.edge_profiles.ggd[0].ion.resize(num_ti_species)
-        self.imas_obj.edge_profiles.ggd[0].ion[ion_specie - 1].temperature.resize(num_ti_gridSubset)
-        tiPath = self.imas_obj.edge_profiles.ggd[0].ion[ion_specie - 1].temperature[num_ti_gridSubset - 1]
+        ion = self.imas_obj.edge_profiles.ggd[0].ion
+        ion.resize(num_ti_species)
+        ion[ion_specie - 1].temperature.resize(num_ti_gridSubset)
+        tiPath = ion[ion_specie - 1].temperature[num_ti_gridSubset - 1]
         tiPath.grid_subset_index = 1  # gridSubset_index for Cells.
         tiPath.values.resize(num_ti_values)
         for n in range(num_ti_values):
@@ -553,8 +560,9 @@ class PutIDSwrapper:
         # Put ne (electron density)
         num_ne_gridSubset = 1
         num_ne_values = len(ne)
-        self.imas_obj.edge_profiles.ggd[0].electrons.density.resize(num_ne_gridSubset)
-        nePath = self.imas_obj.edge_profiles.ggd[0].electrons.density[num_ne_gridSubset - 1]
+        elDensity = self.imas_obj.edge_profiles.ggd[0].electrons.density
+        elDensity.resize(num_ne_gridSubset)
+        nePath = elDensity[num_ne_gridSubset - 1]
         nePath.grid_subset_index = 1  # gridSubset_index for Cells.
         nePath.values.resize(num_ne_values)
         for n in range(num_ne_values):
@@ -570,6 +578,7 @@ class PutIDSwrapper:
             self.imas_obj.edge_profiles.put()
             # Closing the IDS
             self.imas_obj.close()
+
 
 class PutIDSQThread(QThread):
     """QThread for storing data to IDS. Note that it gets the attributes
@@ -614,7 +623,7 @@ class PutIDSQThread(QThread):
         and input files to the given IDS entry.
         """
         self.emitMessage.emit("Reading files...")
-        b2out=False
+        b2out = False
         if os.path.exists(self.rundir + '/' + 'b2fgmtry') and \
            os.path.exists(self.rundir + '/' + 'b2fstati'):
             coorAr = readB2output(self.rundir, 'b2fgmtry',
@@ -634,6 +643,9 @@ class PutIDSQThread(QThread):
         ids = PutIDSwrapper(self.user, self.device, self.shot, self.runNumber,
                             self.version)
         self.emitMessage.emit("IDS object created.")
+        if not ids.isConnected():
+            self.emitMessage("Failed to create IDS entry. Canceling.")
+            return
         ids.basicInit()
         self.emitMessage.emit("Basic IDS initialization done.")
         ids.writeDescription(' directory: ' + self.rundir)
@@ -643,7 +655,8 @@ class PutIDSQThread(QThread):
 
         if b2out:
             ids.writeCoordinates(coorAr['crx'], coorAr['cry'],
-                                 int(coorAr['nx,ny'][0]), int(coorAr['nx,ny'][1]))
+                                 int(coorAr['nx,ny'][0]),
+                                 int(coorAr['nx,ny'][1]))
             self.emitMessage.emit("Coordinates written added.")
             ids.writeTe(tempAr['te'])
             ids.writeTi(tempAr['ti'])
@@ -664,6 +677,7 @@ class PutIDSQThread(QThread):
         self.emitMessage.emit("Finished putting.")
         self.startFlag.emit(True)
 
+
 if __name__ == "__main__":
     try:
         import imas
@@ -671,13 +685,12 @@ if __name__ == "__main__":
         print("Required IMAS support library not available on this system.")
         sys.exit()
 
-
     # For launching python script directly from treminal with python command
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "srudvh", ["dirpath=",
-                                                            "shot=", "run=",
-                                                            "user=", "device=",
-                                                            "version=", "help"])
+        opts, args = getopt.getopt(sys.argv[1:],
+                                   "srudvh",
+                                   ["dirpath=", "shot=", "run=", "user=",
+                                    "device=", "version=", "help"])
         for opt, arg in opts:
             #print opt, arg
             if opt in ("-fp", "--dirpath"):
@@ -695,17 +708,18 @@ if __name__ == "__main__":
 
             elif opt in ("-h", "--help"):
                 print("In order to run put_edge file path, shot, run, user,"
-                    "device and version variables must be defined."
-                    "Example (terminal): "
-                    "python3 put_edge_ids.py "
-                    "--dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun "
-                    "--shot=1001 --run=1001 --user=simicg --device=solps-iter "
-                    "--version=3")
+                      "device and version variables must be defined."
+                      "Example (terminal): "
+                      "python3 put_edge_ids.py "
+                      "--dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun "
+                      "--shot=1001 --run=1001 --user=simicg "
+                      "--device=solps-iter "
+                      "--version=3")
                 sys.exit()
 
     except Exception:
-        print ('Supplied option not recognized!')
-        print ('For help: -h / --help')
+        print('Supplied option not recognized!')
+        print('For help: -h / --help')
         sys.exit(2)
 
     app = QApplication(sys.argv)
