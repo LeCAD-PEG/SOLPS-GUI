@@ -643,7 +643,7 @@ class PutIDSQThread(QThread):
         ids = PutIDSwrapper(self.user, self.device, self.shot, self.runNumber,
                             self.version)
         self.emitMessage.emit("IDS object created.")
-        if not ids.isConnected():
+        if not ids.connected():
             self.emitMessage("Failed to create IDS entry. Canceling.")
             return
         ids.basicInit()
