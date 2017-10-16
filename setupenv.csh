@@ -21,8 +21,10 @@ endif
 setenv PYQTDESIGNERPATH "${PWD}/src/plugins/designer"
 if !($?PYTHONPATH) then
     setenv PYTHONPATH "${PWD}/src/widgets"
+    setenv PYTHONPATH "${PWD}/staging/lib/site-packages:${PYTHONPATH}"
 else
     setenv PYTHONPATH "${PWD}/src/widgets:${PYTHONPATH}"
+    setenv PYTHONPATH "${PWD}/staging/lib/site-packages:${PYTHONPATH}"
 endif
 
 
