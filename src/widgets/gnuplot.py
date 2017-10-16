@@ -50,6 +50,10 @@ class Gnuplot(QWidget):
 
         self.previous_event = None
 
+        # Creating temporary folder.
+        self.temp_dir = QTemporaryDir('/tmp/gnuplot')
+        self.destroyed.connect(self.temp_dir.remove)
+
         layout = QGridLayout()
         layout.setSpacing(0)
 
@@ -61,6 +65,7 @@ class Gnuplot(QWidget):
         else:
 
             self.gnuplot = QProcess()
+            #self.gnuplot.setWorkingDirectory(self.temp_dir.path())
 
             self.gnuplot.finished.connect(self.show_plot)
             self.gnuplot.started.connect(self.write_commands_to_gnuplot)
@@ -79,9 +84,7 @@ class Gnuplot(QWidget):
         self.tcsh.readyReadStandardOutput.connect(self.read_tcsh_stdout)
         self.tcsh.readyReadStandardError.connect(self.print_tcsh_stderr)
 
-        # Creating temporary folder.
-        self.temp_dir = QTemporaryDir('/tmp/gnuplot')
-        self.destroyed.connect(self.temp_dir.remove)
+
 
     def setNumberOfPlots(self, numPlots):
         self.numPlots = numPlots
@@ -106,14 +109,13 @@ class Gnuplot(QWidget):
 
         self.gnuplot_cmd = 'set terminal ' + self.TERMINAL + ' size ' \
             + str(self.width()) + ', ' + str(self.height()) + '\n' \
-            + 'set terminal ' + self.TERMINAL + ' noenhanced \n' \
 
         if GNUPLOT_WIDGET:
             self.gnuplot_cmd += plot_command.split('#', 1)[0]
             self.send_command.emit(self.gnuplot_cmd)
         else:
-            self.gnuplot_cmd += '\nquit\n'
             self.gnuplot_cmd += 'plot ' + plot_command.split('#', 1)[0]
+            self.gnuplot_cmd += '\nquit\n'
             self.gnuplot.start(self.gnuplot_path)
             if not self.gnuplot.waitForStarted():
                 logging.error(self.gnuplot.program() + " not started")
@@ -211,7 +213,6 @@ class Gnuplot(QWidget):
             self.gnuplot_cmd = 'cd "' + self.runDir + '"\n' \
                 'set terminal ' + self.TERMINAL + ' size ' \
                 + str(self.width()) + ', ' + str(self.height()) + '\n' \
-                + 'set terminal ' + self.TERMINAL + ' noenhanced\n' \
                 + 'load "' + self.gnuplot_cmdfile
             # print(self.gnuplot_cmd)
             if GNUPLOT_WIDGET:
