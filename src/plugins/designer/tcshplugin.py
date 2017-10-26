@@ -9,12 +9,12 @@ A TCSH custom widget plugin for Qt Designer.
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
 
-from tcsh import Tcsh
+from tcsh import TcshEdit
 
 
 class TcshWidgetPlugin(QPyDesignerCustomWidgetPlugin):
     """TcshWidgetPlugin(QPyDesignerCustomWidgetPlugin)
-    
+
     Provides a Python custom plugin for Qt Designer by implementing the
     QDesignerCustomWidgetPlugin via a PyQt-specific custom plugin class.
     """
@@ -22,7 +22,7 @@ class TcshWidgetPlugin(QPyDesignerCustomWidgetPlugin):
     # The __init__() method is only used to set up the plugin and define its
     # initialized variable.
     def __init__(self, parent=None):
-    
+
         super(TcshWidgetPlugin, self).__init__(parent)
 
         self.initialized = False
@@ -44,12 +44,12 @@ class TcshWidgetPlugin(QPyDesignerCustomWidgetPlugin):
     # This factory method creates new instances of our custom widget with the
     # appropriate parent.
     def createWidget(self, parent):
-        return Tcsh(parent)
+        return TcshEdit(parent)
 
     # This method returns the name of the custom widget class that is provided
     # by this plugin.
     def name(self):
-        return "Tcsh"
+        return "TcshEdit"
 
     # Returns the name of the group in Qt Designer's widget box that this
     # widget belongs to.
@@ -81,7 +81,7 @@ class TcshWidgetPlugin(QPyDesignerCustomWidgetPlugin):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="Tcsh" name="tcsh" />\n'
+        return '<widget class="TcshEdit" name="tcsh" />\n'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.

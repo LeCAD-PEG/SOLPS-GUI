@@ -4,200 +4,84 @@
 
 from PyQt5.QtCore import (QProcess, QSize, pyqtSignal, QSettings,
                           pyqtSlot, pyqtProperty)
-from PyQt5.QtWidgets import QPlainTextEdit, QFrame
+from PyQt5.QtWidgets import QPlainTextEdit, QFrame, QWidget, QVBoxLayout
 from PyQt5.QtGui import QFont
 
 import logging
 import os
 
-class Tcsh(QPlainTextEdit):
+from akter import Akter
+
+class TcshEdit(Akter):
     """ Tcsh(QWidget)
-    
+
         Provides a custom widget to display TCSH with properties and slots
         that can be used to customize its appearance.
     """
 
     solpsTopChanged = pyqtSignal(str)
     runChanged = pyqtSignal(str)
-    
+
     def __init__(self, parent=None):
-        super(Tcsh, self).__init__(parent)
+        super(TcshEdit, self).__init__(parent)
         settings = QSettings('ITER', 'solps-gui')
-        self.tcsh_path = settings.value("tcsh_path", '/bin/tcsh')
-        self.solps_top = None
-        self.rundir = None # run directory set
-        self.pwd = None # pointer to current working directory
-        self.tcsh_command = None
+        self.tcsh_path = settings.value('tcsh_path', '/bin/tcsh')
+        self.plainTextEdit = QPlainTextEdit(parent)
+        layout = QVBoxLayout()
+        layout.addWidget(self.plainTextEdit)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(layout)
 
         #self.setAlignment(Qt.AlignCenter)
-        self.setFrameStyle(QFrame.StyledPanel)
-        self.setMinimumSize(QSize(180, 50))
-        self.setPlaceholderText("TCSH widget for SOLPS")
+        self.plainTextEdit.setFrameStyle(QFrame.StyledPanel)
+        self.plainTextEdit.setMinimumSize(QSize(180, 50))
+        self.plainTextEdit.setPlaceholderText("TCSH widget for SOLPS")
         font = QFont()
         font.setFamily('Monospace')
-        self.setFont(font)
+        self.plainTextEdit.setFont(font)
 
-        self.tcsh = QProcess()
-        self.tcsh.readyReadStandardOutput.connect(self.print_stdout)
-        self.tcsh.readyReadStandardError.connect(self.print_stderr)
-        self.tcsh.error.connect(self.show_error)
-        self.tcsh.stateChanged.connect(self.stateChanged)
+        self.tcsh.stdOutput.connect(self.updateText)
+        self.tcsh.stdErrOutput.connect(self.showError)
+        self.tcsh.prcStateChanged.connect(self.updateText)
+        self.tcsh.setTcshPath(self.tcsh_path)
 
     def sizeHint(self):
         return QSize(320, 100)
-
-    @pyqtSlot(QProcess.ProcessError)
-    def show_error(self, error):
-        """ Writes an error to the widget in case that the process failed
-            to start.
-        """
-        errors = ['Failed to Start', 'Crashed', 'Timedout', 'WriteError',
-            'ReadError', 'UnknownError']
-        msg = 'ProcessError: ' + errors[error] + '\n' + self.tcsh.errorString()
-        self.setPlainText(msg)
-
-
-    @pyqtSlot(QProcess.ProcessState)
-    def stateChanged(self, newState):
-        states = ['Not Running', 'Starting', 'Running']
-        msg = 'Process state changed: ' + states[newState]
-        self.appendPlainText(msg)
-
-    @pyqtSlot()
-    def print_stdout(self):
-        data = self.tcsh.readAll()
-        text = bytearray(data).decode('utf8')
-        self.appendPlainText(str(text))
-
-
-    @pyqtSlot()
-    def print_stderr(self):
-        error_data=self.tcsh.readAllStandardError()
-        error_text=bytearray(error_data).decode('utf8')
-        self.appendHtml('<b>' + str(error_text) + '</b>')
-
-    @pyqtSlot(int)
-    def setTcshPath(self, tcsh_path):
-        """ Executable requires absolute path. No ${PATH} possible!
-        """
-        self.tch_path = tcsh_path
-
-    def getTcshPath(self):
-        return self.tcsh_path
-
-    tcshPath = pyqtProperty(str, getTcshPath, setTcshPath)
-
-    @pyqtSlot(str)
-    def setRundir(self, directory):
-        """
-        Args:
-             directory (str): Absolute path to SOLPS directory with run data.
-
-        """
-        self.rundir = directory
-
-    def getRundir(self):
-        return self.rundir
-
-    runDir = pyqtProperty(str, getRundir, setRundir)
-
-    @pyqtSlot(str)
-    def setTcshCommand(self, command):
-        self.tcsh_command = command
-
-    def get_tcsh_command(self):
-        return self.tcsh_command
-
-    tcshCommand = pyqtProperty(str, get_tcsh_command, setTcshCommand)
-
-    def find_solps_top(self, directory):
-        """ Searches for setup.csh or SOLPSTOP file in the directory hierarchy.
-            Arguments:
-                run_directory (str): run_directory
-            Returns:
-                solps_top(str): if found setup.csh or SOLPSTOP file. Else None
-        """
-        solps_top = directory
-
-        while solps_top:
-            path = solps_top + '/setup.csh'
-            if os.path.exists(path):
-                return solps_top
-            path = solps_top + '/SOLPSTOP'
-            if os.path.exists(path) and os.access(path, os.R_OK):
-                with open(path) as file:
-                     return file.readline()
-            solps_top = solps_top.rsplit('/', 1)[0]
-        return None
-
-    @pyqtSlot()
-    def executeTcshCommand(self):
-        """ Opens TCSH login shell and runs SOLPS plot command
-            previously defined and under the runsDir.
-
-            TCSH environment is searched sourced from 'setup.csh' or pointed
-            with SOLPSTOP file. SOLPSTOP is probed for runDir changes and
-            if necessary resourced within a new shell.
-        """
-        rundir_solps_top = self.find_solps_top(self.rundir)
-        if not rundir_solps_top:
-            if not self.rundir:
-                logging.error("Empty TCSH runDir! Bailing out.")
-            else:
-                logging.error("Could not find SOLPSTOP for " + self.rundir)
-            return
-
-        if rundir_solps_top != self.solps_top:  # we have a new SOLPSTOP
-            self.tcsh.terminate()
-            self.tcsh.kill()
-            self.tcsh.waitForFinished()
-            self.solps_top = rundir_solps_top
-
-        cmd = ''
-        if self.tcsh.state() != QProcess.Running:
-            self.pwd = None
-            self.tcsh.start(self.tcsh_path, ['-l'])
-            if not self.tcsh.waitForStarted():
-                logging.error(self.tcsh.program() + " not started")
-                return
-            logging.info("TCSH started in " + self.solps_top)
-            cmd +=  'cd ' + self.solps_top \
-                    + '\nsource setup.csh\necho TCSH READY\n'
-
-        if self.rundir:
-            if self.rundir != self.pwd:
-                cmd += 'cd ' + self.rundir + '\n'
-                self.pwd = self.rundir
-            if self.tcsh_command:
-                cmd += self.tcsh_command + '\n'
-            else:
-                logging.warning("Empty command for TCSH")
-            self.tcsh.write(bytearray(cmd, 'utf8'))
-        else:
-            logging.warning("No run directory for TCSH")
-
 
     @pyqtSlot(str)
     def setAndExecuteTcshCommand(self, command):
         """ Immediately executes provided command in TCSH.
         """
-        self.tcsh_command = command
+        self.tcshCommand = command
         self.executeTcshCommand()
+
+    @pyqtSlot(str)
+    def updateText(self, msg):
+        self.plainTextEdit.appendPlainText(msg)
+
+    @pyqtSlot(str)
+    def showError(self, msg):
+        self.plainTextEdit.appendHtml('<b>' + msg + '</b>')
 
 
 if __name__ == "__main__":
 
     import sys
-    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtWidgets import QApplication, QVBoxLayout
 
     logging.getLogger().setLevel(logging.DEBUG)
+    layout = QVBoxLayout()
     app = QApplication(sys.argv)
-    tcsh_widget = Tcsh()
+    tcsh_widget = TcshEdit()
+
     tcsh_widget.show()
-    tcsh_widget.setRundir(os.path.expanduser("~")+
-                          '/solps-iter/runs/AUG_16151_D')
+    tcsh_widget.setTcshPath('/bin/tcsh')
+    tcsh_widget.setRunDir(os.path.expanduser("~") +
+                          '/solps-iter/runs/examples/AUG_16151_D+C+He')
     tcsh_widget.setTcshCommand('ls')
     tcsh_widget.executeTcshCommand()
     tcsh_widget.setTcshCommand('ls -l')
     tcsh_widget.executeTcshCommand()
+
     sys.exit(app.exec_())
