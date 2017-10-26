@@ -52,6 +52,7 @@ class ModuleConfiguration(object):
 
     # The name of the module as it would be used in an import statement.
     name = 'pyQtGnuplot'
+    gnuplot_build_dir = None
 
     # Specify the directory, where to install the module
     # module_dir = os.path.expanduser('~') + '/solps-gui/staging/lib/site-packages/'
@@ -170,6 +171,13 @@ class ModuleConfiguration(object):
                 help="disable the installation of the .sip files "
                         "[default: enabled]")
 
+        optparser.add_option("--outdir", action="callback",
+                callback=optparser_store_abspath_dir,
+                type='string', default=None, dest="gnuplot_build_dir",
+                metavar='DIR',
+                help="Compilation output directory [default: .] ")
+
+
     def apply_options(self, target_configuration, options):
         """ Apply the module specific command line options to the target
         configuration.  target_configuration is the target configuration.
@@ -189,6 +197,9 @@ class ModuleConfiguration(object):
             target_configuration.gnuplot_sip_dir = options.gnuplot_sip_dir
         else:
             target_configuration.gnuplot_sip_dir = target_configuration.pyqt_sip_dir
+
+        if options.gnuplot_build_dir is not None:
+            target_configuration.gnuplot_build_dir = options.gnuplot_build_dir
 
         if options.hello_no_sip_files:
             target_configuration.gnuplot_sip_dir = ''
@@ -313,9 +324,11 @@ class ModuleConfiguration(object):
         if target_configuration.gnuplot_lib_dir is not None:
             qmake['LIBS'] = '-L%s' % quote(target_configuration.gnuplot_lib_dir)
 
-        if target_configuration.gnuplot_features_dir is not None:
-            os.environ['QMAKEFEATURES'] = target_configuration.gnuplot_features_dir
+        #if target_configuration.gnuplot_features_dir is not None:
+        #    os.environ['QMAKEFEATURES'] = target_configuration.gnuplot_features_dir
 
+        if target_configuration.gnuplot_build_dir is not None:
+            qmake['DESTDIR'] = target_configuration.gnuplot_build_dir
         return qmake
 
     def get_mac_wrapped_library_file(self, target_configuration):
@@ -1366,6 +1379,11 @@ def _generate_pro(target_config, opts, module_config):
 
     qt5_qmake_config = _get_qt_qmake_config(qmake_config, 'Qt5')
     qt4_qmake_config = _get_qt_qmake_config(qmake_config, 'Qt4')
+
+    destdir = qmake_config.get('DESTDIR')
+    if destdir:
+        pro.write('OBJECTS_DIR = ' + destdir + '\n')
+        #pro.write('DESTDIR = ' + destdir + '\n')
     pro.write('QMAKE_CXXFLAGS += ' + qmake_config.get('QMAKE_CXXFLAGS'))
 
     if qt5_qmake_config or qt4_qmake_config:
@@ -1543,7 +1561,7 @@ def _run_qmake(target_config, verbose, pro_name, module_config):
     args.append(pro_file)
 
     _run_command(' '.join(args), verbose)
-
+    print(' '.join(args))
     if not os.access(mf, os.F_OK):
         error(
                 "%s failed to create a Makefile from %s." %
