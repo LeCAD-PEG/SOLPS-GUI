@@ -14,7 +14,11 @@ import os
 import time
 
 class DivGeo(QWidget):
-    """ DivGeo(QWidget)
+    """
+        Important notice: DivGeo git branch origin/feature/embedxwin
+        required for this to work.
+
+        DivGeo(QWidget)
 
         Provides a custom widget to embed a DivGeo application as a
         Qt widget.
