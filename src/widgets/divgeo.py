@@ -2,16 +2,14 @@
 """ A PyQt custom DivGeo widget for Qt Designer.
 """
 
-from PyQt5.QtCore import (Qt, QProcess, QSize, pyqtSignal,
-                          QSettings, pyqtSlot, pyqtProperty, QPoint)
+from PyQt5.QtCore import (Qt, QProcess, pyqtSignal, QSettings, pyqtSlot,
+                          pyqtProperty, QPoint)
 from PyQt5.QtGui import QWindow
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QWidgetItem
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QWidgetItem
 
 
 import logging
 import os
-
-import time
 
 class DivGeo(QWidget):
     """
@@ -28,8 +26,8 @@ class DivGeo(QWidget):
         the help of window Container (QWidget.createWindowContainer), which is
         a QWidget object.
 
-        In Qt5 there is no official x11 support, because it was dropped and 
-        so far this is the only way to achieve embedding of external 
+        In Qt5 there is no official x11 support, because it was dropped and
+        so far this is the only way to achieve embedding of external
         applications.
 
         Furthermore, if we wish to embed an external application we need to get
@@ -50,7 +48,6 @@ class DivGeo(QWidget):
             stderrOutput (pyqtSignal): Signal which emits error output from
                 QProcess.
     """
-    _embedDivGeo = pyqtSignal()
 
     stderrOutput = pyqtSignal(str)
 
@@ -59,12 +56,12 @@ class DivGeo(QWidget):
         before trying to embed DivGeo, to avoid drawing problems.
 
         Creating QProcess and connecting the Std. Output and Error to slots.
-        It is important to specify which object should be parent to the 
+        It is important to specify which object should be parent to the
         QProcess. In this case we provide the parent of DivGeo(QWidget). Reason
-        is, it provides stability when it comes to embedding. Or at least in 
+        is, it provides stability when it comes to embedding. Or at least in
         tests.
 
-        What is important to provide the parent of QWidget DivGeo to the 
+        What is important to provide the parent of QWidget DivGeo to the
         QProcess self.divgeo.
 
         Attributes:
@@ -82,7 +79,6 @@ class DivGeo(QWidget):
         self._window = None
         self.Layout = QVBoxLayout()
         self.setLayout(self.Layout)
-        self._embedDivGeo.connect(self.embedDivGeo)
 
         self.divgeo = QProcess(self.parent())
         self.divgeo.error.connect(self.show_error)
@@ -91,19 +87,19 @@ class DivGeo(QWidget):
         self.divgeo.readyReadStandardOutput.connect(self.stdoutReady)
 
     def __del__(self):
-        if self.divgeo.state(): # state() == 0 means NotRunning
+        if self.divgeo.state():  # state() == 0 means NotRunning
             self.divgeo.kill()
             print("Terminating DivGeo")
 
     @pyqtSlot()
     def stderrReady(self):
-       error_data = self.divgeo.readAllStandardError()
-       error_text = bytearray(error_data).decode('utf8')
-       logging.error(error_text)
+        error_data = self.divgeo.readAllStandardError()
+        error_text = bytearray(error_data).decode('utf8')
+        logging.error(error_text)
 
     @pyqtSlot()
     def stdoutReady(self):
-        """We read the standard output of QProcess self.divgeo and start to 
+        """We read the standard output of QProcess self.divgeo and start to
         embed the external DivGeo when we get it's Window ID.
 
         When the Window ID is received the signal _embedDivGeo emits to start
@@ -116,30 +112,29 @@ class DivGeo(QWidget):
             if "DivGeo WID: " in line:
                 DG_ID = int(line.lstrip("DivGeo WID: "))
                 self.DivGeoID = DG_ID
-                self._embedDivGeo.emit()
 
         logging.debug(text)
 
     @pyqtSlot()
     def embedDivGeo(self):
-        """Function that will try to embed the DivGeo started from QProcess 
-        self.divgeo. Notice the try, since there are some problems with 
+        """Function that will try to embed the DivGeo started from QProcess
+        self.divgeo. Notice the try, since there are some problems with
         embedding. The way it works:
 
         .. code-block:: python
 
            # We have the Window ID so first we create the QWindow
            window = QWindow.fromWinId(WinID)
-           # Now we create the container which will control the resizing and 
+           # Now we create the container which will control the resizing and
            # other geometrical functions
            container = QWidget.createWindowContainer(window,
                                                      parent.parent(),
                                                      QtFramelessWindowHint)
            # It's important to specify the parent to the container. The parent
-           # is the widget which holds the widget that is embedding the 
+           # is the widget which holds the widget that is embedding the
            # external application. If it is confusing:
            # QMainwindow -> DivGeo(QWidget) -> container
-           # Provide the QMainwindow as the parent to the container or in this 
+           # Provide the QMainwindow as the parent to the container or in this
            # case DivGeo's parent.
 
            # Now we just put the container in the parents layout and show it.
@@ -150,6 +145,8 @@ class DivGeo(QWidget):
         Because I wrote in so many places the same block of code, I decided to
         create a function and then just call it.
         """
+        # Clean the layout first!
+        self.clearLayout()
         width, height = self.width(), self.height()
         self.hide()
         self._window = QWindow.fromWinId(self.DivGeoID)
@@ -163,7 +160,7 @@ class DivGeo(QWidget):
 
     @pyqtSlot()
     def startDivGeo(self):
-        """ Starts divgeo process inside the qwidget. We provide geometry 
+        """ Starts divgeo process inside the qwidget. We provide geometry
         coordinates, width and height for starting divgeo.
         """
         if self.divgeo.state():
@@ -229,6 +226,8 @@ class DivGeo(QWidget):
             if isinstance(item, QWidgetItem):
                 item.widget().close()
             self.layout().removeItem(item)
+            del item
+
 
 if __name__ == "__main__":
     @pyqtSlot()
@@ -238,7 +237,6 @@ if __name__ == "__main__":
     import sys
     from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
     from PyQt5.QtCore import QRect
-    import logging
 
     logging.getLogger().setLevel(logging.DEBUG)
 
@@ -251,7 +249,17 @@ if __name__ == "__main__":
     divgeo = DivGeo(main_window)
     # divgeo.setGeometry(QRect(70, 30, 501, 411))
     # divgeo.resize(500,500)
-    # divgeo.setDivGeoPath("dg")
+
+    if "HOST_NAME" not in os.environ:
+        divgeo.setDivGeoPath(os.path.expanduser('~') +
+                             '/solps-iter/modules/DivGeo/builds/'
+                             'default.gcc/dg.exe')
+    else:
+        divgeo.setDivGeoPath(os.path.expanduser('~') +
+                             '/solps-iter/modules/DivGeo/builds/' +
+                             os.environ['HOST_NAME'] + '.' +
+                             os.environ['COMPILER'] +
+                             '/dg.exe')
 
     pushButton = QPushButton()
     #pushButton.setGeometry(QRect(30, 450, 81, 22))
@@ -261,13 +269,18 @@ if __name__ == "__main__":
     #pushButtonR.setGeometry(QRect(130, 450, 81, 22))
     pushButtonR.setText("Resize")
 
+    pushButtonE = QPushButton()
+    pushButtonE.setText("Embed DivGeo")
+
     # main_window.setCentralWidget(divgeo)
     pushButton.clicked.connect(divgeo.startDivGeo)
     pushButtonR.clicked.connect(cbresize)
+    pushButtonE.clicked.connect(divgeo.embedDivGeo)
 
     layout.addWidget(divgeo)
     layout.addWidget(pushButton)
     layout.addWidget(pushButtonR)
+    layout.addWidget(pushButtonE)
     w = QWidget(main_window)
     w.setLayout(layout)
     main_window.setCentralWidget(w)
