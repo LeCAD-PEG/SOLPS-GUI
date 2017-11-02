@@ -2,10 +2,10 @@
 """ A PyQt custom DivGeo widget for Qt Designer.
 """
 
-from PyQt5.QtCore import (Qt, QProcess, QSize, pyqtSignal,
-                          QSettings, pyqtSlot, pyqtProperty, QPoint)
+from PyQt5.QtCore import (Qt, QProcess, pyqtSignal, QSettings, pyqtSlot,
+                          pyqtProperty, QPoint)
 from PyQt5.QtGui import QWindow
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QWidgetItem
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QWidgetItem
 
 
 import logging
@@ -48,7 +48,6 @@ class DivGeo(Akter):
             stderrOutput (pyqtSignal): Signal which emits error output from
                 QProcess.
     """
-    _embedDivGeo = pyqtSignal()
 
     stderrOutput = pyqtSignal(str)
 
@@ -80,7 +79,6 @@ class DivGeo(Akter):
         self._window = None
         self.Layout = QVBoxLayout()
         self.setLayout(self.Layout)
-        self._embedDivGeo.connect(self.embedDivGeo)
 
         self.tcsh.stdOutput.connect(self.readStdOutput)
 
@@ -102,7 +100,6 @@ class DivGeo(Akter):
             if "DivGeo WID: " in line:
                 DG_ID = int(line.lstrip("DivGeo WID: "))
                 self.DivGeoID = DG_ID
-                self._embedDivGeo.emit()
 
         logging.debug(text)
 
@@ -182,6 +179,8 @@ class DivGeo(Akter):
             if isinstance(item, QWidgetItem):
                 item.widget().close()
             self.layout().removeItem(item)
+            del item
+
 
 if __name__ == "__main__":
     @pyqtSlot()
@@ -208,7 +207,17 @@ if __name__ == "__main__":
     divgeo.setRunDir(RunDirPath)
     # divgeo.setGeometry(QRect(70, 30, 501, 411))
     # divgeo.resize(500,500)
-    # divgeo.setDivGeoPath("dg")
+
+    if "HOST_NAME" not in os.environ:
+        divgeo.setDivGeoPath(os.path.expanduser('~') +
+                             '/solps-iter/modules/DivGeo/builds/'
+                             'default.gcc/dg.exe')
+    else:
+        divgeo.setDivGeoPath(os.path.expanduser('~') +
+                             '/solps-iter/modules/DivGeo/builds/' +
+                             os.environ['HOST_NAME'] + '.' +
+                             os.environ['COMPILER'] +
+                             '/dg.exe')
 
     pushButton = QPushButton()
     #pushButton.setGeometry(QRect(30, 450, 81, 22))
@@ -220,7 +229,6 @@ if __name__ == "__main__":
 
     pushButtonE = QPushButton()
     pushButtonE.setText("Embed DivGeo")
-
 
     # main_window.setCentralWidget(divgeo)
     pushButton.clicked.connect(divgeo.startDivGeo)
