@@ -9,11 +9,9 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QWidgetItem
 
 
 import logging
-import os
+from akter import Akter
 
-import time
-
-class DivGeo(QWidget):
+class DivGeo(Akter):
     """
         Important notice: DivGeo git branch origin/feature/embedxwin
         required for this to work.
@@ -28,8 +26,8 @@ class DivGeo(QWidget):
         the help of window Container (QWidget.createWindowContainer), which is
         a QWidget object.
 
-        In Qt5 there is no official x11 support, because it was dropped and 
-        so far this is the only way to achieve embedding of external 
+        In Qt5 there is no official x11 support, because it was dropped and
+        so far this is the only way to achieve embedding of external
         applications.
 
         Furthermore, if we wish to embed an external application we need to get
@@ -59,12 +57,12 @@ class DivGeo(QWidget):
         before trying to embed DivGeo, to avoid drawing problems.
 
         Creating QProcess and connecting the Std. Output and Error to slots.
-        It is important to specify which object should be parent to the 
+        It is important to specify which object should be parent to the
         QProcess. In this case we provide the parent of DivGeo(QWidget). Reason
-        is, it provides stability when it comes to embedding. Or at least in 
+        is, it provides stability when it comes to embedding. Or at least in
         tests.
 
-        What is important to provide the parent of QWidget DivGeo to the 
+        What is important to provide the parent of QWidget DivGeo to the
         QProcess self.divgeo.
 
         Attributes:
@@ -84,33 +82,21 @@ class DivGeo(QWidget):
         self.setLayout(self.Layout)
         self._embedDivGeo.connect(self.embedDivGeo)
 
-        self.divgeo = QProcess(self.parent())
-        self.divgeo.error.connect(self.show_error)
-
-        self.divgeo.readyReadStandardError.connect(self.stderrReady)
-        self.divgeo.readyReadStandardOutput.connect(self.stdoutReady)
+        self.tcsh.stdOutput.connect(self.readStdOutput)
 
     def __del__(self):
-        if self.divgeo.state(): # state() == 0 means NotRunning
-            self.divgeo.kill()
+        if self.tcsh.state(): # state() == 0 means NotRunning
+            self.tcsh.kill()
             print("Terminating DivGeo")
 
-    @pyqtSlot()
-    def stderrReady(self):
-       error_data = self.divgeo.readAllStandardError()
-       error_text = bytearray(error_data).decode('utf8')
-       logging.error(error_text)
-
-    @pyqtSlot()
-    def stdoutReady(self):
-        """We read the standard output of QProcess self.divgeo and start to 
+    @pyqtSlot(str)
+    def readStdOutput(self, text):
+        """We read the standard output of QProcess self.divgeo and start to
         embed the external DivGeo when we get it's Window ID.
 
         When the Window ID is received the signal _embedDivGeo emits to start
         the embedding function.
         """
-        data = self.divgeo.readAllStandardOutput()
-        text = bytearray(data).decode('utf8')
 
         for line in text.splitlines():
             if "DivGeo WID: " in line:
@@ -122,24 +108,24 @@ class DivGeo(QWidget):
 
     @pyqtSlot()
     def embedDivGeo(self):
-        """Function that will try to embed the DivGeo started from QProcess 
-        self.divgeo. Notice the try, since there are some problems with 
+        """Function that will try to embed the DivGeo started from QProcess
+        self.divgeo. Notice the try, since there are some problems with
         embedding. The way it works:
 
         .. code-block:: python
 
            # We have the Window ID so first we create the QWindow
            window = QWindow.fromWinId(WinID)
-           # Now we create the container which will control the resizing and 
+           # Now we create the container which will control the resizing and
            # other geometrical functions
            container = QWidget.createWindowContainer(window,
                                                      parent.parent(),
                                                      QtFramelessWindowHint)
            # It's important to specify the parent to the container. The parent
-           # is the widget which holds the widget that is embedding the 
+           # is the widget which holds the widget that is embedding the
            # external application. If it is confusing:
            # QMainwindow -> DivGeo(QWidget) -> container
-           # Provide the QMainwindow as the parent to the container or in this 
+           # Provide the QMainwindow as the parent to the container or in this
            # case DivGeo's parent.
 
            # Now we just put the container in the parents layout and show it.
@@ -150,7 +136,10 @@ class DivGeo(QWidget):
         Because I wrote in so many places the same block of code, I decided to
         create a function and then just call it.
         """
-        width, height = self.width(), self.height()
+
+        # Clean the layout first!
+        self.clearLayout()
+
         self.hide()
         self._window = QWindow.fromWinId(self.DivGeoID)
 
@@ -163,63 +152,27 @@ class DivGeo(QWidget):
 
     @pyqtSlot()
     def startDivGeo(self):
-        """ Starts divgeo process inside the qwidget. We provide geometry 
+        """ Starts divgeo process inside the qwidget. We provide geometry
         coordinates, width and height for starting divgeo.
         """
-        if self.divgeo.state():
-            self.divgeo.kill()
+        if self.tcsh.state():
+            self.tcsh.kill()
             return
         if self.layout():
             self.clearLayout()
 
-        if self.divgeo_path is None:
-            settings = QSettings('ITER', 'solps-gui')
-            self.divgeo_path = settings.value('divgeo_path',
-                                              os.path.expanduser("~")
-                + '/solps-iter/modules/DivGeo/builds/ITER.ifort64/dg.exe')
+        DivGeo = 'dg'
         geometry = '{}x{}'.format(self.width(), self.height())
         global_pos = self.mapToGlobal(QPoint(0, 0))
         if global_pos.x():
            geometry += '+{}+{}'.format(global_pos.x()-6, global_pos.y()-24)
 
-        options = [
-                   "-xrm", 'DivGeo.geometry: ' + geometry,
-                  ]
-
-        self.divgeo.start(self.divgeo_path, options)
-        if not self.divgeo.waitForStarted():
-            logging.error(self.divgeo.program() + " not started")
-            return
-
-    @pyqtSlot(QProcess.ProcessError)
-    def show_error(self, error):
-        """ Writes an error to the widget in case that the process failed
-            to start.
-        """
-        errors = ['Failed to Start', 'Crashed', 'Timedout', 'WriteError',
-            'ReadError', 'UnknownError']
-        msg = 'DivGeo process: ' + errors[error]
-        logging.error(msg)
-
-    @pyqtSlot(int)
-    def setDivGeoPath(self, divgeo_path):
-        """ Executable requires absolute path. No ${PATH} possible!
-        """
-        self.divgeo_path = divgeo_path
-
-    def getDivGeoPath(self):
-        return self.divgeo_path
-
-    divgeoPath = pyqtProperty(str, getDivGeoPath, setDivGeoPath)
-
-    @pyqtSlot(str)
-    def setRundir(self, directory):
-        """
-        Args:
-             directory (str): Absolute path to SOLPS directory with run data.
-
-        """
-        self.rundir = directory
+        self.startTcsh()
+        cmd = 'setenv DEVICE cmod\n'
+        cmd += 'echo setting DEVICE as ${DEVICE}\n'
+        #cmd += DivGeo + ' -xrm "DivGeo.Geometry: ' + geometry + '"\n'
+        cmd += DivGeo + '\n'
+        self.tcsh.write(cmd)
 
     def clearLayout(self):
         """Clearing the layout of widgets.
@@ -236,9 +189,9 @@ if __name__ == "__main__":
         divgeo.resize(550, 400)
 
     import sys
+    import os
     from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
     from PyQt5.QtCore import QRect
-    import logging
 
     logging.getLogger().setLevel(logging.DEBUG)
 
@@ -249,6 +202,10 @@ if __name__ == "__main__":
     layout = QVBoxLayout()
 
     divgeo = DivGeo(main_window)
+    divgeo.activateDebugging()
+    RunDirPath = os.path.expanduser('~/solps-iter/runs/examples')
+    print(RunDirPath)
+    divgeo.setRunDir(RunDirPath)
     # divgeo.setGeometry(QRect(70, 30, 501, 411))
     # divgeo.resize(500,500)
     # divgeo.setDivGeoPath("dg")
@@ -261,13 +218,20 @@ if __name__ == "__main__":
     #pushButtonR.setGeometry(QRect(130, 450, 81, 22))
     pushButtonR.setText("Resize")
 
+    pushButtonE = QPushButton()
+    pushButtonE.setText("Embed DivGeo")
+
+
     # main_window.setCentralWidget(divgeo)
     pushButton.clicked.connect(divgeo.startDivGeo)
     pushButtonR.clicked.connect(cbresize)
+    pushButtonE.clicked.connect(divgeo.embedDivGeo)
 
     layout.addWidget(divgeo)
     layout.addWidget(pushButton)
     layout.addWidget(pushButtonR)
+    layout.addWidget(pushButtonE)
+
     w = QWidget(main_window)
     w.setLayout(layout)
     main_window.setCentralWidget(w)

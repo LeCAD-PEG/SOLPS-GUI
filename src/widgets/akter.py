@@ -32,7 +32,7 @@ class Tcsh(QProcess):
     def __init__(self, parent=None):
         super(Tcsh, self).__init__(parent)
         settings = QSettings('ITER', 'solps-gui')
-        self.tcshPath = settings.value("tcsh_path", '/bin/path')
+        self.tcshPath = settings.value("tcsh_path", '/bin/tcsh')
         self.solpsTop = None
         self.runDir = None
         self.cwd = None
@@ -162,11 +162,22 @@ class Akter(QWidget):
 
         self.runDir = None
         self.solpsTop = None
-
-        self.tcshPath = None
+        settings = QSettings('ITER', 'solps-gui')
+        self.tcshPath = settings.value("tcsh_path", '/bin/tcsh')
         self.tcshCommand = ''
         self.tcshCwd = ''
         self.tcsh = Tcsh(self)
+
+    def activateDebugging(self):
+        self.tcsh.prcError.connect(self.debugg)
+        self.tcsh.prcFinished.connect(self.debugg)
+        self.tcsh.prcStarted.connect(self.debugg)
+        self.tcsh.stdOutput.connect(self.debugg)
+        self.tcsh.stdErrOutput.connect(self.debugg)
+
+    @pyqtSlot(str)
+    def debugg(self, message):
+        print(message)
 
     @pyqtSlot(str)
     def setRunDir(self, newVal):
