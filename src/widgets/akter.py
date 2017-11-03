@@ -169,14 +169,14 @@ class Akter(QWidget):
         self.tcsh = Tcsh(self)
 
     def activateDebugging(self):
-        self.tcsh.prcError.connect(self.debugg)
-        self.tcsh.prcFinished.connect(self.debugg)
-        self.tcsh.prcStarted.connect(self.debugg)
-        self.tcsh.stdOutput.connect(self.debugg)
-        self.tcsh.stdErrOutput.connect(self.debugg)
+        self.tcsh.prcError.connect(self.debug)
+        self.tcsh.prcFinished.connect(self.debug)
+        self.tcsh.prcStarted.connect(self.debug)
+        self.tcsh.stdOutput.connect(self.debug)
+        self.tcsh.stdErrOutput.connect(self.debug)
 
     @pyqtSlot(str)
-    def debugg(self, message):
+    def debug(self, message):
         print(message)
 
     @pyqtSlot(str)

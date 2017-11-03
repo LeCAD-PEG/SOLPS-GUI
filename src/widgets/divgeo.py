@@ -2,14 +2,14 @@
 """ A PyQt custom DivGeo widget for Qt Designer.
 """
 
-from PyQt5.QtCore import (Qt, QProcess, pyqtSignal, QSettings, pyqtSlot,
-                          pyqtProperty, QPoint)
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QWindow
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QWidgetItem
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QWidgetItem, QLabel
 
 
 import logging
 from akter import Akter
+
 
 class DivGeo(Akter):
     """
@@ -77,13 +77,14 @@ class DivGeo(Akter):
 
         self._container = None
         self._window = None
+        self.labelContainer = None
         self.Layout = QVBoxLayout()
         self.setLayout(self.Layout)
 
         self.tcsh.stdOutput.connect(self.readStdOutput)
 
     def __del__(self):
-        if self.tcsh.state(): # state() == 0 means NotRunning
+        if self.tcsh.state():  # state() == 0 means NotRunning
             self.tcsh.kill()
             print("Terminating DivGeo")
 
@@ -100,6 +101,9 @@ class DivGeo(Akter):
             if "DivGeo WID: " in line:
                 DG_ID = int(line.lstrip("DivGeo WID: "))
                 self.DivGeoID = DG_ID
+
+        if 'STARTING DIVGEO' in text:
+            self.labelContainer.setText("DivGeo running.")
 
         logging.debug(text)
 
@@ -152,23 +156,28 @@ class DivGeo(Akter):
         """ Starts divgeo process inside the qwidget. We provide geometry
         coordinates, width and height for starting divgeo.
         """
-        if self.tcsh.state():
-            self.tcsh.kill()
-            return
         if self.layout():
             self.clearLayout()
+        self.labelContainer = QLabel()
+        self.labelContainer.setAlignment(Qt.AlignCenter)
+        self.layout().addWidget(self.labelContainer)
+        if self.tcsh.state():
+            self.tcsh.terminate()
+            self.tcsh.kill()
+            self.labelContainer.setText("Terminated TCSH.")
+            return
+
+        self.labelContainer.setText("Started TCSH. (sourcing setup.csh, "
+                                    "please wait...)")
 
         DivGeo = 'dg'
-        geometry = '{}x{}'.format(self.width(), self.height())
-        global_pos = self.mapToGlobal(QPoint(0, 0))
-        if global_pos.x():
-           geometry += '+{}+{}'.format(global_pos.x()-6, global_pos.y()-24)
 
         self.startTcsh()
         cmd = 'setenv DEVICE cmod\n'
         cmd += 'echo setting DEVICE as ${DEVICE}\n'
-        #cmd += DivGeo + ' -xrm "DivGeo.Geometry: ' + geometry + '"\n'
+        cmd += 'echo STARTING DIVGEO\n'
         cmd += DivGeo + '\n'
+
         self.tcsh.write(cmd)
 
     def clearLayout(self):
@@ -190,7 +199,6 @@ if __name__ == "__main__":
     import sys
     import os
     from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
-    from PyQt5.QtCore import QRect
 
     logging.getLogger().setLevel(logging.DEBUG)
 
@@ -208,23 +216,12 @@ if __name__ == "__main__":
     # divgeo.setGeometry(QRect(70, 30, 501, 411))
     # divgeo.resize(500,500)
 
-    if "HOST_NAME" not in os.environ:
-        divgeo.setDivGeoPath(os.path.expanduser('~') +
-                             '/solps-iter/modules/DivGeo/builds/'
-                             'default.gcc/dg.exe')
-    else:
-        divgeo.setDivGeoPath(os.path.expanduser('~') +
-                             '/solps-iter/modules/DivGeo/builds/' +
-                             os.environ['HOST_NAME'] + '.' +
-                             os.environ['COMPILER'] +
-                             '/dg.exe')
-
     pushButton = QPushButton()
-    #pushButton.setGeometry(QRect(30, 450, 81, 22))
-    pushButton.setText("Start")
+    # pushButton.setGeometry(QRect(30, 450, 81, 22))
+    pushButton.setText("Start/Stop")
 
     pushButtonR = QPushButton()
-    #pushButtonR.setGeometry(QRect(130, 450, 81, 22))
+    # pushButtonR.setGeometry(QRect(130, 450, 81, 22))
     pushButtonR.setText("Resize")
 
     pushButtonE = QPushButton()
