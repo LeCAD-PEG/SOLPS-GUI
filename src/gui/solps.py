@@ -1404,7 +1404,7 @@ class SOLPS_MainWindow(QMainWindow):
         #  self.gnuplot1.process.finished.connect(self.gnuplot1.show_plot)
 
         # Activate debugging on DivGeo widget
-        self.divgeo.activateDebugging()
+        # self.divgeo.activateDebugging()
 
     @pyqtSlot()
     def on_pushButton_Archive_clicked(self):

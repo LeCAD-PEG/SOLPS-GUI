@@ -184,8 +184,8 @@ class DivGeo(Akter):
         self.startTcsh()
         env = QSettings('ITER', 'solps-gui')
         device = env.value('device_environment', 'iter')
-
-        cmd = 'setenv DEVICE ' + device + '\n'
+        cmd = 'cd ' + self.getRunDir() + '\n'
+        cmd += 'setenv DEVICE ' + device + '\n'
         cmd += 'echo setting DEVICE as ${DEVICE}\n'
         cmd += 'echo STARTING DIVGEO\n'
         cmd += DivGeo + ' -wid ' + str(int(self.winId())) + '\n'
