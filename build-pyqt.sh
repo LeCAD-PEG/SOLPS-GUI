@@ -12,8 +12,8 @@ SIP_VERSION=4.19
 case $(hostname -f) in
   *.iter.org) # RHEL5.11 with GCC 4.2
 	module purge
-	# module load GCC/4.8.3 binutils/2.25 python/2.7/11 #gperf
-        module load imas/3.7.2/ual/3.3.14
+	module load GCC/4.8.3 binutils/2.25 python/2.7/11 #gperf
+        #module load imas/3.7.2/ual/3.3.14
 	USE_QT_XCB="NO"
 	BUILD_XCB="YES"
 	unset CXX CC # Remove ICC to be selected by chance
