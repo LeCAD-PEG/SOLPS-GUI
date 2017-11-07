@@ -52,7 +52,7 @@ class Gnuplot(Akter):
 
         layout = QGridLayout()
         layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(1, 1, 1, 1)
 
         if GNUPLOT_WIDGET:
             self.gnuplot = gnuplotWidget(self)

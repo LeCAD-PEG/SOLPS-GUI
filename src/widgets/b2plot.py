@@ -44,7 +44,7 @@ class B2plot(Akter):
         self.label.setText("B2plot widget for SOLPS")
         layout = QVBoxLayout()
         layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(1, 1, 1, 1)
         layout.addWidget(self.label)
         self.setLayout(layout)
 
