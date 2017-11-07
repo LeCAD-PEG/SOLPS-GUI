@@ -52,9 +52,12 @@ class Gnuplot(Akter):
 
         layout = QGridLayout()
         layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
 
         if GNUPLOT_WIDGET:
             self.gnuplot = gnuplotWidget(self)
+            self.gnuplot.layout().setSpacing(0)
+            self.gnuplot.layout().setContentsMargins(0, 0, 0, 0)
             self.send_command.connect(self.gnuplot.cmd)
             self.gnuplot.plotDone.connect(self.showPlot)
             layout.addWidget(self.gnuplot, 0, 0)
