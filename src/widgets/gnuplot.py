@@ -251,6 +251,7 @@ if __name__ == "__main__":
     layout = QVBoxLayout()
 
     window = Gnuplot()
+    window.activateDebugging()
     input_w = CmdInput()
     input_w.sendCmd.connect(window.plot)
 

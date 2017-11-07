@@ -326,6 +326,7 @@ class Preferences():
         self.debugger = 'totalview'
         self.compress_log = 0
         self.dry_run = 0
+        self.device_environment = 'ITER'
 
     def read(self):
         """  Reads Preferences from QSettings()
@@ -347,6 +348,7 @@ class Preferences():
         self.debugger = settings.value('debugger', self.debugger)
         self.compress_log = int(settings.value('compress_log', self.compress_log))
         self.dry_run = int(settings.value('dry_run', self.dry_run))
+        self.device_environment = settings.value('device_environment', self.device_environment)
 
     def write(self):
         """ Writes preference to disk
@@ -368,6 +370,7 @@ class Preferences():
         settings.setValue('debugger', self.debugger)
         settings.setValue('compress_log', self.compress_log)
         settings.setValue('dry_run', str(self.dry_run))
+        settings.setValue('device_environment', str(self.device_environment))
 
 class PreferencesDialog(QDialog):
     """ Maps dialog into Preferences.
@@ -395,6 +398,7 @@ class PreferencesDialog(QDialog):
         self.lineEdit_debugger.setText(preferences.debugger)
         self.checkBox_compress_log.setCheckState(int(preferences.compress_log))
         self.checkBox_dry_run.setCheckState(int(preferences.dry_run))
+        self.comboBox_device_environment.setCurrentText(preferences.device_environment)
 
     def setPreferences(self):
         s = QSettings('ITER', 'solps-gui')
@@ -418,6 +422,7 @@ class PreferencesDialog(QDialog):
         self.preferences.debugger = self.lineEdit_debugger.text()
         self.preferences.compress_log = int(self.checkBox_compress_log.checkState())
         self.preferences.dry_run = int(self.checkBox_dry_run.checkState())
+        self.preferences.device_environment = self.comboBox_device_environment.currentText()
 
 class RunsStatusServer(QThread):
     """ Networking UDP listener for receiving job status updates.
@@ -1397,6 +1402,9 @@ class SOLPS_MainWindow(QMainWindow):
         #  self.gnuplot.setText("Started")
         #  print(self.gnuplot.process.state())
         #  self.gnuplot1.process.finished.connect(self.gnuplot1.show_plot)
+
+        # Activate debugging on DivGeo widget
+        self.divgeo.activateDebugging()
 
     @pyqtSlot()
     def on_pushButton_Archive_clicked(self):

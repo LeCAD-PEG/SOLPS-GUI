@@ -2,13 +2,16 @@
 """ A PyQt custom DivGeo widget for Qt Designer.
 """
 
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QSettings
 from PyQt5.QtGui import QWindow
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QWidgetItem, QLabel
 
 
 import logging
+import os
+import signal
 from akter import Akter
+
 
 
 class DivGeo(Akter):
@@ -78,6 +81,7 @@ class DivGeo(Akter):
         self._container = None
         self._window = None
         self.labelContainer = None
+        self.DivGeoID = None
         self.Layout = QVBoxLayout()
         self.setLayout(self.Layout)
 
@@ -101,6 +105,9 @@ class DivGeo(Akter):
             if "DivGeo WID: " in line:
                 DG_ID = int(line.lstrip("DivGeo WID: "))
                 self.DivGeoID = DG_ID
+
+            if "DivGeo PID: " in line:
+                self.DivGeoPID = int(line.lstrip("DivGeo PID: "))
 
         if 'STARTING DIVGEO' in text:
             self.labelContainer.setText("DivGeo running.")
@@ -139,6 +146,9 @@ class DivGeo(Akter):
         """
 
         # Clean the layout first!
+        if not self.DivGeoID:
+            return
+
         self.clearLayout()
 
         self.hide()
@@ -161,10 +171,9 @@ class DivGeo(Akter):
         self.labelContainer = QLabel()
         self.labelContainer.setAlignment(Qt.AlignCenter)
         self.layout().addWidget(self.labelContainer)
-        if self.tcsh.state():
-            self.tcsh.terminate()
-            self.tcsh.kill()
-            self.labelContainer.setText("Terminated TCSH.")
+
+        if not self.getRunDir():
+            self.labelContainer.setText("No run dir selected!")
             return
 
         self.labelContainer.setText("Started TCSH. (sourcing setup.csh, "
@@ -173,12 +182,37 @@ class DivGeo(Akter):
         DivGeo = 'dg'
 
         self.startTcsh()
-        cmd = 'setenv DEVICE cmod\n'
+        env = QSettings('ITER', 'solps-gui')
+        device = env.value('device_environment', 'iter')
+
+        cmd = 'setenv DEVICE ' + device + '\n'
         cmd += 'echo setting DEVICE as ${DEVICE}\n'
         cmd += 'echo STARTING DIVGEO\n'
-        cmd += DivGeo + '\n'
+        cmd += DivGeo + ' -wid ' + str(int(self.winId())) + '\n'
 
         self.tcsh.write(cmd)
+
+    @pyqtSlot()
+    def stopDivGeo(self):
+        if not self.labelContainer:
+            self.labelContainer = QLabel()
+            self.labelContainer.setAlignment(Qt.AlignCenter)
+        self.layout().addWidget(self.labelContainer)
+
+        if self.DivGeoPID:
+            os.kill(self.DivGeoPID, signal.SIGUSR1)
+        else:
+            self.labelContainer.setText("No DivGeo PID!")
+            return
+
+        if self.tcsh.waitForFinished():
+            self.tcsh.close()
+            self.clearLayout()
+            self.labelContainer.setText("Terminated DivGeo.")
+
+        else:
+            self.labelContainer.setText("DivGeo not running.")
+
 
     def clearLayout(self):
         """Clearing the layout of widgets.

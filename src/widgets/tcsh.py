@@ -74,6 +74,7 @@ if __name__ == "__main__":
     layout = QVBoxLayout()
     app = QApplication(sys.argv)
     tcsh_widget = TcshEdit()
+    tcsh_widget.activateDebugging()
 
     tcsh_widget.show()
     tcsh_widget.setTcshPath('/bin/tcsh')

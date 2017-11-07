@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>975</width>
-    <height>640</height>
+    <width>746</width>
+    <height>423</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -34,7 +34,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>8</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -105,7 +105,14 @@ self.output.emit(&quot;ls -ld run*&quot;)</string>
          </widget>
         </item>
         <item row="2" column="2">
-         <widget class="TcshEdit" name="tcsh_sequence"/>
+         <widget class="TcshEdit" name="tcsh_sequence">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
         <item row="3" column="0" colspan="3">
          <widget class="QLabel" name="label_initialize_runs">
@@ -124,178 +131,78 @@ self.output.emit(&quot;ls -ld run*&quot;)</string>
         <string>&amp;Populate Baserun</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0">
-         <widget class="QGroupBox" name="groupBox">
-          <property name="title">
-           <string>Step 1</string>
+        <item row="0" column="1">
+         <widget class="QTabWidget" name="tabWidget_2">
+          <property name="tabPosition">
+           <enum>QTabWidget::South</enum>
           </property>
-          <widget class="QPushButton" name="pushButton">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>30</y>
-             <width>101</width>
-             <height>31</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Run DivGeo</string>
-           </property>
-          </widget>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QGroupBox" name="groupBox_2">
-          <property name="title">
-           <string>Step 2</string>
+          <property name="tabShape">
+           <enum>QTabWidget::Triangular</enum>
           </property>
-          <widget class="QPushButton" name="pushButton_2">
-           <property name="geometry">
-            <rect>
-             <x>70</x>
-             <y>30</y>
-             <width>111</width>
-             <height>31</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Create Mesh</string>
-           </property>
-          </widget>
-          <widget class="QComboBox" name="comboBox_2">
-           <property name="geometry">
-            <rect>
-             <x>120</x>
-             <y>70</y>
-             <width>72</width>
-             <height>22</height>
-            </rect>
-           </property>
-           <item>
-            <property name="text">
-             <string>Carre</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Carre2</string>
-            </property>
-           </item>
-          </widget>
-          <widget class="QLabel" name="label_6">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>70</y>
-             <width>101</width>
-             <height>21</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Mesh generator</string>
-           </property>
-          </widget>
-         </widget>
-        </item>
-        <item row="0" column="3">
-         <widget class="QGroupBox" name="groupBox_3">
-          <property name="title">
-           <string>Step 3</string>
+          <property name="currentIndex">
+           <number>0</number>
           </property>
-          <widget class="QPushButton" name="pushButton_3">
-           <property name="geometry">
-            <rect>
-             <x>20</x>
-             <y>30</y>
-             <width>81</width>
-             <height>31</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Run UINP</string>
-           </property>
+          <widget class="QWidget" name="tab_16">
+           <attribute name="title">
+            <string>DivGeo</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_12">
+            <item row="1" column="0">
+             <widget class="QPushButton" name="pushButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Start DivGeo</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QPushButton" name="pushButton_3">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Stop DivGeo</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QPushButton" name="pushButton_2">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Embed DivGeo</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0" colspan="3">
+             <widget class="DivGeo" name="divgeo">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
-         </widget>
-        </item>
-        <item row="1" column="0" rowspan="3" colspan="2">
-         <widget class="QGroupBox" name="groupBox_4">
-          <property name="title">
-           <string>EIRENE</string>
-          </property>
-          <widget class="QPushButton" name="pushButton_4">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>40</y>
-             <width>81</width>
-             <height>22</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Run TRIA</string>
-           </property>
+          <widget class="QWidget" name="tab_17">
+           <attribute name="title">
+            <string>Carre</string>
+           </attribute>
           </widget>
-          <widget class="QPushButton" name="pushButton_5">
-           <property name="geometry">
-            <rect>
-             <x>110</x>
-             <y>40</y>
-             <width>101</width>
-             <height>22</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Check Mesh</string>
-           </property>
-          </widget>
-          <widget class="QCheckBox" name="checkBox">
-           <property name="geometry">
-            <rect>
-             <x>50</x>
-             <y>-1</y>
-             <width>85</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Enable</string>
-           </property>
-          </widget>
-         </widget>
-        </item>
-        <item row="1" column="2" colspan="2">
-         <widget class="QPushButton" name="pushButton_6">
-          <property name="text">
-           <string>Transport coefficients</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2" colspan="2">
-         <widget class="QPushButton" name="pushButton_7">
-          <property name="text">
-           <string>Boundary Conditions</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Topology:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="3">
-         <widget class="QComboBox" name="comboBox_3">
-          <item>
-           <property name="text">
-            <string>Single Null</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Double Null</string>
-           </property>
-          </item>
          </widget>
         </item>
        </layout>
@@ -567,7 +474,7 @@ and starts the run</string>
         <item row="0" column="0" colspan="2">
          <widget class="TcshEdit" name="tcsh">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -609,7 +516,7 @@ and starts the run</string>
           <item row="0" column="0">
            <widget class="Gnuplot" name="gnuplot">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -694,7 +601,7 @@ and starts the run</string>
         <item row="0" column="0">
          <widget class="SolpsInput" name="solpsview">
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="tab_14">
            <attribute name="title">
@@ -815,6 +722,12 @@ and starts the run</string>
        <layout class="QGridLayout" name="gridLayout_11">
         <item row="0" column="0" rowspan="2">
          <widget class="B2plot" name="b2plot">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="b2plotCommand">
            <string>echo phys a4p ti te m/ surf | b2plot</string>
           </property>
@@ -830,8 +743,8 @@ and starts the run</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>400</width>
-            <height>200</height>
+            <width>0</width>
+            <height>0</height>
            </size>
           </property>
           <property name="solpsPlotCommand">
@@ -849,8 +762,8 @@ and starts the run</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>400</width>
-            <height>200</height>
+            <width>0</width>
+            <height>0</height>
            </size>
           </property>
           <property name="solpsPlotCommand">
@@ -868,8 +781,8 @@ and starts the run</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>400</width>
-            <height>200</height>
+            <width>0</width>
+            <height>0</height>
            </size>
           </property>
           <property name="solpsPlotCommand">
@@ -879,6 +792,12 @@ and starts the run</string>
         </item>
         <item row="1" column="2">
          <widget class="Gnuplot" name="gnuplot_4">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="solpsPlotCommand">
            <string>rcxhireg_region</string>
           </property>
@@ -909,7 +828,7 @@ and starts the run</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>975</width>
+     <width>746</width>
      <height>20</height>
     </rect>
    </property>
@@ -978,6 +897,11 @@ and starts the run</string>
    <header>director</header>
   </customwidget>
   <customwidget>
+   <class>DivGeo</class>
+   <extends>QWidget</extends>
+   <header>divgeo</header>
+  </customwidget>
+  <customwidget>
    <class>Gnuplot</class>
    <extends>QWidget</extends>
    <header>gnuplot</header>
@@ -1030,12 +954,12 @@ and starts the run</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>52</x>
-     <y>597</y>
+     <x>54</x>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>370</x>
-     <y>597</y>
+     <x>290</x>
+     <y>380</y>
     </hint>
    </hints>
   </connection>
@@ -1046,12 +970,12 @@ and starts the run</string>
    <slot>triggerTextChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>52</x>
-     <y>597</y>
+     <x>54</x>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>635</x>
-     <y>529</y>
+     <x>405</x>
+     <y>322</y>
     </hint>
    </hints>
   </connection>
@@ -1062,8 +986,8 @@ and starts the run</string>
    <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>52</x>
-     <y>597</y>
+     <x>54</x>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
@@ -1094,12 +1018,12 @@ and starts the run</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>52</x>
-     <y>597</y>
+     <x>54</x>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>101</x>
-     <y>583</y>
+     <x>112</x>
+     <y>380</y>
     </hint>
    </hints>
   </connection>
@@ -1110,12 +1034,12 @@ and starts the run</string>
    <slot>run()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>368</x>
-     <y>65</y>
+     <x>379</x>
+     <y>100</y>
     </hint>
     <hint type="destinationlabel">
-     <x>199</x>
-     <y>177</y>
+     <x>210</x>
+     <y>233</y>
     </hint>
    </hints>
   </connection>
@@ -1127,11 +1051,11 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>54</x>
-     <y>597</y>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>449</x>
-     <y>261</y>
+     <x>488</x>
+     <y>204</y>
     </hint>
    </hints>
   </connection>
@@ -1143,11 +1067,11 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>54</x>
-     <y>597</y>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>954</x>
-     <y>264</y>
+     <x>725</x>
+     <y>204</y>
     </hint>
    </hints>
   </connection>
@@ -1158,12 +1082,12 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>52</x>
-     <y>597</y>
+     <x>54</x>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>954</x>
-     <y>264</y>
+     <x>725</x>
+     <y>204</y>
     </hint>
    </hints>
   </connection>
@@ -1174,28 +1098,28 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>52</x>
-     <y>597</y>
+     <x>54</x>
+     <y>380</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>488</x>
+     <y>204</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>gnuplot_2</receiver>
+   <slot>setRunDir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>54</x>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
      <x>449</x>
-     <y>249</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>director</sender>
-   <signal>rundir_passthrough(QString)</signal>
-   <receiver>gnuplot_2</receiver>
-   <slot>setRunDir(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>52</x>
-     <y>597</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>538</x>
-     <y>514</y>
+     <y>270</y>
     </hint>
    </hints>
   </connection>
@@ -1207,11 +1131,11 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>54</x>
-     <y>597</y>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>523</x>
-     <y>514</y>
+     <x>449</x>
+     <y>270</y>
     </hint>
    </hints>
   </connection>
@@ -1222,12 +1146,12 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>52</x>
-     <y>597</y>
+     <x>54</x>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>874</x>
-     <y>519</y>
+     <x>528</x>
+     <y>266</y>
     </hint>
    </hints>
   </connection>
@@ -1239,11 +1163,11 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>54</x>
-     <y>597</y>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>874</x>
-     <y>519</y>
+     <x>528</x>
+     <y>266</y>
     </hint>
    </hints>
   </connection>
@@ -1254,12 +1178,12 @@ and starts the run</string>
    <slot>setAndExecuteTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>199</x>
-     <y>177</y>
+     <x>210</x>
+     <y>233</y>
     </hint>
     <hint type="destinationlabel">
-     <x>368</x>
-     <y>128</y>
+     <x>379</x>
+     <y>183</y>
     </hint>
    </hints>
   </connection>
@@ -1270,12 +1194,12 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>60</x>
-     <y>577</y>
+     <x>54</x>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>368</x>
-     <y>128</y>
+     <x>379</x>
+     <y>183</y>
     </hint>
    </hints>
   </connection>
@@ -1286,12 +1210,12 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>84</x>
-     <y>597</y>
+     <x>54</x>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>167</x>
-     <y>160</y>
+     <x>83</x>
+     <y>120</y>
     </hint>
    </hints>
   </connection>
@@ -1302,12 +1226,12 @@ and starts the run</string>
    <slot>setTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>91</x>
-     <y>570</y>
+     <x>54</x>
+     <y>353</y>
     </hint>
     <hint type="destinationlabel">
-     <x>103</x>
-     <y>156</y>
+     <x>83</x>
+     <y>120</y>
     </hint>
    </hints>
   </connection>
@@ -1318,12 +1242,12 @@ and starts the run</string>
    <slot>executeTcshCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>327</x>
-     <y>570</y>
+     <x>261</x>
+     <y>353</y>
     </hint>
     <hint type="destinationlabel">
-     <x>188</x>
-     <y>127</y>
+     <x>83</x>
+     <y>120</y>
     </hint>
    </hints>
   </connection>
@@ -1334,12 +1258,12 @@ and starts the run</string>
    <slot>setSolpsPlotCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>809</x>
-     <y>538</y>
+     <x>405</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
-     <x>552</x>
-     <y>428</y>
+     <x>425</x>
+     <y>151</y>
     </hint>
    </hints>
   </connection>
@@ -1350,12 +1274,12 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>846</x>
-     <y>538</y>
+     <x>405</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
-     <x>607</x>
-     <y>444</y>
+     <x>425</x>
+     <y>151</y>
     </hint>
    </hints>
   </connection>
@@ -1366,12 +1290,12 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>952</x>
-     <y>539</y>
+     <x>723</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
-     <x>728</x>
-     <y>312</y>
+     <x>425</x>
+     <y>151</y>
     </hint>
    </hints>
   </connection>
@@ -1382,12 +1306,12 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>95</x>
-     <y>577</y>
+     <x>54</x>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>652</x>
-     <y>351</y>
+     <x>425</x>
+     <y>151</y>
     </hint>
    </hints>
   </connection>
@@ -1398,12 +1322,12 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>130</x>
-     <y>587</y>
+     <x>54</x>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>70</x>
-     <y>80</y>
+     <x>43</x>
+     <y>70</y>
     </hint>
    </hints>
   </connection>
@@ -1414,12 +1338,76 @@ and starts the run</string>
    <slot>executeB2plotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>63</x>
-     <y>591</y>
+     <x>54</x>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>84</x>
-     <y>449</y>
+     <x>43</x>
+     <y>70</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>divgeo</receiver>
+   <slot>setRunDir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>54</x>
+     <y>380</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>254</x>
+     <y>285</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>divgeo</receiver>
+   <slot>startDivGeo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>94</x>
+     <y>344</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>248</x>
+     <y>285</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>divgeo</receiver>
+   <slot>embedDivGeo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>714</x>
+     <y>344</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>254</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_3</sender>
+   <signal>clicked()</signal>
+   <receiver>divgeo</receiver>
+   <slot>stopDivGeo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>363</x>
+     <y>335</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>160</x>
+     <y>185</y>
     </hint>
    </hints>
   </connection>

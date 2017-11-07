@@ -65,6 +65,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     main = QMainWindow()
     carreM = Carre()
+    carreM.activateDebugging()
     # carreM.activateDebugging()
     carreM.setTcshPath('/bin/tcsh')
     path = os.path.expanduser(
