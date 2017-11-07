@@ -80,8 +80,11 @@ class DivGeo(Akter):
 
         self._container = None
         self._window = None
+
         self.labelContainer = None
-        self.DivGeoID = None
+
+        self.DivGeoWID = None
+        self.DivGeoPID = None
         self.Layout = QVBoxLayout()
         self.setLayout(self.Layout)
 
@@ -103,8 +106,7 @@ class DivGeo(Akter):
 
         for line in text.splitlines():
             if "DivGeo WID: " in line:
-                DG_ID = int(line.lstrip("DivGeo WID: "))
-                self.DivGeoID = DG_ID
+                self.DivGeoWID = int(line.lstrip("DivGeo WID: "))
 
             if "DivGeo PID: " in line:
                 self.DivGeoPID = int(line.lstrip("DivGeo PID: "))
@@ -146,13 +148,13 @@ class DivGeo(Akter):
         """
 
         # Clean the layout first!
-        if not self.DivGeoID:
+        if not self.DivGeoWID:
             return
 
         self.clearLayout()
 
         self.hide()
-        self._window = QWindow.fromWinId(self.DivGeoID)
+        self._window = QWindow.fromWinId(self.DivGeoWID)
 
         self._container = QWidget.createWindowContainer(self._window,
                                                         self.parent(),
@@ -166,10 +168,14 @@ class DivGeo(Akter):
         """ Starts divgeo process inside the qwidget. We provide geometry
         coordinates, width and height for starting divgeo.
         """
-        if self.layout():
-            self.clearLayout()
         self.labelContainer = QLabel()
         self.labelContainer.setAlignment(Qt.AlignCenter)
+        if self.tcsh.state():
+            return
+
+        if self.layout():
+            self.clearLayout()
+
         self.layout().addWidget(self.labelContainer)
 
         if not self.getRunDir():
@@ -194,25 +200,28 @@ class DivGeo(Akter):
 
     @pyqtSlot()
     def stopDivGeo(self):
-        if not self.labelContainer:
-            self.labelContainer = QLabel()
-            self.labelContainer.setAlignment(Qt.AlignCenter)
-        self.layout().addWidget(self.labelContainer)
+        if not self.tcsh.state():
+            message = "DivGeo not running."
+            return
 
         if self.DivGeoPID:
             os.kill(self.DivGeoPID, signal.SIGUSR1)
+            # Clearing IDs.
+            self.DivGeoPID = None
+            self.DivGeoWID = None
+            message = "Terminated DivGeo."
         else:
-            self.labelContainer.setText("No DivGeo PID!")
+            message ="No DivGeo PID!"
             return
 
-        if self.tcsh.waitForFinished():
-            self.tcsh.close()
-            self.clearLayout()
-            self.labelContainer.setText("Terminated DivGeo.")
+        self.tcsh.close()
 
-        else:
-            self.labelContainer.setText("DivGeo not running.")
+        self.clearLayout()
 
+        self.labelContainer = QLabel()
+        self.labelContainer.setAlignment(Qt.AlignCenter)
+        self.layout().addWidget(self.labelContainer)
+        self.labelContainer.setText(message)
 
     def clearLayout(self):
         """Clearing the layout of widgets.
