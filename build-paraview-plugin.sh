@@ -6,14 +6,14 @@ BUILD_DIR="${BUILDROOT}/build"
 PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.1}
 QT_VERSION=${QT_VERSION:-4.8.7}
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
-STAGING_PARAVIEW="${STAGING_DIR}/paraview/${PARAVIEW_VERSION}"
-STAGING_PLUGINS="${STAGING_DIR}/paraview-plugins/${PARAVIEW_VERSION}/${IMAS_VERSION}"
+STAGING_PARAVIEW=${STAGING_DIR}/paraview/${PARAVIEW_VERSION}
+STAGING_PLUGINS=${STAGING_PLUGINS:-${STAGING_DIR}/paraview-plugins/${PARAVIEW_VERSION}/${IMAS_VERSION}}
 
 
 case $(hostname -f) in
   *.iter.org) 
 	      # module purge
-        module load imas/3.11.0/ual/3.6.2 blitz/0.10 binutils/2.25
+        module load imas/3.12.0/ual/3.6.3 blitz/0.10 binutils/2.25
         module load OpenSSL/1.0.2g-GCC-4.8.3
         module load Python/2.7.9-goolf-1.5.16 # overwrite Anaconda
 	export CC=gcc
