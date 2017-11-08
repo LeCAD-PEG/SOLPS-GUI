@@ -17,6 +17,7 @@ except ImportError as e:
 import tarfile
 import base64
 import os
+import logging
 
 from PyQt5.QtCore import pyqtSlot, Qt, QSize, QThread, pyqtSignal, pyqtProperty
 from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit, QPushButton,
@@ -28,127 +29,6 @@ try:
     import BytesIO
 except ImportError as e:
     from io import BytesIO
-
-class GetIDS(QWidget):
-    """ Push button used for plugin."""
-    emitMessage = pyqtSignal(str)
-    finished = pyqtSignal()
-
-    def __init__(self, parent=None):
-        super(GetIDS, self).__init__(parent)
-
-        self._RunName = ''
-        self._user = ''
-        self._shot = ''
-        self._device = ''
-        self._version = ''
-        self._run = ''
-        self._runName = ''
-        self._dirPAth = ''
-
-        self.thread = GetIDSQThread(self)
-
-        self.pushButton = QPushButton(self)
-        self.pushButton.setText("Get IDS")
-        self.pushButton.clicked.connect(self.getFromIDS)
-        self.pushButton.setEnabled(ENABLED)
-
-        layout = QGridLayout()
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(self.pushButton)
-        self.setLayout(layout)
-
-        self.thread.startFlag.connect(self.pushButton.setEnabled)
-        self.thread.emitMessage.connect(self.emitMessage)
-        self.thread.finished.connect(self.finished)
-
-    @pyqtSlot(str)
-    def setUser(self, user):
-        self._user = user
-
-    def getUser(self):
-        return self._user
-
-    user = pyqtProperty(str, getUser, setUser)
-
-    @pyqtSlot(str)
-    def setDevice(self, device):
-        self._device = device
-
-    def getDevice(self):
-        return self._device
-
-    device = pyqtProperty(str, getDevice, setDevice)
-
-    @pyqtSlot(str)
-    def setVersion(self, version):
-        self._version = version
-
-    def getVersion(self):
-        return self._version
-
-    version = pyqtProperty(str, getVersion, setVersion)
-
-    @pyqtSlot(str)
-    def setRun(self, run):
-        self._run = run
-
-    def getRun(self):
-        return self._run
-
-    runNumber = pyqtProperty(str, getRun, setRun)
-
-    @pyqtSlot(str)
-    def setShot(self, shot):
-        self._shot = shot
-
-    def getShot(self):
-        return self._shot
-
-    shotNumber = pyqtProperty(str, getShot, setShot)
-
-    @pyqtSlot(str)
-    def setDirPath(self, savedir):
-        self._dirPAth = savedir
-
-    def getDirPath(self):
-        return self._dirPAth
-
-    dirPath = pyqtProperty(str, getDirPath, setDirPath)
-
-    @pyqtSlot(str)
-    def setRunName(self, name):
-        self._runName = name
-
-    def getRunName(self):
-        return self._runName
-
-    runName = pyqtProperty(str, getRunName, setRunName)
-
-    @pyqtSlot()
-    def getFromIDS(self):
-        if self._runName and self._shot and self._user and self._version and \
-           self._device and self._run:
-            pass
-
-        else:
-            # Not all variables are set
-            dialog = GetDialog(self)
-            dialog.prepareWidgets(shot=self._shot, run=self._run,
-                                  user=self._user, device=self._device,
-                                  version=self._version, path=self._runName)
-            if dialog.exec_():
-                self._shot, self._run, self._user, self._device, \
-                self._version, self._runName, self._dirPath = dialog.on_close()
-
-        self.thread.setParameters(dirpath=self._dirPath, run=int(self._run),
-                                  shot=int(self._shot), device=self._device,
-                                  version=self._version, user=self._user,
-                                  runName=self._runName)
-        self.thread.checkParameters()
-        self.thread.start()
-
 
 class GetDialog(QDialog):
     """Dialog Demanding the shot, run, name and device for getting the data
@@ -222,11 +102,164 @@ class GetDialog(QDialog):
 
         return SHOT, RUN, USER, DEVICE, VERSION, RUN_NAME, DIR_PATH
 
+class GetIDS(QWidget):
+    """ Push button used for plugin."""
+    finished = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super(GetIDS, self).__init__(parent)
+
+        self._user = ''
+        self._shot = ''
+        self._device = ''
+        self._version = ''
+        self._run = ''
+        self._runName = ''
+        self._dirPath = ''
+
+        self.thread = GetIDSQThread(self)
+        self.thread.finished.connect(self.cleanUp)
+
+        self.pushButton = QPushButton(self)
+        self.pushButton.setText("Get IDS")
+        self.pushButton.clicked.connect(self.getFromIDS)
+        self.pushButton.setEnabled(ENABLED)
+
+        layout = QGridLayout()
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.pushButton)
+        self.setLayout(layout)
+
+        self.thread.startFlag.connect(self.pushButton.setEnabled)
+        self.thread.finished.connect(self.finished)
+
+    @pyqtSlot(str)
+    def setUser(self, user):
+        self._user = user
+
+    def getUser(self):
+        return self._user
+
+    user = pyqtProperty(str, getUser, setUser)
+
+    @pyqtSlot(str)
+    def setDevice(self, device):
+        self._device = device
+
+    def getDevice(self):
+        return self._device
+
+    device = pyqtProperty(str, getDevice, setDevice)
+
+    @pyqtSlot(str)
+    def setVersion(self, version):
+        self._version = version
+
+    def getVersion(self):
+        return self._version
+
+    version = pyqtProperty(str, getVersion, setVersion)
+
+    @pyqtSlot(str)
+    def setRun(self, run):
+        self._run = run
+
+    def getRun(self):
+        return self._run
+
+    runNumber = pyqtProperty(str, getRun, setRun)
+
+    @pyqtSlot(str)
+    def setShot(self, shot):
+        self._shot = shot
+
+    def getShot(self):
+        return self._shot
+
+    shotNumber = pyqtProperty(str, getShot, setShot)
+
+    @pyqtSlot(str)
+    def setDirPath(self, savedir):
+        self._dirPath = savedir
+
+    def getDirPath(self):
+        return self._dirPath
+
+    dirPath = pyqtProperty(str, getDirPath, setDirPath)
+
+    @pyqtSlot(str)
+    def setRunName(self, name):
+        self._runName = name
+
+    def getRunName(self):
+        return self._runName
+
+    runName = pyqtProperty(str, getRunName, setRunName)
+
+    def checkParameters(self):
+        if self._runName and self._shot and self._user and self._version and \
+           self._device and self._run and self._dirPath:
+            return True
+
+        else:
+            # Not all variables are set
+            dialog = GetDialog(self)
+            dialog.prepareWidgets(shot=self._shot, run=self._run,
+                                  user=self._user, device=self._device,
+                                  version=self._version, path=self._dirPath)
+            if dialog.exec_():
+                self._shot, self._run, self._user, self._device, \
+                self._version, self._runName, self._dirPath = dialog.on_close()
+                return self.checkParameters()
+            else:
+                # Canceled!
+                return False
+
+    def checkDestination(self):
+        if self.dirpath == '' and self.runName == '':
+            logging.warning('No location specified, saving stopped!')
+            return False
+
+        dir_path = self.dirpath + '/' + self.runName
+
+        if os.path.exists(dir_path):
+            logging.error('Directory already exists... Canceling!')
+            return False
+
+        return True
+
+    @pyqtSlot()
+    def getFromIDS(self):
+        if not self.checkParameters():
+            logging.warning('Not all parameters are set! Canceling.')
+            self.cleanUp()
+            return
+        else:
+            logging.info('All parameters set. Continuing.')
+
+        if not self.checkDestination:
+            return
+
+        self.thread.setParameters(dirpath=self._dirPath, run=int(self._run),
+                                  shot=int(self._shot), device=self._device,
+                                  version=self._version, user=self._user,
+                                  runName=self._runName)
+        self.thread.start()
+
+    @pyqtSlot()
+    def cleanUp(self):
+        self._user = ''
+        self._shot = ''
+        self._device = ''
+        self._version = ''
+        self._run = ''
+        self._runName = ''
+        self._dirPath = ''
 
 class GetIDSQThread(QThread):
     """QThread for getting data from an IDS from a separate thread.
     """
-    emitMessage = pyqtSignal(str)
     startFlag = pyqtSignal(bool)
 
     def __init__(self, parent=None):
@@ -246,12 +279,6 @@ class GetIDSQThread(QThread):
         self.finished.connect(self.on_finish)
         self.started.connect(self.on_start)
 
-    def setStatusBar(self, status_bar):
-        self.status_bar = status_bar
-
-    def setPushButton(self, push_button):
-        self.push_button = push_button
-
     def setParameters(self, shot=0, run=0, user='', device='', version='',
                       dirpath='', runName=''):
         """Function that sets the parameters.
@@ -264,35 +291,7 @@ class GetIDSQThread(QThread):
         self.dirpath = dirpath
         self.runName = runName
 
-    def checkParameters(self):
-        """Function that checks if all parameter are defined to open an IDS.
-        If not all parameters are provided, a QDialog will open and asking for
-        other parameters, necessary to open an IDS.
 
-        If you use the GetIDS from a CLI this usually doesn't happen, but if it
-        is implemented in a GUI, usually a user will expect some sort of dialog
-        to provide the parameters."""
-
-        if self.shot and self.runNumber and self.user and self.device and \
-           self.version:
-            return True
-        else:
-            self.emitMessage.emit("Not all parameters are specified!")
-            print("Not all parameters are specified!")
-            dialog = GetDialog(self.parent)
-            dialog.prepareWidgets(shot=self.shot, run=self.runNumber,
-                                  user=self.user, device=self.device,
-                                  version=self.version, path=self.dirpath)
-
-            if dialog.exec_():
-                self.shot, self.runNumber, self.user, self.device, \
-                  self.version, self.runName, self.dirpath = dialog.on_close()
-                return self.checkParameters()
-            else:
-                self.emitMessage.emit("Dialog canceled, not enough "
-                                      "parameters.")
-                print("Dialog canceled, not enough parameters.")
-                return False
 
     def run(self):
         ids = GetIDSWrapper(int(self.shot), int(self.runNumber), self.user,
@@ -302,19 +301,17 @@ class GetIDSQThread(QThread):
         if ids.state:
             ids.saveData()
         else:
-            print('IDS did not open correctly.')
+            logging.warning('IDS did not open correctly.')
 
     @pyqtSlot()
     def on_start(self):
-        print('Getting IDS...')
-        self.emitMessage.emit('Getting IDS...')
+        logging.info('Getting IDS...')
         self.startFlag.emit(False)
 
     @pyqtSlot()
     def on_finish(self):
-        print('Finished')
+        logging.info('Finished reading from IDS.')
         self.startFlag.emit(True)
-        self.emitMessage.emit('Finished.')
 
 
 class GetIDSWrapper:
@@ -329,6 +326,12 @@ class GetIDSWrapper:
     def __init__(self, shot='', run='', user='', machine='', version='',
                  dirpath='', runName=''):
 
+        self.setParameters(shot, run, user, machine, version, dirpath, runName)
+        self.ids = imas.ids(shot, run)
+        self.state = self.openIDS()
+
+    def setParameters(self, shot, run, user, machine, version, dirpath,
+                      runName):
         self.shot = shot
         self.run = run
         self.user = user
@@ -338,17 +341,14 @@ class GetIDSWrapper:
         self.dirpath = dirpath
         self.runName = runName
 
-        self.ids = imas.ids(shot, run)
-        self.state = self.openIDS()
-
     def openIDS(self):
-        print('Opening IDS')
+        logging.info('Opening IDS')
         self.ids.open_env(self.user, self.machine, self.version)
         if self.ids.isConnected():
-            print('IDS opened OK!')
+            logging.info('IDS opened OK!')
             return True
         else:
-            print('IDS open failed!')
+            logging.error('IDS open failed!')
             return False
 
     def readCodeParameters(self):
@@ -369,22 +369,14 @@ class GetIDSWrapper:
         """Saves data in the directory with the name ``runName``. The directory
         is located in the ``dirpath``.
         """
-        if self.dirpath == '' and self.runName == '':
-            print('No location specified, saving stopped!')
-            return
-
         dir_path = self.dirpath + '/' + self.runName
-
-        if os.path.exists(dir_path):
-            print('Directory already exists... Canceling!')
-            return
 
         try:
             tar = self.extractFiles()
             for member in tar:
                 name = member.name
                 file = tar.extractfile(member).read().decode()
-                print("Writing to ", dir_path + '/' + name)
+                logging.info("Writing to " + dir_path + '/' + name)
                 abs_path = dir_path + '/' + name
 
                 # The reason for the following lines is that some input files
@@ -395,13 +387,15 @@ class GetIDSWrapper:
                     try:
                         os.makedirs(os.path.dirname(abs_path))
                     except OSError:
-                        print("Warning! Cannot create directory, permission "
-                              "denied")
+                        logging.warning("Warning! Cannot create directory, "
+                                        " permission denied")
                         continue
                 with open(abs_path, 'w') as f:
                     f.write(file)
         except PermissionError:
-            print('Warning!, No permission in the current directory!')
+            logging.error('Warning!, No permission in the current directory!')
+        except tarfile.ReadError as e:
+            logging.error('Warning empty file!')
 
 if __name__ == '__main__':
 

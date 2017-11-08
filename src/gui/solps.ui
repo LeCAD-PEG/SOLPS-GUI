@@ -11,7 +11,7 @@
     <x>0</x>
     <y>0</y>
     <width>662</width>
-    <height>265</height>
+    <height>547</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -147,46 +147,7 @@ self.output.emit(&quot;ls -ld run*&quot;)</string>
             <string>DivGeo</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_12">
-            <item row="1" column="0">
-             <widget class="QPushButton" name="pushButton">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Start DivGeo</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QPushButton" name="pushButton_3">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Stop DivGeo</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="2">
-             <widget class="QPushButton" name="pushButton_2">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Embed DivGeo</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0" colspan="3">
+            <item row="0" column="0" colspan="2">
              <widget class="DivGeo" name="divgeo">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -570,7 +531,7 @@ and starts the run</string>
         <item row="0" column="0">
          <widget class="SolpsInput" name="solpsview">
           <property name="currentIndex">
-           <number>6</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="tab_14">
            <attribute name="title">
@@ -678,130 +639,6 @@ and starts the run</string>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_15">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <attribute name="title">
-        <string>Plots</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_11">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <property name="spacing">
-         <number>0</number>
-        </property>
-        <item row="0" column="0" rowspan="2">
-         <widget class="B2plot" name="b2plot">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="b2plotCommand">
-           <string>echo phys a4p ti te m/ surf | b2plot</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="Gnuplot" name="gnuplot_3">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="solpsPlotCommand">
-           <string>energy_analysis</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="Gnuplot" name="gnuplot_8">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="solpsPlotCommand">
-           <string>energy_balance</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="Gnuplot" name="gnuplot_2">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="solpsPlotCommand">
-           <string>reshi_reg</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="Gnuplot" name="gnuplot_4">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="solpsPlotCommand">
-           <string>rcxhireg_region</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="pushButton_8">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Plot</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
      </widget>
     </item>
    </layout>
@@ -870,11 +707,6 @@ and starts the run</string>
   </action>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>B2plot</class>
-   <extends>QWidget</extends>
-   <header>b2plot</header>
-  </customwidget>
   <customwidget>
    <class>Director</class>
    <extends>QCheckBox</extends>
@@ -949,11 +781,11 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>76</y>
+     <y>202</y>
     </hint>
     <hint type="destinationlabel">
-     <x>101</x>
-     <y>76</y>
+     <x>279</x>
+     <y>202</y>
     </hint>
    </hints>
   </connection>
@@ -965,11 +797,11 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>76</y>
+     <y>202</y>
     </hint>
     <hint type="destinationlabel">
-     <x>87</x>
-     <y>72</y>
+     <x>324</x>
+     <y>179</y>
     </hint>
    </hints>
   </connection>
@@ -981,7 +813,7 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>76</y>
+     <y>202</y>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
@@ -1013,11 +845,11 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>76</y>
+     <y>202</y>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
-     <y>79</y>
+     <y>208</y>
     </hint>
    </hints>
   </connection>
@@ -1028,140 +860,12 @@ and starts the run</string>
    <slot>run()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>101</x>
-     <y>64</y>
+     <x>352</x>
+     <y>65</y>
     </hint>
     <hint type="destinationlabel">
      <x>199</x>
-     <y>124</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_8</sender>
-   <signal>clicked()</signal>
-   <receiver>gnuplot_3</receiver>
-   <slot>executeSolpsPlotCommand()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>44</x>
-     <y>85</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>77</x>
-     <y>65</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_8</sender>
-   <signal>clicked()</signal>
-   <receiver>gnuplot_8</receiver>
-   <slot>executeSolpsPlotCommand()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>44</x>
-     <y>85</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>110</x>
-     <y>65</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>director</sender>
-   <signal>rundir_passthrough(QString)</signal>
-   <receiver>gnuplot_8</receiver>
-   <slot>setRunDir(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>43</x>
-     <y>76</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>110</x>
-     <y>65</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>director</sender>
-   <signal>rundir_passthrough(QString)</signal>
-   <receiver>gnuplot_3</receiver>
-   <slot>setRunDir(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>43</x>
-     <y>76</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>77</x>
-     <y>65</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>director</sender>
-   <signal>rundir_passthrough(QString)</signal>
-   <receiver>gnuplot_2</receiver>
-   <slot>setRunDir(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>43</x>
-     <y>76</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>77</x>
-     <y>75</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_8</sender>
-   <signal>clicked()</signal>
-   <receiver>gnuplot_2</receiver>
-   <slot>executeSolpsPlotCommand()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>44</x>
-     <y>85</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>77</x>
-     <y>75</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>director</sender>
-   <signal>rundir_passthrough(QString)</signal>
-   <receiver>gnuplot_4</receiver>
-   <slot>setRunDir(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>43</x>
-     <y>76</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>110</x>
-     <y>75</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_8</sender>
-   <signal>clicked()</signal>
-   <receiver>gnuplot_4</receiver>
-   <slot>executeSolpsPlotCommand()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>44</x>
-     <y>85</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>110</x>
-     <y>75</y>
+     <y>177</y>
     </hint>
    </hints>
   </connection>
@@ -1173,11 +877,11 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>199</x>
-     <y>124</y>
+     <y>177</y>
     </hint>
     <hint type="destinationlabel">
-     <x>101</x>
-     <y>74</y>
+     <x>352</x>
+     <y>128</y>
     </hint>
    </hints>
   </connection>
@@ -1189,11 +893,11 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>76</y>
+     <y>202</y>
     </hint>
     <hint type="destinationlabel">
-     <x>101</x>
-     <y>74</y>
+     <x>352</x>
+     <y>128</y>
     </hint>
    </hints>
   </connection>
@@ -1205,11 +909,11 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>76</y>
+     <y>202</y>
     </hint>
     <hint type="destinationlabel">
      <x>72</x>
-     <y>64</y>
+     <y>65</y>
     </hint>
    </hints>
   </connection>
@@ -1221,11 +925,11 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>70</y>
+     <y>173</y>
     </hint>
     <hint type="destinationlabel">
      <x>72</x>
-     <y>64</y>
+     <y>65</y>
     </hint>
    </hints>
   </connection>
@@ -1236,12 +940,12 @@ and starts the run</string>
    <slot>executeTcshCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>72</x>
-     <y>70</y>
+     <x>250</x>
+     <y>173</y>
     </hint>
     <hint type="destinationlabel">
      <x>72</x>
-     <y>64</y>
+     <y>65</y>
     </hint>
    </hints>
   </connection>
@@ -1252,12 +956,12 @@ and starts the run</string>
    <slot>setSolpsPlotCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>87</x>
-     <y>72</y>
+     <x>324</x>
+     <y>179</y>
     </hint>
     <hint type="destinationlabel">
-     <x>100</x>
-     <y>65</y>
+     <x>336</x>
+     <y>66</y>
     </hint>
    </hints>
   </connection>
@@ -1268,12 +972,12 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>87</x>
-     <y>72</y>
+     <x>324</x>
+     <y>179</y>
     </hint>
     <hint type="destinationlabel">
-     <x>100</x>
-     <y>65</y>
+     <x>336</x>
+     <y>66</y>
     </hint>
    </hints>
   </connection>
@@ -1284,12 +988,12 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>99</x>
-     <y>72</y>
+     <x>563</x>
+     <y>178</y>
     </hint>
     <hint type="destinationlabel">
-     <x>100</x>
-     <y>65</y>
+     <x>336</x>
+     <y>66</y>
     </hint>
    </hints>
   </connection>
@@ -1301,43 +1005,11 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>76</y>
+     <y>202</y>
     </hint>
     <hint type="destinationlabel">
-     <x>100</x>
-     <y>65</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>director</sender>
-   <signal>rundir_passthrough(QString)</signal>
-   <receiver>b2plot</receiver>
-   <slot>setRunDir(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>43</x>
-     <y>76</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>43</x>
-     <y>70</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_8</sender>
-   <signal>clicked()</signal>
-   <receiver>b2plot</receiver>
-   <slot>executeB2plotCommand()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>44</x>
-     <y>85</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>43</x>
-     <y>70</y>
+     <x>336</x>
+     <y>66</y>
     </hint>
    </hints>
   </connection>
@@ -1349,91 +1021,11 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>76</y>
+     <y>202</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
      <y>76</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>divgeo</receiver>
-   <slot>startDivGeo()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>52</x>
-     <y>85</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>110</x>
-     <y>76</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_2</sender>
-   <signal>clicked()</signal>
-   <receiver>divgeo</receiver>
-   <slot>embedDivGeo()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>110</x>
-     <y>85</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>110</x>
-     <y>76</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_3</sender>
-   <signal>clicked()</signal>
-   <receiver>divgeo</receiver>
-   <slot>stopDivGeo()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>81</x>
-     <y>85</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>110</x>
-     <y>76</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>put_edge_ids</sender>
-   <signal>emitMessage(QString)</signal>
-   <receiver>statusbar</receiver>
-   <slot>showMessage(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>520</x>
-     <y>69</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>321</x>
-     <y>706</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>get_edge_ids</sender>
-   <signal>emitMessage(QString)</signal>
-   <receiver>statusbar</receiver>
-   <slot>showMessage(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>642</x>
-     <y>67</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>408</x>
-     <y>704</y>
     </hint>
    </hints>
   </connection>
@@ -1444,11 +1036,27 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>31</x>
-     <y>76</y>
+     <x>42</x>
+     <y>202</y>
     </hint>
     <hint type="destinationlabel">
      <x>530</x>
+     <y>67</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>get_edge_ids</receiver>
+   <slot>setDirPath(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>31</x>
+     <y>202</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>610</x>
      <y>67</y>
     </hint>
    </hints>

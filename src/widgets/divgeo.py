@@ -4,7 +4,7 @@
 
 from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QSettings
 from PyQt5.QtGui import QWindow
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QWidgetItem, QLabel
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QWidgetItem, QLabel, QFrame
 
 import logging
 import os
@@ -12,6 +12,8 @@ from functools import partial
 import signal
 from akter import Akter
 
+class State:
+    notRunning, running, runningDocked = range(3)
 
 class DivGeo(Akter):
     """
@@ -87,7 +89,14 @@ class DivGeo(Akter):
         self.Layout = QVBoxLayout()
         self.setLayout(self.Layout)
 
+        self.labelContainer = QLabel()
+        self.labelContainer.setText('DivGeo2\nClick to run DivGeo2')
+        self.labelContainer.setAlignment(Qt.AlignCenter)
+        self.Layout.addWidget(self.labelContainer)
+
         self.tcsh.stdOutput.connect(self.readStdOutput)
+
+        self.STATE = State.notRunning
 
         # Call SIGUSR1 signal to DivGeo when main window closes.
         # Partial is used, because otherwise function will  not be
@@ -118,7 +127,9 @@ class DivGeo(Akter):
                 self.DivGeoPID = int(line.lstrip("DivGeo PID: "))
 
         if 'STARTING DIVGEO' in text:
-            self.labelContainer.setText("DivGeo running.")
+            self.labelContainer.setText("DivGeo2 running.\nPress to "
+                                        "dock DivGeo2.")
+            self.STATE = State.running
 
         logging.debug(text)
 
@@ -174,10 +185,12 @@ class DivGeo(Akter):
         """ Starts divgeo process inside the qwidget. We provide geometry
         coordinates, width and height for starting divgeo.
         """
-        self.labelContainer = QLabel()
-        self.labelContainer.setAlignment(Qt.AlignCenter)
+
         if self.tcsh.state():
             return
+
+        self.labelContainer = QLabel()
+        self.labelContainer.setAlignment(Qt.AlignCenter)
 
         if self.layout():
             self.clearLayout()
@@ -239,6 +252,16 @@ class DivGeo(Akter):
             self.layout().removeItem(item)
             del item
 
+    def mousePressEvent(self, e):
+        press = e.button()
+        if press == Qt.LeftButton:
+            if self.STATE == State.notRunning:
+                self.startDivGeo()
+            elif self.STATE == State.running:
+                self.embedDivGeo()
+
+        return super(DivGeo, self).mousePressEvent(e)
+
 
 if __name__ == "__main__":
     @pyqtSlot()
@@ -265,26 +288,7 @@ if __name__ == "__main__":
     # divgeo.setGeometry(QRect(70, 30, 501, 411))
     # divgeo.resize(500,500)
 
-    pushButton = QPushButton()
-    # pushButton.setGeometry(QRect(30, 450, 81, 22))
-    pushButton.setText("Start/Stop")
-
-    pushButtonR = QPushButton()
-    # pushButtonR.setGeometry(QRect(130, 450, 81, 22))
-    pushButtonR.setText("Resize")
-
-    pushButtonE = QPushButton()
-    pushButtonE.setText("Embed DivGeo")
-
-    # main_window.setCentralWidget(divgeo)
-    pushButton.clicked.connect(divgeo.startDivGeo)
-    pushButtonR.clicked.connect(cbresize)
-    pushButtonE.clicked.connect(divgeo.embedDivGeo)
-
     layout.addWidget(divgeo)
-    layout.addWidget(pushButton)
-    layout.addWidget(pushButtonR)
-    layout.addWidget(pushButtonE)
 
     w = QWidget(main_window)
     w.setLayout(layout)

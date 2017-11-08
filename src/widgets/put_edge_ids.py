@@ -38,7 +38,7 @@ except ImportError as e:
 
 
 import getopt
-
+import logging
 import os
 import tarfile
 import base64
@@ -88,6 +88,7 @@ class PutIDS(QWidget):
         self._run = ''
 
         self.thread = PutIDSQThread(self)
+        self.thread.finished.connect(self.cleanUp)
 
         self.pushButton = QPushButton(self)
         self.pushButton.setText("Put IDS")
@@ -95,8 +96,6 @@ class PutIDS(QWidget):
         self.pushButton.setEnabled(ENABLED)
 
         self.thread.startFlag.connect(self.pushButton.setEnabled)
-        self.thread.emitMessage.connect(self.emitMessage)
-
         layout = QGridLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -158,27 +157,52 @@ class PutIDS(QWidget):
 
     shotNumber = pyqtProperty(str, getShot, setShot)
 
-    @pyqtSlot()
-    def putToIDS(self):
-        if self._rundir and self._shot and self._user and self._version and \
-           self._device and self._run:
-            pass
+    def checkParameters(self):
+        """Function that checks if all parameter are defined to open an IDS.
+        If not all parameters are provided, a QDialog will open and asking for
+        other parameters, necessary to open an IDS.
 
+        If you use the GetIDS from a CLI this usually doesn't happen, but if it
+        is implemented in a GUI, usually a user will expect some sort of dialog
+        to provide the parameters."""
+
+        if self._shot and self._run and self._user and self._device and \
+           self._version and self._rundir:
+            return True
         else:
-            # Not all variables are set
+            logging.warning("Not all parameters are specified!")
             dialog = PutDialog(self)
             dialog.prepareWidgets(shot=self._shot, run=self._run,
                                   user=self._user, device=self._device,
                                   version=self._version, path=self._rundir)
+
             if dialog.exec_():
                 self._shot, self._run, self._user, self._device, \
-                    self._version, self._rundir = dialog.on_close()
+                  self._version, self._rundir = dialog.on_close()
+                return self.checkParameters()
+            else:
+                logging.warning("Dialog canceled, not enough parameters.")
+                return False
+
+    @pyqtSlot()
+    def putToIDS(self):
+        if not self.checkParameters():
+            self.cleanUp()
+            return
 
         self.thread.setParameters(self._rundir, int(self._run),
                                   int(self._shot), self._device, self._version,
                                   self._user)
-        self.thread.checkParameters()
         self.thread.start()
+
+    @pyqtSlot()
+    def cleanUp(self):
+        self._rundir = ''
+        self._user = ''
+        self._shot = ''
+        self._device = ''
+        self._version = ''
+        self._run = ''
 
 
 class PutDialog(QDialog):
@@ -382,9 +406,9 @@ class PutIDSwrapper:
         self.state = self.connected()
 
         if self.state:
-            print('Created data entry!')
+            logging.info('Created IDS data entry.')
         else:
-            print('Failed to create data entry.')
+            logging.error('Failed to create data entry.')
 
     def connected(self):
         """Checks whether the data entry has been created."""
@@ -415,7 +439,7 @@ class PutIDSwrapper:
         """ Writing code parameters, which is basically tar-balled input files
         for SOLPS run and then encoded with base64 to avoid null terminations.
         """
-        print('Writing code parameters.')
+        logging.info('Writing code parameters.')
         self.imas_obj.edge_profiles.code.parameters = code_parameters
 
     def writeCoordinates(self, rC, zC, dimR, dimZ):
@@ -423,7 +447,7 @@ class PutIDSwrapper:
         **Nodes** and the ``cells`` are storred in **Cells**.
         The functions used for this are **writeNodes** and **writeCells**.
         """
-        print('Writing coordinates.')
+        logging.info('Writing coordinates.')
         grid = self.imas_obj.edge_profiles.ggd[0].grid
         grid.space.resize(1)
         # Set (IDS substructure shortcut variable) space0
@@ -445,7 +469,7 @@ class PutIDSwrapper:
     def writeNodes(self, rC, zC):
         """Writes points (0D elements) to Nodes inside the IDS.
         """
-        print('Writing nodes.')
+        logging.info('Writing nodes.')
         # -- Put DATA FOR GRID SUBSET "Nodes" --
         # (grid subset index: 2, objects forming the grid subset: nodes, 0D)
         # Note:  All indices must be put in Fortran index notation
@@ -497,7 +521,7 @@ class PutIDSwrapper:
     def writeCells(self, dimR, dimZ):
         """Writes cells (2D elements) to Cells inside the IDS.
         """
-        print('Writing cells.')
+        logging.info('Writing cells.')
         # -- Put DATA FOR GRUD SUBSET "Cells"
         # (grid subset index: 1, objects forming the grid subset: cells, 2D)
         grid = self.imas_obj.edge_profiles.ggd[0].grid
@@ -618,7 +642,6 @@ class PutIDSQThread(QThread):
     to send messages about the state of Putting IDS.
     """
 
-    emitMessage = pyqtSignal(str)
     startFlag = pyqtSignal(bool)
 
     def __init__(self, dirpath='', run='', shot='', device='', version='',
@@ -641,94 +664,64 @@ class PutIDSQThread(QThread):
         self.version = version
         self.user = user
 
-    def checkParameters(self):
-        """Function that checks if all parameter are defined to open an IDS.
-        If not all parameters are provided, a QDialog will open and asking for
-        other parameters, necessary to open an IDS.
-
-        If you use the GetIDS from a CLI this usually doesn't happen, but if it
-        is implemented in a GUI, usually a user will expect some sort of dialog
-        to provide the parameters."""
-
-        if self.shot and self.runNumber and self.user and self.device and \
-           self.version:
-            return True
-        else:
-            self.emitMessage.emit("Not all parameters are specified!")
-            print("Not all parameters are specified!")
-            dialog = GetDialog(self.parent)
-            dialog.prepareWidgets(shot=self.shot, run=self.runNumber,
-                                  user=self.user, device=self.device,
-                                  version=self.version, path=self.dirpath)
-
-            if dialog.exec_():
-                self.shot, self.runNumber, self.user, self.device, \
-                  self.version, self.runName, self.dirpath = dialog.on_close()
-                return self.checkParameters()
-            else:
-                self.emitMessage.emit("Dialog canceled, not enough "
-                                      "parameters.")
-                print("Dialog canceled, not enough parameters.")
-                return False
-
     def run(self):
         """Threaded run function that writes the data of the B2 output files
         and input files to the given IDS entry.
         """
-        self.emitMessage.emit("Reading files...")
+        logging.info('Reading files...')
         b2out = False
         if os.path.exists(self.rundir + '/' + 'b2fgmtry') and \
            os.path.exists(self.rundir + '/' + 'b2fstati'):
             coorAr = readB2output(self.rundir, 'b2fgmtry',
                                   variables=['nx,ny', 'crx', 'cry'])
-            self.emitMessage.emit("B2fmtry read.")
+            logging.info('B2fmtry read.')
             tempAr = readB2output(self.rundir, 'b2fstati',
                                   variables=['ne', 'te', 'ti'])
-            self.emitMessage.emit("B2fstati read.")
+            logging.info('B2fstati read.')
             b2out = True
         else:
-            self.emitMessage.emit('No b2ouput files found, skipping writing'
+            logging.info('No b2ouput files found, skipping writing'
                                   ' output files to IDS.')
 
         code_parameters = tarInputFiles(self.rundir)
-        self.emitMessage.emit("Code parameters read.")
-        self.emitMessage.emit("Creating IDS object.")
+        logging.info('Code parameters read.')
+        logging.info('Creating IDS object.')
         ids = PutIDSwrapper(self.user, self.device, self.shot, self.runNumber,
                             self.version)
-        self.emitMessage.emit("IDS object created.")
+        logging.info('IDS object created.')
         if not ids.connected():
-            self.emitMessage("Failed to create IDS entry. Canceling.")
+            logging.info('Failed to create IDS entry. Canceling.')
             return
         ids.basicInit()
-        self.emitMessage.emit("Basic IDS initialization done.")
+        logging.info('Basic IDS initialization done.')
         ids.writeDescription(' directory: ' + self.rundir)
-        self.emitMessage.emit("Description added.")
+        logging.info('Description added.')
         ids.writeCodeParameters(code_parameters)
-        self.emitMessage.emit("Code parameters added.")
+        logging.info('Code parameters added.')
 
         if b2out:
             ids.writeCoordinates(coorAr['crx'], coorAr['cry'],
                                  int(coorAr['nx,ny'][0]),
                                  int(coorAr['nx,ny'][1]))
-            self.emitMessage.emit("Coordinates written added.")
+            logging.info('Coordinates written added.')
             ids.writeTe(tempAr['te'])
             ids.writeTi(tempAr['ti'])
             ids.writeNe(tempAr['ne'])
-            self.emitMessage.emit("Te, Ti and Ne written.")
-        self.emitMessage.emit("Now saving data entry.")
+            logging.info('Te, Ti and Ne written.')
+        logging.info('Now saving data entry.')
         ids.save()
 
     @pyqtSlot()
     def on_start(self):
-        print('Putting to IDS...')
-        self.emitMessage.emit("Putting to IDS...")
+        logging.info('Putting to IDS...')
         self.startFlag.emit(False)
 
     @pyqtSlot()
     def on_finish(self):
-        print('Finished.')
-        self.emitMessage.emit("Finished putting.")
+        logging.info('Finished writing data to IDS.')
         self.startFlag.emit(True)
+        # Clear Parameters
+
 
 
 if __name__ == "__main__":

@@ -9,13 +9,15 @@ A divgeo http://www.divgeo.info/ custom widget plugin for Qt Designer.
 
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
+from PyQt5.QtWidgets import QFrame
+from PyQt5.QtCore import QRect
 
 from divgeo import DivGeo
 
 
 class DivGeoPlugin(QPyDesignerCustomWidgetPlugin):
     """DivGeoPlugin(QPyDesignerCustomWidgetPlugin)
-    
+
     Provides a Python custom plugin for Qt Designer by implementing the
     QDesignerCustomWidgetPlugin via a PyQt-specific custom plugin class.
     """
@@ -23,7 +25,7 @@ class DivGeoPlugin(QPyDesignerCustomWidgetPlugin):
     # The __init__() method is only used to set up the plugin and define its
     # initialized variable.
     def __init__(self, parent=None):
-    
+
         super(DivGeoPlugin, self).__init__(parent)
 
         self.initialized = False
@@ -45,7 +47,9 @@ class DivGeoPlugin(QPyDesignerCustomWidgetPlugin):
     # This factory method creates new instances of our custom widget with the
     # appropriate parent.
     def createWidget(self, parent):
-        return DivGeo(parent)
+        x = DivGeo(parent)
+        x.labelContainer.setFrameStyle(QFrame.StyledPanel)
+        return x
 
     # This method returns the name of the custom widget class that is provided
     # by this plugin.
