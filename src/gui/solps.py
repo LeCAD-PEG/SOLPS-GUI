@@ -52,8 +52,8 @@ from PyQt5.uic import loadUi
 
 from addmenu import AddMenu
 
-import put_edge_ids
-import get_edge_ids
+# import put_edge_ids
+# import get_edge_ids
 
 REDIRECT_STDOUT_TO_LOG = False
 
@@ -77,11 +77,13 @@ class Column:
     name, path, date, status, label, comment, device, shot, run, user = \
         range(10)
 
+
 def extract_value(line):
     if len(line.split()) == 1:
         return ''
     else:
         return line.split()[-1].strip("'")
+
 
 def read_identification_parameters(directory):
     """ Reads the identification parameters of the experiment.
@@ -293,12 +295,12 @@ class RunsSettings(QDialog):
         settings = QSettings('ITER', 'solps-gui')
         settings.beginGroup('RunDirectories')
         for i in range(5):
-            alias_name = self.alias_base + str(i+1)
-            value = self.main_layout.itemAt(2 + i*3).widget().text()
+            alias_name = self.alias_base + str(i + 1)
+            value = self.main_layout.itemAt(2 + i * 3).widget().text()
             settings.setValue(alias_name, value)
 
-            runDir_name = self.runDir_base + str(i+1)
-            value = self.main_layout.itemAt(2 + i*3 + 1).widget().text()
+            runDir_name = self.runDir_base + str(i + 1)
+            value = self.main_layout.itemAt(2 + i * 3 + 1).widget().text()
             settings.setValue(runDir_name, value)
         settings.endGroup()
 
@@ -307,6 +309,7 @@ class Preferences():
     """
     Class that holds preferences and allows reading/writing them permanently
     """
+
     def __init__(self, parent=None):
         super(Preferences, self).__init__()
         # Create reasonable defaults
@@ -316,7 +319,7 @@ class Preferences():
         self.tcsh_path = '/bin/tcsh'
         self.gnuplot_path = '/usr/bin/gnuplot'
         self.convert_path = '/usr/bin/convert'
-        self.log_level = 1 # info
+        self.log_level = 1  # info
         self.submit_script = 'localsubmit'
         self.job_name = 'SOLPS-ITER'
         self.standalone = 0
@@ -372,16 +375,18 @@ class Preferences():
         settings.setValue('dry_run', str(self.dry_run))
         settings.setValue('device_environment', str(self.device_environment))
 
+
 class PreferencesDialog(QDialog):
     """ Maps dialog into Preferences.
     """
+
     def __init__(self, preferences, parent=None):
         super(PreferencesDialog, self).__init__()
         prefix = os.path.dirname(os.path.abspath(__file__))
         loadUi(prefix + '/preferences.ui', self)
         self.preferences = preferences
         # get GUI settings
-        settings = QSettings('ITER', 'solps-gui')
+        # settings = QSettings('ITER', 'solps-gui')
         self.lineEdit_monitor_interface.setText(preferences.bind_address)
         self.lineEdit_monitor_port.setText(str(preferences.port))
         self.lineEdit_monitor_ip.setText(preferences.solps_gui_ip)
@@ -401,7 +406,7 @@ class PreferencesDialog(QDialog):
         self.comboBox_device_environment.setCurrentText(preferences.device_environment)
 
     def setPreferences(self):
-        s = QSettings('ITER', 'solps-gui')
+        # s = QSettings('ITER', 'solps-gui')
         self.preferences.bind_address = self.lineEdit_monitor_interface.text()
         self.preferences.port = int(self.lineEdit_monitor_port.text())
         self.preferences.solps_gui_ip = self.lineEdit_monitor_ip.text()
@@ -424,6 +429,7 @@ class PreferencesDialog(QDialog):
         self.preferences.dry_run = int(self.checkBox_dry_run.checkState())
         self.preferences.device_environment = self.comboBox_device_environment.currentText()
 
+
 class RunsStatusServer(QThread):
     """ Networking UDP listener for receiving job status updates.
 
@@ -435,7 +441,7 @@ class RunsStatusServer(QThread):
     """
     retrieve = True
     jobStatusChanged = pyqtSignal(str)
-    address  = None
+    address = None
     port = None
 
     def bind(self, address, port):
@@ -458,7 +464,8 @@ class RunsStatusServer(QThread):
             data, addr = self._sock.recvfrom(1024)  # wait for data
             # print("Message", data.decode('utf-8'), "from", addr[0])
             msg = data.decode('utf-8').rstrip('\n')
-            if msg[0:4] == 'STOP' : break
+            if msg[0:4] == 'STOP':
+                break
             self.jobStatusChanged.emit(msg)
             # TODO Graceful exit from blocking recvfrom() by setting retrieve
             # TODO and sending UDP packet to ourselves.
@@ -514,10 +521,8 @@ class RetrieveRunsFolderInfo(QThread):
         """
         # Firstly try to extract label from the beginning of b2mn.dat
 
-
         # IF there is no SHOT, RUN in b2mn try b2md
         static_data = read_identification_parameters(directory)
-
 
         # Parse run.log
         path = directory + '/run.log'
@@ -527,7 +532,7 @@ class RetrieveRunsFolderInfo(QThread):
             try:
                 fsize = os.path.getsize(path)
                 with open(path) as f:
-                    f.seek(max(fsize-8192, 0), 0)  # Set pos @ last 100 lines
+                    f.seek(max(fsize - 8192, 0), 0)  # Set pos @ last 100 lines
                     lines = f.read().splitlines()  # Read to end
                 for line in lines:
                     if 'stopping because' in line \
@@ -539,7 +544,7 @@ class RetrieveRunsFolderInfo(QThread):
                 # Is there B2 running directory?
                 b2mn_exe_dir = directory + '/b2mn.exe.dir'
                 if os.path.exists(b2mn_exe_dir):
-                    if time.time() - mtime > 60: # Is run.log fresh enough?
+                    if time.time() - mtime > 60:  # Is run.log fresh enough?
                         return qtime, 'CRASHED in b2mn.exe.dir', static_data
                     else:
                         return qtime, 'Running', static_data
@@ -560,9 +565,9 @@ class RetrieveRunsFolderInfo(QThread):
                     last_status_line = lines[-1]
                     # detect crashed that 'Started' without run.log present
                     if time.time() - mtime > 60 and 'Started' in last_status_line:
-                       return qtime, 'CRASHED? ' + last_status_line, static_data
+                        return qtime, 'CRASHED? ' + last_status_line, static_data
                     else:
-                       return qtime, last_status_line, static_data
+                        return qtime, last_status_line, static_data
                 else:
                     return qtime, '.status empty', static_data
             except OSError:
@@ -585,27 +590,27 @@ class RetrieveRunsFolderInfo(QThread):
         msg = "Updating runs statuses..."
         logging.info(msg)
         self.status.emit(msg)
-        i = 0
+
         for path in self.model.column_index:
             if self.isInterruptionRequested():
                 logging.warning("Status update interrupted!")
                 break
-            (data, date_index, status_index, label_index, device_index, \
+            (data, date_index, status_index, label_index, device_index,
              run_index, comment_index, shot_index) = \
                 self.model.column_index[path]
             data[Column.date], data[Column.status], static_data = \
                 self.retrieve_folder_state(path)
             data[Column.label], data[Column.run], data[Column.shot], \
             data[Column.user], data[Column.device] = static_data
-            #data[Column.label] = static_data[0]
+            # data[Column.label] = static_data[0]
             # Simulate delays with self.msleep(100)
             # Fill in static data into the columns that follow
 
             # Emit the range of columns that changed in the model
             self.statusChanged.emit(date_index, shot_index)
             self.progress.emit(path)
-        msg = "Updating run statuses finished. " \
-                + str(len(self.model.column_index)) + " directories scanned."
+        msg = "Updating run statuses finished. " + \
+              str(len(self.model.column_index)) + " directories scanned."
         logging.info(msg)
         self.status.emit(msg)
 
@@ -635,8 +640,8 @@ class FileSystemScan(QThread):
         for dir, subdirs, files in os.walk(rootdir):
             if dir == rootdir:  # replace name with alias
                 date = QDateTime().fromTime_t(os.stat(dir).st_mtime)
-                data = [alias, dir, date, None, None, None, None, None, None, \
-                None]  # TODO number of columns
+                data = [alias, dir, date, None, None, None, None, None, None,
+                        None]  # TODO number of columns
                 parents[0].appendChild(TreeItem(data, parent))
                 continue
 
@@ -658,8 +663,8 @@ class FileSystemScan(QThread):
             # Append a new item to the current parent's list of children.
             date = QDateTime().fromTime_t(os.stat(dir).st_mtime)
             # TODO Size data to number of columns in use
-            data = [os.path.basename(dir), dir, date, None, None, None, None, \
-            None, None, None]
+            data = [os.path.basename(dir), dir, date, None, None, None, None,
+                    None, None, None]
             parents[-1].appendChild(TreeItem(data, parents[-1]))
 
     def run(self):
@@ -701,6 +706,7 @@ class TreeItem(object):
         itemData (list) : Column data for tree view. First is always name (str)
         childItems (list) : Rows of child items references.
     """
+
     def __init__(self, data, parent=None):
         self.parentItem = parent
         self.itemData = data
@@ -760,12 +766,14 @@ class TreeItem(object):
 
         return True
 
+
 class TextElideLeftDelegate(QStyledItemDelegate):
     """ Elide text of the first column to the left (... at start).
     This allows long folder names to be shown right aligned when they are too
     long to fit int the column width as usually the folder name changes at the
     end of the Run name (e.g. with sequence or parameter).
     """
+
     def __init__(self, parent=None):
         super(TextElideLeftDelegate, self).__init__(parent)
 
@@ -862,18 +870,6 @@ class RunsModel(QAbstractItemModel):
         self.endInsertRows()
         return success
 
-    def parent(self, index):
-        if not index.isValid():
-            return QModelIndex()
-
-        childItem = self.getItem(index)
-        parentItem = childItem.parent()
-
-        if parentItem == self.rootItem:
-            return QModelIndex()
-
-        return self.createIndex(parentItem.childNumber(), 0, parentItem)
-
     def removeColumns(self, position, columns, parent=QModelIndex()):
         self.beginRemoveColumns(parent, position, position + columns - 1)
         success = self.rootItem.removeColumns(position, columns)
@@ -892,11 +888,6 @@ class RunsModel(QAbstractItemModel):
         self.endRemoveRows()
 
         return success
-
-    def rowCount(self, parent=QModelIndex()):
-        parentItem = self.getItem(parent)
-
-        return parentItem.childCount()
 
     def setData(self, index, value, role=Qt.EditRole):
         """This is the overloaded function for QAbstractItemModel. When the
@@ -920,7 +911,7 @@ class RunsModel(QAbstractItemModel):
             return False
 
         item = self.getItem(index)
-        result = item.setData(index.column(), value)
+        result = item.setData(column, value)
 
         file = '/b2mn.dat'
         if column == Column.run:
@@ -1055,7 +1046,7 @@ class RunsModel(QAbstractItemModel):
                                                  childItem)
                 shot_index = self.createIndex(row, Column.shot, childItem)
                 path = childItem.data(Column.path)
-                self.column_index[path] = (childItem.itemData,  date_index,
+                self.column_index[path] = (childItem.itemData, date_index,
                                            status_index, label_index,
                                            device_index, run_index,
                                            comment_index, shot_index)
@@ -1072,7 +1063,6 @@ class RunsModel(QAbstractItemModel):
             parentItem = parent.internalPointer()
 
         return parentItem.childCount()
-
 
     def startRunsStatusServer(self):
         """ Run networking job status server for status updates.
@@ -1129,7 +1119,7 @@ class RunsModel(QAbstractItemModel):
                 assert(len(self.column_index[path]) == 4)  # indexing changed
         except ValueError as e:
             logging.error(str(e) + " Received essage: '" + message +
-                  "' should be in 'name path status' format.")
+                          "' should be in 'name path status' format.")
 
 
 class LoggingHandler(logging.Handler):
@@ -1211,19 +1201,19 @@ class SOLPS_MainWindow(QMainWindow):
         ui_path = prefix + '/solps.ui'
         try:
             opts, args = getopt.getopt(app.arguments()[1:],
-                                       "hu:d",["help","ui=","default"])
+                                       "hu:d", ["help", "ui=", "default"])
         except getopt.GetoptError:
-            print ('Supplied option not recognized!')
-            print ('For help: solps.py -h / --help')
+            print('Supplied option not recognized!')
+            print('For help: solps.py -h / --help')
             sys.exit(2)
         for opt, arg in opts:
             if opt in ('-h', "--help"):
-                print ('Load default user interface : solps.py')
-                print ('Load custom user interface : solps.py '
-                       '[-u / --ui] <UIfile.ui>')
+                print('Load default user interface : solps.py')
+                print('Load custom user interface : solps.py '
+                      '[-u / --ui] <UIfile.ui>')
                 sys.exit(2)
             elif opt in ("-u", "--ui"):
-                ui_path =  os.path.abspath(arg)
+                ui_path = os.path.abspath(arg)
 
         if os.path.exists(ui_path):
             ui_filename, ui_extension = os.path.splitext(ui_path)
@@ -1264,7 +1254,7 @@ class SOLPS_MainWindow(QMainWindow):
         log_handler.setFormatter(logging.Formatter(log_format))
         logging.getLogger().addHandler(log_handler)
         # get GUI settings
-        #TODO change/remove, we already used it
+        # TODO change/remove, we already used it
         settings = QSettings("ITER", "solps-gui")
         log_levels = [logging.DEBUG, logging.INFO, logging.WARNING,
                       logging.ERROR, logging.CRITICAL]
@@ -1282,8 +1272,6 @@ class SOLPS_MainWindow(QMainWindow):
             self.stdout_receiver.moveToThread(self.stdout_thread)
             self.stdout_thread.started.connect(self.stdout_receiver.run)
             self.stdout_thread.start()
-
-
 
         settings.beginGroup("MainWindow")
         geometry = settings.value("Geometry")
@@ -1350,7 +1338,7 @@ class SOLPS_MainWindow(QMainWindow):
         elide_left_delegate = TextElideLeftDelegate(self.treeViewRuns)
         self.treeViewRuns.setItemDelegate(elide_left_delegate)
 
-        #self.treeViewRuns.setTextElideMode(Qt.ElideLeft)
+        # self.treeViewRuns.setTextElideMode(Qt.ElideLeft)
         self.lineEditRunFilter.returnPressed.connect(self.textFilterChanged)
 
         # Tree view for archived run directories
@@ -1368,24 +1356,6 @@ class SOLPS_MainWindow(QMainWindow):
         self.solpsinput.setup_input_tabs()
         self.tab_Input.setEnabled(False)
 
-        self.pushButton_PutIds.clicked.connect(self.click_put_ids)
-        self.pushButton_GetIds.clicked.connect(self.click_get_ids)
-
-        # Initialize the Put and Get widgets
-
-        self.putIDSthread = put_edge_ids.PutIDSQThread(parent=self)
-        # Setting push button for enabling/disabling and the status bar for
-        # updating the message.
-        self.putIDSthread.emitMessage.connect(self.statusbar.showMessage)
-        self.putIDSthread.startFlag.connect(self.pushButton_PutIds.setEnabled)
-
-        self.getIDSthread = get_edge_ids.GetIDSQThread(parent=self)
-        # Setting push button for enabling/disabling and the status bar for
-        # updating the message.
-        self.getIDSthread.emitMessage.connect(self.statusbar.showMessage)
-        self.getIDSthread.startFlag.connect(self.pushButton_GetIds.setEnabled)
-        self.getIDSthread.finished.connect(self.model.scanFileSystemThread.start)
-
         self.actionPreferences.triggered.connect(self.show_preferences_dialog)
         self.actionRuns.triggered.connect(self.show_runs_dialog)
         self.treeViewRuns.selectionModel().selectionChanged.connect(
@@ -1394,11 +1364,11 @@ class SOLPS_MainWindow(QMainWindow):
             self.enable_restore_button)
 
         # Configure Dashboard
-        #self.gnuplot.plot("sin(3*x)/x")
-        #self.runSelected.connect(self.label_7.setText)
+        # self.gnuplot.plot("sin(3*x)/x")
+        # self.runSelected.connect(self.label_7.setText)
         self.runSelected.connect(self.director.setRundir)
-        #self.runSelected.connect(self.tcsh.setRundir)
-        #self.tcsh.setTcshCommand(self.lineEdit.text())
+        # self.runSelected.connect(self.tcsh.setRundir)
+        # self.tcsh.setTcshCommand(self.lineEdit.text())
         #  self.gnuplot.setText("Started")
         #  print(self.gnuplot.process.state())
         #  self.gnuplot1.process.finished.connect(self.gnuplot1.show_plot)
@@ -1495,7 +1465,6 @@ class SOLPS_MainWindow(QMainWindow):
         self.pushButton_Run.setEnabled(valid)
         self.pushButton_Stop.setEnabled(valid)
 
-
         if valid:
             index = self.treeViewRuns.selectionModel().currentIndex()
             model = self.proxyModel
@@ -1549,58 +1518,6 @@ class SOLPS_MainWindow(QMainWindow):
                        self.preferences.bind_address, self.preferences.port)
                 QMessageBox.warning(None, "SOLPS-GUI Status server", msg,
                                     QMessageBox.Ok)
-    @pyqtSlot()
-    def click_put_ids(self):
-        """ This function saves contents of the selected run in the
-        RunsTreeView to an IDS with the identification parameters the run have.
-        """
-
-        index = self.treeViewRuns.selectionModel().currentIndex()
-        model = self.proxyModel
-
-        index_path = model.index(index.row(), Column.path, index.parent())
-        index_run = model.index(index.row(), Column.run, index.parent())
-        index_shot = model.index(index.row(), Column.shot, index.parent())
-        index_user = model.index(index.row(), Column.user, index.parent())
-
-        path = model.data(index_path, Qt.DisplayRole)
-        user = model.data(index_user, Qt.DisplayRole)
-
-        try:
-            run = int(model.data(index_run, Qt.DisplayRole))
-            shot = int(model.data(index_shot, Qt.DisplayRole))
-        except ValueError as e:
-            shot = ''
-            run = ''
-        device = 'solps-iter'
-        version = '3'
-        # run, shot, user mandatory
-        if user:
-            pass
-        else:
-            user = os.getenv('USER')
-
-        if run == '' or run is None or shot == '' or shot is None:
-            # Mandatory settings not found
-
-            QMessageBox.warning(self, 'Warning!', 'Mandatory settings missing'
-                                'for either shot or run!')
-            return
-
-        self.putIDSthread.setParameters(path, run, shot, device, version, user)
-        self.putIDSthread.start(QThread.LowestPriority)
-
-    @pyqtSlot()
-    def click_get_ids(self):
-        index = self.treeViewRuns.selectionModel().currentIndex()
-        model = self.proxyModel
-        index_path = model.index(index.row(), Column.path, index.parent())
-        path = model.data(index_path, Qt.DisplayRole)
-        # Getting the current model
-        # Run and shot will have to be specified
-        self.getIDSthread.setParameters(dirpath=path)
-        if self.getIDSthread.checkParameters():
-            self.getIDSthread.start()
 
     def closeEvent(self, event):
         """ Save GUI state at exit.
@@ -1637,7 +1554,6 @@ class SOLPS_MainWindow(QMainWindow):
         self.expandAll()
         self.expanded()
 
-
     @pyqtSlot()
     def on_pushButton_Filter_clicked(self):
         self.textFilterChanged()
@@ -1667,7 +1583,8 @@ class SOLPS_MainWindow(QMainWindow):
                                     "No b2mn.dir.exe for graceful stop!")
         except OSError:
             QMessageBox.warning(None, "Permission problem",
-                                        "Can't create " + path)
+                                "Can't create " + path)
+
     @pyqtSlot()
     def on_pushButton_Run_clicked(self):
         """ Submits the selected Run
@@ -1694,7 +1611,6 @@ class SOLPS_MainWindow(QMainWindow):
             except IOError:
                 QMessageBox.warning(self, 'Problem copying B2 state file!',
                                     path + '/b2fstati' + " read/write error")
-
 
     def find_solps_top(self, directory):
         """ Searches for setup.csh or SOLPSTOP file in the directory hierarchy.
@@ -1739,7 +1655,6 @@ class SOLPS_MainWindow(QMainWindow):
         solps_gui_port = settings.value('SOLPS_GUI_PORT', default_port)
         settings.setValue('SOLPS_GUI_PORT', default_port)
 
-
         rundir_solps_top = self.find_solps_top(rundir)
 
         if not rundir_solps_top:
@@ -1761,14 +1676,13 @@ class SOLPS_MainWindow(QMainWindow):
                 logging.error(self.main_tcsh.program() + " not started")
                 return
             logging.info("MAIN TCSH started in " + self.solps_top)
-            cmd +=  'cd ' + self.solps_top \
-                    + '\nsource setup.csh\necho TCSH READY\n'
-        cmd += 'setenv SOLPS_GUI_IP ' + solps_gui_ip + '\n' \
-                + 'setenv SOLPS_GUI_PORT ' + solps_gui_port + '\n'
+            cmd += 'cd ' + self.solps_top + \
+                   '\nsource setup.csh\necho TCSH READY\n'
+        cmd += 'setenv SOLPS_GUI_IP ' + solps_gui_ip + '\n' +\
+               'setenv SOLPS_GUI_PORT ' + solps_gui_port + '\n'
         cmd += 'cd ' + rundir + '\n'
         cmd += tcsh_command + '\n'
         self.main_tcsh.write(bytearray(cmd, 'utf8'))  # TODO flush stdout
-
 
     def submit(self, rundir):
         """ Submits the job in the rundir under its $SOLPSTOP environment
@@ -1790,14 +1704,17 @@ class SOLPS_MainWindow(QMainWindow):
                     opts = ' -j "' + self.preferences.job_name + '"'
                 else:
                     opts = ' -j ' + self.preferences.job_name
-            if self.preferences.standalone: opts += ' -s'
+            if self.preferences.standalone:
+                opts += ' -s'
             if self.preferences.use_mpi:
                 opts += ' -m "' + self.preferences.mpi_options + '"'
             if self.preferences.use_debugger:
                 opts += ' -d "' + self.preferences.debugger + '"'
-            if self.preferences.compress_log:  opts += ' -z'
-            if self.preferences.dry_run: opts += ' -n'
-            cmd +=  'rm -f *.prt\n' + submit_command + opts
+            if self.preferences.compress_log:
+                opts += ' -z'
+            if self.preferences.dry_run:
+                opts += ' -n'
+            cmd += 'rm -f *.prt\n' + submit_command + opts
             self.execute_tcsh_command_in_rundir(cmd, rundir)
             msg = 'batch ' + rundir + ' ' + submit_command + opts
 
@@ -1808,7 +1725,6 @@ class SOLPS_MainWindow(QMainWindow):
             msg += "Empty command or no run directory for MAIN TCSH"
             self.model.jobStatusChanged(msg)
             logging.warning(msg)
-
 
     @pyqtSlot()
     def on_pushButton_Import_clicked(self):
@@ -1843,7 +1759,6 @@ class SOLPS_MainWindow(QMainWindow):
                     "I/O error {0}".format(err.args))  # TODO Properly format
                 return
 
-
             for directory, subdirs, files in os.walk(destination_dir):
                 if os.path.exists(directory + '/baserun'):
                     self.execute_tcsh_command_in_rundir(
@@ -1851,7 +1766,7 @@ class SOLPS_MainWindow(QMainWindow):
                     logging.info("Imported baserun for " + directory)
                 if os.path.basename(directory) != 'baserun':
                     if os.path.exists(directory + '/input.dat'):
-                        cmd =  'setup_baserun_eirene_links'
+                        cmd = 'setup_baserun_eirene_links'
                         self.execute_tcsh_command_in_rundir(cmd, directory)
                         logging.info("B2 and Eirene links set to baserun for "
                                  + directory)
@@ -1859,7 +1774,6 @@ class SOLPS_MainWindow(QMainWindow):
                         cmd = 'touch b2fstati\n'
                         self.execute_tcsh_command_in_rundir(cmd, directory)
             self.model.startThreads()  # rescan the model
-
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):
@@ -1876,16 +1790,6 @@ if __name__ == '__main__':
     # app.setStyle("windows")
     main_window = SOLPS_MainWindow()
     # Activate or deactivate PutIds/GetIds
-    try:
-        import imas
-        main_window.pushButton_PutIds.setEnabled(True)
-        main_window.pushButton_GetIds.setEnabled(True)
-
-    except:
-        main_window.pushButton_PutIds.setEnabled(False)
-        main_window.pushButton_GetIds.setEnabled(False)
-        # Leave them disabled
-        pass
     main_window.show()
     code = app.exec_()
     app.quit()
