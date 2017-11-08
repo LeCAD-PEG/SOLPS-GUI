@@ -9,7 +9,7 @@ A SOLPS getIDS plugin for Qt designer.
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
 
-from get_edge_ids import getIDS
+from get_edge_ids import GetIDS
 
 class getIDSplugin(QPyDesignerCustomWidgetPlugin):
     """Plugin for put_edge_ids functionality.
@@ -18,10 +18,10 @@ class getIDSplugin(QPyDesignerCustomWidgetPlugin):
         super(getIDSplugin, self).__init__(parent)
 
     def createWidget(self, parent):
-        return getIDS(parent)
+        return GetIDS(parent)
 
     def name(self):
-        return "getIDS"
+        return "GetIDS"
 
     def group(self):
         return "SOLPS"
@@ -39,7 +39,7 @@ class getIDSplugin(QPyDesignerCustomWidgetPlugin):
         return False
 
     def domXml(self):
-        return '<widget class="getIDS" name="get_edge_ids">\n</widget>'
+        return '<widget class="GetIDS" name="get_edge_ids">\n</widget>'
 
     def includeFile(self):
         return "get_edge_ids"

@@ -9,7 +9,7 @@ A SOLPS putIDS plugin for Qt designer.
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
 
-from put_edge_ids import putIDS
+from put_edge_ids import PutIDS
 
 class putIDSplugin(QPyDesignerCustomWidgetPlugin):
     """Plugin for put_edge_ids functionality.
@@ -18,10 +18,10 @@ class putIDSplugin(QPyDesignerCustomWidgetPlugin):
         super(putIDSplugin, self).__init__(parent)
 
     def createWidget(self, parent):
-        return putIDS(parent)
+        return PutIDS(parent)
 
     def name(self):
-        return "putIDS"
+        return "PutIDS"
 
     def group(self):
         return "SOLPS"
@@ -39,7 +39,7 @@ class putIDSplugin(QPyDesignerCustomWidgetPlugin):
         return False
 
     def domXml(self):
-        return '<widget class="putIDS" name="put_edge_ids">\n</widget>'
+        return '<widget class="PutIDS" name="put_edge_ids">\n</widget>'
 
     def includeFile(self):
         return "put_edge_ids"
