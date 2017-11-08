@@ -83,9 +83,6 @@ class Gnuplot(Akter):
 
         self.tcsh.stdOutput.connect(self.readTcshStdOut)
 
-    def sizeHint(self):
-        return QSize(320, 200)
-
     @pyqtSlot(str)
     def plot(self, plot_command):
         """ Starts gnuplot process and sends plot commands through the
@@ -136,6 +133,9 @@ class Gnuplot(Akter):
         if GNUPLOT_WIDGET:
             # Do not remove the temporary files, since gnuplot needs it for
             # interactivity!
+            if self.solps_plot_command:
+                logging.info("Gnuplot command: " + self.solps_plot_command +
+                             " finished.")
             return
         else:
             if exit_status == 0:

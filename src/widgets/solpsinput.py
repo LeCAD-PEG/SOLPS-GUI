@@ -131,9 +131,14 @@ class SolpsInput(QTabWidget):
                     _dummy, file_extension = os.path.splitext(filename)
                     if file_extension == '.gz':
                         # TODO handle decompress errors
-                        with gzip.open(path, 'rb') as file:
-                            text_content = file.read().decode("utf-8")
-                            plainTextEdit.setPlainText(text_content)
+                        try:
+                            with gzip.open(path, 'rb') as file:
+                                text_content = file.read().decode("utf-8")
+                                plainTextEdit.setPlainText(text_content)
+                        except EOFError as e:
+                            msg = "Couldn't read file " + filename  + \
+                                  "! File " + filename + " is corrupted!"
+                            plainTextEdit.setPlaceHolderText(msg)
                     else:
                         with open(path) as file:
                             plainTextEdit.setPlainText(file.read())

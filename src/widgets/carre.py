@@ -2,10 +2,11 @@
 """ A PyQt widget for Carre process.
 """
 
-from PyQt5.QtWidgets import QPlainTextEdit, QLineEdit, QVBoxLayout
+from PyQt5.QtWidgets import QPlainTextEdit, QLineEdit, QVBoxLayout, QInputDialog
 from PyQt5.QtCore import (pyqtSlot, pyqtSignal, QProcess, QSettings,
-                          pyqtProperty)
+                          pyqtProperty, Qt)
 from akter import Akter
+
 
 
 class Carre(Akter):
@@ -16,9 +17,12 @@ class Carre(Akter):
         # Creating QPlainTextEdit
 
         self.textDisplay = QPlainTextEdit()
+        self.textDisplay.setReadOnly(True)
 
         layout = QVBoxLayout()
         layout.addWidget(self.textDisplay)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
         self.tcsh.prcStateChanged.connect(self.updateText)
@@ -43,6 +47,23 @@ class Carre(Akter):
         """
         self.textDisplay.appendPlainText(text)
 
+        if 'http' in text:
+            return
+        if '?' in text:
+            # Carre expects an input
+            lines = text.splitlines()
+            for line in lines:
+                if '?' in line:
+                    break
+
+            userInput = QInputDialog.getText(self,
+                                             "Carre input dialog",
+                                             line)
+            self.tcsh.write(userInput)
+
+
+
+
 
     @pyqtSlot(str)
     def updateError(self, text):
@@ -52,6 +73,9 @@ class Carre(Akter):
                                     '</b>')
         pass
 
+    @pyqtSlot()
+    def startCarre(self):
+        pass
 
 
 if __name__ == '__main__':
@@ -68,8 +92,7 @@ if __name__ == '__main__':
     carreM.activateDebugging()
     # carreM.activateDebugging()
     carreM.setTcshPath('/bin/tcsh')
-    path = os.path.expanduser(
-                        '~/solps-iter/runs/examples/AUG_16151_D+C+He/baserun')
+    path = os.path.expanduser('~/solps-iter/runs/test_run/baserun')
     carreM.setRunDir(path)
     carreM.setTcshCommand('carre -')
 

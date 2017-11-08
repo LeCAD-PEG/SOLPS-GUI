@@ -22,14 +22,23 @@ try:
 except Exception as e:
     from io import BytesIO
 
+import sys
+
+ENABLED = True
+
 try:
     import imas
 except ImportError as e:
-    pass
+    if __name__ == '__main__':
+        print('There is no imas module... Exiting.')
+        sys.exit()
+    else:
+        ENABLED = False
+        pass
 
 
 import getopt
-import sys
+
 import os
 import tarfile
 import base64
@@ -38,7 +47,7 @@ from PyQt5.QtCore import (pyqtSlot, Qt, QSize, QThread, pyqtProperty,
                           pyqtSignal)
 from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit,
                              QGridLayout, QLabel, QDialogButtonBox,
-                             QPushButton)
+                             QPushButton, QWidget)
 from PyQt5.QtGui import QIntValidator
 
 
@@ -63,15 +72,14 @@ input_files = [
 ]
 
 
-class putIDS(QPushButton):
+class PutIDS(QWidget):
     """Widget representation of the PutIDS functionality. A normal QPushButton
     that encapsulates the PutIDS QThread that does the putting data to the IDS.
     """
 
+    emitMessage = pyqtSignal(str)
     def __init__(self, parent=None):
-        super(putIDS, self).__init__(parent)
-        self.setText("Put IDS")
-        self.clicked.connect(self.putToIDS)
+        super(PutIDS, self).__init__(parent)
         self._rundir = ''
         self._user = ''
         self._shot = ''
@@ -80,7 +88,21 @@ class putIDS(QPushButton):
         self._run = ''
 
         self.thread = PutIDSQThread(self)
-        self.clicked.connect(self.putToIDS)
+
+        self.pushButton = QPushButton(self)
+        self.pushButton.setText("Put IDS")
+        self.pushButton.clicked.connect(self.putToIDS)
+        self.pushButton.setEnabled(ENABLED)
+
+        self.thread.startFlag.connect(self.pushButton.setEnabled)
+        self.thread.emitMessage.connect(self.emitMessage)
+
+        layout = QGridLayout()
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.pushButton)
+        self.setLayout(layout)
+
 
     @pyqtSlot(str)
     def setRunDir(self, rundir):
@@ -144,7 +166,7 @@ class putIDS(QPushButton):
 
         else:
             # Not all variables are set
-            dialog = PutDialog(self, title='Put IDS')
+            dialog = PutDialog(self)
             dialog.prepareWidgets(shot=self._shot, run=self._run,
                                   user=self._user, device=self._device,
                                   version=self._version, path=self._rundir)
@@ -155,6 +177,7 @@ class putIDS(QPushButton):
         self.thread.setParameters(self._rundir, int(self._run),
                                   int(self._shot), self._device, self._version,
                                   self._user)
+        self.thread.checkParameters()
         self.thread.start()
 
 
@@ -618,6 +641,36 @@ class PutIDSQThread(QThread):
         self.version = version
         self.user = user
 
+    def checkParameters(self):
+        """Function that checks if all parameter are defined to open an IDS.
+        If not all parameters are provided, a QDialog will open and asking for
+        other parameters, necessary to open an IDS.
+
+        If you use the GetIDS from a CLI this usually doesn't happen, but if it
+        is implemented in a GUI, usually a user will expect some sort of dialog
+        to provide the parameters."""
+
+        if self.shot and self.runNumber and self.user and self.device and \
+           self.version:
+            return True
+        else:
+            self.emitMessage.emit("Not all parameters are specified!")
+            print("Not all parameters are specified!")
+            dialog = GetDialog(self.parent)
+            dialog.prepareWidgets(shot=self.shot, run=self.runNumber,
+                                  user=self.user, device=self.device,
+                                  version=self.version, path=self.dirpath)
+
+            if dialog.exec_():
+                self.shot, self.runNumber, self.user, self.device, \
+                  self.version, self.runName, self.dirpath = dialog.on_close()
+                return self.checkParameters()
+            else:
+                self.emitMessage.emit("Dialog canceled, not enough "
+                                      "parameters.")
+                print("Dialog canceled, not enough parameters.")
+                return False
+
     def run(self):
         """Threaded run function that writes the data of the B2 output files
         and input files to the given IDS entry.
@@ -679,12 +732,6 @@ class PutIDSQThread(QThread):
 
 
 if __name__ == "__main__":
-    try:
-        import imas
-    except Exception as e:
-        print("Required IMAS support library not available on this system.")
-        sys.exit()
-
     # For launching python script directly from treminal with python command
     try:
         opts, args = getopt.getopt(sys.argv[1:],

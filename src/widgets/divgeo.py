@@ -6,12 +6,11 @@ from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QSettings
 from PyQt5.QtGui import QWindow
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QWidgetItem, QLabel
 
-
 import logging
 import os
+from functools import partial
 import signal
 from akter import Akter
-
 
 
 class DivGeo(Akter):
@@ -90,10 +89,17 @@ class DivGeo(Akter):
 
         self.tcsh.stdOutput.connect(self.readStdOutput)
 
-    def __del__(self):
-        if self.tcsh.state():  # state() == 0 means NotRunning
-            self.tcsh.kill()
-            print("Terminating DivGeo")
+        # Call SIGUSR1 signal to DivGeo when main window closes.
+        # Partial is used, because otherwise function will  not be
+        self.destroyed.connect(partial(self._onClose_stopDivGeo))
+
+    def _onClose_stopDivGeo(self):
+        DG_PID = self._onClose_getDivGeoPID()
+        if DG_PID:
+            os.kill(DG_PID, signal.SIGUSR1)
+
+    def _onClose_getDivGeoPID(self):
+        return self.DivGeoPID
 
     @pyqtSlot(str)
     def readStdOutput(self, text):

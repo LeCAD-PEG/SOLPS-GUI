@@ -167,6 +167,7 @@ class Akter(QWidget):
         self.tcshCommand = ''
         self.tcshCwd = ''
         self.tcsh = Tcsh(self)
+        self.destroyed.connect(self.tcsh.close)
 
     def activateDebugging(self):
         self.tcsh.prcError.connect(self.debug)

@@ -1,19 +1,8 @@
 #!/usr/bin/python3
 
-import getopt
 import sys
-import tarfile
-import base64
-import os
 
-from PyQt5.QtCore import pyqtSlot, Qt, QSize, QThread, pyqtSignal, pyqtProperty
-from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit, QPushButton,
-                             QGridLayout, QLabel, QDialogButtonBox, )
-from PyQt5.QtGui import QIntValidator
-try:
-    import BytesIO
-except ImportError as e:
-    from io import BytesIO
+ENABLED = True
 
 try:
     import imas
@@ -22,16 +11,32 @@ except ImportError as e:
         print('There is no imas module... Exiting.')
         sys.exit()
     else:
+        ENABLED = False
         pass
 
+import tarfile
+import base64
+import os
 
-class getIDS(QPushButton):
+from PyQt5.QtCore import pyqtSlot, Qt, QSize, QThread, pyqtSignal, pyqtProperty
+from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit, QPushButton,
+                             QGridLayout, QLabel, QDialogButtonBox, QWidget)
+from PyQt5.QtGui import QIntValidator
+import getopt
+
+try:
+    import BytesIO
+except ImportError as e:
+    from io import BytesIO
+
+class GetIDS(QWidget):
     """ Push button used for plugin."""
+    emitMessage = pyqtSignal(str)
+    finished = pyqtSignal()
 
     def __init__(self, parent=None):
-        super(getIDS, self).__init__(parent)
-        self.setText("Get IDS")
-        self.clicked.connect(self.getFromIDS)
+        super(GetIDS, self).__init__(parent)
+
         self._RunName = ''
         self._user = ''
         self._shot = ''
@@ -42,6 +47,21 @@ class getIDS(QPushButton):
         self._dirPAth = ''
 
         self.thread = GetIDSQThread(self)
+
+        self.pushButton = QPushButton(self)
+        self.pushButton.setText("Get IDS")
+        self.pushButton.clicked.connect(self.getFromIDS)
+        self.pushButton.setEnabled(ENABLED)
+
+        layout = QGridLayout()
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.pushButton)
+        self.setLayout(layout)
+
+        self.thread.startFlag.connect(self.pushButton.setEnabled)
+        self.thread.emitMessage.connect(self.emitMessage)
+        self.thread.finished.connect(self.finished)
 
     @pyqtSlot(str)
     def setUser(self, user):
@@ -126,6 +146,7 @@ class getIDS(QPushButton):
                                   shot=int(self._shot), device=self._device,
                                   version=self._version, user=self._user,
                                   runName=self._runName)
+        self.thread.checkParameters()
         self.thread.start()
 
 
@@ -349,7 +370,7 @@ class GetIDSWrapper:
         is located in the ``dirpath``.
         """
         if self.dirpath == '' and self.runName == '':
-            print('No location specified, saving stopped')
+            print('No location specified, saving stopped!')
             return
 
         dir_path = self.dirpath + '/' + self.runName
@@ -406,9 +427,8 @@ if __name__ == '__main__':
             if opt in ("-h", "--help"):
                 print("In order to run get_edge file path, shot, run, user,"
                     "device and version variables must be defined."
-                    "Example (terminal): "
+                    "Example (terminal):\n"
                     "python3.5 get_edge_ids.py "
-                    "--dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun "
                     "--shot=1001 --run=1001 --user=simicg "
                     "--device=solps-iter --version=3")
                 sys.exit()
