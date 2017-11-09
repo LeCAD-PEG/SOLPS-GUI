@@ -17,12 +17,24 @@
 # $ imasdb solps-iter
 # -----------------------------------------------------------------------------
 
+import sys
+import getopt
+import logging
+import os
+import tarfile
+import base64
+
+from PyQt5.QtCore import (pyqtSlot, Qt, QSize, QThread, pyqtProperty,
+                          pyqtSignal)
+from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit,
+                             QGridLayout, QLabel, QDialogButtonBox,
+                             QPushButton, QWidget, QFormLayout)
+from PyQt5.QtGui import QIntValidator
+
 try:
     import BytesIO
 except Exception as e:
     from io import BytesIO
-
-import sys
 
 ENABLED = True
 
@@ -35,20 +47,6 @@ except ImportError as e:
     else:
         ENABLED = False
         pass
-
-
-import getopt
-import logging
-import os
-import tarfile
-import base64
-
-from PyQt5.QtCore import (pyqtSlot, Qt, QSize, QThread, pyqtProperty,
-                          pyqtSignal)
-from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit,
-                             QGridLayout, QLabel, QDialogButtonBox,
-                             QPushButton, QWidget)
-from PyQt5.QtGui import QIntValidator
 
 
 input_files = [
@@ -71,21 +69,90 @@ input_files = [
     'b2.atomic_physics_rescale.parameters'
 ]
 
+class PutVars:
+    names = ['SHOT', 'RUN', 'USER', 'DEVICE', 'VERSION', 'RUNDIRPATH']
+    numOfParams = len(names)
+    shot, run, user, device, version, runDirPath = range(numOfParams)
+    defaultValues = {}
+    defaultValues[shot] = '1001'
+    defaultValues[run] = '1001'
+    defaultValues[user] = os.getenv('USER')
+    defaultValues[device] = 'solps-iter'
+    defaultValues[version] = '3'
+    defaultValues[runDirPath] = os.path.expanduser('~')
+
+
+class PutDialog(QDialog):
+    """Dialog Demanding the shot, run, name and device for getting the data
+    from IDS.
+    """
+
+    def __init__(self, parent=None):
+        super(PutDialog, self).__init__(parent)
+
+    def prepareWidgets(self, parameters, title='IDS Variables'):
+        self.setModal(True)
+
+        self.setWindowTitle(title)
+
+        formLayout = QFormLayout(self)
+
+        self.lineEditContainer = {}
+
+        for i in range(PutVars.numOfParams):
+            currLineEdit = QLineEdit()
+            currLineEdit.setText(PutVars.names[i])
+            self.lineEditContainer[i] = currLineEdit
+            if parameters[i]:
+                currLineEdit.setText(parameters[i])
+            else:
+                currLineEdit.setText(PutVars.defaultValues[i])
+
+            formLayout.addRow(PutVars.names[i], currLineEdit)
+
+        # Setting integer validator for run and shot numbers.
+        self.lineEditContainer[PutVars.run].setValidator(QIntValidator())
+        self.lineEditContainer[PutVars.shot].setValidator(QIntValidator())
+
+        # Adding the Ok and Cancel button.
+        dialog_button_box = QDialogButtonBox()
+        dialog_button_box.setStandardButtons(QDialogButtonBox.Ok |
+                                             QDialogButtonBox.Cancel)
+        dialog_button_box.accepted.connect(self.accept)
+        dialog_button_box.rejected.connect(self.reject)
+        formLayout.addRow(dialog_button_box)
+
+    def getValue(self, Id):
+        return self.lineEditContainer[Id].text()
+
+    def on_close(self):
+        # Returning a dictionary of values. The values are defined in
+        # enumerator class PutVars.
+
+        variables = {}
+
+        for i in range(PutVars.numOfParams):
+            variables[i] = self.getValue(i)
+
+        # Checking if validating Integers.
+        try:
+            variables[PutVars.shot] = int(variables[PutVars.shot])
+            variables[PutVars.run] = int(variables[PutVars.run])
+        except ValueError as e:
+            variables[PutVars.shot] = -1
+            variables[PutVars.run] = -1
+        return variables
 
 class PutIDS(QWidget):
     """Widget representation of the PutIDS functionality. A normal QPushButton
     that encapsulates the PutIDS QThread that does the putting data to the IDS.
     """
 
-    emitMessage = pyqtSignal(str)
     def __init__(self, parent=None):
         super(PutIDS, self).__init__(parent)
-        self._rundir = ''
-        self._user = ''
-        self._shot = ''
-        self._device = ''
-        self._version = ''
-        self._run = ''
+        self.vars = {}
+        for i in range(PutVars.numOfParams):
+            self.vars[i] = ''
 
         self.thread = PutIDSQThread(self)
         self.thread.finished.connect(self.cleanUp)
@@ -102,58 +169,57 @@ class PutIDS(QWidget):
         layout.addWidget(self.pushButton)
         self.setLayout(layout)
 
-
     @pyqtSlot(str)
     def setRunDir(self, rundir):
-        self._rundir = rundir
+        self.vars[PutVars.runDirPath] = rundir
 
     def getRunDir(self):
-        return self._rundir
+        return self.vars[PutVars.runDirPath]
 
     runDir = pyqtProperty(str, getRunDir, setRunDir)
 
     @pyqtSlot(str)
     def setUser(self, user):
-        self._user = user
+        self.vars[PutVars.user] = user
 
     def getUser(self):
-        return self._user
+        return self.vars[PutVars.user]
 
     user = pyqtProperty(str, getUser, setUser)
 
     @pyqtSlot(str)
     def setDevice(self, device):
-        self._device = device
+        self.vars[PutVars.device] = device
 
     def getDevice(self):
-        return self._device
+        return self.vars[PutVars.device]
 
     device = pyqtProperty(str, getDevice, setDevice)
 
     @pyqtSlot(str)
     def setVersion(self, version):
-        self._version = version
+        self.vars[PutVars.version] = version
 
     def getVersion(self):
-        return self._version
+        return self.vars[PutVars.version]
 
     version = pyqtProperty(str, getVersion, setVersion)
 
     @pyqtSlot(str)
     def setRun(self, run):
-        self._run = run
+        self.vars[PutVars.run] = run
 
     def getRun(self):
-        return self._run
+        return self.vars[PutVars.run]
 
     runNumber = pyqtProperty(str, getRun, setRun)
 
     @pyqtSlot(str)
     def setShot(self, shot):
-        self._shot = shot
+        self.vars[PutVars.shot] = shot
 
     def getShot(self):
-        return self._shot
+        return self.vars[PutVars.shot]
 
     shotNumber = pyqtProperty(str, getShot, setShot)
 
@@ -166,22 +232,24 @@ class PutIDS(QWidget):
         is implemented in a GUI, usually a user will expect some sort of dialog
         to provide the parameters."""
 
-        if self._shot and self._run and self._user and self._device and \
-           self._version and self._rundir:
+        state = True
+        for key in self.vars:
+            if not self.vars[key]:
+                state = False
+                break
+        if state:
             return True
-        else:
-            logging.warning("Not all parameters are specified!")
-            dialog = PutDialog(self)
-            dialog.prepareWidgets(shot=self._shot, run=self._run,
-                                  user=self._user, device=self._device,
-                                  version=self._version, path=self._rundir)
 
+        else:
+            # Not all variables are set
+            logging.warning('Not all parameters are specified!')
+            dialog = PutDialog(self)
+            dialog.prepareWidgets(self.vars)
             if dialog.exec_():
-                self._shot, self._run, self._user, self._device, \
-                  self._version, self._rundir = dialog.on_close()
+                self.vars = dialog.on_close()
                 return self.checkParameters()
             else:
-                logging.warning("Dialog canceled, not enough parameters.")
+                # Canceled!
                 return False
 
     @pyqtSlot()
@@ -190,99 +258,13 @@ class PutIDS(QWidget):
             self.cleanUp()
             return
 
-        self.thread.setParameters(self._rundir, int(self._run),
-                                  int(self._shot), self._device, self._version,
-                                  self._user)
+        self.thread.setParameters(self.vars)
         self.thread.start()
 
     @pyqtSlot()
     def cleanUp(self):
-        self._rundir = ''
-        self._user = ''
-        self._shot = ''
-        self._device = ''
-        self._version = ''
-        self._run = ''
-
-
-class PutDialog(QDialog):
-    """Dialog Demanding the shot, run, name and device for getting the data
-    from IDS.
-    """
-
-    def __init__(self, parent=None):
-        super(PutDialog, self).__init__(parent)
-
-    def prepareWidgets(self, shot='1001', run='1001', user=os.getenv('USER'),
-                       device='solps-iter', version='3',
-                       title='Put IDS', path=os.path.expanduser('~')):
-        self.main_layout = QGridLayout(self)
-        self.setWindowTitle(title)
-
-        self.main_layout.addWidget(QLabel('SHOT'), 0, 0, Qt.AlignLeft)
-        shot = QLineEdit(shot)
-        shot.setValidator(QIntValidator())
-        self.main_layout.addWidget(shot, 0, 1, Qt.AlignCenter)
-
-        self.main_layout.addWidget(QLabel('RUN'), 1, 0, Qt.AlignLeft)
-        run = QLineEdit(run)
-        run.setValidator(QIntValidator())
-        self.main_layout.addWidget(run, 1, 1, Qt.AlignCenter)
-
-        self.main_layout.addWidget(QLabel('USER'), 2, 0, Qt.AlignLeft)
-        self.main_layout.addWidget(QLineEdit(os.getenv('USER')), 2, 1,
-                                   Qt.AlignCenter)
-
-        self.main_layout.addWidget(QLabel('DEVICE'), 3, 0, Qt.AlignLeft)
-        self.main_layout.addWidget(QLineEdit('solps-iter'),
-                                   3, 1, Qt.AlignCenter)
-
-        self.main_layout.addWidget(QLabel('VERSION'), 4, 0, Qt.AlignLeft)
-        self.main_layout.addWidget(QLineEdit('3'), 4, 1, Qt.AlignCenter)
-
-        self.main_layout.addWidget(QLabel('RUN PATH'), 5, 0, Qt.AlignLeft)
-        self.main_layout.addWidget(QLineEdit(path), 5, 1, Qt.AlignCenter)
-
-        # Adding the Ok and Cancel button.
-        dialog_button_box = QDialogButtonBox()
-        dialog_button_box.setStandardButtons(QDialogButtonBox.Ok |
-                                             QDialogButtonBox.Cancel)
-        dialog_button_box.accepted.connect(self.accept)
-        dialog_button_box.rejected.connect(self.reject)
-        self.main_layout.addWidget(dialog_button_box, 6, 1)
-
-    def sizeHint(self):
-        return QSize(100, 100)
-
-    def on_close(self):
-        """ If the ``OK`` button was clicked then this function should be
-        called to process the input widgets and return it's values.
-
-        Note that there is a run number and a **run**. The run number is a
-        number but a **run** specifies a SOLPS case.
-
-        Returns:
-            SHOT (int): The shot number for a SOLPS case.
-            RUN (int): The run number for a SOLPS case.
-            USER (str): The user name for a SOLPS case.
-            DEVICE (str): The device name for a SOLPS case.
-            VERSION (str): The version of IMAS.
-        """
-        # Returning the values
-        # SHOT, RUN, USER, DEVICE, VERSION, run_name exclusively.
-        try:
-            SHOT = int(self.main_layout.itemAt(1).widget().text())
-            RUN = int(self.main_layout.itemAt(3).widget().text())
-        except ValueError as e:
-            SHOT = -1
-            RUN = -1
-
-        USER = self.main_layout.itemAt(5).widget().text()
-        DEVICE = self.main_layout.itemAt(7).widget().text()
-        VERSION = self.main_layout.itemAt(9).widget().text()
-        PATH = self.main_layout.itemAt(11).widget().text()
-
-        return SHOT, RUN, USER, DEVICE, VERSION, PATH
+        for key in self.vars:
+            self.vars[key] = ''
 
 
 def tarInputFiles(dir_path):
@@ -372,6 +354,90 @@ def readB2output(file_path, file_name, variables):
     return arrays
 
 
+class PutIDSQThread(QThread):
+    """QThread for storing data to IDS. Note that it gets the attributes
+    necessary to open an IDS and create a data entry, from PutIDS instances.
+
+    The threading is required since it takes sometime for everything to be
+    written to an IDS so in order avoid from freezing the GUI, QThread is used.
+    """
+
+    startFlag = pyqtSignal(bool)
+
+    def __init__(self, parent=None):
+        super(PutIDSQThread, self).__init__(parent)
+        self.vars = {}
+        for i in range(PutVars.numOfParams):
+            self.vars[i] = None
+
+        self.started.connect(self.on_start)
+        self.finished.connect(self.on_finish)
+
+    def setParameters(self, parameters):
+        """Function that sets the parameters necessary for accessing IDS.
+        """
+        for key in parameters:
+            self.vars[key] = parameters[key]
+
+    def run(self):
+        """Threaded run function that writes the data of the B2 output files
+        and input files to the given IDS entry.
+        """
+        logging.info('Reading files...')
+        b2out = False
+        runDir = self.vars[PutVars.runDirPath]
+        if os.path.exists(runDir + '/' + 'b2fgmtry') and \
+           os.path.exists(runDir + '/' + 'b2fstati'):
+            coorAr = readB2output(runDir, 'b2fgmtry',
+                                  variables=['nx,ny', 'crx', 'cry'])
+            logging.info('B2fmtry read.')
+            tempAr = readB2output(runDir, 'b2fstati',
+                                  variables=['ne', 'te', 'ti'])
+            logging.info('B2fstati read.')
+            b2out = True
+        else:
+            logging.info('No b2ouput files found, skipping writing'
+                                  ' output files to IDS.')
+
+        code_parameters = tarInputFiles(runDir)
+        logging.info('Code parameters read.')
+        logging.info('Creating IDS object.')
+        ids = PutIDSwrapper(self.vars)
+        logging.info('IDS object created.')
+        if not ids.connected():
+            logging.info('Failed to create IDS entry. Canceling.')
+            return
+        ids.basicInit()
+        logging.info('Basic IDS initialization done.')
+        ids.writeDescription(' directory: ' + runDir)
+        logging.info('Description added.')
+        ids.writeCodeParameters(code_parameters)
+        logging.info('Code parameters added.')
+
+        if b2out:
+            ids.writeCoordinates(coorAr['crx'], coorAr['cry'],
+                                 int(coorAr['nx,ny'][0]),
+                                 int(coorAr['nx,ny'][1]))
+            logging.info('Coordinates written added.')
+            ids.writeTe(tempAr['te'])
+            ids.writeTi(tempAr['ti'])
+            ids.writeNe(tempAr['ne'])
+            logging.info('Te, Ti and Ne written.')
+        logging.info('Now saving data entry.')
+        ids.save()
+
+    @pyqtSlot()
+    def on_start(self):
+        logging.info('Putting to IDS...')
+        self.startFlag.emit(False)
+
+    @pyqtSlot()
+    def on_finish(self):
+        logging.info('Finished writing data to IDS.')
+        self.startFlag.emit(True)
+        # Clear Parameters
+
+
 class PutIDSwrapper:
     """ A python wrapper that eases the saving of data to an IDS. It is used
     for creating or opening an IDS data entry and then storing data to it. The
@@ -386,15 +452,17 @@ class PutIDSwrapper:
     of a new entry will take some time.
     """
 
-    def __init__(self, user, device, shot, run, version):
+    def __init__(self, variables):
         """ The constructor creates the IDS database object and then creates
         the data entry."""
 
-        self.run = run
-        self.shot = shot
-        self.user = user
-        self.device = device
-        self.version = version
+        self.vars = variables
+        shot = self.vars[PutVars.shot]
+        run = self.vars[PutVars.run]
+        user = self.vars[PutVars.user]
+        device = self.vars[PutVars.device]
+        version = self.vars[PutVars.version]
+
         # Create the IDS database
         self.imas_obj = imas.ids(shot, run, shot, run)
 
@@ -426,11 +494,11 @@ class PutIDSwrapper:
 
     def writeDescription(self, msg=''):
         """Writing simple description to IDS."""
-
-        grid_description = "IDS:" + " shot=" + str(self.shot) + " run=" + \
-                           str(self.run) + " user=" + str(self.user) + \
-                           " device=" + str(self.device) + \
-                           " version=" + str(self.version) + msg
+        grid_description = "IDS:" + " shot=" + str(self.vars[PutVars.shot]) + \
+                           " run=" + str(self.vars[PutVars.run]) + \
+                           " user=" + self.vars[PutVars.user] + \
+                           " device=" + self.vars[PutVars.device] + \
+                           " version=" + self.vars[PutVars.version] + msg
         # Put IDS grid description
         self.imas_obj.edge_profiles.ggd[0].grid.identifier.description = \
             grid_description
@@ -627,105 +695,28 @@ class PutIDSwrapper:
             self.imas_obj.close()
 
 
-class PutIDSQThread(QThread):
-    """QThread for storing data to IDS. Note that it gets the attributes
-    necessary to open an IDS and create a data entry, from PutIDS instances.
-
-    The threading is required since it takes sometime for everything to be
-    written to an IDS so in order avoid from freezing the GUI, QThread is used.
-
-    The `push_button` is a widget that is passed to the thread, for when the
-    thread is working that the button should be disabled and then enabled after
-    it's done.
-
-    The `status_bar` is a StatusBar widget, part of the QMainWindow and is used
-    to send messages about the state of Putting IDS.
-    """
-
-    startFlag = pyqtSignal(bool)
-
-    def __init__(self, dirpath='', run='', shot='', device='', version='',
-                 user='', parent=None):
-        super(PutIDSQThread, self).__init__(parent)
-        self.setParameters(dirpath, run, shot, device, version, user)
-        self.started.connect(self.on_start)
-        self.finished.connect(self.on_finish)
-
-        self.push_button = None
-        self.status_bar = None
-
-    def setParameters(self, dirpath, run, shot, device, version, user):
-        """ Setting the parameters for the IDS data entry.
-        """
-        self.rundir = dirpath
-        self.runNumber = run
-        self.shot = shot
-        self.device = device
-        self.version = version
-        self.user = user
-
-    def run(self):
-        """Threaded run function that writes the data of the B2 output files
-        and input files to the given IDS entry.
-        """
-        logging.info('Reading files...')
-        b2out = False
-        if os.path.exists(self.rundir + '/' + 'b2fgmtry') and \
-           os.path.exists(self.rundir + '/' + 'b2fstati'):
-            coorAr = readB2output(self.rundir, 'b2fgmtry',
-                                  variables=['nx,ny', 'crx', 'cry'])
-            logging.info('B2fmtry read.')
-            tempAr = readB2output(self.rundir, 'b2fstati',
-                                  variables=['ne', 'te', 'ti'])
-            logging.info('B2fstati read.')
-            b2out = True
-        else:
-            logging.info('No b2ouput files found, skipping writing'
-                                  ' output files to IDS.')
-
-        code_parameters = tarInputFiles(self.rundir)
-        logging.info('Code parameters read.')
-        logging.info('Creating IDS object.')
-        ids = PutIDSwrapper(self.user, self.device, self.shot, self.runNumber,
-                            self.version)
-        logging.info('IDS object created.')
-        if not ids.connected():
-            logging.info('Failed to create IDS entry. Canceling.')
-            return
-        ids.basicInit()
-        logging.info('Basic IDS initialization done.')
-        ids.writeDescription(' directory: ' + self.rundir)
-        logging.info('Description added.')
-        ids.writeCodeParameters(code_parameters)
-        logging.info('Code parameters added.')
-
-        if b2out:
-            ids.writeCoordinates(coorAr['crx'], coorAr['cry'],
-                                 int(coorAr['nx,ny'][0]),
-                                 int(coorAr['nx,ny'][1]))
-            logging.info('Coordinates written added.')
-            ids.writeTe(tempAr['te'])
-            ids.writeTi(tempAr['ti'])
-            ids.writeNe(tempAr['ne'])
-            logging.info('Te, Ti and Ne written.')
-        logging.info('Now saving data entry.')
-        ids.save()
-
-    @pyqtSlot()
-    def on_start(self):
-        logging.info('Putting to IDS...')
-        self.startFlag.emit(False)
-
-    @pyqtSlot()
-    def on_finish(self):
-        logging.info('Finished writing data to IDS.')
-        self.startFlag.emit(True)
-        # Clear Parameters
-
-
-
 if __name__ == "__main__":
-    # For launching python script directly from treminal with python command
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    root.addHandler(ch)
+
+    Vars = {}
+
+    Help = """
+This is used for testing for writing data to IDS. By default the data \
+from a run directory will be stored to an IDS with the ID variables you \
+provide via CLI.
+
+In order to run put_edge run directory path, shot, run, user, device and \
+version must be defined: Example (terminal):
+
+python3 put_edge_ids.py \
+--dirpath=/home/ITER/simicg/solps-iter/runs/examples/AUG_16151_D+C+He\
+/16151_1.6MW_2.0e19_D=0.4_chi=1.6_standalone \
+--shot=1001 --run=1001 --user=%s --device=solps-iter --version=3"""
+
     try:
         opts, args = getopt.getopt(sys.argv[1:],
                                    "srudvh",
@@ -734,27 +725,20 @@ if __name__ == "__main__":
         for opt, arg in opts:
             #print opt, arg
             if opt in ("-fp", "--dirpath"):
-                dirpath = arg
+                Vars[PutVars.runDirPath] = arg
             elif opt in ("-s", "--shot"):
-                shot = int(arg)
+                Vars[PutVars.shot] = int(arg)
             elif opt in ("-r", "--run"):
-                run = int(arg)
+                Vars[PutVars.run] = int(arg)
             elif opt in ("-u", "--user"):
-                user = arg
+                Vars[PutVars.user] = arg
             elif opt in ("-t", "--device"):
-                device = arg
+                Vars[PutVars.device] = arg
             elif opt in ("-v", "--version"):
-                version = arg
+                Vars[PutVars.version] = arg
 
             elif opt in ("-h", "--help"):
-                print("In order to run put_edge file path, shot, run, user,"
-                      "device and version variables must be defined."
-                      "Example (terminal): "
-                      "python3 put_edge_ids.py "
-                      "--dirpath=/home/ITER/simicg/RUNS/demo/2171/baserun "
-                      "--shot=1001 --run=1001 --user=simicg "
-                      "--device=solps-iter "
-                      "--version=3")
+                logging.info(Help % os.environ['USER'])
                 sys.exit()
 
     except Exception:
@@ -762,8 +746,18 @@ if __name__ == "__main__":
         print('For help: -h / --help')
         sys.exit(2)
 
+    if len(Vars) < PutVars.numOfParams:
+        print('Not enough variables defined!')
+        print ('For help: -h / --help')
+        sys.exit(2)
+    elif len(Vars) > PutVars.numOfParams:
+        print('Too many variables defined!')
+        print ('For help: -h / --help')
+        sys.exit(2)
+
     app = QApplication(sys.argv)
-    t = PutIDSQThread(dirpath, run, shot, device, version, user)
+    t = PutIDSQThread()
+    t.setParameters(Vars)
     t.finished.connect(app.exit)
     t.start()
     sys.exit(app.exec_())
