@@ -127,7 +127,7 @@ class DivGeo(Akter):
                 self.DivGeoPID = int(line.lstrip("DivGeo PID: "))
 
         if 'STARTING DIVGEO' in text:
-            self.labelContainer.setText("DivGeo2 running.\nPress to "
+            self.labelContainer.setText("DivGeo2 running.\Click here to "
                                         "dock DivGeo2.")
             self.STATE = State.running
 
@@ -198,7 +198,7 @@ class DivGeo(Akter):
         self.layout().addWidget(self.labelContainer)
 
         if not self.getRunDir():
-            self.labelContainer.setText("No run dir selected!")
+            self.labelContainer.setText("No baserun selected!")
             return
 
         self.labelContainer.setText("Started TCSH. (sourcing setup.csh, "
