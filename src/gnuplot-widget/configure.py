@@ -52,7 +52,8 @@ class ModuleConfiguration(object):
 
     # The name of the module as it would be used in an import statement.
     name = 'pyQtGnuplot'
-    gnuplot_build_dir = None
+    build_dir = None
+    src_dir = None # Contains the CPP files
 
     # Specify the directory, where to install the module
     # module_dir = os.path.expanduser('~') + '/solps-gui/staging/lib/site-packages/'
@@ -128,11 +129,11 @@ class ModuleConfiguration(object):
         """
 
         target_configuration.hello_version = '.'
-        target_configuration.gnuplot_features_dir = 'features'
-        target_configuration.gnuplot_inc_dir = '.'
-        target_configuration.gnuplot_lib_dir = '.'
+        target_configuration.features_dir = 'features'
+        target_configuration.inc_dir = '.'
+        target_configuration.lib_dir = '.'
         target_configuration.hello_is_dll = (target_configuration.py_platform == 'win32')
-        target_configuration.gnuplot_sip_dir = 'sip'
+        target_configuration.sip_dir = 'sip'
 
     def init_optparser(self, optparser, target_configuration):
         """ Perform any module specific initialisation of the command line
@@ -141,26 +142,26 @@ class ModuleConfiguration(object):
         target_configuration is the target configuration.
         """
 
-        optparser.add_option('--incdir', '-n', dest='gnuplot_inc_dir',
+        optparser.add_option('--incdir', '-n', dest='inc_dir',
                 type='string', default=None, action='callback',
                 callback=optparser_store_abspath_dir, metavar="DIR",
                 help="the directory containing the gnuplotWidget header "
                         "file directory is DIR [default: QT_INSTALL_HEADERS]")
 
-        optparser.add_option('--featuresdir', dest='gnuplot_features_dir',
+        optparser.add_option('--featuresdir', dest='features_dir',
                 type='string', default=None, action='callback',
                 callback=optparser_store_abspath_dir, metavar="DIR",
                 help="the directory containing the gnuplotWidget.prf features "
                         "file is DIR [default: "
                         "QT_INSTALL_PREFIX/mkspecs/features]")
 
-        optparser.add_option('--libdir', '-o', dest='gnuplot_lib_dir',
+        optparser.add_option('--libdir', '-o', dest='lib_dir',
                 type='string', default=None, action='callback',
                 callback=optparser_store_abspath_dir, metavar="DIR",
                 help="the directory containing the hello library is DIR "
                         "[default: QT_INSTALL_LIBS]")
 
-        optparser.add_option('--sipdir', '-v', dest='gnuplot_sip_dir',
+        optparser.add_option('--sipdir', '-v', dest='sip_dir',
                 type='string', default=None, action='callback',
                 callback=optparser_store_abspath_dir, metavar="DIR",
                 help="the hello .sip files will be installed in DIR "
@@ -173,9 +174,16 @@ class ModuleConfiguration(object):
 
         optparser.add_option("--outdir", action="callback",
                 callback=optparser_store_abspath_dir,
-                type='string', default=None, dest="gnuplot_build_dir",
+                type='string', default=None, dest="build_dir",
                 metavar='DIR',
                 help="Compilation output directory [default: .] ")
+
+        optparser.add_option("--srcdir", action="callback",
+                callback=optparser_store_abspath_dir,
+                type='string', default=None, dest="src_dir",
+                metavar='DIR',
+                help="Source files [default: ./src] ")
+
 
 
     def apply_options(self, target_configuration, options):
@@ -184,25 +192,28 @@ class ModuleConfiguration(object):
         options are the parsed options.
         """
 
-        if options.gnuplot_features_dir is not None:
-            target_configuration.gnuplot_features_dir = options.gnuplot_features_dir
+        if options.features_dir is not None:
+            target_configuration.features_dir = options.features_dir
 
-        if options.gnuplot_inc_dir is not None:
-            target_configuration.gnuplot_inc_dir = options.gnuplot_inc_dir
+        if options.inc_dir is not None:
+            target_configuration.inc_dir = options.inc_dir
 
-        if options.gnuplot_lib_dir is not None:
-            target_configuration.gnuplot_lib_dir = options.gnuplot_lib_dir
+        if options.lib_dir is not None:
+            target_configuration.lib_dir = options.lib_dir
 
-        if options.gnuplot_sip_dir is not None:
-            target_configuration.gnuplot_sip_dir = options.gnuplot_sip_dir
+        if options.sip_dir is not None:
+            target_configuration.sip_dir = options.sip_dir
         else:
-            target_configuration.gnuplot_sip_dir = target_configuration.pyqt_sip_dir
+            target_configuration.sip_dir = target_configuration.pyqt_sip_dir
 
-        if options.gnuplot_build_dir is not None:
-            target_configuration.gnuplot_build_dir = options.gnuplot_build_dir
+        if options.build_dir is not None:
+            target_configuration.build_dir = options.build_dir
+
+        if options.src_dir is not None:
+            target_configuration.src_dir = options.src_dir
 
         if options.hello_no_sip_files:
-            target_configuration.gnuplot_sip_dir = ''
+            target_configuration.sip_dir = ''
 
     def check_module(self, target_configuration):
         """ Perform any module specific checks now that the target
@@ -211,7 +222,7 @@ class ModuleConfiguration(object):
         """
 
         # Find the Hello header files.
-        inc_dir = target_configuration.gnuplot_inc_dir
+        inc_dir = target_configuration.inc_dir
         if inc_dir is None:
             inc_dir = target_configuration.qt_inc_dir
 
@@ -233,16 +244,16 @@ class ModuleConfiguration(object):
                     "The gnuplotWdiget version number could not be determined by "
                     "reading %s." % sciglobal)
 
-        lib_dir = target_configuration.gnuplot_lib_dir
-        if lib_dir is None:
-            lib_dir = target_configuration.qt_lib_dir
+        # lib_dir = target_configuration.lib_dir
+        # if lib_dir is None:
+        #     lib_dir = target_configuration.qt_lib_dir
 
-        if not glob.glob(os.path.join(lib_dir, '*gnuplotWidget*')):
-            error(
-                    "The gnuplotWidget library could not be found in %s. If "
-                    "gnuplotWidget is installed then use the --libdir "
-                    "argument to explicitly specify the correct "
-                    "directory." % lib_dir)
+        # if not glob.glob(os.path.join(lib_dir, '*gnuplotWidget*')):
+        #     error(
+        #             "The gnuplotWidget library could not be found in %s. If "
+        #             "gnuplotWidget is installed then use the --libdir "
+        #             "argument to explicitly specify the correct "
+        #             "directory." % lib_dir)
 
         # Because we include the Python bindings with the C++ code we can
         # reasonably force the same version to be used and not bother about
@@ -265,9 +276,9 @@ class ModuleConfiguration(object):
         inform("gnuplotWidget %s is being used." %
                 target_configuration.hello_version)
 
-        if target_configuration.gnuplot_sip_dir != '':
+        if target_configuration.sip_dir != '':
             inform("The gnuplotWidget .sip files will be installed in %s." %
-                    target_configuration.gnuplot_sip_dir)
+                    target_configuration.sip_dir)
 
     def pre_code_generation(self, target_config):
         """ Perform any module specific initialisation prior to generating the
@@ -299,10 +310,10 @@ class ModuleConfiguration(object):
         target_configuration is the target configuration.
         """
 
-        if target_configuration.gnuplot_sip_dir == '':
+        if target_configuration.sip_dir == '':
             return None
 
-        path = os.path.join(target_configuration.gnuplot_sip_dir, 'pyQtGnuplot')
+        path = os.path.join(target_configuration.sip_dir, 'pyQtGnuplot')
         files = glob.glob('sip/*.sip')
 
         return path, files
@@ -318,17 +329,17 @@ class ModuleConfiguration(object):
         qmake['QT'] = "gui core network printsupport svg"
         qmake['QMAKE_CXXFLAGS'] = "-fpermissive"
 
-        if target_configuration.gnuplot_inc_dir is not None:
-            qmake['INCLUDEPATH'] = quote(target_configuration.gnuplot_inc_dir)
+        if target_configuration.inc_dir is not None:
+            qmake['INCLUDEPATH'] = quote(target_configuration.inc_dir)
 
-        if target_configuration.gnuplot_lib_dir is not None:
-            qmake['LIBS'] = '-L%s' % quote(target_configuration.gnuplot_lib_dir)
+        if target_configuration.lib_dir is not None:
+            qmake['LIBS'] = '-L%s' % quote(target_configuration.lib_dir)
 
-        #if target_configuration.gnuplot_features_dir is not None:
-        #    os.environ['QMAKEFEATURES'] = target_configuration.gnuplot_features_dir
+        #if target_configuration.features_dir is not None:
+        #    os.environ['QMAKEFEATURES'] = target_configuration.features_dir
 
-        if target_configuration.gnuplot_build_dir is not None:
-            qmake['DESTDIR'] = target_configuration.gnuplot_build_dir
+        if target_configuration.build_dir is not None:
+            qmake['DESTDIR'] = target_configuration.build_dir
         return qmake
 
     def get_mac_wrapped_library_file(self, target_configuration):
@@ -339,7 +350,7 @@ class ModuleConfiguration(object):
         target_configuration is the target configuration.
         """
 
-        lib_dir = target_configuration.gnuplot_lib_dir
+        lib_dir = target_configuration.lib_dir
         if lib_dir is None:
             lib_dir = target_configuration.qt_lib_dir
 
@@ -652,8 +663,8 @@ class _HostPythonConfiguration:
 
         self.inc_dir = sysconfig.get_python_inc()
         self.venv_inc_dir = sysconfig.get_python_inc(prefix=sys.prefix)
-        #self.module_dir = sysconfig.get_python_lib(plat_specific=1)
-        self.module_dir =  os.path.expanduser('~') + '/solps-gui/staging/lib/site-packages/'
+        self.module_dir = sysconfig.get_python_lib(plat_specific=1)
+        # self.module_dir =  os.path.expanduser('~') + '/solps-gui/staging/lib/site-packages/'
         if sys.platform == 'win32':
             self.data_dir = sys.prefix
             self.lib_dir = sys.prefix + '\\libs'
@@ -1302,11 +1313,12 @@ def _generate_code(target_config, opts, module_config):
         argv.append('-r')
 
     argv.append('-c')
-    argv.append('.')
+    #argv.append('.')
+    argv.append(target_config.src_dir)
 
     argv.append(module_config.get_sip_file(target_config))
 
-    check_file = 'sipAPI%s.h' % module_config.name
+    check_file = target_config.src_dir + '/sipAPI%s.h' % module_config.name
     _remove_file(check_file)
 
     _run_command(' '.join(argv), opts.verbose)
@@ -1356,8 +1368,7 @@ def _generate_pro(target_config, opts, module_config):
     # is run otherwise the install and uninstall targets are not generated.
 
     qmake_config = module_config.get_qmake_configuration(target_config)
-
-    pro_name = module_config.name + '.pro'
+    pro_name = target_config.src_dir + '/' + module_config.name + '.pro'
 
     pro = open(pro_name, 'w')
 
@@ -1463,7 +1474,7 @@ INSTALLS += sip
         else:
             entry_point = 'init%s' % mname
 
-        exp = open('%s.exp' % mname, 'wt')
+        exp = open(target_config.src_dir + '/' + '%s.exp' % mname, 'wt')
         exp.write('{ global: %s; local: *; };' % entry_point)
         exp.close()
 
@@ -1522,7 +1533,8 @@ macx {
     pro.write('HEADERS = sipAPI%s.h\n' % mname)
 
     pro.write('SOURCES =')
-    for s in glob.glob('*.cpp'):
+
+    for s in glob.glob(target_config.src_dir + '/*.cpp'):
         pro.write(' \\\n    %s' % s)
     pro.write('\n')
 
@@ -1561,7 +1573,6 @@ def _run_qmake(target_config, verbose, pro_name, module_config):
     args.append(pro_file)
 
     _run_command(' '.join(args), verbose)
-    print(' '.join(args))
     if not os.access(mf, os.F_OK):
         error(
                 "%s failed to create a Makefile from %s." %
