@@ -115,3 +115,19 @@ openssl (1.0.x):
     apt-get install libssl1.0-dev
 
 This installs the development files for openSSL version 1.0.2.
+
+## Building interactive Gnuplot widget for Anaconda3
+Anaconda3 lacks mkspecs and some other development Qt and PyQt build required
+files. To build the Anaconda3 binary-compatible gnuplot and PyQt widget do:
+
+    module load imas binutils
+    module unload Anaconda2
+    qmake --version && sip -V
+    export QT_VERSION=5.6.2 PyQT_VERSION=5.6.2 SIP_VERSION=4.18
+    export STAGING_QT=${EBROOTANACONDA3}/pkgs/qt-5.6.2-3
+    QT_LIBS=$(pkg-config --libs Qt5Network Qt5Svg Qt5PrintSupport Qt5Widgets\
+                Qt5Gui Qt5Core)
+    QT_LIBS="-Wl,-rpath=${EBROOTANACONDA3}/lib ${QT_LIBS}"
+    export QT_LIBS="-L${EBROOTANACONDA3}/lib -liconv ${QT_LIBS}"
+    export GNUPLOT_INSTALL_DIR=/work/imas/opt/gnuplot/5.2.1
+    MAKE_JOBS=16 ./build-gnuplot.sh
