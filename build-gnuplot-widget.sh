@@ -1,20 +1,20 @@
 #!/bin/sh -x
 
-
-
-
-SOURCES_DIR=$PWD/src
+BUILDROOT=${PWD}
+GNUPLOT_WIDGET_DIR=${GNUPLOT_WIDGET_DIR:-$BUILDROOT/src/gnuplot-widget}
+SOURCES_DIR=$GNUPLOT_WIDGET_DIR/src
+STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging/lib/site-packages}
 # SOurce files.
 FILES="$SOURCES_DIR/Qt*.h $SOURCES_DIR/gnuplotWidget.h"
 
 # Where to store generated sip file
-SIPDIR=$HOME/solps-gui/staging/share/sip/PyQt5
+SIPDIR=${SIPDIR:-$BUILDROOT/staging/share/sip/PyQt5}
 
 # Where to store compiled objects
-OBJECTS_DIR=$HOME/solps-gui/build/gnuplotWidget
-STAGING_DIR=$HOME/solps-gui/staging/lib/site-packages
+OBJECTS_DIR=${OBJECTS_DIR:-$BUILDROOT/build/gnuplotWidget}
 
-echo $FILES
+cd $GNUPLOT_WIDGET_DIR
+
 for file in $FILES
 do
     moc $file -o $SOURCES_DIR/moc_$(basename $file .h).cpp
@@ -45,11 +45,10 @@ esac
 
 cd $SOURCES_DIR
 
-
 make -j $MAKE_JOBS
 make install
 make clean
 make distclean
 echo "Cleaning up"
 rm moc_* sippy* sipAPI* pyQtGnuplot.*
-rm -r $HOME/solps-gui/build/gnuplotWidget
+rm -r $OBJECTS_DIR
