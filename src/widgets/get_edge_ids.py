@@ -1,6 +1,23 @@
 #!/usr/bin/python3
 
 import sys
+import tarfile
+import base64
+import os
+import logging
+
+from PyQt5.QtCore import pyqtSlot, QSize, QThread, pyqtSignal, pyqtProperty
+from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit, QPushButton,
+                             QGridLayout, QDialogButtonBox, QWidget,
+                             QFormLayout)
+from PyQt5.QtGui import QIntValidator
+import getopt
+
+try:
+    import BytesIO
+except ImportError as e:
+    from io import BytesIO
+
 
 ENABLED = True
 
@@ -14,21 +31,21 @@ except ImportError as e:
         ENABLED = False
         pass
 
-import tarfile
-import base64
-import os
-import logging
 
-from PyQt5.QtCore import pyqtSlot, Qt, QSize, QThread, pyqtSignal, pyqtProperty
-from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit, QPushButton,
-                             QGridLayout, QLabel, QDialogButtonBox, QWidget)
-from PyQt5.QtGui import QIntValidator
-import getopt
+class GetVars:
+    names = ['SHOT', 'RUN', 'USER', 'DEVICE', 'VERSION', 'RUNNAME', 'DIRPATH']
+    numOfParams = len(names)
+    shot, run, user, device, version, runName, dirPath = range(numOfParams)
 
-try:
-    import BytesIO
-except ImportError as e:
-    from io import BytesIO
+    defaultValues = {}
+    defaultValues[shot] = '1001'
+    defaultValues[run] = '1001'
+    defaultValues[user] = os.getenv('USER')
+    defaultValues[device] = 'solps-iter'
+    defaultValues[version] = '3'
+    defaultValues[runName] = 'my_run'
+    defaultValues[dirPath] = os.path.expanduser('~')
+
 
 class GetDialog(QDialog):
     """Dialog Demanding the shot, run, name and device for getting the data
@@ -37,41 +54,30 @@ class GetDialog(QDialog):
     def __init__(self, parent=None):
         super(GetDialog, self).__init__(parent)
 
-    def prepareWidgets(self, shot='1001', run='1001', title='Get IDS',
-                       user=os.getenv('USER'), device='solps-iter',
-                       version='3', runName='new_run',
-                       path=os.path.expanduser('~')):
+    def prepareWidgets(self, parameters, title='IDS Variables',):
 
         self.setModal(True)
-        self.main_layout = QGridLayout(self)
+
         self.setWindowTitle(title)
 
-        self.main_layout.addWidget(QLabel('SHOT'), 0, 0, Qt.AlignLeft)
-        shot = QLineEdit(str(shot))
-        shot.setValidator(QIntValidator())
-        self.main_layout.addWidget(shot, 0, 1, Qt.AlignCenter)
+        formLayout = QFormLayout(self)
 
-        self.main_layout.addWidget(QLabel('RUN'), 1, 0, Qt.AlignLeft)
-        run = QLineEdit(str(run))
-        run.setValidator(QIntValidator())
-        self.main_layout.addWidget(run, 1, 1, Qt.AlignCenter)
+        self.lineEditContainer = {}
 
-        self.main_layout.addWidget(QLabel('USER'), 2, 0, Qt.AlignLeft)
-        self.main_layout.addWidget(QLineEdit(user), 2, 1,
-                                   Qt.AlignCenter)
+        for i in range(GetVars.numOfParams):
+            currLineEdit = QLineEdit()
+            currLineEdit.setText(GetVars.names[i])
+            self.lineEditContainer[i] = currLineEdit
+            if parameters[i]:
+                currLineEdit.setText(parameters[i])
+            else:
+                currLineEdit.setText(GetVars.defaultValues[i])
 
-        self.main_layout.addWidget(QLabel('DEVICE'), 3, 0, Qt.AlignLeft)
-        self.main_layout.addWidget(QLineEdit(device),
-                                   3, 1, Qt.AlignCenter)
+            formLayout.addRow(GetVars.names[i], currLineEdit)
 
-        self.main_layout.addWidget(QLabel('VERSION'), 4, 0, Qt.AlignLeft)
-        self.main_layout.addWidget(QLineEdit(version), 4, 1, Qt.AlignCenter)
-
-        self.main_layout.addWidget(QLabel('RUN NAME'), 5, 0, Qt.AlignLeft)
-        self.main_layout.addWidget(QLineEdit(runName), 5, 1, Qt.AlignCenter)
-
-        self.main_layout.addWidget(QLabel('DIR PATH'), 6, 0, Qt.AlignLeft)
-        self.main_layout.addWidget(QLineEdit(path), 6, 1, Qt.AlignCenter)
+        # Setting integer validator for run and shot numbers.
+        self.lineEditContainer[GetVars.run].setValidator(QIntValidator())
+        self.lineEditContainer[GetVars.shot].setValidator(QIntValidator())
 
         # Adding the Ok and Cancel button.
         dialog_button_box = QDialogButtonBox()
@@ -79,28 +85,31 @@ class GetDialog(QDialog):
                                              QDialogButtonBox.Cancel)
         dialog_button_box.accepted.connect(self.accept)
         dialog_button_box.rejected.connect(self.reject)
-        self.main_layout.addWidget(dialog_button_box, 7, 1)
+        formLayout.addRow(dialog_button_box)
 
-    def sizeHint(self):
-        return QSize(100, 100)
+
+    def getValue(self, Id):
+        return self.lineEditContainer[Id].text()
 
     def on_close(self):
-        # Returning the values
-        # SHOT, RUN, USER, DEVICE, VERSION, run_name exclusively.
+        # Returning a dictionary of values. The values are defined in
+        # enumerator class GetVars.
+
+        variables = {}
+
+        for i in range(GetVars.numOfParams):
+            variables[i] = self.getValue(i)
+
+        # Checking if validating Integers.
         try:
-            SHOT = int(self.main_layout.itemAt(1).widget().text())
-            RUN = int(self.main_layout.itemAt(3).widget().text())
+            variables[GetVars.shot] = int(variables[GetVars.shot])
+            variables[GetVars.run] = int(variables[GetVars.run])
         except ValueError as e:
-            SHOT = -1
-            RUN = -1
+            variables[GetVars.shot] = -1
+            variables[GetVars.run] = -1
 
-        USER = self.main_layout.itemAt(5).widget().text()
-        DEVICE = self.main_layout.itemAt(7).widget().text()
-        VERSION = self.main_layout.itemAt(9).widget().text()
-        RUN_NAME = self.main_layout.itemAt(11).widget().text()
-        DIR_PATH = self.main_layout.itemAt(13).widget().text()
+        return variables
 
-        return SHOT, RUN, USER, DEVICE, VERSION, RUN_NAME, DIR_PATH
 
 class GetIDS(QWidget):
     """ Push button used for plugin."""
@@ -109,13 +118,10 @@ class GetIDS(QWidget):
     def __init__(self, parent=None):
         super(GetIDS, self).__init__(parent)
 
-        self._user = ''
-        self._shot = ''
-        self._device = ''
-        self._version = ''
-        self._run = ''
-        self._runName = ''
-        self._dirPath = ''
+        self.vars = {}
+        for i in range(GetVars.numOfParams):
+            # At the begining clear all parameters
+            self.vars[i] = ''
 
         self.thread = GetIDSQThread(self)
         self.thread.finished.connect(self.cleanUp)
@@ -136,81 +142,83 @@ class GetIDS(QWidget):
 
     @pyqtSlot(str)
     def setUser(self, user):
-        self._user = user
+        self.vars[GetVars.user] = user
 
     def getUser(self):
-        return self._user
+        return self.vars[GetVars.user]
 
     user = pyqtProperty(str, getUser, setUser)
 
     @pyqtSlot(str)
     def setDevice(self, device):
-        self._device = device
+        self.vars[GetVars.device] = device
 
     def getDevice(self):
-        return self._device
+        return self.vars[GetVars.device]
 
     device = pyqtProperty(str, getDevice, setDevice)
 
     @pyqtSlot(str)
     def setVersion(self, version):
-        self._version = version
+        self.vars[GetVars.device] = version
 
     def getVersion(self):
-        return self._version
+        return self.vars[GetVars.device]
 
     version = pyqtProperty(str, getVersion, setVersion)
 
     @pyqtSlot(str)
     def setRun(self, run):
-        self._run = run
+        self.vars[GetVars.run] = run
 
     def getRun(self):
-        return self._run
+        return self.vars[GetVars.run]
 
     runNumber = pyqtProperty(str, getRun, setRun)
 
     @pyqtSlot(str)
     def setShot(self, shot):
-        self._shot = shot
+        self.vars[GetVars.shot] = shot
 
     def getShot(self):
-        return self._shot
+        return self.vars[GetVars.shot]
 
     shotNumber = pyqtProperty(str, getShot, setShot)
 
     @pyqtSlot(str)
     def setDirPath(self, savedir):
-        self._dirPath = savedir
+        self.vars[GetVars.dirPath] = savedir
 
     def getDirPath(self):
-        return self._dirPath
+        return self.vars[GetVars.dirPath]
 
     dirPath = pyqtProperty(str, getDirPath, setDirPath)
 
     @pyqtSlot(str)
     def setRunName(self, name):
-        self._runName = name
+        self.vars[GetVars.runName] = name
 
     def getRunName(self):
-        return self._runName
+        return self.vars[GetVars.runName]
 
     runName = pyqtProperty(str, getRunName, setRunName)
 
     def checkParameters(self):
-        if self._runName and self._shot and self._user and self._version and \
-           self._device and self._run and self._dirPath:
+        state = True
+        for key in self.vars:
+            if not self.vars[key]:
+                state = False
+                break
+        if state:
             return True
 
         else:
             # Not all variables are set
+            logging.warning('Not all parameters are specified!')
             dialog = GetDialog(self)
-            dialog.prepareWidgets(shot=self._shot, run=self._run,
-                                  user=self._user, device=self._device,
-                                  version=self._version, path=self._dirPath)
+            dialog.prepareWidgets(self.vars)
             if dialog.exec_():
-                self._shot, self._run, self._user, self._device, \
-                self._version, self._runName, self._dirPath = dialog.on_close()
+                self.vars = dialog.on_close()
                 return self.checkParameters()
             else:
                 # Canceled!
@@ -241,21 +249,14 @@ class GetIDS(QWidget):
         if not self.checkDestination:
             return
 
-        self.thread.setParameters(dirpath=self._dirPath, run=int(self._run),
-                                  shot=int(self._shot), device=self._device,
-                                  version=self._version, user=self._user,
-                                  runName=self._runName)
+        self.thread.setParameters(self.vars)
         self.thread.start()
 
     @pyqtSlot()
     def cleanUp(self):
-        self._user = ''
-        self._shot = ''
-        self._device = ''
-        self._version = ''
-        self._run = ''
-        self._runName = ''
-        self._dirPath = ''
+        for key in self.vars:
+            self.vars[key] = ''
+
 
 class GetIDSQThread(QThread):
     """QThread for getting data from an IDS from a separate thread.
@@ -265,38 +266,20 @@ class GetIDSQThread(QThread):
     def __init__(self, parent=None):
         super(GetIDSQThread, self).__init__(parent)
         self.parent = parent
-        self.shot = None
-        self.runNumber = None
-        self.user = None
-        self.device = None
-        self.version = None
-
-        self.dirpath = None
-        self.runName = None
-
-        self.status_bar = None
-
+        self.vars = {}
+        for i in range(GetVars.numOfParams):
+            self.vars[i] = None
         self.finished.connect(self.on_finish)
         self.started.connect(self.on_start)
 
-    def setParameters(self, shot=0, run=0, user='', device='', version='',
-                      dirpath='', runName=''):
-        """Function that sets the parameters.
+    def setParameters(self, parameters):
+        """Function that sets the parameters necessary for accessing IDS.
         """
-        self.shot = shot
-        self.runNumber = run
-        self.user = user
-        self.device = device
-        self.version = version
-        self.dirpath = dirpath
-        self.runName = runName
-
-
+        for key in parameters:
+            self.vars[key] = parameters[key]
 
     def run(self):
-        ids = GetIDSWrapper(int(self.shot), int(self.runNumber), self.user,
-                            self.device, self.version, self.dirpath,
-                            self.runName)
+        ids = GetIDSWrapper(self.vars)
         # Data is saved if the self.dirpath and self.runName were provided.
         if ids.state:
             ids.saveData()
@@ -323,27 +306,22 @@ class GetIDSWrapper:
     Attributes:
 
     """
-    def __init__(self, shot='', run='', user='', machine='', version='',
-                 dirpath='', runName=''):
-
-        self.setParameters(shot, run, user, machine, version, dirpath, runName)
-        self.ids = imas.ids(shot, run)
+    def __init__(self, parameters):
+        self.vars = {}
+        self.setParameters(parameters)
+        self.ids = imas.ids(self.vars[GetVars.shot], self.vars[GetVars.run])
         self.state = self.openIDS()
 
-    def setParameters(self, shot, run, user, machine, version, dirpath,
-                      runName):
-        self.shot = shot
-        self.run = run
-        self.user = user
-        self.machine = machine
-        self.version = version
 
-        self.dirpath = dirpath
-        self.runName = runName
+    def setParameters(self, parameters):
+        for key in parameters:
+            self.vars[key] = parameters[key]
 
     def openIDS(self):
         logging.info('Opening IDS')
-        self.ids.open_env(self.user, self.machine, self.version)
+        self.ids.open_env(self.vars[GetVars.user],
+                          self.vars[GetVars.device],
+                          self.vars[GetVars.version])
         if self.ids.isConnected():
             logging.info('IDS opened OK!')
             return True
@@ -369,7 +347,8 @@ class GetIDSWrapper:
         """Saves data in the directory with the name ``runName``. The directory
         is located in the ``dirpath``.
         """
-        dir_path = self.dirpath + '/' + self.runName
+        dir_path = self.vars[GetVars.dirPath] + '/' + \
+                   self.vars[GetVars.runName]
 
         try:
             tar = self.extractFiles()
@@ -397,45 +376,71 @@ class GetIDSWrapper:
         except tarfile.ReadError as e:
             logging.error('Warning empty file!')
 
+
 if __name__ == '__main__':
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    root.addHandler(ch)
 
     # For launching python script directly from treminal with python command
+    Vars = {}
+    Help = """
+This is used for testing the importing data from an IDS. By default the data \
+from an IDS will be saved in $HOME/my_run directory.
+
+In order to run get_edge path, shot, run, user, device, version and  \
+target-directory variables must be defined. Example (terminal):
+
+python3 get_edge_ids.py --shot=1001 --run=1001 --user=%s \
+--device=solps-iter --version=3 --targetDir=%s --runName=my_run
+"""
     try:
         opts, args = getopt.getopt(sys.argv[1:], "srudvh", ["dirpath=",
                                                             "shot=", "run=",
                                                             "user=", "device=",
-                                                           "version=", "help"])
+                                                           "version=",
+                                                           "targetDir=",
+                                                           "runName=", "help"])
         for opt, arg in opts:
             #print opt, arg
             if opt in ("-s", "--shot"):
-                shot = int(arg)
+                Vars[GetVars.shot] = int(arg)
             elif opt in ("-r", "--run"):
-                run = int(arg)
+                Vars[GetVars.run] = int(arg)
             elif opt in ("-u", "--user"):
-                user = arg
+                Vars[GetVars.user] = arg
             elif opt in ("-t", "--device"):
-                device = arg
+                Vars[GetVars.device] = arg
             elif opt in ("-v", "--version"):
-                version = arg
+                Vars[GetVars.version] = arg
+            elif opt in ("-D", "--targetDir"):
+                Vars[GetVars.dirPath] = arg
+            elif opt in ("-R", "--runName"):
+                Vars[GetVars.runName] = arg
 
             if opt in ("-h", "--help"):
-                print("In order to run get_edge file path, shot, run, user,"
-                    "device and version variables must be defined."
-                    "Example (terminal):\n"
-                    "python3.5 get_edge_ids.py "
-                    "--shot=1001 --run=1001 --user=simicg "
-                    "--device=solps-iter --version=3")
+                print(Help % (os.environ['USER'], os.path.expanduser('~')))
                 sys.exit()
 
     except Exception:
-        print ('Supplied option not recognized!')
+        print('Supplied option not recognized!')
+        print('For help: -h / --help')
+        sys.exit(2)
+
+    if len(Vars) < GetVars.numOfParams:
+        print('Not enough variables defined!')
+        print ('For help: -h / --help')
+        sys.exit(2)
+    elif len(Vars) > GetVars.numOfParams:
+        print('Too many variables defined!')
         print ('For help: -h / --help')
         sys.exit(2)
 
     app = QApplication(sys.argv)
     t = GetIDSQThread()
-    t.setParameters(shot=shot, run=run, user=user, device=device,
-                    version=version)
+    t.setParameters(Vars)
     t.finished.connect(app.exit)
     t.start()
     sys.exit(app.exec_())

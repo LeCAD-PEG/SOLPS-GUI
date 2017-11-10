@@ -1,0 +1,30 @@
+#%Module1.0#####################################################################
+##
+## $name modulefile
+##
+set ver [lrange [split [ module-info name ] / ] 1 1 ]
+set name [lrange [split [ module-info name ] / ] 0 0 ]
+
+
+set loading [module-info mode load]
+
+proc ModulesHelp { } {
+puts stderr "\tThis module sets the environment for $name v$ver"
+}
+conflict $name
+
+# Checking if paraview is loaded.
+if { ! [ is-loaded paraview ] } { 
+  module load paraview
+} 
+if { ! [ is-loaded blitz/10 ] } {
+  module load blitz/0.10
+}
+if { ! [ is-loaded imas ] } {
+  module load imas
+}
+
+set paraview_version $::env(PARAVIEW_VERSION)
+set imas_version $::env(IMAS_VERSION)
+
+prepend-path PV_PLUGIN_PATH /work/imas/opt/paraview-plugins/$paraview_version/$imas_version
