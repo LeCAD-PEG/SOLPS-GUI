@@ -14,6 +14,7 @@
    edgeualplugin/index.rst
    editors.rst
    custom_plot.rst
+   divgeo.rst
 
 
 
