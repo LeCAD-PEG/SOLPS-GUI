@@ -1,5 +1,5 @@
 # source this csh file for local setup environment if PyQT is provided locally
-setenv QTDIR "${PWD}/staging/qt/5.7.1"
+setenv QTDIR "${PWD}/staging/qt/5.9.1"
 setenv PARAVIEW_PREFIX ${PWD}/staging/paraview/5.4.1
 
 setenv PATH "${PWD}/staging/bin:${QTDIR}/bin:${PARAVIEW_PREFIX}/bin:${PATH}"
@@ -9,7 +9,7 @@ if !($?LD_LIBRARY_PATH) then
     setenv LD_LIBRARY_PATH "${PWD}/staging/lib:${QTDIR}/lib"
 else
     setenv LD_LIBRARY_PATH "${PWD}/staging/lib:${QTDIR}/lib:${LD_LIBRARY_PATH}"
-    setenv LD_LIBRARY_PATH "${PWD}/staging/qt/4.8.7/lib:${LD_LIBRARY_PATH}"
+    setenv LD_LIBRARY_PATH "${PWD}/staging/qt/5.9.1/lib:${LD_LIBRARY_PATH}"
 endif
 
 if !($?PKG_CONFIG_PATH) then
