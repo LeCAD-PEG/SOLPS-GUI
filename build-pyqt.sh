@@ -2,11 +2,11 @@
 ## Building PyQt with Python3 and Qt5
 ## Minimum GCC supported version for building Qt5 is 4.7
 
-PYTHON_VERSION=3.6.0
+PYTHON_VERSION=3.6.3
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
-QT_VERSION=5.7.1
-PyQT_VERSION=5.7.1 # should be the same as Qt
-SIP_VERSION=4.19
+QT_VERSION=5.9.1
+PyQT_VERSION=5.9.1 # should be the same as Qt
+SIP_VERSION=4.19.4
 
 # Site specific defaults
 case $(hostname -f) in
@@ -166,7 +166,7 @@ done
 ## Install QT
 
 QT_MAJOR_VERSION=${QT_VERSION%.*}
-QT_TAR="qt-everywhere-opensource-src-${QT_VERSION}.tar.gz"
+QT_TAR="qt-everywhere-opensource-src-${QT_VERSION}.tar.xz"
 QT_SITE="http://download.qt.io/official_releases/qt"
 #QT_SITE="http://download.qt.io/development_releases/qt/"
 QT_DOWNLOAD="${QT_SITE}/${QT_MAJOR_VERSION}/${QT_VERSION}/single/${QT_TAR}"
@@ -181,25 +181,28 @@ fi
 if [ ! -e ${QT_SOURCE_DIR}/.configured ]; then # Configuring Qt
   rm -rf ${QT_SOURCE_DIR} ${STAGING_QT}
   cd ${BUILD_DIR}
-  tar xzf ${DOWNLOAD_DIR}/${QT_TAR}
+  tar xf ${DOWNLOAD_DIR}/${QT_TAR}
   cd ${QT_SOURCE_DIR}
   sed -i.orig -e 's/-Wno-error=return-type//' \
       qtlocation/src/3rdparty/poly2tri/poly2tri.pro
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-openssl.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-no-offscreen.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
+  #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
   patch -p 1 -d ${QT_SOURCE_DIR}<${PATCH_DIR}/qglxintegration-glx-context.patch
   #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qxcbconnection.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qbenchmarkperfevents.patch
   #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qsimd.cpp-gcc4.2.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qdbusinternalfilters.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-invoke-static.patch
+  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qtbase-platformsupport-fbconveniance-qfbvthandler.patch
   sed -i -e '/auto/d' qtdeclarative/tests/tests.pro \
                       qtmultimedia/tests/tests.pro \
                       qtgraphicaleffects/tests/tests.pro
   PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH} \
     ./configure -v --prefix=${STAGING_QT} -opensource -confirm-license \
-      -shared -no-audio-backend \
+      -shared \
+      -skip qtmultimedia \
+      -skip qtwayland \
       -skip qtgamepad \
       -skip qtwebchannel \
       -skip qtwebengine \
