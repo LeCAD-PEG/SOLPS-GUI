@@ -181,7 +181,8 @@ fi
 if [ ! -e ${QT_SOURCE_DIR}/.configured ]; then # Configuring Qt
   rm -rf ${QT_SOURCE_DIR} ${STAGING_QT}
   cd ${BUILD_DIR}
-  tar xf ${DOWNLOAD_DIR}/${QT_TAR}
+  #tar cf ${DOWNLOAD_DIR}/${QT_TAR}
+  xzcat ${DOWNLOAD_DIR}/${QT_TAR} | tar -xf -
   cd ${QT_SOURCE_DIR}
   sed -i.orig -e 's/-Wno-error=return-type//' \
       qtlocation/src/3rdparty/poly2tri/poly2tri.pro
