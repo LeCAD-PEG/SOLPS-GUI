@@ -1,4 +1,4 @@
-.. _cpo2ids-howto:
+.. _catalyst-howto:
 
 .. highlight:: csh
    
