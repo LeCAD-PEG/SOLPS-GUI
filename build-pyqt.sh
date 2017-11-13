@@ -223,6 +223,7 @@ if [ ! -e ${QT_SOURCE_DIR}/.built ]; then  ## Building Qt and docs
   PATH="${STAGING_QT}/bin:${PATH}" make -C qtbase/src html_docs
   PATH="${STAGING_QT}/bin:${PATH}" make qmake_all
   PATH="${STAGING_QT}/bin:${PATH}" make -j ${MAKE_JOBS} docs install_docs
+  PATH="${STAGING_QT}/bin:${PATH}" make -j ${MAKE_JOBS} install_docs
   touch ${QT_SOURCE_DIR}/.built
 fi # building Qt
 

@@ -9,22 +9,19 @@ if !($?LD_LIBRARY_PATH) then
     setenv LD_LIBRARY_PATH "${PWD}/staging/lib:${QTDIR}/lib"
 else
     setenv LD_LIBRARY_PATH "${PWD}/staging/lib:${QTDIR}/lib:${LD_LIBRARY_PATH}"
-    setenv LD_LIBRARY_PATH "${PWD}/staging/qt/5.9.1/lib:${LD_LIBRARY_PATH}"
 endif
 
 if !($?PKG_CONFIG_PATH) then
-    setenv PKG_CONFIG_PATH "${PWD}/staging/lib/pkgconfig"
+    setenv PKG_CONFIG_PATH "${PWD}/staging/lib/pkgconfig:${QTDIR}/lib/pkgconfig"
 else
-    setenv PKG_CONFIG_PATH "${PWD}/staging/lib/pkgconfig:${PKG_CONFIG_PATH}"
+    setenv PKG_CONFIG_PATH "${PWD}/staging/lib/pkgconfig:${QTDIR}/lib/pkgconfig:${PKG_CONFIG_PATH}"
 endif
 
 setenv PYQTDESIGNERPATH "${PWD}/src/plugins/designer"
 if !($?PYTHONPATH) then
     setenv PYTHONPATH "${PWD}/src/widgets"
-    setenv PYTHONPATH "${PWD}/staging/lib/site-packages:${PYTHONPATH}"
 else
     setenv PYTHONPATH "${PWD}/src/widgets:${PYTHONPATH}"
-    setenv PYTHONPATH "${PWD}/staging/lib/site-packages:${PYTHONPATH}"
 endif
 
 

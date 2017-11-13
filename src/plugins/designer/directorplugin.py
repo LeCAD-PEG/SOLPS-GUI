@@ -14,7 +14,7 @@ from director import Director
 
 class DirectorPlugin(QPyDesignerCustomWidgetPlugin):
     """DirectorPlugin(QPyDesignerCustomWidgetPlugin)
-    
+
     Provides a Python custom plugin for Qt Designer by implementing the
     QDesignerCustomWidgetPlugin via a PyQt-specific custom plugin class.
     """
@@ -22,7 +22,7 @@ class DirectorPlugin(QPyDesignerCustomWidgetPlugin):
     # The __init__() method is only used to set up the plugin and define its
     # initialized variable.
     def __init__(self, parent=None):
-    
+
         super(DirectorPlugin, self).__init__(parent)
 
         self.initialized = False
