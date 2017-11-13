@@ -12,10 +12,10 @@ STAGING_PLUGINS=${STAGING_PLUGINS:-${STAGING_DIR}/paraview-plugins/${PARAVIEW_VE
 
 case $(hostname -f) in
   *.iter.org) 
-	      # module purge
-        module load imas/3.12.0/ual/3.6.3 blitz/0.10 binutils/2.25
+        # module purge
+        module load imas blitz/0.10 binutils/2.25
         module load OpenSSL/1.0.2g-GCC-4.8.3
-        module load Python/2.7.9-goolf-1.5.16 # overwrite Anaconda
+        module load Python/2.7.9-goolf-1.5.16 # overwrite Anaconda2
 	export CC=gcc
 	export CXX=g++
 	MAKE_JOBS=${MAKE_JOBS:-4}
