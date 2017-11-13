@@ -429,7 +429,7 @@ modelling grid to have. As was said at the C-mode case that can be done by
 the list.
 For the previous example of C-mode case was selected SN. But for this case
 none of the topologies fulfills the conditions. You can create a magnetic
-topology by your own with :menuselection:`Commands --> Edit topology `
+topology by your own with :menuselection:`Commands --> Edit topology`
 
 .. image:: divgeo_ITER_4.png
    :align: center
