@@ -39,6 +39,7 @@ in Qt with the following commands:
 
 ## Buiding documentation
 
+    $ module load texlive Perl
     $ cd doc
     $ make latexpdf PAPER=a4 # for PDF with TexLive
     $ make html # for solps_doc alias within "modern" browser
@@ -131,3 +132,6 @@ files. To build the Anaconda3 binary-compatible gnuplot and PyQt widget do:
     export QT_LIBS="-L${EBROOTANACONDA3}/lib -liconv ${QT_LIBS}"
     export GNUPLOT_INSTALL_DIR=/work/imas/opt/gnuplot/5.2.1
     MAKE_JOBS=16 ./build-gnuplot.sh
+
+Building PyQt based Gnuplot widget with build-gnuplot-widget.sh has been 
+unsucessful so far.

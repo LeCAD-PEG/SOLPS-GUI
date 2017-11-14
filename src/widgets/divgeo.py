@@ -90,7 +90,7 @@ class DivGeo(Akter):
         self.setLayout(self.Layout)
 
         self.labelContainer = QLabel()
-        self.labelContainer.setText('DivGeo2\nClick to run DivGeo2')
+        self.labelContainer.setText('DivGeo\nClick to run DivGeo')
         self.labelContainer.setAlignment(Qt.AlignCenter)
         self.Layout.addWidget(self.labelContainer)
 
@@ -127,8 +127,8 @@ class DivGeo(Akter):
                 self.DivGeoPID = int(line.lstrip("DivGeo PID: "))
 
         if 'STARTING DIVGEO' in text:
-            self.labelContainer.setText("DivGeo2 running.\Click here to "
-                                        "dock DivGeo2.")
+            self.labelContainer.setText("DivGeo running.\Click here to "
+                                        "dock DivGeo.")
             self.STATE = State.running
 
         logging.debug(text)

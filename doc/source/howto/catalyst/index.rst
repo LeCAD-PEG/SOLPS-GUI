@@ -1,4 +1,4 @@
-.. _cpo2ids-howto:
+.. _catalyst-howto:
 
 .. highlight:: csh
    
@@ -510,7 +510,6 @@ code.
 Listing below shows the main part of the subroutine
 ``coprocessor``. Complete function is presented in `fortranAdaptor.F90`_
 
-.. _lst-fortranadaptor:
 .. code-block:: fortran
 
     subroutine coprocessor(crx,cry,ncrx,nx,ny,ns,step,time,vol,<cell_data>)

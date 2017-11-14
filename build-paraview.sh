@@ -7,7 +7,7 @@ CMAKE_VERSION=3.9.1
 case $(hostname -f) in
   *.iter.org)
 	module purge
-	module load GCC/4.8.3 binutils/2.25 intel/12.0.2 
+	module load GCC/4.8.3 binutils/2.25 intel/12.0.2
 	module load Python/2.7.3-goolf-1.5.16
 	module load OpenSSL/1.0.2g-GCC-4.8.3
 	#module load Python/2.7.9-gompi-1.5.16-bare
@@ -59,14 +59,14 @@ CMAKE_TEST=$(hash cmake 2> /dev/null && cmake --version \
              | sed -e 's/[^0-9]//g;s/^\(.\{2\}\).*/\1/')
 if [ "${CMAKE_TEST}0" -ge 350 ]
  then CMAKE=cmake
- else CMAKE=${STAGING_DIR}/bin/cmake
+ else CMAKE=${STAGING_DIR}/cmake/${CMAKE_VERSION}/bin/cmake
 fi
 
 set -e
 
 # Install cmake as needed
 CMAKE_SRC_DIR="${BUILD_DIR}/cmake-${CMAKE_VERSION}"
-CMAKE_INSTALL_DIR="${STAGING_DIR}"
+CMAKE_INSTALL_DIR="${STAGING_DIR}"/cmake/${CMAKE_VERSION}
 if [ ${CMAKE} != cmake -a  ! -e  ${CMAKE_SRC_DIR}/.built ]; then
   CMAKE_SRC="cmake-${CMAKE_VERSION}.tar.gz"
   CMAKE_MAIN_VERSION=${CMAKE_VERSION%.*}

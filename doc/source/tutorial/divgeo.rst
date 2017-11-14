@@ -11,17 +11,16 @@ Meshing C-Mod with DivGeo
 =========================
 
 
-With this tutorial we'll show how the submodule DivGeo is working. Firstly
+With this tutorial we'll show how the tool *DivGeo* is working. Firstly
 every file which is used for running in the DivGeo should be located in one
 working directory called ``baserun``. The basic setup of the run directory
 starts::
 
      $ stop
-     $ cd runs
-     $ mkdir <your test case direcotry name>
-     $ cd <your test case direcotry name>
-     $ mkdir baserun
-     $ cd baserun
+     $ cd runs/examples
+     $ cmake . && make # Fetches all examples
+     $ tar xvzf tutorial-DivGeo_C-Mod.tar.gz
+     $ cd tutorial-DivGeo_C-Mod/baserun
 
 Then is needed to copy the EFIT equilibrium file ``g.990429019.00940`` into
 ``baserun`` directory. This example of the equilibrium file is for a C-Mod
@@ -46,7 +45,7 @@ i.e. the first and last points must be the same.
 To start DivGeo, as a SOLPS-GUI tool can be done with choosing first at the
 Runs menu the directory baserun and after that to click on the Populate
 baserun and just click on the Start DivGeo button on the left down corner
-of the SMITER-GUI window.
+of the SOLPS GUI window.
 
 You should see the following window at the end of this tutorial.
 
@@ -355,22 +354,21 @@ identification”`. Set `"Desired side length”` to the desired characteristic
 scale size of the triangles in this region.
 
 
-DivGeo meshing ITER Baseline scenario
-=====================================
+Meshing ITER Baseline scenario
+==============================
 
 The ITER baseline scenario case follows the same steps as for the C-mod.
 Every file which is used for running is located in one working directory
-called ``baserun_ITER``. The basic setup of the run directory starts:
+called ``baserun``. The basic setup of the run directory starts::
 
      $ stop
-     $ cd runs
-     $ mkdir <your test case direcotry name>
-     $ cd <your test case direcotry name>
-     $ mkdir baserun_ITER
-     $ cd baserun_ITER
+     $ cd runs/examples
+     $ cmake . && make # Fetches all examples
+     $ tar xvzf tutorial-DivGeo_ITER_baseline_scenario.tar.gz
+     $ cd tutorial-DivGeo_ITER_baseline_scenario/baserun
 
 Then is needed to copy the EFIT equilibrium file ``Baseline2008-li0.70`` into
-``baserun_ITER`` directory. This example of the equilibrium file is for a
+``baserun`` directory. This example of the equilibrium file is for a
 ITER case Ne plasma with beryllium wolfram impurities. Because the format of
 the EFIT equilibrium file is not readable, so is needed to format it, into
 the DG equilibrium::
@@ -384,7 +382,7 @@ equilibrium can avoid some problems when the fluid grid is generated::
     $ d2d Baseline2008-li0.70.equ Baseline2008-li0.70.x4.equ
 
 
-The next step is to copy the wall geometry file into ``baserun_ITER``
+The next step is to copy the wall geometry file into ``baserun``
 directory.
 
 To start DivGeo, as a SOLPS-GUI tool can be done with choosing first at the
@@ -397,7 +395,7 @@ Import geometry file
 --------------------
 
 To start to use the DivGeo should make an import of the wall geometry file
-which is already into ``baserun_ITER`` directory. That can be done with opening
+which is already into ``baserun`` directory. That can be done with opening
 the: :menuselection:`File --> Import --> Template` and load
 ``F57-Be_W-Ne.ogr``, which should appear in the dialogue box. Then press
 :kbd:`CTRL+P` to fit the wall data to the workspace. If you cannot
@@ -426,10 +424,17 @@ Setting the magnetic topology
 You can tell to DivGeo also which kind of magnetic topology you want the
 modelling grid to have. As was said at the C-mode case that can be done by
 :menuselection:`File --> Import --> Topology` and choose one of topology in
+<<<<<<< HEAD
 the list.
 For the previous example of C-mode case was selected SN. But for this case
 none of the topologies fulfills the conditions. You can create a magnetic
 topology by your own with :menuselection:`Commands --> Edit topology`
+=======
+the list. For the previous example of C-mode case was selected SN. But for
+this case none of the topologies fulfills the conditions. You can create a
+magnetic topology by your own with :menuselection:`Commands --> Edit
+topology`
+>>>>>>> b29d998d6713d53a4a0b00b664b724ac7c2757f9
 
 .. image:: divgeo_ITER_4.png
    :align: center
@@ -573,12 +578,11 @@ this case is 2.7e22.
 PRF surface group pump
 ----------------------
 
-For PFR edge is only set based on where the radial boundary of the grid will
-be, as determined by intersection with the divertor knee. You can definite
-the PRF surface group pump with choosing the
+For PFR edge is only set based on where the radial boundary of the grid
+will be, as determined by intersection with the divertor knee. You can
+definite the PRF surface group pump with choosing the
 :menuselection:`Variables --> Add --> PFR surface group` and then choosing
-which part
- you will mark: the pump part
+which part you will mark: the pump part
 
 .. image:: divgeo_ITER_15.png
    :align: center
