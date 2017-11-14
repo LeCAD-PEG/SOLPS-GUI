@@ -135,3 +135,10 @@ files. To build the Anaconda3 binary-compatible gnuplot and PyQt widget do:
 
 Building PyQt based Gnuplot widget with build-gnuplot-widget.sh has been 
 unsucessful so far.
+
+## Importing IMAS Python modules into local Python
+For situations where IMAS library is provided system wide but Python3
+is used from local build using setupenv.sh then one can install IMAS
+package by
+
+    pip3 install ${IMAS_PREFIX}/python/dist/imas*.tar.gz
