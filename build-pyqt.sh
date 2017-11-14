@@ -95,6 +95,7 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   ./configure --prefix=${STAGING_DIR} --enable-shared
   make -j ${MAKE_JOBS}
   make install
+  ln -sf python3 ${STAGING_DIR}/bin/python
   LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
   ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
       pip sphinx sphinx_rtd_theme matplotlib mock nose
@@ -102,7 +103,7 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
     ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
       Cython scipy luigi tornado deap decorator liac-arff ecdsa \
-      netaddr paramiko paycheck virtualenv # mpi4py netifaces
+      netaddr paramiko paycheck virtualenv
   touch ${PYTHON_SRC_DIR}/.built
 fi
 
