@@ -191,10 +191,10 @@ The same is for the outer target.
 .. image:: divgeo_12.png
    :align: center
 
-Setting the structure which is ignored by EIRINE
+Setting the structure which is ignored by EIRENE
 ------------------------------------------------
 
-To ignored the parts of the structure which are not a parts of the EIRINE can
+To ignored the parts of the structure which are not a parts of the EIRENE can
 be done by :menuselection:`Variables --> Add --> Elements not for Eirene`. Mark
 the elements behind the targets and click `"Set”`.
 
@@ -353,6 +353,417 @@ top-bottom), as shown on the right, and click `"Set”` for `"Region
 identification”`. Set `"Desired side length”` to the desired characteristic
 scale size of the triangles in this region.
 
+Choose the toroidal approximation
+---------------------------------
+
+To set the toroidal approximation you need to set the `"Major Radius"` to a
+negative (real) number, such as -1.0, if you want to use the toroidal
+approximation instead of the cylindrical approximation.
+
+:menuselection:`Variables --> Global Eirene Data`
+
+Write the output data files that are needed by later steps
+----------------------------------------------------------
+
+With the :menuselection:`Commands --> Check variables` you can check if all
+variables have valid values. If the check is it ok with:
+:menuselection:`Commands --> Rebuild Carre objects`
+:menuselection:`File --> Save`
+:menuselection:`File --> Output`
+can be create three files:
+:kbd:`<DG_model_name>.dgo`, `the DG “output” file`
+:kbd:`<DG_model_name>.str`, `the “structure” file (used by Carre)`
+:kbd:`<DG_model_name>.trg`, `the “targets” file (used by Carre)`
+
+Prepare the links of the DG output files for later programs
+-----------------------------------------------------------
+
+Because the other SOLPS-GUI programs expect to find the DG output files in a
+"standard" place, a set of symbolic links is produced to fulfill this
+requirement, by means of the command: ``lns <DG_model_name>``
+Note that you should not include the ``".dg"`` extension in the DG model name.
+
+Launch the mesh building script
+-------------------------------
+
+In the following part we wil proceed the creation of a plasma gridm using the
+Carre gird operator
+
+``carre -``.
+
+Preparation step
+----------------
+
+The preparation starts with:
+
+:kbd:`p (or <Enter>)`
+
+This steps reads the DG files and translates them into
+the format needed by Carre
+
+:kbd:`class = cmod`
+
+:kbd:`grid_stem = g1070725014.00700.default.pnl`
+
+ :kbd:`rdeqdg: before rdeqlh`
+
+ :kbd:`rdeqdg: after rdeqlh. nr,nz,btf,rtf=          257         257`
+
+   :kbd:`5.40751075744629       0.660000026226044`
+
+ :kbd:`reading rgr...`
+
+ :kbd:`reading zgr...`
+
+ :kbd:`reading pfm...`
+
+:kbd:`Help, Prepare, Grid, Save, Convert, sTore, Next, Remove, Input, Output,`
+
+:kbd:`Quit`
+
+Gridding step
+-------------
+
+The gridding step strats with:
+
+:kbd:`g (or <Enter>)`
+
+The first question you must answer is whether the `X-` and `O-` points
+identified by Carre are correct (they usually are). If they are not, then,
+you refuse the selection and indicate yourself which of the extrema are `X-`
+and `O-` points.
+
+:kbd:`Starting`
+
+:kbd:`newpag OK`
+
+:kbd:`cpsets ok`
+
+:kbd:`cprect ok`
+
+:kbd:`cpcldr ok`
+
+:kbd:`Pre-selected points are identified.`
+
+:kbd:`O-point:     6.8030E-01   -8.0087E-03`
+
+:kbd:`X-point:     5.6218E-01   -3.8994E-01`
+
+:kbd:`Do you accept the selection (y/n)?`
+
+:kbd:`y`
+
+Grid parameter selection step
+-----------------------------
+
+Carre then provides a table of parameters. Carre attempts to provide a grid
+that must satisfy three criteria simulatenously:
+
+    1. The grid cells must be as locally orthogonal as possible
+    2. The grid cells must align with the targets in their vicinity
+    3. The size of neighbouring grid cells must not vary too quickly.
+
+It is relatively easy to find a satisfactory solution meeting these three
+criteria, but this is not always the case, especially in geometries where the
+targets are almost parallel to the flux surfaces, putting criteria 1 and 2 at
+odds with one another.
+
+Quickly, the data provided in the Carre table indicates the poloidal spacing
+of the grid points along the separatrix segments, the radial spacing of the
+successive flux surfaces as one steps away from the separatrix, the
+penetration depth of the grid (:kbd:`pntrat`), the guard lengths (i.e. the
+vicinity
+over which criterion 2 above is applied, in meters), and some numerical
+parameters used for the optimization algorithm that attempts to build the mesh.
+
+The poloidal spacings are deduced from the distribution of grid points chosen
+in DG. The guard lengths are given by the `"CARRE guard length"` parameters in
+the DG `"Target specifications"`. The pntrat value is obtained from the
+innermost DG surface chosen in the core.
+
+The radial extent of the grid (and therefore the radial grid spacings) is
+determined by the first tangency points (in the PFR and main chamber vessel)
+between the flux surfaces and the `"Structure"` defined in DG. However, the
+algorithm is not identical to DG’s, so the values found may differ.
+
+SEPARATRIX SEGMENTS:
+
+=== =========== ========== =========== =========== =========== =============
+ #   nptseg(i)   lg(i)      deltp1(i)    deltpn(i)     dpmin      dpmax
+=== =========== ========== =========== =========== =========== =============
+ 1      21      1.1724E-01  9.1116E-03  1.8834E-04  1.8834E-04  9.1116E-03
+
+ 2      21      1.1053E-01  8.8644E-03  1.8323E-04  1.8323E-04  8.8644E-03
+
+ 3      41      1.7723E+00  1.1810E-02  1.5681E-02  1.1810E-02  6.0815E-02
+
+=== =========== ========== =========== =========== =========== =============
+
+RADIAL DISTRIBUTIONS FOR EACH REGION:
+
+Distribution in psi: repart=    2
+
+====== ======= ============ ============ ============ ============ ============
+region  npr(i)     width      deltr1(i)   deltrn(i)     drmin      drmax
+====== ======= ============ ============ ============ ============ ============
+ 1       21      2.7276E-02   9.6815E-05   2.4586E-03   9.6815E-05   2.4586E-03
+
+ 2       11     -1.8005E-02  -2.1524E-04  -3.1739E-03  -3.1739E-03  -2.1524E-04
+
+====== ======= ============ ============ ============ ============ ============
+
+
+CENTRAL REGION: region i=  3     pntrat max.= 0.39977943
+
+======= ======= ============ ============ ============= ============ ===========
+ pntrat  npr(i)    width      deltr1(i)     deltrn(i)      drmin         drmax
+======= ======= ============ ============ ============= ============ ===========
+0.161   11       -1.4957E-01  -1.7755E-03  -2.6181E-02  -2.6181E-02  -1.7755E-03
+
+======= ======= ============ ============ ============= ============ ===========
+
+GUARD LENGTH FOR EACH DIVERTOR PLATE:
+
+============ ============
+ tgarde(1)     tgarde(2)
+============ ============
+  0.20000        0.20000
+============ ============
+
+RELAXATION PARAMETERS USED TO CONSTRUCT THE MESH:
+
+========= ============= =============== ============
+nrelax        relax          pasmin         rlcept
+========= ============= =============== ============
+5000         0.200          1.000E-03      1.000E-06
+========= ============= =============== ============
+
+
+Carre criterion checks
+----------------------
+
+Often, the first pass at the Carre grid parameters will not pass internal
+muster. Carre checks for a few minimal requirements:
+
+    1. The poloidal grid spacing must be above a minimal threshold, defined
+       by the :kbd:`pasmin` parameter. This is not enforced by DG and is the
+       most common correction you’ll have to make.
+    2. The radial and poloidal grid spacings in each region must have the
+       same sign. The spacings are constrained by the first and last values
+       of the region to grid and the total interval length.
+
+The code will not proceed until these requirements are met and will show
+messages like this:
+
+:kbd:`Invalid data for segment 1!`
+
+The numbers :kbd:`dpmin` and :kbd:`dpmax` must be larger than :kbd:`pasmin` in
+absolute value.
+
+Modify :kbd:`deltp1`, :kbd:`deltpn` or :kbd:`pasmin` accordingly.
+
+:kbd:`dpmin,dpmax,pasmin =  1.8834E-04  9.1116E-03  1.0000E-03`
+
+:kbd:`Invalid data for segment 2!`
+
+The numbers :kbd:`dpmin` and :kbd:`dpmax` must be larger than :kbd:`pasmin`
+in absolute value. Modify :kbd:`deltp1`, :kbd:`deltpn` or :kbd:`pasmin`
+accordingly.
+
+:kbd:`dpmin,dpmax,pasmin =  1.8323E-04  8.8644E-03  1.0000E-03`
+
+Type the name of the variable to be changed followed by `'='`, and its
+numerical value. For example: :kbd:`nptseg(2)=32` (return). Type `"end"` to
+stop.
+
+
+
+Modifying the Carre parameters
+------------------------------
+
+Usually changing the value of :kbd:`pasmin` is a good start.
+
+:kbd:`pasmin = 0.99e-3`
+
+:kbd:`end`
+
+:kbd:`Invalid data for segment 1!`
+
+The numbers :kbd:`dpmin` and :kbd:`dpmax` must be larger than :kbd:`pasmin` in
+absolute value. MModify :kbd:`deltp1`, :kbd:`deltpn` or :kbd:`pasmin`
+accordingly.
+
+:kbd:`dpmin,dpmax,pasmin =  1.8834E-04  9.1116E-03  9.9000E-04`
+
+:kbd:`Invalid data for segment 2!`
+
+The numbers :kbd:`dpmin` and :kbd:`dpmax` must be larger than :kbd:`pasmin`
+in absolute value.
+Modify :kbd:`deltp1`, :kbd:`deltpn` or :kbd:`pasmin` accordingly.
+
+:kbd:`dpmin,dpmax,pasmin =  1.8323E-04  8.8644E-03  9.9000E-04`
+
+We now modify the poloidal grid spacings. The first spacing is the one touching
+the `X-point`, and the last spacing is at the targets.
+
+:kbd:`deltpn(1)=1.0e-3`
+
+:kbd:`deltpn(2)=1.0e-3`
+
+:kbd:`end`
+
+SEPARATRIX SEGMENTS:
+
+=== ========== ============ ============= ============ ============= ===========
+ #   nptseg(i)   lg(i)       deltp1(i)     deltpn(i)      dpmin         dpmax
+=== ========== ============ ============= ============ ============= ===========
+1      21      1.1724E-01   9.1116E-03    1.0000E-03   1.0000E-03    9.1116E-03
+
+2      21      1.1053E-01   8.8644E-03    1.0000E-03   1.0000E-03    8.8644E-03
+
+3      41      1.7723E+00   1.1810E-02    1.5681E-02   1.1810E-02    6.0815E-02
+
+=== ========== ============ ============= ============ ============= ===========
+
+RELAXATION PARAMETERS USED TO CONSTRUCT THE MESH:
+
+====== ======== =========== ===========
+nrelax  relax     pasmin       rlcept
+====== ======== =========== ===========
+5000    0.200    9.900E-04   1.000E-06
+
+====== ======== =========== ===========
+
+:kbd:`Do you wish to accept these values (y/n)? y`
+
+Producing the grid
+------------------
+
+Carre then proceeds, one region at a time (:kbd:`ireg` index), to build the
+flux surfaces (:kbd:`ir` index) in order, stepping from the separatrix outward.
+If the Carre algorithm fails to converge while building the flux surfaces,
+you will get a (non-fatal) error message that allows you to continue, but
+suggests some possible changes to the gridding parameters that might improve
+convergence, although it may not improve the “quality” of the final grid.
+
+You may also get a fatal error message that indicates that Carre was not able
+to build the next flux surface. This usually occurs because the radial
+spacings required are too small compared to the resolution of the magnetic
+equilibrium provided (fix this by refining the equilibrium a further step,
+using :kbd:`d2d`, or by increasing the minimal radial spacings by modifying the
+:kbd:`deltr1` and :kbd:`deltrn` parameters). Sometimes, this is because the
+limiting  structures in the DG structure are so small that they may stepped
+over as Carre moves from one flux surface to the next, and can be fixed by
+going back to the DG model and making this limiting structures bigger.
+
+You will get this kind of output:
+
+:kbd:`ireg=           1`
+
+:kbd:`ir=           2`
+
+:kbd:`ir=           3`
+
+:kbd:`ir=           4`
+
+:kbd:`ir=           5`
+
+:kbd:`ir=           6`
+
+….
+
+:kbd:`ir=           7`
+
+:kbd:`ir=           8`
+
+:kbd:`ir=           9`
+
+:kbd:`ir=          10`
+
+:kbd:`ir=          11`
+
+
+Saving the grid parameters
+--------------------------
+
+If you wish to remember the settings change you made, choose the :kbd:`Save`
+option. The grid parameters are then written in the :kbd:`carre.dat` file. If
+you wish to re-use these parameters, skip the :kbd:`Prepare` step in your next
+invocation of the :kbd:`carre` script.
+
+:kbd:`Help, Prepare, Grid, Save, Convert, sTore, Next, Remove, Input, Output,`
+:kbd:`Quit ?`
+
+:kbd:`s`
+
+Saved grid settings in carre.dat file
+
+
+Converting the grid output from Carre
+-------------------------------------
+
+To convert the grid output from Carre, you can do it by:
+
+:kbd:`c (or <Enter>)`
+
+:kbd:`Help, Prepare, Grid, Save, Convert, sTore, Next, Remove, Input, Output,`
+:kbd:`Quit ?`
+
+:kbd:`c`
+
+Name of the file containing the carre grid
+
+:kbd:`carre.out`
+
+
+The conversion step takes the carre.out file containing the Carre grid and
+converts it to the `Sonnet` and `B2.5` formats, respectively a :kbd:`*.sno`
+and :kbd:`*.geo` file.
+
+Select the output format
+
+    1. standard mailtri format
+    2. format `B2.5`
+    3. format `SONNET-DIVIMP`
+    4. format `DG-SONNET-B2-EIRENE`
+    5. revised `DIVIMP` with grid parameters and `PSI` values
+
+ :kbd:`The format chosen is :           4`
+
+ Name of the file containing the carre grid :kbd:`carre.out`
+
+ Select the output format
+
+    1. standard mailtri format
+    2. format `B2.5`
+    3. format `SONNET-DIVIMP`
+    4. format `DG-SONNET-B2-EIRENE`
+    5. revised `DIVIMP` with grid parameters and `PSI` values
+
+ :kbd:`The format chosen is :           2`
+
+Storing the grid files
+----------------------
+
+The sorting of the grid files can be made by:
+
+:kbd:`Help, Prepare, Grid, Save, Convert, sTore, Next, Remove, Input, Output,`
+:kbd:`Quit?`
+
+:kbd:`t (or <Enter>)`
+
+dir OK
+
+The grid in DG format is stored as ``*.sno`` format. The ``dg.dgo``,
+``dg.equ``, ``dg.str`` and ``dg.trg``, you need to copied them into
+the::
+
+    $ /home/ITER/user_name/SOLPS-GUI/modules/DivGeo/device/cmod
+
+
+The grid in B2.5 format is stored as ``*.geo`` format and the you can view
+the grid in PostScript format as ``*.ps`` format.
+
 
 Meshing ITER Baseline scenario
 ==============================
@@ -424,17 +835,10 @@ Setting the magnetic topology
 You can tell to DivGeo also which kind of magnetic topology you want the
 modelling grid to have. As was said at the C-mode case that can be done by
 :menuselection:`File --> Import --> Topology` and choose one of topology in
-<<<<<<< HEAD
 the list.
 For the previous example of C-mode case was selected SN. But for this case
 none of the topologies fulfills the conditions. You can create a magnetic
 topology by your own with :menuselection:`Commands --> Edit topology`
-=======
-the list. For the previous example of C-mode case was selected SN. But for
-this case none of the topologies fulfills the conditions. You can create a
-magnetic topology by your own with :menuselection:`Commands --> Edit
-topology`
->>>>>>> b29d998d6713d53a4a0b00b664b724ac7c2757f9
 
 .. image:: divgeo_ITER_4.png
    :align: center
