@@ -26,7 +26,7 @@ if { [file exists $prefix] } {
   prepend-path PATH             $prefix/bin:$qtdir/bin
   prepend-path CPATH            $prefix/include
   prepend-path LD_LIBRARY_PATH  $prefix/lib:$qtdir/lib
-  prepend-path PKG_CONFIG_PATH  $prefix/lib/pkgconfig:$qtdir/lib/pgkconfig
+  prepend-path PKG_CONFIG_PATH  $prefix/lib/pkgconfig:$qtdir/lib/pkgconfig
   prepend-path MANPATH          $prefix/man:$prefix/share/man
 } else {
   puts stderr "Error:  $prefix could not be found, exiting without changes."
