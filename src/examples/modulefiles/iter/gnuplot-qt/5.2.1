@@ -8,8 +8,8 @@ set name [lrange [split [ module-info name ] / ] 0 0 ]
 set imas_home /home/ITER/kosl/solps-gui
 set loading [module-info mode load]
 #set desc [join [read [ open "$imas_home/etc/modulefiles/$name/.desc" ] ] ]
-set prefix $imas_home/opt/$name/$ver/$minor
-set prefix $::env(HOME)/solps-gui/staging
+set prefix $imas_home/opt/$name/$ver
+#set prefix $::env(HOME)/solps-gui/staging
 
 # conflicting modules:
 conflict gnuplot-qt
