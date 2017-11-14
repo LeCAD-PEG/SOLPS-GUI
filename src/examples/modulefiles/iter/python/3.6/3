@@ -1,0 +1,77 @@
+#%Module1.0####################################################################
+##
+##      $name modulefile
+##
+set minor [lrange [split [ module-info name ] / ] 2 2 ]
+set ver [lrange [split [ module-info name ] / ] 1 1 ]
+set name [lrange [split [ module-info name ] / ] 0 0 ]
+set imas_home /work/imas
+set loading [module-info mode load]
+set desc [join [read [ open "$imas_home/etc/modulefiles/$name/.desc" ] ] ]
+set prefix $imas_home/opt/$name/$ver/$minor
+#set prefix $::env(HOME)/solps-gui/staging
+
+module-whatis "$desc (v$ver.$minor)"
+
+set qtver 5.9.1
+
+conflict $name
+
+if { [file exists $prefix] } {
+  set qtdir $prefix/qt/$qtver
+  setenv PYTHON_VERSION         $ver.$minor
+  setenv PYTHON_HOME            $prefix
+  setenv QT_VERSION             $qtver
+  setenv QTDIR                  $qtdir
+  prepend-path PATH             $prefix/bin:$qtdir/bin
+  prepend-path CPATH            $prefix/include
+  prepend-path LD_LIBRARY_PATH  $prefix/lib:$qtdir/lib
+  prepend-path PKG_CONFIG_PATH  $prefix/lib/pkgconfig:$qtdir/lib/pgkconfig
+  prepend-path MANPATH          $prefix/man:$prefix/share/man
+} else {
+  puts stderr "Error:  $prefix could not be found, exiting without changes."
+  break
+}
+
+#  
+
+proc ModulesHelp {} {
+  puts stderr {
+
+Brief description: Python programming language
+Web site:     https://www.python.org/
+Comment: This Python module contains PyQt $qtver and a custom Gnuplot widget
+         that requires gnuplot-qt module.
+
+In order to install any package of python you need you can use "virtualenv"
+tool by following these instructions:
+
+# using python interpreter from the module
+$ module load python/3.6
+
+# List of preinstalled packages can be obtained by
+$ pip3 freeze
+
+# If you would like to add your own packages locally you may use
+$ pip3 install --user ipython
+$ ~/.local/bin/ipython
+
+# Instead of user packages one can have many different packages by creating
+# a virtualenv, that is basically just a new directory (my_venv) containing
+# all you need with
+$ virtualenv my_venv
+
+# activating the new virtualenv
+$ source my_venv/bin/activate
+
+# installing whatever you need (e.g sympy)
+(my_venv) $ pip install sympy
+(my_venv) $ isympy
+
+# deactivating the virtualenv when you are done working
+(my_venv) $ deactivate
+
+}
+
+  return 0
+}
