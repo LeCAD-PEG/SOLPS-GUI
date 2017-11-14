@@ -11,10 +11,10 @@ Meshing C-Mod with DivGeo
 =========================
 
 
-With this tutorial we'll show how the tool *DivGeo* is working. Firstly
-every file which is used for running in the DivGeo should be located in one
-working directory called ``baserun``. The basic setup of the run directory
-starts::
+In this tutorial we will use *DivGeo* to prepare the DivGeo model for C-Mod.
+The model will be later used for creating mesh for C-Mod. Every input file
+used for creating the DivGeo model should be located in a run directory called
+``baserun``. The following commands will prepare the ``baserun``::
 
      $ stop
      $ cd runs/examples
@@ -24,15 +24,15 @@ starts::
 
 Then is needed to copy the EFIT equilibrium file ``g.990429019.00940`` into
 ``baserun`` directory. This example of the equilibrium file is for a C-Mod
-lower single-null equilibrium for shot 990429029 at 940 ms into the sischarge
-Because the format of the EFIT equilibrium file is not readable, so is needed
-to format it, into the DG equilibrium::
+lower single-null equilibrium for shot 990429029 at 940 ms into the discharge.
+Because DivGeo cannot read the EFIT format equilibrium file, a format is
+needed to transfrom from EFIT format to DivGeo equilibrium format::
 
     $ e2d g990429019.00940 g990429019.00940.equ
 
-To improved smoother contouring in the grid generator, should increase the
-resolution of the equilibrium data. Using higher resolution equilibrium can
-avoid some problems when the fluid grid is generated::
+To have smoother contouring in the grid generator, we should increase the
+resolution of the equilibrium data. Using higher resolution equilibrium avoids
+us some problems when the fluid grid is generated::
 
     $ d2d g990429019.00940.equ g990429019.00940.x2.equ
 
@@ -42,40 +42,53 @@ R, Z points in the machine coordinates describes the layout of the plasma
 facing components. The points are in `mm` and must form a closed polygon,
 i.e. the first and last points must be the same.
 
-To start DivGeo, as a SOLPS-GUI tool can be done with choosing first at the
-Runs menu the directory baserun and after that to click on the Populate
-baserun and just click on the Start DivGeo button on the left down corner
-of the SOLPS GUI window.
+DivGeo can be start inside SOLPS-GUI. The procedure is as follows. First start
+SOLPS-GUI. SOLPS-GUI will open with the **runs** tab.
+
+.. image:: divgeo_1a.png
+   :align: center
+
+Be sure that the
+``baserun`` is situated inside ``SOLPSTOP/run/`` directory and that directory
+``SOLPSTOP/run`` is in the Runs settings of SOLPS-GUI, as shown in the
+following image:
+
+.. image:: divgeo_1b.png
+   :align: center
+
+Now select your ``baserun`` folder and go to the tab
+:guilabel:`&Populate Baserun`. Click on the DivGeo area to start DivGeo and if
+you wish to dock it into SOLPS-GUI, click again when DivGeo appears.
 
 You should see the following window at the end of this tutorial.
 
-.. image:: divgeo_1.png
-   :align: center
+.. Comment.. image:: divgeo_1.png
+   Comment:align: center
 
 Import geometry file
 --------------------
 
-To start to use the DivGeo should make an import of the wall geometry file
-which is already into ``baserun`` directory. That can be done with opening the:
+In DivGeo import the wall geometry file which is in ``baserun`` directory.
+That can be done with opening the
 :menuselection:`File --> Import --> Template` and load
-``wall_geometry_990429019.ogr``, which should appear in the dialogue box.
+``wall_geometry_990429019.ogr``, which should appear in the dialog box.
 Then press :kbd:`CTRL+P` to fit the wall
 data to the workspace. If you cannot see the wall, then use the
 :menuselection:`View --> Display` and make sure that the Template radio button
 is pressed.
 
-.. image:: divgeo_2.png
-   :align: center
+.. Comment.. image:: divgeo_2.png
+   Comment:align: center
 
 Import equilibrium file
 -----------------------
 
-After that need to be load the equilibrium file
+After that need load the equilibrium file
 :menuselection:`File --> Import --> Equilibrium` and select the
-``g990429019.00940.x2.equ`` from the dialogue box.If you cannot
+``g990429019.00940.x2.equ`` from the dialog box.If you cannot
 see the equilibrium displayed as blue (SOL) and red (core and PFR)
 rectangles after it is loaded, then use :menuselection:`View --> Display`
-and make sure that the Equilibrium button is pressed.
+and make sure that the Equilibrium radio button is pressed.
 
 .. image:: divgeo_3.png
    :align: center
@@ -83,16 +96,16 @@ and make sure that the Equilibrium button is pressed.
 Converting the wall segments
 ----------------------------
 
-To set the surface normals can be done by choosing
+To set the surface normals click
 :menuselection:`Command --> Convert --> Template to elements`. The short pink
-lines, which indicates the normal surfaces, will appears.
+lines, which indicates the normal surfaces, will appear.
 
 .. image:: divgeo_4.png
    :align: center
 
 It is very important to notice that all surface normals are pointing away
-from the plasma. To reverse them can be done if you set the middle mouse
-button to `"Reverse normals”`. Then click :kbd:`SHIFT+Reverse normals` (middle
+from the plasma. To reverse them can set the middle mouse button to
+`"Reverse normals”`. Then click :kbd:`SHIFT+Reverse normals` (middle
 button) somewhere on the vessel wall and all of the normals should flip.
 
 .. image:: divgeo_5.png
@@ -101,8 +114,8 @@ button) somewhere on the vessel wall and all of the normals should flip.
 Setting the magnetic topology
 -----------------------------
 
-You can tell to DivGeo also which kind of magnetic topology you want the
-modelling grid to have. That can be done by
+You can tell DivGeo which kind of magnetic topology you want the
+modelling grid to have. This can be done by
 :menuselection:`File --> Import --> Topology` and choose one of:
 
    1. SN lower single-null
@@ -121,7 +134,7 @@ topology is applied correctly.
 Target definition
 -----------------
 
-To make a target definition need to be satisfied the following conditions:
+To make a target definition the following conditions needs to be satisfied:
 
     1. each target segment needs to have a short wall element at each end
        which will be used to separate the target from the main wall;
@@ -131,8 +144,8 @@ To make a target definition need to be satisfied the following conditions:
        wall elements.
 
 In the C-Mod example only the first condition is satisfied. Therefore, a
-short segment needs to be added. That can be done by: change the assignment
-of the middle mouse button to `"Split element”`, and then click on the vertical
+short segment needs to be added. This can be done by: change the assignment
+of the middle mouse button to `"Split element"`, and then click on the vertical
 segment just above the target, which adds a point on the wall and creates a
 new segment.
 Avoid making very short segments, which can cause problems for the triangle
@@ -141,17 +154,19 @@ grid generator.
 .. image:: divgeo_7.png
    :align: center
 
-For creating the closed polygon, which is required by the second condition,it
-is necessary to add a point behind the target and then connect it to the
-existing points at the ends of the target.
-:menuselection:`Edit --> Create --> Point`
+The second condition requires a closed polygon, therefore it is necessary to
+add a point behind the target and then connect it to the existing points at the
+ends of the target. To create a point, click
+:menuselection:`Edit --> Create --> Point` and create a point with the
+coordinates: ``(400, -500)``.
 
 .. image:: divgeo_8.png
    :align: center
 
-Then, change the middle mouse button to `"Connect points”`, and
-:kbd:`middle-click` on the new point, and drag the cursor to one end of the
-target and release the mouse button.
+Then, change the middle mouse button to `"Connect points”`,
+:kbd:`middle-click` on the new point and drag the cursor to one end of the
+target and release the mouse button. Connect the new point to the second end
+as well.
 
 The same thing is done for the outer target. The first and the second
 conditions should be satisfied as was done for the inner target.
@@ -191,17 +206,17 @@ The same is for the outer target.
 .. image:: divgeo_12.png
    :align: center
 
-Setting the structure which is ignored by EIRENE
+Setting structure to be ignored by EIRENE
 ------------------------------------------------
 
-To ignored the parts of the structure which are not a parts of the EIRENE can
-be done by :menuselection:`Variables --> Add --> Elements not for Eirene`. Mark
+To select which parts should EIRENE ignore, select
+:menuselection:`Variables --> Add --> Elements not for Eirene`. Mark
 the elements behind the targets and click `"Set”`.
 
 .. image:: divgeo_13.png
    :align: center
 
-Setting the structure that are used by B2plot
+Setting the structure used by B2plot
 ---------------------------------------------
 
 Defining the wall surfaces that will be written to the mesh.extra file that
@@ -213,6 +228,10 @@ Mark everything except the segments behind the targets.
 .. image:: divgeo_14.png
    :align: center
 
+Setting the target specifications
+---------------------------------
+
+TODO
 
 Creating the grid points
 ------------------------
@@ -768,7 +787,7 @@ the grid in PostScript format as ``*.ps`` format.
 Meshing ITER Baseline scenario
 ==============================
 
-The ITER baseline scenario case follows the same steps as for the C-mod.
+The ITER baseline scenario case follows the same steps as for the C-Mod.
 Every file which is used for running is located in one working directory
 called ``baserun``. The basic setup of the run directory starts::
 
@@ -777,6 +796,17 @@ called ``baserun``. The basic setup of the run directory starts::
      $ cmake . && make # Fetches all examples
      $ tar xvzf tutorial-DivGeo_ITER_baseline_scenario.tar.gz
      $ cd tutorial-DivGeo_ITER_baseline_scenario/baserun
+
+In this directory you will find the following files:
+
+Baseline2008-li0.x4.equ
+    - Equilibrium file (Sonnet format)
+F57-Be_W-Ne.dg
+    - DivGeo model
+iterm.carre.105
+    - CARRE grid for SOLPS_ITER simulations
+tt.tpl
+    - Vacuum vessel description
 
 Then is needed to copy the EFIT equilibrium file ``Baseline2008-li0.70`` into
 ``baserun`` directory. This example of the equilibrium file is for a
@@ -799,7 +829,7 @@ directory.
 To start DivGeo, as a SOLPS-GUI tool can be done with choosing first at the
 Runs menu the directory baserun and after that to click on the Populate baserun
 and just click on the Start DivGeo button on the left down corner of the
-SMITER-GUI window.
+SOLPS-GUI window.
 
 
 Import geometry file
@@ -833,12 +863,12 @@ Setting the magnetic topology
 -----------------------------
 
 You can tell to DivGeo also which kind of magnetic topology you want the
-modelling grid to have. As was said at the C-mode case that can be done by
+modelling grid to have. As was said at the C-Mod case that can be done by
 :menuselection:`File --> Import --> Topology` and choose one of topology in
-the list.
-For the previous example of C-mode case was selected SN. But for this case
-none of the topologies fulfills the conditions. You can create a magnetic
-topology by your own with :menuselection:`Commands --> Edit topology`
+the list. For the previous example of C-Mod case was selected SN. But for
+this case none of the topologies fulfills the conditions. You can create a
+magnetic topology by your own with :menuselection:`Commands --> Edit
+topology`
 
 .. image:: divgeo_ITER_4.png
    :align: center

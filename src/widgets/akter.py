@@ -170,15 +170,23 @@ class Akter(QWidget):
         self.destroyed.connect(self.tcsh.close)
 
     def activateDebugging(self):
-        self.tcsh.prcError.connect(self.debug)
-        self.tcsh.prcFinished.connect(self.debug)
-        self.tcsh.prcStarted.connect(self.debug)
-        self.tcsh.stdOutput.connect(self.debug)
-        self.tcsh.stdErrOutput.connect(self.debug)
+        self.tcsh.prcError.connect(self.debugError)
+        self.tcsh.prcFinished.connect(self.debugState)
+        self.tcsh.prcStarted.connect(self.debugState)
+        self.tcsh.stdOutput.connect(self.debugStd)
+        self.tcsh.stdErrOutput.connect(self.debugError)
 
     @pyqtSlot(str)
-    def debug(self, message):
-        print(message)
+    def debugError(self, message):
+        print('Error: ' + message)
+
+    @pyqtSlot(str)
+    def debugState(self, message):
+        print('Changed State: ' + message)
+
+    @pyqtSlot(str)
+    def debugStd(self, message):
+        print('STD: ' + message)
 
     @pyqtSlot(str)
     def setRunDir(self, newVal):

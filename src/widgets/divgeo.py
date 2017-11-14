@@ -99,7 +99,7 @@ class DivGeo(Akter):
         self.STATE = State.notRunning
 
         # Call SIGUSR1 signal to DivGeo when main window closes.
-        # Partial is used, because otherwise function will  not be
+        # Partial is used, because otherwise function will not run
         self.destroyed.connect(partial(self._onClose_stopDivGeo))
 
     def _onClose_stopDivGeo(self):
@@ -127,7 +127,7 @@ class DivGeo(Akter):
                 self.DivGeoPID = int(line.lstrip("DivGeo PID: "))
 
         if 'STARTING DIVGEO' in text:
-            self.labelContainer.setText("DivGeo running.\Click here to "
+            self.labelContainer.setText("DivGeo running.\nClick here to "
                                         "dock DivGeo.")
             self.STATE = State.running
 
@@ -166,6 +166,10 @@ class DivGeo(Akter):
 
         # Clean the layout first!
         if not self.DivGeoWID:
+            self.labelContainer.setText("No DivGeo found.\nCheck if baserun "
+                                        "is in solps-iter/runs "
+                                        "directory\nor\nif DivGeo needs to be "
+                                        "installed.")
             return
 
         self.clearLayout()
