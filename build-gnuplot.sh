@@ -14,18 +14,20 @@ STAGING_QT=${STAGING_QT:-${STAGING_DIR}/qt/${QT_VERSION}}
 case $(hostname -f) in
   *.iter.org)
         module purge
-	#module load GCC
-        module load imas binutils
-        module unload Anaconda2
-        qmake --version && sip -V
-        QT_VERSION=5.6.2 PyQT_VERSION=5.6.2 SIP_VERSION=4.18
-        STAGING_QT=${EBROOTANACONDA3}/pkgs/qt-5.6.2-3
-        QT_LIBS=$(pkg-config --libs Qt5Network Qt5Svg Qt5PrintSupport\
-                  Qt5Widgets Qt5Gui Qt5Core)
-        QT_LIBS="-Wl,-rpath=${EBROOTANACONDA3}/lib ${QT_LIBS}"
-        export QT_LIBS="-L${EBROOTANACONDA3}/lib -liconv ${QT_LIBS}"
-        GNUPLOT_INSTALL_DIR=${GNUPLOT_INSTALL_DIR:-${STAGING_DIR}}
-	MAKE_JOBS=${MAKE_JOBS:-4}
+        module load GCC/4.8.3 binutils/2.25 libgd
+
+        # DEPRECATED
+        # module load imas binutils
+        # module unload Anaconda2
+        # qmake --version && sip -V
+        # QT_VERSION=5.6.2 PyQT_VERSION=5.6.2 SIP_VERSION=4.18
+        # STAGING_QT=${EBROOTANACONDA3}/pkgs/qt-5.6.2-3
+        # QT_LIBS=$(pkg-config --libs Qt5Network Qt5Svg Qt5PrintSupport\
+        #           Qt5Widgets Qt5Gui Qt5Core)
+        # QT_LIBS="-Wl,-rpath=${EBROOTANACONDA3}/lib ${QT_LIBS}"
+        # export QT_LIBS="-L${EBROOTANACONDA3}/lib -liconv ${QT_LIBS}"
+        # GNUPLOT_INSTALL_DIR=${GNUPLOT_INSTALL_DIR:-${STAGING_DIR}}
+	   MAKE_JOBS=${MAKE_JOBS:-4}
 	;;
 
   *)
