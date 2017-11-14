@@ -10,7 +10,7 @@ import logging
 import os
 from functools import partial
 import signal
-from tcshProcess import TcshProcess
+from tcsh_process import TcshProcess
 
 class State:
     notRunning, running, runningDocked = range(3)

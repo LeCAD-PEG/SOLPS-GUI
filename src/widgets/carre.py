@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QPlainTextEdit, QLineEdit, QVBoxLayout,
                              QInputDialog)
 from PyQt5.QtCore import (pyqtSlot, pyqtSignal, QProcess, QSettings,
                           pyqtProperty, Qt)
-from tcshProcess import tcshProcess
+from tcsh_process import tcshProcess
 
 
 class Carre(tcshProcess):

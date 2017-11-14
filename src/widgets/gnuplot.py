@@ -7,7 +7,7 @@ from PyQt5.QtCore import (Qt, QProcess, QSize, pyqtSignal,
                           QProcessEnvironment)
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QLabel, QFrame, QVBoxLayout, QWidget, QGridLayout
-from tcshProcess import TcshProcess
+from tcsh_process import TcshProcess
 
 import logging
 import os

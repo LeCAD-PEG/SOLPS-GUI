@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QLabel, QFrame, QVBoxLayout
 import logging
 import os
 
-from tcshProcess import TcshProcess
+from tcsh_process import TcshProcess
 
 class B2plot(TcshProcess):
     """ B2plot(QWidget)

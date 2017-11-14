@@ -10,7 +10,7 @@ from PyQt5.QtGui import QFont
 import logging
 import os
 
-from tcshProcess import TcshProcess
+from tcsh_process import TcshProcess
 
 class TcshEdit(TcshProcess):
     """ Tcsh(QWidget)
