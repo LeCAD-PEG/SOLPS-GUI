@@ -2,7 +2,7 @@
 ## Building PyQt with Python3 and Qt5
 ## Minimum GCC supported version for building Qt5 is 4.7
 
-PYTHON_VERSION=3.6.3
+PYTHON_VERSION=${PYTHON_VERSION:-3.6.3}
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
 QT_VERSION=5.9.1
 PyQT_VERSION=5.9.1 # should be the same as Qt
