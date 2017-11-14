@@ -95,7 +95,7 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   ./configure --prefix=${STAGING_DIR} --enable-shared
   make -j ${MAKE_JOBS}
   make install
-  ln -sf python3 ${STAGING_DIR}/bin/python
+  ln -sf python${PYTHON_VERSION%%.*} ${STAGING_DIR}/bin/python
   LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
   ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
       pip sphinx sphinx_rtd_theme matplotlib mock nose

@@ -19,6 +19,7 @@ conflict $name
 
 if { [file exists $prefix] } {
   set qtdir $prefix/qt/$qtver
+  setenv PYTHON3_VERSION        $ver.$minor
   setenv PYTHON_VERSION         $ver.$minor
   setenv PYTHON_HOME            $prefix
   setenv QT_VERSION             $qtver
