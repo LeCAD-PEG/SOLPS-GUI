@@ -10,12 +10,12 @@ import logging
 import os
 from functools import partial
 import signal
-from akter import Akter
+from tcshProcess import TcshProcess
 
 class State:
     notRunning, running, runningDocked = range(3)
 
-class DivGeo(Akter):
+class DivGeo(TcshProcess):
     """
         Important notice: DivGeo git branch origin/feature/embedxwin
         required for this to work.

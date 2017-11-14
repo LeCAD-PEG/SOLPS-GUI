@@ -10,9 +10,9 @@ from PyQt5.QtGui import QFont
 import logging
 import os
 
-from akter import Akter
+from tcshProcess import TcshProcess
 
-class TcshEdit(Akter):
+class TcshEdit(TcshProcess):
     """ Tcsh(QWidget)
 
         Provides a custom widget to display TCSH with properties and slots
