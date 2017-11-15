@@ -13,7 +13,8 @@ import signal
 from tcsh_process import TcshProcess
 
 class State:
-    notRunning, running, runningDocked = range(3)
+    notRunning, starting, running, runningDocked = range(4)
+
 
 class DivGeo(TcshProcess):
     """
@@ -87,6 +88,8 @@ class DivGeo(TcshProcess):
         self.DivGeoWID = None
         self.DivGeoPID = None
         self.Layout = QVBoxLayout()
+        self.Layout.setSpacing(0)
+        self.Layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.Layout)
 
         self.labelContainer = QLabel()
@@ -163,8 +166,6 @@ class DivGeo(TcshProcess):
         Because I wrote in so many places the same block of code, I decided to
         create a function and then just call it.
         """
-
-        # Clean the layout first!
         if not self.DivGeoWID:
             self.labelContainer.setText("No DivGeo found.\nCheck if baserun "
                                         "is in solps-iter/runs "
@@ -172,6 +173,7 @@ class DivGeo(TcshProcess):
                                         "installed.")
             return
 
+        # Clean the layout first!
         self.clearLayout()
 
         self.hide()
@@ -219,6 +221,8 @@ class DivGeo(TcshProcess):
         cmd += 'echo STARTING DIVGEO\n'
         cmd += DivGeo + ' -wid ' + str(int(self.winId())) + '\n'
 
+        self.STATE = State.starting
+
         self.tcsh.write(cmd)
 
     @pyqtSlot()
@@ -261,7 +265,8 @@ class DivGeo(TcshProcess):
         if press == Qt.LeftButton:
             if self.STATE == State.notRunning:
                 self.startDivGeo()
-            elif self.STATE == State.running:
+            elif self.STATE >= State.running:
+                # Meaning that DivGeo is either running or runningDocked
                 self.embedDivGeo()
 
         return super(DivGeo, self).mousePressEvent(e)
