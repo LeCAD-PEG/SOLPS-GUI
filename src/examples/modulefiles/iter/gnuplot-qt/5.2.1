@@ -5,7 +5,7 @@
 set minor [lrange [split [ module-info name ] / ] 2 2 ]
 set ver [lrange [split [ module-info name ] / ] 1 1 ]
 set name [lrange [split [ module-info name ] / ] 0 0 ]
-set imas_home /home/ITER/kosl/solps-gui
+set imas_home /work/imas
 set loading [module-info mode load]
 #set desc [join [read [ open "$imas_home/etc/modulefiles/$name/.desc" ] ] ]
 set prefix $imas_home/opt/$name/$ver
