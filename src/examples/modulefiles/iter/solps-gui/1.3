@@ -12,7 +12,13 @@ proc ModulesHelp { } {
 puts stderr "\tThis module sets the environment for $name v$ver"
 }
 conflict $name
-conflict Anaconda3
+module-whatis "$desc (v$ver)"
+
+if { ! [ is-loaded imas ] } {
+  module load imas
+  # module unload Anaconda3
+}
+
 module-whatis "$desc (v$ver)"
 
 if { ! [ is-loaded python/3.6 ] } {
