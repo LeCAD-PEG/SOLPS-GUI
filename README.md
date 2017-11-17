@@ -141,4 +141,4 @@ For situations where IMAS library is provided system wide but Python3
 is used from local build using setupenv.sh then one can install IMAS
 package by
 
-    pip3 install ${IMAS_PREFIX}/python/dist/imas*.tar.gz
+    pip3 install --user --compile ${IMAS_PREFIX}/python/dist/imas*.tar.gz
