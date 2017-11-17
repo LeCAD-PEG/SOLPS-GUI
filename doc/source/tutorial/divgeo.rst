@@ -7,26 +7,27 @@
 Meshing toolchain
 =================
 
-Meshing C-Mod with DivGeo
-=========================
+Meshing C-Mod with DivGeo and Carre
+===================================
 
 
-In this tutorial we will use *DivGeo* to prepare the DivGeo model for C-Mod.
-The model will be later used for creating mesh for C-Mod. Every input file
-used for creating the DivGeo model should be located in a run directory called
-``baserun``. The following commands will prepare the ``baserun``::
+In this tutorial we will use *DivGeo* and *Carre* to prepare the C-Mod tokamak
+geometry. The model will be later used for creating a mesh. Each input file
+used for creating the DivGeo model should be located in the ``baserun`` run
+directory. The following commands repare the ``baserun`` input data needed for
+this tutorial::
 
      $ stop
      $ cd runs/examples
-     $ cmake . && make # Fetches all examples
+     $ cmake . && make # Fetches all examples from external repository
      $ tar xvzf tutorial-DivGeo_C-Mod.tar.gz
      $ cd tutorial-DivGeo_C-Mod/baserun
 
-Then is needed to copy the EFIT equilibrium file ``g.990429019.00940`` into
-``baserun`` directory. This example of the equilibrium file is for a C-Mod
-lower single-null equilibrium for shot 990429029 at 940 ms into the discharge.
-Because DivGeo cannot read the EFIT format equilibrium file, a format is
-needed to transfrom from EFIT format to DivGeo equilibrium format::
+The EFIT equilibrium file  ``baserun/g.990429019.00940`` in this example
+describes a C-Mod tokamak lower single-null shot number 990429029 at 940 ms
+of the the discharge.
+Since DivGeo cannot read the EFIT format equilibrium file directly the EFIT
+format is needed to be transformed to DivGeo equilibrium format with::
 
     $ e2d g990429019.00940 g990429019.00940.equ
 
@@ -36,69 +37,74 @@ us some problems when the fluid grid is generated::
 
     $ d2d g990429019.00940.equ g990429019.00940.x2.equ
 
-The next step is to copy the wall geometry file
-``wall_geometry_990429019.ogr`` into ``baserun`` directory. The list of the
-R, Z points in the machine coordinates describes the layout of the plasma
+The the wall geometry file ``baserun/wall_geometry_990429019.ogr`` lists the
+R, Z points in the machine coordinates and describes the layout of the plasma
 facing components. The points are in `mm` and must form a closed polygon,
 i.e. the first and last points must be the same.
 
-DivGeo can be start inside SOLPS-GUI. The procedure is as follows. First start
-SOLPS-GUI. SOLPS-GUI will open with the **runs** tab.
+*DivGeo* can be started inside SOLPS GUI. The procedure is as follows. First
+start SOLPS GUI. SOLPS GUI will open with the **runs** tab.
 
 .. image:: divgeo_1a.png
    :align: center
 
-Be sure that the
-``baserun`` is situated inside ``SOLPSTOP/run/`` directory and that directory
-``SOLPSTOP/run`` is in the Runs settings of SOLPS-GUI, as shown in the
+The ``baserun`` directory must be located under the
+``${SOLPSTOP}/runs/examples/tutorial-DivGeo_C-Mod/`` directory for SOLPS-ITER
+to work correctly. Moreover, the top directory ``${SOLPSTOP}/runs`` needs to
+be listed in the :menuselection:`&Settings --> &Runs`, such as shown in the
 following image:
 
 .. image:: divgeo_1b.png
    :align: center
 
-Now select your ``baserun`` folder and go to the tab
-:guilabel:`&Populate Baserun`. Click on the DivGeo area to start DivGeo and if
-you wish to dock it into SOLPS-GUI, click again when DivGeo appears.
+Now select your ``baserun`` folder in :menuselection:`&Runs` tab and click
+ont the :guilabel:`&Populate Baserun` tab. Click inside the DivGeo area to
+start DivGeo. If you wish to dock it into SOLPS GUI, click once again inside
+DivGeo area after DivGeo appears in standalone window.
 
-You should see the following window at the end of this tutorial.
+.. You should see the following window at the end of this tutorial.
 
 .. Comment.. image:: divgeo_1.png
    Comment:align: center
 
-Import geometry file
---------------------
+Import the vessel wall description
+----------------------------------
 
-In DivGeo import the wall geometry file which is in ``baserun`` directory.
-That can be done with opening the
-:menuselection:`File --> Import --> Template` and load
-``wall_geometry_990429019.ogr``, which should appear in the dialog box.
-Then press :kbd:`CTRL+P` to fit the wall
-data to the workspace. If you cannot see the wall, then use the
-:menuselection:`View --> Display` and make sure that the Template radio button
-is pressed.
+The wall geometry file is located in the ``baserun`` directory.
+Import the vessel wall description by opening
+:menuselection:`&File --> &Import --> &Template` and load the
+``wall_geometry_990429019.ogr`` file, which should be listed in the
+Template dialog box.
 
-.. Comment.. image:: divgeo_2.png
-   Comment:align: center
+Press :kbd:`CTRL+P` to fit the wall data to the workspace. If you cannot see
+the wall, then use the :menuselection:`&View --> &Display` and make sure that
+the :guilabel:`Template` radio button is pressed.
 
-Import equilibrium file
------------------------
+.. image:: divgeo_2.png
+   :align: center
 
-After that need load the equilibrium file
-:menuselection:`File --> Import --> Equilibrium` and select the
-``g990429019.00940.x2.equ`` from the dialog box.If you cannot
-see the equilibrium displayed as blue (SOL) and red (core and PFR)
-rectangles after it is loaded, then use :menuselection:`View --> Display`
-and make sure that the Equilibrium radio button is pressed.
+Import magnetic equilibrium data
+--------------------------------
+
+The magnetic equilibrium file is located in the ``baserun`` directory. Import
+the magnetic equilibrium data by opening
+:menuselection:`&File --> &Import --> &Equilibrium` and load the
+``g990429019.00940.x2.equ`` file, which should be listed in the Equilibrium
+dialog box.
+
+If you cannot see the equilibrium displayed as blue (SOL) and red (core and PFR)
+rectangles after it is loaded, then use :menuselection:`&View --> &Display`
+and make sure that the :guilabel:`Equilibrium` radio button is pressed.
 
 .. image:: divgeo_3.png
    :align: center
 
-Converting the wall segments
-----------------------------
+Converting the wall segments to geometry elements
+-------------------------------------------------
 
 To set the surface normals click
-:menuselection:`Command --> Convert --> Template to elements`. The short pink
-lines, which indicates the normal surfaces, will appear.
+:menuselection:`&Command --> &Convert --> &Template to elements`. The short pink
+lines, which indicate the normal surfaces, will appear.
 
 .. image:: divgeo_4.png
    :align: center
@@ -114,9 +120,9 @@ button) somewhere on the vessel wall and all of the normals should flip.
 Setting the magnetic topology
 -----------------------------
 
-You can tell DivGeo which kind of magnetic topology you want the
-modelling grid to have. This can be done by
-:menuselection:`File --> Import --> Topology` and choose one of:
+In DivGeo is very easy to choose which kind of magnetic topology the
+modelling grid should have. You can choose it by opening
+:menuselection:`&File --> &Import --> &Topology` and choose one of:
 
    1. SN lower single-null
    2. SN-up upper single-null
@@ -127,24 +133,25 @@ modelling grid to have. This can be done by
 .. image:: divgeo_6.png
    :align: center
 
-For C-Mod case select SN. The separatrix will be markedin a red line if the
+For C-Mod case select SN. The separatrix will be marked in a red line if the
 topology is applied correctly.
 
 
-Target definition
------------------
+Defining the extent of the targets
+----------------------------------
 
-To make a target definition the following conditions needs to be satisfied:
+The target definitions need to satisfy the following rules:
 
-    1. each target segment needs to have a short wall element at each end
-       which will be used to separate the target from the main wall;
+    1. Each target segment needs to have a short wall element at each end,
+       which will not be part of the target, but will be used to separate the
+       target from the main wall in a subsequent setup step;
     2. the targets must be closed polygons;
     3. the surfaces normals of the closed polygon must all point inward;
     4. the plasma-wetted part of the target must consist of at least two (2)
        wall elements.
 
 In the C-Mod example only the first condition is satisfied. Therefore, a
-short segment needs to be added. This can be done by: change the assignment
+short segment needs to be added. To add the short segments change the assignment
 of the middle mouse button to `"Split element"`, and then click on the vertical
 segment just above the target, which adds a point on the wall and creates a
 new segment.
@@ -157,7 +164,7 @@ grid generator.
 The second condition requires a closed polygon, therefore it is necessary to
 add a point behind the target and then connect it to the existing points at the
 ends of the target. To create a point, click
-:menuselection:`Edit --> Create --> Point` and create a point with the
+:menuselection:`&Edit --> &Create --> &Point` and create a point with the
 coordinates: ``(400, -500)``.
 
 .. image:: divgeo_8.png
@@ -174,11 +181,11 @@ conditions should be satisfied as was done for the inner target.
 .. image:: divgeo_9.png
    :align: center
 
-Setting the structure
-----------------------
+Setting the "Structure" variable for "Structure"
+-----------------------------------------------
 
-This is the primary definition for the vessel wall. This can be done if you
-choose :menuselection:`Variables --> Structure`
+The structure variable is the primary definition for the vessel wall. You can
+definite the vessel wall by opening :menuselection:`&Variables --> &Structure`
 
 .. image:: divgeo_10.png
    :align: center
@@ -189,10 +196,12 @@ segment will un-select it. When the highlighting is complete, left-click on
 `"Set”` in the `"Structure”` dialogue box, at the end of the line marked
 `"Structure”`.
 
-:kbd:`CTRL+U` to unmark everything.
+:kbd:`CTRL+U`
 
-Setting the structure for the targets
--------------------------------------
+to unmark everything.
+
+Setting the "Structure" variable for the targets
+------------------------------------------------
 
 As the same like the structure you can set the targets. Mark all of the
 segments for the inner target and then click on `"Set”`. Do not include the
@@ -201,27 +210,27 @@ segments that are behind the target.
 .. image:: divgeo_11.png
    :align: center
 
-The same is for the outer target.
+The same steps are used for setting the outer target.
 
 .. image:: divgeo_12.png
    :align: center
 
-Setting structure to be ignored by EIRENE
-------------------------------------------------
+Setting elements that are to be ignored by EIRENE
+-------------------------------------------------
 
-To select which parts should EIRENE ignore, select
-:menuselection:`Variables --> Add --> Elements not for Eirene`. Mark
+You can select which parts should EIRENE ignored, by opening
+:menuselection:`&Variables --> &Add --> &Elements not for Eirene`. Mark
 the elements behind the targets and click `"Set”`.
 
 .. image:: divgeo_13.png
    :align: center
 
 Setting the structure used by B2plot
----------------------------------------------
+------------------------------------
 
-Defining the wall surfaces that will be written to the mesh.extra file that
-defines the wall specification in B2plot, can be done by
-:menuselection:`Variables --> Add --> Input to b2plot`
+Defining the wall surfaces that will be written to the mesh.extra file, that
+defines the wall specification in B2plot, can be done opening the
+:menuselection:`&Variables --> &Add --> &Input to b2plot`
 
 Mark everything except the segments behind the targets.
 
@@ -233,12 +242,12 @@ Setting the target specifications
 
 TODO
 
-Creating the grid points
-------------------------
+Poloidal grid points
+--------------------
 
 The poloidal distribution of cells on the Carre grid are set by the
 `"poloidal grid points”` in DG.  These are defined separately for the
-divertor legs and the SOL. :menuselection:`Edit --> Create --> Grid points`.
+divertor legs and the SOL. :menuselection:`&Edit --> &Create --> &Grid points`.
 Set the Zone to Inner divertor and Cells to 18. The distribution of the cells
 can be adjusted by left-clicking and dragging the black line on the plot.
 Then click Create to update the workspace. Repeat for the outer divertor. Set
@@ -248,14 +257,13 @@ spacing of the grid points around the x-point should be symmetric.
 .. image:: divgeo_15.png
    :align: center
 
-Creating the radial surfaces
-----------------------------
+Radial surfaces
+---------------
 
 The radial surfaces in DG define the boundaries between rings on the Carre
-grid. To create the surfaces can be done by
-:menuselection:`Edit --> Create --> Surfaces…` Set 18 surfaces in the SOL.
-Adjust
-the radial distribution to give higher spatial resolution near the
+grid. You can create the surfaces by opening
+:menuselection:`&Edit --> &Create --> &Surfaces…` Set 18 surfaces in the SOL.
+Adjust the radial distribution to give higher spatial resolution near the
 separatrix.
 
 .. image:: divgeo_16.png
@@ -265,16 +273,16 @@ Adding a radial surfaces
 ------------------------
 
 For the core region it is necessary to add a surface which will define the
-extent to which the grid penetrates into the core. To do that assign `"Add
-surface”` to the middle mouse button. :kbd:`Middle-click` and hold
+extent to which the grid penetrates into the core. To do that assign
+`"Add surface”` to the middle mouse button. :kbd:`Middle-click` and hold
 somewhere in the core, and release the mouse button when happy with the
 location of the inner radial boundary (red line).
 
 .. image:: divgeo_17.png
    :align: center
 
-Adding the core radiation
--------------------------
+Adding some core radiation
+--------------------------
 
 To include core radiation in the wall heat loads, one needs to specify the
 amount of core radiation (in `MW`): :menuselection:`Variables --> Add -->
@@ -282,7 +290,7 @@ Radiation sources` Enter in the `"Radiated Power”` field the amount of core
 radiation (in `MW`) then need to specify the location from where this core
 radiation is emitted. This is done by providing a set of point sources. The
 radiated power will be spread evenly among these point sources. You create
-them by: :menuselection:`Edit --> Create --> Source` And specify the X and
+them by: :menuselection:`&Edit --> &Create --> &Source` And specify the X and
 Y coordinates (in `mm`) of the point source location. You may input as few
 or as many point sources as you’d like. The point sources (if you choose to
 display them) are shown as white asterisks in the DG model.
@@ -290,17 +298,22 @@ display them) are shown as white asterisks in the DG model.
 .. image:: divgeo_18.png
    :align: center
 
-Defining plot zones
--------------------
+Defining "plot zones"
+---------------------
 
-The plot zones are a set of walls on which the power load, including the
+The "plot zones" are a set of walls on which the power load, including the
 contrabutions from the plasma particles, Eirene neutrals and radiation can
-be computed by b2plot. That can be done with :menuselection:`Variables -->
-Add --> Plot zone` :kbd:`CTRL+U` and mark the set of elements that you want
-to include in the plot zone. :kbd:`CTRL+U` mark the `"Starting element”`.
-which is the first element of the plot zone set. Give the zone a label
-(`Zone-label`) that will be used in the files created by b2plot (8
-characters maximum, no spaces, stars or ellipses).
+be computed by b2plot. You add them by:
+:menuselection:`&Variables --> &Add --> &Plot zone`
+
+:kbd:`CTRL+U`
+
+and mark the set of elements that you want to include in the plot zone.
+
+:kbd:`CTRL+U` mark the `"Starting element”`. which is the first element of
+the plot zone set. Give the zone a label (`Zone-label`) that will be used in
+the files created by b2plot (8 characters maximum, no spaces, stars or
+ellipses).
 
 .. image:: divgeo_19.png
    :align: center
@@ -310,10 +323,10 @@ Configuring the plasma species to be included in the simulations
 ----------------------------------------------------------------
 
 It is very important to definite plasma species which are included in the
-simulations. That you do it by: :menuselection:`Variables --> Plasma
-species D` . Also you can add it the impurity species
+simulations. You definite them by opening:
+:menuselection:`Variables --> Plasma species D` .
+Also you can add it the impurity species
 :menuselection:`Variables --> Add --> Plasma species`
-
 DG recognizes a few "generic” species: H, D, T, He, Be, C, N, Ne, and Ar,
 for which a full consistent default set of reactions will be provided by
 Uinp. For all other elements, Uinp will look for the corresponding ADAS
@@ -326,7 +339,7 @@ include them as part of your model.
 
 If one wishes to use a different reaction set than the default, one can
 instead choose to load the reactions from an AMDS file, using:
-:menuselection:`Variables > Add > Reference to AMDS`
+:menuselection:`&Variables --> &Add --> &Reference to AMDS`
 and giving the name of the AMDS file requested. The number of AMDS files to
 be loaded is not limited. These files are to be found in the::
 
@@ -344,7 +357,7 @@ EIRENE will use a triangle grid in regions that are outside the fluid grid,
 and this variable defines the zones for the triangle mesh generator.
 
 Mark all of the main chamber elements, including the "SOL edge” segments for
-the targets. :menuselection:`Variables --> Add --> TRIA-EIRENE parameters`
+the targets. :menuselection:`&Variables --> &Add --> &TRIA-EIRENE parameters`
 
 Set index to -1 in the dialogue box, and :kbd:`"General Triangle size”`
 to 10.0, which will generate large triangles. The negative index indicates
@@ -354,15 +367,15 @@ value means the opposite.
 .. image:: divgeo_21.png
    :align: center
 
-With :kbd:`CTRL+U` mark the the wall segments in the PFR, including the `"PFR
-edge”` elements. Set index to -2 in the dialogue box, and `"General Triangle
-size”` to 10.0.
+With :kbd:`CTRL+U` mark the the wall segments in the PFR, including the
+`"PFR edge”` elements. Set index to -2 in the dialogue box, and
+`"General Triangle size”` to 10.0.
 
 Local refinement of the EIRENE triangle grid
 --------------------------------------------
 With DG it’s possible to increase the spatial resolution on sub-regions of the
-triangle mesh, i.e. the PFR. This can be done by
-:menuselection:`Variables --> Add --> Mesh Refinement Zones`
+triangle mesh, i.e. the PFR. You can add it by
+:menuselection:`&Variables --> &Add --> &Mesh Refinement Zones`
 
 .. image:: divgeo_22.png
    :align: center
@@ -595,8 +608,6 @@ Type the name of the variable to be changed followed by `'='`, and its
 numerical value. For example: :kbd:`nptseg(2)=32` (return). Type `"end"` to
 stop.
 
-
-
 Modifying the Carre parameters
 ------------------------------
 
@@ -783,6 +794,93 @@ the::
 The grid in B2.5 format is stored as ``*.geo`` format and the you can view
 the grid in PostScript format as ``*.ps`` format.
 
+Import the mesh into DG
+-----------------------
+
+After you stored the grid files, the ``*sno`` format file is the one that DG
+can read it as a mesh. Note that DG can only read files in the Sonnet format
+``(*.sno)``. The mesh can be import as:
+
+:menuselection:`File --> Import --> Mesh`
+
+When you import the mesh you need to check if some grid cells are
+outlined in magenta. If there are, these are concave cells that will yield
+errors when running Eirene and should be corrected before proceeding. Two
+methods are available for proceeding. The first is to go back to
+Carre and chose a different set of gridding parameters. This is where the Save
+option comes in. The second is to modify the grid points by hand (if there
+are not too many of them). This can be done as follows. Change one of the
+mouse button functions to ``Move mesh point`` and select a corner of a magenta
+grid cell and move it until the cell outline changes colour to lavender. You
+may need to propagate such changes over a range of cells. Bear in mind
+however that you are only modifying the ``*.sno`` grid file. You will need to
+save your modifications by exporting the mesh:
+
+:menuselection:`File --> Export --> Mesh`
+
+.. image:: divgeo_23.png
+   :align: center
+
+Closing Carre or gridding again
+-------------------------------
+
+If you are satisfied with your grid, or modified it within DG, you can now quit
+the carre script with
+
+:kbd:`Help, Prepare, Grid, Save, Convert, sTore, Next, Remove, Input, Output,`
+:kbd:`Quit ?`
+
+:kbd:`q (or <Enter>)`
+
+If you wish to obtain a new grid (and you have saved the previous set of
+gridding parameters):
+
+:kbd:`g (or <Enter>)`
+
+Repeat until the grid will be done correct.
+
+Start the triangulation script
+------------------------------
+After the meshing part, is needed to be done the triangulation script. This
+script can be start with:
+
+:kbd:`triang-.`
+
+Create the input files for triangulation script
+-----------------------------------------------
+
+On the first call, when you will get:
+
+:kbd:`Help, Uinp, B2ag, Eirene, Tria, triaGeom, Plot, View, Store, Convert,`
+:kbd:`List, Remove, reMap, Inquire, Quit ?`
+
+is best to use:
+
+:kbd:`U`
+
+Using uppercase U instead of the (default) lowercase u ensures that the links
+(from the ``lns`` command earlier) are correct. ``Uinp`` is a program that
+builds several input files for SOLPS-GUI programs according to the data
+provided in the DG model:
+
+   1. Eirene input files ``input.eir, test.eir and triang.eir``
+   2. Tria input file header ``triang.hed``
+   3. B2.5 pre-processor input files ``b2ag.dat, b2ai.dat, b2ar.dat``, and
+      converter input file ``b2yt.dat``.
+   4. B2.5 input file ``b2.user.parameters``
+   5. b2plot input file ``mesh.extra``
+   6. Stencil files ``b2.neutral.parameters.stencil`` and
+      ``b2.boundary.parameters.stencil`` which are sample files containing a
+      very rough default physics model for the boundary conditions and
+      recycling parameters, but that have the right format for further
+      modification to adapt to your physics  problem at hand.
+
+``Uinp`` will display the list of particles being used, the reactions it will
+include in the Eirene input file, the boundaries it will define and so on.
+
+The output of the list of the particles, all them reactions (ionization,
+recombination) you can see it in the ``AMJUEL``. which is a Database of
+Eirene.
 
 Meshing ITER Baseline scenario
 ==============================
