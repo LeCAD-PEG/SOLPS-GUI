@@ -217,6 +217,9 @@ class Carre(TcshProcess):
         if not baserunDir:
             return
 
+        if not baserunDir.endswith('baserun'):
+            return
+
         file = baserunDir + '/.status'
 
         # Checking file permission and existance
@@ -256,6 +259,7 @@ class Carre(TcshProcess):
         variables = self.vars
         if not baserunDir:
             return
+        if not baserunDir.endswith('baserun')
         logging.info('Storing .status in baserun ' + baserunDir)
         file = baserunDir + '/.status'
         if os.access(file, os.F_OK):
