@@ -233,6 +233,9 @@ class Carre(TcshProcess):
         CarreBlocks = 0
         with open(file, 'r') as f:
             for i, line in enumerate(f):
+                if reading and line.startswith('&'):
+                    reading = 0
+
                 if reading:
                     try:
                         sline = line.split()
@@ -243,9 +246,10 @@ class Carre(TcshProcess):
                         logging.error("Wrong value for: " + name)
                     except IndexError as e:
                         logging.error("Not enough arguments on line: " + line)
+                        if CarreVars.Name[CarreVars.dgModel] in line:
+                            self.vars[CarreVars.dgModel] = ''
 
-                if reading and line.startswith('&'):
-                    reading = 0
+
 
                 if line.startswith('&Carre'):
                     reading = 1 # We are reading the block
@@ -259,9 +263,12 @@ class Carre(TcshProcess):
         variables = self.vars
         if not baserunDir:
             return
-        if not baserunDir.endswith('baserun')
+        if not baserunDir.endswith('baserun'):
+            return
         logging.info('Storing .status in baserun ' + baserunDir)
         file = baserunDir + '/.status'
+        carreLines = [CarreVars.Name[i] + ' ' + str(variables[i]) for i
+                      in range(len(variables))]
         if os.access(file, os.F_OK):
             if os.access(file, os.W_OK):
                 logging.info(".status file exists in baserun " + baserunDir)
@@ -279,21 +286,28 @@ class Carre(TcshProcess):
                             break
 
                     text = text[mark + 1:]
-                    text += [CarreVars.Name[i] + ' ' + str(variables[i]) for i
-                             in range(len(variables))]
+                    text += carreLines
                     text += end
+                    text = '\n'.join(text)
 
-                    with open(file, 'w') as f:
-                        f.write('\n'.join(text))
-                    logging.info("Written to .status file.")
+                else:
+                    logging.info("No Carre block found in .status file!")
+                    text += '&Carre\n' + '\n'.join(carreLines) + '\n&\n'
+
+                with open(file, 'w') as f:
+                    f.write(text)
+                logging.info("Written to .status file.")
+
             else:
                 logging.error("No writing permission to .status file!")
 
         else:
             logging.info("No .status file exists in baserun " + baserunDir)
             with open(file, 'w') as f:
-                f.write('\n'.join([CarreVars.Name[i] + ' ' + str(variables[i])
-                                   for i in range(len(variables))]))
+                text = '&Carre\n'
+                text += '\n'.join(carreLines)
+                text += '&\n'
+                f.write(text)
             logging.info(".status file created!")
 
     @pyqtSlot()

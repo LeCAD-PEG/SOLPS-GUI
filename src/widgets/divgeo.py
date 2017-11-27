@@ -217,7 +217,7 @@ class DivGeo(TcshProcess):
         device = env.value('device_environment', 'iter')
         cmd = 'cd ' + self.getRunDir() + '\n'
         cmd += 'setenv DEVICE ' + device + '\n'
-        cmd += 'echo setting DEVICE as ${DEVICE}\n'
+        cmd += 'echo setting DEVICE as ' + device + '\n'
         cmd += 'echo STARTING DIVGEO\n'
         cmd += DivGeo + ' -wid ' + str(int(self.winId())) + '\n'
 
