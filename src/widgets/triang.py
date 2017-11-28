@@ -4,7 +4,7 @@
 
 from PyQt5.QtWidgets import (QPlainTextEdit, QVBoxLayout, QLabel, QGridLayout,
                              QInputDialog, QSpacerItem, QSizePolicy, QFrame,
-                             QMessageBox, QPushButton)
+                             QMessageBox, QPushButton, QGroupBox, QCheckBox)
 from PyQt5.QtCore import pyqtSlot, QSettings
 from PyQt5.QtGui import QTextCursor
 from tcsh_process import TcshProcess
@@ -13,8 +13,32 @@ import os
 import sys
 
 
+class TriangVars:
+    NumOfVars = 8
+
+    Uinp, b2ag, eirene, tria, triaGeom, store, outTemp, gridTemp = \
+        range(NumOfVars)
+
+    Name = {0: 'Uinp', 1: 'B2ag', 2: 'Eirene', 3: 'Tria', 4: 'triaGeom',
+            5: 'Store', 6: 'Conv2Out', 7: 'Conv2Grid'}
+
+    command = {0: 'U', 1: 'b', 2: 'e', 3: 't', 4: 'g', 5: 's', 6: 'c',
+               7: 'C'}
+
+    Values = {'Uinp': 0, 'B2ag': 1, 'Eirene': 2, 'Tria': 3, 'triaGeom': 4,
+              'Store': 5, 'Conv2Out': 6, 'Conv2Grid': 7}
+
+    Default = {i: 0 for i in range(NumOfVars)}
+
+
 class TriangState:
-    notRunning, running = range(2)
+    notRunning, starting, waiting, stepRunning = range(4)
+
+
+class StepPush(QPushButton):
+    def __init__(self, parent=None, value=None):
+        super(StepPush, self).__init__(parent)
+        self.value = value
 
 
 class Triang(TcshProcess):
@@ -23,41 +47,8 @@ class Triang(TcshProcess):
         super(Triang, self).__init__(parent)
 
         # Creating QPlainTextEdit
-
-        self.textDisplay = QPlainTextEdit()
-        self.textDisplay.setReadOnly(True)
-
-        self.startTriangPush = QPushButton('Start Triang')
-        self.startTriangPush.clicked.connect(self.startCarre)
-
-        self.baserunLabel = QLabel(self.runDir)
-
-        self.writeCommandPush = QPushButton('Write command')
-        self.writeCommandPush.clicked.connect(self.manualInput)
-
-
-        layout = QGridLayout()
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
-
-        layout.addWidget(self.textDisplay, 0, 0, 1, -1)
-
-        labelBaserun = QLabel('Baserun: ')
-        labelBaserun.setFrameStyle(QFrame.Box | QFrame.Raised)
-
-        layout.addWidget(self.startTriangPush, 1, 0)
-        layout.addWidget(self.writeCommandPush, 1, 1)
-
-        layout.addItem(QSpacerItem(20, 20, hPolicy=QSizePolicy.Expanding),
-                       1, 2)
-
-        layout.addWidget(labelBaserun, 1, 3)
-        layout.addWidget(self.baserunLabel, 1, 4)
-        layout.addItem(QSpacerItem(20, 20, ), 1, 5)
-
-
-
-        self.setLayout(layout)
+        self.vars = TriangVars.Default
+        self.prepareUserInterface()
 
         self.tcsh.readyReadStandardOutput.connect(self.tcsh.readStdOut)
         settings = QSettings('ITER', 'solps-gui')
@@ -71,6 +62,207 @@ class Triang(TcshProcess):
         self.currentRunDir = ''
         self.STATE = TriangState.notRunning
 
+    def prepareUserInterface(self):
+        mainLayout = QVBoxLayout()
+        mainLayout.setSpacing(0)
+        mainLayout.setContentsMargins(0, 0, 0, 0)
+
+        upperGridLayout = QGridLayout()
+        lowerGridLayout = QGridLayout()
+
+        #############
+        # Group Box 1
+        groupBox1 = QGroupBox()
+        self.checkBoxWidget = groupBox1
+        groupLayout = QGridLayout()
+        groupBox1.setTitle('Baserun .status')
+        Slice = 2
+        for i in range(TriangVars.NumOfVars // Slice):
+            for j in range(Slice):
+                # Creating checkboxes for
+                x = QCheckBox(TriangVars.Name[i * Slice + j])
+                x.setCheckState(0)
+                groupLayout.addWidget(x, j, i)
+        leftOver = TriangVars.NumOfVars - (TriangVars.NumOfVars // Slice ) \
+                * Slice
+        if leftOver > 0:
+            for k in range(leftOver):
+                x = QCheckBox(TriangVars.Name[i * Slice + k])
+                x.setCheckState(0)
+                groupLayout.addWidget(x, k, i + 1)
+        groupBox1.setLayout(groupLayout)
+        # Group Box 1
+        #############
+
+        upperGridLayout.addWidget(groupBox1, 0, 0)
+
+        upperGridLayout.addItem(QSpacerItem(20, 40,
+                                            hPolicy=QSizePolicy.Expanding),
+                                0, 2)
+
+        #############
+        # Group Box 2
+        groupBox2 = QGroupBox()
+        groupBox2.setTitle('Steps')
+        groupLayout = QVBoxLayout()
+        groupLayout.setSpacing(0)
+        groupLayout.setContentsMargins(0, 0, 0, 0)
+
+        start = QPushButton('Start Triang')
+        start.clicked.connect(self.startTriang)
+        groupLayout.addWidget(start)
+        for i in range(TriangVars.NumOfVars):
+            x = StepPush(value=TriangVars.command[i])
+            x.clicked.connect(self.runStep)
+            x.setText(TriangVars.Name[i])
+            groupLayout.addWidget(x)
+        groupLayout.addItem(QSpacerItem(40, 20, vPolicy=QSizePolicy.Expanding))
+        groupBox2.setLayout(groupLayout)
+        # Group Box 2
+        #############
+
+        lowerGridLayout.addWidget(groupBox2, 0, 0)
+
+        #############
+        # Group Box 3
+        groupBox3 = QGroupBox()
+        groupBox3.setTitle('Log window')
+
+        self.textDisplay = QPlainTextEdit()
+        self.textDisplay.setReadOnly(True)
+
+        groupLayout = QGridLayout()
+        groupLayout.setContentsMargins(0, 0, 0, 0)
+        groupLayout.setSpacing(0)
+        groupLayout.addWidget(self.textDisplay, 0, 0, 1, -1)
+
+        groupLayout.addItem(QSpacerItem(40, 20, hPolicy=QSizePolicy.Expanding),
+                            1, 0)
+        manualInput = QPushButton('Terminal input')
+        manualInput.clicked.connect(self.manualInput)
+
+        groupLayout.addWidget(manualInput, 1, 1)
+
+        yes = StepPush(value='y')
+        yes.setText('Yes')
+        yes.clicked.connect(self.runStep)
+
+        no = StepPush(value='n')
+        no.setText('No')
+        no.clicked.connect(self.runStep)
+
+        groupLayout.addWidget(yes, 1, 2)
+        groupLayout.addWidget(no, 1, 3)
+        groupBox3.setLayout(groupLayout)
+        # Group Box 3
+        #############
+
+        lowerGridLayout.addWidget(groupBox3, 0, 1)
+
+        mainLayout.addLayout(upperGridLayout)
+        mainLayout.addLayout(lowerGridLayout)
+        self.setLayout(mainLayout)
+
+    def readStatusFile(self, baserunDir):
+        """Read the .status file in baserun.
+
+        Variables:
+            statusFile (array): text of status without the Triang block.
+            mark (int): Where Triang block is inserted into .status file.
+        """
+
+        if not baserunDir:
+            return
+
+        if not baserunDir.endswith('baserun'):
+            return
+
+        file = baserunDir + '/.status'
+
+        # Checking file permission and existance
+        ok = os.access(file, os.F_OK | os.R_OK)
+        if not ok:
+            logging.info("No .status found in baserun " + baserunDir +
+                         ", or no permission to read .status.")
+            return
+
+        reading = 0
+        TriangBlocks = 0
+        with open(file, 'r') as f:
+            for i, line in enumerate(f):
+                if reading and line.startswith('&'):
+                    reading = 0
+
+                if reading:
+                    try:
+                        sline = line.split()
+                        name, val = sline[0], sline[1]
+                        self.vars[TriangVars.Values[name]] = int(val) if \
+                            val.isdigit else val
+                    except ValueError as e:
+                        logging.error("Wrong value for: " + name)
+                    except IndexError as e:
+                        logging.error("Not enough arguments on line: " + line)
+
+                if line.startswith('&Triang'):
+                    reading = 1 # We are reading the block
+                    TriangBlocks += 1
+                    if TriangBlocks > 1:
+                        logging.error("Multiple Triang block in .status file "
+                                      "in baserun: " + baserunDir)
+                        break
+
+    def storeStatusFile(self, baserunDir):
+        variables = self.vars
+        if not baserunDir:
+            return
+        if not baserunDir.endswith('baserun'):
+            return
+        logging.info('Storing .status in baserun ' + baserunDir)
+        file = baserunDir + '/.status'
+        triangLines = [TriangVars.Name[i] + ' ' + str(variables[i]) for i
+                      in range(len(variables))]
+        if os.access(file, os.F_OK):
+            if os.access(file, os.W_OK):
+                logging.info(".status file exists in baserun " + baserunDir)
+                with open(file, 'r') as f:
+                    text = f.read()
+
+                if "&Triang" in text:
+                    logging.info("Triang block found in .status file!")
+                    text = text.splitlines()
+                    mark = text.index("&Triang")
+                    end = 0
+                    for i, line in enumerate(text[mark + 1:]):
+                        if line.startswith("&"):
+                            end = text[i:]
+                            break
+
+                    text = text[mark + 1:]
+                    text += triangLines
+                    text += end
+                    text = '\n'.join(text)
+
+                else:
+                    logging.info("No Triang block found in .status file!")
+                    text += '&Triang\n' + '\n'.join(triangLines) + '\n&\n'
+
+                with open(file, 'w') as f:
+                    f.write(text)
+                logging.info("Written to .status file.")
+
+            else:
+                logging.error("No writing permission to .status file!")
+
+        else:
+            logging.info("No .status file exists in baserun " + baserunDir)
+            with open(file, 'w') as f:
+                text = '&Triang\n'
+                text += '\n'.join(triangLines)
+                text += '&\n'
+                f.write(text)
+            logging.info(".status file created!")
+
     @pyqtSlot()
     def manualInput(self):
         if not self.tcsh.state():
@@ -81,6 +273,56 @@ class Triang(TcshProcess):
         if ok:
             self.tcsh.write(msg + '\n')
             self.insertTextAtBottom(msg)
+
+    @pyqtSlot()
+    def runStep(self):
+        """Custom PushButtons emits signal to this function. They contain
+        attribute value which is then passed to tcsh if it is running.
+        """
+        if not self.tcsh.state():
+            return
+        if self.STATE == TriangState.waiting:
+            sender = self.sender()
+            msg = sender.value + '\n'
+            self.tcsh.write(msg)
+
+    def processText(self, text):
+        # if 'http' in text:
+        #     return
+        # if 'y/n' in text or 'y / n' in text:
+        #     ok = QMessageBox.question(self,'Triang input dialog', text)
+        #     if ok == QMessageBox.Yes:
+        #         msg = 'y\n'
+        #     else:
+        #         msg = 'n\n'
+        #     self.tcsh.write(msg)
+        #     self.insertTextAtBottom(msg)
+        #     return
+
+        # if 'Type \"end\" to stop.' in text:
+        #     userInput, ok = QInputDialog.getMultiLineText(self, "Triang input "
+        #                                                   "dialog", text)
+        #     if ok:
+        #         self.tcsh.write(userInput + '\n')
+        #         self.insertTextAtBottom(userInput + '\n')
+        #     return
+
+        # if '?' in text:
+        #     # Triang expects an input
+        #     ok = False
+        #     userInput, ok = QInputDialog.getText(self,
+        #                                          "Triang input dialog",
+        #                                          text)
+        #     if ok:
+        #         # self.tcsh.write(userInput)
+        #         self.tcsh.write(userInput + '\n')
+        #         self.insertTextAtBottom(userInput)
+        #         if userInput in 'qQquit':
+        #             self.STATE = TriangState.notRunning
+        default = "Help, Uinp, B2ag, Eirene, Tria, triaGeom, Plot, View, " \
+                  "Store, Convert, List, Remove, reMap, Inquire, Quit ?"
+        if default in text:
+            self.STATE = TriangState.waiting
 
     def insertTextAtBottom(self, msg):
         self.textDisplay.moveCursor(QTextCursor.End)
@@ -93,51 +335,20 @@ class Triang(TcshProcess):
     @pyqtSlot(str)
     def setRunDir(self, runDir):
         if runDir:
-            self.baserunLabel.setText(runDir)
+            self.storeStatusFile(self.runDir)
+            self.readStatusFile(runDir)
         super(Triang, self).setRunDir(runDir)
-
-    def processText(self, text):
-        if 'http' in text:
-            return
-        if 'y/n' in text or 'y / n' in text:
-            ok = QMessageBox.question(self,'Triang input dialog', text)
-            if ok == QMessageBox.Yes:
-                msg = 'y\n'
-            else:
-                msg = 'n\n'
-            self.tcsh.write(msg)
-            self.insertTextAtBottom(msg)
-            return
-
-        if 'Type \"end\" to stop.' in text:
-            userInput, ok = QInputDialog.getMultiLineText(self, "Triang input "
-                                                          "dialog", text)
-            if ok:
-                self.tcsh.write(userInput + '\n')
-                self.insertTextAtBottom(userInput + '\n')
-            return
-
-        if '?' in text:
-            # Carre expects an input
-            ok = False
-            userInput, ok = QInputDialog.getText(self,
-                                                 "Triang input dialog",
-                                                 text)
-            if ok:
-                # self.tcsh.write(userInput)
-                self.tcsh.write(userInput + '\n')
-                self.insertTextAtBottom(userInput)
-                if userInput in 'qQquit':
-                    self.STATE = TriangState.notRunning
 
     @pyqtSlot(str)
     def updateText(self, text):
-        """Read the output given from carre, and when input is expected, spawn
+        """Read the output given from Triang, and when input is expected, spawn
         input dialogs to get input from the user and then pass it back to
-        Carre.
+        Triang.
         """
-        self.insertTextAtBottom(text)
+        #self.insertTextAtBottom(text)
         # self.processText(text)  # Triang script outputs via StdError...
+        if self.STATE >= TriangState.waiting:
+            self.insertTextAtBottom(text)
 
     @pyqtSlot(str)
     def updateError(self, text):
@@ -145,11 +356,14 @@ class Triang(TcshProcess):
         # color_post = '</font>'
         # self.textDisplay.appendHtml('<b>' + color_pref + text + color_post +
         #                             '</b>')
-        self.insertTextAtBottom(text)
-        self.processText(text)
+        if self.STATE >= TriangState.starting:
+            self.processText(text)
+        if self.STATE >= TriangState.waiting:
+            self.insertTextAtBottom(text)
 
     @pyqtSlot()
-    def startCarre(self):
+    def startTriang(self):
+        self.textDisplay.clear()
         if not self.getRunDir():
             logging.error('No baserun selected.')
             return
@@ -157,7 +371,7 @@ class Triang(TcshProcess):
         runDir = self.getRunDir()
         if self.getRunDir() != self.currentRunDir:
             msg = 'Baserun changed'
-            if self.STATE == TriangState.running:
+            if self.STATE != TriangState.notRunning:
                 msg += '. But current triang run hasn\'t finished yet!'
                 logging.warning(msg)
                 self.insertTextAtBottom(msg)
@@ -181,6 +395,8 @@ class Triang(TcshProcess):
         else:
             logging.info('TCSH for triang is aready running.')
 
+
+        self.STATE = TriangState.starting
         Triang = 'triang\n'
         cmd = Triang + '\n'
         # self.tcsh.write(cmd)
@@ -193,15 +409,15 @@ if __name__ == '__main__':
     env.setValue('device_environment', 'cmod')
     app = QApplication(sys.argv)
     main = QMainWindow()
-    carreM = Triang()
-    # carreM.activateDebugging()
-    carreM.setTcshPath('/bin/tcsh')
+    triangM = Triang()
+    triangM.activateDebugging()
+    triangM.setTcshPath('/bin/tcsh')
     path = os.path.expanduser('~/solps-iter/runs/test_run/baserun')
-    carreM.setRunDir(path)
+    triangM.setRunDir(path)
 
     layout = QVBoxLayout()
     layout.setContentsMargins(0, 0, 0, 0)
-    layout.addWidget(carreM)
+    layout.addWidget(triangM)
 
     window = QWidget()
     window.setLayout(layout)

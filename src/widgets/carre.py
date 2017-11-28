@@ -2,10 +2,9 @@
 """ A PyQt widget for Carre process.
 """
 
-from PyQt5.QtWidgets import (QPlainTextEdit, QVBoxLayout, QLabel, QPushButton,
+from PyQt5.QtWidgets import (QPlainTextEdit, QVBoxLayout, QPushButton,
                              QGridLayout, QInputDialog, QComboBox, QSpacerItem,
-                             QSizePolicy, QFrame, QMessageBox, QGroupBox,
-                             QCheckBox)
+                             QSizePolicy, QGroupBox, QCheckBox)
 from PyQt5.QtCore import pyqtSlot, QSettings, Qt
 from PyQt5.QtGui import QTextCursor
 from tcsh_process import TcshProcess
@@ -13,7 +12,7 @@ import logging
 import glob
 import os
 import sys
-from functools import partial
+
 
 class CarreVars:
     """Variables for Carre for automation.
@@ -225,8 +224,8 @@ class Carre(TcshProcess):
         # Checking file permission and existance
         ok = os.access(file, os.F_OK | os.R_OK)
         if not ok:
-            logging.info("No .status found in baserun " + baserunDir + ", or no "
-                         "permission to read .status.")
+            logging.info("No .status found in baserun " + baserunDir +
+                         ", or no permission to read .status.")
             return
 
         reading = 0
