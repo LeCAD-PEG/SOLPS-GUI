@@ -248,8 +248,6 @@ class Carre(TcshProcess):
                         if CarreVars.Name[CarreVars.dgModel] in line:
                             self.vars[CarreVars.dgModel] = ''
 
-
-
                 if line.startswith('&Carre'):
                     reading = 1 # We are reading the block
                     CarreBlocks += 1
@@ -333,39 +331,6 @@ class Carre(TcshProcess):
             self.tcsh.write(msg)
 
     def processText(self, text):
-        if 'http' in text:
-            return
-        # if 'y/n' in text or 'y / n' in text:
-        #     ok = QMessageBox.question(self,'Triang input dialog', text)
-        #     if ok == QMessageBox.Yes:
-        #         msg = 'y\n'
-        #     else:
-        #         msg = 'n\n'
-        #     self.tcsh.write(msg)
-        #     self.insertTextAtBottom(msg)
-        #     return
-
-        # if 'Type \"end\" to stop.' in text:
-        #     userInput, ok = QInputDialog.getMultiLineText(self, "Triang input "
-        #                                                   "dialog", text)
-        #     if ok:
-        #         self.tcsh.write(userInput + '\n')
-        #         self.insertTextAtBottom(userInput + '\n')
-        #     return
-
-        # if '?' in text:
-        #     # Carre expects an input
-        #     ok = False
-        #     userInput, ok = QInputDialog.getText(self,
-        #                                          "Triang input dialog",
-        #                                          text)
-        #     if ok:
-        #         # self.tcsh.write(userInput)
-        #         self.tcsh.write(userInput + '\n')
-        #         self.insertTextAtBottom(userInput)
-        #         if userInput in 'qQquit':
-                    # self.STATE = CarreState.notRunning
-
         default = "Help, Prepare, Grid, Save, Convert, sTore, Next, " \
                   "Remove, Input, Output, Quit ?"
         if default in text:
@@ -405,14 +370,13 @@ class Carre(TcshProcess):
         if self.STATE >= CarreState.waiting:
             self.insertTextAtBottom(text)
 
-
     @pyqtSlot(str)
     def updateError(self, text):
         # color_pref = '<font color=red>'
         # color_post = '</font>'
         # self.textDisplay.appendHtml('<b>' + color_pref + text + color_post +
         #                             '</b>')
-        #self.insertTextAtBottom(text)
+        # self.insertTextAtBottom(text)
         # self.processText(text)
         pass
 
@@ -470,6 +434,7 @@ class Carre(TcshProcess):
         cmd = Carre + '\n'
         # self.tcsh.write(cmd)
         self.tcsh.write(cmd)
+
 
 if __name__ == '__main__':
     from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget)

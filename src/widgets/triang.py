@@ -2,9 +2,9 @@
 """ A PyQt widget for Triang process.
 """
 
-from PyQt5.QtWidgets import (QPlainTextEdit, QVBoxLayout, QLabel, QGridLayout,
-                             QInputDialog, QSpacerItem, QSizePolicy, QFrame,
-                             QMessageBox, QPushButton, QGroupBox, QCheckBox)
+from PyQt5.QtWidgets import (QPlainTextEdit, QVBoxLayout, QGridLayout,
+                             QInputDialog, QSpacerItem, QSizePolicy,
+                             QPushButton, QGroupBox, QCheckBox)
 from PyQt5.QtCore import pyqtSlot, QSettings
 from PyQt5.QtGui import QTextCursor
 from tcsh_process import TcshProcess
@@ -76,15 +76,14 @@ class Triang(TcshProcess):
         self.checkBoxWidget = groupBox1
         groupLayout = QGridLayout()
         groupBox1.setTitle('Baserun .status')
-        Slice = 2
-        for i in range(TriangVars.NumOfVars // Slice):
-            for j in range(Slice):
+        _n = 2  # Number of widgets per column
+        for i in range(TriangVars.NumOfVars // _n):
+            for j in range(_n):
                 # Creating checkboxes for
-                x = QCheckBox(TriangVars.Name[i * Slice + j])
+                x = QCheckBox(TriangVars.Name[i * _n + j])
                 x.setCheckState(0)
                 groupLayout.addWidget(x, j, i)
-        leftOver = TriangVars.NumOfVars - (TriangVars.NumOfVars // Slice ) \
-                * Slice
+        leftOver = TriangVars.NumOfVars - (TriangVars.NumOfVars // _n ) * _n
         if leftOver > 0:
             for k in range(leftOver):
                 x = QCheckBox(TriangVars.Name[i * Slice + k])
@@ -287,38 +286,6 @@ class Triang(TcshProcess):
             self.tcsh.write(msg)
 
     def processText(self, text):
-        # if 'http' in text:
-        #     return
-        # if 'y/n' in text or 'y / n' in text:
-        #     ok = QMessageBox.question(self,'Triang input dialog', text)
-        #     if ok == QMessageBox.Yes:
-        #         msg = 'y\n'
-        #     else:
-        #         msg = 'n\n'
-        #     self.tcsh.write(msg)
-        #     self.insertTextAtBottom(msg)
-        #     return
-
-        # if 'Type \"end\" to stop.' in text:
-        #     userInput, ok = QInputDialog.getMultiLineText(self, "Triang input "
-        #                                                   "dialog", text)
-        #     if ok:
-        #         self.tcsh.write(userInput + '\n')
-        #         self.insertTextAtBottom(userInput + '\n')
-        #     return
-
-        # if '?' in text:
-        #     # Triang expects an input
-        #     ok = False
-        #     userInput, ok = QInputDialog.getText(self,
-        #                                          "Triang input dialog",
-        #                                          text)
-        #     if ok:
-        #         # self.tcsh.write(userInput)
-        #         self.tcsh.write(userInput + '\n')
-        #         self.insertTextAtBottom(userInput)
-        #         if userInput in 'qQquit':
-        #             self.STATE = TriangState.notRunning
         default = "Help, Uinp, B2ag, Eirene, Tria, triaGeom, Plot, View, " \
                   "Store, Convert, List, Remove, reMap, Inquire, Quit ?"
         if default in text:
@@ -394,7 +361,6 @@ class Triang(TcshProcess):
             self.tcsh.write(cmd)
         else:
             logging.info('TCSH for triang is aready running.')
-
 
         self.STATE = TriangState.starting
         Triang = 'triang\n'
