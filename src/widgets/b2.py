@@ -196,7 +196,7 @@ class B2Edit(QWidget):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_F2:
-            if self.path:
+            if self.path.endswith('.stencil'):
                 # No checks are required since the solpsinput.py have
                 # checked if stensils exist
                 with open(self.path, 'r') as f:

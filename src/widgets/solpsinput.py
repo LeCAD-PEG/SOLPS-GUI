@@ -134,7 +134,11 @@ class SolpsInput(QTabWidget):
                         try:
                             with gzip.open(path, 'rb') as file:
                                 text_content = file.read().decode("utf-8")
+                            if text_content:
                                 plainTextEdit.setPlainText(text_content)
+                            else:
+                                msg = "File " + filename + " is empty!"
+                                plainTextEdit.setPlainText(msg)
                         except EOFError as e:
                             msg = "Couldn't read file " + filename  + \
                                   "! File " + filename + " is corrupted!"
@@ -175,7 +179,12 @@ class SolpsInput(QTabWidget):
                     plainTextEdit.setReadOnly(True)
                 try:
                     with open(path) as file:
-                        plainTextEdit.setPlainText(file.read())
+                        text = file.read()
+                    if text:
+                        plainTextEdit.setPlainText(text)
+                    else:
+                        plainTextEdit.setPlaceholderText("File " + filename +
+                                                         " is empty!")
                 except PermissionError as error:
                     plainTextEdit.setPlainText(str(error))
                     plainTextEdit.setEnabled(False)

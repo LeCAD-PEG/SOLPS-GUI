@@ -1426,6 +1426,7 @@ class SOLPS_MainWindow(QMainWindow):
         self.statusbar.showMessage('Editing ' + path)
         self.solpsinput.setRundir(path)
         self.solpsinput.read_input_files()
+        self.solpsinput.editor_tab_changed(self.solpsinput.currentIndex())
         self.tab_Input.setEnabled(True)
 
     @pyqtSlot()
