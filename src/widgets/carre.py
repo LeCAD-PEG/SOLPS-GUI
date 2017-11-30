@@ -141,6 +141,8 @@ class Carre(TcshProcess):
         groupLayout = QVBoxLayout()
         self.selectDgModel = QComboBox()
         self.selectDgModel.addItem('')
+        self.selectDgModel.setSizePolicy(QSizePolicy(QSizePolicy.Expanding,
+                                                     QSizePolicy.Fixed))
         groupLayout.addWidget(self.selectDgModel, alignment=Qt.AlignTop)
         groupBox2.setLayout(groupLayout)
         # Group Box 2
