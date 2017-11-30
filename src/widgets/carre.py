@@ -29,12 +29,14 @@ class CarreVars:
     are only NumOfVars-2 steps since the last to are reserved for which
     dgModel has been used and if lns was called.
     """
-    NumOfVars = 5
-    prepare, grid, store, lns, dgModel = range(NumOfVars)
-    Name = {0: 'Prepare', 1: 'Grid', 2: 'Store', 3: 'lns', 4: 'dgModel'}
-    command = {0: 'p', 1: 'g', 2: 't'}
+    NumOfVars = 6
+    prepare, grid, convert, store, lns, dgModel = range(NumOfVars)
+    Name = {0: 'Prepare', 1: 'Grid', 2: 'Convert', 3: 'Store',
+            4: 'lns', 5: 'dgModel'}
+    command = {0: 'p', 1: 'g', 2: 'c', 3: 't'}
 
-    Values = {'Prepare': 0, 'Grid': 1, 'Store': 2, 'lns': 3, 'dgModel': 4}
+    Values = {'Prepare': 0, 'Grid': 1, 'Convert': 2, 'Store': 3, 'lns': 4,
+              'dgModel': 5}
 
     Default = {i: 0 for i in range(NumOfVars - 1)}
     Default[NumOfVars - 1] = ''
@@ -109,14 +111,23 @@ class Carre(TcshProcess):
         # Group Box 1
         groupBox1 = QGroupBox()
         self.clickedGroup = groupBox1
-        groupLayout = QVBoxLayout()
+        groupLayout = QGridLayout()
         groupBox1.setTitle('Baserun .status')
-        for i in range(CarreVars.NumOfVars - 2):
-            # Creating checkboxes for
-            x = QCheckBox(CarreVars.Name[i])
-            x.setCheckState(self.vars[i])
-            x.stateChanged.connect(self.setVarsFromClickedGroup)
-            groupLayout.addWidget(x)
+        _n = 2  # Number of widgets per column
+        for i in range((CarreVars.NumOfVars - 2) // _n):
+            for j in range(_n):
+                # Creating checkboxes for
+                x = QCheckBox(CarreVars.Name[i * _n + j])
+                x.setCheckState(0)
+                x.stateChanged.connect(self.setVarsFromClickedGroup)
+                groupLayout.addWidget(x, j, i)
+        leftOver = CarreVars.NumOfVars - 2 - (CarreVars.NumOfVars // _n) * _n
+        if leftOver > 0:
+            for k in range(leftOver):
+                x = QCheckBox(CarreVars.Name[i * _n + k])
+                x.setCheckState(0)
+                x.stateChanged.connect(self.setVarsFromClickedGroup)
+                groupLayout.addWidget(x, k, i + 1)
         groupBox1.setLayout(groupLayout)
         # Group Box 1
         #############
@@ -332,7 +343,7 @@ class Carre(TcshProcess):
         if os.access(path, os.W_OK | os.F_OK):
             with open(path, 'a') as f:
                 time = "{:%H:%M:%S %d-%m-%Y}".format(datetime.datetime.now())
-                f.write('\nStarted Carre step ' + msg + ' at ' + time)
+                f.write('\nRan Carre step ' + msg + ' at ' + time)
 
     @pyqtSlot()
     def manualInput(self):
@@ -377,13 +388,15 @@ class Carre(TcshProcess):
         if runDir:
             # Update QMainWindow status bar.
             self.storeStatusFile(self.runDir)
-            self.readStatusFile(runDir)
             self.updateDivGeoModel(runDir)
+            self.readStatusFile(runDir)
         super(Carre, self).setRunDir(runDir)
 
     def updateDivGeoModel(self, runDir):
         """Gives the user a list of all .dg files in baserun
         """
+        self.selectDgModel.clear()
+        self.selectDgModel.addItem('')
         [self.selectDgModel.addItem(os.path.basename(_)) for _ in
          glob.glob(runDir + '/*.dg')]
 
@@ -412,7 +425,7 @@ class Carre(TcshProcess):
     def startCarre(self):
         self.textDisplay.clear()
         if not self.getRunDir():
-            logging.error('No baserun selected.')
+            self.textDisplay.appendPlainText('No baserun selected.')
             return
 
         runDir = self.getRunDir()

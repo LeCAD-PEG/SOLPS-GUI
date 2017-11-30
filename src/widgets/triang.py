@@ -290,7 +290,7 @@ class Triang(TcshProcess):
         if os.access(path, os.W_OK | os.F_OK):
             with open(path, 'a') as f:
                 time = "{:%H:%M:%S %d-%m-%Y}".format(datetime.datetime.now())
-                f.write('\nStarted Triang step' + msg + ' at ' + time)
+                f.write('\nRan Triang step' + msg + ' at ' + time)
 
     @pyqtSlot()
     def manualInput(self):
@@ -363,7 +363,7 @@ class Triang(TcshProcess):
     def startTriang(self):
         self.textDisplay.clear()
         if not self.getRunDir():
-            logging.error('No baserun selected.')
+            self.textDisplay.appendPlainText('No baserun selected.')
             return
 
         runDir = self.getRunDir()
