@@ -1227,6 +1227,7 @@ class SOLPS_MainWindow(QMainWindow):
             sys.exit(2)
 
         self.addMenu = AddMenu(self.menubar)
+        self.menubar.insertMenu(self.menu_Help.menuAction(), self.addMenu)
         self.addMenu.output.connect(self.solpsinput.insert_line)
         self.solpsinput.editorChanged.connect(self.addMenu.editorChanged)
 

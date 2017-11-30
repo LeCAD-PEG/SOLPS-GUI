@@ -235,6 +235,8 @@ class SolpsInput(QTabWidget):
         # print("Current index", tab_index)
         # print("Current widget", self.widget(tab_index))
         # print("Current widget window title", self.tabText(tab_index))
+        if not self.runDir:
+            return
         filename = self.tabText(tab_index)
         for filename_and_descr in solps_input_files:
             if filename == filename_and_descr[0]:

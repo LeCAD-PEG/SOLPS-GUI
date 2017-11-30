@@ -6,8 +6,6 @@ from PyQt5.QtCore import (QSize, pyqtSignal, QSettings,
                           pyqtSlot, pyqtProperty)
 from PyQt5.QtWidgets import QMenu, QToolTip
 
-import logging
-import os
 import textwrap
 import functools
 
@@ -29,9 +27,7 @@ class AddMenu(QMenu):
         '''
         super(AddMenu, self).__init__(parent)
         self.setTitle("Add")
-        parent.addAction(self.menuAction())
         self.hovered.connect(self.handleMenuHovered)
-        #self.setEnabled(False)
 
         for category in sorted(b2menu.b2mn_menu):
             category_menu = QMenu(self)
@@ -81,6 +77,12 @@ class AddMenu(QMenu):
                     line = start + name + association + data + end
                     pfn = functools.partial(self.handleMenuTriggered, line)
                     action.triggered.connect(pfn)
+
+        self.disableActions()
+
+    def disableActions(self):
+        for a in self.actions():
+            a.setEnabled(False)
 
     def handleMenuHovered(self, action):
         """ Instead of showing tooltip on hover we rather setup a new tooltip
