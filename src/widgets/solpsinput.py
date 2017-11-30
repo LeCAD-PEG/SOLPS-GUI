@@ -10,19 +10,17 @@ Tooltips are created in solps-iter/doc with::
   make
 """
 
-from PyQt5.QtCore import (QSize, QEvent, QRegExp, Qt,
-                          pyqtProperty,  pyqtSignal, pyqtSlot, QSettings)
-from PyQt5.QtWidgets import (QTabWidget, QPlainTextEdit, QSizePolicy,
-                             QGridLayout, QToolTip)
-from PyQt5.QtGui import (QFont, QSyntaxHighlighter, QTextCharFormat, QBrush)
+from PyQt5.QtCore import QSize, pyqtProperty, pyqtSignal, pyqtSlot, QSettings
+from PyQt5.QtWidgets import QTabWidget, QPlainTextEdit, QGridLayout
+from PyQt5.QtGui import QFont
 
 import os
 import logging
 import gzip
-import textwrap
 
 from eirene import Eirene
 from b2 import B2Edit
+
 
 class SolpsInput(QTabWidget):
     """SolpsInput(QTabWidget)
@@ -40,6 +38,7 @@ class SolpsInput(QTabWidget):
         self.currently_viewing = None
         self.editors = dict()
         self.currentChanged.connect(self.editor_tab_changed)
+
     def restore_tab_positions(self):
         """ Get tabs ordering from settings and restore the to saved position.
         """
@@ -140,7 +139,7 @@ class SolpsInput(QTabWidget):
                                 msg = "File " + filename + " is empty!"
                                 plainTextEdit.setPlainText(msg)
                         except EOFError as e:
-                            msg = "Couldn't read file " + filename  + \
+                            msg = "Couldn't read file " + filename + \
                                   "! File " + filename + " is corrupted!"
                             plainTextEdit.setPlaceHolderText(msg)
                     else:
@@ -171,8 +170,6 @@ class SolpsInput(QTabWidget):
         for filename in self.editors:
             plainTextEdit = self.editors[filename]
 
-            if not os.access(self.rundir, os.W_OK):
-                    plainTextEdit.setReadOnly(True)
             path = self.rundir + '/' + filename
             if os.path.exists(path):
                 if not os.access(path, os.W_OK):
@@ -186,20 +183,19 @@ class SolpsInput(QTabWidget):
                         plainTextEdit.setPlaceholderText("File " + filename +
                                                          " is empty!")
                 except PermissionError as error:
-                    plainTextEdit.setPlainText(str(error))
+                    plainTextEdit.setPlaceholderText(str(error))
                     plainTextEdit.setEnabled(False)
             else:
                 if os.access(self.rundir, os.W_OK):
                     msg = "File does not exist yet. "
-                    stencil_path_1 = self.rundir + '/../baserun/' + filename +\
-                                   '.stencil'
-                    stencil_path_2 = self.rundir + filename + '.stencil'
-                    if os.path.exists(stencil_path_1) or\
-                       os.path.exists(stencil_path_2):
+                    stenc1 = self.rundir + '/../baserun/' + filename + \
+                        '.stencil'
+                    stenc2 = self.rundir + filename + '.stencil'
+                    if os.path.exists(stenc1) or os.path.exists(stenc2):
                         msg += "Press F2 to load the stencil file or start"\
                                " typing here."
-                        self.editors[filename].path = stencil_path_1 if \
-                            os.path.exists(stencil_path_1) else stencil_path_2
+                        self.editors[filename].path = stenc1 if \
+                            os.path.exists(stenc1) else stenc2
                     else:
                         msg += "Start typing here!"
                 else:
@@ -208,9 +204,9 @@ class SolpsInput(QTabWidget):
 
     @pyqtSlot(str)
     def insert_line(self, line):
-        if type(self.currentWidget()) == type(B2Edit()):
+        if isinstance(self.currentWidget(), B2Edit):
             self.currentWidget().plainTextWidget.insert_line(line)
-            print("Emmiting: " + line)
+            logging.info("Emmiting: " + line)
 
     @pyqtSlot()
     def save_modified_input_files(self):
@@ -223,13 +219,13 @@ class SolpsInput(QTabWidget):
             for filename in self.editors:
                 plainTextEdit = self.editors[filename]
                 if plainTextEdit.document().isModified():
+                    plainTextEdit.document().setModified(False)
                     try:
                         path = self.rundir + '/' + filename
                         with open(path, 'w') as f:
                             f.write(plainTextEdit.toPlainText())
-                        print("Saving " + filename)
+                        logging.info("Saving " + filename)
                     except OSError as error:
-                        print('error')
                         logging.error(error)
 
     @pyqtSlot(int)

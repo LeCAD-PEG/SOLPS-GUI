@@ -19,10 +19,12 @@ try:
 except ImportError as e:
     GNUPLOT_WIDGET = False
 
+
 def cleanTempFiles(*files):
     for file in files:
         if file and os.path.exists(file):
             os.unlink(file)
+
 
 class Gnuplot(TcshProcess):
     """Gnuplot(QWidget)

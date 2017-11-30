@@ -6,21 +6,19 @@ A PyQt custom widget with embedded list of SOLPS scripts.
 
 """
 
-from PyQt5.QtCore import (Qt, QProcess, QSize, pyqtProperty,
-                          pyqtSignal, pyqtSlot)
-from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtCore import Qt, QProcess, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QComboBox
 
 
 class SolpsPlots(QComboBox):
     """SolpsPlots(QComboBox)
-    
+
     Provides a custom widget that holds all SOLPS Gnuplot script names
     for combining them with
     """
 
     returnPressed = pyqtSignal()
-    
+
     def __init__(self, parent=None):
         super(SolpsPlots, self).__init__(parent)
 
@@ -48,6 +46,8 @@ class SolpsPlots(QComboBox):
 # List of TCSH plot scripts in solps-iter/scripts obtained by
 # grep -H plot * | grep -v .py | \
 #  sed 's/\([a-zA-Z0-9_+-]*\):.*/    \"\1 # \",/'| sort | uniq
+
+
 _tcsh_solps_scripts = [
     ('resall_D', 'all residuals for a D-only case'),
     ('resall_D+', 'only all residuals for a D+-only case'),
@@ -65,7 +65,7 @@ _tcsh_solps_scripts = [
     ('resco_continuity', 'residuals'),
     ('resco_reg', 'continuity residuals per region'),
     ('resco_reg_region', '#1 continuity residuals per region\n'
-    'for species #1 (default 0)'),
+     'for species #1 (default 0)'),
     ('resco_D+C', 'continuity residuals for a D + C case'),
     ('resco_D+O', 'continuity residuals for a D + O case'),
     ('resco_D+C+He', 'continuity residuals for a D+C+He case'),
@@ -388,5 +388,3 @@ if __name__ == "__main__":
     window = SolpsPlots()
     window.show()
     sys.exit(app.exec_())
-
-

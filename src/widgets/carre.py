@@ -112,12 +112,14 @@ class Carre(TcshProcess):
         #############
         # Group Box 1
         groupBox1 = QGroupBox()
+        self.clickedGroup = groupBox1
         groupLayout = QVBoxLayout()
         groupBox1.setTitle('Baserun .status')
         for i in range(CarreVars.NumOfVars - 2):
             # Creating checkboxes for
             x = QCheckBox(CarreVars.Name[i])
-            x.setCheckState(0)
+            x.setCheckState(self.vars[i])
+            x.stateChanged.connect(self.setVarsFromClickedGroup)
             groupLayout.addWidget(x)
         groupBox1.setLayout(groupLayout)
         # Group Box 1
@@ -205,6 +207,30 @@ class Carre(TcshProcess):
         mainLayout.addLayout(lowerGridLayout)
         self.setLayout(mainLayout)
 
+    def setClickedGroupFromVars(self):
+        layout = self.clickedGroup.layout()
+        for i in range(layout.count()):
+            item = layout.itemAt(i).widget()
+            if self.vars[i]:
+                item.setCheckState(Qt.Checked)
+            else:
+                item.setCheckState(Qt.Unchecked)
+
+    @pyqtSlot()
+    def setVarsFromClickedGroup(self):
+        layout = self.clickedGroup.layout()
+        for i in range(layout.count()):
+            item = layout.itemAt(i).widget()
+            if item.isChecked():
+                self.vars[i] = 1
+            else:
+                self.vars[i] = 0
+
+    def resetCheckBox(self):
+        layout = self.clickedGroup.layout()
+        for i in range(layout.count()):
+            layout.itemAt(i).widget().setCheckState(Qt.Unchecked)
+
     def readStatusFile(self, baserunDir):
         """Read the .status file in baserun.
 
@@ -212,7 +238,7 @@ class Carre(TcshProcess):
             statusFile (array): text of status without the Carre block.
             mark (int): Where Carre block is inserted into .status file.
         """
-
+        self.resetCheckBox()
         if not baserunDir:
             return
 
@@ -255,6 +281,7 @@ class Carre(TcshProcess):
                         logging.error("Multiple Carre block in .status file "
                                       "in baserun: " + baserunDir)
                         break
+            self.setClickedGroupFromVars()
 
     def storeStatusFile(self, baserunDir):
         variables = self.vars
@@ -274,26 +301,19 @@ class Carre(TcshProcess):
 
                 if "&Carre" in text:
                     logging.info("Carre block found in .status file!")
-                    text = text.splitlines()
-                    mark = text.index("&Carre")
-                    end = 0
-                    for i, line in enumerate(text[mark + 1:]):
-                        if line.startswith("&"):
-                            end = text[i:]
-                            break
+                    left, right = text.split("&Carre", 1)
+                    center, right = right.split("&", 1)
 
-                    text = text[mark + 1:]
-                    text += carreLines
-                    text += end
-                    text = '\n'.join(text)
+                    text = left + "&Carre\n" + '\n'.join(carreLines) + \
+                        "\n&" + right
 
                 else:
                     logging.info("No Carre block found in .status file!")
-                    text += '&Carre\n' + '\n'.join(carreLines) + '\n&\n'
+                    text += '\n&Carre\n' + '\n'.join(carreLines) + '\n&'
 
                 with open(file, 'w') as f:
                     f.write(text)
-                logging.info("Written to .status file.")
+                logging.info("Carre written to .status file.")
 
             else:
                 logging.error("No writing permission to .status file!")
@@ -303,9 +323,9 @@ class Carre(TcshProcess):
             with open(file, 'w') as f:
                 text = '&Carre\n'
                 text += '\n'.join(carreLines)
-                text += '&\n'
+                text += '&'
                 f.write(text)
-            logging.info(".status file created!")
+            logging.info(".status file created for carre block!")
 
     @pyqtSlot()
     def manualInput(self):

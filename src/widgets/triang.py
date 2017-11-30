@@ -5,7 +5,7 @@
 from PyQt5.QtWidgets import (QPlainTextEdit, QVBoxLayout, QGridLayout,
                              QInputDialog, QSpacerItem, QSizePolicy,
                              QPushButton, QGroupBox, QCheckBox)
-from PyQt5.QtCore import pyqtSlot, QSettings
+from PyQt5.QtCore import pyqtSlot, QSettings, Qt
 from PyQt5.QtGui import QTextCursor
 from tcsh_process import TcshProcess
 import logging
@@ -73,7 +73,7 @@ class Triang(TcshProcess):
         #############
         # Group Box 1
         groupBox1 = QGroupBox()
-        self.checkBoxWidget = groupBox1
+        self.clickedGroup = groupBox1
         groupLayout = QGridLayout()
         groupBox1.setTitle('Baserun .status')
         _n = 2  # Number of widgets per column
@@ -82,12 +82,14 @@ class Triang(TcshProcess):
                 # Creating checkboxes for
                 x = QCheckBox(TriangVars.Name[i * _n + j])
                 x.setCheckState(0)
+                x.stateChanged.connect(self.setVarsFromClickedGroup)
                 groupLayout.addWidget(x, j, i)
-        leftOver = TriangVars.NumOfVars - (TriangVars.NumOfVars // _n ) * _n
+        leftOver = TriangVars.NumOfVars - (TriangVars.NumOfVars // _n) * _n
         if leftOver > 0:
             for k in range(leftOver):
-                x = QCheckBox(TriangVars.Name[i * Slice + k])
+                x = QCheckBox(TriangVars.Name[i * _n + k])
                 x.setCheckState(0)
+                x.stateChanged.connect(self.setVarsFromClickedGroup)
                 groupLayout.addWidget(x, k, i + 1)
         groupBox1.setLayout(groupLayout)
         # Group Box 1
@@ -162,6 +164,30 @@ class Triang(TcshProcess):
         mainLayout.addLayout(lowerGridLayout)
         self.setLayout(mainLayout)
 
+    def setClickedGroupFromVars(self):
+        layout = self.clickedGroup.layout()
+        for i in range(layout.count()):
+            item = layout.itemAt(i).widget()
+            if self.vars[i]:
+                item.setCheckState(Qt.Checked)
+            else:
+                item.setCheckState(Qt.Unchecked)
+
+    @pyqtSlot()
+    def setVarsFromClickedGroup(self):
+        layout = self.clickedGroup.layout()
+        for i in range(layout.count()):
+            item = layout.itemAt(i).widget()
+            if item.isChecked():
+                self.vars[i] = 1
+            else:
+                self.vars[i] = 0
+
+    def resetCheckBox(self):
+        layout = self.clickedGroup.layout()
+        for i in range(layout.count()):
+            layout.itemAt(i).widget().setCheckState(Qt.Unchecked)
+
     def readStatusFile(self, baserunDir):
         """Read the .status file in baserun.
 
@@ -169,7 +195,7 @@ class Triang(TcshProcess):
             statusFile (array): text of status without the Triang block.
             mark (int): Where Triang block is inserted into .status file.
         """
-
+        self.resetCheckBox()
         if not baserunDir:
             return
 
@@ -210,6 +236,7 @@ class Triang(TcshProcess):
                         logging.error("Multiple Triang block in .status file "
                                       "in baserun: " + baserunDir)
                         break
+            self.setClickedGroupFromVars()
 
     def storeStatusFile(self, baserunDir):
         variables = self.vars
@@ -229,26 +256,19 @@ class Triang(TcshProcess):
 
                 if "&Triang" in text:
                     logging.info("Triang block found in .status file!")
-                    text = text.splitlines()
-                    mark = text.index("&Triang")
-                    end = 0
-                    for i, line in enumerate(text[mark + 1:]):
-                        if line.startswith("&"):
-                            end = text[i:]
-                            break
+                    left, right = text.split("&Triang", 1)
+                    center, right = right.split("&", 1)
 
-                    text = text[mark + 1:]
-                    text += triangLines
-                    text += end
-                    text = '\n'.join(text)
+                    text = left + "&Triang\n" +'\n'.join(triangLines) + \
+                           "\n&" + right
 
                 else:
                     logging.info("No Triang block found in .status file!")
-                    text += '&Triang\n' + '\n'.join(triangLines) + '\n&\n'
+                    text += '&Triang\n' + '\n'.join(triangLines) + '\n&'
 
                 with open(file, 'w') as f:
                     f.write(text)
-                logging.info("Written to .status file.")
+                logging.info("Triang Written to .status file.")
 
             else:
                 logging.error("No writing permission to .status file!")
@@ -258,9 +278,9 @@ class Triang(TcshProcess):
             with open(file, 'w') as f:
                 text = '&Triang\n'
                 text += '\n'.join(triangLines)
-                text += '&\n'
+                text += '\n&'
                 f.write(text)
-            logging.info(".status file created!")
+            logging.info(".status file created for triang block!")
 
     @pyqtSlot()
     def manualInput(self):

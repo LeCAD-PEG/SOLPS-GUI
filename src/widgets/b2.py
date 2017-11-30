@@ -365,6 +365,7 @@ if __name__ == '__main__':
 
     class Standalone(QMainWindow):
         editorChanged = pyqtSignal(str)
+
         def __init__(self, parent=None):
             super(Standalone, self).__init__(parent)
 
@@ -386,7 +387,7 @@ if __name__ == '__main__':
                     self.editorChanged.emit(filename)
                     self.setMenuBar(menu_bar)
             else:
-                print('File does not exist')
+                logging.warning("Path " + path + " does not exist")
 
         def closeEvent(self, e):
             self.documentSave()
@@ -398,7 +399,7 @@ if __name__ == '__main__':
                     try:
                         with open(self.path, 'w') as f:
                             f.write(self.editor.plainTextWidget.toPlainText())
-                        print('File', self.path, 'saved.')
+                        logging.info('File', self.path, 'saved.')
                     except PermissionError as e:
                         print('Permission error.')
                 else:
