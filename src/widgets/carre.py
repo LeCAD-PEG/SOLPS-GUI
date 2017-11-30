@@ -12,6 +12,7 @@ import logging
 import glob
 import os
 import sys
+import datetime
 
 
 class CarreVars:
@@ -96,11 +97,6 @@ class Carre(TcshProcess):
         self.currentRunDir = ''
         self.STATE = CarreState.notRunning
 
-    def closeEvent(self, event):
-        print('Closing')
-        self.storeStatusFile(self.runDir)
-        super(Carre, self).closeEvent(event)
-
     def prepareUserInterface(self):
         mainLayout = QVBoxLayout()
         mainLayout.setSpacing(0)
@@ -147,6 +143,7 @@ class Carre(TcshProcess):
         #############
         # Group Box 3
         groupBox3 = QGroupBox()
+        self.stepGroup = groupBox3
         groupBox3.setTitle('Steps')
         groupLayout = QVBoxLayout()
         groupLayout.setSpacing(0)
@@ -281,7 +278,7 @@ class Carre(TcshProcess):
                         logging.error("Multiple Carre block in .status file "
                                       "in baserun: " + baserunDir)
                         break
-            self.setClickedGroupFromVars()
+        self.setClickedGroupFromVars()
 
     def storeStatusFile(self, baserunDir):
         variables = self.vars
@@ -309,7 +306,7 @@ class Carre(TcshProcess):
 
                 else:
                     logging.info("No Carre block found in .status file!")
-                    text += '\n&Carre\n' + '\n'.join(carreLines) + '\n&'
+                    text = '&Carre\n' + '\n'.join(carreLines) + '\n&\n' + text
 
                 with open(file, 'w') as f:
                     f.write(text)
@@ -326,6 +323,16 @@ class Carre(TcshProcess):
                 text += '&'
                 f.write(text)
             logging.info(".status file created for carre block!")
+
+    def appendToStatus(self, msg):
+        baserunDir = self.runDir
+        if not baserunDir:
+            return
+        path = baserunDir + '/.status'
+        if os.access(path, os.W_OK | os.F_OK):
+            with open(path, 'a') as f:
+                time = "{:%H:%M:%S %d-%m-%Y}".format(datetime.datetime.now())
+                f.write('\nStarted Carre step ' + msg + ' at ' + time)
 
     @pyqtSlot()
     def manualInput(self):
@@ -347,6 +354,7 @@ class Carre(TcshProcess):
             return
         if self.STATE == CarreState.waiting:
             sender = self.sender()
+            self.appendToStatus(sender.text())
             msg = sender.value + '\n'
             self.tcsh.write(msg)
 
@@ -443,6 +451,8 @@ class Carre(TcshProcess):
             cmd += 'cd ' + runDir + '\n'
             if not self.vars[CarreVars.lns]:
                 cmd += 'lns ' + dgModel + '\n'  # Link .sno DivGeo file
+                self.vars[CarreVars.lns] = 1
+                self.setClickedGroupFromVars()
             self.tcsh.write(cmd)
         else:
             logging.info('TCSH for Carre is aready running.')

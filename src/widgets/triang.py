@@ -11,7 +11,7 @@ from tcsh_process import TcshProcess
 import logging
 import os
 import sys
-
+import datetime
 
 class TriangVars:
     NumOfVars = 8
@@ -236,7 +236,7 @@ class Triang(TcshProcess):
                         logging.error("Multiple Triang block in .status file "
                                       "in baserun: " + baserunDir)
                         break
-            self.setClickedGroupFromVars()
+        self.setClickedGroupFromVars()
 
     def storeStatusFile(self, baserunDir):
         variables = self.vars
@@ -264,7 +264,7 @@ class Triang(TcshProcess):
 
                 else:
                     logging.info("No Triang block found in .status file!")
-                    text += '&Triang\n' + '\n'.join(triangLines) + '\n&'
+                    text = '&Triang\n' + '\n'.join(triangLines) + '\n&' + text
 
                 with open(file, 'w') as f:
                     f.write(text)
@@ -281,6 +281,16 @@ class Triang(TcshProcess):
                 text += '\n&'
                 f.write(text)
             logging.info(".status file created for triang block!")
+
+    def appendToStatus(self, msg):
+        baserunDir = self.runDir
+        if not baserunDir:
+            return
+        path = baserunDir + '/.status'
+        if os.access(path, os.W_OK | os.F_OK):
+            with open(path, 'a') as f:
+                time = "{:%H:%M:%S %d-%m-%Y}".format(datetime.datetime.now())
+                f.write('\nStarted Triang step' + msg + ' at ' + time)
 
     @pyqtSlot()
     def manualInput(self):
@@ -302,6 +312,7 @@ class Triang(TcshProcess):
             return
         if self.STATE == TriangState.waiting:
             sender = self.sender()
+            self.appendToStatus(sender.text())
             msg = sender.value + '\n'
             self.tcsh.write(msg)
 

@@ -4682,19 +4682,20 @@ class Eirene(QWidget):
 
 if __name__ == "__main__":
 
-    import sys, os
+    import sys
+    import os
     from PyQt5.QtWidgets import (QApplication, QMainWindow,
                                  QTreeWidgetItemIterator)
 
-    os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1' # for solving high-dpi
-    app = QApplication(sys.argv)                    # problems
+    os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'  # for solving high-dpi
+    app = QApplication(sys.argv)                     # problems
 
     class Standalone(QMainWindow):
         def __init__(self, parent=None):
             super(Standalone, self).__init__(parent)
             self.eirene = Eirene(self)
             self.eirene.tree.setSelectionMode(
-                                            QAbstractItemView.SingleSelection)
+                QAbstractItemView.SingleSelection)
             self.setCentralWidget(self.eirene)
 
         def closeEvent(self, e):
@@ -4761,7 +4762,7 @@ if __name__ == "__main__":
     else:
         print('Provide path to Eirene input file!')
         sys.exit()
-        #input_dat='input_2.dat'
+        # input_dat='input_2.dat'
     mainwindow = Standalone()
     mainwindow.eirene.tree.readInput(os.path.expanduser(input_dat))
     mainwindow.show()

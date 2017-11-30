@@ -82,7 +82,6 @@ class Gnuplot(TcshProcess):
         self.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
-
         self.tcsh.stdOutput.connect(self.readTcshStdOut)
 
     @pyqtSlot(str)
