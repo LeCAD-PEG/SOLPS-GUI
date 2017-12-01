@@ -393,6 +393,7 @@ class Triang(TcshProcess):
             device = env.value('device_environment', 'iter')
             cmd = 'setenv DEVICE ' + device + '\n'
             cmd += 'cd ' + runDir + '\n'
+            self.textDisplay('Sourcing setup.csh. It will take a while.')
             self.tcsh.write(cmd)
         else:
             logging.info('TCSH for triang is aready running.')
@@ -407,7 +408,7 @@ class Triang(TcshProcess):
         if self.tcsh.state():
             self.textDisplay.clear()
             self.tcsh.terminate()
-            self.STATE = Triang.notRunning
+            self.STATE = TriangState.notRunning
             msg = "Switched to another baserun, therefore stopped carre."
             self.textDisplay.appendPlainText(msg)
 

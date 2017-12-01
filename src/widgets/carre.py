@@ -410,6 +410,8 @@ class Carre(TcshProcess):
         input dialogs to get input from the user and then pass it back to
         Carre.
         """
+        if "does not exist. Create it?" in text:
+            self.tcsh.write('y\n')
         if self.STATE >= CarreState.starting:
             self.processText(text)
         if self.STATE >= CarreState.waiting:
@@ -472,6 +474,7 @@ class Carre(TcshProcess):
                 cmd += 'lns ' + dgModel + '\n'  # Link .sno DivGeo file
                 self.vars[CarreVars.lns] = 1
                 self.setClickedGroupFromVars()
+            self.textDisplay('Sourcing setup.csh. It will take a while.')
             self.tcsh.write(cmd)
         else:
             logging.info('TCSH for Carre is aready running.')
