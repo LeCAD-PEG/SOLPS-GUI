@@ -5,13 +5,16 @@
 from PyQt5.QtWidgets import (QPlainTextEdit, QVBoxLayout, QGridLayout,
                              QInputDialog, QSpacerItem, QSizePolicy,
                              QPushButton, QGroupBox, QCheckBox)
-from PyQt5.QtCore import pyqtSlot, QSettings, Qt
+from PyQt5.QtCore import pyqtSlot, QSettings, Qt, QDateTime
 from PyQt5.QtGui import QTextCursor
 from tcsh_process import TcshProcess
 import logging
 import os
 import sys
-import datetime
+
+TIME = QDateTime()
+TIME_FORMAT = "ddd MMM d t yyyy"
+
 
 class TriangVars:
     NumOfVars = 8
@@ -289,8 +292,8 @@ class Triang(TcshProcess):
         path = baserunDir + '/.status'
         if os.access(path, os.W_OK | os.F_OK):
             with open(path, 'a') as f:
-                time = "{:%H:%M:%S %d-%m-%Y}".format(datetime.datetime.now())
-                f.write('\nRan Triang step' + msg + ' at ' + time)
+                time = TIME.currentDateTime().toString(TIME_FORMAT)
+                f.write('\nRan Triang step ' + msg + ' at ' + time)
 
     @pyqtSlot()
     def manualInput(self):
@@ -332,9 +335,10 @@ class Triang(TcshProcess):
     # Overloaded
     @pyqtSlot(str)
     def setRunDir(self, runDir):
-        if runDir:
+        if runDir.endswith('baserun'):
             self.storeStatusFile(self.runDir)
             self.readStatusFile(runDir)
+            self.stopTriang()
         super(Triang, self).setRunDir(runDir)
 
     @pyqtSlot(str)
@@ -399,6 +403,12 @@ class Triang(TcshProcess):
         # self.tcsh.write(cmd)
         self.tcsh.write(cmd)
 
+    def stopTriang(self):
+        if self.tcsh.state():
+            self.textDisplay.clear()
+            self.tcsh.terminate()
+            msg = "Switched to another baserun, therefore stopped carre."
+            self.textDisplay.appendPlainText(msg)
 
 if __name__ == '__main__':
     from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget)

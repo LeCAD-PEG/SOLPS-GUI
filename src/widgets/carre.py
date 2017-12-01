@@ -5,15 +5,16 @@
 from PyQt5.QtWidgets import (QPlainTextEdit, QVBoxLayout, QPushButton,
                              QGridLayout, QInputDialog, QComboBox, QSpacerItem,
                              QSizePolicy, QGroupBox, QCheckBox)
-from PyQt5.QtCore import pyqtSlot, QSettings, Qt
+from PyQt5.QtCore import pyqtSlot, QSettings, Qt, QDateTime
 from PyQt5.QtGui import QTextCursor
 from tcsh_process import TcshProcess
 import logging
 import glob
 import os
 import sys
-import datetime
 
+TIME = QDateTime()
+TIME_FORMAT = "ddd MMM d t yyyy"
 
 class CarreVars:
     """Variables for Carre for automation.
@@ -29,14 +30,14 @@ class CarreVars:
     are only NumOfVars-2 steps since the last to are reserved for which
     dgModel has been used and if lns was called.
     """
-    NumOfVars = 6
-    prepare, grid, convert, store, lns, dgModel = range(NumOfVars)
-    Name = {0: 'Prepare', 1: 'Grid', 2: 'Convert', 3: 'Store',
-            4: 'lns', 5: 'dgModel'}
-    command = {0: 'p', 1: 'g', 2: 'c', 3: 't'}
+    NumOfVars = 7
+    prepare, grid, convert, save, store, lns, dgModel = range(NumOfVars)
+    Name = {0: 'Prepare', 1: 'Grid', 2: 'Convert', 3: 'Save Choice',
+            4: 'Store', 5: 'lns', 6: 'dgModel'}
+    command = {0: 'p', 1: 'g', 2: 'c', 3: 's', 4: 't'}
 
-    Values = {'Prepare': 0, 'Grid': 1, 'Convert': 2, 'Store': 3, 'lns': 4,
-              'dgModel': 5}
+    Values = {'Prepare': 0, 'Grid': 1, 'Convert': 2, 'Save Choice': 3,
+              'Store': 4, 'lns': 5, 'dgModel': 6}
 
     Default = {i: 0 for i in range(NumOfVars - 1)}
     Default[NumOfVars - 1] = ''
@@ -344,7 +345,7 @@ class Carre(TcshProcess):
         path = baserunDir + '/.status'
         if os.access(path, os.W_OK | os.F_OK):
             with open(path, 'a') as f:
-                time = "{:%H:%M:%S %d-%m-%Y}".format(datetime.datetime.now())
+                time = TIME.currentDateTime().toString(TIME_FORMAT)
                 f.write('\nRan Carre step ' + msg + ' at ' + time)
 
     @pyqtSlot()
@@ -387,11 +388,12 @@ class Carre(TcshProcess):
     # Overloaded
     @pyqtSlot(str)
     def setRunDir(self, runDir):
-        if runDir:
+        if runDir.endswith('baserun'):
             # Update QMainWindow status bar.
             self.storeStatusFile(self.runDir)
             self.updateDivGeoModel(runDir)
             self.readStatusFile(runDir)
+            self.stopCarre()
         super(Carre, self).setRunDir(runDir)
 
     def updateDivGeoModel(self, runDir):
@@ -425,13 +427,13 @@ class Carre(TcshProcess):
 
     @pyqtSlot()
     def startCarre(self):
-        self.textDisplay.clear()
+
         if not self.getRunDir():
             self.textDisplay.appendPlainText('No baserun selected.')
             return
 
         runDir = self.getRunDir()
-        if self.getRunDir() != self.currentRunDir:
+        if runDir != self.currentRunDir:
             msg = 'Baserun changed'
             if self.STATE != CarreState.notRunning:
                 msg += '. But current carre run hasn\'t finished yet!'
@@ -442,6 +444,8 @@ class Carre(TcshProcess):
             msg += '. Running carre in directory ' + self.currentRunDir + '.'
             logging.info(msg)
             self.currentRunDir = runDir
+
+        self.textDisplay.clear()
 
         if not self.tcsh.state():
             # Get DG model from combo box
@@ -479,6 +483,13 @@ class Carre(TcshProcess):
         cmd = Carre + '\n'
         # self.tcsh.write(cmd)
         self.tcsh.write(cmd)
+
+    def stopCarre(self):
+        if self.tcsh.state():
+            self.textDisplay.clear()
+            self.tcsh.terminate()
+            msg = "Switched to another baserun, therefore stopped carre."
+            self.textDisplay.appendPlainText(msg)
 
 
 if __name__ == '__main__':
