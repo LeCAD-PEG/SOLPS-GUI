@@ -32,11 +32,11 @@ class CarreVars:
     """
     NumOfVars = 7
     prepare, grid, convert, save, store, lns, dgModel = range(NumOfVars)
-    Name = {0: 'Prepare', 1: 'Grid', 2: 'Convert', 3: 'Save Choice',
+    Name = {0: 'Prepare', 1: 'Grid', 2: 'Save Choice', 3: 'Convert',
             4: 'Store', 5: 'lns', 6: 'dgModel'}
-    command = {0: 'p', 1: 'g', 2: 'c', 3: 's', 4: 't'}
+    command = {0: 'p', 1: 'g', 2: 's', 3: 'c', 4: 't'}
 
-    Values = {'Prepare': 0, 'Grid': 1, 'Convert': 2, 'Save Choice': 3,
+    Values = {'Prepare': 0, 'Grid': 1, 'Save Choice': 2, 'Convert': 3,
               'Store': 4, 'lns': 5, 'dgModel': 6}
 
     Default = {i: 0 for i in range(NumOfVars - 1)}
