@@ -393,7 +393,8 @@ class Triang(TcshProcess):
             device = env.value('device_environment', 'iter')
             cmd = 'setenv DEVICE ' + device + '\n'
             cmd += 'cd ' + runDir + '\n'
-            self.textDisplay('Sourcing setup.csh. It will take a while.')
+            self.textDisplay.appendPlainText('Sourcing setup.csh. It will '
+                                             'take a while.')
             self.tcsh.write(cmd)
         else:
             logging.info('TCSH for triang is aready running.')

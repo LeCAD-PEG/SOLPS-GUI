@@ -474,7 +474,8 @@ class Carre(TcshProcess):
                 cmd += 'lns ' + dgModel + '\n'  # Link .sno DivGeo file
                 self.vars[CarreVars.lns] = 1
                 self.setClickedGroupFromVars()
-            self.textDisplay('Sourcing setup.csh. It will take a while.')
+            self.textDisplay.appendPlainText('Sourcing setup.csh. It will '
+                                             'take a while.')
             self.tcsh.write(cmd)
         else:
             logging.info('TCSH for Carre is aready running.')
