@@ -488,6 +488,7 @@ class Carre(TcshProcess):
         if self.tcsh.state():
             self.textDisplay.clear()
             self.tcsh.terminate()
+            self.STATE = CarreState.notRunning
             msg = "Switched to another baserun, therefore stopped carre."
             self.textDisplay.appendPlainText(msg)
 
