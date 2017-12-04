@@ -4,32 +4,33 @@
 
 from PyQt5.QtWidgets import (QPlainTextEdit, QVBoxLayout, QGridLayout,
                              QInputDialog, QSpacerItem, QSizePolicy,
-                             QPushButton, QGroupBox, QCheckBox)
+                             QPushButton, QGroupBox, QCheckBox, QMessageBox)
 from PyQt5.QtCore import pyqtSlot, QSettings, Qt, QDateTime
 from PyQt5.QtGui import QTextCursor
 from tcsh_process import TcshProcess
 import logging
 import os
 import sys
+import glob
 
 TIME = QDateTime()
 TIME_FORMAT = "ddd MMM d t yyyy"
 
 
 class TriangVars:
-    NumOfVars = 8
+    NumOfVars = 9
 
-    Uinp, b2ag, eirene, tria, triaGeom, store, outTemp, gridTemp = \
+    Uinp, uinp, b2ag, eirene, tria, triaGeom, store, outTemp, gridTemp = \
         range(NumOfVars)
 
-    Name = {0: 'Uinp', 1: 'B2ag', 2: 'Eirene', 3: 'Tria', 4: 'triaGeom',
-            5: 'Store', 6: 'Conv2Out', 7: 'Conv2Grid'}
+    Name = {0: 'Uinp(U)', 1: 'Uinp(u)', 2: 'B2ag', 3: 'Eirene', 4: 'Tria',
+            5: 'triaGeom', 6: 'Store', 7: 'Conv2Out', 8: 'Conv2Grid'}
 
-    command = {0: 'U', 1: 'b', 2: 'e', 3: 't', 4: 'g', 5: 's', 6: 'c',
-               7: 'C'}
+    command = {0: 'U', 1: 'u', 2: 'b', 3: 'e', 4: 't', 5: 'g', 6: 's', 7: 'c',
+               8: 'C'}
 
-    Values = {'Uinp': 0, 'B2ag': 1, 'Eirene': 2, 'Tria': 3, 'triaGeom': 4,
-              'Store': 5, 'Conv2Out': 6, 'Conv2Grid': 7}
+    Values = {'Uinp(U)': 0, 'Uinp(u)': 1, 'B2ag': 2, 'Eirene': 3, 'Tria': 4,
+              'triaGeom': 5, 'Store': 6, 'Conv2Out': 7, 'Conv2Grid': 8}
 
     Default = {i: 0 for i in range(NumOfVars)}
 
@@ -142,10 +143,15 @@ class Triang(TcshProcess):
 
         groupLayout.addItem(QSpacerItem(40, 20, hPolicy=QSizePolicy.Expanding),
                             1, 0)
+        editB2ag = QPushButton('Edit b2ag.dat')
+        editB2ag.clicked.connect(self.editB2ag)
+
+        groupLayout.addWidget(editB2ag, 1, 1)
+
         manualInput = QPushButton('Terminal input')
         manualInput.clicked.connect(self.manualInput)
 
-        groupLayout.addWidget(manualInput, 1, 1)
+        groupLayout.addWidget(manualInput, 1, 2)
 
         yes = StepPush(value='y')
         yes.setText('Yes')
@@ -155,8 +161,8 @@ class Triang(TcshProcess):
         no.setText('No')
         no.clicked.connect(self.runStep)
 
-        groupLayout.addWidget(yes, 1, 2)
-        groupLayout.addWidget(no, 1, 3)
+        groupLayout.addWidget(yes, 1, 3)
+        groupLayout.addWidget(no, 1, 4)
         groupBox3.setLayout(groupLayout)
         # Group Box 3
         #############
@@ -171,10 +177,15 @@ class Triang(TcshProcess):
         layout = self.clickedGroup.layout()
         for i in range(layout.count()):
             item = layout.itemAt(i).widget()
+
+            item.stateChanged.disconnect()
+
             if self.vars[i]:
                 item.setCheckState(Qt.Checked)
             else:
                 item.setCheckState(Qt.Unchecked)
+
+            item.stateChanged.connect(self.setVarsFromClickedGroup)
 
     @pyqtSlot()
     def setVarsFromClickedGroup(self):
@@ -227,6 +238,8 @@ class Triang(TcshProcess):
                         name, val = sline[0], sline[1]
                         self.vars[TriangVars.Values[name]] = int(val) if \
                             val.isdigit else val
+                    except KeyError as e:
+                        logging.error('Uknown key ' + name)
                     except ValueError as e:
                         logging.error("Wrong value for: " + name)
                     except IndexError as e:
@@ -307,6 +320,49 @@ class Triang(TcshProcess):
             self.insertTextAtBottom(msg)
 
     @pyqtSlot()
+    def editB2ag(self):
+        """Read b2ag.dat if it exists and prompts the user with a
+        QInputDialog.getMultiLineText to edit the file and then writes back
+        to the file.
+        """
+        file = self.getRunDir() + '/b2ag.dat'
+
+        # Get .sno file
+        env = QSettings('ITER', 'solps-gui')
+        device = env.value('device_environment', 'iter')
+
+        solpstop = self.tcsh.findSolpsTop(self.getRunDir())
+        if solpstop:
+            # Directory to Divgeo/device/$device
+
+            deviceDir = solpstop + '/modules/DivGeo/device/' + device
+
+            snoFile = self.findLatestFile(deviceDir, '*.sno')
+
+        else:
+            deviceDir = ''
+            snoFile = ''
+
+        snoFile = os.path.basename(snoFile)
+
+        if os.access(file, os.F_OK | os.W_OK | os.R_OK):
+            with open(file, 'r') as f:
+                text = f.read()
+            text += '\n!Latest SNO file in ' + 'DivGeo/device/' + device + \
+                    ': ' + snoFile
+            msg, ok = QInputDialog.getMultiLineText(self, 'Input dialog',
+                                                    'Edit b2ag.dat',
+                                                    text)
+            if ok:
+                with open(file, 'w') as f:
+                    f.write(text)
+        else:
+            QMessageBox.information(self, 'Information', 'File b2ag.dat in ' +
+                                    self.getRunDir() + ' either does not exist'
+                                    ' or you do not have permission to wrie/'
+                                    'read!')
+
+    @pyqtSlot()
     def runStep(self):
         """Custom PushButtons emits signal to this function. They contain
         attribute value which is then passed to tcsh if it is running.
@@ -335,8 +391,9 @@ class Triang(TcshProcess):
     # Overloaded
     @pyqtSlot(str)
     def setRunDir(self, runDir):
-        if runDir.endswith('baserun'):
+        if runDir != self.runDir:
             self.storeStatusFile(self.runDir)
+        if runDir.endswith('baserun'):
             self.readStatusFile(runDir)
             self.stopTriang()
         super(Triang, self).setRunDir(runDir)
@@ -412,6 +469,14 @@ class Triang(TcshProcess):
             self.STATE = TriangState.notRunning
             msg = "Switched to another baserun, therefore stopped carre."
             self.textDisplay.appendPlainText(msg)
+
+    def findLatestFile(self, directory, suffix):
+        files = glob.glob(directory + '/' + suffix)
+        if files:
+            return max(files, key=os.path.getctime)
+        else:
+            return ''
+
 
 if __name__ == '__main__':
     from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget)

@@ -32,11 +32,11 @@ class CarreVars:
     """
     NumOfVars = 7
     prepare, grid, convert, save, store, lns, dgModel = range(NumOfVars)
-    Name = {0: 'Prepare', 1: 'Grid', 2: 'Save Choice', 3: 'Convert',
+    Name = {0: 'Prepare', 1: 'Grid', 2: 'SaveChoice', 3: 'Convert',
             4: 'Store', 5: 'lns', 6: 'dgModel'}
     command = {0: 'p', 1: 'g', 2: 's', 3: 'c', 4: 't'}
 
-    Values = {'Prepare': 0, 'Grid': 1, 'Save Choice': 2, 'Convert': 3,
+    Values = {'Prepare': 0, 'Grid': 1, 'SaveChoice': 2, 'Convert': 3,
               'Store': 4, 'lns': 5, 'dgModel': 6}
 
     Default = {i: 0 for i in range(NumOfVars - 1)}
@@ -222,10 +222,15 @@ class Carre(TcshProcess):
         layout = self.clickedGroup.layout()
         for i in range(layout.count()):
             item = layout.itemAt(i).widget()
+
+            item.stateChanged.disconnect()
+
             if self.vars[i]:
                 item.setCheckState(Qt.Checked)
             else:
                 item.setCheckState(Qt.Unchecked)
+
+            item.stateChanged.connect(self.setVarsFromClickedGroup)
 
     @pyqtSlot()
     def setVarsFromClickedGroup(self):
@@ -276,10 +281,14 @@ class Carre(TcshProcess):
                     try:
                         sline = line.split()
                         name, val = sline[0], sline[1]
+                        print(CarreVars.Values[name], name)
+                        print(val, val.isdigit())
                         self.vars[CarreVars.Values[name]] = int(val) if \
-                            val.isdigit else val
+                            val.isdigit() else val
+                    except KeyError as e:
+                        logging.error('Uknown key ' + name)
                     except ValueError as e:
-                        logging.error("Wrong value for: " + name)
+                        logging.error("Wrong value for: " + name + ': ' + val)
                     except IndexError as e:
                         logging.error("Not enough arguments on line: " + line)
                         if CarreVars.Name[CarreVars.dgModel] in line:
@@ -292,6 +301,10 @@ class Carre(TcshProcess):
                         logging.error("Multiple Carre block in .status file "
                                       "in baserun: " + baserunDir)
                         break
+        if self.vars[CarreVars.dgModel]:
+            self.selectDgModel.setCurrentText(self.vars[CarreVars.dgModel] +
+                                              '.dg')
+
         self.setClickedGroupFromVars()
 
     def storeStatusFile(self, baserunDir):
@@ -388,9 +401,10 @@ class Carre(TcshProcess):
     # Overloaded
     @pyqtSlot(str)
     def setRunDir(self, runDir):
+        if runDir != self.runDir:
+            self.storeStatusFile(self.runDir)
         if runDir.endswith('baserun'):
             # Update QMainWindow status bar.
-            self.storeStatusFile(self.runDir)
             self.updateDivGeoModel(runDir)
             self.readStatusFile(runDir)
             self.stopCarre()
@@ -410,8 +424,6 @@ class Carre(TcshProcess):
         input dialogs to get input from the user and then pass it back to
         Carre.
         """
-        if "does not exist. Create it?" in text:
-            self.tcsh.write('y\n')
         if self.STATE >= CarreState.starting:
             self.processText(text)
         if self.STATE >= CarreState.waiting:
@@ -425,6 +437,8 @@ class Carre(TcshProcess):
         #                             '</b>')
         # self.insertTextAtBottom(text)
         # self.processText(text)
+        if "does not exist. Create it?" in text:
+            self.tcsh.write('y\n')
         pass
 
     @pyqtSlot()
@@ -453,7 +467,9 @@ class Carre(TcshProcess):
             # Get DG model from combo box
             if self.vars[CarreVars.dgModel]:
                 dgModel = self.vars[CarreVars.dgModel]
-            dgModel = self.selectDgModel.currentText().split('.')[0]
+            dgModel = self.selectDgModel.currentText()
+            if dgModel.endswith('.dg'):
+                dgModel = dgModel[:-3]
 
             if not dgModel:
                 logging.error('No valid dg model selected from '
@@ -461,6 +477,8 @@ class Carre(TcshProcess):
                 self.insertTextAtBottom('No valid dg model selected from '
                                         'baserun ' + runDir + '!')
                 return
+
+            self.vars[CarreVars.dgModel] = dgModel
 
             self.startTcsh()
             self.tcsh.waitForStarted()
