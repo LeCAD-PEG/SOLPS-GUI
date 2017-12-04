@@ -122,10 +122,11 @@ class Carre(TcshProcess):
                 x.setCheckState(0)
                 x.stateChanged.connect(self.setVarsFromClickedGroup)
                 groupLayout.addWidget(x, j, i)
-        leftOver = CarreVars.NumOfVars - 2 - (CarreVars.NumOfVars // _n) * _n
+        _N = CarreVars.NumOfVars - 2
+        leftOver = _N - (_N // _n) * _n
         if leftOver > 0:
             for k in range(leftOver):
-                x = QCheckBox(CarreVars.Name[i * _n + k])
+                x = QCheckBox(CarreVars.Name[(i + 1) * _n + k])
                 x.setCheckState(0)
                 x.stateChanged.connect(self.setVarsFromClickedGroup)
                 groupLayout.addWidget(x, k, i + 1)
@@ -184,6 +185,7 @@ class Carre(TcshProcess):
         groupBox4.setTitle('Log window')
 
         self.textDisplay = QPlainTextEdit()
+        self.textDisplay.setLineWrapMode(QPlainTextEdit.NoWrap)
         self.textDisplay.setReadOnly(True)
 
         groupLayout = QGridLayout()
@@ -508,6 +510,7 @@ class Carre(TcshProcess):
         if self.tcsh.state():
             self.textDisplay.clear()
             self.tcsh.terminate()
+            self.tcsh.close()
             self.STATE = CarreState.notRunning
             msg = "Switched to another baserun, therefore stopped carre."
             self.textDisplay.appendPlainText(msg)

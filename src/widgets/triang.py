@@ -91,7 +91,7 @@ class Triang(TcshProcess):
         leftOver = TriangVars.NumOfVars - (TriangVars.NumOfVars // _n) * _n
         if leftOver > 0:
             for k in range(leftOver):
-                x = QCheckBox(TriangVars.Name[i * _n + k])
+                x = QCheckBox(TriangVars.Name[(i + 1) * _n + k])
                 x.setCheckState(0)
                 x.stateChanged.connect(self.setVarsFromClickedGroup)
                 groupLayout.addWidget(x, k, i + 1)
@@ -134,6 +134,7 @@ class Triang(TcshProcess):
         groupBox3.setTitle('Log window')
 
         self.textDisplay = QPlainTextEdit()
+        self.textDisplay.setLineWrapMode(QPlainTextEdit.NoWrap)
         self.textDisplay.setReadOnly(True)
 
         groupLayout = QGridLayout()
@@ -466,6 +467,7 @@ class Triang(TcshProcess):
         if self.tcsh.state():
             self.textDisplay.clear()
             self.tcsh.terminate()
+            self.tcsh.close()
             self.STATE = TriangState.notRunning
             msg = "Switched to another baserun, therefore stopped carre."
             self.textDisplay.appendPlainText(msg)
