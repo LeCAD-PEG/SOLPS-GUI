@@ -193,3 +193,7 @@ pseudoxml:
 	$(SPHINXBUILD) -b pseudoxml $(ALLSPHINXOPTS) $(BUILDDIR)/pseudoxml
 	@echo
 	@echo "Build finished. The pseudo-XML files are in $(BUILDDIR)/pseudoxml."
+
+install-iter: latexpdf html 
+	install -d /work/imas/opt/solps-gui/build/html/
+	rsync -avr build/html/* /work/imas/opt/solps-gui/build/html

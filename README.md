@@ -39,7 +39,7 @@ in Qt with the following commands:
 
 ## Buiding documentation
 
-    $ module load texlive Perl
+    $ module load Perl/5.20.3-goolf-1.5.16 imas texlive
     $ cd doc
     $ make latexpdf PAPER=a4 # for PDF with TexLive
     $ make html # for solps_doc alias within "modern" browser
