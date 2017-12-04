@@ -281,8 +281,6 @@ class Carre(TcshProcess):
                     try:
                         sline = line.split()
                         name, val = sline[0], sline[1]
-                        print(CarreVars.Values[name], name)
-                        print(val, val.isdigit())
                         self.vars[CarreVars.Values[name]] = int(val) if \
                             val.isdigit() else val
                     except KeyError as e:
