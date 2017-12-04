@@ -13,7 +13,7 @@ STAGING_QT=${STAGING_QT:-${STAGING_DIR}/qt/${QT_VERSION}}
 
 case $(hostname -f) in
   *.iter.org)
-        module purge
+        # module purge
         module load GCC/4.8.3 binutils/2.25 # libgd
 
         # DEPRECATED
