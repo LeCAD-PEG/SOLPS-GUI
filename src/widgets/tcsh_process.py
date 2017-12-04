@@ -153,6 +153,8 @@ class Tcsh(QProcess):
                 with open(path) as file:
                     return file.readline()
             solpsTop = solpsTop.rsplit('/', 1)[0]
+        logging.error('No SOLPSTOP found. Are you sure that the run is inside'
+                      ' of a solps-iter?')
         return None
 
 

@@ -4518,6 +4518,9 @@ class EireneEdit(QTreeWidget):
             return False
         return self.TextModified
 
+    def setModified(self, flag):
+        self.TextModified = False
+
     def toPlainText(self):
         """ It returns the text from the editor. It is first gathered from the
         elements of the tree then returned.
