@@ -1,8 +1,8 @@
 #!/bin/sh -x
-## Building PyQt with Python3 and Qt5
+## Building PyQt with Python3 (or Python 2) and Qt5
 ## Minimum GCC supported version for building Qt5 is 4.7
 
-PYTHON_VERSION=3.6.3
+PYTHON_VERSION=${PYTHON_VERSION:-3.6.3}
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
 QT_VERSION=5.9.1
 PyQT_VERSION=5.9.1 # should be the same as Qt
@@ -92,17 +92,17 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
     sed -i -e "s,#SSL=.*,SSL=${ssl}," -e "/^#.*ssl/s/#//" \
 	-e '/ssl/s|-lcrypto|-lcrypto -Wl,-rpath,$(SSL)/lib|' Modules/Setup.dist
   fi
-  ./configure --prefix=${STAGING_DIR} --enable-shared
-  make -j ${MAKE_JOBS}
+  ./configure --prefix=${STAGING_DIR} --enable-shared --enable-optimizations
+  make # -j ${MAKE_JOBS}
   make install
-  ln -sf python3 ${STAGING_DIR}/bin/python
+  ln -sf python${PYTHON_VERSION%%.*} ${STAGING_DIR}/bin/python
   LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
   ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
-      pip sphinx sphinx_rtd_theme matplotlib mock nose
+      --compile pip sphinx sphinx_rtd_theme matplotlib mock nose
   # The following Python modules are preferred by IMAS
   LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
     ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
-      Cython scipy luigi tornado deap decorator liac-arff ecdsa \
+      --compile Cython scipy luigi tornado deap decorator liac-arff ecdsa \
       netaddr paramiko paycheck virtualenv
   touch ${PYTHON_SRC_DIR}/.built
 fi

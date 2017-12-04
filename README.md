@@ -37,15 +37,20 @@ in Qt with the following commands:
 
     $ src/gui/solps.py # or simply type "solps" alias
 
-## Buiding documentation
+## Buiding documentation 
+On the ITER cluster the following modules and commands are needed
+for building documentation (and running SOLPS GUI):
 
-    $ module load texlive Perl
+    $ module load Perl/5.20.3-goolf-1.5.16 imas texlive python/3.6/3
     $ cd doc
+    $ make install-iter # or use one of
     $ make latexpdf PAPER=a4 # for PDF with TexLive
     $ make html # for solps_doc alias within "modern" browser
     $ make qthelp # for solps_help alias with assistant
     $ qcollectiongenerator build/qthelp/SOLPSGUI.qhcp
 
+One should always build latexpdf before html as HTML includes
+generated SOLPS-GUI.pdf
 
 ## ITER cluster specifics
 ### CentOS 5.x and xcb
@@ -135,3 +140,10 @@ files. To build the Anaconda3 binary-compatible gnuplot and PyQt widget do:
 
 Building PyQt based Gnuplot widget with build-gnuplot-widget.sh has been 
 unsucessful so far.
+
+## Importing IMAS Python modules into local Python
+For situations where IMAS library is provided system wide but Python3
+is used from local build using setupenv.sh then one can install IMAS
+package by
+
+    pip3 install --user --compile ${IMAS_PREFIX}/python/dist/imas*.tar.gz

@@ -28,7 +28,7 @@ if { ! [ is-loaded python/3.6 ] } {
 prereq python/3.6
 prereq imas
 
-set solpsguihome $imas_home/opt/solps-gui
+set solpsguihome /home/ITER/kosl/solps-gui
 
 setenv SOLPSGUI $solpsguihome/src/gui
 
