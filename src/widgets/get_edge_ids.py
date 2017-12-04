@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#! /usr/bin/env python3
 
 import sys
 import tarfile
@@ -6,7 +6,7 @@ import base64
 import os
 import logging
 
-from PyQt5.QtCore import pyqtSlot, QSize, QThread, pyqtSignal, pyqtProperty
+from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal, pyqtProperty
 from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit, QPushButton,
                              QGridLayout, QDialogButtonBox, QWidget,
                              QFormLayout)
@@ -51,6 +51,7 @@ class GetDialog(QDialog):
     """Dialog Demanding the shot, run, name and device for getting the data
     from IDS.
     """
+
     def __init__(self, parent=None):
         super(GetDialog, self).__init__(parent)
 
@@ -86,7 +87,6 @@ class GetDialog(QDialog):
         dialog_button_box.accepted.connect(self.accept)
         dialog_button_box.rejected.connect(self.reject)
         formLayout.addRow(dialog_button_box)
-
 
     def getValue(self, Id):
         return self.lineEditContainer[Id].text()
@@ -306,12 +306,12 @@ class GetIDSWrapper:
     Attributes:
 
     """
+
     def __init__(self, parameters):
         self.vars = {}
         self.setParameters(parameters)
         self.ids = imas.ids(self.vars[GetVars.shot], self.vars[GetVars.run])
         self.state = self.openIDS()
-
 
     def setParameters(self, parameters):
         for key in parameters:
@@ -431,11 +431,11 @@ python3 get_edge_ids.py --shot=1001 --run=1001 --user=%s \
 
     if len(Vars) < GetVars.numOfParams:
         print('Not enough variables defined!')
-        print ('For help: -h / --help')
+        print('For help: -h / --help')
         sys.exit(2)
     elif len(Vars) > GetVars.numOfParams:
         print('Too many variables defined!')
-        print ('For help: -h / --help')
+        print('For help: -h / --help')
         sys.exit(2)
 
     app = QApplication(sys.argv)

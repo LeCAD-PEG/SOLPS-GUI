@@ -2,15 +2,15 @@
 """ A PyQt custom TCSH widget.
 """
 
-from PyQt5.QtCore import (QProcess, QSize, pyqtSignal, QSettings,
-                          pyqtSlot, pyqtProperty)
-from PyQt5.QtWidgets import QPlainTextEdit, QFrame, QWidget, QVBoxLayout
+from PyQt5.QtCore import QSize, pyqtSignal, QSettings, pyqtSlot
+from PyQt5.QtWidgets import QPlainTextEdit, QFrame, QVBoxLayout
 from PyQt5.QtGui import QFont
 
 import logging
 import os
 
 from tcsh_process import TcshProcess
+
 
 class TcshEdit(TcshProcess):
     """ Tcsh(QWidget)
@@ -33,7 +33,7 @@ class TcshEdit(TcshProcess):
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
-        #self.setAlignment(Qt.AlignCenter)
+        # self.setAlignment(Qt.AlignCenter)
         self.plainTextEdit.setFrameStyle(QFrame.StyledPanel)
         self.plainTextEdit.setMinimumSize(QSize(180, 50))
         self.plainTextEdit.setPlaceholderText("TCSH widget for SOLPS")

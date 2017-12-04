@@ -2,26 +2,23 @@
 """ A PyQt custom Python Script widget.
 """
 
-from PyQt5.QtCore import (QProcess, QSize, pyqtSignal, QSettings,
-                          pyqtSlot, pyqtProperty)
+from PyQt5.QtCore import QSize, pyqtSignal, pyqtSlot, pyqtProperty
 from PyQt5.QtWidgets import QPlainTextEdit, QFrame
 from PyQt5.QtGui import QFont
 
-import logging
-import os
 
 class Script(QPlainTextEdit):
     """ Script(QPlainTextEdit)
-    
-        Provides a custom widget to display a box where Python script 
+
+        Provides a custom widget to display a box where Python script
         can be entered and run.
     """
 
     output = pyqtSignal(str)
-    
+
     def __init__(self, parent=None):
         super(Script, self).__init__(parent)
-        #self.setAlignment(Qt.AlignCenter)
+        # self.setAlignment(Qt.AlignCenter)
         self.setFrameStyle(QFrame.StyledPanel)
         self.setMinimumSize(QSize(180, 50))
         self.setPlaceholderText("Python script widget. "
@@ -46,6 +43,8 @@ class Script(QPlainTextEdit):
         return self.toPlainText()
 
     script = pyqtProperty(str, getScript, setScript)
+
+
 if __name__ == "__main__":
 
     import sys

@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>662</width>
-    <height>547</height>
+    <width>660</width>
+    <height>411</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -192,6 +192,56 @@ self.output.emit(&quot;ls -ld run*&quot;)</string>
                </size>
               </property>
              </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_15">
+           <attribute name="title">
+            <string>Carre</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_12">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="Carre" name="carre"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_17">
+           <attribute name="title">
+            <string>Triang</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_13">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="Triang" name="triang"/>
             </item>
            </layout>
           </widget>
@@ -688,8 +738,8 @@ and starts the run</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>662</width>
-     <height>20</height>
+     <width>660</width>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -747,6 +797,11 @@ and starts the run</string>
  </widget>
  <customwidgets>
   <customwidget>
+   <class>Carre</class>
+   <extends>QWidget</extends>
+   <header>carre</header>
+  </customwidget>
+  <customwidget>
    <class>Director</class>
    <extends>QCheckBox</extends>
    <header>director</header>
@@ -793,6 +848,11 @@ and starts the run</string>
    <extends>QWidget</extends>
    <header>tcsh</header>
   </customwidget>
+  <customwidget>
+   <class>Triang</class>
+   <extends>QWidget</extends>
+   <header>triang</header>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections>
@@ -819,12 +879,12 @@ and starts the run</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>202</y>
+     <x>42</x>
+     <y>351</y>
     </hint>
     <hint type="destinationlabel">
-     <x>279</x>
-     <y>202</y>
+     <x>278</x>
+     <y>351</y>
     </hint>
    </hints>
   </connection>
@@ -835,12 +895,12 @@ and starts the run</string>
    <slot>triggerTextChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>202</y>
+     <x>42</x>
+     <y>351</y>
     </hint>
     <hint type="destinationlabel">
-     <x>324</x>
-     <y>179</y>
+     <x>319</x>
+     <y>323</y>
     </hint>
    </hints>
   </connection>
@@ -851,8 +911,8 @@ and starts the run</string>
    <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>202</y>
+     <x>42</x>
+     <y>351</y>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
@@ -883,12 +943,12 @@ and starts the run</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>202</y>
+     <x>42</x>
+     <y>351</y>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
-     <y>208</y>
+     <y>357</y>
     </hint>
    </hints>
   </connection>
@@ -900,11 +960,11 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>352</x>
-     <y>65</y>
+     <y>61</y>
     </hint>
     <hint type="destinationlabel">
-     <x>199</x>
-     <y>177</y>
+     <x>197</x>
+     <y>170</y>
     </hint>
    </hints>
   </connection>
@@ -915,12 +975,12 @@ and starts the run</string>
    <slot>setAndExecuteTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>199</x>
-     <y>177</y>
+     <x>197</x>
+     <y>170</y>
     </hint>
     <hint type="destinationlabel">
      <x>352</x>
-     <y>128</y>
+     <y>121</y>
     </hint>
    </hints>
   </connection>
@@ -931,12 +991,12 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>202</y>
+     <x>42</x>
+     <y>351</y>
     </hint>
     <hint type="destinationlabel">
      <x>352</x>
-     <y>128</y>
+     <y>121</y>
     </hint>
    </hints>
   </connection>
@@ -947,12 +1007,12 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>202</y>
+     <x>42</x>
+     <y>351</y>
     </hint>
     <hint type="destinationlabel">
      <x>72</x>
-     <y>65</y>
+     <y>62</y>
     </hint>
    </hints>
   </connection>
@@ -963,12 +1023,12 @@ and starts the run</string>
    <slot>setTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>173</y>
+     <x>42</x>
+     <y>324</y>
     </hint>
     <hint type="destinationlabel">
      <x>72</x>
-     <y>65</y>
+     <y>62</y>
     </hint>
    </hints>
   </connection>
@@ -979,12 +1039,12 @@ and starts the run</string>
    <slot>executeTcshCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>250</x>
-     <y>173</y>
+     <x>249</x>
+     <y>324</y>
     </hint>
     <hint type="destinationlabel">
      <x>72</x>
-     <y>65</y>
+     <y>62</y>
     </hint>
    </hints>
   </connection>
@@ -995,12 +1055,12 @@ and starts the run</string>
    <slot>setSolpsPlotCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>324</x>
-     <y>179</y>
+     <x>319</x>
+     <y>323</y>
     </hint>
     <hint type="destinationlabel">
-     <x>336</x>
-     <y>66</y>
+     <x>332</x>
+     <y>62</y>
     </hint>
    </hints>
   </connection>
@@ -1011,12 +1071,12 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>324</x>
-     <y>179</y>
+     <x>319</x>
+     <y>323</y>
     </hint>
     <hint type="destinationlabel">
-     <x>336</x>
-     <y>66</y>
+     <x>332</x>
+     <y>62</y>
     </hint>
    </hints>
   </connection>
@@ -1027,12 +1087,12 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>563</x>
-     <y>178</y>
+     <x>546</x>
+     <y>323</y>
     </hint>
     <hint type="destinationlabel">
-     <x>336</x>
-     <y>66</y>
+     <x>332</x>
+     <y>62</y>
     </hint>
    </hints>
   </connection>
@@ -1043,12 +1103,12 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>202</y>
+     <x>42</x>
+     <y>351</y>
     </hint>
     <hint type="destinationlabel">
-     <x>336</x>
-     <y>66</y>
+     <x>332</x>
+     <y>62</y>
     </hint>
    </hints>
   </connection>
@@ -1059,8 +1119,8 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>202</y>
+     <x>42</x>
+     <y>351</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -1076,7 +1136,7 @@ and starts the run</string>
    <hints>
     <hint type="sourcelabel">
      <x>42</x>
-     <y>202</y>
+     <y>351</y>
     </hint>
     <hint type="destinationlabel">
      <x>530</x>
@@ -1091,12 +1151,60 @@ and starts the run</string>
    <slot>setDirPath(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>31</x>
-     <y>202</y>
+     <x>42</x>
+     <y>351</y>
     </hint>
     <hint type="destinationlabel">
      <x>610</x>
      <y>67</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>triang</receiver>
+   <slot>setRunDir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>42</x>
+     <y>351</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>111</x>
+     <y>84</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>carre</receiver>
+   <slot>setRunDir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>42</x>
+     <y>351</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>330</x>
+     <y>272</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>statusbar</receiver>
+   <slot>showMessage(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>99</x>
+     <y>367</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>110</x>
+     <y>396</y>
     </hint>
    </hints>
   </connection>

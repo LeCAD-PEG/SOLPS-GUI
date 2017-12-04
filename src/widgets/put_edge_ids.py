@@ -1,5 +1,4 @@
-#! /usr/bin/env python
-#Python 3.5
+#! /usr/bin/env python3
 # Legend:
 #      # .............. variables description, additional (helpful)
 #                            information etc.
@@ -24,11 +23,10 @@ import os
 import tarfile
 import base64
 
-from PyQt5.QtCore import (pyqtSlot, Qt, QSize, QThread, pyqtProperty,
-                          pyqtSignal)
+from PyQt5.QtCore import pyqtSlot, QThread, pyqtProperty, pyqtSignal
 from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit,
-                             QGridLayout, QLabel, QDialogButtonBox,
-                             QPushButton, QWidget, QFormLayout)
+                             QGridLayout, QDialogButtonBox, QPushButton,
+                             QWidget, QFormLayout)
 from PyQt5.QtGui import QIntValidator
 
 try:
@@ -68,6 +66,7 @@ input_files = [
     'b2.user.parameters',
     'b2.atomic_physics_rescale.parameters'
 ]
+
 
 class PutVars:
     names = ['SHOT', 'RUN', 'USER', 'DEVICE', 'VERSION', 'RUNDIRPATH']
@@ -142,6 +141,7 @@ class PutDialog(QDialog):
             variables[PutVars.shot] = -1
             variables[PutVars.run] = -1
         return variables
+
 
 class PutIDS(QWidget):
     """Widget representation of the PutIDS functionality. A normal QPushButton
@@ -723,7 +723,7 @@ python3 put_edge_ids.py \
                                    ["dirpath=", "shot=", "run=", "user=",
                                     "device=", "version=", "help"])
         for opt, arg in opts:
-            #print opt, arg
+            # print opt, arg
             if opt in ("-fp", "--dirpath"):
                 Vars[PutVars.runDirPath] = arg
             elif opt in ("-s", "--shot"):
@@ -748,11 +748,11 @@ python3 put_edge_ids.py \
 
     if len(Vars) < PutVars.numOfParams:
         print('Not enough variables defined!')
-        print ('For help: -h / --help')
+        print('For help: -h / --help')
         sys.exit(2)
     elif len(Vars) > PutVars.numOfParams:
         print('Too many variables defined!')
-        print ('For help: -h / --help')
+        print('For help: -h / --help')
         sys.exit(2)
 
     app = QApplication(sys.argv)

@@ -1,49 +1,41 @@
 #!/usr/bin/env python3
-""" A PyQt widget for Carre process.
+""" A PyQt widget for Triang process.
 """
 
-from PyQt5.QtWidgets import (QPlainTextEdit, QVBoxLayout, QPushButton,
-                             QGridLayout, QInputDialog, QComboBox, QSpacerItem,
-                             QSizePolicy, QGroupBox, QCheckBox)
+from PyQt5.QtWidgets import (QPlainTextEdit, QVBoxLayout, QGridLayout,
+                             QInputDialog, QSpacerItem, QSizePolicy,
+                             QPushButton, QGroupBox, QCheckBox, QMessageBox)
 from PyQt5.QtCore import pyqtSlot, QSettings, Qt, QDateTime
 from PyQt5.QtGui import QTextCursor
 from tcsh_process import TcshProcess
 import logging
-import glob
 import os
 import sys
+import glob
 
 TIME = QDateTime()
 TIME_FORMAT = "ddd MMM d t yyyy"
 
-class CarreVars:
-    """Variables for Carre for automation.
 
-    Variables it includes are Carre steps performed for the selected baserun,
-    the name of the dgModel and if the lns command has been called for the
-    dgModel.
+class TriangVars:
+    NumOfVars = 9
 
-    NumOfVars tells us how many variables are there.
+    Uinp, uinp, b2ag, eirene, tria, triaGeom, store, outTemp, gridTemp = \
+        range(NumOfVars)
 
-    It should be noted that this is used for ease of creating widgets for
-    steps and that the steps should be written in proper order and that there
-    are only NumOfVars-2 steps since the last to are reserved for which
-    dgModel has been used and if lns was called.
-    """
-    NumOfVars = 7
-    prepare, grid, convert, save, store, lns, dgModel = range(NumOfVars)
-    Name = {0: 'Prepare', 1: 'Grid', 2: 'SaveChoice', 3: 'Convert',
-            4: 'Store', 5: 'lns', 6: 'dgModel'}
-    command = {0: 'p', 1: 'g', 2: 's', 3: 'c', 4: 't'}
+    Name = {0: 'Uinp(U)', 1: 'Uinp(u)', 2: 'B2ag', 3: 'Eirene', 4: 'Tria',
+            5: 'triaGeom', 6: 'Store', 7: 'Conv2Out', 8: 'Conv2Grid'}
 
-    Values = {'Prepare': 0, 'Grid': 1, 'SaveChoice': 2, 'Convert': 3,
-              'Store': 4, 'lns': 5, 'dgModel': 6}
+    command = {0: 'U', 1: 'u', 2: 'b', 3: 'e', 4: 't', 5: 'g', 6: 's', 7: 'c',
+               8: 'C'}
 
-    Default = {i: 0 for i in range(NumOfVars - 1)}
-    Default[NumOfVars - 1] = ''
+    Values = {'Uinp(U)': 0, 'Uinp(u)': 1, 'B2ag': 2, 'Eirene': 3, 'Tria': 4,
+              'triaGeom': 5, 'Store': 6, 'Conv2Out': 7, 'Conv2Grid': 8}
+
+    Default = {i: 0 for i in range(NumOfVars)}
 
 
-class CarreState:
+class TriangState:
     notRunning, starting, waiting, stepRunning = range(4)
 
 
@@ -53,44 +45,18 @@ class StepPush(QPushButton):
         self.value = value
 
 
-class Carre(TcshProcess):
-    """ Widget for the grid generation tool Carre.
-    Its layout will look:
-    #-VericalBox layout-#
-    |----------------------------------------------|
-    | #-GridBox layout-#                           |
-    |                                              |
-    | #################     #############          |
-    | #Status GroupBox#     #DG groupbox#          |
-    | #               #     #           #          |
-    | #               #     #           #          |
-    | #################     #############          |
-    |----------------------------------------------|
-    |#-GridBox layout-#                            |
-    |                                              |
-    | #################    ####################    |
-    | #PushButton for #    # Display output of#    |
-    | #steps          #    # current step     #    |
-    | #               #    ####################    |
-    | #               #    # Default response #    |
-    | #               #    # buttons          #    |
-    | #################    ####################    |
-    |----------------------------------------------|
-
-    Widget creates a .status file in baserun directory that contains
-    information about which steps have been performed for which DG model and
-    if the initial lns linking for the DG model has been ran.
-    """
+class Triang(TcshProcess):
 
     def __init__(self, parent=None):
-        super(Carre, self).__init__(parent)
+        super(Triang, self).__init__(parent)
 
-        self.vars = CarreVars.Default
-
+        # Creating QPlainTextEdit
+        self.vars = TriangVars.Default
         self.prepareUserInterface()
 
         self.tcsh.readyReadStandardOutput.connect(self.tcsh.readStdOut)
-        self.tcsh.setTcshPath('/usr/bin/tcsh')
+        settings = QSettings('ITER', 'solps-gui')
+        self.tcsh.setTcshPath(settings.value('tcsh_path', '/usr/bin/tcsh'))
         self.tcsh.prcStateChanged.connect(self.updateText)
         self.tcsh.prcFinished.connect(self.updateText)
         self.tcsh.prcError.connect(self.updateError)
@@ -98,7 +64,7 @@ class Carre(TcshProcess):
         self.tcsh.stdErrOutput.connect(self.updateError)
 
         self.currentRunDir = ''
-        self.STATE = CarreState.notRunning
+        self.STATE = TriangState.notRunning
 
     def prepareUserInterface(self):
         mainLayout = QVBoxLayout()
@@ -115,17 +81,17 @@ class Carre(TcshProcess):
         groupLayout = QGridLayout()
         groupBox1.setTitle('Baserun .status')
         _n = 2  # Number of widgets per column
-        for i in range((CarreVars.NumOfVars - 2) // _n):
+        for i in range(TriangVars.NumOfVars // _n):
             for j in range(_n):
                 # Creating checkboxes for
-                x = QCheckBox(CarreVars.Name[i * _n + j])
+                x = QCheckBox(TriangVars.Name[i * _n + j])
                 x.setCheckState(0)
                 x.stateChanged.connect(self.setVarsFromClickedGroup)
                 groupLayout.addWidget(x, j, i)
-        leftOver = CarreVars.NumOfVars - 2 - (CarreVars.NumOfVars // _n) * _n
+        leftOver = TriangVars.NumOfVars - (TriangVars.NumOfVars // _n) * _n
         if leftOver > 0:
             for k in range(leftOver):
-                x = QCheckBox(CarreVars.Name[i * _n + k])
+                x = QCheckBox(TriangVars.Name[i * _n + k])
                 x.setCheckState(0)
                 x.stateChanged.connect(self.setVarsFromClickedGroup)
                 groupLayout.addWidget(x, k, i + 1)
@@ -135,53 +101,37 @@ class Carre(TcshProcess):
 
         upperGridLayout.addWidget(groupBox1, 0, 0)
 
-        #############
-        # Group Box 2
-        groupBox2 = QGroupBox()
-        groupBox2.setTitle('DG model')
-        groupLayout = QVBoxLayout()
-        self.selectDgModel = QComboBox()
-        self.selectDgModel.addItem('')
-        self.selectDgModel.setSizePolicy(QSizePolicy(QSizePolicy.Expanding,
-                                                     QSizePolicy.Fixed))
-        groupLayout.addWidget(self.selectDgModel, alignment=Qt.AlignTop)
-        groupBox2.setLayout(groupLayout)
-        # Group Box 2
-        #############
-
-        upperGridLayout.addWidget(groupBox2, 0, 1)
         upperGridLayout.addItem(QSpacerItem(20, 40,
                                             hPolicy=QSizePolicy.Expanding),
                                 0, 2)
 
         #############
-        # Group Box 3
-        groupBox3 = QGroupBox()
-        self.stepGroup = groupBox3
-        groupBox3.setTitle('Steps')
+        # Group Box 2
+        groupBox2 = QGroupBox()
+        groupBox2.setTitle('Steps')
         groupLayout = QVBoxLayout()
         groupLayout.setSpacing(0)
         groupLayout.setContentsMargins(0, 0, 0, 0)
 
-        start = QPushButton('Start Carre')
-        start.clicked.connect(self.startCarre)
+        start = QPushButton('Start Triang')
+        start.clicked.connect(self.startTriang)
         groupLayout.addWidget(start)
-        for i in range(CarreVars.NumOfVars - 2):
-            x = StepPush(value=CarreVars.command[i])
+        for i in range(TriangVars.NumOfVars):
+            x = StepPush(value=TriangVars.command[i])
             x.clicked.connect(self.runStep)
-            x.setText(CarreVars.Name[i])
+            x.setText(TriangVars.Name[i])
             groupLayout.addWidget(x)
         groupLayout.addItem(QSpacerItem(40, 20, vPolicy=QSizePolicy.Expanding))
-        groupBox3.setLayout(groupLayout)
+        groupBox2.setLayout(groupLayout)
+        # Group Box 2
+        #############
+
+        lowerGridLayout.addWidget(groupBox2, 0, 0)
+
+        #############
         # Group Box 3
-        #############
-
-        lowerGridLayout.addWidget(groupBox3, 0, 0)
-
-        #############
-        # Group Box 4
-        groupBox4 = QGroupBox()
-        groupBox4.setTitle('Log window')
+        groupBox3 = QGroupBox()
+        groupBox3.setTitle('Log window')
 
         self.textDisplay = QPlainTextEdit()
         self.textDisplay.setReadOnly(True)
@@ -193,10 +143,15 @@ class Carre(TcshProcess):
 
         groupLayout.addItem(QSpacerItem(40, 20, hPolicy=QSizePolicy.Expanding),
                             1, 0)
+        editB2ag = QPushButton('Edit b2ag.dat')
+        editB2ag.clicked.connect(self.editB2ag)
+
+        groupLayout.addWidget(editB2ag, 1, 1)
+
         manualInput = QPushButton('Terminal input')
         manualInput.clicked.connect(self.manualInput)
 
-        groupLayout.addWidget(manualInput, 1, 1)
+        groupLayout.addWidget(manualInput, 1, 2)
 
         yes = StepPush(value='y')
         yes.setText('Yes')
@@ -206,13 +161,13 @@ class Carre(TcshProcess):
         no.setText('No')
         no.clicked.connect(self.runStep)
 
-        groupLayout.addWidget(yes, 1, 2)
-        groupLayout.addWidget(no, 1, 3)
-        groupBox4.setLayout(groupLayout)
-        # Group Box 4
+        groupLayout.addWidget(yes, 1, 3)
+        groupLayout.addWidget(no, 1, 4)
+        groupBox3.setLayout(groupLayout)
+        # Group Box 3
         #############
 
-        lowerGridLayout.addWidget(groupBox4, 0, 1)
+        lowerGridLayout.addWidget(groupBox3, 0, 1)
 
         mainLayout.addLayout(upperGridLayout)
         mainLayout.addLayout(lowerGridLayout)
@@ -251,8 +206,8 @@ class Carre(TcshProcess):
         """Read the .status file in baserun.
 
         Variables:
-            statusFile (array): text of status without the Carre block.
-            mark (int): Where Carre block is inserted into .status file.
+            statusFile (array): text of status without the Triang block.
+            mark (int): Where Triang block is inserted into .status file.
         """
         self.resetCheckBox()
         if not baserunDir:
@@ -271,7 +226,7 @@ class Carre(TcshProcess):
             return
 
         reading = 0
-        CarreBlocks = 0
+        TriangBlocks = 0
         with open(file, 'r') as f:
             for i, line in enumerate(f):
                 if reading and line.startswith('&'):
@@ -281,28 +236,22 @@ class Carre(TcshProcess):
                     try:
                         sline = line.split()
                         name, val = sline[0], sline[1]
-                        self.vars[CarreVars.Values[name]] = int(val) if \
-                            val.isdigit() else val
+                        self.vars[TriangVars.Values[name]] = int(val) if \
+                            val.isdigit else val
                     except KeyError as e:
                         logging.error('Uknown key ' + name)
                     except ValueError as e:
-                        logging.error("Wrong value for: " + name + ': ' + val)
+                        logging.error("Wrong value for: " + name)
                     except IndexError as e:
                         logging.error("Not enough arguments on line: " + line)
-                        if CarreVars.Name[CarreVars.dgModel] in line:
-                            self.vars[CarreVars.dgModel] = ''
 
-                if line.startswith('&Carre'):
+                if line.startswith('&Triang'):
                     reading = 1 # We are reading the block
-                    CarreBlocks += 1
-                    if CarreBlocks > 1:
-                        logging.error("Multiple Carre block in .status file "
+                    TriangBlocks += 1
+                    if TriangBlocks > 1:
+                        logging.error("Multiple Triang block in .status file "
                                       "in baserun: " + baserunDir)
                         break
-        if self.vars[CarreVars.dgModel]:
-            self.selectDgModel.setCurrentText(self.vars[CarreVars.dgModel] +
-                                              '.dg')
-
         self.setClickedGroupFromVars()
 
     def storeStatusFile(self, baserunDir):
@@ -313,7 +262,7 @@ class Carre(TcshProcess):
             return
         logging.info('Storing .status in baserun ' + baserunDir)
         file = baserunDir + '/.status'
-        carreLines = [CarreVars.Name[i] + ' ' + str(variables[i]) for i
+        triangLines = [TriangVars.Name[i] + ' ' + str(variables[i]) for i
                       in range(len(variables))]
         if os.access(file, os.F_OK):
             if os.access(file, os.W_OK):
@@ -321,21 +270,21 @@ class Carre(TcshProcess):
                 with open(file, 'r') as f:
                     text = f.read()
 
-                if "&Carre" in text:
-                    logging.info("Carre block found in .status file!")
-                    left, right = text.split("&Carre", 1)
+                if "&Triang" in text:
+                    logging.info("Triang block found in .status file!")
+                    left, right = text.split("&Triang", 1)
                     center, right = right.split("&", 1)
 
-                    text = left + "&Carre\n" + '\n'.join(carreLines) + \
-                        "\n&" + right
+                    text = left + "&Triang\n" +'\n'.join(triangLines) + \
+                           "\n&" + right
 
                 else:
-                    logging.info("No Carre block found in .status file!")
-                    text = '&Carre\n' + '\n'.join(carreLines) + '\n&\n' + text
+                    logging.info("No Triang block found in .status file!")
+                    text = '&Triang\n' + '\n'.join(triangLines) + '\n&' + text
 
                 with open(file, 'w') as f:
                     f.write(text)
-                logging.info("Carre written to .status file.")
+                logging.info("Triang Written to .status file.")
 
             else:
                 logging.error("No writing permission to .status file!")
@@ -343,11 +292,11 @@ class Carre(TcshProcess):
         else:
             logging.info("No .status file exists in baserun " + baserunDir)
             with open(file, 'w') as f:
-                text = '&Carre\n'
-                text += '\n'.join(carreLines)
-                text += '&'
+                text = '&Triang\n'
+                text += '\n'.join(triangLines)
+                text += '\n&'
                 f.write(text)
-            logging.info(".status file created for carre block!")
+            logging.info(".status file created for triang block!")
 
     def appendToStatus(self, msg):
         baserunDir = self.runDir
@@ -357,7 +306,7 @@ class Carre(TcshProcess):
         if os.access(path, os.W_OK | os.F_OK):
             with open(path, 'a') as f:
                 time = TIME.currentDateTime().toString(TIME_FORMAT)
-                f.write('\nRan Carre step ' + msg + ' at ' + time)
+                f.write('\nRan Triang step ' + msg + ' at ' + time)
 
     @pyqtSlot()
     def manualInput(self):
@@ -371,23 +320,66 @@ class Carre(TcshProcess):
             self.insertTextAtBottom(msg)
 
     @pyqtSlot()
+    def editB2ag(self):
+        """Read b2ag.dat if it exists and prompts the user with a
+        QInputDialog.getMultiLineText to edit the file and then writes back
+        to the file.
+        """
+        file = self.getRunDir() + '/b2ag.dat'
+
+        # Get .sno file
+        env = QSettings('ITER', 'solps-gui')
+        device = env.value('device_environment', 'iter')
+
+        solpstop = self.tcsh.findSolpsTop(self.getRunDir())
+        if solpstop:
+            # Directory to Divgeo/device/$device
+
+            deviceDir = solpstop + '/modules/DivGeo/device/' + device
+
+            snoFile = self.findLatestFile(deviceDir, '*.sno')
+
+        else:
+            deviceDir = ''
+            snoFile = ''
+
+        snoFile = os.path.basename(snoFile)
+
+        if os.access(file, os.F_OK | os.W_OK | os.R_OK):
+            with open(file, 'r') as f:
+                text = f.read()
+            text += '\n!Latest SNO file in ' + 'DivGeo/device/' + device + \
+                    ': ' + snoFile
+            msg, ok = QInputDialog.getMultiLineText(self, 'Input dialog',
+                                                    'Edit b2ag.dat',
+                                                    text)
+            if ok:
+                with open(file, 'w') as f:
+                    f.write(text)
+        else:
+            QMessageBox.information(self, 'Information', 'File b2ag.dat in ' +
+                                    self.getRunDir() + ' either does not exist'
+                                    ' or you do not have permission to wrie/'
+                                    'read!')
+
+    @pyqtSlot()
     def runStep(self):
         """Custom PushButtons emits signal to this function. They contain
         attribute value which is then passed to tcsh if it is running.
         """
         if not self.tcsh.state():
             return
-        if self.STATE == CarreState.waiting:
+        if self.STATE == TriangState.waiting:
             sender = self.sender()
             self.appendToStatus(sender.text())
             msg = sender.value + '\n'
             self.tcsh.write(msg)
 
     def processText(self, text):
-        default = "Help, Prepare, Grid, Save, Convert, sTore, Next, " \
-                  "Remove, Input, Output, Quit ?"
+        default = "Help, Uinp, B2ag, Eirene, Tria, triaGeom, Plot, View, " \
+                  "Store, Convert, List, Remove, reMap, Inquire, Quit ?"
         if default in text:
-            self.STATE = CarreState.waiting
+            self.STATE = TriangState.waiting
 
     def insertTextAtBottom(self, msg):
         self.textDisplay.moveCursor(QTextCursor.End)
@@ -402,29 +394,19 @@ class Carre(TcshProcess):
         if runDir != self.runDir:
             self.storeStatusFile(self.runDir)
         if runDir.endswith('baserun'):
-            # Update QMainWindow status bar.
-            self.updateDivGeoModel(runDir)
             self.readStatusFile(runDir)
-            self.stopCarre()
-        super(Carre, self).setRunDir(runDir)
-
-    def updateDivGeoModel(self, runDir):
-        """Gives the user a list of all .dg files in baserun
-        """
-        self.selectDgModel.clear()
-        self.selectDgModel.addItem('')
-        [self.selectDgModel.addItem(os.path.basename(_)) for _ in
-         glob.glob(runDir + '/*.dg')]
+            self.stopTriang()
+        super(Triang, self).setRunDir(runDir)
 
     @pyqtSlot(str)
     def updateText(self, text):
-        """Read the output given from carre, and when input is expected, spawn
+        """Read the output given from Triang, and when input is expected, spawn
         input dialogs to get input from the user and then pass it back to
-        Carre.
+        Triang.
         """
-        if self.STATE >= CarreState.starting:
-            self.processText(text)
-        if self.STATE >= CarreState.waiting:
+        #self.insertTextAtBottom(text)
+        # self.processText(text)  # Triang script outputs via StdError...
+        if self.STATE >= TriangState.waiting:
             self.insertTextAtBottom(text)
 
     @pyqtSlot(str)
@@ -433,84 +415,67 @@ class Carre(TcshProcess):
         # color_post = '</font>'
         # self.textDisplay.appendHtml('<b>' + color_pref + text + color_post +
         #                             '</b>')
-        # self.insertTextAtBottom(text)
-        # self.processText(text)
-        if "does not exist. Create it?" in text:
-            self.tcsh.write('y\n')
-        pass
+        if self.STATE >= TriangState.starting:
+            self.processText(text)
+        if self.STATE >= TriangState.waiting:
+            self.insertTextAtBottom(text)
 
     @pyqtSlot()
-    def startCarre(self):
-
+    def startTriang(self):
+        self.textDisplay.clear()
         if not self.getRunDir():
             self.textDisplay.appendPlainText('No baserun selected.')
             return
 
         runDir = self.getRunDir()
-        if runDir != self.currentRunDir:
+        if self.getRunDir() != self.currentRunDir:
             msg = 'Baserun changed'
-            if self.STATE != CarreState.notRunning:
-                msg += '. But current carre run hasn\'t finished yet!'
+            if self.STATE != TriangState.notRunning:
+                msg += '. But current triang run hasn\'t finished yet!'
                 logging.warning(msg)
                 self.insertTextAtBottom(msg)
                 return
 
-            msg += '. Running carre in directory ' + self.currentRunDir + '.'
+            msg += '. Running triang in directory ' + self.currentRunDir + '.'
             logging.info(msg)
             self.currentRunDir = runDir
 
-        self.textDisplay.clear()
-
         if not self.tcsh.state():
             # Get DG model from combo box
-            if self.vars[CarreVars.dgModel]:
-                dgModel = self.vars[CarreVars.dgModel]
-            dgModel = self.selectDgModel.currentText()
-            if dgModel.endswith('.dg'):
-                dgModel = dgModel[:-3]
-
-            if not dgModel:
-                logging.error('No valid dg model selected from '
-                              ' baserun ' + runDir + '!')
-                self.insertTextAtBottom('No valid dg model selected from '
-                                        'baserun ' + runDir + '!')
-                return
-
-            self.vars[CarreVars.dgModel] = dgModel
 
             self.startTcsh()
             self.tcsh.waitForStarted()
 
             env = QSettings('ITER', 'solps-gui')
             device = env.value('device_environment', 'iter')
-            cmd = 'module load libpng\n'
-            cmd += 'setenv DEVICE ' + device + '\n'
+            cmd = 'setenv DEVICE ' + device + '\n'
             cmd += 'cd ' + runDir + '\n'
-            if not self.vars[CarreVars.lns]:
-                cmd += 'lns ' + dgModel + '\n'  # Link .sno DivGeo file
-                self.vars[CarreVars.lns] = 1
-                self.setClickedGroupFromVars()
             self.textDisplay.appendPlainText('Sourcing setup.csh. It will '
                                              'take a while.')
             self.tcsh.write(cmd)
         else:
-            logging.info('TCSH for Carre is aready running.')
+            logging.info('TCSH for triang is aready running.')
 
-        Carre = 'carre -\n'
-
-        self.STATE = CarreState.starting
-
-        cmd = Carre + '\n'
+        self.STATE = TriangState.starting
+        Triang = 'triang\n'
+        cmd = Triang + '\n'
         # self.tcsh.write(cmd)
         self.tcsh.write(cmd)
 
-    def stopCarre(self):
+    def stopTriang(self):
         if self.tcsh.state():
             self.textDisplay.clear()
             self.tcsh.terminate()
-            self.STATE = CarreState.notRunning
+            self.STATE = TriangState.notRunning
             msg = "Switched to another baserun, therefore stopped carre."
             self.textDisplay.appendPlainText(msg)
+
+    def findLatestFile(self, directory, suffix):
+        files = glob.glob(directory + '/' + suffix)
+        if files:
+            return max(files, key=os.path.getctime)
+        else:
+            return ''
 
 
 if __name__ == '__main__':
@@ -519,16 +484,15 @@ if __name__ == '__main__':
     env.setValue('device_environment', 'cmod')
     app = QApplication(sys.argv)
     main = QMainWindow()
-    carreM = Carre()
-    logging.getLogger().setLevel(logging.DEBUG)
-    carreM.activateDebugging()
-    carreM.setTcshPath('/bin/tcsh')
+    triangM = Triang()
+    triangM.activateDebugging()
+    triangM.setTcshPath('/bin/tcsh')
     path = os.path.expanduser('~/solps-iter/runs/test_run/baserun')
-    carreM.setRunDir(path)
+    triangM.setRunDir(path)
 
     layout = QVBoxLayout()
     layout.setContentsMargins(0, 0, 0, 0)
-    layout.addWidget(carreM)
+    layout.addWidget(triangM)
 
     window = QWidget()
     window.setLayout(layout)

@@ -19,10 +19,12 @@ try:
 except ImportError as e:
     GNUPLOT_WIDGET = False
 
+
 def cleanTempFiles(*files):
     for file in files:
         if file and os.path.exists(file):
             os.unlink(file)
+
 
 class Gnuplot(TcshProcess):
     """Gnuplot(QWidget)
@@ -79,7 +81,6 @@ class Gnuplot(TcshProcess):
             layout.addWidget(self.label, 0, 0)
         self.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
-
 
         self.tcsh.stdOutput.connect(self.readTcshStdOut)
 

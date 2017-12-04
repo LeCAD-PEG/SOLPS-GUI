@@ -6,21 +6,19 @@ A PyQt custom widget with Line edit capabilities and input triggering.
 
 """
 
-from PyQt5.QtCore import (Qt, QProcess, QSize, pyqtProperty,
-                          pyqtSignal, pyqtSlot)
-from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtCore import (Qt, QProcess, pyqtSignal, pyqtSlot)
 from PyQt5.QtWidgets import QComboBox
 
 
 class LineInput(QComboBox):
     """LineInput(QComboBox)
-    
+
     Provides a custom widget that allows several commands to be
     combinined for Line input.
     """
 
     returnPressed = pyqtSignal()
-    
+
     def __init__(self, parent=None):
         super(LineInput, self).__init__(parent)
 
@@ -52,5 +50,3 @@ if __name__ == "__main__":
     window = LineInput()
     window.show()
     sys.exit(app.exec_())
-
-

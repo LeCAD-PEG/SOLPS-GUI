@@ -1,12 +1,12 @@
 """Basic widget for SOLPS gui incorporating signals and a tcsh qprocess
 """
-from PyQt5.QtCore import (QProcess, QSize, pyqtSignal, QSettings,
-                          pyqtSlot, pyqtProperty, QObject)
-from PyQt5.QtWidgets import QPlainTextEdit, QFrame, QWidget
-from PyQt5.QtGui import QFont
+from PyQt5.QtCore import (QProcess, pyqtSignal, QSettings, pyqtSlot,
+                          pyqtProperty)
+from PyQt5.QtWidgets import QWidget
 
 import logging
 import os
+
 
 class Tcsh(QProcess):
     """A wrapper encompassing QProcess, which starts a TCSH session. The
@@ -121,8 +121,8 @@ class Tcsh(QProcess):
             logging.info(self.program() + " is already running!")
             return
 
-        self.setArguments(['-l'])
         self.setProgram(self.tcshPath)
+        self.setArguments(['-l'])
         super(Tcsh, self).start()
 
         if not self.waitForStarted():
@@ -153,6 +153,8 @@ class Tcsh(QProcess):
                 with open(path) as file:
                     return file.readline()
             solpsTop = solpsTop.rsplit('/', 1)[0]
+        logging.error('No SOLPSTOP found. Are you sure that the run is inside'
+                      ' of a solps-iter?')
         return None
 
 
@@ -217,7 +219,7 @@ class TcshProcess(QWidget):
 
     def startTcsh(self):
         self.tcsh.setRunDir(self.runDir)
-        self.tcsh.setTcshPath(self.tcshPath)
+        self.tcsh.setTcshPath(self.getTcshPath())
         self.tcsh.start()
 
     @pyqtSlot()
