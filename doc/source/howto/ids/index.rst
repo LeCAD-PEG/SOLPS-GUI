@@ -476,7 +476,7 @@ top-point *edge* CPO node, as shown in :numref:`fig-cpo_edge_top`, are:
    ``grid``, ``species(:)``, ``fluid`` and ``time`` nodes.
 
 
-.. subsubsec:grid_node_structure:
+.. _subsubsec-grid_node_structure:
 
 grid node structure
 ^^^^^^^^^^^^^^^^^^^
@@ -512,7 +512,7 @@ are:
    ``label`` node.
 
 
-.. parag:cpo_grid_spaces:
+.. _parag-cpo_grid_spaces:
 
 spaces(:) node structure
 ''''''''''''''''''''''''
@@ -608,7 +608,7 @@ are:
    nodes.
 
 
-.. subsubsec:species_branch_structure:
+.. _subsubsec-species_branch_structure:
 
 species(:) node structure
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -620,7 +620,7 @@ characteristics, but not data fields on the ion properties itself. Its
 more notable child is ``label`` node, a leaf designed to contain the
 name of the ion (single *string* data type value).
 
-.. subsubsec:fluid_branch_structure:
+.. _subsubsec-fluid_branch_structure:
 
 fluid node structure
 ^^^^^^^^^^^^^^^^^^^^
@@ -805,7 +805,7 @@ the main children of the top-point *edge_profiles* IDS node, as shown in
    highlighted relevant ``homogeneous_time`` nodes.
 
 
-.. subsubsec:ids_ggd:
+.. _subsubsec-ids_ggd:
 
 ggd(:) node structure
 ^^^^^^^^^^^^^^^^^^^^^
@@ -835,7 +835,7 @@ shown in :numref:`fig-ids_edgeprofiles_ggd`, are:
    highlighted relevant ``grid``, ``electrons`` and ``ion(:)`` nodes.
 
 
-.. parag:ids_ggd_grid:
+.. _parag-ids_ggd_grid:
 
 grid node structure
 '''''''''''''''''''
@@ -843,7 +843,7 @@ grid node structure
 The ``edge_profiles.ggd(:).grid`` node is a sibling of
 ``edge_profiles.ggd(:).electrons`` node and
 ``edge_profiles.ggd(:).ion(:)`` node. It contains data on full grid
-description, described in chapter `1 <#sec:grid_desc>`__, and its more
+description, described in :numref:`sec-grid_desc`, and its more
 notable children, as shown in :numref:`fig-ids_edgeprofiles_ggd_grid`,
 are:
 
@@ -867,7 +867,7 @@ are:
    ``grid_subset(:)`` nodes.
 
 
-.. subparag:ids_ggd_identifier:
+.. _subparag-ids_ggd_identifier:
 
 identifier
           
@@ -895,7 +895,7 @@ as shown in :numref:`fig-ids_edgeprofiles_ggd_grid_identifier`, are:
    highlighted relevant ``name``, ``index`` and ``description`` nodes.
 
 
-.. parag:ids_ggd_space:
+.. _parag-ids_ggd_space:
 
 space(:)
         
@@ -977,7 +977,7 @@ specific grid subset object, as shown in
    ``geometry`` and ``nodes`` nodes.
 
 
-.. parag:ids_ggd_grid_gridsubset:
+.. _parag-ids_ggd_grid_gridsubset:
 
 grid_subset(:)
               
@@ -1059,7 +1059,7 @@ shown in :numref:`fig-ids_edgeprofiles_ggd_grid_gridsubset`, are:
    ``dimension`` and ``index`` nodes.
 
 
-.. parag:ids_ggd_electrons:
+.. _parag-ids_ggd_electrons:
 
 electrons node structure
 ''''''''''''''''''''''''
@@ -1078,7 +1078,7 @@ Its more notable children are:
 
 Note that the
 
-.. subparag:ei_temperature_density:
+.. _subparag-ei_temperature_density:
 
 temperature(:)
               
@@ -1144,7 +1144,7 @@ children are:
    ``values`` nodes.
 
 
-.. parag:ids_ggd_ion:
+.. _parag-ids_ggd_ion:
 
 ion(:) node structure
 '''''''''''''''''''''
@@ -1255,7 +1255,7 @@ notation [6]_. FORTRAN index notation [7]_ is used for the conversion
 process presentation in the following sections. The same index notation
 is also used in various IDS and CPO data structure documentation.
 
-.. subsubsec:conv_geo:
+.. _subsubsec-conv_geo:
 
 Grid geometry
 ^^^^^^^^^^^^^
@@ -1265,7 +1265,7 @@ The first share of converted and transferred data from *edge* CPO to
 coordinate system [8]_, the objects forming the grid [9]_ and the grid
 subsets [10]_.
 
-.. parag:conv_geo_coordsys:
+.. parag-conv_geo_coordsys:
 
 Coordinate system
 '''''''''''''''''
@@ -1282,21 +1282,20 @@ indicate that the grid is set in two-dimensional space, and three
 coordinate code numbers stored would indicate that the grid is set in
 three-dimensional space, etc.
 
+
 .. table::  Coordinate system data: Comparison of data structures and their 
             leafs, containing the discussed data, and their data format.
 
-    +----------------------------+--------------------------------------------------+
-    |                            |               Data structure                     |
-    |                            +-----------------------+--------------------------+
-    |                            |       edgeCPO         |   edge_profiles IDS      |
-    +=============+==============+=======================+==========================+
-    | | Coordinate| | Data       | | edge.grid.spaces(:) | | edge_profiles.ggd(:)   |
-    | | type      | | location   | | .coordtype          | | .grid.space(:)         |
-    | | code      |              |                       | | .coordinate_types      |
-    | | numbers   +--------------+-----------------------+--------------------------+
-    |             | | Data type  | 2D integer array.     | 1D integer array.        |
-    |             | | and format |                       |                          |
-    +-------------+--------------+-----------------------+--------------------------+
+    +--------------+-----------------------+--------------------------+
+    |              |       edgeCPO         |   edge_profiles IDS      |
+    +==============+=======================+==========================+
+    |              |  edge.grid.spaces(:)  |  edge_profiles.ggd(:)    |
+    | Location     |  .coordtype           |  .grid.space(:)          |
+    |              |                       |  .coordinate_types       |
+    |--------------+-----------------------+--------------------------+
+    | Type         | 2D integer array.     | 1D integer array.        |
+    | and format   |                       |                          |
+    +--------------+-----------------------+--------------------------+
 
 
 
@@ -1395,7 +1394,7 @@ variables together with their explanation.
         edge_profiles.ggd[0].grid.space[0].coordinates_type[c]= \
             edge.grid.spaces[0].coordtype[c, 0]
 
-.. parag:conv_geo_gridobjects:
+.. _parag-conv_geo_gridobjects:
 
 Grid objects
 ''''''''''''
@@ -1418,7 +1417,7 @@ The lower-level nodes containing the data on grid objects and detailed
 data format for 0D, 1D, and 2D objects is presented in continuation of
 this chapter.
 
-.. subparag:conv_geo_0dobjects:
+.. _subparag-conv_geo_0dobjects:
 
 0D objects
           
@@ -1504,7 +1503,7 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
         edge_profiles.ggd[0].grid.space[0].objects_per_dimension[0].object[o1] \
             .nodes[0] = o1 + 1 
 
-.. subparag:conv_geo_1dobjects:
+.. _subparag-conv_geo_1dobjects:
 
 1D objects
           
@@ -1586,7 +1585,7 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
             edge_profiles.ggd[0].grid.space[0].objects_per_dimension[1].object[o2] \
                 .nodes[b] = edge.grid.spaces[0].objects[1].boundary[o2,b]
 
-.. subparag:conv_geo_2dobjects:
+.. _subparag-conv_geo_2dobjects:
 
 2D objects
           
@@ -1698,7 +1697,7 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
             edge_profiles.ggd[0].grid.space[0].objects_per_dimension[2].object[o3] \
                 .boundary[b].index = edge.grid.spaces[0].objects[2].boundary[o3,b] 
 
-.. parag:conv_gridsubset:
+.. _parag-conv_gridsubset:
 
 Grid subset data
 ''''''''''''''''
@@ -1838,7 +1837,7 @@ part of the ``cpo2ids`` Python code shown in
         edge_profiles.ggd[0].grid.grid_subset[s].element[e].object[0].index = \
             gridSubset_object_index_array[e] + 1
 
-.. subsubsec:conv_scalars:
+.. _subsubsec-conv_scalars:
 
 Data fields
 ^^^^^^^^^^^
@@ -1869,7 +1868,7 @@ treated the same, and in this aspect only the data transfer and
 conversion process of data fields on the most extensive and complex
 between the discussed plasma properties, the ion density, is presented.
 
-.. parag:cpoids_ni:
+.. _parag-cpoids_ni:
 
 Ion density
 '''''''''''
@@ -2025,7 +2024,7 @@ this chapter are:
 A couple of tools for data storage of the discussed data to
 *edge_profiles* IDS were developed, using the same data storage
 principles as already previously discussed ``cpo2ids`` tool covered in
-section `1 <#sec:cpo2ids>`__:
+:numref:`sec-cpo2ids`:
 
 -  **put_edge_ids**, written in Python 3.5 programming language and
    using step-by-step method of writing edge data to *edge_profiles*
@@ -2310,8 +2309,8 @@ converter, ``put_edge_ids`` tool, ``b2_ual_write`` /
 ``b2_ual_write_gsl`` tool, SOLPS-ITER code suite etc., however, it
 allows the visualization of any other *edge* plasma data, under the
 condition that the data is properly stored in the *edge_profiles* IDS
-data structure unit, as previously described in section `2`_ and
-chapter `1 <#sec:cpo2ids>`__. At the beginning of the development, the
+data structure unit, as previously described in 
+:numref:`sec-cpo2ids`. At the beginning of the development, the
 plugin was adjusted to work with *edge* CPO data structure unit, but
 later the development was, and still is, focused on compatibility of the
 plugin with the *edge_profiles* IDS data structure unit.
@@ -2626,24 +2625,23 @@ plugin use are presented in the chapter ` <#cha:results>`__.
 
 .. cha:results:
 
-Results
-=======
+Visualisation
+=============
 
 The results are divided into two sections. In
-Sec. `1 <#sec:results_cpo2ids>`__ are presented the results of *edge*
+:numref:`sec-results_cpo2ids` are presented the results of *edge*
 CPO to *edge_profiles* IDS data conversion using ``cpo2ids`` tool and
 the visualization of the physics data from the converted *edge_profiles*
 IDS using the ``ReadUALEdge`` plugin. Then in
-Sec. `2 <#sec:results_b2_ual_write>`__ are presented the results of
+:numref:`sec-results_b2_ual_write` are presented the results of
 storing the SOLPS-ITER B2.5 simulation results to the *edge_profiles*
 IDS, and then the visualization of the stored data using the
 ``ReadUALEdge`` plugin inside the ParaView application.
 
 .. _sec-results_cpo2ids:
 
-Visualization of converted edge CPO to
-edge_profiles IDS physics data
---------------------------------------
+Visualization of converted edge CPO to edge_profiles IDS physics data
+---------------------------------------------------------------------
 
 In this section the results of data conversion from pre-existing *edge*
 CPOs to newly created *edge_profiles* IDS with the use of ``cpo2ids``
@@ -2712,7 +2710,7 @@ representing one of the grid subsets and marked with different colors,
 as shown in :numref:`fig-readualedge_16151_1000_all_sg`. Furthermore,
 due to the use of VTK ``vtkMultiBlockDataSet`` object and code structure
 in the ``ReadUALEdge`` plugin source code, previously discussed in
-section `1.1 <#subsec:readualedge_vtkUnstructuredGrid>`__, the plugin
+:numref:`subsec-readualedge_vtkUnstructuredGrid`, the plugin
 allows selection of any available block (grid subsets) or blocks, as
 shown in :numref:`fig-readualedge_16151_1000_cells_sciod`. A list of
 all available grid subsets is shown in :numref:`fig-gridsubset_list`.
@@ -2992,7 +2990,7 @@ Version: 3. Both input examples and output IDS are listed in
 Running the B2.5 simulation and producing the output result files using
 the above listed examples beforehand, the ``b2_ual_write.F90`` or
 ``b2_ual_write_gsl.F90`` tool, previously discussed in
-section `2 <#sec:b25toids>`__ is used to read the required data out
+:numref:`sec-b25toids` is used to read the required data out
 from ``b2fstate`` or ``b2fstati`` and ``b2fgmtry`` files and storing it
 to specified IDS. The newly created IDSs are then ready to be loaded and
 its contents displayed using the ``ReadUALEdge`` plugin.
@@ -3291,7 +3289,7 @@ https://portal.iter.org/departments/POP/CM/IMAS/Forms/AllItems.aspx?RootFolder=%
    ion temperature properties of edge plasma.
 
 .. [23]
-   Using the principles, presented in section `1 <#sec:cpo2ids>`__ and
+   Using the principles, presented in :numref:`sec-cpo2ids` and
    other chapters.
 
 .. [24]
@@ -3328,132 +3326,3 @@ https://portal.iter.org/departments/POP/CM/IMAS/Forms/AllItems.aspx?RootFolder=%
    Note that *Edges* grid subset is still available even though it is
    empty.
 
-.. _`[fig:grid_structure_1]`: #fig:grid_structure_1
-.. _`[fig:grid_structure_4]`: #fig:grid_structure_4
-.. _`[fig:grid_structure_2]`: #fig:grid_structure_2
-.. _`[fig:grid_structure_3]`: #fig:grid_structure_3
-.. _`[fig:aug_1]`: #fig:aug_1
-.. _`[fig:str_grid]`: #fig:str_grid
-.. _`[fig:unstr_grid]`: #fig:unstr_grid
-.. _`[fig:grid_structure_5]`: #fig:grid_structure_5
-.. _1.1: #subsec:grid_struc
-.. _`[fig:tokamak_coord_system_2]`: #fig:tokamak_coord_system_2
-.. _`[fig:ITER_te_coord]`: #fig:ITER_te_coord
-.. _`[fig:data_unit_tree_structure]`: #fig:data_unit_tree_structure
-.. _`[fig:node_types]`: #fig:node_types
-.. _`[fig:node_parentChildSibling]`: #fig:node_parentChildSibling
-.. _: #cha:cpoids
-.. _2: #sec:data_storage_units
-.. _`[fig:cpo_edge_top]`: #fig:cpo_edge_top
-.. _`[fig:cpo_edge_grid]`: #fig:cpo_edge_grid
-.. _1.3: #subsec:grid_subset
-.. _`[fig:cpo_edge_grid_spaces]`: #fig:cpo_edge_grid_spaces
-.. _1.2: #subsec:grid_boundary
-.. _`[fig:cpo_edge_grid_subgrids]`: #fig:cpo_edge_grid_subgrids
-.. _1.1.1.1: #parag:cpo_grid_spaces
-.. _`[fig:cpo_edge_fluid]`: #fig:cpo_edge_fluid
-.. _`[fig:cpo_edge_fluid_ni]`: #fig:cpo_edge_fluid_ni
-.. _`[fig:ids_data_dictionary]`: #fig:ids_data_dictionary
-.. _1: #sec:cpo
-.. _`[fig:ids_edgeprofiles_top]`: #fig:ids_edgeprofiles_top
-.. _`[fig:ids_edgeprofiles_idsproperties]`: #fig:ids_edgeprofiles_idsproperties
-.. _`[fig:ids_edgeprofiles_ggd]`: #fig:ids_edgeprofiles_ggd
-.. _`[fig:ids_edgeprofiles_ggd_grid]`: #fig:ids_edgeprofiles_ggd_grid
-.. _`[fig:ids_edgeprofiles_ggd_grid_identifier]`: #fig:ids_edgeprofiles_ggd_grid_identifier
-.. _`[fig:ids_edgeprofiles_ggd_grid_space]`: #fig:ids_edgeprofiles_ggd_grid_space
-.. _`[fig:ids_edgeprofiles_ggd_grid_space_dim_object]`: #fig:ids_edgeprofiles_ggd_grid_space_dim_object
-.. _2.1.1.1.2: #parag:ids_ggd_space
-.. _`[fig:ids_edgeprofiles_ggd_grid_gridsubset]`: #fig:ids_edgeprofiles_ggd_grid_gridsubset
-.. _`[fig:ids_grid_hirearchy]`: #fig:ids_grid_hirearchy
-.. _`[fig:ids_edgeprofiles_ggd_grid_gridsubset_element]`: #fig:ids_edgeprofiles_ggd_grid_gridsubset_element
-.. _`[fig:ids_edgeprofiles_ggd_ei_temperature]`: #fig:ids_edgeprofiles_ggd_ei_temperature
-.. _`[fig:ids_edgeprofiles_ggd_ei_density]`: #fig:ids_edgeprofiles_ggd_ei_density
-.. _2.1.1.1.3: #parag:ids_ggd_grid_gridsubset
-.. _`[fig:ids_edgeprofiles_ggd_ion]`: #fig:ids_edgeprofiles_ggd_ion
-.. _2.1.1.2.1: #subparag:ei_temperature_density
-.. _`[app:cpo2ids_code]`: #app:cpo2ids_code
-.. _`[tbl:cpo2ids_coordtype_data]`: #tbl:cpo2ids_coordtype_data
-.. _`[lst:cpoids_coordinatestype]`: #lst:cpoids_coordinatestype
-.. _`[tbl:cpo2ids_coordtype_iv_explanation]`: #tbl:cpo2ids_coordtype_iv_explanation
-.. _`[tbl:cpo2ids_coordtype_conv]`: #tbl:cpo2ids_coordtype_conv
-.. _`[lst:cpo2ids_code_coordtype]`: #lst:cpo2ids_code_coordtype
-.. _`[tbl:cpo2ids_obj]`: #tbl:cpo2ids_obj
-.. _`[tbl:cpo2ids_0dobjects_data]`: #tbl:cpo2ids_0dobjects_data
-.. _`[lst:cpoids_0D_objects]`: #lst:cpoids_0D_objects
-.. _`[lst:cpoids_0D_objects_example]`: #lst:cpoids_0D_objects_example
-.. _`[tbl:cpo2ids_0dobjects_conv]`: #tbl:cpo2ids_0dobjects_conv
-.. _`[lst:cpo2ids_code_0dobjects]`: #lst:cpo2ids_code_0dobjects
-.. _`[tbl:cpo2ids_1dobjects_data]`: #tbl:cpo2ids_1dobjects_data
-.. _`[lst:cpoids_1D_objects]`: #lst:cpoids_1D_objects
-.. _`[tbl:cpo2ids_1dobjects_iv_explanation]`: #tbl:cpo2ids_1dobjects_iv_explanation
-.. _`[tbl:cpo2ids_1dobjects_conv]`: #tbl:cpo2ids_1dobjects_conv
-.. _`[lst:cpo2ids_1dobjects]`: #lst:cpo2ids_1dobjects
-.. _`[tbl:cpo2ids_2dobjects_data]`: #tbl:cpo2ids_2dobjects_data
-.. _`[lst:cpoids_2D_objects]`: #lst:cpoids_2D_objects
-.. _`[tbl:cpo2ids_2dobjects_conv]`: #tbl:cpo2ids_2dobjects_conv
-.. _`[lst:cpo2ids_code_2dobjects]`: #lst:cpo2ids_code_2dobjects
-.. _`[tbl:cpo2ids_gridsubset]`: #tbl:cpo2ids_gridsubset
-.. _`[tbl:cpo2ids_gridsubset_data]`: #tbl:cpo2ids_gridsubset_data
-.. _`[lst:cpoids_gridsubset]`: #lst:cpoids_gridsubset
-.. _`[tbl:cpo2ids_gridsubset_conv]`: #tbl:cpo2ids_gridsubset_conv
-.. _`[lst:cpo2ids_code_gridsubsets]`: #lst:cpo2ids_code_gridsubsets
-.. _`[tbl:cpo2ids_scalars]`: #tbl:cpo2ids_scalars
-.. _`[tbl:cpo2ids_ni]`: #tbl:cpo2ids_ni
-.. _`[tbl:cpo2ids_ni_data]`: #tbl:cpo2ids_ni_data
-.. _`[lst:cpo2ids_ni]`: #lst:cpo2ids_ni
-.. _`[tbl:cpo2ids_ni_conv]`: #tbl:cpo2ids_ni_conv
-.. _`[lst:cpo2ids_code_ni]`: #lst:cpo2ids_code_ni
-.. _`[app:putedgeids_code]`: #app:putedgeids_code
-.. _`[app:b2_ual_write_code]`: #app:b2_ual_write_code
-.. _`[app:b2_ual_write_gsl_code]`: #app:b2_ual_write_gsl_code
-.. _`[lst:b2_ual_write_gsl_code_fundamentals]`: #lst:b2_ual_write_gsl_code_fundamentals
-.. _`[lst:b2_ual_write_gsl_code_coordtype]`: #lst:b2_ual_write_gsl_code_coordtype
-.. _`[lst:b2_ual_write_gsl_code_0dobjects]`: #lst:b2_ual_write_gsl_code_0dobjects
-.. _`[lst:b2_ual_write_gsl_code_2dobjects]`: #lst:b2_ual_write_gsl_code_2dobjects
-.. _`[lst:b2_ual_write_gsl_code_gslgrid]`: #lst:b2_ual_write_gsl_code_gslgrid
-.. _`[lst:b2_ual_write_gsl_code_scalars]`: #lst:b2_ual_write_gsl_code_scalars
-.. _`[lst:b2_ual_write_gsl_code_idswrite]`: #lst:b2_ual_write_gsl_code_idswrite
-.. _`[fig:readualedge_visualization_process_scheme]`: #fig:readualedge_visualization_process_scheme
-.. _`[app:readualedge_code]`: #app:readualedge_code
-.. _`[fig:readualedge_gridsubset_process_scheme]`: #fig:readualedge_gridsubset_process_scheme
-.. _`[lst:readualedge_code_fSetVtkPoints]`: #lst:readualedge_code_fSetVtkPoints
-.. _`[lst:readualedge_code_fSetCellArray]`: #lst:readualedge_code_fSetCellArray
-.. _`[lst:readualedge_code_UG]`: #lst:readualedge_code_UG
-.. _`[lst:readualedge_code_fValues2UnstructuredGrid]`: #lst:readualedge_code_fValues2UnstructuredGrid
-.. _`[lst:readualedge_code_fAddBlock2MultiBlock]`: #lst:readualedge_code_fAddBlock2MultiBlock
-.. _`[fig:readualedge_gui]`: #fig:readualedge_gui
-.. _`[fig:readualedge_gui_close]`: #fig:readualedge_gui_close
-.. _`[fig:readualedge_cpo2ids]`: #fig:readualedge_cpo2ids
-.. _`[tbl:res_cpo_data_units]`: #tbl:res_cpo_data_units
-.. _`[tbl:res_cpo2ids_data_units]`: #tbl:res_cpo2ids_data_units
-.. _`[fig:readualedge_16151_1000_all_sg]`: #fig:readualedge_16151_1000_all_sg
-.. _`[fig:readualedge_16151_1000_cells_sciod]`: #fig:readualedge_16151_1000_cells_sciod
-.. _`[tbl:gridsubset_list]`: #tbl:gridsubset_list
-.. _`[fig:readualedge_16151_1000_datafield]`: #fig:readualedge_16151_1000_datafield
-.. _`[fig:readualedge_16151_1000_sol_sciod_te]`: #fig:readualedge_16151_1000_sol_sciod_te
-.. _`[fig:readualedge_16151_1000_sol_te]`: #fig:readualedge_16151_1000_sol_te
-.. _`[fig:readualedge_16151_1000_ne_te]`: #fig:readualedge_16151_1000_ne_te
-.. _`[fig:readualedge_16151_1000_ni1_ni2]`: #fig:readualedge_16151_1000_ni1_ni2
-.. _`[fig:readualedge_16151_1000_ti]`: #fig:readualedge_16151_1000_ti
-.. _`[fig:readualedge_1_1_datafield]`: #fig:readualedge_1_1_datafield
-.. _`[fig:readualedge_1_1_ne_te]`: #fig:readualedge_1_1_ne_te
-.. _`[fig:readualedge_1_1_ni1_ni2]`: #fig:readualedge_1_1_ni1_ni2
-.. _`[fig:readualedge_1_1_ti]`: #fig:readualedge_1_1_ti
-.. _`[fig:readualedge_aug_vs_iter_edge]`: #fig:readualedge_aug_vs_iter_edge
-.. _`[fig:readualedge_aug_vs_iter_te1]`: #fig:readualedge_aug_vs_iter_te1
-.. _`[fig:readualedge_aug_vs_iter_te2]`: #fig:readualedge_aug_vs_iter_te2
-.. _`[fig:readualedge_b2]`: #fig:readualedge_b2
-.. _`[tbl:b2_ual_write_benchmark]`: #tbl:b2_ual_write_benchmark
-.. _`[fig:readualedge_16151_1001_gs]`: #fig:readualedge_16151_1001_gs
-.. _`[fig:readualedge_16151_1001_cells_te]`: #fig:readualedge_16151_1001_cells_te
-.. _`[fig:readualedge_16151_1001_cells_ne]`: #fig:readualedge_16151_1001_cells_ne
-.. _`[fig:readualedge_16151_1001_cells_ti]`: #fig:readualedge_16151_1001_cells_ti
-.. _`[fig:readualedge_535_1_cells_te]`: #fig:readualedge_535_1_cells_te
-.. _`[fig:readualedge_535_1_cells_ne]`: #fig:readualedge_535_1_cells_ne
-.. _`[fig:readualedge_535_1_cells_ti]`: #fig:readualedge_535_1_cells_ti
-.. _`http://www.efda-itm.eu/ITM/imports/isip/public/data_structure/4.10b.8/Phase4top.html"`: http://www.efda-itm.eu/ITM/imports/isip/public/data_structure/4.10b.8/Phase4top.html"
-.. _1.5: #subsec:coordinate_systems
-.. _2.1.1.1: #parag:ids_ggd_grid
-.. _1.1.3: #subsubsec:fluid_branch_structure
-.. _2.1.1.2: #parag:ids_ggd_electrons
-.. _2.1.1.3: #parag:ids_ggd_ion
