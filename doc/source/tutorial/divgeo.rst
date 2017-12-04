@@ -182,7 +182,7 @@ conditions should be satisfied as was done for the inner target.
    :align: center
 
 Setting the "Structure" variable for "Structure"
-------------------------------------------------
+-----------------------------------------------
 
 The structure variable is the primary definition for the vessel wall. You can
 definite the vessel wall by opening :menuselection:`&Variables --> &Structure`
@@ -237,10 +237,6 @@ Mark everything except the segments behind the targets.
 .. image:: divgeo_14.png
    :align: center
 
-Setting the target specifications
----------------------------------
-
-TODO
 
 Poloidal grid points
 --------------------
@@ -418,7 +414,7 @@ Note that you should not include the ``".dg"`` extension in the DG model name.
 Launch the mesh building script
 -------------------------------
 
-In the following part we wil proceed the creation of a plasma gridm using the
+In the following part we will proceed the creation of a plasma grid using the
 Carre gird operator
 
 ``carre -``.
@@ -1206,4 +1202,181 @@ Then click Create to update the workspace. Repeat for the outer divertor. Set
 spacing of the grid points around the x-point should be symmetric.
 
 .. image:: divgeo_ITER_22.png
+   :align: center
+
+Write the output data files that are needed by later steps
+----------------------------------------------------------
+
+With the :menuselection:`Commands --> Check variables` you can check if all
+variables have valid values. If the check is it ok with:
+:menuselection:`Commands --> Rebuild Carre objects`
+:menuselection:`File --> Save`
+:menuselection:`File --> Output`
+can be create three files:
+:kbd:`<DG_model_name>.dgo`, `the DG “output” file`
+:kbd:`<DG_model_name>.str`, `the “structure” file (used by Carre)`
+:kbd:`<DG_model_name>.trg`, `the “targets” file (used by Carre)`
+which are leater used for Carre meshing building script.
+
+.. image:: carre_gui_1.png
+   :align: center
+
+
+Prepare the links of the DG output files for later programs
+-----------------------------------------------------------
+
+Because the other SOLPS-GUI programs expect to find the DG output files in a
+"standard" place, a set of symbolic links is produced to fulfill this
+requirement, by means of the command: ``lns <DG_model_name>``
+Note that you should not include the ``".dg"`` extension in the DG model name.
+
+Launch the mesh building script
+-------------------------------
+
+In the following part we will proceed the creation of a plasma grid using the
+Carre grid operator. First is necessary to check if the saved ``".dg"``
+files are in ``home`` directory at ``baserun``. You can check it by clicking
+ ``&Runs``.
+
+.. image:: carre_gui_2.png
+   :align: center
+
+Carre grid operator is opening by choosing the ``&Populate Baserun`` and then
+on the down left corner of the window there is a ``Carre`` button.
+
+.. image:: carre_gui_3.png
+   :align: center
+
+After that you should choose the  ``".dg"`` model on which you want to make
+the mesh. And than ``Start Carre``.
+
+.. image:: carre_gui_4.png
+   :align: center
+
+Preparation step
+----------------
+
+This step reads the ``DG`` files and translates them into the format needed
+by Carre. In SOLPS-GUI this step is done by clicking on the ``Prepare`` button.
+
+.. image:: carre_gui_5.png
+   :align: cente
+
+Gridding step
+-------------
+
+The gridding step strats with clicking on ``Grid``
+The first question you must answer is whether the `X-` and `O-` points
+identified by Carre are correct (they usually are) click `Yes`. If they are
+not, then, you refuse the selection and indicate yourself which of the extrema
+are `X-` and `O-` points.
+
+.. image:: carre_gui_6.png
+   :align: center
+
+Grid parameter selection step
+-----------------------------
+
+Carre then provides a table of parameters. Carre attempts to provide a grid
+that must satisfy three criteria simulatenously:
+
+    1. The grid cells must be as locally orthogonal as possible
+    2. The grid cells must align with the targets in their vicinity
+    3. The size of neighbouring grid cells must not vary too quickly.
+
+It is relatively easy to find a satisfactory solution meeting these three
+criteria, but this is not always the case, especially in geometries where the
+targets are almost parallel to the flux surfaces, putting criteria 1 and 2 at
+odds with one another.
+
+In SOLPS-GUI this is done by choosing ``Save Choice``
+
+.. image:: carre_gui_7.png
+   :align: center
+
+Carre criterion checks
+----------------------
+
+Often, the first pass at the Carre grid parameters will not pass internal
+muster. Carre checks for a few minimal requirements:
+
+    1. The poloidal grid spacing must be above a minimal threshol.
+    2. The radial and poloidal grid spacings in each region must have the
+       same sign. The spacings are constrained by the first and last values
+       of the region to grid and the total interval length.
+
+The code will not proceed until these requirements are met and will show
+messages like this `Try to increase the` ``deltr[1n]`` `values, or to reduce`
+`the number of the radial grid points, or to use equilibrium data with higher`
+`resolution`
+
+Modifying the Carre parameters
+------------------------------
+
+Carre parameters can be modified by opening ``Terminal input`` and writing
+the correct values of the parameteres:
+
+.. image:: carre_gui_8.png
+   :align: center
+
+
+Producing the grid
+------------------
+
+If the set parmeters are correct next Carre starts to produce the grid. As
+an output you can see it on the window the following:
+
+.. image:: carre_gui_9.png
+   :align: center
+
+and ``Yes`` if the paramteres are correct.
+
+Saving the grid parameters
+--------------------------
+
+During the``Save Choice`` the grid parameters are then written in the
+:kbd:`carre.dat` file.
+
+
+Converting the grid output from Carre
+-------------------------------------
+
+To convert the grid output from Carre, you can do it by clicking on ``Convert``.
+
+.. image:: carre_gui_10.png
+   :align: center
+
+
+Name of the file containing the carre grid
+
+:kbd:`carre.out`
+
+The conversion step takes the carre.out file containing the Carre grid and
+converts it to the `Sonnet` and `B2.5` formats, respectively a :kbd:`*.sno`
+and :kbd:`*.geo` file.
+
+Storing the grid files
+----------------------
+
+The sorting of the grid files can be made by clicking on ``Store``:
+
+.. image:: carre_gui_11.png
+   :align: center
+
+The grid in DG format is stored as ``*.sno`` format. The ``dg.dgo``,
+``dg.equ``, ``dg.str`` and ``dg.trg``.
+
+The grid in B2.5 format is stored as ``*.geo`` format and the you can view
+the grid in PostScript format as ``*.ps`` format.
+
+Import the mesh into DG
+-----------------------
+
+After you stored the grid files, the ``*sno`` format file is the one that DG
+can read it as a mesh. Note that DG can only read files in the Sonnet format
+``(*.sno)``. The mesh can be import as:
+
+:menuselection:`File --> Import --> Mesh`
+
+.. image:: carre_gui_12.png
    :align: center
