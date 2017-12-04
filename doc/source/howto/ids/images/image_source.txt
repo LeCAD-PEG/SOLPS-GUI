@@ -1,0 +1,23 @@
+Če ne veš: Search Google For Image
+
+- CPO_top_1.png : CPO_data_structure
+
+- ITER_tokamak_1.png : iter.org
+
+- ITER_tokamak_2.png : 
+
+- ITER_tokamak_3.png : 
+
+- ITER_tokamak_4.png : 
+
+- tokamak_coord_system_1.png : Magnetic Equations with FreeFem++: the Grad-Shafranov Equation and the Current Hole
+
+- tokamak_coord_system_1.png : solps-gui
+
+- tokamak_coord_system_1.png : Hans-Joachim Klingshirn - Adaptive Grids...
+
+- grid_structure_1,2 : moje
+
+
+
+
