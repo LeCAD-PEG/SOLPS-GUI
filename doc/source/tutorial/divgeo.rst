@@ -182,7 +182,7 @@ conditions should be satisfied as was done for the inner target.
    :align: center
 
 Setting the "Structure" variable for "Structure"
------------------------------------------------
+------------------------------------------------
 
 The structure variable is the primary definition for the vessel wall. You can
 definite the vessel wall by opening :menuselection:`&Variables --> &Structure`
