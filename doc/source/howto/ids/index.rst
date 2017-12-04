@@ -1293,17 +1293,27 @@ indicate that the grid is set in two-dimensional space, and three
 coordinate code numbers stored would indicate that the grid is set in
 three-dimensional space, etc.
 
-::
+.. table::  Coordinate system data: Comparison of data structures and their 
+            leafs, containing the discussed data, and their data format.
 
-    coordtype:
-    [[:math:`C_1` ] [:math:`C_2`] :math:`\cdots` [:math:`C_{n_\text{c}}`]]
-        
+    +----------------------------+--------------------------------------------------+
+    |                            |               Data structure                     |
+    |                            +-----------------------+--------------------------+
+    |                            |       edgeCPO         |   edge_profiles IDS      |
+    +=============+==============+=======================+==========================+
+    | | Coordinate| | Data       | | edge.grid.spaces(:) | | edge_profiles.ggd(:)   |
+    | | type      | | location   | | .coordtype          | | .grid.space(:)         |
+    | | code      |              |                       | | .coordinate_types      |
+    | | numbers   +--------------+-----------------------+--------------------------+
+    |             | | Data type  | 2D integer array.     | 1D integer array.        |
+    |             | | and format |                       |                          |
+    +-------------+--------------+-----------------------+--------------------------+
 
-::
 
-    coordinates_type:
-    [:math:`C_1` :math:`C_2` :math:`\cdots` :math:`C_{n_\text{c}}`]
-        
+
+
+
+
 
 [Coordinate system data: Data structure comparison] Coordinate system
 data: Data structure comparison. CPO ``coordtype`` (a) and IDS
