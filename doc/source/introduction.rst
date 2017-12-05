@@ -276,12 +276,12 @@ plasma along the magnetic field lines, which is strong in parallel and
 weak in radial direction. In addition to that the coordinate system also
 takes advantage of tokamak’s shape. Its rotational symmetry allows
 three-dimensional problem to be reduced into two dimensions. Poloidal
-cut through the torus, in :numref:coordinates`, shows the cells are
+cut through the torus, in :numref:`coordinates`, shows the cells are
 quadrilateral shaped and either aligned with or perpendicular to the
 magnetic field lines.
 
 Because of the reasons mentioned earlier, the following coordinate
-systems are used for the B2 model (Fig. [fig:coordinates]).
+systems are used for the B2 model (:numref:`coordinates`).
 
 #. **Cylindrical system** (:math:`R,\phi,z`), where :math:`R` is the
    torus’s major radius, :math:`\phi` the toroidal direction and
