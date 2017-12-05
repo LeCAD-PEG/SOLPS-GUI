@@ -2,6 +2,10 @@
 
 .. _meshing:
 
+.. |step| note::
+          The file
+
+
 
 =================
 Meshing toolchain
@@ -78,6 +82,9 @@ Additionally the ``tutorial-DivGeo_C-Mod/`` contains DivGeo files for different
 stages in the tutorial in preparing the DivGeo model for the C-mod tokamak.
 This way you can either start from beginning or from any point of the steps.
 
+Make sure that when you either load a DivGeo file or start a new, to then save
+it to the ``baserun`` directory, alongside the equilibrium file.
+
 Import the vessel wall description
 ----------------------------------
 
@@ -110,6 +117,9 @@ and make sure that the :guilabel:`Equilibrium` radio button is pressed.
 .. image:: divgeo_3.png
    :align: center
 
+.. note::
+   This step is available in ``step_1_import_wall_equi_topology.dg``
+
 Converting the wall segments to geometry elements
 -------------------------------------------------
 
@@ -122,11 +132,14 @@ lines, which indicate the normal surfaces, will appear.
 
 It is very important to notice that all surface normals are pointing away
 from the plasma. To reverse them can set the middle mouse button to
-`"Reverse normals”`. Then click :kbd:`SHIFT+Reverse normals` (middle
+`"Reverse normals”`. Then click :kbd:`Shift + Reverse normals` (middle
 button) somewhere on the vessel wall and all of the normals should flip.
 
 .. image:: divgeo_5.png
    :align: center
+
+.. note::
+   This step is available in ``step_2_reverse_normals.dg``
 
 Setting the magnetic topology
 -----------------------------
@@ -192,6 +205,9 @@ conditions should be satisfied as was done for the inner target.
 .. image:: divgeo_9.png
    :align: center
 
+.. note::
+   This step is available in ``step_3_defining_targets.dg``
+
 Setting the "Structure" variable for "Structure"
 ------------------------------------------------
 
@@ -228,6 +244,9 @@ The same steps are used for setting the outer target.
 .. image:: divgeo_12.png
    :align: center
 
+.. note::
+   This step is available in ``step_4_structure.dg``
+
 Setting elements that are to be ignored by EIRENE
 -------------------------------------------------
 
@@ -249,6 +268,9 @@ Mark everything except the segments behind the targets.
 
 .. image:: divgeo_14.png
    :align: center
+
+.. note::
+   This step is available in ``step_5_notforEirene_b2plotinput.dg``
 
 Setting the target specifications
 ---------------------------------
@@ -300,19 +322,19 @@ The "edge" settings for the targets have to intersect the outer radial boundary
 of the grid, but it’s not obvious where the SOL radial boundary edge will be at
 this stage.
 
-Trick!
+.. tip::
 
-Set the middle button to "Add surface".
+   Set the middle button to "Add surface".
 
-The outer radial extent of the SOL is set by the first intersection between a
-flux surface and the main chamber wall ("tangency point"), which will be near
-the inner midplane for this case.
+   The outer radial extent of the SOL is set by the first intersection between
+   a flux surface and the main chamber wall ("tangency point"), which will be
+   near the inner midplane for this case.
 
-Hold the middle button down at the inner midplane and the flux coutour will
-appear, and you can see where it maps to at the outer target; see the figure on
-the right. Set "SOL edge" to this segment. (Note: You can accidentally add a
-surface in the core if you’re not careful with your clicking. Press
-:kbd:`Ctrl + Z` for undo if this happens.)
+   Hold the middle button down at the inner midplane and the flux coutour will
+   appear, and you can see where it maps to at the outer target; see the figure
+   on the right. Set "SOL edge" to this segment. (Note: You can accidentally
+   add a surface in the core if you’re not careful with your clicking. Press
+   :kbd:`Ctrl + Z` for undo if this happens.)
 
 .. image:: divgeo_17.png
    :align: center
@@ -327,6 +349,9 @@ divertor knee.
    :align: center
 
 Assign the *Mo* as the material and turn off *chemical sputtering*.
+
+.. note::
+   This step is available in ``step_6_target_specification.dg``
 
 Poloidal grid points
 --------------------
@@ -358,7 +383,8 @@ that set the grid points for SOL, click the :guilabel:`Reset` button and assign
 .. image:: divgeo_20.png
    :align: center
 
-
+.. note::
+   This step is available in ``step_7_grid_points.dg``
 
 Radial surfaces
 ---------------
@@ -375,17 +401,20 @@ separatrix.
 .. image:: divgeo_21.png
    :align: center
 
+.. note::
+   This step is available in ``step_8_radial_surfaces_a.dg``
+
 There is an issue in the PFR for this particular case: the flux surface which
 is tangent to the "knee" will miss the bottom of the outer target and cross the
 entrance to the "plenum" in the sub-divertor.
 
-Trick!
+.. tip::
 
-Create a virtual structure in the PFR volume, which will cause DG to reduce the
-radial extent of the grid.
+   Create a virtual structure in the PFR volume, which will cause DG to reduce
+   the radial extent of the grid.
 
-Set the middle mouse button to "Add surface" and identify the flux surface
-which intersect the bottom of the outer target.
+   Set the middle mouse button to "Add surface" and identify the flux surface
+   which intersect the bottom of the outer target.
 
 .. image:: divgeo_22.png
    :align: center
@@ -409,10 +438,16 @@ segments in the list.
 .. image:: divgeo_24.png
    :align: center
 
+.. note::
+   This step is available in step_8_radial_surfaces_b_virtual_structure.dg
+
 Set 18 surfaces in the PFR.
 
 .. image:: divgeo_25.png
    :align: center
+
+.. note::
+   This step is available in  ``step_8_radial_surfaces_c_pfr.dg``
 
 For the core region t is necessary to add a surface which will define the
 extent to which the grid penetrates into the core.
@@ -430,6 +465,9 @@ The number of radial surfaces in the core must be the same as for the PFR, i.e.
 
 .. image:: divgeo_27.png
    :align: center
+
+.. note::
+   This step is available in  ``step_8_radial_surfaces_d_core.dg``
 
 
 Setting the shadowing structure
@@ -449,6 +487,8 @@ structure must be continuous and closed.
 .. image:: divgeo_28.png
    :align: center
 
+.. note::
+   This step is available in  ``step_9_shadowin_structure.dg``
 
 Adding some core radiation
 --------------------------
@@ -471,6 +511,9 @@ display them) are shown as white asterisks in the DG model.
 
 .. image:: divgeo_29.png
    :align: center
+
+.. note::
+   This step is available in  ``step_10_radiation_sources.dg``
 
 Defining "plot zones"
 ---------------------
@@ -508,6 +551,8 @@ simulations. You definite them by clicking
 .. image:: divgeo_32.png
    :align: center
 
+.. note::
+   This step is available in  ``step_11_plot_zone_and_plasma_species.dg``
 
 Also you can add it the impurity species with clicking
 :menuselection:`Variables --> Add --> Plasma species`.
@@ -555,6 +600,9 @@ index to -2 in the dialogue box, and "General Triangle size" to 10.0.
 .. image:: divgeo_34.png
    :align: center
 
+.. note::
+   This step is available in  ``step_12_tria-eirene-parameters.dg``
+
 Local refinement of the EIRENE triangle grid
 --------------------------------------------
 With DG it’s possible to increase the spatial resolution on sub-regions of the
@@ -569,6 +617,9 @@ scale size of the triangles in this region.
 .. image:: divgeo_35.png
    :align: center
 
+.. note::
+   This step is available in  ``step_13_mesh_refinement_zone.dg``
+
 Choose the toroidal approximation
 ---------------------------------
 
@@ -577,6 +628,9 @@ negative (real) number, such as -1.0, if you want to use the toroidal
 approximation instead of the cylindrical approximation.
 
 :menuselection:`Variables --> Global Eirene Data`
+
+.. note::
+   This step is available in  ``step_14_prepared_for_carre_and_triang.dg``
 
 Write the output data files that are needed by later steps
 ----------------------------------------------------------
