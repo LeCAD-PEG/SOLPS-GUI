@@ -3040,7 +3040,7 @@ Version: 3. Both input examples and output IDS are listed in
 
 .. figure:: images/ReadUALEdge_scheme_b2.*
    :alt: Visualization process of the edge plasma data using
-   ``b2_ual_write_gsl`` tool and ``ReadUALEdge`` plugin.
+         ``b2_ual_write_gsl`` tool and ``ReadUALEdge`` plugin.
 
    Visualization process of the edge plasma data using
    ``b2_ual_write_gsl`` tool and ``ReadUALEdge`` plugin.
