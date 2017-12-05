@@ -504,7 +504,7 @@ are:
 
 
 .. _fig-cpo_edge_species:
-.. figure:: images/CPO_edge_datainfo-grid-fluid-species2.png
+.. figure:: images/CPO_edge_datainfo-species.png
    :alt: CPO ``edge.species(:)`` node structure [13] with highlighted
          relevant ``label`` node.
 
@@ -674,7 +674,7 @@ are:
       *float* data type values).
 
 .. _fig-cpo_edge_fluid:
-.. figure:: images/CPO_edge_datainfo-grid-fluid-species2.png
+.. figure:: images/CPO_edge_datainfo-fluid.png
    :alt: CPO ``edge.fluid`` node structure [13] with highlighted
          relevant ``ne``, ``ni(:)``, ``te`` and ``ti(:)`` nodes.
 
@@ -954,7 +954,7 @@ specific grid subset object, as shown in
    its children *index* leaf (an array of *integer* data type values).
 
 .. _fig-ids_edgeprofiles_ggd_grid_space:
-.. figure:: images/IDS_edgeprofiles_ggd_grid_identifier-space-gridsubset2.png
+.. figure:: images/IDS_edgeprofiles_ggd_grid_space.png
    :alt: IDS ``edge_profiles.ggd(:).grid.space(:)`` node structure [12]
          with highlighted relevant ``coordinates_type``,
          ``objects_per_dimension(:)`` and ``object(:)`` nodes.
@@ -1132,7 +1132,7 @@ children are:
 
 
 .. _fig-ids_edgeprofiles_ggd_ei_density:
-.. figure:: images/IDS_edgeprofiles_ggd_electrons_temperature-density2.png
+.. figure:: images/IDS_edgeprofiles_ggd_electrons_density.png
    :alt: IDS ``edge_profiles.ggd(:).electrons.(:)`` and
          ``edge_profiles.ggd(:).ion(:).density(:)`` node structure [12] with
          highlighted relevant ``grid_index``, ``grid_subset_index`` and
