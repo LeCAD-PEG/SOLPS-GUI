@@ -1289,7 +1289,7 @@ three-dimensional space, etc.
     +------------------------------------+-------------------------------------------------+
     |                                    |                   Data structure                |
     |                                    +------------------------+------------------------+
-    |                                    |       edgeCPO          |   edge_profiles IDS    |
+    |                                    |       *edge* CPO       |   *edge_profiles* IDS  |
     +=================+==================+========================+========================+
     |                 | | **Data**       | | edge.grid.spaces(:)  | | edge_profiles.ggd(:) |
     | | **Coordinate**| | **Location**   | | .coordtype           | | .grid.space(:)       |
@@ -1332,7 +1332,7 @@ of the ``cpo2ids`` Python code presented in
     +------------------------------------+-------------------------------------------------+
     |                                    |                   Data structure                |
     |                                    +------------------------+------------------------+
-    |                                    |  From edgeCPO          |  to edge_profiles IDS  |
+    |                                    |  From *edge* CPO       |  to *edge_profiles* IDS|
     +=================+==================+========================+========================+
     | | **Coordinate**| | **Data**       | | edge.grid.spaces(p)  | | edge_profiles.ggd(g) |
     | | **type code** | | **Location**   | | .coordtype[c, 1]     | | .grid.space(p)       |
@@ -1347,26 +1347,27 @@ of the ``cpo2ids`` Python code presented in
 .. table::  Coordinate system data: List of appearing indices and
             variables together with their explanation.
 
-   +-----------------------+--------------------------------+--------------------------+
-   | | **Index** /         |         **Explanation**        | **Range definition**     |
-   | | **Variable**        |                                |                          |
-   +-----------------------+--------------------------------+--------------------------+
-   | :math:`g`             | | General grid description     | :math:`g = 1`            |
-   |                       | | structure array index.       |                          |
-   +-----------------------+--------------------------------+--------------------------+
-   | :math:`p`             | | Space structure array index  | :math:`p = 1`            |
-   +-----------------------+--------------------------------+--------------------------+
-   | :math:`c`             | | Coordinate type array index. | :math:`c=\{1,2,...,n_c\}`|
-   +-----------------------+--------------------------------+--------------------------+
-   | :math:`n_c`           | | Total number of different    | /                        |
-   |                       | | coordinate types describing  |                          |
-   |                       | | the grid and indicating      |                          |
-   |                       | | the dimension of the grid.   |                          |
-   +-----------------------+--------------------------------+--------------------------+
-   | :math:`C_c`           | | *c*-th coordinate type in    | /                        |
-   |                       | | form of a coordinate code    |                          |
-   |                       | | number [15].                 |                          |
-   +-----------------------+--------------------------------+--------------------------+
+   +-----------------------+--------------------------------+---------------------+
+   | | **Index** /         |         **Explanation**        | **Range definition**|
+   | | **Variable**        |                                |                     |
+   +-----------------------+--------------------------------+---------------------+
+   | :math:`g`             | | General grid description     | :math:`g = 1`       |
+   |                       | | structure array index.       |                     |
+   +-----------------------+--------------------------------+---------------------+
+   | :math:`p`             | | Space structure array index  | :math:`p = 1`       |
+   +-----------------------+--------------------------------+---------------------+
+   | :math:`c`             | | Coordinate type array index. | :math:`c=           |
+   |                       |                                | \{1,2,...,n_c\}`    |
+   +-----------------------+--------------------------------+---------------------+
+   | :math:`n_c`           | | Total number of different    | /                   |
+   |                       | | coordinate types describing  |                     |
+   |                       | | the grid and indicating      |                     |
+   |                       | | the dimension of the grid.   |                     |
+   +-----------------------+--------------------------------+---------------------+
+   | :math:`C_c`           | | *c*-th coordinate type in    | /                   |
+   |                       | | form of a coordinate code    |                     |
+   |                       | | number [15].                 |                     |
+   +-----------------------+--------------------------------+---------------------+
 
 ::
 
@@ -1391,7 +1392,7 @@ storage of data on each object of the grid are presented in
     +-------------------+-----------------------------------------------------+
     |                   |                   Data structure                    |
     |                   +-----------------------+-----------------------------+
-    |                   |       edge CPO        |   edge_profiles IDS         |
+    |                   |       *edge* CPO      |   *edge_profiles* IDS       |
     +===================+=======================+=============================+
     | | **objects data**| | edge.grid.spaces(:) | | edge_profiles.ggd(:)      |
     | | **parent node** | | .objects(:)         | | .grid.space(:)            |
@@ -1441,7 +1442,7 @@ presented in :numref:`lst-cpoids_0D_objects`.
     +------------------------------------+----------------------------------------------------------+
     |                                    |                  Data structure                          |
     |                                    +----------------------+-----------------------------------+
-    |                                    |        edge CPO      |         edge_profiles IDS         |
+    |                                    |        *edge* CPO    |         *edge_profiles* IDS       |
     +==================+=================+======================+===================================+
     | | **Coordinates**| | **Data**      | | edge.grid          | | edge_profiles.ggd(:)            |
     | | **of the**     | | **Location**  | | .spaces(:)         | | .grid.space(:)                  |
@@ -1532,16 +1533,15 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
         edge_profiles.ggd[0].grid.space[0].objects_per_dimension[0].object[o1] \
             .nodes[0] = o1 + 1
 
-..
 
-..table::   0D objects data: Data conversion process from edge CPO to
+.. table::  0D objects data: Data conversion process from edge CPO to
             edge profiles IDS. For explanation of appearing indices see
             Table 4.7.
 
     +-------------------------------------+-------------------------------------------------------------+
     |                                     |                   Data structure                            |
     |                                     +------------------------+------------------------------------+
-    |                                     |      From edgeCPO      |  to edge_profiles IDS              |
+    |                                     |      From *edge* CPO   |  to *edge_profiles* IDS            |
     +==================+==================+========================+====================================+
     | | **Coordinates**| | **Data**       | | edge.grid            | | edge_profiles.ggd(g)             |
     | | **of the**     | | **Location**   | | .spaces(p)           | | .grid.space(p)                   |
@@ -1557,36 +1557,38 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
     | | **index**      |                  |                        | | .object(:math:`o^1`).nodes[1] =  |
     |                  |                  |                        |   :math:`o^1`                      |
     |                  +------------------+------------------------+------------------------------------+
-    |                  | | **Conversion** | Additionally defined and stored to *edge_profiles* IDS.     |
+    |                  | | **Conversion** | | Additionally defined and stored to *edge_profiles* IDS.   |
     |                  | | **description**|                                                             |
     +------------------+------------------+-------------------------------------------------------------+
 
-..table::   0D objects data: List of appearing indices and variables together
+.. table::  0D objects data: List of appearing indices and variables together
             with their explanation.
 
-    +-------------------+------------------------------------+--------------------------------+
-    | | **Index** /     |         **Explanation**            | **Range definition**           |
-    | | **Variable**    |                                    |                                |
-    +-------------------+------------------------------------+--------------------------------+
-    | :math:`g`         | | General grid description         | :math:`g = 1`                  |
-    |                   | | structure array index.           |                                |
-    +-------------------+------------------------------------+--------------------------------+
-    | :math:`p`         | | Space structure array index      | :math:`p = 1`                  |
-    +-------------------+------------------------------------+--------------------------------+
-    | :math:`d`         | | Dimension structure array index. | :math:`d = 1`                  |
-    +-------------------+------------------------------------+--------------------------------+
-    | :math:`o^1`       | | 0D object structure array index. | :math:`o^1=\{1,2,...,n_{o^1}\}`|
-    +-------------------+------------------------------------+--------------------------------+
-    | :math:`c`         | | Cordinate type array index.      | :math:`c=\{1,2,...,n_c\}`      |
-    +-------------------+------------------------------------+--------------------------------+
-    | :math:`G^{o^1}_c` | | *c*-th coordinate of the the     | /                              |
-    |                   | | 0d object.                       |                                |
-    +-------------------+------------------------------------+--------------------------------+
-    | :math:`n_{o^1}`   | | Total number of 0D objects.      | /                              |
-    +-------------------+------------------------------------+--------------------------------+
-    | :math:`n_c`       | | Total number of different        | /                              |
-    |                   | | coordinate types                 |                                |
-    +-------------------+------------------------------------+--------------------------------+
+    +----------------+------------------------------------+---------------------+
+    | | **Index** /  |         **Explanation**            | **Range definition**|
+    | | **Variable** |                                    |                     |
+    +----------------+------------------------------------+---------------------+
+    | :math:`g`      | | General grid description         | :math:`g = 1`       |
+    |                | | structure array index.           |                     |
+    +----------------+------------------------------------+---------------------+
+    | :math:`p`      | | Space structure array index      | :math:`p = 1`       |
+    +----------------+------------------------------------+---------------------+
+    | :math:`d`      | | Dimension structure array index. | :math:`d = 1`       |
+    +----------------+------------------------------------+---------------------+
+    | :math:`o^1`    | | 0D object structure array index. | :math:`o^1=         |
+    |                |                                    | \{1,2,...,n_{o^1}\}`|
+    +----------------+------------------------------------+---------------------+
+    | :math:`c`      | | Cordinate type array index.      | :math:`c=           |
+    |                |                                    | \{1,2,...,n_c\}`    |
+    +----------------+------------------------------------+---------------------+
+    | :math:`G       | | *c*-th coordinate of the the     | /                   |
+    | ^{o^1}_c`      | | 0D object.                       |                     |
+    +----------------+------------------------------------+---------------------+
+    | :math:`n_{o^1}`| | Total number of 0D objects.      | /                   |
+    +----------------+------------------------------------+---------------------+
+    | :math:`n_c`    | | Total number of different        | /                   |
+    |                | | coordinate types                 |                     |
+    +----------------+------------------------------------+---------------------+
 
 
 .. _subparag-conv_geo_1dobjects:
@@ -1608,6 +1610,37 @@ of data on 1D objects and their data format are presented in
 :numref:`fig-cpo2ids_1dobjects_data`, while the data structure and
 detailed format of the data on 1D objects in both data structures are
 presented in :numref:`lst-cpoids_1D_objects`.
+
+.. table::  1D objects data: Comparison of data structures, their leafs,
+            designed for storage of data on 0D objects, and the leafs data
+            format.
+
+    +------------------------------------+------------------------------------------------------------+
+    |                                    |                     Data structure                         |
+    |                                    +--------------------------+---------------------------------+
+    |                                    |        *edge* CPO        |         *edge_profiles* IDS     |
+    +==================+=================+==========================+=================================+
+    | | **Boundary**   | | **Data**      | | edge.grid              | | edge_profiles.ggd(:)          |
+    | | **of the**     | | **Location**  | | .spaces(:)             | | .grid.space(:)                |
+    | | **1D objects** |                 | | .objects(2)            | | .objects_per_dimension(2)     |
+    |                  |                 | | .boundary              | | .object(:).boundary(:).index  |
+    |                  +-----------------+--------------------------+---------------------------------+
+    |                  | | **Data type** | | 2D integer array,      | | 1D float array. Each          |
+    |                  | | **and format**| | set to contain         | | object(:) structure           |
+    |                  |                 | | boundary data of       | | to contain boundary data      |
+    |                  |                 | | all 1D objects.        | | on one 1D object.             |
+    +------------------+-----------------+--------------------------+---------------------------------+
+    | | **Explicit**   | | **Data**      | | edge.grid              | | edge_profiles.ggd(:)          |
+    | | **list of**    | | **Location**  | | .spaces(:)             | | .grid.space(:)                |
+    | | **0D objects** |                 | | .objects(2)            | | .objects_per_dimension(2)     |
+    | | **forming the**|                 | | .boundary :math:`^{10}`| | .object(:).nodes              |
+    | | **1D object**  +-----------------+--------------------------+---------------------------------+
+    |                  | | **Data type** | /                        | | 1D integer array. Each        |
+    |                  | | **and format**|                          | | object(:) structure is set to |
+    |                  |                 |                          | | contain and explicit list of  |
+    |                  |                 |                          | | 0D objects for one 2D object. |
+    +------------------+-----------------+--------------------------+---------------------------------+
+
 
 ::
 
@@ -1657,6 +1690,61 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
 :numref:`fig-cpo2ids_1dobjects_conv`, together with part of the
 ``cpo2ids`` Python code shown in :numref:`lst-cpo2ids_1dobjects`.
 
+.. table::  1D objects data: Data conversion process from edge CPO to edge
+            profiles IDS. For explanation of appearing indices and variables
+            see Table 4.10
+
+    +-------------------------------------+-------------------------------------------------------------+
+    |                                     |                       Data structure                        |
+    |                                     +----------------------------+--------------------------------+
+    |                                     |      From *edge* CPO       |     to *edge_profiles* IDS     |
+    +==================+==================+============================+================================+
+    | | **Boundary**   | | **Data**       | | edge.grid                | | edge_profiles.ggd(g)         |
+    | | **of the**     | | **Location**   | | .spaces(p)               | | .grid.space(p)               |
+    | | **1D objects** |                  | | .objects(d=2)            | | .objects_per_dimension(d=2)  |
+    |                  |                  | | .boundary[:math:`o^2`,b] | | .object(:math:`o^2`)         |
+    |                  |                  |                            | | .boundary(b).index           |
+    |                  +------------------+----------------------------+--------------------------------+
+    |                  | | **Conversion** | | Data transfer.                                            |
+    |                  | | **description**|                                                             |
+    +------------------+------------------+----------------------------+--------------------------------+
+    | | **List of**    | | **Data**       | | edge.grid                | | edge_profiles.ggd(g)         |
+    | | **0D objects** | | **Location**   | | .spaces(p)               | | .grid.space(p)               |
+    | | **forming the**|                  | | .objects(d=2)            | | .objects_per_dimension(d=2)  |
+    | | **1D objects** |                  | | .boundary[:math:`o^2`,k] | | .object(:math:`o^2`).nodes[k]|
+    |                  +------------------+----------------------------+--------------------------------+
+    |                  | | **Conversion** | | Data transfer.                                            |
+    |                  | | **description**|                                                             |
+    +------------------+------------------+-------------------------------------------------------------+
+
+.. table::  1D objects data: List of appearing indices and variables together
+            with their explanation.
+
+    +----------------+------------------------------------+---------------------+
+    | | **Index** /  |         **Explanation**            | **Range definition**|
+    | | **Variable** |                                    |                     |
+    +----------------+------------------------------------+---------------------+
+    | :math:`g`      | | General grid description         | :math:`g = 1`       |
+    |                | | structure array index.           |                     |
+    +----------------+------------------------------------+---------------------+
+    | :math:`p`      | | Space structure array index      | :math:`p = 1`       |
+    +----------------+------------------------------------+---------------------+
+    | :math:`d`      | | Dimension structure array index. | :math:`d = 1`       |
+    +----------------+------------------------------------+---------------------+
+    | :math:`b`      | | Boundary array index.            | :math:`b=\{1,2\}`   |
+    +----------------+------------------------------------+---------------------+
+    | :math:`k`      | | 0D object array index.           | :math:`k=\{1,2\}`   |
+    +----------------+------------------------------------+---------------------+
+    | :math:`o^2`    | | 1D object array index.           | :math:`o^2=         |
+    |                |                                    | \{1,2,...,n_{o^2}\}`|
+    +----------------+------------------------------------+---------------------+
+    | :math˛`B       | | *b*-th boundary index of the     | /                   |
+    | ^{o^2}_b`      | | 1D object.                       |                     |
+    +----------------+------------------------------------+---------------------+
+    | :math:`n_{o^2}`| | Total number of 1D objects.      | /                   |
+    +----------------+------------------------------------+---------------------+
+
+
 ::
 
     num_obj_1D_all = len(edge.grid.spaces[0].objects[1].boundary)
@@ -1702,6 +1790,36 @@ of data on 2D objects and their data format are presented in
 :numref:`fig-cpo2ids_2dobjects_data`, while the data structure and
 detailed format of data on 2D objects in both data structures are
 presented in :numref:`lst-cpoids_2D_objects`.
+
+.. table::  2D objects data: Comparison of data structures, their leafs,
+            designed for storage of data on 2D objects, and the leafs data
+            format.
+
+    +------------------------------------+--------------------------------------------------------------+
+    |                                    |                     Data structure                           |
+    |                                    +--------------------------+-----------------------------------+
+    |                                    |        *edge* CPO        |         *edge_profiles* IDS       |
+    +==================+=================+==========================+===================================+
+    | | **Boundary**   | | **Data**      | | edge.grid              | | edge_profiles.ggd(:)            |
+    | | **of the**     | | **Location**  | | .spaces(:)             | | .grid.space(:)                  |
+    | | **2D objects** |                 | | .objects(3)            | | .objects_per_dimension(3)       |
+    |                  |                 | | .boundary              | | .object(:).boundary(:).index    |
+    |                  +-----------------+--------------------------+-----------------------------------+
+    |                  | | **Data type** | | 2D integer array,      | | 1D float array. Each            |
+    |                  | | **and format**| | set to contain         | | object(:) structure             |
+    |                  |                 | | boundary data of       | | to contain boundary data        |
+    |                  |                 | | all 2D objects.        | | on one 2D object.               |
+    +------------------+-----------------+--------------------------+-----------------------------------+
+    | | **Explicit**   | | **Data**      | /                        | | edge_profiles.ggd(:)            |
+    | | **list of**    | | **Location**  |                          | | .grid.space(:)                  |
+    | | **0D objects** |                 |                          | | .objects_per_dimension(3)       |
+    | | **forming the**|                 |                          | | .object(:).nodes                |
+    | | **2D object**  +-----------------+--------------------------+-----------------------------------+
+    |                  | | **Data type** | /                        | | 1D integer array. Each          |
+    |                  | | **and format**|                          | | object(:) structure is set to   |
+    |                  |                 |                          | | contain and explicit list of    |
+    |                  |                 |                          | | 0D objects for one 2D object.   |
+    +------------------+-----------------+--------------------------+-----------------------------------+
 
 ::
 
@@ -1760,6 +1878,64 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
 ``cpo2ids`` Python code shown in
 :numref:`lst-cpo2ids_code_2dobjects`.
 
+.. table::  2D objects data: Data conversion process from edge CPO to
+            edge profiles IDS. For explanation of appearing indices, see
+            Table 4.13.
+
+    +-------------------------------------+-----------------------------------------------------------+
+    |                                     |                       Data structure                      |
+    |                                     +----------------------------+------------------------------+
+    |                                     |      From *edge* CPO       |     to *edge_profiles* IDS   |
+    +==================+==================+============================+==============================+
+    | | **Boundary**   | | **Data**       | | edge.grid                | | edge_profiles.ggd(g)       |
+    | | **of the**     | | **Location**   | | .spaces(p)               | | .grid.space(p)             |
+    | | **2D objects** |                  | | .objects(d=3)            | | .objects_per_dimension(d=3)|
+    |                  |                  | | .boundary[:math:`o^3`,b] | | .object(:math:`o^3`)       |
+    |                  |                  |                            | | .boundary(b).index         |
+    |                  +------------------+----------------------------+------------------------------+
+    |                  | | **Conversion** | | Data transfer.                                          |
+    |                  | | **description**|                                                           |
+    +------------------+------------------+----------------------------+------------------------------+
+    | | **List of**    | | **Data**       | /                          | | edge_profiles.ggd(g)       |
+    | | **0D objects** | | **Location**   |                            | | .grid.space(p)             |
+    | | **forming the**|                  |                            | | .objects_per_dimension(d=3)|
+    | | **2D objects** |                  |                            | | .object(:math:`o^3`).nodes |
+    |                  +------------------+----------------------------+------------------------------+
+    |                  | | **Conversion** | Computed using *edge* CPO boundary of 2D objects.         |
+    |                  | | **description**|                                                           |
+    +------------------+------------------+-----------------------------------------------------------+
+
+
+.. table::  2D objects data: List of appearing indices and variables together
+            with their explanation.
+
+    +----------------+------------------------------------+----------------------+
+    | | **Index** /  |         **Explanation**            | **Range definition** |
+    | | **Variable** |                                    |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`g`      | | General grid description         | :math:`g = 1`        |
+    |                | | structure array index.           |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`p`      | | Space structure array index      | :math:`p = 1`        |
+    +----------------+------------------------------------+----------------------+
+    | :math:`d`      | | Dimension structure array index. | :math:`d = 1`        |
+    +----------------+------------------------------------+----------------------+
+    | :math:`b`      | | Boundary array index.            | :math:`b=\{1,2,3,4\}`|
+    +----------------+------------------------------------+----------------------+
+    | :math:`k`      | | 0D object array index.           | :math:`k=\{1,2,3,4\}`|
+    +----------------+------------------------------------+----------------------+
+    | :math:`o^3`    | | 2D object array index.           | :math:`o^3=          |
+    |                |                                    | \{1,2,...,n_{o^3}\}` |
+    +----------------+------------------------------------+----------------------+
+    | :math:`o       | | Object index of *k*-th 0D object | /                    |
+    | ^1_{o^3,k}`    | | composing the 2D object          |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`B       | | *b*-th boundary index of the     | /                    |
+    | ^{o^3}_b`      | | 2D object.                       |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`n_{o^3}`| | Total number of 2D objects.      | /                    |
+    +----------------+------------------------------------+----------------------+
+
 ::
 
     ...
@@ -1791,6 +1967,22 @@ Grid subset data
 The *edge* CPO and *edge_profiles* IDS parent nodes, designed for data
 storage of data on grid subsets of the grid, are presented in
 :numref:`fig-cpo2ids_gridsubset`.
+
+.. table::  Grid subset data: Comparison of data structures and their
+            parent nodes, designed for storage of data on grid subsets.
+
+    +------------------+-----------------------------------------------------+
+    |                  |                   Data structure                    |
+    |                  +------------------------+----------------------------+
+    |                  |       *edge* CPO       |   *edge_profiles* IDS      |
+    +==================+========================+============================+
+    | | **Grid subset**| | edge.grid.subgrids(:)| | edge_profiles.ggd(:)     |
+    | | **data parent**|                        | | .grid.grid_subset(:)     |
+    | | **node**       |                        |                            |
+    +------------------+------------------------+----------------------------+
+    | | **Node type**  | | Array of structures  | | Array of structures node.|
+    |                  | | node.                |                            |
+    +------------------+------------------------+----------------------------+
 
 Each structure of ``.subgrids(:)`` and ``.grid_subset(:)`` the array of
 structures node is set to store data on a specific grid subset.
@@ -1877,6 +2069,62 @@ shown in :numref:`lst-cpoids_gridsubset`.
                            data format. For an explanation of appearing indices and variables, see
                            Table~\ref{tbl:cpo2ids_gridsubset_iv_explanation}.}
 
+.. table::  Grid subset data: Comparison of data structures, their leafs
+            designed for storage of data on grid subsets and the leafs data
+            format.
+
+    +----------------------------------+-------------------------------------------------+
+    |                                  |                  Data structure                 |
+    |                                  +-----------------------+-------------------------+
+    |                                  |        *edge* CPO     |  *edge_profiles* IDS    |
+    +================+=================+=======================+=========================+
+    | | **Grid**     | | **Data**      | | edge.grid           | | edge_profiles.ggd(:)  |
+    | | **subset**   | | **Location**  | | .subgrids(:).id     | | .grid.grid_subset(:)  |
+    | | **name**     |                 |                       | | .identifier.name      |
+    |                +-----------------+-----------------------+-------------------------+
+    |                | | **Data type** | | Single string.      | | Single string.        |
+    |                | | **and format**|                       |                         |
+    +----------------+-----------------+-----------------------+-------------------------+
+    | | **Grid**     | | **Data**      | | edge.grid           | | edge_profiles.ggd(:)  |
+    | | **subset**   | | **Location**  | | .subgrids(:)        | | .grid.grid_subset(:)  |
+    | | **dimension**|                 | | .list(1).cls        | | .dimension            |
+    | | **index**    |                 |                       |                         |
+    |                +-----------------+-----------------------+-------------------------+
+    |                | | **Data type** | | Single integer.     | | Single integer.       |
+    |                | | **and format**|                       |                         |
+    +----------------+-----------------+-----------------------+-------------------------+
+    | | **Grid**     | | **Data**      | | edge.grid           | | edge_profiles.ggd(:)  |
+    | | **subset**   | | **Location**  | | .subgrids(:)        | | .grid.grid_subset(:)  |
+    | | **list**     |                 | | .list(1).indset(1)  | | .element(:).object(1) |
+    | | **of object**|                 | | .range              |                         |
+    | | **indices**  |                 | | **OR**              |                         |
+    |                |                 | | edge.grid           |                         |
+    |                |                 | | .subgrids(:)        |                         |
+    |                |                 | | .list(1).ind        |                         |
+    |                +-----------------+-----------------------+-------------------------+
+    |                | | **Data type** | | Two integers        | | Single integer        |
+    |                | | **and format**| | defining the range  | | (for each element).   |
+    |                |                 | | or 2D integer array |                         |
+    |                |                 | | for explicit list.  |                         |
+    +----------------+-----------------+-----------------------+-------------------------+
+    | | **Object**   | | **Data**      | /                     | | edge_profiles.ggd(:)  |
+    | | **space**    | | **Location**  |                       | | .grid.grid_subset(:)  |
+    | | **index**    |                 |                       | | .element(:).object(1) |
+    |                |                 |                       | | .space                |
+    |                +-----------------+-----------------------+-------------------------+
+    |                | | **Data type** | /                     | | Single integer.       |
+    |                | | **and format**|                       |                         |
+    +----------------+-----------------+-----------------------+-------------------------+
+    | | **Object**   | | **Data**      | /                     | | edge_profiles.ggd(:)  |
+    | | **dimension**| | **Location**  |                       | | .grid.grid_subset(:)  |
+    | | **index**    |                 |                       | | .element(:).object(1) |
+    |                |                 |                       | | .dimension            |
+    |                +-----------------+-----------------------+-------------------------+
+    |                | | **Data type** | /                     | | Single integer.       |
+    |                | | **and format**|                       |                         |
+    +----------------+-----------------+-----------------------+-------------------------+
+
+
 .. _lst-cpoids_gridsubset:
 
 | In *edge_profiles* IDS, the **space index** ``p``, **dimension
@@ -1893,6 +2141,105 @@ process of the grid subset data from *edge* CPO to *edge_profiles* IDS
 is presented in table `[tbl:cpo2ids_gridsubset_conv]`_, together with
 part of the ``cpo2ids`` Python code shown in
 :numref:`lst-cpo2ids_code_gridsubsets`.
+
+.. table::  Grid subset data: Data conversion process from edge CPO to
+            edge profiles IDS. For an explanation of appearing indices, see
+            Table 4.17.
+
+    +-----------------------------------+-------------------------------------------------+
+    |                                   |                  Data structure                 |
+    |                                   +-----------------------+-------------------------+
+    |                                   |        *edge* CPO     |  *edge_profiles* IDS    |
+    +================+==================+=======================+=========================+
+    | | **Grid**     | | **Data**       | | edge.grid           | | edge_profiles.ggd(g)  |
+    | | **subset**   | | **Location**   | | .subgrids(s).id     | | .grid.grid_subset(s)  |
+    | | **name**     |                  |                       | | .identifier.name      |
+    |                +------------------+-----------------------+-------------------------+
+    |                | | **Conversion** | | Data transfer.                                |
+    |                | | **description**|                                                 |
+    +----------------+------------------+-----------------------+-------------------------+
+    | | **Grid**     | | **Data**       | | edge.grid           | | edge_profiles.ggd(:)  |
+    | | **subset**   | | **Location**   | | .subgrids(:)        | | .grid.grid_subset(:)  |
+    | | **dimension**|                  | | .list(1).cls = d-1  | | .dimension = d        |
+    | | **index**    |                  |                       |                         |
+    |                +------------------+-----------------------+-------------------------+
+    |                | | **Conversion** | | Data transfer and increase in value.          |
+    |                | | **description**|                                                 |
+    +----------------+------------------+-----------------------+-------------------------+
+    | | **Grid**     | | **Data**       | | edge.grid           | | edge_profiles.ggd(g)  |
+    | | **subset**   | | **Location**   | | .subgrids(s)        | | .grid.grid_subset(s)  |
+    | | **list**     |                  | | .list(1).indset(1)  | | .element(             |
+    | | **of object**|                  | | .range(             |   :math:`e=o^d`)        |
+    | | **indices**  |                  |   :math:`o^d_{start}`,| | .object(1).index      |
+    |                |                  |   :math:`o^d_{end}`)  |                         |
+    |                +------------------+-----------------------+-------------------------+
+    |                | | **Conversion** | | Data conversion using range of object indices,|
+    |                | | **description**| | stored i na single leaf, to multiple          |
+    |                |                  | | structures, with :math:`o^d` running from     |
+    |                |                  | | :math:`o^d_{start}` to :math:`o^d_{end}`,     |
+    |                |                  |   **OR**                                        |
+    |                +------------------+-----------------------+-------------------------+
+    |                | | **Data**       | | edge.grid           | | edge_profiles.ggd(g)  |
+    |                | | **Location**   | | .subgrids(s)        | | .grid.grid_subset(s)  |
+    |                |                  | | .list(1).ind(       | | .element(             |
+    |                |                  |   :math:`o^d`)        |   :math:`e=o^d`)        |
+    |                |                  |                       | | .object(1).index      |
+    |                +------------------+-----------------------+-------------------------+
+    |                | | **Conversion** | | Data transfer.                                |
+    |                | | **description**|                                                 |
+    +----------------+------------------+-----------------------+-------------------------+
+    | | **Object**   | | **Data**       | /                     | | edge_profiles.ggd(g)  |
+    | | **space**    | | **Location**   |                       | | .grid.grid_subset(s)  |
+    | | **index**    |                  |                       | | .element(             |
+    |                |                  |                       |   :math:`e=o^d`)        |
+    |                |                  |                       | | .object(1).space=p    |
+    |                +------------------+-----------------------+-------------------------+
+    |                | | **Conversion** | | Additionally stored known object space index. |
+    |                | | **description**|                                                 |
+    +----------------+------------------+-----------------------+-------------------------+
+    | | **Object**   | | **Data**       | /                     | | edge_profiles.ggd(:)  |
+    | | **dimension**| | **Location**   |                       | | .grid.grid_subset(:)  |
+    | | **index**    |                  |                       | | .element(             |
+    |                |                  |                       |   :math:`e=o^d`)        |
+    |                |                  |                       | | .object(1).dimension=d|
+    |                +------------------+-----------------------+-------------------------+
+    |                | | **Conversion** | | Additionally stored known object dimension    |
+    |                | | **description**|   index.                                        |
+    +----------------+------------------+-----------------------+-------------------------+
+
+
+.. table::  Grid subset data: List of appearing indices and variables
+            together with their explanation.
+
+    +----------------+------------------------------------+----------------------+
+    | | **Index** /  |         **Explanation**            | **Range definition** |
+    | | **Variable** |                                    |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`g`      | | General grid description         | :math:`g = 1`        |
+    |                | | structure array index.           |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`p`      | | Space structure array index      | :math:`p = 1`        |
+    +----------------+------------------------------------+----------------------+
+    | :math:`s`      | | Grid subset structure array      | :math:`s=            |
+    |                | | index and base grid subset index.| \{1,2,...,n_s\}`     |
+    +----------------+------------------------------------+----------------------+
+    | :math:`d`      | | Dimension of the grid subset.    | :math:`d = 1/2/3`    |
+    +----------------+------------------------------------+----------------------+
+    | :math:`e`      | | Element array index composing    | :math:`b=\{1,2,3,4\}`|
+    |                | | the grid subset:math:`18`        |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`o^d`    | | Object index of *d*-dimensional  | :math:`o^d=          |
+    |                | | object composing the grid subset.| \{o_1^d,o_2^d,...    |
+    |                |                                    | o_{n_{s_o}}\}`       |
+    +----------------+------------------------------------+----------------------+
+    | :math:`o       | | Object index of *k*-th 0D object | /                    |
+    | ^1_{o^3,k}`    | | composing the 2D object.         |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`B       | | *b*-th boundary index of the 2D  | /                    |
+    | ^{o^3}_b`      | | object.                          |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`n_{o^3}`| | Total number of the 2D objects.  | /                    |
+    +----------------+------------------------------------+----------------------+
 
 ::
 
