@@ -1295,19 +1295,28 @@ three-dimensional space, etc.
     | | **Coordinate**| | **Location**   | | .coordtype           | | .grid.space(:)       |
     | | **type code** |                  |                        | | .coordinate_types    |
     | | **numbers**   +------------------+------------------------+------------------------+
-    |                 | | **Data type**  | 2D integer array.      | 1D integer array.      |
+    |                 | | **Data type**  | | 2D integer array.    | | 1D integer array.    |
     |                 | | **and format** |                        |                        |
     |                 |                  |                        |                        |
     +-----------------+------------------+------------------------+------------------------+
 
-coordtype:
-[[:math:`C_1` ] [:math:`C_2`] :math:`\cdots` [:math:`C_{n_\text{c}}`]]
+.. _lst-cpoids_coordinatestype:
 
+.. list-table:: Coordinate system data: Data structure comparison. CPO
+                coordtype (a) and IDS coordinates types (b) leaf structure and
+                data format. For explanation of appearing indices and variables
+                see Table :numref:`fig-cpo2ids_coordtype_iv_explanation`.
+   :header-rows: 1
+   :widths: 80 80
+   :stub-columns: 1
 
+   *  - *edge* CPO
+      - *edge_profiles* IDS
+   *  - coordtype:
+        [[:math:`C_1` ] [:math:`C_2`] :math:`\cdots` [:math:`C_{n_\text{c}}`]]
+      - coordinates_type:
+        [:math:`C_1` :math:`C_2` :math:`\cdots` :math:`C_{n_\text{c}}`]
 
-
-coordinates_type:
-[:math:`C_1` :math:`C_2` :math:`\cdots` :math:`C_{n_\text{c}}`]
 
 
 [Coordinate system data: Data structure comparison] Coordinate system
@@ -1315,7 +1324,7 @@ data: Data structure comparison. CPO ``coordtype`` (a) and IDS
 ``coordinates_types`` (b) leaf structure and data format. For
 explanation of appearing indices and variables see
 :numref:`fig-cpo2ids_coordtype_iv_explanation`.
-.. _lst-cpoids_coordinatestype:
+
 
 Following the discussed data format, the conversion process of
 coordinate system data from *edge* CPO to *edge_profiles* IDS is
@@ -1338,7 +1347,7 @@ of the ``cpo2ids`` Python code presented in
     | | **type code** | | **Location**   | | .coordtype[c, 1]     | | .grid.space(p)       |
     | | **numbers**   |                  |                        | | .coordinate_types[c] |
     |                 +------------------+------------------------+------------------------+
-    |                 | | **Conversion** | Data transfer                                   |
+    |                 | | **Conversion** | | Data transfer.                                |
     |                 | | **description**|                                                 |
     +-----------------+------------------+-------------------------------------------------+
 
@@ -1369,7 +1378,11 @@ of the ``cpo2ids`` Python code presented in
    |                       | | number [15].                 |                     |
    +-----------------------+--------------------------------+---------------------+
 
-::
+.. _lst-cpo2ids_code_coordtype:
+.. code-block:: Python
+   :caption:    Coordinate system data: Data conversion process - cpo2ids code.
+                Partial and adjusted presentation of the cpo2ids code used for
+                data conversion from edge CPO to edge profiles IDS.
 
     num_coordtype = len(edge.grid.spaces[0].coordtype)
     ...
@@ -1398,7 +1411,7 @@ storage of data on each object of the grid are presented in
     | | **parent node** | | .objects(:)         | | .grid.space(:)            |
     |                   |                       | | .objects_per_dimension(:) |
     +-------------------+-----------------------+-----------------------------+
-    | | **Node type**   | Array of structures   | Array of structures         |
+    | | **Node type**   | | Array of structures | | Array of structures       |
     |                   | node.                 | node.                       |
     +-------------------+-----------------------+-----------------------------+
 
@@ -1471,48 +1484,103 @@ presented in :numref:`lst-cpoids_0D_objects_example`, describing grid
 nodes in 2D cylindrical space (R,Z), with ``R`` being torus’s major
 radius and ``z`` being the height.
 
-::
+.. _lst-cpoids_0D_objects:
+.. list-table:: 0D objects data: Data structure comparison. CPO objects(1).geo
+                leaf (a) and IDS objects_per_dimension(1)
+                structure (b) data and their accompanying children data format.
+                For explanation of the appearing indices and variables
+                see Table :numref:`tbl-cpo2ids_0dobjects_iv_explanation`.
+   :header-rows: 1
+   :widths: 80 80
 
-    -objects[1]
-        -geo:
-        [[[[:math:`R_1`]] [[:math:`z_1`]]]
-         [[[:math:`R_2`]] [[:math:`z_2`]]]
-         :math:`\cdots`
-         [[[:math:`R_{n_{\text{o}^1}}`]] [[:math:`z_{n_{\text{o}^1}}`]]]]
-        (*@ \vspace{10\baselineskip} @*)
-
-
-::
-
-    -objects:math:`_`per:math:`_`dimension[1]
-        -object[1]
-            -geometry:
-            [:math:`R_1` :math:`z_1`]
-            -nodes:
-            [1]
-        -object[2]
-            -geometry:
-            [:math:`R_2` :math:`z_2`]
-            -nodes:
-            [2]
-        :math:`\cdots`
-        -object[:math:`n_{\text{o}^1}`]
-            -geometry:
-            [:math:`R_{n_{\text{o}^1}}` :math:`R_{n_{\text{o}^1}}`]
-            -nodes:
-            [:math:`n_{\text{o}^1}`]
-
-
-                           \texttt{objects_per_dimension(1)}
-                           structure (b) and their accompanying children data format
-                           with demonstration of the data on the grid, set in 2D space with
-                           R and Z coordinate types.
-                           :math:`R_i` and :math:`z_i` are coordinates of :math:`i`-th 0D object or grid node, with
-                           :math:`i` running from 1 to :math:`n_{\text{o}^1}` where :math:`n_{\text{o}^1}` is
-                           total number of 0D objects. As such, :math:`N_i` grid node is defined as
-                           :math:`N_i[R_i,z_i]`.}
+   *  - | *edge* CPO
+      - | *edge_profiles* IDS
+   *  - |   -objects[1]
+        |       -geo:
+        |       [[[[:math:`G^1_1`]] [[:math:`G^1_2`]] :math:`\cdots` [[:math:`G^1_{n_\text{c}}`]]]
+        |       [[[:math:`G^2_1`]] [[:math:`G^2_2`]] :math:`\cdots` [[:math:`G^2_{n_\text{c}}`]]]
+        |       :math:`\cdots`
+        |       [[[:math:`G^{n_{\text{o}^1}}_1`]] [[:math:`G^{n_{\text{o}^1}}_2`]] :math:`\cdots` [[:math:`G^{n_{\text{o}^1}}_{n_\text{c}}`]]]]
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+      - |   -objects_per_dimension[1]
+        |       -object[:math:`o^1=1`]
+        |       -geometry:
+        |       [:math:`G^1_1` :math:`G^1_2` :math:`\cdots` :math:`G^1_{n_\text{c}}`]
+        |       -nodes:
+        |       [1]
+        |   -object[:math:`o^1= 2`]
+        |       -geometry:
+        |       [:math:`G^2_1` :math:`G^2_2` :math:`\cdots` :math:`G^2_{n_\text{c}}`]
+        |       -nodes:
+        |       [2]
+        |   :math:`\cdots`
+        |   -object[:math:`o^1=n_{\text{o}^1}`]
+        |       -geometry:
+        |           [:math:`^{n_{\text{o}^1}}_1` :math:`G^{n_{\text{o}^1}}_2` :math:`\cdots` :math:`G^{n_{\text{o}^1}}_{n_\text{c}}`]
+        |       -nodes:
+        |       [:math:`n_{\text{o}^1}`]
 
 .. _lst-cpoids_0D_objects_example:
+.. list-table:: 0D objects data: Data structure comparison - example. CPO
+                objects(1) structure (a) and IDS objects per dimension(1)
+                structure (b) and their accompanying children data format
+                with demonstration of the data on the grid, set in 2D space with
+                R and Z coordinate types.
+                :math:`R_i` and :math:`z_i` are coordinates of :math:`i`-th 0D
+                object or grid node,  with :math:`i` running from 1 to
+                :math:`n_{\text{o}^1}` where :math:`n_{\text{o}^1}` is
+                total number of 0D objects. As such, :math:`N_i` grid node is
+                defined as :math:`N_i[R_i,z_i]`.
+   :header-rows: 1
+   :widths: 80 80
+
+   *  - | *edge* CPO
+      - | *edge_profiles* IDS
+   *  - |   -objects[1]
+        |       -geo:
+        |       [[[[:math:`R_1`]] [[:math:`z_1`]]]
+        |       [[[:math:`R_2`]] [[:math:`z_2`]]]
+        |       :math:`\cdots`
+        |       [[[:math:`R_{n_{\text{o}^1}}`]] [[:math:`z_{n_{\text{o}^1}}`]]]]
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+      - |   -objects_per_dimension[1]
+        |       -object[1]
+        |           -geometry:
+        |           [:math:`R_1` :math:`z_1`]
+        |           -nodes:
+        |           [1]
+        |       -object[2]
+        |           -geometry:
+        |           [:math:`R_2` :math:`z_2`]
+        |           -nodes:
+        |           [2]
+        |       :math:`\cdots`
+        |       -object[:math:`n_{\text{o}^1}`]
+        |           -geometry:
+        |           [:math:`R_{n_{\text{o}^1}}` :math:`R_{n_{\text{o}^1}}`]
+        |           -nodes:
+        |           [:math:`n_{\text{o}^1}`]
 
 Following the discussed data format, the conversion process of 0D
 objects data from *edge* CPO to *edge_profiles* IDS is presented in
@@ -1520,7 +1588,11 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
 ``cpo2ids`` Python code shown in
 :numref:`lst-cpo2ids_code_0dobjects`.
 
-::
+.. _lst-cpo2ids_code_0dobjects:
+.. code-block:: Python
+   :caption:    0D objects data: Data conversion process - cpo2ids code. Partial
+                and adjusted presentation of the cpo2ids code used for data
+                conversion from edge CPO to edge profiles IDS.
 
     num_obj_0D_all = len(edge.grid.spaces[0].objects[0].geo)
     ...
@@ -1533,10 +1605,10 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
         edge_profiles.ggd[0].grid.space[0].objects_per_dimension[0].object[o1] \
             .nodes[0] = o1 + 1
 
-
+.. _tbl-cpo2ids_0dobjects_iv_explanation:
 .. table::  0D objects data: Data conversion process from edge CPO to
             edge profiles IDS. For explanation of appearing indices see
-            Table 4.7.
+            Table :numref:`tbl-cpo2ids_0dobjects_iv_explanation`.
 
     +-------------------------------------+-------------------------------------------------------------+
     |                                     |                   Data structure                            |
@@ -1548,7 +1620,7 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
     | | **0D objects** |                  | | .objects(d=1)        | | .objects_per_dimension(d=1)      |
     |                  |                  | | .geo[:math:`o^1`,c]  | | .object(:math:`o^1`).geometry[c] |
     |                  +------------------+------------------------+------------------------------------+
-    |                  | | **Conversion** | Data transfer                                               |
+    |                  | | **Conversion** | | Data transfer.                                            |
     |                  | | **description**|                                                             |
     +------------------+------------------+------------------------+------------------------------------+
     | | **0D object**  | | **Data**       | /                      | | edge_profiles.ggd(g)             |
@@ -1561,6 +1633,7 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
     |                  | | **description**|                                                             |
     +------------------+------------------+-------------------------------------------------------------+
 
+.. _tbl-cpo2ids_0dobjects_iv_explanation:
 .. table::  0D objects data: List of appearing indices and variables together
             with their explanation.
 
@@ -1611,6 +1684,7 @@ of data on 1D objects and their data format are presented in
 detailed format of the data on 1D objects in both data structures are
 presented in :numref:`lst-cpoids_1D_objects`.
 
+.. _tbl-cpo2ids_1dobjects_data:
 .. table::  1D objects data: Comparison of data structures, their leafs,
             designed for storage of data on 0D objects, and the leafs data
             format.
@@ -1641,55 +1715,70 @@ presented in :numref:`lst-cpoids_1D_objects`.
     |                  |                 |                          | | 0D objects for one 2D object. |
     +------------------+-----------------+--------------------------+---------------------------------+
 
-
-::
-
-    -objects[2]
-        -boundary:
-        [[:math:`B^{1}_1` :math:`B^{1}_2`] [:math:`B^{2}_1` :math:`B^{2}_2`]:math:`\cdots`
-         [:math:`B^{n_{\text{o}^2}}_1` :math:`B^{n_{\text{o}^2}}_2`]]
-         (*@ \vspace{18\baselineskip} @*)
-
-
-::
-
-    -objects:math:`_`per:math:`_`dimension[2]
-        -object[:math:`o^2= `1]
-            -boundary[1]
-                -index: :math:`B^{1}_1`
-            -boundary[2]
-                -index: :math:`B^{1}_2`
-            -nodes:
-            [:math:`B^{1}_1` :math:`B^{1}_2`]
-        -object[:math:`o^2= `2]
-            -boundary[1]
-                -index: :math:`B^{2}_1`
-            -boundary[2]
-                -index: :math:`B^{2}_2`
-            -nodes:
-            [:math:`B^{2}_1` :math:`B^{2}_2`]
-        :math:`\cdots`
-        -object[:math:`o^2= ` :math:`n_{\text{o}^2}`]
-            -boundary[1]
-                -index: :math:`B^{n_{\text{o}^2}}_1`
-            -boundary[2]
-                -index: :math:`B^{n_{\text{o}^2}}_2`
-            -nodes:
-            [:math:`B^{n_{\text{o}^2}}_1` :math:`B^{n_{\text{o}^2}}_2`]
-
-
-[1D objects data: Data structure comparison] 1D objects data: Data
-structure comparison. CPO ``objects(2).boundary`` leaf (a) and IDS
-``objects_per_dimension(2)`` structure (b) and their accompanying
-children data format. For explanation of the appearing indices and
-variables see :numref:`fig-cpo2ids_1dobjects_iv_explanation`.
 .. _lst-cpoids_1D_objects:
+.. list-table:: 1D objects data: Data
+                structure comparison. CPO ``objects(2).boundary`` leaf (a) and IDS
+                ``objects_per_dimension(2)`` structure (b) and their accompanying
+                children data format. For explanation of the appearing indices and
+                variables see :numref:`fig-cpo2ids_1dobjects_iv_explanation`.
+   :header-rows: 1
+   :widths: 80 80
+
+   *  - | *edge* CPO
+      - | *edge_profiles* IDS
+   *  - |   -objects[2]
+        |       -boundary:
+        |       [[:math:`B^{1}_1` :math:`B^{1}_2`] [:math:`B^{2}_1` :math:`B^{2}_2`]:math:`\cdots`
+        |       [:math:`B^{n_{\text{o}^2}}_1` :math:`B^{n_{\text{o}^2}}_2`]]
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+      - |   -objects:math:`_`per:math:`_`dimension[2]
+        |       -object[:math:`o^2= `1]
+        |           -boundary[1]
+        |               -index: :math:`B^{1}_1`
+        |           -boundary[2]
+        |               -index: :math:`B^{1}_2`
+        |           -nodes:
+        |           [:math:`B^{1}_1` :math:`B^{1}_2`]
+        |       -object[:math:`o^2= `2]
+        |           -boundary[1]
+        |               -index: :math:`B^{2}_1`
+        |           -boundary[2]
+        |               -index: :math:`B^{2}_2`
+        |           -nodes:
+        |           [:math:`B^{2}_1` :math:`B^{2}_2`]
+        |       :math:`\cdots`
+        |       -object[:math:`o^2= ` :math:`n_{\text{o}^2}`]
+        |           -boundary[1]
+        |               -index: :math:`B^{n_{\text{o}^2}}_1`
+        |           -boundary[2]
+        |               -index: :math:`B^{n_{\text{o}^2}}_2`
+        |           -nodes:
+        |           [:math:`B^{n_{\text{o}^2}}_1` :math:`B^{n_{\text{o}^2}}_2`]
 
 Following the discussed data format, the conversion process of 1D
 objects data from *edge* CPO to *edge_profiles* IDS is presented in
 :numref:`fig-cpo2ids_1dobjects_conv`, together with part of the
 ``cpo2ids`` Python code shown in :numref:`lst-cpo2ids_1dobjects`.
 
+.. _tbl-cpo2ids_1dobjects_conv:
 .. table::  1D objects data: Data conversion process from edge CPO to edge
             profiles IDS. For explanation of appearing indices and variables
             see Table 4.10
@@ -1717,6 +1806,7 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
     |                  | | **description**|                                                             |
     +------------------+------------------+-------------------------------------------------------------+
 
+.. _tbl-cpo2ids_1dobjects_iv_explanation:
 .. table::  1D objects data: List of appearing indices and variables together
             with their explanation.
 
@@ -1744,8 +1834,11 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
     | :math:`n_{o^2}`| | Total number of 1D objects.      | /                   |
     +----------------+------------------------------------+---------------------+
 
-
-::
+.. _lst-cpo2ids_1dobjects:
+.. code-block:: Python
+   :caption:    1D objects data: Data conversion process - cpo2ids code. Partial
+                and adjusted presentation of the cpo2ids code used for data
+                conversion from edge CPO to edge profiles IDS.
 
     num_obj_1D_all = len(edge.grid.spaces[0].objects[1].boundary)
     ...
@@ -1791,6 +1884,7 @@ of data on 2D objects and their data format are presented in
 detailed format of data on 2D objects in both data structures are
 presented in :numref:`lst-cpoids_2D_objects`.
 
+.. _tbl-cpo2ids_2dobjects_data:
 .. table::  2D objects data: Comparison of data structures, their leafs,
             designed for storage of data on 2D objects, and the leafs data
             format.
@@ -1821,56 +1915,77 @@ presented in :numref:`lst-cpoids_2D_objects`.
     |                  |                 |                          | | 0D objects for one 2D object.   |
     +------------------+-----------------+--------------------------+-----------------------------------+
 
-::
-
-    -objects[3]
-        -boundary:
-        [[:math:`B^{1}_1` :math:`B^{1}_2` :math:`B^{1}_3` :math:`B^{1}_4`]
-         [:math:`B^{2}_1` :math:`B^{2}_2` :math:`B^{2}_3` :math:`B^{2}_4`]
-         :math:`\cdots`
-         [:math:`B^{n_{\text{o}^3}}_1` :math:`B^{n_{\text{o}^3}}_2` :math:`B^{n_{\text{o}^3}}_3` :math:`B^{n_{\text{o}^3}}_4`]]
-         (*@ \vspace{22\baselineskip} @*)
-
-
-::
-
-    -objects:math:`_`per:math:`_`dimension[3]
-        -object[:math:`o^3=`1]
-            -boundary[1] =
-                -index: :math:`B^{1}_1`
-            -boundary[2] =
-                -index: :math:`B^{1}_2`
-            -boundary[3] =
-                -index: :math:`B^{1}_3`
-            -boundary[4] =
-                -index: :math:`B^{1}_4`
-            -nodes:
-            [:math:`o^{1}_{11}` :math:`o^{1}_{12}` :math:`o^{1}_{13}` :math:`o^{1}_{14}`]
-        -object[:math:`o^3=`2] =
-            -boundary[1] =
-                -index: :math:`B^{2}_1`
-            ...
-            -boundary[4] =
-                -index: :math:`B^{2}_4`
-            -nodes:
-            [:math:`o^{1}_{21}` :math:`o^{1}_{22}` :math:`o^{1}_{23}` :math:`o^{1}_{24}`]
-        :math:`\cdots`
-        -object[:math:`o^3=` :math:`n_{\text{o}^3}`] =
-            -boundary[1] =
-                -index: :math:`B^{n_{\text{o}^3}}_1`
-            ...
-            -boundary[4] =
-                -index: :math:`B^{n_{\text{o}^3}}_4`
-            -nodes:
-            [:math:`o^{1}_{n_{\text{o}^3}1}` :math:`o^{1}_{n_{\text{o}^3}2}` :math:`o^{1}_{n_{\text{o}^3}3}` :math:`o^{1}_{n_{\text{o}^3}4}`]
-
-
-                           \texttt{objects_per_dimension(3)} structure (b) and their
-                           accompanying children data format. For an explanation of
-                           appearing indices and variables, see
-                           Table~\ref{tbl:cpo2ids_2dobjects_iv_explanation}.}
 
 .. _lst-cpoids_2D_objects:
+.. list-table:: 2D objects data: Data structure comparison. CPO
+                objects(3).boundary leaf (a) and IDS objects_per_dimension(3)
+                structure (b) and their accompanying children data format. For
+                an explanation of appearing indices and variables, see
+                Table :numref:`tbl-cpo2ids_2dobjects_iv_explanation`.
+   :header-rows: 1
+   :widths: 80 80
+
+   *  - | *edge* CPO
+      - | *edge_profiles* IDS
+   *  - |   -objects[3]
+        |        -boundary:
+        |        [[:math:`B^{1}_1` :math:`B^{1}_2` :math:`B^{1}_3` :math:`B^{1}_4`]
+        |        [:math:`B^{2}_1` :math:`B^{2}_2` :math:`B^{2}_3` :math:`B^{2}_4`]
+        |        :math:`\cdots`
+        |        [:math:`B^{n_{\text{o}^3}}_1` :math:`B^{n_{\text{o}^3}}_2` :math:`B^{n_{\text{o}^3}}_3` :math:`B^{n_{\text{o}^3}}_4`]]
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+    *  -|    -objects:math:`_`per:math:`_`dimension[3]
+        |        -object[:math:`o^3=`1]
+        |            -boundary[1] =
+        |                -index: :math:`B^{1}_1`
+        |            -boundary[2] =
+        |                -index: :math:`B^{1}_2`
+        |            -boundary[3] =
+        |                -index: :math:`B^{1}_3`
+        |            -boundary[4] =
+        |                -index: :math:`B^{1}_4`
+        |            -nodes:
+        |            [:math:`o^{1}_{11}` :math:`o^{1}_{12}` :math:`o^{1}_{13}` :math:`o^{1}_{14}`]
+        |        -object[:math:`o^3=`2] =
+        |            -boundary[1] =
+        |                -index: :math:`B^{2}_1`
+        |            ...
+        |            -boundary[4] =
+        |                -index: :math:`B^{2}_4`
+        |            -nodes:
+        |            [:math:`o^{1}_{21}` :math:`o^{1}_{22}` :math:`o^{1}_{23}` :math:`o^{1}_{24}`]
+        |        :math:`\cdots`
+        |        -object[:math:`o^3=` :math:`n_{\text{o}^3}`] =
+        |            -boundary[1] =
+        |                -index: :math:`B^{n_{\text{o}^3}}_1`
+        |            ...
+        |            -boundary[4] =
+        |                -index: :math:`B^{n_{\text{o}^3}}_4`
+        |            -nodes:
+        |            [:math:`o^{1}_{n_{\text{o}^3}1}` :math:`o^{1}_{n_{\text{o}^3}2}` :math:`o^{1}_{n_{\text{o}^3}3}` :math:`o^{1}_{n_{\text{o}^3}4}`]
+
 
 Following the discussed data format, the conversion process of 2D
 objects data from *edge* CPO to *edge_profiles* IDS is presented in
@@ -1901,7 +2016,7 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
     | | **forming the**|                  |                            | | .objects_per_dimension(d=3)|
     | | **2D objects** |                  |                            | | .object(:math:`o^3`).nodes |
     |                  +------------------+----------------------------+------------------------------+
-    |                  | | **Conversion** | Computed using *edge* CPO boundary of 2D objects.         |
+    |                  | | **Conversion** | | Computed using *edge* CPO boundary of 2D objects.       |
     |                  | | **description**|                                                           |
     +------------------+------------------+-----------------------------------------------------------+
 
@@ -1936,7 +2051,11 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
     | :math:`n_{o^3}`| | Total number of 2D objects.      | /                    |
     +----------------+------------------------------------+----------------------+
 
-::
+.. _lst-cpo2ids_code_2dobjects:
+.. code-block:: Python
+   :caption:    2D objects data: Data conversion process - cpo2ids code. Partial
+                and adjusted presentation of the cpo2ids code used for data
+                conversion from edge CPO to edge profiles IDS.
 
     ...
     num_gridNodes_2D    = 4
@@ -2015,60 +2134,7 @@ of data on grid subsets, and their data format are presented in
 detailed format of data on grid subsets in both data structures are
 shown in :numref:`lst-cpoids_gridsubset`.
 
-::
-
-    -subgrids[:math:`s=`1]
-        -id: (*@ "grid subset :math:`s` name" @*)
-        -list[1]
-            -cls:
-             [d]
-            -indset[1]
-                -range:
-                 [:math:`o^d_{\text{start}}` :math:`o^d_{\text{end}}`]
-            (*@ \large\textbf{OR} @*)
-            -ind:
-             [:math:`o^d_1` :math:`o^d_2` :math:`\cdots` :math:`o^d_{n_{\text{s}_\text{o}}}`]
-    -subgrids[:math:`s=`2]
-        ...
-    ...
-    -subgrids[:math:`n_\text{s}`]
-        ...
-        (*@ \vspace{9\baselineskip} @*)
-
-
-::
-
-    -grid_subset[:math:`s=`1]
-        -identifier
-            -name: (*@ "grid subset :math:`s` name" @*)
-            -index: :math:`I_s`
-        -dimension: :math:`d`
-            -element[:math:`e=`1]
-                -object[1]
-                    -space: :math:`p`
-                    -dimension: :math:`d`
-                    -index: :math:`o^d_1`
-            -element[:math:`e=`2]
-                -object[1]
-                    -space: :math:`p`
-                    -dimension: :math:`d`
-                    -index: :math:`o^d_2`
-            ...
-            -element[:math:`e=` :math:`n_{\text{s}_\text{e}}`]
-                -object[1]
-                    -space: :math:`p`
-                    -dimension: :math:`d`
-                    -index: :math:`o^d_{n_{\text{s}_\text{e}}}`
-    -grid_subset[:math:`s=`2]
-        ...
-    ...
-    -grid_subset[:math:`s=` :math:`n_\text{s}`]
-        ...
-
-
-                           data format. For an explanation of appearing indices and variables, see
-                           Table~\ref{tbl:cpo2ids_gridsubset_iv_explanation}.}
-
+.. _tbl-cpo2ids_gridsubset_data:
 .. table::  Grid subset data: Comparison of data structures, their leafs
             designed for storage of data on grid subsets and the leafs data
             format.
@@ -2124,8 +2190,69 @@ shown in :numref:`lst-cpoids_gridsubset`.
     |                | | **and format**|                       |                         |
     +----------------+-----------------+-----------------------+-------------------------+
 
-
 .. _lst-cpoids_gridsubset:
+.. list-table:: Grid subset data: Data structure comparison. CPO subgrids(:) structure
+                        (a) and IDS grid_subset(:) structure (b) and their accompanying children
+                        data format. For an explanation of appearing indices and variables, see
+                        Table :numref:`tbl-cpo2ids_gridsubset_iv_explanation`.
+   :header-rows: 1
+   :widths: 80 80
+
+   *  - | *edge* CPO
+      - | *edge_profiles* IDS
+   *  - |   -subgrids[:math:`s=1`]
+        |       -id: "grid subset :math:`s` name"
+        |       -list[1]
+        |           -cls:
+        |            [d]
+        |           -indset[1]
+        |               -range:
+        |                [:math:`o^d_{\text{start}}` :math:`o^d_{\text{end}}`]
+        |               **OR**
+        |           -ind:
+        |            [:math:`o^d_1` :math:`o^d_2` :math:`\cdots` :math:`o^d_{n_{\text{s}_\text{o}}}`]
+        |   -subgrids[:math:`s=2`]
+        |       ...
+        |   ...
+        |   -subgrids[:math:`n_\text{s}`]
+        |       ...
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+        |
+      - |   -grid_subset[:math:`s=1`]
+        |       -identifier
+        |           -name: "grid subset :math:`s` name"
+        |           -index: :math:`I_s`
+        |       -dimension: :math:`d`
+        |           -element[:math:`e=1`]
+        |               -object[1]
+        |                   -space: :math:`p`
+        |                   -dimension: :math:`d`
+        |                   -index: :math:`o^d_1`
+        |           -element[:math:`e=2`]
+        |               -object[1]
+        |                   -space: :math:`p`
+        |                   -dimension: :math:`d`
+        |                   -index: :math:`o^d_2`
+        |           ...
+        |           -element[:math:`e=` :math:`n_{\text{s}_\text{e}}`]
+        |               -object[1]
+        |                   -space: :math:`p`
+        |                   -dimension: :math:`d`
+        |                   -index: :math:`o^d_{n_{\text{s}_\text{e}}}`
+        |   -grid_subset[:math:`s=2`]
+        |       ...
+        |   ...
+        |   -grid_subset[:math:`s=` :math:`n_\text{s}`]
+        |       ...
+
 
 | In *edge_profiles* IDS, the **space index** ``p``, **dimension
   index** ``d`` and **object index** ``o^{d}`` are used to
@@ -2142,9 +2269,10 @@ is presented in table `[tbl:cpo2ids_gridsubset_conv]`_, together with
 part of the ``cpo2ids`` Python code shown in
 :numref:`lst-cpo2ids_code_gridsubsets`.
 
+.. _tbl-cpo2ids_gridsubset_conv:
 .. table::  Grid subset data: Data conversion process from edge CPO to
             edge profiles IDS. For an explanation of appearing indices, see
-            Table 4.17.
+            Table :numref`tbl-cpo2ids_gridsubset_iv_explanation`.
 
     +-----------------------------------+-------------------------------------------------+
     |                                   |                  Data structure                 |
@@ -2207,7 +2335,7 @@ part of the ``cpo2ids`` Python code shown in
     |                | | **description**|   index.                                        |
     +----------------+------------------+-----------------------+-------------------------+
 
-
+.. _tbl-cpo2ids_gridsubset_iv_explanation:
 .. table::  Grid subset data: List of appearing indices and variables
             together with their explanation.
 
@@ -2218,7 +2346,7 @@ part of the ``cpo2ids`` Python code shown in
     | :math:`g`      | | General grid description         | :math:`g = 1`        |
     |                | | structure array index.           |                      |
     +----------------+------------------------------------+----------------------+
-    | :math:`p`      | | Space structure array index      | :math:`p = 1`        |
+    | :math:`p`      | | Space structure array index.     | :math:`p = 1`        |
     +----------------+------------------------------------+----------------------+
     | :math:`s`      | | Grid subset structure array      | :math:`s=            |
     |                | | index and base grid subset index.| \{1,2,...,n_s\}`     |
@@ -2241,7 +2369,11 @@ part of the ``cpo2ids`` Python code shown in
     | :math:`n_{o^3}`| | Total number of the 2D objects.  | /                    |
     +----------------+------------------------------------+----------------------+
 
-::
+.. _lst-cpo2ids_code_gridsubsets:
+.. code-block:: Python
+   :caption:    Grid subset data: Data conversion process - cpo2ids code. Partial
+                and adjusted presentation of the cpo2ids code used for data
+                conversion from edge CPO to edge profiles IDS .
 
     gridSubset_ind   = s + 1
     gridSubset_name = edge.grid.subgrids[s].id
@@ -2301,6 +2433,49 @@ treated the same, and in this aspect only the data transfer and
 conversion process of data fields on the most extensive and complex
 between the discussed plasma properties, the ion density, is presented.
 
+.. _tbl-cpo2ids_scalars:
+.. table::  Data fields: Comparison between data structures and their
+            parent nodes, designed for storage of the data fields holding
+            data on electron temperature, electron density, ion temperature,
+            and ion density plasma properties or quantities.
+
+    +-------------------+-----------------------------------------------------+
+    |                   |                   Data structure                    |
+    |                   +-----------------------+-----------------------------+
+    |                   |       *edge* CPO      |   *edge_profiles* IDS       |
+    +===================+=======================+=============================+
+    | | **Electron**    | | edge.grid.fluid.ne  | | edge_profiles.ggd(:)      |
+    | | **density**     |                       | | .electrons.density(:)     |
+    | | **parent node** |                       |                             |
+    +-------------------+-----------------------+-----------------------------+
+    | | **Node type**   | | Simple structure    | | Array of structures       |
+    |                   |   node.               |   node.                     |
+    +-------------------+-----------------------+-----------------------------+
+    +-------------------+-----------------------+-----------------------------+
+    | | **Electron**    | | edge.grid.fluid.te  | | edge_profiles.ggd(:)      |
+    | | **temperature** |                       | | .electrons.temperature(:  |
+    | | **parent node** |                       |                             |
+    +-------------------+-----------------------+-----------------------------+
+    | | **Node type**   | | Simple structure    | | Array of structures       |
+    |                   |   node.               |   node.                     |
+    +-------------------+-----------------------+-----------------------------+
+    +-------------------+-----------------------+-----------------------------+
+    | | **Ion**         | | edge.grid.fluid     | | edge_profiles.ggd(:)      |
+    | | **density**     |   .ni(:)              | | .ion.density(:)           |
+    | | **parent node** |                       |                             |
+    +-------------------+-----------------------+-----------------------------+
+    | | **Node type**   | | Array of structures | | Array of structures       |
+    |                   |   node.               |   node.                     |
+    +-------------------+-----------------------+-----------------------------+
+    +-------------------+-----------------------+-----------------------------+
+    | | **Ion**         | | edge.grid.fluid     | | edge_profiles.ggd(:)      |
+    | | **temperature** |   .ti(:)              | | .ion.temperature(:)       |
+    | | **parent node** |                       |                             |
+    +-------------------+-----------------------+-----------------------------+
+    | | **Node type**   | | Array of structures | | Array of structures       |
+    |                   |   node.               |   node.                     |
+    +-------------------+-----------------------+-----------------------------+
+
 .. _parag-cpoids_ni:
 
 Ion density
@@ -2331,61 +2506,88 @@ format are presented in :numref:`fig-cpo2ids_ni_data`, while the data
 structure and detailed format of the ion density data in both data
 structures are shown in :numref:`lst-cpo2ids_ni`.
 
-.. _tbl-cpo2ids_ni_data:
+.. _tbl-cpo2ids_ni:
+.. table::  Ion density data field: Comparison between data structures, their
+            leafs designed for storage of data on ion density quantity and the
+            leafs data format.
 
-::
-
-    -ni[:math:`q=`1]
-        -value[:math:`v=`1]
-            -subgrid: :math:`s_1`
-            -scalar:
-            [ :math:`V_{11}` :math:`V_{12}` :math:`\ldots` :math:`V_{1n_{\text{V}^{\text{v}}}}` ]
-        -value[:math:`v=`2]
-            -subgrid: :math:`s_2`
-            -scalar:
-            [ :math:`V_{21}` :math:`V_{22}` :math:`\ldots` :math:`V_{2n_{\text{V}^{\text{v}}}}` ]
-        :math:`\ldots`
-        -value[:math:`v=` :math:`\text{n}_\text{v}`]
-            -subgrid: :math:`s_{n_\text{v}}`
-            -scalar:
-            [ :math:`V_{n_\text{v} 1}` :math:`V_{n_\text{v} 2}` :math:`\ldots` :math:`V_{n_{\text{v}} n_{\text{V}^\text{v}}}` ]
-    -ni[:math:`q=`2]
-        :math:`\ldots`
-    :math:`\ldots`
-    -ni[:math:`q=` :math:`n_{\text{q}}`]
-        :math:`\ldots`
-        (*@ \vspace{2\baselineskip} @*)
-
-
-::
-
-    -ion[:math:`q=`1]
-        -density[:math:`v=`1]
-            -grid_subset_index: :math:`s_1`
-            -values
-            [ :math:`V_{11}` :math:`V_{12}` :math:`\ldots` :math:`V_{1n_{\text{V}^{\text{v}}}}` ]
-        -density[:math:`v=`2]
-            -grid_subset_index: :math:`s_2`
-            -values
-            [ :math:`V_{21}` :math:`V_{22}` :math:`\ldots` :math:`V_{2n_{\text{V}^{\text{v}}}}` ]
-        :math:`\ldots`
-        -density[:math:`v=` :math:`n_\text{v}`]
-            -grid_subset_index: :math:`s_{n_\text{v}}`
-            -values
-            [ :math:`V_{n_\text{v} 1}` :math:`V_{n_\text{v} 2}` :math:`\ldots` :math:`V_{n_{\text{v}} n_{\text{V}^\text{v}}}` ]
-        :math:`\ldots`
-    -ion[:math:`q=`2]
-        :math:`\ldots`
-    :math:`\ldots`
-    -ion[:math:`q=` :math:`n_{\text{q}}`]
-        :math:`\ldots`
-        (*@ \vspace{1\baselineskip} @*)
-
-
-                           For explanation of appearing indices and variables see
-                           Table~\ref{tbl:cpo2ids_ni_iv_explanation}.}
+    +---------------------------------+---------------------------------------------+
+    |                                 |               Data structure                |
+    |                                 +--------------------+------------------------+
+    |                                 |        *edge* CPO  |  *edge_profiles* IDS   |
+    +===============+=================+====================+========================+
+    | | **Ion**     | | **Data**      | | edge.fluid.ni(:) | | edge_profiles.ggd(:) |
+    | | **density** | | **Location**  | | .value(:).scalar | | .ion(:).density(:)   |
+    | | **scalars** |                 |                    | | .values              |
+    |               +-----------------+--------------------+------------------------+
+    |               | | **Data type** | | 1D float array.  | | 1D float array.      |
+    |               | | **and format**|                    |                        |
+    +---------------+-----------------+--------------------+------------------------+
+    | | **Grid**    | | **Data**      | | edge.fluid.ni(:) | | edge_profiles.ggd(:) |
+    | | **subset**  | | **Location**  | | .value(:).subgrid| | .ion(:).density(:)   |
+    | | **index**   |                 |                    | | .grid_subset_index   |
+    |               +-----------------+--------------------+------------------------+
+    |               | | **Data type** | | Single integer.  | | Single integer.      |
+    |               | | **and format**|                    |                        |
+    +---------------+-----------------+--------------------+------------------------+
+    | | **Ion**     | | **Data**      | | edge.species(:)  | | edge_profiles.ggd(:) |
+    | | **specie**  | | **Location**  |   label            | | .ion(:).label        |
+    | | **label**   |                 |                    |                        |
+    |               +-----------------+--------------------+------------------------+
+    |               | | **Data type** | | Single string.   | | Single string.       |
+    |               | | **and format**|                    |                        |
+    +---------------+-----------------+--------------------+------------------------+
 
 .. _lst-cpo2ids_ni:
+.. list-table:: Ion density data field: Data structure comparison. CPO ni(:)
+                (a) and IDS ion(:) (b) structure and their accompanying
+                children data format. For explanation of appearing indices and
+                variables see Table :numref:`tbl-cpo2ids_ni_iv_explanation`.
+   :header-rows: 1
+   :widths: 80 80
+
+   *  - | *edge* CPO
+      - | *edge_profiles* IDS
+   *  - |   -ni[:math:`q=1`]
+        |       -value[:math:`v=1`]
+        |           -subgrid: :math:`s_1`
+        |           -scalar:
+        |           [ :math:`V_{11}` :math:`V_{12}` :math:`\ldots` :math:`V_{1n_{\text{V}^{\text{v}}}}` ]
+        |       -value[:math:`v=`2]
+        |           -subgrid: :math:`s_2`
+        |           -scalar:
+        |           [ :math:`V_{21}` :math:`V_{22}` :math:`\ldots` :math:`V_{2n_{\text{V}^{\text{v}}}}` ]
+        |       :math:`\ldots`
+        |       -value[:math:`v=` :math:`\text{n}_\text{v}`]
+        |           -subgrid: :math:`s_{n_\text{v}}`
+        |           -scalar:
+        |           [ :math:`V_{n_\text{v} 1}` :math:`V_{n_\text{v} 2}` :math:`\ldots` :math:`V_{n_{\text{v}} n_{\text{V}^\text{v}}}` ]
+        |   -ni[:math:`q=2`]
+        |       :math:`\ldots`
+        |   :math:`\ldots`
+        |   -ni[:math:`q=` :math:`n_{\text{q}}`]
+        |       :math:`\ldots`
+        |
+      - |   -ion[:math:`q=1`]
+        |       -density[:math:`v=1`]
+        |           -grid_subset_index: :math:`s_1`
+        |           -values
+        |           [ :math:`V_{11}` :math:`V_{12}` :math:`\ldots` :math:`V_{1n_{\text{V}^{\text{v}}}}` ]
+        |       -density[:math:`v=2`]
+        |           -grid_subset_index: :math:`s_2`
+        |           -values
+        |           [ :math:`V_{21}` :math:`V_{22}` :math:`\ldots` :math:`V_{2n_{\text{V}^{\text{v}}}}` ]
+        |       :math:`\ldots`
+        |       -density[:math:`v=` :math:`n_\text{v}`]
+        |           -grid_subset_index: :math:`s_{n_\text{v}}`
+        |           -values
+        |           [ :math:`V_{n_\text{v} 1}` :math:`V_{n_\text{v} 2}` :math:`\ldots` :math:`V_{n_{\text{v}} n_{\text{V}^\text{v}}}` ]
+        |       :math:`\ldots`
+        |   -ion[:math:`q=2`]
+        |       :math:`\ldots`
+        |   :math:`\ldots`
+        |   -ion[:math:`q=` :math:`n_{\text{q}}`]
+        |       :math:`\ldots`
 
 In the provided benchmark *edge* CPO examples, only one
 ``ni(:).value(:)`` structure [21]_ contained a data field corresponding
@@ -2406,10 +2608,118 @@ is presented in :numref:`fig-cpo2ids_ni_conv`, together with part of
 the cpo2ids Python code shown in :numref:`lst-cpo2ids_code_ni`.
 
 .. _tbl-cpo2ids_ni_conv:
+.. table::  Ion density data field: Data conversion process from edge CPO to
+            edge profiles IDS.
+
+    +-------------------------------------+---------------------------------------------------+
+    |                                     |                       structure                   |
+    |                                     +-----------------------+---------------------------+
+    |                                     |      From *edge* CPO  | to *edge_profiles* IDS    |
+    +==================+==================+=======================+===========================+
+    | | **Ion**        | | **Data**       | | edge.fluid.ni(q)    | | edge_profiles.ggd(g)    |
+    | | **density**    | | **Location**   | | .value(v).scalar[i] | | ion(q).density(v).      |
+    | | **scalars**    |                  |                       | | .values[i]              |
+    |                  +------------------+-----------------------+---------------------------+
+    |                  | | **Conversion** | | Data transfer.                                  |
+    |                  | | **description**|                                                   |
+    +------------------+------------------+-----------------------+---------------------------+
+    | | **Grid**       | | **Data**       | | edge.fluid.ni(q)    | | edge_profiles.ggd(g)    |
+    | | **subset**     | | **Location**   | | value(v).subgrid    | | .ion(q).density(v)      |
+    | | **index**      |                  |                       | | .grid_subset_index      |
+    |                  +------------------+-----------------------+---------------------------+
+    |                  | | **Conversion** | | Data transfer.                                  |
+    |                  | | **description**|                                                   |
+    +------------------+------------------+-----------------------+---------------------------+
+    | | **Ion**        | | **Data**       | | edge.species(q).labe| | edge_profiles.ggd(g)    |
+    | | **specie**     | | **Location**   |                       | | .ion(q).density(v)      |
+    | | **label**      |                  |                       | | .grid_subset_index      |
+    |                  +------------------+-----------------------+---------------------------+
+    |                  | | **Conversion** | | Data transfer.                                  |
+    |                  | | **description**|                                                   |
+    +------------------+------------------+-----------------------+---------------------------+
+    | | **Ion**        | | **Data**       | | edge.grid.subgrids( | | edge_profiles.ggd(g)    |
+    | | **density**    | | **Location**   |   :math:`s_v^+`)      | | .ion(q).density(        |
+    | | **scalars (2)**|                  | | .list(1).ind[i]     |   :math:`v^+`)            |
+    |                  |                  | | and                 | | .values[i]              |
+    |                  |                  | | edge.grid.fluid.ni(q|                           |
+    |                  |                  | | .value(1).scalar[i] |                           |
+    |                  +------------------+-----------------------+---------------------------+
+    |                  | | **Conversion** | | Using list of indices together with data field  |
+    |                  | | **description**| | corresponding to the and only 2D grid subset,   |
+    |                  |                  | | and explicit list in *edge* CPO to assemble     |
+    |                  |                  | | additional data field for other 2D grid subsets.|
+    +------------------+------------------+-----------------------+---------------------------+
+    | | **Grid**       | | **Data**       | /                     | | edge_profiles.ggd(g)    |
+    | | **subset**     | | **Location**   |                       | | .ion(q).density(v)      |
+    | | **index (2)**  |                  |                       | | .grid_subset_index =    |
+    |                  |                  |                       |   :math:`s_v^+`           |
+    |                  +------------------+-----------------------+---------------------------+
+    |                  | | **Conversion** | | Properly set in the cpo2ids** code.             |
+    |                  | | **description**|                                                   |
+    +------------------+------------------+---------------------------------------------------+
 
 .. _tbl-cpo2ids_ni_iv_explanation:
+.. table::  Ion density data field: List of appearing indices and variables
+            together with their explanation.
 
-::
+    +----------------+------------------------------------+----------------------+
+    | | **Index** /  |         **Explanation**            | **Range definition** |
+    | | **Variable** |                                    |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`g`      | | General grid description         | :math:`g = 1`        |
+    |                | | structure array index.           |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`p`      | | Space structure array index.     | :math:`p = 1`        |
+    +----------------+------------------------------------+----------------------+
+    | :math:`q`      | | Ion specie structure array index.| :math:`q=            |
+    |                |                                    | \{1,2,...,n_q\}`     |
+    +----------------+------------------------------------+----------------------+
+    | :math:`i`      | | Data field value array index.    | :math:`i=            |
+    |                |                                    | \{1,2,...,n_{V^v}\}` |
+    +----------------+------------------------------------+----------------------+
+    | :math:`v`      | | *value(:)* and *density(:)*      | :math:`v=            |
+    |                |   structure array                  | \{1,2,...,n_v\}`     |
+    |                | | index.                           |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`v^+`    | | Next available *.density(:)*     | /                    |
+    |                |   structure array                  |                      |
+    |                | | index of in the IDS additionally |                      |
+    |                |   defined ion                      |                      |
+    |                | | density data field.              |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`s_v`    | | Grid subset index, defining the  | /                    |
+    |                |   grid subset to                   |                      |
+    |                | | which the data field             |                      |
+    |                |   corresponds to.                  |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`s_v^+`  | | Grid subset index of the         | /                    |
+    |                |   grid subset to which             |                      |
+    |                | | the in *edge_profiles* IDS       |                      |
+    |                |   additionally defined             |                      |
+    |                | | data field :math:`v^+`           |                      |
+    |                |   corresponds to.                  |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`V_{v,i}`| | *i*-th value of the *v*-th ion   | /                    |
+    |                |   density data field,              |                      |
+    |                | | corresponding to the *i*-th      |                      |
+    |                |   element of the                   |                      |
+    |                | | defined grid subset.             |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`n_q`    | | Total number of ion species.     | /                    |
+    +----------------+------------------------------------+----------------------+
+    | :math:`n_v`    | | Total number of data fields      | /                    |
+    |                |   containing values                |                      |
+    |                | | of specific ion specie.          |                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`n_{V^v}`| | Total number of values in the    | /                    |
+    |                |   *v*-th data field.               |                      |
+    +----------------+------------------------------------+----------------------+
+
+.. _lst-cpo2ids_code_ni:
+.. code-block:: Python
+   :caption:    Ion density data field: Data conversion process - cpo2ids code.
+                Partial and adjusted presentation of the cpo2ids code used
+                for data conversion from edge CPO to edge profiles IDS.
 
     ...
     for q in range (ni_species_num):
