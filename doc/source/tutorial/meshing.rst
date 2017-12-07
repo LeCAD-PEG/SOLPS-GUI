@@ -2,10 +2,6 @@
 
 .. _meshing:
 
-.. |step| note::
-          The file
-
-
 
 =================
 Meshing toolchain
@@ -673,6 +669,11 @@ clickable tells the user which steps were already run and the *DG model* drop
 down button tells us which DivGeo model has been used to create the plasma
 grid.
 
+.. note::
+
+  If the list does not contain a DG model, you have to rescan the baserun dir
+  with clicking the :guilabel:`Update DG list`.
+
 The lower half is the interface to the Carre. On the left side are control
 buttons and on the right we have a log window which shows us the output of
 Carre. Underneath the log window we have the response widgets for Carre. The
@@ -698,6 +699,10 @@ For more information search the ``solps-iter/scripts`` folder and run the
 Now we can click the button :guilabel:`Start Carre` to start Carre. This will
 take a while since the environemnt of *SOLPS-ITER* has to be loaded to a TCSH
 shell before Carre can be started.
+
+Notice that the ``lns`` check box was ticked. Whenever you will want to redo
+the linking with ``lns`` just untick it before clicking
+:guilabel:`Start Carre`.
 
 After a while the following output should be shown in the log window.
 
@@ -964,7 +969,14 @@ The second is to modify the grid points by hand (if there are not too many of
 them). This can be done as follows. Change one of the mouse button functions
 to ``Move mesh point`` and select a corner of a magenta grid cell and move it
 until the cell outline changes colour to lavender. You may need to propagate
-such changes over a range of cells. Bear in mind however that you are only
+such changes over a range of cells.
+
+The result is that there are no more magenta grids.
+
+.. image:: carre_19.png
+   :align: center
+
+Bear in mind however that you are only
 modifying the \*.sno grid file. You will need to save your modifications by
 exporting the mesh :menuselection:`File --> Export --> Mesh`.
 

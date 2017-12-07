@@ -236,7 +236,11 @@ class Triang(TcshProcess):
                 if reading:
                     try:
                         sline = line.split()
-                        name, val = sline[0], sline[1]
+                        if len(sline) == 3:
+                            name = sline[0] + ' ' + sline[1]
+                            val = sline[2]
+                        else:
+                            name, val = sline[0], sline[1]
                         self.vars[TriangVars.Values[name]] = int(val) if \
                             val.isdigit else val
                     except KeyError as e:
