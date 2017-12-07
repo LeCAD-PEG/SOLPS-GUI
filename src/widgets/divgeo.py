@@ -107,7 +107,16 @@ class DivGeo(TcshProcess):
 
     def _onClose_stopDivGeo(self):
         DG_PID = self._onClose_getDivGeoPID()
-        if DG_PID:
+        if not DG_PID:
+            return None
+
+        # Check if user have permission to PID and if the PID exists, by
+        # sending signal 0 to process PID
+        try:
+            os.kill(DG_PID, 0)
+        except OSError:
+            return None
+        else:
             os.kill(DG_PID, signal.SIGUSR1)
 
     def _onClose_getDivGeoPID(self):
@@ -172,6 +181,13 @@ class DivGeo(TcshProcess):
                                         "directory\nor\nif DivGeo needs to be "
                                         "installed.")
             return
+        # Checking if DivGeo hasn't been destroyed meanwhile by the user.
+        try:
+            os.kill(self.DivGeoPID, 0)
+        except OSError:
+            self.tcsh.kill()
+            self.tcsh.close()
+            self.STATE = State.notRunning
 
         # Clean the layout first!
         self.clearLayout()

@@ -16,6 +16,7 @@ import sys
 TIME = QDateTime()
 TIME_FORMAT = "ddd MMM d t yyyy"
 
+
 class CarreVars:
     """Variables for Carre for automation.
 
@@ -84,7 +85,6 @@ class Carre(TcshProcess):
 
     def __init__(self, parent=None):
         super(Carre, self).__init__(parent)
-
         self.vars = CarreVars.Default
 
         self.prepareUserInterface()
@@ -115,14 +115,14 @@ class Carre(TcshProcess):
         groupLayout = QGridLayout()
         groupBox1.setTitle('Baserun .status')
         _n = 2  # Number of widgets per column
-        for i in range((CarreVars.NumOfVars - 2) // _n):
+        for i in range((CarreVars.NumOfVars - 1) // _n):
             for j in range(_n):
                 # Creating checkboxes for
                 x = QCheckBox(CarreVars.Name[i * _n + j])
                 x.setCheckState(0)
                 x.stateChanged.connect(self.setVarsFromClickedGroup)
                 groupLayout.addWidget(x, j, i)
-        _N = CarreVars.NumOfVars - 2
+        _N = CarreVars.NumOfVars - 1
         leftOver = _N - (_N // _n) * _n
         if leftOver > 0:
             for k in range(leftOver):
@@ -143,9 +143,12 @@ class Carre(TcshProcess):
         groupLayout = QVBoxLayout()
         self.selectDgModel = QComboBox()
         self.selectDgModel.addItem('')
-        self.selectDgModel.setSizePolicy(QSizePolicy(QSizePolicy.Expanding,
+        self.selectDgModel.setSizePolicy(QSizePolicy(QSizePolicy.Preferred,
                                                      QSizePolicy.Fixed))
+        x = QPushButton('Update DG list')
+        x.clicked.connect(self.updateDivGeoModel)
         groupLayout.addWidget(self.selectDgModel, alignment=Qt.AlignTop)
+        groupLayout.addWidget(x, alignment=Qt.AlignTop)
         groupBox2.setLayout(groupLayout)
         # Group Box 2
         #############
@@ -410,9 +413,16 @@ class Carre(TcshProcess):
             self.stopCarre()
         super(Carre, self).setRunDir(runDir)
 
-    def updateDivGeoModel(self, runDir):
+    @pyqtSlot(str)
+    @pyqtSlot()
+    def updateDivGeoModel(self, runDir=None):
         """Gives the user a list of all .dg files in baserun
         """
+        if not runDir:
+            if not self.getRunDir():
+                return
+            runDir = self.getRunDir()
+
         self.selectDgModel.clear()
         self.selectDgModel.addItem('')
         [self.selectDgModel.addItem(os.path.basename(_)) for _ in
