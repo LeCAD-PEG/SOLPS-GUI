@@ -3436,6 +3436,9 @@ class CardEditDelegate(QStyledItemDelegate):
         self.parameter_help.emit(parameter)
 
 
+class MyException(Exception):
+    pass
+
 class EireneEdit(QTreeWidget):
     def __init__(self, parent=None):
         super(EireneEdit, self).__init__(parent)
@@ -3452,6 +3455,7 @@ class EireneEdit(QTreeWidget):
         self.setItemDelegate(self.card_edit_delegate)
         self.setCurrentIndex(self.model().index(0, 0))
         self.values = {}
+        self.currentLine = ''
         self.blocks = [self.block_1, self.block_2, self.block_3a,
                        self.block_3b, self.block_4, self.block_5, self.block_6,
                        self.block_7, self.block_8, self.block_9, self.block_10,
@@ -3482,15 +3486,20 @@ class EireneEdit(QTreeWidget):
         # Initiator
         try:
             self.dummy_block()
-        except Exception as e:
+        except MyException as e:
             pass
         for i in range(self.number_of_blocks):
             try:
                 self.blocks[i]()
+            except MyException as e:
+                # New Block
+                continue
             except Exception as e:
-                #print('Error type:', type(e))
-                #print('Error:', e)
                 if type(e) != IndexError:
+                    # print('Block: ', i + 1)
+                    # print('Line: ', self.currentLine)
+                    # print('Error type:', type(e))
+                    # print('Error:', e)
                     self.successful_reading = 0
 
             try:
@@ -4396,6 +4405,7 @@ class EireneEdit(QTreeWidget):
         if self.row >= self.text_size:
             raise IndexError
         line = self.text[self.row]
+        self.currentLine = line
 
         if role is None:
             return line
@@ -4408,7 +4418,7 @@ class EireneEdit(QTreeWidget):
         if line[:3] == '***':
             block_item = self.createItem(self, line)
             self.curr_par = self.grup_par = block_item
-            raise Exception
+            raise MyException
 
         elif line[:1] == '*':
             item = self.createItem(group, line)
@@ -4461,13 +4471,13 @@ class EireneEdit(QTreeWidget):
             text [str]: The text containing values for the roles
 
         """
-        args = self.get_arguments(text, role[0])
+        args = self.get_arguments(text, role[0], len(role) - 1)
         for i in range(1, len(role)):
             if i <= len(args) and role[0] != 'S':
                 self.values[role[i]] = args[i-1]
         role.insert(1,len(args))
 
-    def get_arguments(self, line, type):
+    def get_arguments(self, line, type, numOfVals):
         """This function accepts a string line and then based on a pattern, it
         extracts the correct typed values and then return it via an array.
 
@@ -4485,14 +4495,18 @@ class EireneEdit(QTreeWidget):
                     arguments.append(True if char in 'tT' else False)
         elif type == 'R5':
             arguments = []
-            for i in range(len(line) // 12):
-                arguments.append(float(line[12 * i:12 * (i + 1)]))
+            for i in range(numOfVals):
+                val = line[12 * i:12 * (i + 1)]
+                if val.strip():
+                    arguments.append(float(val))
         elif type == 'R4':
             arguments = [float(e) for e in line.replace('E ', 'E+').split()]
         elif type == 'I':
             arguments = []
-            for i in range(len(line) // 6):
-                arguments.append(int(line[i * 6:(i + 1) * 6]))
+            for i in range(numOfVals):
+                val = line[i * 6:(i + 1) * 6]
+                if val:
+                    arguments.append(int(val))
         elif type == 'S':
             arguments = ''.join([char for char in line])
         else:
@@ -4515,8 +4529,12 @@ class EireneEdit(QTreeWidget):
         self.TextModified = True
 
     def isModified(self):
-        if self.successful_reading == 0:
-            return False
+        """ Usually if there is a slight change in format the editor would go
+        in full error mode. But now that the lines are nonetheless read, the
+        only difference is that there are no tooltips.
+        """
+        # if self.successful_reading == 0:
+        #     return False
         return self.TextModified
 
     def setModified(self, flag):
