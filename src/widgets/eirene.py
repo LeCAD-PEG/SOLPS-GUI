@@ -3185,7 +3185,7 @@ class MyValidator(QValidator):
         self.old_text = old_text
         self.n = n
         if type == 'L':
-            self.length = self.n + int(self.n/5)
+            self.length = self.n + int(self.n / 5)
             self.n = self.length
             self.mask = "T|F|t|f|\s"
         elif type == 'R5':
@@ -3211,6 +3211,7 @@ class MyValidator(QValidator):
         #    self.length = self.n
         #    self.mask = '.'
         #...
+
     def fixup(self, string):
         if self.old_text:
             return self.old_text
@@ -3411,10 +3412,10 @@ class CardEditDelegate(QStyledItemDelegate):
             self.lineEdit.set_card_help(card_type, variables_name,
                                         number_of_args)
 
-            if card_type:
-                val = MyValidator(self.lineEdit, number_of_args, card_type,
-                                  index.data(Qt.DisplayRole))
-                self.lineEdit.setValidator(val)
+            # if card_type:
+            #     val = MyValidator(self.lineEdit, number_of_args, card_type,
+            #                       index.data(Qt.DisplayRole))
+            #     self.lineEdit.setValidator(val)
 
             self.lineEdit.parameter_help.connect(self.parameter_help)
         self.lineEdit.editingFinished.connect(self.parent().changed)
@@ -3530,7 +3531,7 @@ class EireneEdit(QTreeWidget):
         *** 1. Data for operating mode
         """
         self.getline(['I', 'NMACH', 'NMODE', 'NTCPU', 'NFILE', 'NITER0',
-                      'NITER', 'NTIME0', 'NTIME'])
+                      'NITER', 'NTIME0', 'NTIME', 'DUMMY'])
 
         line = self.getline()
         if not self.looks_like_boolean_card(line):
@@ -4474,8 +4475,8 @@ class EireneEdit(QTreeWidget):
         args = self.get_arguments(text, role[0], len(role) - 1)
         for i in range(1, len(role)):
             if i <= len(args) and role[0] != 'S':
-                self.values[role[i]] = args[i-1]
-        role.insert(1,len(args))
+                self.values[role[i]] = args[i - 1]
+        role.insert(1, len(args))
 
     def get_arguments(self, line, type, numOfVals):
         """This function accepts a string line and then based on a pattern, it
@@ -4505,7 +4506,7 @@ class EireneEdit(QTreeWidget):
             arguments = []
             for i in range(numOfVals):
                 val = line[i * 6:(i + 1) * 6]
-                if val:
+                if val.strip():
                     arguments.append(int(val))
         elif type == 'S':
             arguments = ''.join([char for char in line])
