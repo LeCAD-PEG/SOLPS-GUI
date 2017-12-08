@@ -3489,6 +3489,8 @@ class EireneEdit(QTreeWidget):
             self.dummy_block()
         except MyException as e:
             pass
+        except IndexError as e:
+            pass
         for i in range(self.number_of_blocks):
             try:
                 self.blocks[i]()
