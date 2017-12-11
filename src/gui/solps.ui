@@ -161,7 +161,7 @@ self.output.emit(&quot;ls -ld run*&quot;)</string>
            <enum>QTabWidget::Triangular</enum>
           </property>
           <property name="currentIndex">
-           <number>3</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_16">
            <attribute name="title">
