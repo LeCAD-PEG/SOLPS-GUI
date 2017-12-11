@@ -355,8 +355,8 @@ class Triang(TcshProcess):
                 text = f.read()
             text += '\n! Latest SNO file in ' + 'DivGeo/device/' + device + \
                     ': ' + snoFile
-            text += '\n! Change the b2agfs_geometry value with: ' + device
-            text += '\n! Change The first value of *param from -2 to -1'
+            text += '\n! Change the b2agfs_geometry value with: ' + snoFile
+            text += '\n! Change The first value of *param from -1 to -2'
             msg, ok = QInputDialog.getMultiLineText(self, 'Input dialog',
                                                     'Edit b2ag.dat',
                                                     text)
