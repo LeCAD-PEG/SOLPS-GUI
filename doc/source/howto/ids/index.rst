@@ -96,7 +96,7 @@ would be four edges as described in :numref:`fig-grid_structure_1`.
 
 .. _fig-grid_structure_2:
 
-.. figure:: images/grid_structure_2.png
+.. figure:: images/grid_structure_2.*
    :alt: Simple structured quadrilateral grid in two-dimensional space.
    :align: center
    :width: 50%
@@ -106,7 +106,7 @@ would be four edges as described in :numref:`fig-grid_structure_1`.
 
 .. _fig-grid_structure_3:
 
-.. figure:: images/grid_structure_3.png
+.. figure:: images/grid_structure_3.*
    :alt: Simple, structured hexahedral grid in three-dimensional space.
    :align: center
    :width: 40%
@@ -157,20 +157,20 @@ the grid, or on the type or shape of the cells present.
 
 The main two grid types, based upon the type of the connectivity,
 
-#. | **structured grid**,
-   | consist of multiple cells organized in rows and columns, restricted
-     to quadrilaterals in 2D and hexahedra in 3D space, as shown in
-     :numref:`Figs. %s<fig-grid_structure_2>`,
-     :numref:`%s<fig-grid_structure_3>` and :numref:`%s<fig-str_grid>`,
+#. **structured grid**,
+   consist of multiple cells organized in rows and columns, restricted
+   to quadrilaterals in 2D and hexahedra in 3D space, as shown in
+   :numref:`Figs. %s<fig-grid_structure_2>`,
+   :numref:`%s<fig-grid_structure_3>` and :numref:`%s<fig-str_grid>`,
 
-#. | **unstructured grid**,
-   | consisting of multiple unorganized cells and with all cell elements
-     types available, as shown in :numref:`Figs. %s<fig-grid_structure_4>`
-     and :numref:`%s<fig-unstr_grid>`.
+#. **unstructured grid**,
+   consisting of multiple unorganized cells and with all cell elements
+   types available, as shown in :numref:`Figs. %s<fig-grid_structure_4>`
+   and :numref:`%s<fig-unstr_grid>`.
 
 .. _fig-str_grid:
 
-.. figure:: images/example_structured_grid.png
+.. figure:: images/example_structured_grid.*
    :alt: An example of a complex structured grid in 2D space.
    :width: 50%
 
@@ -178,7 +178,7 @@ The main two grid types, based upon the type of the connectivity,
 
 .. _fig-unstr_grid:
 
-.. figure:: images/example_unstructured_grid.png
+.. figure:: images/example_unstructured_grid.*
    :alt: An example of a complex unstructured grid in 2D space.
    :width: 50%
 
@@ -202,7 +202,7 @@ are (also shown in :numref:`fig-grid_structure_5`):
 
 .. _fig-grid_structure_5:
 
-.. figure:: images/grid_structure_5.png
+.. figure:: images/grid_structure_5.*
    :alt: Common grid cell elements.
    :width: 45.0%
 
@@ -239,7 +239,7 @@ cylindrical system.
 
 .. _fig-tokamak_coord_system_2:
 
-.. figure:: images/tokamak_coord_system_2.png
+.. figure:: images/tokamak_coord_system_2.*
    :alt:    Global coordinate systems of the tokamak in three-dimensional
             space. (from Ref. [8]).
    :width:  70.0%
@@ -283,8 +283,8 @@ described by (from Ref. [10]):
 
 -  a **node**, the main building block of the data tree, referring to
    any element of the tree. There are two types of nodes [11], also
-   shown in Figs. :numref:`fig-node-parentChildSibling` and
-   :numref:`fig-data_unit_tree_structure`:
+   shown in Figs. :numref:`fig-node_simpleStructureNode` and
+   :numref:`fig-node_arrayOfStructuredNodes`:
 
    -  **simple structure node**, being a regular single node, and
 
@@ -302,22 +302,39 @@ described by (from Ref. [10]):
 -  a **child**, referring to an element one level below a particular
    node,
 
-as shown in Fig. :numref:`fig-node-parentChildSibling`, with navigation
+as shown in Fig. :numref:`fig-node_parentChildSibling`, with navigation
 through the tree nodes running from start-point nodes through
 lower-level nodes to the end-point leafs.
 
-.. _fig-node-parentChildSibling:
+.. _fig-node_simpleStructureNode:
 
-.. figure:: images/data_tree_combined.*
-   :alt: Parent, sibling, child and leaf element of data structure unit tree.
-   :width: 100.0%
+.. figure:: images/data_tree_simpleStructureNode.*
+   :width:  60%
+   :alt:    Simple structure node concept.
+
+   Simple structure node concept
+
+
+.. _fig-node_arrayOfStructuredNodes:
+
+.. figure:: images/data_tree_arrayOfStructuresNode.*
+   :width:  60%
+   :alt:    Array of structures node
+            concept (right), with structures running from ``1`` to ``n``,
+            where ``n`` is total number of structures.
+
+.. _fig-node_parentChildSibling:
+
+.. figure:: images/data_tree_parentChildSibling.*
+   :width:  60%
+   :alt:    Parent, sibling, child and leaf element of data structure unit tree.
 
    Parent, sibling, child and leaf element of data structure unit tree.
 
 
 .. _fig-data_unit_tree_structure:
 
-.. figure:: images/data_unit_tree_structure.png
+.. figure:: images/data_unit_tree_structure.*
    :alt: An example of schematics of data structure unit tree structure [12].
    :width: 80.0%
 
@@ -346,8 +363,8 @@ programming languages the specific tree node is described in form
 separation mark, while in Fortran90 percentage sign ``"%"`` is used
 instead. The ``"(:)"`` mark used in the shown form is used to designate
 a node being an array of structures node, as shown in
-Figs. :numref:`fig-node-parentChildSibling` and
-:numref:`fig-data_unit_tree_structure`, containing many structures with
+Figs. :numref:`fig-node_simpleStructureNode` and
+:numref:`fig-node_arrayOfStructuredNodes`, containing many structures with
 identical structure, additionally defined by array index with ``1`` as a start
 index (Fortran notation). For example, ``node_top.node_LV1(1)``
 navigates to first structure of the ``node_LV1`` array of structures
@@ -445,7 +462,7 @@ only http://portal.eufus.eu [14].
 
 .. _fig-cpo_top_1:
 
-.. figure:: images/CPO_Phase4TOP_schema3.png
+.. figure:: images/CPO_Phase4TOP_schema3.*
    :alt: Partial tree structure of the EU-IM database [13] with
          highlighted *edge* CPO data structure, relevant to this thesis.
    :width: 70%
@@ -462,7 +479,7 @@ The edge CPO data structure
 
 The *edge* CPO is a database object within EU-IM database structure,
 predefined to hold data related to the *edge* plasma with SOL region
-included. As previously presented in chapter `2`_, *edge* CPO consists
+included. As previously presented in section :ref:`sec-data_storage_units`, *edge* CPO consists
 of lower-level data-tree nodes. Taking into the account the extent and
 complexity of the *edge* CPO structure, only nodes relevant to this
 thesis will be covered. Following that, the main children of the
@@ -485,7 +502,7 @@ top-point *edge* CPO node, as shown in :numref:`fig-cpo_edge_top`, are:
 
 .. _fig-cpo_edge_top:
 
-.. figure:: images/CPO_edge_top2.png
+.. figure:: images/CPO_edge_top2.*
    :alt: *edge* CPO structure [13] with highlighted relevant
          ``datainfo``, ``grid``, ``species(:)``, ``fluid`` and ``time`` nodes.
 
@@ -513,7 +530,7 @@ are:
 
 .. _fig-cpo_edge_grid:
 
-.. figure:: images/CPO_edge_datainfo-grid-fluid-species2.png
+.. figure:: images/CPO_edge_datainfo-grid-fluid-species2.*
    :alt: CPO ``edge.grid`` node structure [13] with highlighted relevant
          ``spaces(:)`` and ``subgrids(:)`` nodes.
 
@@ -523,7 +540,7 @@ are:
 
 .. _fig-cpo_edge_species:
 
-.. figure:: images/CPO_edge_datainfo-species.png
+.. figure:: images/CPO_edge_datainfo-species.*
    :alt: CPO ``edge.species(:)`` node structure [13] with highlighted
          relevant ``label`` node.
 
@@ -575,7 +592,7 @@ shown in :numref:`fig-cpo_edge_grid_spaces`, are:
 
 .. _fig-cpo_edge_grid_spaces:
 
-.. figure:: images/CPO_edge_grid_spaces2.png
+.. figure:: images/CPO_edge_grid_spaces2.*
    :alt: CPO ``edge.grid.spaces(:)`` node structure [13] with
          highlighted relevant ``coordtype``, ``objects`` ``boundary`` and
          ``geo`` nodes.
@@ -620,7 +637,7 @@ are:
 
 .. _fig-cpo_edge_grid_subgrids:
 
-.. figure:: images/CPO_edge_grid_subgrids2.png
+.. figure:: images/CPO_edge_grid_subgrids2.*
    :alt: CPO ``edge.grid.subgrids(:)`` node structure [13] with
          highlighted relevant ``id``, ``list``, ``cls``, ``indset``, ``ind``
          and ``range`` nodes.
@@ -697,7 +714,7 @@ are:
 
 .. _fig-cpo_edge_fluid:
 
-.. figure:: images/CPO_edge_datainfo-fluid.png
+.. figure:: images/CPO_edge_datainfo-fluid.*
    :alt: CPO ``edge.fluid`` node structure [13] with highlighted
          relevant ``ne``, ``ni(:)``, ``te`` and ``ti(:)`` nodes.
 
@@ -707,7 +724,7 @@ are:
 
 .. _fig-cpo_edge_fluid_ni:
 
-.. figure:: images/CPO_edge_fluid_ni2.png
+.. figure:: images/CPO_edge_fluid_ni2.*
    :alt: CPO ``edge.fluid.ni(:)`` node structure [13] with highlighted
          relevant ``value(:)``, ``griduid``, ``subgrid`` and ``scalar`` nodes.
 
@@ -778,7 +795,7 @@ nodes.
 
 .. _fig-ids_data_dictionary:
 
-.. figure:: images/IDS_physics_data_dictionary3.png
+.. figure:: images/IDS_physics_data_dictionary3.*
    :alt: Partial structure of Physics Data Dictionary (the root of the
          Data Dictionary tree), and its listed IDSs [12] with highlighted
          relevant ``edge_profiles`` IDS.
@@ -796,8 +813,8 @@ The edge_profiles IDS
 The *edge_profiles* IDS is a generic data structure within the Data
 Dictionary database [12], designed to hold data related to plasma burn
 in the edge region of the tokamak with the SOL region included. As
-previously discussed in chapter `2`_, *edge_profiles* IDS consists of
-many lower-level data-tree nodes.
+previously discussed in chapter :ref:`sec-data_storage_units`,
+*edge_profiles* IDS consists of many lower-level data-tree nodes.
 
 Taking into the account the extent of the *edge_profiles* IDS structure,
 only nodes relevant to this work will be presented. Considering this,
@@ -814,7 +831,7 @@ the main children of the top-point *edge_profiles* IDS node, as shown in
 
 .. _fig-ids_edgeprofiles_top:
 
-.. figure:: images/IDS_edgeprofiles_top2.png
+.. figure:: images/IDS_edgeprofiles_top2.*
    :alt: IDS ``edge_profiles`` node structure [12] with highlighted
          relevant ``ids_properties`` and ``ggd(:)`` nodes.
 
@@ -824,7 +841,7 @@ the main children of the top-point *edge_profiles* IDS node, as shown in
 
 .. _fig-ids_edgeprofiles_idsproperties:
 
-.. figure:: images/IDS_edgeprofiles_idsproperties2.png
+.. figure:: images/IDS_edgeprofiles_idsproperties2.*
    :alt: IDS ``edge_profiles.ids_properties`` node structure [12] with
          highlighted relevant ``homogeneous_time`` nodes.
 
@@ -855,7 +872,7 @@ shown in :numref:`fig-ids_edgeprofiles_ggd`, are:
 
 .. _fig-ids_edgeprofiles_ggd:
 
-.. figure:: images/IDS_edgeprofiles_ggd3.png
+.. figure:: images/IDS_edgeprofiles_ggd3.*
    :alt: IDS ``edge_profiles.ggd(:)`` node partial structure [12] with
          highlighted relevant ``grid``, ``electrons`` and ``ion(:)`` nodes.
 
@@ -886,7 +903,7 @@ are:
 
 .. _fig-ids_edgeprofiles_ggd_grid:
 
-.. figure:: images/IDS_edgeprofiles_ggd_grid2.png
+.. figure:: images/IDS_edgeprofiles_ggd_grid2.*
    :alt: IDS ``edge_profiles.ggd(:).grid`` node structure [12] with
          highlighted relevant ``identifier``, ``space(:)`` and
          ``grid_subset(:)`` nodes.
@@ -916,7 +933,7 @@ as shown in :numref:`fig-ids_edgeprofiles_ggd_grid_identifier`, are:
 
 .. _fig-ids_edgeprofiles_ggd_grid_identifier:
 
-.. figure:: images/IDS_edgeprofiles_ggd_grid_identifier-space-gridsubset2.png
+.. figure:: images/IDS_edgeprofiles_ggd_grid_identifier-space-gridsubset2.*
    :alt: IDS ``edge_profiles.ggd(:).grid.identifier`` node
          structure [12] with highlighted relevant ``name``, ``index`` and
          ``description`` nodes.
@@ -928,7 +945,7 @@ as shown in :numref:`fig-ids_edgeprofiles_ggd_grid_identifier`, are:
 .. _parag-ids_ggd_space:
 
 space(:)
-
+''''''''
 
 node is an array of structures and a sibling to ``identifier`` and
 ``grid_subset(:)`` node, set to contain data on grid spaces. Its more
@@ -953,14 +970,14 @@ notable children, as shown in
 
    -  index 4 for 3D objects (3D cells), etc.
 
-| Each structure of
-  ``edge_profiles.ggd(:).grid.space(:).objects_per_dimension(:)`` node
-  has one child node, that is also an array of structures, named
-  ``object(:)``, with each ``object(i)`` node describing the i-th object
-  of the given dimension. For example, having ``n`` m-dimensional
-  objects would result in set of ``n``
-| ``objects_per_dimension(m).object(i)`` nodes, with node set index
-  ``i`` running from 1 to ``n``.
+Each structure of
+``edge_profiles.ggd(:).grid.space(:).objects_per_dimension(:)`` node
+has one child node, that is also an array of structures, named
+``object(:)``, with each ``object(i)`` node describing the i-th object
+of the given dimension. For example, having ``n`` m-dimensional
+objects would result in set of ``n``
+``objects_per_dimension(m).object(i)`` nodes, with node set index
+``i`` running from 1 to ``n``.
 
 The more notable children of ``object(:)`` node, each describing
 specific grid subset object, as shown in
@@ -972,10 +989,10 @@ specific grid subset object, as shown in
    covered in section :ref:`parag-ids_ggd_grid` (an array of *float* data type
    values),
 
--  | **nodes**, a leaf designed to contain list of 0D points or grid
-     nodes forming this object, corresponding to
-   | ``edge_profiles.ggd(:).grid.spaces(:).objects_per_dimension(1).object(:)``
-   | nodes (an array of *integer* data type values),
+-  **nodes**, a leaf designed to contain list of 0D points or grid
+   nodes forming this object, corresponding to
+   ``edge_profiles.ggd(:).grid.spaces(:).objects_per_dimension(1).object(:)``
+   nodes (an array of *integer* data type values),
 
 -  **boundary(:)**, an array of structures node, designed to contain
    data on boundary of the object, previously covered in
@@ -985,7 +1002,7 @@ specific grid subset object, as shown in
 
 .. _fig-ids_edgeprofiles_ggd_grid_space:
 
-.. figure:: images/IDS_edgeprofiles_ggd_grid_space.png
+.. figure:: images/IDS_edgeprofiles_ggd_grid_space.*
    :alt: IDS ``edge_profiles.ggd(:).grid.space(:)`` node structure [12]
          with highlighted relevant ``coordinates_type``,
          ``objects_per_dimension(:)`` and ``object(:)`` nodes.
@@ -997,7 +1014,7 @@ specific grid subset object, as shown in
 
 .. _fig-ids_edgeprofiles_ggd_grid_space_dim_object:
 
-.. figure:: images/IDS_edgeprofiles_ggd_grid_space_dim_object2.png
+.. figure:: images/IDS_edgeprofiles_ggd_grid_space_dim_object2.*
    :alt: IDS ``edge_profiles.ggd(:).grid.space(:)
          .objects_per_dimension(:).object(:)``
          node structure [12] with highlighted relevant ``boundary``, *index*,
@@ -1012,6 +1029,7 @@ specific grid subset object, as shown in
 .. _parag-ids_ggd_grid_gridsubset:
 
 grid_subset(:)
+''''''''''''''
 
 node is an array of structures and a sibling to ``identifier`` node and
 ``space(:)`` node, set to contain data on grid subsets previously
@@ -1052,7 +1070,7 @@ shown in :numref:`fig-ids_edgeprofiles_ggd_grid_gridsubset`, are:
 
 .. _fig-ids_grid_hirearchy:
 
-.. figure:: images/grid_hierarchy_scheme.png
+.. figure:: images/grid_hierarchy_scheme.*
    :width: 40%
    :alt:  Hierarchy scheme of grid and grid basic components in
           *edge_profiles* IDS.
@@ -1061,17 +1079,17 @@ shown in :numref:`fig-ids_edgeprofiles_ggd_grid_gridsubset`, are:
    *edge_profiles* IDS.
 
 
-| The *space index*, *dimension* and *object index* are then used to
-  navigate through the IDS hierarchical data tree structure to the node
-  containing the explicit data on the object forming the element. The
-  "address" of the sought node is
-| ``edge_profiles.ggd(:).grid.space(s).objects_per_dimension(d).object(o)``
-| where ``s`` is the *space index*, ``d`` is the *dimension* and
-  ``o`` is the *object index*.
+The *space index*, *dimension* and *object index* are then used to
+navigate through the IDS hierarchical data tree structure to the node
+containing the explicit data on the object forming the element. The
+"address" of the sought node is
+``edge_profiles.ggd(:).grid.space(s).objects_per_dimension(d).object(o)``
+where ``s`` is the *space index*, ``d`` is the *dimension* and
+``o`` is the *object index*.
 
 .. _fig-ids_edgeprofiles_ggd_grid_gridsubset:
 
-.. figure:: images/IDS_edgeprofiles_ggd_grid_gridsubset2.png
+.. figure:: images/IDS_edgeprofiles_ggd_grid_gridsubset2.*
    :alt: IDS ``edge_profiles.ggd(:).grid.grid_subset(:)`` node
          structure [12] with highlighted relevant ``identifier``, ``name``,
          ``index``, ``dimension`` and ``element`` nodes.
@@ -1083,7 +1101,7 @@ shown in :numref:`fig-ids_edgeprofiles_ggd_grid_gridsubset`, are:
 
 .. _fig-ids_edgeprofiles_ggd_grid_gridsubset_element:
 
-.. figure:: images/IDS_edgeprofiles_ggd_grid_gridsubset_element2.png
+.. figure:: images/IDS_edgeprofiles_ggd_grid_gridsubset_element2.*
    :alt: IDS ``edge_profiles.ggd(:).grid.grid_subset(:).element(:)``
          node structure [12] with highlighted relevant ``object(:)``,
          ``space``, ``dimension`` and ``index`` nodes.
@@ -1110,42 +1128,36 @@ Its more notable children are:
 -  **density(:)**, an array of structures node designed to contain data
    on density of the electrons in the edge plasma.
 
-Note that the
-
-.. _subparag-ei_temperature_density:
-
-temperature(:)
-
-
+Note that the **temperature(:)**
 and **density(:)** nodes have the same structure, as seen on figures
 :numref:`fig-ids_edgeprofiles_ggd_ei_temperature` and
 :numref:`fig-ids_edgeprofiles_ggd_ei_density`. Their more notable
 children are:
 
--  | **grid_index**, a leaf containing index, pointing to the grid
-     associated with the electron data (single *integer* data type
-     value, corresponding to
-   | ``edge_profiles.ggd(:).grid.identifier.index`` leaf),
+-  **grid_index**, a leaf containing index, pointing to the grid
+   associated with the electron data (single *integer* data type
+   value, corresponding to
+   ``edge_profiles.ggd(:).grid.identifier.index`` leaf),
 
--  | **grid_subset_index**, a leaf containing index of the grid subset
-     associated with the electron data (single *integer* data type
-     value, corresponding to
-   | ``edge_profiles.ggd(:).grid.grid_subset(s)`` node out of array of
-     structures, where ``s`` represents the ``grid_subset_index)``,
-     and
+-  **grid_subset_index**, a leaf containing index of the grid subset
+   associated with the electron data (single *integer* data type
+   value, corresponding to
+   ``edge_profiles.ggd(:).grid.grid_subset(s)`` node out of array of
+   structures, where ``s`` represents the ``grid_subset_index)``,
+   and
 
--  | **values**, a leaf containing data field of scalar values on
-     electron temperature or electron density physical quantity (array
-     of *float* data type values). One scalar value is provided per
-     element, with ``e``-th scalar value corresponding to element
-     defined in
-   | ``edge_profiles.ggd(:).grid.grid_subset(:).element(e)`` node
-     (previously covered in section :ref:`subsubsec-grid_node_structure`), where ``e``
-     represents the ``element(:)`` node structure array index.
+-  **values**, a leaf containing data field of scalar values on
+   electron temperature or electron density physical quantity (array
+   of *float* data type values). One scalar value is provided per
+   element, with ``e``-th scalar value corresponding to element
+   defined in
+   ``edge_profiles.ggd(:).grid.grid_subset(:).element(e)`` node
+   (previously covered in section :ref:`subsubsec-grid_node_structure`), where ``e``
+   represents the ``element(:)`` node structure array index.
 
 .. _fig-ids_edgeprofiles_ggd_electrons:
 
-.. figure:: images/IDS_edgeprofiles_ggd_electrons2.png
+.. figure:: images/IDS_edgeprofiles_ggd_electrons2.*
    :alt: IDS ``edge_profiles.ggd(:).electrons`` node structure [12] with
          highlighted relevant ``temperature(:)`` and ``density`` nodes.
 
@@ -1155,7 +1167,7 @@ children are:
 
 .. _fig-ids_edgeprofiles_ggd_ei_temperature:
 
-.. figure:: images/IDS_edgeprofiles_ggd_electrons_temperature-density2.png
+.. figure:: images/IDS_edgeprofiles_ggd_electrons_temperature-density2.*
    :alt: IDS ``edge_profiles.ggd(:).electrons.temperature(:)`` and
          ``edge_profiles.ggd(:).ion(:).temperature(:)`` node structure [12]
           with highlighted relevant ``grid_index``, ``grid_subset_index`` and
@@ -1169,7 +1181,7 @@ children are:
 
 .. _fig-ids_edgeprofiles_ggd_ei_density:
 
-.. figure:: images/IDS_edgeprofiles_ggd_electrons_density.png
+.. figure:: images/IDS_edgeprofiles_ggd_electrons_density.*
    :alt: IDS ``edge_profiles.ggd(:).electrons.(:)`` and
          ``edge_profiles.ggd(:).ion(:).density(:)`` node structure [12] with
          highlighted relevant ``grid_index``, ``grid_subset_index`` and
@@ -1186,19 +1198,19 @@ children are:
 ion(:) node structure
 '''''''''''''''''''''
 
-| ``edge_profiles.ggd(:).ion(:)`` node is an array of structures, a
-  child of
-| ``edge_profiles.ggd(:)`` node and a sibling to
-  ``edge_profiles.ggd(:).grid`` and
-| ``edge_profiles.ggd(:).electrons`` node, set to contain data on
-  quantities related to ion species that are present in the edge plasma
-  during plasma burn. The structure of the ``ion(:)`` node is similar to
-  the structure of previously covered ``electrons`` node, as seen in
-  :numref:`fig-ids_edgeprofiles_ggd_ion`, with the main difference in
-  the ``ion(:)`` node being an array of structures while ``electron`` is
-  a node with single structure, as many different ion species exist
-  while in physics all electrons are identical. The more notable
-  children of the ``ion(:)`` node are:
+``edge_profiles.ggd(:).ion(:)`` node is an array of structures, a
+child of
+``edge_profiles.ggd(:)`` node and a sibling to
+``edge_profiles.ggd(:).grid`` and
+``edge_profiles.ggd(:).electrons`` node, set to contain data on
+quantities related to ion species that are present in the edge plasma
+during plasma burn. The structure of the ``ion(:)`` node is similar to
+the structure of previously covered ``electrons`` node, as seen in
+:numref:`fig-ids_edgeprofiles_ggd_ion`, with the main difference in
+the ``ion(:)`` node being an array of structures while ``electron`` is
+a node with single structure, as many different ion species exist
+while in physics all electrons are identical. The more notable
+children of the ``ion(:)`` node are:
 
 -  **label**, a leaf designed to contain name of the ion specie (single
    *string* data type value),
@@ -1215,7 +1227,7 @@ and is presented in previous section :ref:`parag-ids_ggd_electrons`.
 
 .. _fig-ids_edgeprofiles_ggd_ion:
 
-.. figure:: images/IDS_edgeprofiles_ggd_ion3.png
+.. figure:: images/IDS_edgeprofiles_ggd_ion3.*
    :alt: IDS ``edge_profiles.ggd(:).ion`` node structure [12] with
          highlighted relevant ``label``, ``temperature(:)`` and ``density(:)``
          nodes.
@@ -1223,8 +1235,8 @@ and is presented in previous section :ref:`parag-ids_ggd_electrons`.
    IDS ``edge_profiles.ggd(:).ion`` node structure [12] with highlighted
    relevant ``label``, ``temperature(:)`` and ``density(:)`` nodes.
 
-
 .. cha-data_processing:
+
 Data Processing
 ===============
 
@@ -1264,12 +1276,12 @@ a tool for data conversion and data transfer between the EU-IM *edge*
 CPO and the ITER *edge_profiles* IDS, following the structure
 description of the data structures presented in chapter
 :ref:`CPO data structure and IDS <cha-cpoids>`.
-the converter is written in Pyth:ref:¸` 3.5 [5]_ programming language and is use`d
+the converter is written in Python 3.5 [5]_ programming language and is use`d
 under ITER IMAS.
 
 .. _fig-cpo2ids_schema:
 
-.. figure:: images/cpo2ids_scheme.png
+.. figure:: images/cpo2ids_scheme.*
    :alt: *edge* CPO to *edge_profiles* IDS conversion process schema.
 
    *edge* CPO to *edge_profiles* IDS conversion process schema.
@@ -1311,7 +1323,7 @@ Coordinate system
 '''''''''''''''''
 
 The *edge* CPO and *edge_profiles* leaves designed for data storage of
-data on coordinate system of the grid are presented in Table
+data on coordinate system of the grid are presented in
 :numref:`tbl-cpo2ids_coordtype_data`, while the data structure and
 format comparison of the CPO ``coordtype`` and IDS ``coordinates_type``
 leafs are presented in :numref:`lst-cpoids_coordinatestype`.
@@ -1346,7 +1358,7 @@ three-dimensional space, etc.
 .. list-table:: Coordinate system data: Data structure comparison. CPO
                 coordtype (a) and IDS coordinates types (b) leaf structure and
                 data format. For explanation of appearing indices and variables
-                see Table :numref:`tbl-cpo2ids_coordtype_iv_explanation`.
+                see :numref:`tbl-cpo2ids_coordtype_iv_explanation`.
    :header-rows: 1
    :widths: 80 80
    :stub-columns: 1
@@ -1357,7 +1369,6 @@ three-dimensional space, etc.
         [[:math:`C_1` ] [:math:`C_2`] :math:`\cdots` [:math:`C_{n_\text{c}}`]]
       - coordinates_type:
         [:math:`C_1` :math:`C_2` :math:`\cdots` :math:`C_{n_\text{c}}`]
-
 
 
 [Coordinate system data: Data structure comparison] Coordinate system
@@ -1475,12 +1486,10 @@ this chapter.
 
 .. _subparag-conv_geo_0dobjects:
 
-0D objects
+**0D objects**
 
-
-|
-| The data on **0D objects** or **grid nodes** [12]_, that are being
-  processed by the converter, are as follows:
+The data on **0D objects** or **grid nodes** [12]_, that are being
+processed by the converter, are as follows:
 
 -  **coordinates of the 0D object**, and
 
@@ -1536,7 +1545,7 @@ radius and ``z`` being the height.
                 leaf (a) and IDS objects_per_dimension(1)
                 structure (b) data and their accompanying children data format.
                 For explanation of the appearing indices and variables
-                see Table :numref:`tbl-cpo2ids_0dobjects_iv_explanation`.
+                see :numref:`tbl-cpo2ids_0dobjects_iv_explanation`.
    :header-rows: 1
    :widths: 80 80
 
@@ -1658,7 +1667,7 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
 
 .. table::  0D objects data: Data conversion process from edge CPO to
             edge profiles IDS. For explanation of appearing indices see
-            Table :numref:`tbl-cpo2ids_0dobjects_iv_explanation`.
+            :numref:`tbl-cpo2ids_0dobjects_iv_explanation`.
 
     +-------------------------------------+-------------------------------------------------------------+
     |                                     |                   Data structure                            |
@@ -1717,12 +1726,10 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
 
 .. _subparag-conv_geo_1dobjects:
 
-1D objects
+**1D objects**
 
-
-|
-| The data on **1D objects** or **edges** [13]_, that are being
-  processed by the converter, are as follows:
+The data on **1D objects** or **edges** [13]_, that are being
+processed by the converter, are as follows:
 
 -  **boundary** information on each 1D object, and
 
@@ -1759,13 +1766,15 @@ presented in :numref:`lst-cpoids_1D_objects`.
     | | **Explicit**   | | **Data**      | | edge.grid              | | edge_profiles.ggd(:)          |
     | | **list of**    | | **Location**  | | .spaces(:)             | | .grid.space(:)                |
     | | **0D objects** |                 | | .objects(2)            | | .objects_per_dimension(2)     |
-    | | **forming the**|                 | | .boundary :math:`^{10}`| | .object(:).nodes              |
+    | | **forming the**|                 | | .boundary [#]_         | | .object(:).nodes              |
     | | **1D object**  +-----------------+--------------------------+---------------------------------+
     |                  | | **Data type** | /                        | | 1D integer array. Each        |
     |                  | | **and format**|                          | | object(:) structure is set to |
     |                  |                 |                          | | contain and explicit list of  |
     |                  |                 |                          | | 0D objects for one 2D object. |
     +------------------+-----------------+--------------------------+---------------------------------+
+
+.. [#] Same leaf as for boundary data, as boundary data and list of 0D indices forming the 1D object are the same.
 
 .. _lst-cpoids_1D_objects:
 
@@ -1802,15 +1811,15 @@ presented in :numref:`lst-cpoids_1D_objects`.
         |
         |
         |
-      - |   -objects:math:`_`per:math:`_`dimension[2]
-        |       -object[:math:`o^2= `1]
+      - |   -objects_per_dimension[2]
+        |       -object[:math:`o^2=1`]
         |           -boundary[1]
         |               -index: :math:`B^{1}_1`
         |           -boundary[2]
         |               -index: :math:`B^{1}_2`
         |           -nodes:
         |           [:math:`B^{1}_1` :math:`B^{1}_2`]
-        |       -object[:math:`o^2= `2]
+        |       -object[:math:`o^2=2`]
         |           -boundary[1]
         |               -index: :math:`B^{2}_1`
         |           -boundary[2]
@@ -1883,11 +1892,12 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
     | :math:`o^2`    | | 1D object array index.           | :math:`o^2=         |
     |                |                                    | \{1,2,...,n_{o^2}\}`|
     +----------------+------------------------------------+---------------------+
-    | :math˛`B       | | *b*-th boundary index of the     | /                   |
+    | :math:`B       | | *b*-th boundary index of the     | /                   |
     | ^{o^2}_b`      | | 1D object.                       |                     |
     +----------------+------------------------------------+---------------------+
     | :math:`n_{o^2}`| | Total number of 1D objects.      | /                   |
     +----------------+------------------------------------+---------------------+
+
 
 .. _lst-cpo2ids_1dobjects:
 
@@ -1910,12 +1920,10 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
 
 .. _subparag-conv_geo_2dobjects:
 
-2D objects
+**2D objects**
 
-
-|
-| The data on **2D objects** or **2D cells** [14]_, that are being
-  processed by the converter, are as follows:
+The data on **2D objects** or **2D cells** [14]_, that are being
+processed by the converter, are as follows:
 
 -  **boundary** information on each 2D object, and
 
@@ -1935,7 +1943,7 @@ converter in order to obtain the explicit list of 0D objects forming the
 *edge_profiles* IDS.
 
 The *edge* CPO and *edge_profiles* IDS leaves, designed for data storage
-of data on 2D objects and their data format are presented in Table
+of data on 2D objects and their data format are presented in
 :numref:`tbl-cpo2ids_2dobjects_data`, while the data structure and
 detailed format of data on 2D objects in both data structures are
 presented in :numref:`lst-cpoids_2D_objects`.
@@ -1979,7 +1987,7 @@ presented in :numref:`lst-cpoids_2D_objects`.
                 objects(3).boundary leaf (a) and IDS objects_per_dimension(3)
                 structure (b) and their accompanying children data format. For
                 an explanation of appearing indices and variables, see
-                Table :numref:`tbl-cpo2ids_2dobjects_iv_explanation`.
+                :numref:`tbl-cpo2ids_2dobjects_iv_explanation`.
    :header-rows: 1
    :widths: 80 80
 
@@ -2014,8 +2022,8 @@ presented in :numref:`lst-cpoids_2D_objects`.
         |
         |
         |
-      - |    -objects:math:`_`per:math:`_`dimension[3]
-        |        -object[:math:`o^3=`1]
+      - |    -objects_pre_dimension[3]
+        |        -object[:math:`o^3=1`]
         |            -boundary[1] =
         |                -index: :math:`B^{1}_1`
         |            -boundary[2] =
@@ -2026,7 +2034,7 @@ presented in :numref:`lst-cpoids_2D_objects`.
         |                -index: :math:`B^{1}_4`
         |            -nodes:
         |            [:math:`o^{1}_{11}` :math:`o^{1}_{12}` :math:`o^{1}_{13}` :math:`o^{1}_{14}`]
-        |        -object[:math:`o^3=`2] =
+        |        -object[:math:`o^3=2`] =
         |            -boundary[1] =
         |                -index: :math:`B^{2}_1`
         |            ...
@@ -2098,9 +2106,9 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
     +----------------+------------------------------------+----------------------+
     | :math:`b`      | | Boundary array index.            | :math:`b=\{1,2,3,4\}`|
     +----------------+------------------------------------+----------------------+
-    | :math:`k`      | | 0D object array index.           | :math:`k=\{1,2,3,4\}`|
+    | :math:`k`      | | 0D object array index [#]_.      | :math:`k=\{1,2,3,4\}`|
     +----------------+------------------------------------+----------------------+
-    | :math:`o^3`    | | 2D object array index.           | :math:`o^3=          |
+    | :math:`o^3`    | | 2D object array index [#]_.      | :math:`o^3=          |
     |                |                                    | \{1,2,...,n_{o^3}\}` |
     +----------------+------------------------------------+----------------------+
     | :math:`o       | | Object index of *k*-th 0D object | /                    |
@@ -2111,6 +2119,10 @@ objects data from *edge* CPO to *edge_profiles* IDS is presented in
     +----------------+------------------------------------+----------------------+
     | :math:`n_{o^3}`| | Total number of 2D objects.      | /                    |
     +----------------+------------------------------------+----------------------+
+
+.. [#] In this case the boundary of each 2D object is described with four 1D objects.
+
+.. [#] Each 2D object is assembled using by four 0D objects.
 
 .. _lst-cpo2ids_code_2dobjects:
 
@@ -2260,7 +2272,7 @@ shown in :numref:`lst-cpoids_gridsubset`.
 .. list-table:: Grid subset data: Data structure comparison. CPO subgrids(:) structure
                         (a) and IDS grid_subset(:) structure (b) and their accompanying children
                         data format. For an explanation of appearing indices and variables, see
-                        Table :numref:`tbl-cpo2ids_gridsubset_iv_explanation`.
+                        :numref:`tbl-cpo2ids_gridsubset_iv_explanation`.
    :header-rows: 1
    :widths: 80 80
 
@@ -2320,18 +2332,18 @@ shown in :numref:`lst-cpoids_gridsubset`.
         |       ...
 
 
-| In *edge_profiles* IDS, the **space index** ``p``, **dimension
-  index** ``d`` and **object index** ``o^{d}`` are used to
-  navigate through nodes in the data structure tree structure to node
-| ``edge_profiles.ggd(g).grid.space(p).objects_per_dimension(d).object(o^{d})``,
-  containing data on object composing the element of the grid subset.
-  When constructing the grid subset, the same process is done for all
-  objects listed inside the ``.grid_subset(:)`` structure. Each grid
-  subset can be constructed using only elements of the same dimension.
+In *edge_profiles* IDS, the **space index** ``p``, **dimension
+index** ``d`` and **object index** ``o^{d}`` are used to
+navigate through nodes in the data structure tree structure to node
+``edge_profiles.ggd(g).grid.space(p).objects_per_dimension(d).object(o^{d})``,
+containing data on object composing the element of the grid subset.
+When constructing the grid subset, the same process is done for all
+objects listed inside the ``.grid_subset(:)`` structure. Each grid
+subset can be constructed using only elements of the same dimension.
 
 Following the discussed data format and properties, the conversion
 process of the grid subset data from *edge* CPO to *edge_profiles* IDS
-is presented in Table :numref:`tbl-cpo2ids_gridsubset_conv`, together with
+is presented in :numref:`tbl-cpo2ids_gridsubset_conv`, together with
 part of the ``cpo2ids`` Python code shown in
 :numref:`lst-cpo2ids_code_gridsubsets`.
 
@@ -2422,19 +2434,23 @@ part of the ``cpo2ids`` Python code shown in
     | :math:`d`      | | Dimension of the grid subset.    | :math:`d = 1/2/3`    |
     +----------------+------------------------------------+----------------------+
     | :math:`e`      | | Element array index composing    | :math:`b=\{1,2,3,4\}`|
-    |                | | the grid subset:math:`18`        |                      |
+    |                | | the grid subset [33]_.           |                      |
     +----------------+------------------------------------+----------------------+
     | :math:`o^d`    | | Object index of *d*-dimensional  | :math:`o^d=          |
     |                | | object composing the grid subset.| \{o_1^d,o_2^d,...    |
     |                |                                    | o_{n_{s_o}}\}`       |
     +----------------+------------------------------------+----------------------+
-    | :math:`o       | | Object index of *k*-th 0D object | /                    |
-    | ^1_{o^3,k}`    | | composing the 2D object.         |                      |
+    | :math:`I_s`    | | Base grid subset index.          | /                    |
     +----------------+------------------------------------+----------------------+
-    | :math:`B       | | *b*-th boundary index of the 2D  | /                    |
-    | ^{o^3}_b`      | | object.                          |                      |
+    | :math:`n_s`    | | Total number of grid subets.     | /                    |
     +----------------+------------------------------------+----------------------+
-    | :math:`n_{o^3}`| | Total number of the 2D objects.  | /                    |
+    | :math:`n_{s_o}`| | Total number of objects composing| /                    |
+    |                | | the grid subset                  |                      |
+    |                |   ( :math:`n_{s_o}=n_{s_e}`) [33]_.|                      |
+    +----------------+------------------------------------+----------------------+
+    | :math:`n_{s_e}`| | Total number of objects composing| /                    |
+    |                | | the grid subset                  |                      |
+    |                |   ( :math:`n_{s_o}=n_{s_e}`) [33]_.|                      |
     +----------------+------------------------------------+----------------------+
 
 .. _lst-cpo2ids_code_gridsubsets:
@@ -2591,7 +2607,7 @@ processed by the converter, are as follows:
 
 The *edge* CPO and *edge_profiles* IDS leaves, designed for the data
 storage of data on density of ion species in plasma, and their data
-format are presented in Table :numref:`tbl-cpo2ids_ni_data`, while the data
+format are presented in :numref:`tbl-cpo2ids_ni_data`, while the data
 structure and detailed format of the ion density data in both data
 structures are shown in Listing :numref:`lst-cpo2ids_ni`.
 
@@ -2633,7 +2649,7 @@ structures are shown in Listing :numref:`lst-cpo2ids_ni`.
 .. list-table:: Ion density data field: Data structure comparison. CPO ni(:)
                 (a) and IDS ion(:) (b) structure and their accompanying
                 children data format. For explanation of appearing indices and
-                variables see Table :numref:`tbl-cpo2ids_ni_iv_explanation`.
+                variables see :numref:`tbl-cpo2ids_ni_iv_explanation`.
    :header-rows: 1
    :widths: 80 80
 
@@ -2644,7 +2660,7 @@ structures are shown in Listing :numref:`lst-cpo2ids_ni`.
         |           -subgrid: :math:`s_1`
         |           -scalar:
         |           [ :math:`V_{11}` :math:`V_{12}` :math:`\ldots` :math:`V_{1n_{\text{V}^{\text{v}}}}` ]
-        |       -value[:math:`v=`2]
+        |       -value[:math:`v=2`]
         |           -subgrid: :math:`s_2`
         |           -scalar:
         |           [ :math:`V_{21}` :math:`V_{22}` :math:`\ldots` :math:`V_{2n_{\text{V}^{\text{v}}}}` ]
@@ -2904,11 +2920,11 @@ discussed tools is as follows:
    IDS process schema.
 
 
-| In the continuation of this chapter, a review of ``b2_ual_write`` and
-  ``b2_ual_write_gsl`` code is presented. Full source codes of
-  ``put_edge_ids.py``, ``b2_ual_write.f90`` and
-| ``b2_ual_write_gsl`` are available in the directories
-  *SOLPS-GUI/src/widgets* and *B2.5/src/ids*.
+In the continuation of this chapter, a review of ``b2_ual_write`` and
+``b2_ual_write_gsl`` code is presented. Full source codes of
+``put_edge_ids.py``, ``b2_ual_write.f90`` and
+``b2_ual_write_gsl`` are available in the directories
+*SOLPS-GUI/src/widgets* and *B2.5/src/ids*.
 
 .. _sec-b25_write_tools:
 
@@ -2947,12 +2963,12 @@ both tool being used to accomplish the same task only
 presented in continuation of this section. For full IDS writing method
 comparison see the codes located in *B2.5/src/ids*.
 
-| Firstly, in the ``write_ids_edge_profiles`` subroutine, the mandatory
-  data of
-| *edge_profiles* IDS are set, those being the homogeneous time
-  indicator and time value using the ``exampleSetIDSFundamentals`` GSL
-  routine, as shown in Code block
-  :numref:`lst-b2_ual_write_gsl_code_fundamentals`.
+Firstly, in the ``write_ids_edge_profiles`` subroutine, the mandatory
+data of
+*edge_profiles* IDS are set, those being the homogeneous time
+indicator and time value using the ``exampleSetIDSFundamentals`` GSL
+routine, as shown in Code block
+:numref:`lst-b2_ual_write_gsl_code_fundamentals`.
 
 
 .. _lst-b2_ual_write_gsl_code_fundamentals:
@@ -3168,6 +3184,7 @@ written to the IDS, as shown in
     end subroutine write_ids_edge_profiles
 
 .. cha-readualedge:
+
 ParaView ReadUALEdge plugin
 ===========================
 
@@ -3219,16 +3236,16 @@ The whole plugin consists of multiple files:
 
 -  ``pqMyPropertyWidgetDecorator.h``,
 
-| where ``ReadUALEdge.cxx`` and ``ReadUALEdge.h`` files represent the
-  "heart" of the plugin as they provide code for data handling, while
-  ``ReadUALEdge.xml``,
-| ``pqMyPropertyWidgetDecorator.cxx`` and
-  ``pqMyPropertyWidgetDecorator.cxx`` files provide code for GUI
-  implementation of the plugin inside the ParaView application.
+where ``ReadUALEdge.cxx`` and ``ReadUALEdge.h`` files represent the
+"heart" of the plugin as they provide code for data handling, while
+``ReadUALEdge.xml``,
+``pqMyPropertyWidgetDecorator.cxx`` and
+``pqMyPropertyWidgetDecorator.cxx`` files provide code for GUI
+implementation of the plugin inside the ParaView application.
 
 .. _fig-readualedge_visualization_process_scheme:
 
-.. figure:: images/ReadUALEdge_scheme.png
+.. figure:: images/ReadUALEdge_scheme.*
    :alt: Procedure of the visualization process of the *edge* plasma
          data using ``ReadUALEdge`` plugin and *edge_profiles* IDS.
 
@@ -3260,7 +3277,7 @@ The VTK objects, used in the ``ReadUALEdge`` plugin code, are:
 -  ``vtkPoints`` [26], an array representing an explicit list of 0D
    points and their coordinates in the 3D space,
 
--  ``vtkVertex`` **???**, a data type representing a 0D vertex in 3D
+-  ``vtkVertex`` [34], a data type representing a 0D vertex in 3D
    space containing information on single point forming the vertex,
 
 -  ``vtkLine`` [27], a data type representing a 1D line in 3D space
@@ -3275,14 +3292,14 @@ The VTK objects, used in the ``ReadUALEdge`` plugin code, are:
 
 -  ``vtkDoubleArray`` [30], an array of values of *double* data type,
 
--  | ``vtkUnstructuredGrid`` [31], a dataset and a combination of
-     ``vtkPoints`` array,
-   | ``vtkCellArray`` array and ``vtkDoubleArray`` array. It stores
-     connectivity information between VTK data types forming the
-     unstructured grid, together with, if provided, value information on
-     each VTK data type.
+-  ``vtkUnstructuredGrid`` [31], a dataset and a combination of
+   ``vtkPoints`` array,
+   ``vtkCellArray`` array and ``vtkDoubleArray`` array. It stores
+   connectivity information between VTK data types forming the
+   unstructured grid, together with, if provided, value information on
+   each VTK data type.
 
--  ``vtkMultiBlockDataSet`` **???**, a dataset collection, storing and
+-  ``vtkMultiBlockDataSet`` [35], a dataset collection, storing and
    organizing datasets, such as ``vtkUnstructuredGrid``, as blocks of
    data into a hierarchical tree structure.
 
@@ -3309,12 +3326,12 @@ structure unit, is as follows:
 Setting vtkUnstructuredGrid and vtkMultiblockdataSet
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-| In ``ReadUALEdge`` plugin, the ``vtkUnstructuredGrid`` dataset
-  represents the main component used for storage of all required data on
-  specific grid subset while the
-| ``vtkMultiBlockDataSet`` stores every created ``vtkUnstructuredGrid``
-  dataset as a block inside multiblock dataset and sets all blocks
-  display-ready.
+In ``ReadUALEdge`` plugin, the ``vtkUnstructuredGrid`` dataset
+represents the main component used for storage of all required data on
+specific grid subset while the
+``vtkMultiBlockDataSet`` stores every created ``vtkUnstructuredGrid``
+dataset as a block inside multiblock dataset and sets all blocks
+display-ready.
 
 Each ``vtkUnstructuredGrid`` dataset contains data only on one grid
 subset and although each grid subset, as already discussed in previous
@@ -3331,7 +3348,7 @@ language, of course, uses C++ convention [26]_.
 
 .. _fig-readualedge_gridsubset_process_scheme:
 
-.. figure:: images/ReadUALEdge_scheme2.png
+.. figure:: images/ReadUALEdge_scheme2.*
    :alt: Process of ``vtkUnstructuredGrid`` and ``vtkMultiBlockDataSet``
          creation.
 
@@ -3510,12 +3527,12 @@ place in function ``fAddBlock2MultiBlock``, shown in Listing
         vtkCompositeDataSet::NAME(), gridSubset_name.c_str());
     ...
 
-| After all ``vtkUnstructuredGrid`` datasets were created and set to
-| ``vtkMultiBlockDataSet``, as previously shown in
-  :numref:`fig-readualedge_gridsubset_process_scheme`, the plugin runs
-  the command
-| ``output->ShallowCopy(mainMB);``, that sets all blocks inside the
-  multiblock as display-ready in ParaView application.
+After all ``vtkUnstructuredGrid`` datasets were created and set to
+``vtkMultiBlockDataSet``, as previously shown in
+:numref:`fig-readualedge_gridsubset_process_scheme`, the plugin runs
+the command
+``output->ShallowCopy(mainMB);``, that sets all blocks inside the
+multiblock as display-ready in ParaView application.
 
 .. _sec-readualedge_gui:
 
@@ -3545,7 +3562,7 @@ plugin use are presented in the chapter ` <#cha:results>`__.
 
 .. _fig-readualedge_gui:
 
-.. figure:: images/ReadUALEdge_GUI_2.png
+.. figure:: images/ReadUALEdge_GUI_2.*
    :alt: ParaView and ``ReadUALEdge`` plugin graphical user interface.
          The plugin custom GUI is marked with the green box.
 
@@ -3555,14 +3572,14 @@ plugin use are presented in the chapter ` <#cha:results>`__.
 
 .. _fig-readualedge_gui_close:
 
-.. figure:: images/ReadUALEdge_GUI_2.png
+.. figure:: images/ReadUALEdge_GUI_2.*
    :alt: Close up view of the ``ReadUALEdge`` plugin graphical user
          interface.
 
    Close up view of the ``ReadUALEdge`` plugin graphical user interface.
 
-
 .. cha-results:
+
 Visualisation
 =============
 
@@ -3721,7 +3738,8 @@ all available grid subsets is shown in :numref:`tbl-gridsubset_list`.
 
 .. _fig-readualedge_16151_1000_all_sg:
 
-.. figure:: images/IDS_16151_1000_all_sg.png
+.. figure:: images/IDS_16151_1000_all_sg.*
+   :width:  50%
    :alt: Visualization of 16151/1000 [29]_ IDS case using ReadUALEdge
          plugin: All grid subsets. The list of all available grid subsets,
          ready for display, is shown on bottom left corner of the ParaView
@@ -3735,7 +3753,8 @@ all available grid subsets is shown in :numref:`tbl-gridsubset_list`.
 
 .. _fig-readualedge_16151_1000_cells_sciod:
 
-.. figure:: images/IDS_16151_1000_Cells_vs_SCIOD.png
+.. figure:: images/IDS_16151_1000_Cells_vs_SCIOD.*
+   :width:  50%
    :alt: Visualization of 16151/1000 IDS case using ReadUALEdge plugin:
          Separate grid subsets. The displayed grid subsets are *Cells* (left
          display window) and *SOL*, *Core*, *Inner Divertor* and *Outer
@@ -3769,7 +3788,8 @@ Figs. :numref:`fig-readualedge_16151_1000_ne`,
 
 .. _fig-readualedge_16151_1000_datafield:
 
-.. figure:: images/IDS_16151_1000_data_fields.png
+.. figure:: images/IDS_16151_1000_data_fields.*
+   :width:  50%
    :alt:    16151/1000 IDS case: List of available data fields of
             quantities.
 
@@ -3778,23 +3798,22 @@ Figs. :numref:`fig-readualedge_16151_1000_ne`,
 
 .. _fig-readualedge_16151_1000_sciod_te:
 
-.. figure:: images/IDS_16151_1000_SOL_Core_IO_Div_te_edit.pdf
-   :alt:    16151/1000 IDS case: Presentation of quantities - multiple selected
-            grid subsets.
-            Electron temperature of selected Core, SOL, Inner divertor and Outer
-            divertor [#]_ grid subsets.
+.. figure:: images/IDS_16151_1000_SOL_Core_IO_Div_te_edit.*
+   :width:  50%
+   :alt: 16151/1000 IDS case: Presentation of quantities - multiple selected
+         grid subsets. Electron temperature of selected Core, SOL, Inner
+         divertor and Outer divertor grid subsets. These four grid subsets
+         together form the complete edge plasma region.
 
    16151/1000 IDS case: Presentation of quantities - multiple selected
-   grid subsets.
-   Electron temperature of selected Core, SOL, Inner divertor and Outer
-   divertor [#]_ grid subsets.
-
-.. [#]  These four grid subsets together form the complete edge plasma region.
-
+   grid subsets. Electron temperature of selected Core, SOL, Inner divertor
+   and Outer divertor grid subsets. These four grid subsets together form
+   the complete edge plasma region.
 
 .. _fig-readualedge_16151_1000_sol_te:
 
-.. figure:: images/IDS_16151_1000_SOL_te_edit.pdf
+.. figure:: images/IDS_16151_1000_SOL_te_edit.*
+   :width:  50%
    :alt:    16151/1000 IDS case: Presentation of quantities - single selected
             grid subsets. Electron temperature of selected SOL grid subsets.
 
@@ -3803,7 +3822,8 @@ Figs. :numref:`fig-readualedge_16151_1000_ne`,
 
 .. _fig-readualedge_16151_1000_ne:
 
-.. figure:: images/IDS_16151_1000_CSIOD_ne_edit.pdf
+.. figure:: images/IDS_16151_1000_CSIOD_ne_edit.*
+   :width:  50%
    :alt:    16151/1000 IDS case: Display of electron density edge plasma.
 
    16151/1000 IDS case: Display of electron density of edge plasma.
@@ -3811,7 +3831,8 @@ Figs. :numref:`fig-readualedge_16151_1000_ne`,
 
 .. _fig-readualedge_16151_1000_te:
 
-.. figure:: images/IDS_16151_1000_CSIOD_te_edit.pdf
+.. figure:: images/IDS_16151_1000_CSIOD_te_edit.*
+   :width:  50%
    :alt:    16151/1000 IDS case: Display of electron temperature of edge plasma.
 
    16151/1000 IDS case: Display of electron temperature of edge plasma.
@@ -3819,7 +3840,8 @@ Figs. :numref:`fig-readualedge_16151_1000_ne`,
 
 .. _fig-readualedge_16151_1000_ni1:
 
-.. figure:: images/IDS_16151_1000_CSIOD_ni1_edit.pdf
+.. figure:: images/IDS_16151_1000_CSIOD_ni1_edit.*
+   :width:  50%
    :alt:    16151/1000 IDS case: Display of D0 ion density of edge plasma.
 
    16151/1000 IDS case: Display of D0 ion density of edge plasma.
@@ -3827,7 +3849,8 @@ Figs. :numref:`fig-readualedge_16151_1000_ne`,
 
 .. _fig-readualedge_16151_1000_ni2:
 
-.. figure:: images/IDS_16151_1000_CSIOD_ni2_edit.pdf
+.. figure:: images/IDS_16151_1000_CSIOD_ni2_edit.*
+   :width:  50%
    :alt:    16151/1000 IDS case: Display of D+1 ion density of edge plasma.
 
    16151/1000 IDS case: Display of D+1 ion density of edge plasma.
@@ -3835,10 +3858,12 @@ Figs. :numref:`fig-readualedge_16151_1000_ne`,
 
 .. _fig-readualedge_16151_1000_ti:
 
-.. figure:: images/IDS_16151_1000_CSIOD_ti_edit.pdf
+.. figure:: images/IDS_16151_1000_CSIOD_ti_edit.*
+   :width:  50%
    :alt:    16151/1000 IDS case: Display of ion temperature of edge plasma.
 
    16151/1000 IDS case: Display of ion temperature of edge plasma.
+
 
 The same as for the first IDS case can be done for the second IDS case
 with Shot: 1 and Run: 1 parameters. This IDS case is more extensive,
@@ -3854,7 +3879,8 @@ Figs. :numref:`fig-readualedge_1_1_ne`, :numref:`fig-readualedge_1_1_te`
 
 .. _fig-readualedge_1_1_datafield:
 
-.. figure:: images/IDS_1_1_data_fields.png
+.. figure:: images/IDS_1_1_data_fields.*
+   :width:  50%
    :alt: 1/1 IDS case: Partial list of available data fields of
          quantities. There are total 98 different ion specie density data
          fields.
@@ -3865,7 +3891,8 @@ Figs. :numref:`fig-readualedge_1_1_ne`, :numref:`fig-readualedge_1_1_te`
 
 .. _fig-readualedge_1_1_te:
 
-.. figure:: images/IDS_1_1_CSIOD_te_edit.pdf
+.. figure:: images/IDS_1_1_CSIOD_te_edit.*
+   :width:  50%
    :alt:    1/1 IDS case: Display of electron temperature of edge plasma region.
 
    1/1 IDS case: Display of electron temperature of edge plasma region.
@@ -3873,7 +3900,8 @@ Figs. :numref:`fig-readualedge_1_1_ne`, :numref:`fig-readualedge_1_1_te`
 
 .. _fig-readualedge_1_1_ne:
 
-.. figure:: images/IDS_1_1_CSIOD_ne_edit.pdf
+.. figure:: images/IDS_1_1_CSIOD_ne_edit.*
+   :width:  50%
    :alt:    1/1 IDS case: Display of electron denisty of edge plasma region.
 
    1/1 IDS case: Display of electron denisty of edge plasma region.
@@ -3881,7 +3909,8 @@ Figs. :numref:`fig-readualedge_1_1_ne`, :numref:`fig-readualedge_1_1_te`
 
 .. _fig-readualedge_1_1_ni1:
 
-.. figure:: images/IDS_1_1_CSIOD_ni1_edit.pdf
+.. figure:: images/IDS_1_1_CSIOD_ni1_edit.*
+   :width:  50%
    :alt:    1/1 IDS case: Display of D0 ion density of edge plasma.
 
    1/1 IDS case: Display of D0 ion density of edge plasma.
@@ -3890,7 +3919,8 @@ Figs. :numref:`fig-readualedge_1_1_ne`, :numref:`fig-readualedge_1_1_te`
 
 .. _fig-readualedge_1_1_ni2:
 
-.. figure:: images/IDS_1_1_CSIOD_ni2_edit.pdf
+.. figure:: images/IDS_1_1_CSIOD_ni2_edit.*
+   :width:  50%
    :alt:    1/1 IDS case: Display of D+1 ion density of edge plasma.
 
    1/1 IDS case: Display of D+1 ion density of edge plasma.
@@ -3898,7 +3928,8 @@ Figs. :numref:`fig-readualedge_1_1_ne`, :numref:`fig-readualedge_1_1_te`
 
 .. _fig-readualedge_1_1_ti:
 
-.. figure:: images/IDS_1_1_CSIOD_ti_edit.pdf
+.. figure:: images/IDS_1_1_CSIOD_ti_edit.*
+   :width:  50%
    :alt:    1/1 IDS case: Display of ion temperature of edge plasma region.
 
    1/1 IDS case: Display of ion temperature of edge plasma region.
@@ -3916,6 +3947,7 @@ shown in Figs. :numref:`fig-readualedge_aug_vs_iter_te1` and
 .. _fig-readualedge_aug_vs_iter_edge:
 
 .. figure:: images/IDS_aug_vs_iter_SCIOD.*
+   :width:  50%
    :alt: Comparative analysis: Size and edge plasma region of AUG (left)
          and ITER (right) tokamak.
 
@@ -3926,6 +3958,7 @@ shown in Figs. :numref:`fig-readualedge_aug_vs_iter_te1` and
 .. _fig-readualedge_aug_vs_iter_te1:
 
 .. figure:: images/AUG_vs_ITER_te_edit2.*
+   :width:  50%
    :alt: Comparative analysis: Display of electron temperature in the
          edge plasma region of AUG (left) and ITER (right) tokamak - single
          display view.
@@ -3938,6 +3971,7 @@ shown in Figs. :numref:`fig-readualedge_aug_vs_iter_te1` and
 .. _fig-readualedge_aug_vs_iter_te2:
 
 .. figure:: images/AUG_vs_ITER_te_edit.*
+   :width:  50%
    :alt: Comparative analysis: Display of electron temperature in the
          edge plasma region of AUG (left) and ITER (right) tokamak - multiple
          display views.
@@ -3970,6 +4004,7 @@ Version: 3. Both input examples and output IDS are listed in
 .. _fig-readualedge_b2:
 
 .. figure:: images/ReadUALEdge_scheme_b2.*
+   :width:  50%
    :alt: Visualization process of the edge plasma data using
          ``b2_ual_write_gsl`` tool and ``ReadUALEdge`` plugin.
 
@@ -4011,14 +4046,16 @@ and :numref:`fig-readualedge_16151_1001_cells_ti`.
 
 .. _fig-readualedge_16151_1001_gs:
 
-.. figure:: images/IDS_16151_1001_gs.pdf
+.. figure:: images/IDS_16151_1001_gs.*
+   :width:  50%
    :alt:    16151/1001 IDS case: Available grid subsets.
 
    16151/1001 IDS case: Available grid subsets.
 
 .. _fig-readualedge_16151_1001_cells_te:
 
-.. figure:: images/IDS_16151_1001_cells_te.pdf
+.. figure:: images/IDS_16151_1001_cells_te.*
+   :width:  50%
    :alt:    16151/1001 IDS case: Display of electron temperature of the edge
             plasma.
 
@@ -4027,7 +4064,8 @@ and :numref:`fig-readualedge_16151_1001_cells_ti`.
 
 .. _fig-readualedge_16151_1001_cells_ne:
 
-.. figure:: images/IDS_16151_1001_cells_ne.pdf
+.. figure:: images/IDS_16151_1001_cells_ne.*
+   :width:  50%
    :alt:    16151/1001 IDS case: Display of electron density of the edge
             plasma region.
 
@@ -4035,7 +4073,8 @@ and :numref:`fig-readualedge_16151_1001_cells_ti`.
 
 .. _fig-readualedge_16151_1001_cells_ti:
 
-.. figure:: images/IDS_16151_1001_cells_ti.pdf
+.. figure:: images/IDS_16151_1001_cells_ti.*
+   :width:  50%
    :alt:    16151/1001 IDS case: Display of ion temperature of the edge plasma
             region.
 
@@ -4053,7 +4092,8 @@ and :numref:`fig-readualedge_535_1_cells_ti`.
 
 .. _fig-readualedge_535_1_cells_ne:
 
-.. figure:: images/IDS_535_1_cells_ne.pdf
+.. figure:: images/IDS_535_1_cells_ne.*
+   :width:  50%
    :alt:    535/1 IDS case: Electron density of the edge plasma region.
 
    535/1 IDS case: Electron density of the edge plasma region.
@@ -4061,7 +4101,8 @@ and :numref:`fig-readualedge_535_1_cells_ti`.
 
 .. _fig-readualedge_535_1_cells_te:
 
-.. figure:: images/IDS_535_1_cells_te.pdf
+.. figure:: images/IDS_535_1_cells_te.*
+   :width:  50%
    :alt:    535/1 IDS case: Display of electron temperature of the edge plasma
             region.
 
@@ -4070,7 +4111,8 @@ and :numref:`fig-readualedge_535_1_cells_ti`.
 
 .. _fig-readualedge_535_1_cells_ti:
 
-.. figure:: images/IDS_535_1_cells_ti.pdf
+.. figure:: images/IDS_535_1_cells_ti.*
+   :width:  50%
    :alt:    535/1 IDS case: Display of ion temperature of the edge plasma
             region.
 
@@ -4147,6 +4189,7 @@ comparative data analysis, data presentation customization, further data
 processing and more.
 
 [1] "Geometry modeling and grid generation."
+https://web.stanford.edu/class/me469b/handouts/geoandgrid.pdf
 
 [2] G. Visavale, "Grid generation for cfd simulation: Introduction."
 https://ganeshvisavale.wordpress.com/2013/02/14/pre-processing-meshing-for-cfd-simulations/.
@@ -4155,13 +4198,13 @@ https://ganeshvisavale.wordpress.com/2013/02/14/pre-processing-meshing-for-cfd-s
 
 [4] "CFD-online: Meshing." https://www.cfd-online.com/Wiki/Meshing.
 
-| [5] "ITM cpo example grids."
-  "http://www.efda-itm.eu/ITM/html/imp3_gridexamples.html?sso_from=/ITM/html/
-| imp3_gridexamples.html".
+[5] "ITM cpo example grids."
+"http://www.efda-itm.eu/ITM/html/imp3_gridexamples.html?sso_from=/ITM/html/
+imp3_gridexamples.html".
 
-| [6] "Fortran90 example itm_grid_example1_2dstructured_manual."
-  "https://git.iter.org/projects/IMEX/repos/ggd/browse/f90/src/examples/
-| itm_grid_example1_2dstructured_manual.f90".
+[6] "Fortran90 example itm_grid_example1_2dstructured_manual."
+"https://git.iter.org/projects/IMEX/repos/ggd/browse/f90/src/examples/
+itm_grid_example1_2dstructured_manual.f90".
 
 [7] Klingshirn and H.-J., "Adaptive grids and numerical fluid
 simulations for scrape-off layer plasmas," PhD thesis, Technische
@@ -4241,6 +4284,13 @@ http://www.vtk.org/doc/release/4.2/html/vtkCellType_8h.html.
 
 [33] "SOLPS-iter examples database."
 https://portal.iter.org/departments/POP/CM/IMAS/Forms/AllItems.aspx?RootFolder=%2Fdepartments%2FPOP%2FCM%2FIMAS%2FSOLPS-ITER%2FExamples.
+
+[34] "VtkVertex class reference."
+http://www.vtk.org/doc/release/7.1/html/classvtkVertex.html.
+
+[35] "VtkMultiBlockDataSet class reference."
+http://www.vtk.org/doc/release/7.1/html/classvtkMultiBlockDataSet.html.
+
 
 .. [1]
    Do not confuse with data structure tree nodes, as described in the
@@ -4362,4 +4412,9 @@ https://portal.iter.org/departments/POP/CM/IMAS/Forms/AllItems.aspx?RootFolder=%
 .. [32]
    Note that *Edges* grid subset is still available even though it is
    empty.
+
+.. [33]
+   In our case each element consists of only one object.  So the number of all
+   grid subset elements :math:`n_{s_e}` is the same as the number of objects
+   :math:`n_{s_o}`.
 
