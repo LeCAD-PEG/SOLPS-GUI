@@ -411,8 +411,8 @@ class Triang(TcshProcess):
         input dialogs to get input from the user and then pass it back to
         Triang.
         """
-        #self.insertTextAtBottom(text)
-        # self.processText(text)  # Triang script outputs via StdError...
+        # self.insertTextAtBottom(text)
+        self.processText(text)  # Triang script outputs via StdError...
         if self.STATE >= TriangState.waiting:
             self.insertTextAtBottom(text)
 
