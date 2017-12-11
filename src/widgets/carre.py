@@ -89,7 +89,6 @@ class Carre(TcshProcess):
 
         self.prepareUserInterface()
 
-        self.tcsh.readyReadStandardOutput.connect(self.tcsh.readStdOut)
         self.tcsh.setTcshPath('/usr/bin/tcsh')
         self.tcsh.prcStateChanged.connect(self.updateText)
         self.tcsh.prcFinished.connect(self.updateText)
@@ -305,8 +304,7 @@ class Carre(TcshProcess):
                                       "in baserun: " + baserunDir)
                         break
         if self.vars[CarreVars.dgModel]:
-            self.selectDgModel.setCurrentText(self.vars[CarreVars.dgModel] +
-                                              '.dg')
+            self.selectDgModel.setCurrentText(self.vars[CarreVars.dgModel])
 
         self.setClickedGroupFromVars()
 
@@ -350,7 +348,7 @@ class Carre(TcshProcess):
             with open(file, 'w') as f:
                 text = '&Carre\n'
                 text += '\n'.join(carreLines)
-                text += '&'
+                text += '\n&'
                 f.write(text)
             logging.info(".status file created for carre block!")
 

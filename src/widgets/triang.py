@@ -285,7 +285,7 @@ class Triang(TcshProcess):
 
                 else:
                     logging.info("No Triang block found in .status file!")
-                    text = '&Triang\n' + '\n'.join(triangLines) + '\n&' + text
+                    text = '&Triang\n' + '\n'.join(triangLines) + '\n&\n' + text
 
                 with open(file, 'w') as f:
                     f.write(text)

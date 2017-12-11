@@ -252,7 +252,7 @@ class B2InputFiles(TcshProcess):
                 else:
                     logging.info("No b2 block found in .status file!")
                     text = '&B2InputFiles\n' + '\n'.join(b2lines) + \
-                           '\n&' + text
+                           '\n&\n' + text
 
                 with open(file, 'w') as f:
                     f.write(text)
@@ -364,6 +364,7 @@ class B2InputFiles(TcshProcess):
         oldRunDir = self.runDir
         if not runDir.endswith('baserun') and runDir != oldRunDir:
             self.textDisplay.clear()
+            self.storeStatusFile(oldRunDir)
             self.textDisplay.appendPlainText('Current directory is not a '
                                              'baserun: ' + runDir)
             self.STATE = B2State.notRunning
