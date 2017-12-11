@@ -7,7 +7,7 @@
 =======================
 
 
-:Author: Dejan Penko, University of Ljubljana
+:Author: Dejan Penko
 
 .. only:: html
 
@@ -214,7 +214,7 @@ are (also shown in :numref:`fig-grid_structure_5`):
 Coordinate systems
 ------------------
 
-As previously stated in section `1.1`_, the node geometry information
+As previously stated in section :ref:`subsec-grid_struc`, the node geometry information
 is given in the form of coordinates in a specific coordinate system.
 Commonly used coordinate systems in various tokamak fusion simulations
 and analysis, also shown in :numref:`fig-tokamak_coord_system_2`,
@@ -509,7 +509,7 @@ are:
 
 -  **subgrids(:)**, an array of structures node designed to contain data
    describing each grid subset [3]_ previously presented in
-   chapter `1.3`_.
+   chapter :ref:`subsec-grid_subset`.
 
 .. _fig-cpo_edge_grid:
 
@@ -546,7 +546,7 @@ shown in :numref:`fig-cpo_edge_grid_spaces`, are:
    values),
 
 -  **objects(:)**, an array of structures node designed to contain data
-   on objects, previously discussed in chapter `1.1`_, separated by
+   on objects, previously discussed in chapter :ref:`subsec-grid_struc`, separated by
    EU-IM *object class* index [5] referring to the type or dimension of
    the object (2D space):
 
@@ -565,7 +565,7 @@ shown in :numref:`fig-cpo_edge_grid_spaces`, are:
    -  **boundary**, leaf designed to contain an array of ``(n-1)``
       dimensional space objects defining the boundary of an
       n-dimensional space object (2D array of *integer* data type
-      values), explained in chapter `1.2`_,
+      values), explained in chapter :ref:`subsec-grid_boundary`,
 
    -  **geo**, leaf designed to contain an array of geometry data
       associated with every object (4D array of *float* data type
@@ -585,7 +585,8 @@ shown in :numref:`fig-cpo_edge_grid_spaces`, are:
 
 
 **subgrids(:)** is an array of structures node, set to contain data on
-grid subsets, previously explained in chapter `1.3`_. It is a child of
+grid subsets, previously explained in chapter :ref:`subsec-grid_subset`.
+It is a child of
 ``edge.grid`` node and a sibling to the ``spaces(:)`` node. Its children
 are:
 
@@ -597,7 +598,7 @@ are:
    :numref:`fig-cpo_edge_grid_subgrids`, are:
 
    -  **cls**, a leaf describing the class of the objects defining the
-      grid subset, previously presented in section `1.1.1.1`_ under
+      grid subset, previously presented in section :ref:`parag-cpo_grid_spaces` under
       ``objects(:)`` node (single *integer* data type value).
 
    -  **ind**, a leaf designed to contain explicit list of index tuples
@@ -941,7 +942,7 @@ notable children, as shown in
 
 -  **objects_per_dimension(:)**, an array of structures node designed to
    contain definition of space objects, previously covered in
-   chapter `1.1`_, for every dimension. Each dimension corresponds to
+   chapter :ref:`subsec-grid_struc`, for every dimension. Each dimension corresponds to
    the predetermined array index:
 
    -  index 1 for 0D objects (points or grid nodes),
@@ -968,7 +969,7 @@ specific grid subset object, as shown in
 -  **geometry**, a leaf designed to contain geometry data associated
    with the object. Its array size depends on the type of object and
    coordinate system (previously defined in ``coordinates_type`` leaf,
-   covered in section `2.1.1.1.2`_ (an array of *float* data type
+   covered in section :ref:`parag-ids_ggd_grid` (an array of *float* data type
    values),
 
 -  | **nodes**, a leaf designed to contain list of 0D points or grid
@@ -978,7 +979,7 @@ specific grid subset object, as shown in
 
 -  **boundary(:)**, an array of structures node, designed to contain
    data on boundary of the object, previously covered in
-   section `1.2`_. Each node contains a set of (n-1) dimensional
+   section :ref:`subsec-grid_boundary`. Each node contains a set of (n-1) dimensional
    objects defining the boundary of this n-dimensional object, stored in
    its children *index* leaf (an array of *integer* data type values).
 
@@ -1014,8 +1015,8 @@ grid_subset(:)
 
 node is an array of structures and a sibling to ``identifier`` node and
 ``space(:)`` node, set to contain data on grid subsets previously
-explained in `1.3`_ and it is an IDS variation of *edge* CPO
-``subgrid(:)`` node, discussed in section `1.1.1.1`_. Its children, as
+explained in :ref:`subsec-grid_subset` and it is an IDS variation of *edge* CPO
+``subgrid(:)`` node, discussed in section :ref:`parag-cpo_grid_spaces`. Its children, as
 shown in :numref:`fig-ids_edgeprofiles_ggd_grid_gridsubset`, are:
 
 -  **identifier**, a simple structure node to contain the identification
@@ -1056,7 +1057,7 @@ shown in :numref:`fig-ids_edgeprofiles_ggd_grid_gridsubset`, are:
    :alt:  Hierarchy scheme of grid and grid basic components in
           *edge_profiles* IDS.
 
-    Hierarchy scheme of grid and grid basic components in
+   Hierarchy scheme of grid and grid basic components in
    *edge_profiles* IDS.
 
 
@@ -1139,7 +1140,7 @@ children are:
      element, with ``e``-th scalar value corresponding to element
      defined in
    | ``edge_profiles.ggd(:).grid.grid_subset(:).element(e)`` node
-     (previously covered in section `2.1.1.1.3`_), where ``e``
+     (previously covered in section :ref:`subsubsec-grid_node_structure`), where ``e``
      represents the ``element(:)`` node structure array index.
 
 .. _fig-ids_edgeprofiles_ggd_electrons:
@@ -1210,7 +1211,7 @@ ion(:) node structure
 
 The structure of ``ion(:).temperature(:)`` and ``ion(:).density(:)``
 nodes is identical to the same-name nodes found in ``electrons`` node
-and is presented in previous section `2.1.1.2.1`_.
+and is presented in previous section :ref:`parag-ids_ggd_electrons`.
 
 .. _fig-ids_edgeprofiles_ggd_ion:
 
@@ -1286,7 +1287,8 @@ such as the data on the two-dimensional edge plasma region grid and data
 on quantities (such as electron temperature, etc.). Parts of data
 structure contents and parts of the code of the converter are presented
 for the purposes of better interpretation. For complete ``cpo2ids`` code
-description see Appendix `[app:cpo2ids_code]`_.
+description see **cpo2ids.py** located in B2.5 project
+( *B2.5/src/ids/cpo2ids.py )*.
 
 In order to avoid any possible confusion regarding the index
 notation [6]_. FORTRAN index notation [7]_ is used for the conversion
@@ -2162,7 +2164,7 @@ storage of data on grid subsets of the grid, are presented in Table
     | | **node**       |                        |                            |
     +------------------+------------------------+----------------------------+
     | | **Node type**  | | Array of structures  | | Array of structures node.|
-    |                  | | node.                |                            |
+    |                  |   node.                |                            |
     +------------------+------------------------+----------------------------+
 
 Each structure of ``.subgrids(:)`` and ``.grid_subset(:)`` the array of
@@ -2553,6 +2555,25 @@ The *edge* CPO and *edge_profiles* IDS parent nodes, designed for the
 data storage of data on each ion density data field corresponding to the
 grid subsets, are presented in :numref:`tbl-cpo2ids_ni`.
 
+.. _tbl-cpo2ids_ni:
+
+.. table::  Ion density data Field: Comparison between data structures and
+            their parent nodes, designed for storage of the data on the ion
+            density quantity..
+
+    +------------------+-----------------------------------------------------+
+    |                  |                   Data structure                    |
+    |                  +------------------------+----------------------------+
+    |                  |       *edge* CPO       |   *edge_profiles* IDS      |
+    +==================+========================+============================+
+    | | **Ion density**| | edge.grid.fluid.ni(:)| | edge_profiles.ggd(:)     |
+    | | **parent node**|                        | | .ion(:).density(:)       |
+    |                  |                        |                            |
+    +------------------+------------------------+----------------------------+
+    | | **Node type**  | | Array of structures  | | Array of structures node.|
+    |                  |   node.                |                            |
+    +------------------+------------------------+----------------------------+
+
 Each structure of ``.ni(:)`` and ``.ion(:)`` array of structures node is
 set to store the ion density data field of each ion specie.
 
@@ -2570,9 +2591,9 @@ processed by the converter, are as follows:
 
 The *edge* CPO and *edge_profiles* IDS leaves, designed for the data
 storage of data on density of ion species in plasma, and their data
-format are presented in :numref:`tbl-cpo2ids_ni_data`, while the data
+format are presented in Table :numref:`tbl-cpo2ids_ni_data`, while the data
 structure and detailed format of the ion density data in both data
-structures are shown in :numref:`lst-cpo2ids_ni`.
+structures are shown in Listing :numref:`lst-cpo2ids_ni`.
 
 .. _tbl-cpo2ids_ni_data:
 
@@ -2886,9 +2907,8 @@ discussed tools is as follows:
 | In the continuation of this chapter, a review of ``b2_ual_write`` and
   ``b2_ual_write_gsl`` code is presented. Full source codes of
   ``put_edge_ids.py``, ``b2_ual_write.f90`` and
-| ``b2_ual_write_gsl`` are available in the
-  Appendices `[app:putedgeids_code]`_, `[app:b2_ual_write_code]`_
-  and `[app:b2_ual_write_gsl_code]`_.
+| ``b2_ual_write_gsl`` are available in the directories
+  *SOLPS-GUI/src/widgets* and *B2.5/src/ids*.
 
 .. _sec-b25_write_tools:
 
@@ -2924,19 +2944,22 @@ repository https://git.iter.org/projects/IMEX/repos/ggd/ [20] under
 Due to the source code of the both tools being quite extensive and with
 both tool being used to accomplish the same task only
 ``write_ids_edge_profiles`` subroutine of the ``b2_ual_write_gsl`` is
-presented in continuation of this section. For full source code and full
-IDS writing method comparison see
-appendices `[app:b2_ual_write_code]`_
-and `[app:b2_ual_write_gsl_code]`_.
+presented in continuation of this section. For full IDS writing method
+comparison see the codes located in *B2.5/src/ids*.
 
 | Firstly, in the ``write_ids_edge_profiles`` subroutine, the mandatory
   data of
 | *edge_profiles* IDS are set, those being the homogeneous time
   indicator and time value using the ``exampleSetIDSFundamentals`` GSL
-  routine, as shown in Listing
+  routine, as shown in Code block
   :numref:`lst-b2_ual_write_gsl_code_fundamentals`.
 
+
+.. _lst-b2_ual_write_gsl_code_fundamentals:
+
 .. code-block:: Fortran
+   :caption:    **b2_ual_write_gsl** code: Setting the mandatory data using
+                ``exampleSetIDSFundamentals`` GSL routine.
 
     subroutine write_ids_edge_profiles(treename, shot, run, idx, username, &
                                         & machine, version, ne, te, ti)
@@ -2950,7 +2973,14 @@ Secondly, the coordinate system is being defined (global 2D cylindrical
 coordinate system), as shown in
 :numref:`lst-b2_ual_write_gsl_code_coordtype`.
 
+.. _lst-b2_ual_write_gsl_code_coordtype:
+
 .. code-block:: Fortran
+   :caption:    **b2_ual_write_gsl** code: Setting the coordinate system of
+                the 2D grid. ``IDS_COORDTYPE_R`` variable represents the
+                coordinate type code number ``4`` for radius ``R`` while
+                ``IDS_COORDTYPE_Z`` variable represents the coordinate type
+                code number ``5`` for height ``Z``.
 
         ...
         !> Set definition of the coordinate system of the space
@@ -2961,7 +2991,14 @@ Thirdly, 0D objects or nodes are being defined by coordinates that were
 previously read from the ``b2fgmtry`` file, as shown in
 :numref:`lst-b2_ual_write_gsl_code_0dobjects`.
 
+.. _lst-b2_ual_write_gsl_code_0dobjects:
+
 .. code-block:: Fortran
+   :caption:    **b2_ual_write_gsl** code: Setting the 0D objects or nodes
+                of the grid. ``crx`` and ``cry`` are 3D array containing four
+                sets of the node coordinates in 2D space, previously read
+                from ``b2fgmtry`` file, while ``nodesGeoList`` is a 2D array
+                containing one set of node coordinates in 2D space.
 
         ...
         !> Set geometry (R,Z) coordinate of each node object
@@ -2987,7 +3024,12 @@ anti-clockwise), as shown in Listing
 :numref:`lst-b2_ual_write_gsl_code_2dobjects`. Note that in this case 1D
 objects/edges are not included.
 
+.. _lst-b2_ual_write_gsl_code_2dobjects:
+
 .. code-block:: Fortran
+  :caption:     **b2_ual_write_gsl** code: Setting connectivity array of the
+                2D unstructured quadrilateral grid. ``cellsNodesList`` is a
+                2D array containing list of node indices forming each cell.
 
         ...
         !> Set list of indices for nodes defining each cell object
@@ -3017,7 +3059,20 @@ subsets are required to be writtend to the IDS. The use of the mentioned
 GSL routine is shown in
 :numref:`lst-b2_ual_write_gsl_code_gslgrid`.
 
+.. _lst-b2_ual_write_gsl_code_gslgrid:
+
 .. code-block:: Fortran
+   :caption:    **b2_ual_write_gsl** code: Setting the grid data to IDS using
+                ``gridSetup2dSpace`` GSL routine. ``nodesGeoList`` represents
+                a 2D array containing one set of node coordinates in 2D space,
+                ``edgesNodesList`` represents a empty placeholder 2D array
+                containing list of node indices forming each edge,
+                ``cellsNodesList`` represents a 2D array containing list of
+                node indices forming each cell and ``createGridSubsets``
+                represents a logical operator (``true`` or
+                ``false``) defining if default grid subsets, each consisting
+                of all n-dimensional objects in the domain,  should be set
+                for our IDS.
 
         ...
         !> --- Set the grid space objects and grid subsets ---
@@ -3038,7 +3093,21 @@ stored to ``ne``, ``te`` and ``ti`` arrays, are written to IDS using
 values are given in joules [J] unit and are converted to electron volts
 [eV] (1 J = 6.242e18 eV).
 
+.. _lst-b2_ual_write_gsl_code_scalars:
+
 .. code-block:: Fortran
+   :caption:    **b2_ual_write_gsl** code: Setting the data fields of
+                plasma quantities electron temperature, electron density,
+                and ion temperature to IDS using ``gridStructWriteData1d} GSL
+                routine. ``grid`` represents the pointer variable to grid
+                structure of the IDS, ``idsField`` represents the pointer
+                structure of the IDS, ``gridSubset_index`` represents the base
+                grid subset index [#]_ and ``ne``, ``te`` and ``ti``
+                represent 1D arrays containing scalar values on plasma
+                quantities electron temperature, electron density, and ion
+                temperature, previously read from ``b2fstate`` file,
+                corresponding to *2D Cells* grid subset with one scalar value
+                per element (object) of the grid subset.
 
         ...
         gridSubset_index = 3
@@ -3071,12 +3140,17 @@ values are given in joules [J] unit and are converted to electron volts
             machine, version)
         ...
 
+.. [#] In this case 1 for *Nodes*, 2 for *Edges* and 3 for *2D Cells* grid subset.
+
 Lastly, new *edge_profiles* is created and entire previously set data is
 written to the IDS, as shown in
 :numref:`lst-b2_ual_write_gsl_code_idswrite`.
 
-.. code-block:: Fortran
+.. _lst-b2_ual_write_gsl_code_idswrite:
 
+.. code-block:: Fortran
+   :caption:    **b2_ual_write_gsl** code: Writing the data to IDS with
+                defined shot, run, username, device and version parameters.
         ...
         !> Create and modify new shot/run
         call imas_create_env(treename, shot, run, 0, 0, idx, username, &
@@ -3164,10 +3238,10 @@ The whole plugin consists of multiple files:
 
 In the continuation of this chapter, a review of the main ParaView
 ``ReadUALEdge`` plugin code file, ``ReadUALEdge.cxx``, and of the
-plugins graphical user interface are presented. For complete plugin
-codes, see Appendix `[app:readualedge_code]`_, while the tutorial and
-additional information on the ``ReadUALEdge`` plugin can be found in
-document SOLPS-GUI documentation [8].
+plugins graphical user interface are presented. The plugin codes are located
+in SOLPS-GUI/src/plugins/paraview, while the tutorial and
+additional information on the ``ReadUALEdge`` plugin can be found in section
+[4.5.5].
 
 .. _sec-readualedge_code:
 
@@ -3247,7 +3321,7 @@ subset and although each grid subset, as already discussed in previous
 chapters, consists of either 0D, 1D, or 2D elements, the process of
 defining the ``vtkUnstructuredGrid`` dataset for every grid subset is
 mostly identical, and it is in close relation to the principles
-previously discussed in section `1.1`_.
+previously discussed in section :ref:`subsec-grid_struc`.
 
 The process of setting the ``vtkUnstructuredGrids`` is shown in Fig.
 :numref:`fig-readualedge_gridsubset_process_scheme` and described below,
@@ -3271,8 +3345,13 @@ assigns points data to ``vtkPoints`` array. The process of
 ``fSetVtkPoints`` function is shown in
 :numref:`lst-readualedge_code_fSetVtkPoints`.
 
-.. code-block:: C++
+.. _lst-readualedge_code_fSetVtkPoints:
 
+.. code-block:: C++
+  :caption: ReadUALEdge code: Process of assigning points data to ``vtkPoints``
+            array inside function ``fSetVtkPoints``. The ``dim_obj_0D`` is a
+            replacement or shortcut variable to  ``.objects_per_dimension(0)``
+            structure inside IDS *edge_profiles*.
     ...
     vtkSmartPointer<vtkPoints> pointsArray =
         vtkSmartPointer<vtkPoints>::New();
@@ -3299,7 +3378,20 @@ of the three data types:
 The process of setting the list of the elements ``vtkCellArray`` is
 shown in :numref:`lst-readualedge_code_fSetCellArray`
 
+.. _lst-readualedge_code_fSetCellArray:
+
 .. code-block:: C++
+   :caption:    ReadUALEdge code: Process of assigning grid subset elements
+                to ``vtkCellArray`` array inside function ``fSetCellArray``.
+                Firstly, the information on objects forming the element (object
+                dimension, object space index, object index, number of objects
+                forming the element [#]_) is obtained and used to get
+                a list of indices of 0D objects or points composing the element.
+                Secondly, using the same list of indices, the element is set as
+                ``vtk data type`` and added to a single ``vtkCellArray``
+                The process repeats for every available element of the grid
+                subset, and at the end of the process the ``vtkCellArray``
+                contains data on all elements forming the grid subset.
 
     ...
     vtkSmartPointer<vtkCellArray> newCellArray =
@@ -3325,6 +3417,8 @@ shown in :numref:`lst-readualedge_code_fSetCellArray`
     }
     ...
 
+.. [#] All benchmark examples use the assumption of each element consisting of single object.
+
 Thirdly, the plugin sets the geometry of ``vtkUnstructuredGrid`` dataset
 by assigning the previously defined ``vtkPoints`` and ``vtkCellArray``
 data arrays to it, and additionally specifying the type of elements
@@ -3339,7 +3433,16 @@ forming the grid [32]:
 The process of setting the geometry of ``vtkUnstructuredGrid`` dataset
 is shown in :numref:`lst-readualedge_code_UG`.
 
+.. _lst-readualedge_code_UG:
+
 .. code-block:: C++
+   :caption:    ReadUALEdge code: Process of ``vtkUnstructuredGrid`` dataset
+                definition. ``<UG>`` represents the label of the
+                ``vtkUnstructuredGrid`` dataset, ``<vtkPoints>``
+                represents the label of predefined ``vtkPoints`` array,
+                ``<vtkCellType>`` represents data type [32]and
+                ``<vtkCellArray>`` represents the label of predefined
+                ``vtkCellArray`` array.
 
     //> Set vtkUnstructuredGrid dataset
     vtkSmartPointer<vtkUnstructuredGrid> <UG> =
@@ -3360,7 +3463,16 @@ fields can be assigned to the same ``vtkUnstructuredGrid``. In the
 ``fSetValuesArrayLabel``, shown in Listing
 :numref:`lst-readualedge_code_fValues2UnstructuredGrid`.
 
+.. _lst-readualedge_code_fValues2UnstructuredGrid:
+
 .. code-block:: C++
+   :caption:    ReadUALEdge code: Process of assigning quantity data field to
+                ``vtkUnstructuredGrid`` dataset inside function
+                ``fValues2UnstructuredGrid``. The predefined
+                ``fSetValuesArrayBasis`` function sets the ``vtkDoubleArray``
+                (array label and size) then the data field is assigned to
+                ``vtkDoubleArray`` and the ``vtkDoubleArray`` is assigned to
+                previously set ``vtkUnstructuredGrid``.
 
     ...
     // Define vtkDoubleArray and set its label and size
@@ -3384,7 +3496,12 @@ to multiblock dataset In ``ReadUALEdge`` the plugin. That process takes
 place in function ``fAddBlock2MultiBlock``, shown in Listing
 :numref:`lst-readualedge_code_fAddBlock2MultiBlock`.
 
+.. _lst-readualedge_code_fAddBlock2MultiBlock:
+
 .. code-block:: C++
+  :caption:     ReadUALEdge code: Process of adding ``vtkUnstructuredGrid``
+                (labeled as ``<UG>``) as a block to ``vtkMultiBlockDataSet``
+                inside function ``fAddBlock2MultiBlock``.
 
     ...
     int num_blocks = MB->GetNumberOfBlocks();
@@ -3493,15 +3610,15 @@ used on *Marconi GateWay eufus.eu* HPC cluster.
 .. table::  Case parameters of provided benchmark *edge* CPO data
             structures.
 
-+------------------------------------------+
-|       *edge* CPO data structure          |
-+-------+------+--------+--------+---------+
-| Shot  | Run  | User   | Device | Version |
-+=======+======+========+========+=========+
-| 16151 | 1000 | g2kosl | aug    | 4.10a   |
-+-------+------+--------+--------+---------+
-| 1     | 1    | g2kosl | iter   | 4.10a   |
-+-------+------+--------+--------+---------+
+   +------------------------------------------+
+   |       *edge* CPO data structure          |
+   +-------+------+--------+--------+---------+
+   | Shot  | Run  | User   | Device | Version |
+   +=======+======+========+========+=========+
+   | 16151 | 1000 | g2kosl | aug    | 4.10a   |
+   +-------+------+--------+--------+---------+
+   | 1     | 1    | g2kosl | iter   | 4.10a   |
+   +-------+------+--------+--------+---------+
 
 With the help of the ``cpo2ids`` tool, the *edge* CPO data structures,
 listed in :numref:`tbl-res_cpo_data_units`, are converted to
@@ -3539,12 +3656,12 @@ in the ``ReadUALEdge`` plugin source code, previously discussed in
 :numref:`subsec-readualedge_vtkUnstructuredGrid`, the plugin
 allows selection of any available block (grid subsets) or blocks, as
 shown in :numref:`fig-readualedge_16151_1000_cells_sciod`. A list of
-all available grid subsets is shown in :numref:`fig-gridsubset_list`.
+all available grid subsets is shown in :numref:`tbl-gridsubset_list`.
 
 .. _tbl-gridsubset_list:
 
-.. table:: Visualization of 16151/1000 IDS case using ReadUALEdge
-plugin: List of all available grid subsets.
+.. table::  Visualization of 16151/1000 IDS case using ReadUALEdge
+            plugin: List of all available grid subsets.
 
    +-------------------------------------------+
    |              Grid subset                  |
@@ -3635,7 +3752,8 @@ plugin: List of all available grid subsets.
 Moreover, the plugin allows the selection between the available data
 fields on plasma quantity, shown in
 :numref:`fig-readualedge_16151_1000_datafield`, for selected grid
-subsets, as shown in :numref:`fig-readualedge_16151_1000_sol_sciod_te`.
+subsets, as shown in Figs. :numref:`fig-readualedge_16151_1000_sciod_te`
+and :numref:`fig-readualedge_16151_1000_sol_te`.
 This allows the user to work only those grid subsets that he is
 interested in. As such, the SOL region can be displayed individually and
 further analyzed without having the unnecessary edge plasma regions
@@ -3643,45 +3761,84 @@ displayed on the screen, as shown in Fig.
 :numref:`fig-readualedge_16151_1000_sol_te`. The same can be done for any
 other grid subset. The display of 16151/1000 IDS case edge plasma and
 its all available data fields on plasma quantities [30]_ are shown in
-Figs. :numref:`fig-readualedge_16151_1000_ne_te`,
-:numref:`fig-readualedge_16151_1000_ni1_ni2` and
+Figs. :numref:`fig-readualedge_16151_1000_ne`,
+:numref:`fig-readualedge_16151_1000_te`
+:numref:`fig-readualedge_16151_1000_ni1`,
+:numref:`fig-readualedge_16151_1000_ni2` and
 :numref:`fig-readualedge_16151_1000_ti`.
 
 .. _fig-readualedge_16151_1000_datafield:
 
 .. figure:: images/IDS_16151_1000_data_fields.png
-   :alt: 16151/1000 IDS case: List of available data fields of
-         quantities.
+   :alt:    16151/1000 IDS case: List of available data fields of
+            quantities.
 
    16151/1000 IDS case: List of available data fields of quantities.
 
 
-
 .. _fig-readualedge_16151_1000_sciod_te:
+
+.. figure:: images/IDS_16151_1000_SOL_Core_IO_Div_te_edit.pdf
+   :alt:    16151/1000 IDS case: Presentation of quantities - multiple selected
+            grid subsets.
+            Electron temperature of selected Core, SOL, Inner divertor and Outer
+            divertor [#]_ grid subsets.
+
+   16151/1000 IDS case: Presentation of quantities - multiple selected
+   grid subsets.
+   Electron temperature of selected Core, SOL, Inner divertor and Outer
+   divertor [#]_ grid subsets.
+
+.. [#]  These four grid subsets together form the complete edge plasma region.
 
 
 .. _fig-readualedge_16151_1000_sol_te:
 
-.. _fig-readualedge_16151_1000_sol_sciod_te:
+.. figure:: images/IDS_16151_1000_SOL_te_edit.pdf
+   :alt:    16151/1000 IDS case: Presentation of quantities - single selected
+            grid subsets. Electron temperature of selected SOL grid subsets.
 
+   16151/1000 IDS case: Presentation of quantities - single selected
+   grid subsets. Electron temperature of selected SOL grid subsets.
 
 .. _fig-readualedge_16151_1000_ne:
+
+.. figure:: images/IDS_16151_1000_CSIOD_ne_edit.pdf
+   :alt:    16151/1000 IDS case: Display of electron density edge plasma.
+
+   16151/1000 IDS case: Display of electron density of edge plasma.
 
 
 .. _fig-readualedge_16151_1000_te:
 
-.. _fig-readualedge_16151_1000_ne_te:
+.. figure:: images/IDS_16151_1000_CSIOD_te_edit.pdf
+   :alt:    16151/1000 IDS case: Display of electron temperature of edge plasma.
+
+   16151/1000 IDS case: Display of electron temperature of edge plasma.
 
 
 .. _fig-readualedge_16151_1000_ni1:
 
+.. figure:: images/IDS_16151_1000_CSIOD_ni1_edit.pdf
+   :alt:    16151/1000 IDS case: Display of D0 ion density of edge plasma.
+
+   16151/1000 IDS case: Display of D0 ion density of edge plasma.
+
 
 .. _fig-readualedge_16151_1000_ni2:
 
-.. _fig-readualedge_16151_1000_ni1_ni2:
+.. figure:: images/IDS_16151_1000_CSIOD_ni2_edit.pdf
+   :alt:    16151/1000 IDS case: Display of D+1 ion density of edge plasma.
+
+   16151/1000 IDS case: Display of D+1 ion density of edge plasma.
 
 
 .. _fig-readualedge_16151_1000_ti:
+
+.. figure:: images/IDS_16151_1000_CSIOD_ti_edit.pdf
+   :alt:    16151/1000 IDS case: Display of ion temperature of edge plasma.
+
+   16151/1000 IDS case: Display of ion temperature of edge plasma.
 
 The same as for the first IDS case can be done for the second IDS case
 with Shot: 1 and Run: 1 parameters. This IDS case is more extensive,
@@ -3691,8 +3848,8 @@ ion density data on a total of 98 ion species, as shown in
 contained ion density for just two ion species. The display of the
 second IDS case together with applying some of its many available data
 fields on plasma properties [31]_ are presented in
-Figs. :numref:`fig-readualedge_1_1_ne_te`,
-:numref:`fig-readualedge_1_1_ni1_ni2` and
+Figs. :numref:`fig-readualedge_1_1_ne`, :numref:`fig-readualedge_1_1_te`
+:numref:`fig-readualedge_1_1_ni1`, :numref:`fig-readualedge_1_1_ni2` and
 :numref:`fig-readualedge_1_1_ti`.
 
 .. _fig-readualedge_1_1_datafield:
@@ -3706,24 +3863,46 @@ Figs. :numref:`fig-readualedge_1_1_ne_te`,
    There are total 98 different ion specie density data fields.
 
 
+.. _fig-readualedge_1_1_te:
+
+.. figure:: images/IDS_1_1_CSIOD_te_edit.pdf
+   :alt:    1/1 IDS case: Display of electron temperature of edge plasma region.
+
+   1/1 IDS case: Display of electron temperature of edge plasma region.
+
 
 .. _fig-readualedge_1_1_ne:
 
+.. figure:: images/IDS_1_1_CSIOD_ne_edit.pdf
+   :alt:    1/1 IDS case: Display of electron denisty of edge plasma region.
 
-.. _fig-readualedge_1_1_te:
-
-.. _fig-readualedge_1_1_ne_te:
+   1/1 IDS case: Display of electron denisty of edge plasma region.
 
 
 .. _fig-readualedge_1_1_ni1:
 
+.. figure:: images/IDS_1_1_CSIOD_ni1_edit.pdf
+   :alt:    1/1 IDS case: Display of D0 ion density of edge plasma.
+
+   1/1 IDS case: Display of D0 ion density of edge plasma.
+
+
 
 .. _fig-readualedge_1_1_ni2:
 
-.. _fig-readualedge_1_1_ni1_ni2:
+.. figure:: images/IDS_1_1_CSIOD_ni2_edit.pdf
+   :alt:    1/1 IDS case: Display of D+1 ion density of edge plasma.
+
+   1/1 IDS case: Display of D+1 ion density of edge plasma.
 
 
 .. _fig-readualedge_1_1_ti:
+
+.. figure:: images/IDS_1_1_CSIOD_ti_edit.pdf
+   :alt:    1/1 IDS case: Display of ion temperature of edge plasma region.
+
+   1/1 IDS case: Display of ion temperature of edge plasma region.
+
 
 Furthermore, as an addition to this section, through the ParaView
 application interface the ``ReadUALEdge`` plugin allows straightforward
@@ -3786,7 +3965,9 @@ stored to IDS data structure with base parameters Shot: 16151, Run:
 1001, User: penkod, Device: solps-iter and Version: 3 for the first
 example and Shot: 535, Run: 1, User: penkod, Device: solps-iter and
 Version: 3. Both input examples and output IDS are listed in
-:numref:`fig-b2_ual_write_benchmark`.
+:numref:`tbl-b2_ual_write_benchmark`.
+
+.. _fig-readualedge_b2:
 
 .. figure:: images/ReadUALEdge_scheme_b2.*
    :alt: Visualization process of the edge plasma data using
@@ -3795,33 +3976,19 @@ Version: 3. Both input examples and output IDS are listed in
    Visualization process of the edge plasma data using
    ``b2_ual_write_gsl`` tool and ``ReadUALEdge`` plugin.
 
-.. _fig-readualedge_b2:
-
 .. _tbl-b2_ual_write_benchmark:
 
 .. table:: Benchmark SOLPS-ITER examples and output IDS parameters.
 
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   |           | column{5} |           |           |           |           |
-   |           | {c|}{Outp |           |           |           |           |
-   |           | ut IDS}   |           |           |           |           |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | {2-6}     |           |           |           |           |           |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | {1-6}{2.0 |           |           |           |           |           |
-   | pt}       |           |           |           |           |           |
-   |           |           |           |           |           |           |
-   | AUG_16151 |           |           |           |           |           |
-   | _D+C+He   |           |           |           |           |           |
-   | standalon |           |           |           |           |           |
-   | e         |           |           |           |           |           |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | {1-6}{2.0 |           |           |           |           |           |
-   | pt}       |           |           |           |           |           |
-   |           |           |           |           |           |           |
-   | ITER_535_ |           |           |           |           |           |
-   | D+He+Ar   |           |           |           |           |           |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
+   +------------------------------+----------------------------------------------+
+   |                              |                 Output IDS                   |
+   |     SOLPS_ITER example       +-------+------+--------+------------+---------+
+   |                              | Shot  | Run  | User   |   Device   | Version |
+   +==============================+=======+======+========+============+=========+
+   | AUG 16151 D+C+He standalone  | 16151 | 1001 | penkod | solps-iter | 3       |
+   +------------------------------+-------+------+--------+------------+---------+
+   | ITER 535 D+He+Ar             | 535   | 1    | penkod | solps-iter | 3       |
+   +------------------------------+-------+------+--------+------------+---------+
 
 Running the B2.5 simulation and producing the output result files using
 the above listed examples beforehand, the ``b2_ual_write.F90`` or
@@ -3844,18 +4011,35 @@ and :numref:`fig-readualedge_16151_1001_cells_ti`.
 
 .. _fig-readualedge_16151_1001_gs:
 
+.. figure:: images/IDS_16151_1001_gs.pdf
+   :alt:    16151/1001 IDS case: Available grid subsets.
+
+   16151/1001 IDS case: Available grid subsets.
 
 .. _fig-readualedge_16151_1001_cells_te:
 
-.. _fig-readualedge_16151_1001_gs_te:
+.. figure:: images/IDS_16151_1001_cells_te.pdf
+   :alt:    16151/1001 IDS case: Display of electron temperature of the edge
+            plasma.
 
+   16151/1001 IDS case: Display of electron temperature of the edge
+   plasma.
 
 .. _fig-readualedge_16151_1001_cells_ne:
 
+.. figure:: images/IDS_16151_1001_cells_ne.pdf
+   :alt:    16151/1001 IDS case: Display of electron density of the edge
+            plasma region.
+
+   16151/1001 IDS case: Display of electron density of the edge plasma region.
 
 .. _fig-readualedge_16151_1001_cells_ti:
 
-.. _fig-readualedge_16151_1001_ne_ti:
+.. figure:: images/IDS_16151_1001_cells_ti.pdf
+   :alt:    16151/1001 IDS case: Display of ion temperature of the edge plasma
+            region.
+
+   16151/1001 IDS case: Display of ion temperature of the edge plasma region.
 
 Next, the visualized contents of the second IDS data structure, Shot:
 535, Run: 1, in the ``ReadUALEdge`` plugin are presented. The plasma
@@ -3869,13 +4053,28 @@ and :numref:`fig-readualedge_535_1_cells_ti`.
 
 .. _fig-readualedge_535_1_cells_ne:
 
+.. figure:: images/IDS_535_1_cells_ne.pdf
+   :alt:    535/1 IDS case: Electron density of the edge plasma region.
+
+   535/1 IDS case: Electron density of the edge plasma region.
+
 
 .. _fig-readualedge_535_1_cells_te:
+
+.. figure:: images/IDS_535_1_cells_te.pdf
+   :alt:    535/1 IDS case: Display of electron temperature of the edge plasma
+            region.
+
+   535/1 IDS case: Display of electron temperature of the edge plasma region.
 
 
 .. _fig-readualedge_535_1_cells_ti:
 
-.. _fig-readualedge_535_1_te_ti:
+.. figure:: images/IDS_535_1_cells_ti.pdf
+   :alt:    535/1 IDS case: Display of ion temperature of the edge plasma
+            region.
+
+   535/1 IDS case: Display of ion temperature of the edge plasma region.
 
 .. cha-discussion:
 
@@ -3984,7 +4183,7 @@ model," 2014.
 https://git.iter.org/projects/IMAS/repos/data-dictionary.
 
 [13] "CPO data structure 4.10b.8."
-"`http://www.efda-itm.eu/ITM/imports/isip/public/data_structure/4.10b.8/Phase4top.html"`_.
+"http://www.efda-itm.eu/ITM/imports/isip/public/data_structure/4.10b.8/Phase4top.html".
 
 [14] "Official eu-im tf website." http://portal.eufus.eu.
 
@@ -4069,13 +4268,13 @@ https://portal.iter.org/departments/POP/CM/IMAS/Forms/AllItems.aspx?RootFolder=%
    using Python notation.
 
 .. [8]
-   Covered in sections `1.5`_, `1.1.1.1`_ and `2.1.1.1.2`_
+   Covered in sections :ref:`subsec-coordinate_systems`, :ref:`parag-cpo_grid_spaces` and :ref:`parag-ids_ggd_grid`.
 
 .. [9]
-   Covered in sections `1.1`_, `1.1.1.1`_ and `2.1.1.1.2`_
+   Covered in sections :ref:`subsec-grid_struc`, :ref:`parag-cpo_grid_spaces` and :ref:`parag-ids_ggd_grid`.
 
 .. [10]
-   Covered in sections `1.3`_, `1.1.1.1`_ and `2.1.1.1`_
+   Covered in sections :ref:`subsec-grid_subset`, :ref:`parag-cpo_grid_spaces` and :ref:`subsec-ids_edge_profiles_structure`.
 
 .. [11]
    For example, ``.objects(1)`` and ``.object_per_dimension(1)``
@@ -4109,8 +4308,8 @@ https://portal.iter.org/departments/POP/CM/IMAS/Forms/AllItems.aspx?RootFolder=%
    ending object index
 
 .. [19]
-   Previously covered in sections `1.1.3`_, `2.1.1.2`_
-   and `2.1.1.3`_
+   Previously covered in sections :ref:`subsubsec-fluid_branch_structure`,
+   :ref:`parag-ids_ggd_electrons` :ref:`parag-ids_ggd_ion`.
 
 .. [20]
    From here comes the abbreviation *ni* as *number of ions*. The same
@@ -4120,7 +4319,7 @@ https://portal.iter.org/departments/POP/CM/IMAS/Forms/AllItems.aspx?RootFolder=%
 
 .. [21]
    The same for ``te(:).value(:)``, ``ne(:).value(:)`` and
-   ``ti(:).value(:)`` for other physical quantities
+   ``ti(:).value(:)`` for other physical quantities.
 
 .. [22]
    Geometry data and data on electron temperature, electron density, and
@@ -4132,7 +4331,7 @@ https://portal.iter.org/departments/POP/CM/IMAS/Forms/AllItems.aspx?RootFolder=%
 
 .. [24]
    Both file formats are identical and usually ``b2fstate`` is copied
-   over ``b2fstate`` to continue SOLPS simulation
+   over ``b2fstate`` to continue SOLPS simulation.
 
 .. [25]
    It requires also list of nodes indices forming the edges. In this
@@ -4142,7 +4341,7 @@ https://portal.iter.org/departments/POP/CM/IMAS/Forms/AllItems.aspx?RootFolder=%
    Indices ``i_{FORTRAN90}=i_{C++}+1``
 
 .. [27]
-   2D quadrilateral cells
+   2D quadrilateral cells.
 
 .. [28]
    The converted IDSs are transferred from *Marconi GateWay eufus.eu*
