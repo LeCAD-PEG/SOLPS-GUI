@@ -3,7 +3,7 @@
 .. highlight:: csh
 
 =======================
- IDS HOWTO
+ IMAS HOWTO
 =======================
 
 
@@ -2865,7 +2865,8 @@ the data of results. The main objective of the work in this section is
 to extract the required data [22]_ based on these "plasma state" files
 and properly [23]_ store the data to *edge_profiles* IDS. The B2.5
 plasma simulation output files and their edge plasma data covered in
-this chapter are:
+this chapter are (only regarding the **put_edge_ids**,  **b2_ual_write**
+and **b2_ual_write_gsl** tool):
 
 -  **b2fgmtry**, holding data on edge geometry, and
 
@@ -2879,25 +2880,38 @@ A couple of tools for data storage of the discussed data to
 principles as already previously discussed ``cpo2ids`` tool covered in
 :numref:`sec-cpo2ids`:
 
--  **put_edge_ids**, written in Python 3.5 programming language and
-   using step-by-step method of writing edge data to *edge_profiles*
+-  **put_edge_ids**, written in Python 3.5 programming language. It uses
+   step-by-step method of writing edge data to *edge_profiles*
    IDS,
 
--  **b2_ual_write**, written in Fortran90 programming language and also
-   using step-by-step method of writing edge data to *edge_profiles*
-   IDS, and
+-  **b2_ual_write**, written in Fortran90 programming language. Same as previous
+   tool this one too uses step-by-step method of writing edge data to
+   *edge_profiles* IDS,
 
--  **b2_ual_write_gsl**, written in Fortran90 programming language and
-   using Grid Service Library (GSL) routines for writing edge data to
-   *edge_profiles* IDS.
+-  **b2_ual_write_gsl**, written in Fortran90 programming language. It uses
+   using Grid Service Library (GSL) routines to write edge data to
+   *edge_profiles* IDS, and
 
-All listed tools operate with the same data, the main difference between
-them is the programming language they are written in and/or the method
-of writing the data to the IDS, which is either a step-by-step method,
-manually defining every single node and leaf in IDS tree structure and
-setting its contents, or by using the Grid Service Library, written in
-Fortran90, which provides routines for a simplified and more
-user-friendly way of setting the data before it is written to the IDS.
+-  **b2_ual_write_b2mod**, written in Fortran90 programming language. It uses
+   ported **IDS b2mod** routines that were originally designed to work only
+   with the CPOs, and those **b2mod** routines use the IMAS GGD (also called
+   GSL) library in full extent when dealing with grid geometry, grid subsets
+   and plasma states. Full description is avaliable in section
+   :ref:`sec-b25_write_b2mod`.
+
+All listed tools operate with the same data, the main differences between
+them are:
+
+-  The programming language they are written in,
+-  the method of writing the data to the IDS, which is either
+
+   *   a **step-by-step method**, manually defining every single node and
+       leaf in IDS tree structure and setting its contents, or
+   *   by using the **Grid Service Library**, written in Fortran90, which
+       provides routines for a simplified and more user-friendly way of
+       setting the data before it is written to the IDS, or
+   *   by using **IDS b2mod** routines, which includes also IMAS GGD (GSL)
+       library routines.
 
 The fundamental process of data extraction and data storage in the
 discussed tools is as follows:
@@ -2914,16 +2928,21 @@ discussed tools is as follows:
 
 .. figure:: images/b2_data_to_IDS_schema.*
    :alt:  Data transfer of B2.5 plasma simulation results to
-          *edge_profiles* IDS process schema.
+          *edge_profiles* IDS process schema. Note: This schema presents only
+          *put_edge_ids*, *b2_ual_write* and *b2_ual_write_gsl* tools, but
+          the main concept is the same also for the *b2_ual_write_b2mod* tool
+          (while this latest tool deals with many more data files etc.).
 
    Data transfer of B2.5 plasma simulation results to *edge_profiles*
-   IDS process schema.
+   IDS process schema. Note: This schema presents only
+   *put_edge_ids*, *b2_ual_write* and *b2_ual_write_gsl* tools, but
+   the main concept is the same also for the *b2_ual_write_b2mod* tool
+   (while this latest tool deals with many more data files etc.).
 
-
-In the continuation of this chapter, a review of ``b2_ual_write`` and
-``b2_ual_write_gsl`` code is presented. Full source codes of
-``put_edge_ids.py``, ``b2_ual_write.f90`` and
-``b2_ual_write_gsl`` are available in the directories
+In the continuation of this chapter, a review of **b2_ual_write** and
+**b2_ual_write_gsl** code is presented. Full source codes of
+**put_edge_ids.py**, **b2_ual_write.f90**,
+**b2_ual_write_gsl** and **b2_ual_write_b2mod** are available in the directory
 *SOLPS-GUI/src/widgets* and *B2.5/src/ids*.
 
 .. _sec-b25_write_tools:
@@ -3182,6 +3201,182 @@ written to the IDS, as shown in
 
         write(0,*) "IDS write finished"
     end subroutine write_ids_edge_profiles
+
+.. _sec-b25_write_b2mod:
+
+b2_ual_write_b2mod tool
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This code is used to generate b2_ual_write_b2mod.exe
+(main program), which is a post-processor for B2. It
+is the latest and the most advanced B2.5 writer. It was developed using
+the experience and concepts gained while developing the *b2_ual_write* and
+*b2_ual_write_gsl* tools. Same as the previous two tools it is written in
+Fortran90 programing language. It uses ported **IDS b2mod** routines that were
+originally designed to work only with the CPOs, and those **b2mod** routines
+use the IMAS GGD (also called GSL) library in full extent when dealing with
+plasma grid geometry, grid subsets and plasma state (electron
+density/temperature, ion temperature, velocity etc.).. Moreover, this tool
+obtains data from all available data files, not only from previously mentioned
+**b2fgmtry** and **b2fstate**/**b2fstati**, and saves the data besides to
+*edge_profiles* IDS also *edge_sources* and *edge_transport* IDSs. This
+writer also processes the data through the first step of the **b2mn** routine
+before it is written to the IDSs.
+
+The basic code structure contains/uses the next essential subroutines:
+
+#. ``checkFileAndDelete``, designed to check if supposed new file already
+   exists. If the file exists it deletes it,
+#. **B2** routines ``b2mn_init`` and ``b2mn_step(0)``, used
+   to run main B2 routine to process and read the B2 data,
+#. main **b2mod IDS** routine ``B2_process_ids``, used to set B2.5 result
+   data to IDS, and
+#. ``put_ids_edge``, designed to put the set data to ``edge_profiles``,
+   ``edge_sources`` and ``edge_transport`` IDSs.
+
+The full description of each script and routine (``9`` .F90 scripts with about
+together ``10000`` lines of code) can be found in directory
+*SOLPS-ITER/modules/B2.5/src/ids* while the Doxygen generated documentation
+is available in *SOLPS-ITER/modules/B2.5/src/documentation* (please see the
+**README.md** in *B2.5* directory on how to generate and view the documentation).
+
+.. _subsec-b25_write_b2mod_mapping:
+
+Mapping CPO -> IDS
+^^^^^^^^^^^^^^^^^^
+
+Most B2.5 routines were originally developed to work solely with ITM
+CPOs. Those same routines were modified or created anew, providing
+necessary tools for working with IMAS IDSs.
+Since CPO and IDS data structure is not the same a lot of proper
+adjustments had to be made, mostly in modules
+**b2mod_ual_io_grid.F90** and **b2mod_ual_io.F90**.
+
+.. _parag-b25_write_b2mod_cpo_vs_ids1:
+
+Constants, classes etc.
+'''''''''''''''''''''''
+
+In :numref:`tbl-cpoids-constants` are listed CPO constants, classes etc. and
+corresponding IDS ones that were used in IMAS IDS B2.5 routines.
+
+.. _tbl-cpoids-constants:
+
+.. table::  CPO vs IDS: Object classes.
+
+   +-----------------------------------------+------------------------------------+
+   |                   CPO                   |                 IDS                |
+   +=========================================+====================================+
+   | CLASS_NODE = (/ 0, 0 /)                 | IDS_CLASS_NODE = 1                 |
+   +-----------------------------------------+------------------------------------+
+   | CLASS_RZ_EDGE = (/ 1, 0 /)              | IDS_CLASS_RZ_EDGE = 2              |
+   +-----------------------------------------+------------------------------------+
+   | CLASS_PHI_EDGE = (/ 0,10 /)             | IDS_CLASS_PHI_EDGE = 2             |
+   +-----------------------------------------+------------------------------------+
+   | CLASS_POLOIDALRADIAL_FACE = (/ 1, 1 /)  | IDS_CLASS_POLOIDALRADIAL_FACE = 2  |
+   +-----------------------------------------+------------------------------------+
+   | CLASS_TOROIDAL_FACE = (/ 2, 0 /)        | IDS_CLASS_TOROIDAL_FACE = 2        |
+   +-----------------------------------------+------------------------------------+
+   | CLASS_CELL = (/ 2, 1 /)                 | IDS_CLASS_CELL = 3                 |
+   +-----------------------------------------+------------------------------------+
+
+
+.. _parag-b25_write_b2mod_cpo_vs_ids2:
+
+Grid subset IDs:
+''''''''''''''''
+
+B2.5 ITM routines use grid subset IDs (B2_SUBGRID_UNSPECIFIED,
+B2_SUBGRID_NODES, B2_SUBGRID_CELLS etc.) defined in
+**b2mod_ual_io_grid.F90**, while B2.5 IDS
+uses grid subset IDs defined in IMAS GGD (ids_grid_common.f90).
+
+.. _parag-b25_write_b2mod_cpo_vs_ids3:
+
+Data tree nodes
+'''''''''''''''
+
+In :numref:`tbl-cpoids-nodes1` and :numref:`tbl-cpoids-nodes2` are listed CPO
+nodes and corresponding IDS nodes to which the data was written instead.
+
+.. _tbl-cpoids-nodes1:
+
+.. table:: CPO vs IDS: Data structure nodes - grid geometry.
+
+   +---------------------------------+---------------------------------------------+
+   |       CPO edge.grid. ...        |    IDS edge_profiles.ggd(:).grid. ...       |
+   +=================================+=============================================+
+   | spaces(:).coordtype             | space(:).coordinates_type                   |
+   +---------------------------------+---------------------------------------------+
+   | spaces(:).objects               | space(:).objects_per_dimension(:).object(:) |
+   +---------------------------------+---------------------------------------------+
+   | spaces(:).objects(:).geo        | space(:).objects_per_dimension(:).object(:) |
+   |                                 | .geometry                                   |
+   +---------------------------------+---------------------------------------------+
+   | spaces(:).objects(:).boundary   | space(:).objects_per_dimension(:).object(:) |
+   |                                 | .boundary                                   |
+   +---------------------------------+---------------------------------------------+
+   | spaces(:).objects(:).neighbour  | space(:).objects_per_dimension(:).object(:) |
+   |                                 | .boundary(:).neighbours                     |
+   +---------------------------------+---------------------------------------------+
+   | spaces(:).xpoints               | No node for data on x-points was found      |
+   +---------------------------------+---------------------------------------------+
+   | subgrids                        | grid_subset                                 |
+   +---------------------------------+---------------------------------------------+
+
+.. _tbl-cpoids-nodes2:
+
+.. table:: CPO vs IDS: Data structure nodes - plasma state.
+
+   +---------------------------+----------------------------------------------------------+
+   |       CPO edge. ...       |                       IDS                                |
+   +===========================+==========================================================+
+   | | fluid.ne.value          | | edge_profiles.ggd(:).electrons.density                 |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.ne.flux           | | edge_transport.model(:).ggd(:).electrons.particles.flux|
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.ne.source         | | edge_sources.source(:).ggd(:).electrons.particles      |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.ni.value          | | edge_profiles.ggd(:).ion(:).density                    |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.ni.flux           | | edge_transport.model(:).ggd(:).ion(:).particles.flux   |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.ni.source         | | edge_sources.source(:).ggd(:).ion(:).particles         |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.vi(:).comps(1)    | | edge_profiles.ggd(:).ion(:).velocity(:).radial         |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.vi(:).comps(2)    | | edge_profiles.ggd(:).ion(:).velocity(:).poloidal       |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.vi(:).comps(3)    | | edge_profiles.ggd(:).ion(:).velocity(:).toroidal       |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.vi(:).align(:)    | | Probably not required as the leaf label refers         |
+   |                           | | to vector component itself                             |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.vi(:).alignid     | | Refers to the label of the node velocity(:) leaf       |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.te(:).value       | | edge_profiles.ggd(:).electrons.temperature             |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.te(:).flux        | | edge_transport.model(:).ggd(:).electrons.energy.flux   |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.ti(:).value       | | edge_profiles.ggd(:).ion(:).temperature                |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.ti(:).flux        | | edge_transport.model(:).ggd(:).ion(:).energy.flux      |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.po.value          | | edge_profiles.ggd(:).phi_potential                     |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.te_aniso.comps(1) | | edge_profiles.ggd(:).e_field.poloidal                  |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.te_aniso.comps(2) | | edge_profiles.ggd(:).e_field.radial                    |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.te_aniso.comps(3) | | edge_profiles.ggd(:).e_field.toroidal                  |
+   +---------------------------+----------------------------------------------------------+
+   | | fluid.te_aniso.comps(4) | | edge_profiles.ggd(:).e_field.diamagnetic               |
+   +---------------------------+----------------------------------------------------------+
+
+Note: In the future, IDS data structure nodes that correspond to
+      flux data fields are to be moved from edge_transport IDS to
+      edge_profiles IDS.
+
 
 .. cha-readualedge:
 

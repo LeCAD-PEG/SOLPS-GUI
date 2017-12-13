@@ -15,7 +15,6 @@ Currently, the HOWTOs are:
 
    submit.rst
    catalyst/index.rst
-   cpo2ids/index.rst
    input-editor.rst
    ids/index.rst
    imas.rst
