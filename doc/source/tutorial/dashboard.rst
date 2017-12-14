@@ -10,6 +10,9 @@ Designing Dashboard
 With this tutorial we'll show the ease of graphical programming of the SOLPS-GUI
 Dashboard with a set of custom PyQt widgets and standard Qt widgets.
 
+.. note::   A short video tutorial on the **Desinig dashboard** is
+            available `here <https://youtu.be/V6_ohI7TQQc>`_.
+
 We will start from existing user SOLPS-GUI interface description (UI) saved
 as an XML file with the ``.ui`` extension. We will create a new Dashboard
 from scratch and save our UI (``mysolps.ui``) in our home directory or

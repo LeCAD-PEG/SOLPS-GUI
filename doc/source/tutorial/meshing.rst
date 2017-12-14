@@ -7,6 +7,9 @@
 Meshing toolchain
 =================
 
+.. note::   A short video tutorial on the **Meshing toolchain** is
+            available `here <https://youtu.be/MtwH4vPCVic>`_.
+
 DivGeo
 ======
 

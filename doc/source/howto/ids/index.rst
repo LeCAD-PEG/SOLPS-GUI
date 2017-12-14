@@ -7,7 +7,7 @@
 =======================
 
 
-:Author: Dejan Penko
+:Author: Dejan Penko, University of Ljubljana
 
 .. only:: html
 
@@ -3373,10 +3373,65 @@ nodes and corresponding IDS nodes to which the data was written instead.
    | | fluid.te_aniso.comps(4) | | edge_profiles.ggd(:).e_field.diamagnetic               |
    +---------------------------+----------------------------------------------------------+
 
-Note: In the future, IDS data structure nodes that correspond to
+.. note:: In the future, IDS data structure nodes that correspond to
       flux data fields are to be moved from edge_transport IDS to
       edge_profiles IDS.
 
+
+.. _subsec-b25_write_b2mod_howto:
+
+How to set the environment and run the code
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In this subsection it will be shown how to set the environment on ITER HPC
+and run the code.
+
+.. _subsec-b25_write_b2mod_set:
+
+Compiling and setting the environment
+'''''''''''''''''''''''''''''''''''''
+
+In order compile the B2.5 writer code use the commands below while in
+the SOLPS-ITER project main directory::
+
+    tcsh
+    source setup.csh
+    cd modules/B2.5
+    make ids
+
+.. note::   At the time of writing this manual IMAS module
+            imas/3.13.0/ual/3.6.3 was used. This IMAS module provides also GGD
+            support as it includes IMAS GGD library routines (Fortran90).
+
+.. _subsec-b25_write_b2mod_run:
+
+Running the code
+''''''''''''''''
+
+The B2.5 cases are available on ITER portal (`link <https://portal.iter.org/departments/POP/CM/IMAS/Forms/AllItems.aspx?RootFolder=%2Fdepartments%2FPOP%2FCM%2FIMAS%2FSOLPS-ITER%2FExamples>`_):
+
+In terminal navigate to directory containing the case required data files
+(b2fgmtry, b2fstate etc.) and run the following command::
+
+    $HOME/solps-iter/modules/B2.5/builds/standalone.$HOST_NAME.$COMPILER/b2_ual_write_b2mod.exe <shot> <run> <username> <device> <version>
+
+The arguments marked with < ... > are the parameters of the IDS database
+where the data is to be stored:
+-  ``shot``: The shot number of the database being created
+-  ``run``:  The run number of the database being created
+-  ``username``: Creator/owner of the IMAS IDS database
+-  ``device``: Device name of the IMAS IDS database (i. e. solps-iter, iter, aug)
+-  ``version``: Major version of the IMAS IDS database
+
+Example of the command::
+
+    $HOME/solps-iter/modules/B2.5/builds/standalone.$HOST_NAME.$COMPILER/b2_ual_write_b2mod.exe 100 7 penkod solps-iter 3
+
+.. note::   A short video tutorial on the use of the B2.5 writer is
+            available `here <https://youtu.be/5IuADXPAgkQ>`_.
+
+.. note::   More information on using the B2.5 writer is available in SOLPS-ITER
+            `B2.5 git repository <https://git.iter.org/projects/BND/repos/b2.5/browse>`_.
 
 .. cha-readualedge:
 
@@ -3787,6 +3842,10 @@ IDS using the ``ReadUALEdge`` plugin. Then in
 storing the SOLPS-ITER B2.5 simulation results to the *edge_profiles*
 IDS, and then the visualization of the stored data using the
 ``ReadUALEdge`` plugin inside the ParaView application.
+
+.. note::   A short video tutorial on the use of the **B2.5 writer** and the
+            ParaView **ReadUALEdge plugin** is available
+            `here <https://youtu.be/5IuADXPAgkQ>`_.
 
 .. _sec-results_cpo2ids:
 
@@ -4346,6 +4405,9 @@ are presented in Figs. :numref:`fig-b2ualwrite_b2mod_AUG` and
 electron temperature etc., are very similar to the ones presented in
 :ref:`subsec-results_b2_ual_write_gsl`. The values of course vary a bit as the
 data was processed through first step.
+
+.. note::   A short video tutorial on the use of the B2.5 writer is
+            available `here <https://youtu.be/5IuADXPAgkQ>`_.
 
 .. _fig-b2ualwrite_b2mod_AUG:
 

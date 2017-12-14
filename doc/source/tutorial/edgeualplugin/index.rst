@@ -7,7 +7,7 @@
 Using ParaView ReadUALEdge plugin
 =================================
 
-:Author: Dejan Penko
+:Author: Dejan Penko, University of Ljubljana
 
 This tutorial covers the basic instructions about running and using
 ParaView application [1]_ and how to run and use ReadUALEdge

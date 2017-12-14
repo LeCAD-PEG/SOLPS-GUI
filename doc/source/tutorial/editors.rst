@@ -9,6 +9,8 @@ Using Eirene and B2 editors
 This tutorial will show you how to use the Eirene and B2 editors and show how
 it helps us to edit and read the input files for Eirene and B2.
 
+.. note::   A short video tutorial on the use of the **Eirene editor** is
+            available `here <https://youtu.be/h27c_YB75GY>`_.
 
 Eirene editor
 -------------

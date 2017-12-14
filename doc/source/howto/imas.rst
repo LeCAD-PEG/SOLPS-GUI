@@ -13,6 +13,9 @@ Put IDS and Get IDS functions HOWTO
 This howto describes how the put and get functions for ids work inside of
 SOLPS-GUI.
 
+.. note::   A short video tutorial on the use of the B2.5 writer is
+            available `here <https://youtu.be/Dl_Bo-1zmxc>`_.
+
 Put IDS
 =======
 

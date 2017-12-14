@@ -40,6 +40,9 @@ path of the input file to the Eirene editor .py file. e.g.:
 
     python3 eirene.py /PATH/TO/THE/INPUT/FILE
 
+.. note::   A tutorial on the use of the Eirene editor is
+            available :ref:`editors`.
+
 B2 editor
 =========
 
