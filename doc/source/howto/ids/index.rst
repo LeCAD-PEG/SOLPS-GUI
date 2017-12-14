@@ -3380,8 +3380,8 @@ nodes and corresponding IDS nodes to which the data was written instead.
 
 .. _subsec-b25_write_b2mod_howto:
 
-How to set the environment and run the code
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Setting the environment and running the code
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In this subsection it will be shown how to set the environment on ITER HPC
 and run the code.
