@@ -180,6 +180,8 @@ class B2Edit(QWidget):
         else:
             tooltips = {}
 
+
+
         # for switch_name in b2_tooltips.tooltips['b2mn.dat']:
         #     if switch_name not in tooltips and \
         #         switch_name[:4] == filename[:4]:
@@ -196,11 +198,12 @@ class B2Edit(QWidget):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_F2:
-            if self.path.endswith('.stencil'):
+            if self.path.endswith('.stencil') or 'baserun' in self.path:
                 # No checks are required since the solpsinput.py have
-                # checked if stensils exist
+                # checked if stencils exist
                 with open(self.path, 'r') as f:
                     self.plainTextWidget.setPlainText(f.read())
+                    self.plainTextWidget.document().setModified(True)
                     self.path = ''
         elif event.key() == Qt.Key_F5:
             # Refresh the highlighter

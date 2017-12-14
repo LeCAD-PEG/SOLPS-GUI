@@ -141,11 +141,25 @@ class AddMenu(QMenu):
                     action.setEnabled(False)
         else:
             actions = self.actions()
-            for action in actions:
-                if filename[:-4] in action.text():
-                    action.setEnabled(True)
-                else:
+            strip = filename.rstrip('.dat')
+            if len(strip) == 4:
+                for action in self.actions():
                     action.setEnabled(False)
+                    enable = 1
+                    for a in action.menu().actions():
+                        if a.text().startswith(strip):
+                            if enable:
+                                action.setEnabled(True)
+                                enable = 0
+                            a.setEnabled(True)
+                        else:
+                            a.setEnabled(False)
+            else:
+                for action in actions:
+                    if filename[:-4] in action.text():
+                        action.setEnabled(True)
+                    else:
+                        action.setEnabled(False)
 
 
 if __name__ == "__main__":

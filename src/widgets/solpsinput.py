@@ -171,6 +171,7 @@ class SolpsInput(QTabWidget):
             plainTextEdit = self.editors[filename]
 
             path = self.rundir + '/' + filename
+            plainTextEdit.document().clear()
             if os.path.exists(path):
                 if not os.access(path, os.W_OK):
                     plainTextEdit.setReadOnly(True)
@@ -188,14 +189,17 @@ class SolpsInput(QTabWidget):
             else:
                 if os.access(self.rundir, os.W_OK):
                     msg = "File does not exist yet. "
-                    stenc1 = self.rundir + '/../baserun/' + filename + \
-                        '.stencil'
+                    stenc1 = self.rundir + '/../baserun/' + filename
                     stenc2 = self.rundir + filename + '.stencil'
-                    if os.path.exists(stenc1) or os.path.exists(stenc2):
+                    stenc3 = self.rundir + '/../baserun/' + filename + \
+                        '.stencil'
+                    if os.path.exists(stenc1) or os.path.exists(stenc2) or \
+                    os.path.exists(stenc3):
                         msg += "Press F2 to load the stencil file or start"\
                                " typing here."
                         self.editors[filename].path = stenc1 if \
-                            os.path.exists(stenc1) else stenc2
+                            os.path.exists(stenc1) else (stenc2 if
+                            os.path.exists(stenc2) else stenc3)
                     else:
                         msg += "Start typing here!"
                 else:

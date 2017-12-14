@@ -15,6 +15,7 @@
    editors.rst
    custom_plot.rst
    meshing.rst
+   initialize_run.rst
 
 
 
