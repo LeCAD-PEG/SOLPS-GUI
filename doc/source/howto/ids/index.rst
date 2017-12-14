@@ -464,12 +464,12 @@ only http://portal.eufus.eu [14].
 
 .. figure:: images/CPO_Phase4TOP_schema3.*
    :alt: Partial tree structure of the EU-IM database [13] with
-         highlighted *edge* CPO data structure, relevant to this thesis.
+         highlighted *edge* CPO data structure, relevant to this documentation.
    :width: 70%
    :align: center
 
    Partial tree structure of the EU-IM database [13] with highlighted
-   *edge* CPO data structure, relevant to this thesis.
+   *edge* CPO data structure, relevant to this documentation.
 
 
 .. _subsec-cpo_edge_structure:
@@ -482,7 +482,7 @@ predefined to hold data related to the *edge* plasma with SOL region
 included. As previously presented in section :ref:`sec-data_storage_units`, *edge* CPO consists
 of lower-level data-tree nodes. Taking into the account the extent and
 complexity of the *edge* CPO structure, only nodes relevant to this
-thesis will be covered. Following that, the main children of the
+documentation will be covered. Following that, the main children of the
 top-point *edge* CPO node, as shown in :numref:`fig-cpo_edge_top`, are:
 
 -  **datainfo**, a simple structure node designed to contain generic
@@ -3804,7 +3804,7 @@ of the new ``cpo2ids`` converter tool features and ``ReadUALEdge``
 plugin features. Both addressed CPO data structures, containing the
 *edge* CPO data structure with stored physical data on edge plasma. The
 same CPO cases were previously stored on the old *gateway.efda-itm.org*
-HPC cluster and, at the time of writing this thesis, are available and
+HPC cluster and, at the time of writing this documentation, are available and
 used on *Marconi GateWay eufus.eu* HPC cluster.
 
 .. _fig-readualedge_cpo2ids:
@@ -4181,6 +4181,11 @@ shown in Figs. :numref:`fig-readualedge_aug_vs_iter_te1` and
 Visualization of B2.5 simulation results
 ----------------------------------------
 
+.. _subsec-results_b2_ual_write_gsl:
+
+b2_ual_write_gsl results
+~~~~~~~~~~~~~~~~~~~~~~~~
+
 In this section, the results of storing the B2.5 simulation data to
 newly created *edge_profiles* IDS using ``b2_ual_write_gsl`` tool
 following with the use of the ``ReadUALEdge`` plugin to visualize the
@@ -4315,6 +4320,52 @@ and :numref:`fig-readualedge_535_1_cells_ti`.
 
 .. cha-discussion:
 
+
+.. _subsec-results_b2_ual_write_b2mod:
+
+b2_ual_write_b2mod results
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this section, the results of storing the B2.5 simulation data to
+newly created *edge_profiles* [#]_ IDS using ``b2_ual_write_b2mod`` tool
+following with the use of the ``ReadUALEdge`` plugin to visualize the
+data from the same *edge_profiles* IDS data structure units are presented.
+That is accomplished using
+the results obtained by running the B2.5 simulation with two SOLPS-ITER
+examples, *AUG_16151_D+C+He* a standalone case and *ITER_535_D+He+Ar*
+case [33], used for debugging and benchmarking of the
+``b2_ual_write_b2mod`` features. The newly created IDSs are then ready to be
+loaded and its contents displayed using the ``ReadUALEdge`` plugin.
+
+.. [#]  ReadUALEdge does not yet support the edge_transport and edge_sources IDSs.
+
+The visualized contents of the both created IDS data structures in the
+``ReadUALEdge`` plugin are shown below. All 25 available grid subsets
+are presented in Figs. :numref:`fig-b2ualwrite_b2mod_AUG` and
+:numref:`fig-b2ualwrite_b2mod_ITER`. The plasma state quantities, such as
+electron temperature etc., are very similar to the ones presented in
+:ref:`subsec-results_b2_ual_write_gsl`. The values of course vary a bit as the
+data was processed through first step.
+
+.. _fig-b2ualwrite_b2mod_AUG:
+
+.. figure:: images/B2_5_case_example.*
+   :alt:    The grid and grid subsets of B2.5 AUG 16151_D+C+He case, stored to IDS
+            using B2.5 writer **b2_ual_write_b2mod**.
+
+   The grid and grid subsets of B2.5 AUG 16151_D+C+He case, stored to IDS
+   using B2.5 writer **b2_ual_write_b2mod**.
+
+
+.. _fig-b2ualwrite_b2mod_ITER:
+
+.. figure:: images/B2_5_case_example_ITER.*
+   :alt:    The grid and grid subsets of B2.5 ITER 535_D+He+Ar case, stored to IDS
+            using B2.5 writer **b2_ual_write_b2mod**.
+
+   The grid and grid subsets of B2.5 ITER 535_D+He+Ar case, stored to IDS
+   using B2.5 writer **b2_ual_write_b2mod**.
+
 Discussion
 ==========
 
@@ -4356,7 +4407,8 @@ plasma data from CPO to IDS is possible, opening new way of potential
 use of the existing CPO cases and confirming the IDS as a more than
 suitable successor of the CPO, producing some of the first IDS cases
 containing the edge plasma data in the process. The same goes for the
-IDS tools ``put_edge_ids``, ``b2_ual_write`` and ``b2_ual_write_gsl``,
+IDS tools ``put_edge_ids``, ``b2_ual_write``, ``b2_ual_write_gsl`` and,
+the most advanced tool, ``b2_ual_write_b2mod``,
 developed with the intent of writing the B2.5 simulation output results
 IDS, providing the means of storing the most recent edge data to IDS
 from other sources other than pre-existing CPOs. Furthermore, all of the
@@ -4364,11 +4416,11 @@ above mentioned IDS data processing tools can be seen as large-scale
 examples of their own, and can be used as another considerable source of
 information on how to handle and properly store the data to the IDS,
 with the addition of the use of *Grid Service Library (GSL)*, unlike at
-the beginning stages of this thesis when the IDS handling proved to be
+the beginning stages of this documentation when the IDS handling proved to be
 somewhat difficult due to the lack of more extensive examples and
 information on the IDS handling.
 
-Finally, the major and final outcome of this master’s thesis, the
+Finally, the major and final outcome, the
 ``ReadUALEdge`` plugin, operating within the open-source ParaView
 application, makes it possible for the edge plasma data, stored within
 the IDS, to be visualized using little effort as the plugin itself does
