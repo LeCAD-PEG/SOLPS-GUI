@@ -30,6 +30,15 @@ class Gnuplot(TcshProcess):
     """Gnuplot(QWidget)
     Provides a custom widget to display a gnuplot with properties and slots
     that can be used to customize its appearance.
+
+    The gnuplot can be either the embedded Qt5 widget from
+    ``solps-gui/src/gnuplot-widget``, built with
+    ``solps-gui/build-gnuplot-widget.sh`` (read more in ``README.md``) or
+    the system gnuplot.
+
+    The difference is that the embedded version also has interactivity, meaning
+    zooming, resizing, etc... while the system version is a static picture,
+    that does not resize or zoom.
     """
 
     TERMINAL = 'gif'
@@ -195,11 +204,11 @@ class Gnuplot(TcshProcess):
     @pyqtSlot()
     def executeSolpsPlotCommand(self):
         """ Opens TCSH login shell and runs SOLPS plot command
-            previously defined and under the runsDir.
+        previously defined and under the runsDir.
 
-            TCSH enviromnent is searched sourced from 'setup.csh' or pointed
-            with SOLPSTOP file. SOLPSTOP is probed for runDir changes and
-            if necessary resourced within a new shell.
+        TCSH enviromnent is searched sourced from 'setup.csh' or pointed
+        with SOLPSTOP file. SOLPSTOP is probed for runDir changes and
+        ff necessary resourced within a new shell.
 
             SOLPS plot is executed in GNUPLOT_BATCH mode.
         """
