@@ -20,6 +20,8 @@ class Tcsh(QProcess):
     processes also require input from the user so additional signals are
     created so that classes inheriting **tcsh** will be able to process and
     write user input back to the TCSH session.
+
+
     """
 
     stdOutput = pyqtSignal(str)
@@ -87,7 +89,7 @@ class Tcsh(QProcess):
 
     @pyqtSlot(QProcess.ProcessError)
     def showError(self, error):
-        """ Writes an error to the widget in case that the process failed
+        """Writes an error to the widget in case that the process failed
             to start.
         """
         errors = ['Failed to Start', 'Crashed', 'Timed out', 'WriteError',
@@ -135,8 +137,9 @@ class Tcsh(QProcess):
         self.write(cmd)
 
     def findSolpsTop(self, directory):
-        """ Searches for setup.csh or SOLPSTOP file in the directory hierarchy.
-        Arguments:
+        """Searches for setup.csh or SOLPSTOP file in the directory hierarchy.
+
+        Args:
             run_directory (str): run_directory
 
         Returns:
@@ -159,7 +162,18 @@ class Tcsh(QProcess):
 
 
 class TcshProcess(QWidget):
+    """QWidget for creating custom widgets that requires TCSH terminal for
+    starting programs and starting scripts from SOLPS-ITER.
+
+    Also because the widgets will be used as Qt's Designer plugins it is easier
+    if they have a template to avoid creating a mess (i.e. with signals) in
+    QDesigner.
+    """
     def __init__(self, parent=None):
+        """The important variables are:
+
+
+        """
         super(TcshProcess, self).__init__(parent)
 
         self.runDir = None
@@ -172,6 +186,9 @@ class TcshProcess(QWidget):
         self.destroyed.connect(self.tcsh.close)
 
     def activateDebugging(self):
+        """Function that activates printing of all the output from the
+        tcsh (TCSH terminal) variable.
+        """
         self.tcsh.prcError.connect(self.debugError)
         self.tcsh.prcFinished.connect(self.debugState)
         self.tcsh.prcStarted.connect(self.debugState)
@@ -180,36 +197,69 @@ class TcshProcess(QWidget):
 
     @pyqtSlot(str)
     def debugError(self, message):
+        """Prints std error message. Used for debugging.
+        """
         print('Error: ' + message)
 
     @pyqtSlot(str)
     def debugState(self, message):
+        """Prints QProcess state. Used for debugging.
+        """
         print('Changed State: ' + message)
 
     @pyqtSlot(str)
     def debugStd(self, message):
+        """Prints std output message. Used for debugging.
+        """
         print('STD: ' + message)
 
     @pyqtSlot(str)
     def setRunDir(self, newVal):
+        """Setter function for variable runDir.
+
+        The main widget that passes the current run directory path is the
+        widget Director.
+
+        The directory should be inside a SOLPS-ITER project as it is necessary
+        for starting the TCSH terminal with the correct SOLPS environment.
+
+        Args:
+            newVal (str): The new directory.
+        """
         self.runDir = newVal
 
     def getRunDir(self):
+        """Getter function for variable runDir.
+        """
         return self.runDir
 
     run_dir = pyqtProperty(str, getRunDir, setRunDir)
 
     @pyqtSlot(str)
     def setTcshPath(self, tcshPath):
+        """Setter for variable tcshPath.
+
+        The path should be an absolute path i.e. /usr/bin/tcsh.
+
+        Args:
+            tcshPath (str): Absolute path to TCSH.
+        """
         self.tcshPath = tcshPath
 
     def getTcshPath(self):
+        """Getter for variable tcshPath.
+        """
         return self.tcshPath
 
     tcsh_path = pyqtProperty(str, getTcshPath, setTcshPath)
 
     @pyqtSlot(str)
     def setTcshCommand(self, command):
+        """Setter for variable tcshCommand.
+
+        Args:
+            command (command): Command for TCSH terminal.
+        """
         self.tcshCommand = command
 
     def getTcshCommand(self):
@@ -218,12 +268,33 @@ class TcshProcess(QWidget):
     tcsh_command = pyqtProperty(str, getTcshCommand, setTcshCommand)
 
     def startTcsh(self):
+        """Starts the TCSH terminal by first setting the run directory variable
+        runDir, so the correct SOLPS-ITER is used for setting the TCSH
+        environment.
+
+        You can run it as many times as you want, since it always check if it
+        is running.
+        """
         self.tcsh.setRunDir(self.runDir)
         self.tcsh.setTcshPath(self.getTcshPath())
         self.tcsh.start()
 
     @pyqtSlot()
     def executeTcshCommand(self):
+        """Executes the TCSH command storred in variable tcshCommand by passing
+        it to the TCSH terminal.
+
+        It is not needed to first start TCSH with
+        :meth:`TcshProcess.startTcsh` as it is run with
+        :meth:`TcshProcess.executeTcshCommand`
+
+        Examples:
+            tcsh_process.setTcshCommand(command)
+            tcsh_process.executeTcshCommnad()
+            # is
+            tcsh_process.setTcshCommand(command)
+
+        """
         self.startTcsh()
         self.tcshCwd = self.tcsh.cwd
 
