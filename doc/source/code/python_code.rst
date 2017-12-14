@@ -17,16 +17,13 @@ Custom widgets and plugins for the Dashboard
 Pairs of custom widgets and plugins for Qt Designer to ease configuration
 of the Dashboard by graphical programming by users.
 
-------
-DivGeo
-------
-
-.. automodule:: divgeo
-   :members:
-
 -------
 Gnuplot
 -------
+
+This widget is an embedded gnuplot inside Qt5, written in C++. With the help of
+SIP a simple python wrapper has been made so we can use the embedded gnuplot
+inside python.
 
 .. automodule:: gnuplot
    :members:
