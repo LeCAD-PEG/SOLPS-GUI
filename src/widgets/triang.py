@@ -118,7 +118,7 @@ class Triang(TcshProcess):
 
     def __init__(self, parent=None):
         super(Triang, self).__init__(parent)
-
+        # self.activateDebugging()
         # Creating QPlainTextEdit
         self.vars = TriangVars.Default
         self.prepareUserInterface()
@@ -554,8 +554,8 @@ class Triang(TcshProcess):
         input dialogs to get input from the user and then pass it back to
         Triang.
         """
-        #self.insertTextAtBottom(text)
-        # self.processText(text)  # Triang script outputs via StdError...
+        # self.insertTextAtBottom(text)
+        self.processText(text)  # Triang script outputs via StdError...
         if self.STATE >= TriangState.waiting:
             self.insertTextAtBottom(text)
 
@@ -565,6 +565,8 @@ class Triang(TcshProcess):
         # color_post = '</font>'
         # self.textDisplay.appendHtml('<b>' + color_pref + text + color_post +
         #                             '</b>')
+        if "does not exist. Create it?" in text:
+            self.tcsh.write('y\n')
         if self.STATE >= TriangState.starting:
             self.processText(text)
         if self.STATE >= TriangState.waiting:
