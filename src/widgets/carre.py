@@ -30,6 +30,23 @@ class CarreVars:
     steps and that the steps should be written in proper order and that there
     are only NumOfVars-2 steps since the last to are reserved for which
     dgModel has been used and if lns was called.
+
+    Attributes:
+        NumOfVars (int): This tells us the number of values in
+            :class:`CarreVars`
+        Name (dict): Holds the string representation of the enumerated value
+        command (dict): Holds the command of the enumerated value
+        Values (dict): Holds the enumerated value for the string representation
+        Default (dict): Default values for the values
+
+        prepare (int): The **prepare** step for ``carre`` script
+        grid (int): The **grid** step for ``carre`` script
+        convert (int): The **convert** step for ``carre`` script
+        save (int): The **save** step for ``carre`` script
+        store (int): The **store** step for ``carre`` script
+        lns (int): Is the value that tells the widget if the linking command
+            ``lns`` has been run against the selected DivGeo model
+        dgModel (int): String name of the DivGeo model to use for Carre
     """
     NumOfVars = 7
     prepare, grid, convert, save, store, lns, dgModel = range(NumOfVars)
@@ -45,10 +62,25 @@ class CarreVars:
 
 
 class CarreState:
+    """This class contains the enumerator values for state of the TCSH
+    terminal.
+
+    Attributes:
+        notRunning (int): Means that the TCSH terminal is not running
+        starting (int): Means that the TCSH terminal is starting, sourcing
+            the SOLPS-ITER environment
+        waiting (int): Means that we can run the steps of ``carre`` script
+        stepRunning (int): Means that a step from ``carre`` script is running
+    """
     notRunning, starting, waiting, stepRunning = range(4)
 
 
 class StepPush(QPushButton):
+    """Modified :class:`QtWidgets.QPushButton` that contains the command for
+    the step it represents, i.e., if the :class:`StepPush` represents the
+    **store** step of carre script, the value stored in :attr:`StepPush.value`
+    corresponds to the command to run the step: ``t``.
+    """
     def __init__(self, parent=None, value=None):
         super(StepPush, self).__init__(parent)
         self.value = value
@@ -56,31 +88,22 @@ class StepPush(QPushButton):
 
 class Carre(TcshProcess):
     """ Widget for the grid generation tool Carre.
-    Its layout will look:
-    #-VericalBox layout-#
-    |----------------------------------------------|
-    | #-GridBox layout-#                           |
-    |                                              |
-    | #################     #############          |
-    | #Status GroupBox#     #DG groupbox#          |
-    | #               #     #           #          |
-    | #               #     #           #          |
-    | #################     #############          |
-    |----------------------------------------------|
-    |#-GridBox layout-#                            |
-    |                                              |
-    | #################    ####################    |
-    | #PushButton for #    # Display output of#    |
-    | #steps          #    # current step     #    |
-    | #               #    ####################    |
-    | #               #    # Default response #    |
-    | #               #    # buttons          #    |
-    | #################    ####################    |
-    |----------------------------------------------|
 
     Widget creates a .status file in baserun directory that contains
     information about which steps have been performed for which DG model and
     if the initial lns linking for the DG model has been ran.
+
+    In :meth:`Carre.__init__` the signals from :meth:`tcsh_process.Tcsh` output
+    signals are connected to the functions that process the output. Also other
+    variables are instantiated.
+
+    Attributes:
+        vars (dict): This contains the enumerators for steps described in
+            :class:`CarreVars` and their value
+        STATE (int): This contains the enumerator value for the TCSH status.
+            States are described in :class:`CarreState`
+        textDisplay (QPlainTextEdit): Widget for displayin the output of
+            ``carre`` script
     """
 
     def __init__(self, parent=None):
@@ -100,6 +123,15 @@ class Carre(TcshProcess):
         self.STATE = CarreState.notRunning
 
     def prepareUserInterface(self):
+        """This prepares the user interface for the :meth:`carre.Carre` class.
+        The widget is split into upper and lower half.
+
+        The upper half contains the self-assessment group box and a separate
+        group box for choosing the DivGeo model for ``carre``.
+
+        The lower half contains buttons for communicating with the ``carre``
+        script and a log window for viewing the output of ``carre`` script.
+        """
         mainLayout = QVBoxLayout()
         mainLayout.setSpacing(0)
         mainLayout.setContentsMargins(0, 0, 0, 0)
@@ -223,6 +255,10 @@ class Carre(TcshProcess):
         self.setLayout(mainLayout)
 
     def setClickedGroupFromVars(self):
+        """Sets the QCheckBox clicked state according to the values storred in
+        :attr:`Carre.vars`. If the value for a step is 0 then the
+        QCheckBox is unchecked and vice versa if the value is 1.
+        """
         layout = self.clickedGroup.layout()
         for i in range(layout.count()):
             item = layout.itemAt(i).widget()
@@ -238,6 +274,9 @@ class Carre(TcshProcess):
 
     @pyqtSlot()
     def setVarsFromClickedGroup(self):
+        """When you change the checked state of a QCheckBox, the values are
+        updated into :attr:`Carre.vars` variable.
+        """
         layout = self.clickedGroup.layout()
         for i in range(layout.count()):
             item = layout.itemAt(i).widget()
@@ -247,14 +286,20 @@ class Carre(TcshProcess):
                 self.vars[i] = 0
 
     def resetCheckBox(self):
+        """Resets all the QCheckBox-es to unchecked state.
+        """
         layout = self.clickedGroup.layout()
         for i in range(layout.count()):
             layout.itemAt(i).widget().setCheckState(Qt.Unchecked)
 
     def readStatusFile(self, baserunDir):
-        """Read the .status file in baserun.
+        """Read the .status file in baserun. At the end it also sets the
+        checked status of the QCheckBox-es.
 
-        Variables:
+        Arguments:
+            baserunDir (str): Absolute path to the baserun directory.
+
+        Attributes:
             statusFile (array): text of status without the Carre block.
             mark (int): Where Carre block is inserted into .status file.
         """
@@ -309,6 +354,16 @@ class Carre(TcshProcess):
         self.setClickedGroupFromVars()
 
     def storeStatusFile(self, baserunDir):
+        """Stores the values of the :attr:`Carre.vars` to the .status file in
+        baserun directory.
+
+        If the status file is not created, it will create it. If the status
+        file exists it will check if there is already a carre block inside and
+        write the values.
+
+        Arguments:
+            baserunDir (str): absolute path to the baserun directory
+        """
         variables = self.vars
         if not baserunDir:
             return
@@ -353,6 +408,12 @@ class Carre(TcshProcess):
             logging.info(".status file created for carre block!")
 
     def appendToStatus(self, msg):
+        """Stores the current step that the user ran at the end of the .status
+        file in the baserun directory.
+
+        Arguments:
+            msg (str): Message to write to the end of the status file
+        """
         baserunDir = self.runDir
         if not baserunDir:
             return
@@ -364,6 +425,10 @@ class Carre(TcshProcess):
 
     @pyqtSlot()
     def manualInput(self):
+        """Spawns an input dialog in which the user writes the commands for
+        a TCSH terminal or the expected input the ``carre`` scripts expect from
+        the user.
+        """
         if not self.tcsh.state():
             return
 
@@ -387,12 +452,24 @@ class Carre(TcshProcess):
             self.tcsh.write(msg)
 
     def processText(self, text):
+        """Process the output of the ``carre`` script so the user gets notified
+        when he can start running the ``carre`` steps.
+
+        Arguments:
+            text (str): Output of the ``carre`` script.
+        """
         default = "Help, Prepare, Grid, Save, Convert, sTore, Next, " \
                   "Remove, Input, Output, Quit ?"
         if default in text:
             self.STATE = CarreState.waiting
 
     def insertTextAtBottom(self, msg):
+        """Inserts text to the bottom of :attr:`Carre.textDisplay` without
+        creating a new newline.
+
+        Arguments:
+            msg (str): Message to append to the :attr:`Carre.textDisplay`
+        """
         self.textDisplay.moveCursor(QTextCursor.End)
         if msg.endswith('\n'):
             msg = msg[:-1]
@@ -402,6 +479,21 @@ class Carre(TcshProcess):
     # Overloaded
     @pyqtSlot(str)
     def setRunDir(self, runDir):
+        """Overloaded function of :meth:`tcsh_process.Tcsh.setRunDir`.
+        Additionally to setting the new directory, it is also tested whether
+        the directory is a **baserun** directory.
+
+        If we select a new baserun directory from the ``Runs`` tab of
+        ``SOLPS-GUI`` the following happens:
+
+        1. If we left a baserun directory, then update the .status file.
+        2. Stop current TCSH terminal.
+        3. Read the new .status file in the new baserun directory.
+        4. Start the TCSH terminal in the new baserun directory.
+
+        Arguments:
+            runDir (str): Absolute path to the run directory.
+        """
         if runDir != self.runDir:
             self.storeStatusFile(self.runDir)
         if runDir.endswith('baserun'):
@@ -415,6 +507,8 @@ class Carre(TcshProcess):
     @pyqtSlot()
     def updateDivGeoModel(self, runDir=None):
         """Gives the user a list of all .dg files in baserun
+        Attributes:
+            runDir (str): Absolute path to the run directory.
         """
         if not runDir:
             if not self.getRunDir():
@@ -451,6 +545,10 @@ class Carre(TcshProcess):
 
     @pyqtSlot()
     def startCarre(self):
+        """ Starts the ``carre`` script in the baserun directory and with the
+        selected device from the **Preferences** settings and with the selected
+        DivGeo model.
+        """
 
         if not self.getRunDir():
             self.textDisplay.appendPlainText('No baserun selected.')

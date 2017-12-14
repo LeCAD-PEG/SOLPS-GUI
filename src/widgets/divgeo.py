@@ -52,13 +52,9 @@ class DivGeo(TcshProcess):
                 embedding DivGeo.
             stderrOutput (pyqtSignal): Signal which emits error output from
                 QProcess.
-    """
 
-    stderrOutput = pyqtSignal(str)
-
-    def __init__(self, parent=None):
-        """Initialize variables. Create an empty layout so that it's created
-        before trying to embed DivGeo, to avoid drawing problems.
+        In :meth:`divgeo.DivGeo.__init__` create an empty layout so that it's
+        created before trying to embed DivGeo, to avoid drawing problems.
 
         Creating QProcess and connecting the Std. Output and Error to slots.
         It is important to specify which object should be parent to the
@@ -75,7 +71,14 @@ class DivGeo(TcshProcess):
             Layout (QVBoxLayout): Layout for DivGeo widget.
             divgeo (QProcess): QProcess that will start DivGeo and then provide
                 the Window ID so QWidget DivGeo can embed it.
-        """
+
+
+
+    """
+
+    stderrOutput = pyqtSignal(str)
+
+    def __init__(self, parent=None):
 
         super(DivGeo, self).__init__(parent)
         self.divgeo_path = None
@@ -106,6 +109,8 @@ class DivGeo(TcshProcess):
         self.destroyed.connect(partial(self._onClose_stopDivGeo))
 
     def _onClose_stopDivGeo(self):
+        """Kill DivGeo.
+        """
         DG_PID = self._onClose_getDivGeoPID()
         if not DG_PID:
             return None
@@ -174,6 +179,12 @@ class DivGeo(TcshProcess):
 
         Because I wrote in so many places the same block of code, I decided to
         create a function and then just call it.
+
+        Two important ID numbers from DivGeo are:
+
+        1. DivGeoWID - Window ID for DivGeo, used for embedding
+        2. DivGeoPID - Process ID for DivGeo, used for killing or checking if
+           it is working
         """
         if not self.DivGeoWID:
             self.labelContainer.setText("No DivGeo found.\nCheck if baserun "
