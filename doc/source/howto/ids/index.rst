@@ -283,8 +283,8 @@ described by (from Ref. [10]):
 
 -  a **node**, the main building block of the data tree, referring to
    any element of the tree. There are two types of nodes [11], also
-   shown in Figs. :numref:`fig-node_simpleStructureNode` and
-   :numref:`fig-node_arrayOfStructuredNodes`:
+   shown in :numref:`Figs. %s<fig-node_simpleStructureNode>` and
+   :numref:`%s<fig-node_arrayOfStructuredNodes>`:
 
    -  **simple structure node**, being a regular single node, and
 
@@ -302,7 +302,7 @@ described by (from Ref. [10]):
 -  a **child**, referring to an element one level below a particular
    node,
 
-as shown in Fig. :numref:`fig-node_parentChildSibling`, with navigation
+as shown in :numref:`fig-node_parentChildSibling`, with navigation
 through the tree nodes running from start-point nodes through
 lower-level nodes to the end-point leafs.
 
@@ -363,8 +363,8 @@ programming languages the specific tree node is described in form
 separation mark, while in Fortran90 percentage sign ``"%"`` is used
 instead. The ``"(:)"`` mark used in the shown form is used to designate
 a node being an array of structures node, as shown in
-Figs. :numref:`fig-node_simpleStructureNode` and
-:numref:`fig-node_arrayOfStructuredNodes`, containing many structures with
+:numref:`Figs. %s<fig-node_simpleStructureNode>` and
+:numref:`%s<fig-node_arrayOfStructuredNodes>`, containing many structures with
 identical structure, additionally defined by array index with ``1`` as a start
 index (Fortran notation). For example, ``node_top.node_LV1(1)``
 navigates to first structure of the ``node_LV1`` array of structures
@@ -1129,9 +1129,9 @@ Its more notable children are:
    on density of the electrons in the edge plasma.
 
 Note that the **temperature(:)**
-and **density(:)** nodes have the same structure, as seen on figures
-:numref:`fig-ids_edgeprofiles_ggd_ei_temperature` and
-:numref:`fig-ids_edgeprofiles_ggd_ei_density`. Their more notable
+and **density(:)** nodes have the same structure, as seen in
+:numref:`Figs %s<fig-ids_edgeprofiles_ggd_ei_temperature>` and
+:numref:`%s<fig-ids_edgeprofiles_ggd_ei_density>`. Their more notable
 children are:
 
 -  **grid_index**, a leaf containing index, pointing to the grid
@@ -1449,7 +1449,7 @@ Grid objects
 ''''''''''''
 
 The *edge* CPO and *edge_profiles* IDS parent nodes designed for data
-storage of data on each object of the grid are presented in Table
+storage of data on each object of the grid are presented in
 :numref:`fig-cpo2ids_obj`
 
 .. _fig-cpo2ids_obj:
@@ -1496,7 +1496,7 @@ processed by the converter, are as follows:
 -  only in *edge_profiles* IDS, **explicit entry of 0D object indices**.
 
 The *edge* CPO and *edge_profiles* IDS leafs designed for data storage
-of data on 0D objects and their data format are presented in Table
+of data on 0D objects and their data format are presented in
 :numref:`tbl-cpo2ids_0dobjects_data`, while the data structure and
 detailed format of the data on 0D objects in both data structures are
 presented in :numref:`lst-cpoids_0D_objects`.
@@ -2158,7 +2158,7 @@ Grid subset data
 ''''''''''''''''
 
 The *edge* CPO and *edge_profiles* IDS parent nodes, designed for data
-storage of data on grid subsets of the grid, are presented in Table
+storage of data on grid subsets of the grid, are presented in
 :numref:`tbl-cpo2ids_gridsubset`.
 
 .. _tbl-cpo2ids_gridsubset:
@@ -2205,7 +2205,7 @@ be stored only as an explicit list, however, also with direct details on
 a specific object composing the grid subset.
 
 The *edge* CPO and *edge_profiles* IDS leaves, designed for data storage
-of data on grid subsets, and their data format are presented in Table
+of data on grid subsets, and their data format are presented in
 :numref:`tbl-cpo2ids_gridsubset_data`, while the data structure and
 detailed format of data on grid subsets in both data structures are
 shown in :numref:`lst-cpoids_gridsubset`.
@@ -2351,7 +2351,7 @@ part of the ``cpo2ids`` Python code shown in
 
 .. table::  Grid subset data: Data conversion process from edge CPO to
             edge profiles IDS. For an explanation of appearing indices, see
-            Table :numref`tbl-cpo2ids_gridsubset_iv_explanation`.
+            :numref`tbl-cpo2ids_gridsubset_iv_explanation`.
 
     +-----------------------------------+-------------------------------------------------+
     |                                   |                  Data structure                 |
@@ -2609,7 +2609,7 @@ The *edge* CPO and *edge_profiles* IDS leaves, designed for the data
 storage of data on density of ion species in plasma, and their data
 format are presented in :numref:`tbl-cpo2ids_ni_data`, while the data
 structure and detailed format of the ion density data in both data
-structures are shown in Listing :numref:`lst-cpo2ids_ni`.
+structures are shown in :numref:`lst-cpo2ids_ni`.
 
 .. _tbl-cpo2ids_ni_data:
 
@@ -3220,7 +3220,8 @@ density/temperature, ion temperature, velocity etc.).. Moreover, this tool
 obtains data from all available data files, not only from previously mentioned
 **b2fgmtry** and **b2fstate**/**b2fstati**, and saves the data besides to
 *edge_profiles* IDS also *edge_sources* and *edge_transport* IDSs. This
-writer also processes the data through the first step of the **b2mn** routine
+writer also processes the data through the ``n`` steps
+(``b2mn_step()`` routine ) of the **b2mn** routine
 before it is written to the IDSs.
 
 The basic code structure contains/uses the next essential subroutines:
@@ -3422,10 +3423,11 @@ where the data is to be stored:
 -  ``username``: Creator/owner of the IMAS IDS database
 -  ``device``: Device name of the IMAS IDS database (i. e. solps-iter, iter, aug)
 -  ``version``: Major version of the IMAS IDS database
+-  ``step``: Number of steps to be processed with ``b2mn_step()`` routine
 
 Example of the command::
 
-    $HOME/solps-iter/modules/B2.5/builds/standalone.$HOST_NAME.$COMPILER/b2_ual_write_b2mod.exe 100 7 penkod solps-iter 3
+    $HOME/solps-iter/modules/B2.5/builds/standalone.$HOST_NAME.$COMPILER/b2_ual_write_b2mod.exe --shot 1512 --run 6 --username penkod --device solps-iter --version 3 --step 250
 
 .. note::   A short video tutorial on the use of the B2.5 writer is
             available `here <https://youtu.be/5IuADXPAgkQ>`_.
@@ -3590,7 +3592,7 @@ defining the ``vtkUnstructuredGrid`` dataset for every grid subset is
 mostly identical, and it is in close relation to the principles
 previously discussed in section :ref:`subsec-grid_struc`.
 
-The process of setting the ``vtkUnstructuredGrids`` is shown in Fig.
+The process of setting the ``vtkUnstructuredGrids`` is shown in
 :numref:`fig-readualedge_gridsubset_process_scheme` and described below,
 however, it should be noted that various indices found inside the data
 structure unit are stored in Fortran90 notation, while C++ programming
@@ -3791,8 +3793,8 @@ Graphical user interface
 
 The design of the graphical user interface (GUI) of the developed
 ``ReadUALEdge`` plugin, whose purpose is to simplify the use of the
-plugin itself, is shown in Figs. :numref:`fig-readualedge_gui` and
-:numref:`fig-readualedge_gui_close`.
+plugin itself, is shown in :numref:`Figs %s<fig-readualedge_gui>` and
+:numref:`%s<fig-readualedge_gui_close>`.
 
 It consists of:
 
@@ -3893,7 +3895,7 @@ used on *Marconi GateWay eufus.eu* HPC cluster.
 
 With the help of the ``cpo2ids`` tool, the *edge* CPO data structures,
 listed in :numref:`tbl-res_cpo_data_units`, are converted to
-*edge_profiles* IDSs, presented in Table
+*edge_profiles* IDSs, presented in
 :numref:`tbl-res_cpo2ids_data_units`. The *Version* of the CPO data structure
 defines the version of EU-IM database [13] while the version of the IDS
 data structure defines the version of IMAS.
@@ -4030,15 +4032,15 @@ and :numref:`fig-readualedge_16151_1000_sol_te`.
 This allows the user to work only those grid subsets that he is
 interested in. As such, the SOL region can be displayed individually and
 further analyzed without having the unnecessary edge plasma regions
-displayed on the screen, as shown in Fig.
+displayed on the screen, as shown in
 :numref:`fig-readualedge_16151_1000_sol_te`. The same can be done for any
 other grid subset. The display of 16151/1000 IDS case edge plasma and
 its all available data fields on plasma quantities [30]_ are shown in
-Figs. :numref:`fig-readualedge_16151_1000_ne`,
-:numref:`fig-readualedge_16151_1000_te`
-:numref:`fig-readualedge_16151_1000_ni1`,
-:numref:`fig-readualedge_16151_1000_ni2` and
-:numref:`fig-readualedge_16151_1000_ti`.
+:numref:`Figs. %s<fig-readualedge_16151_1000_ne>`,
+:numref:`%s<fig-readualedge_16151_1000_te>`
+:numref:`%s<fig-readualedge_16151_1000_ni1>`,
+:numref:`%s<fig-readualedge_16151_1000_ni2>` and
+:numref:`%s<fig-readualedge_16151_1000_ti>`.
 
 .. _fig-readualedge_16151_1000_datafield:
 
@@ -4127,9 +4129,9 @@ ion density data on a total of 98 ion species, as shown in
 contained ion density for just two ion species. The display of the
 second IDS case together with applying some of its many available data
 fields on plasma properties [31]_ are presented in
-Figs. :numref:`fig-readualedge_1_1_ne`, :numref:`fig-readualedge_1_1_te`
-:numref:`fig-readualedge_1_1_ni1`, :numref:`fig-readualedge_1_1_ni2` and
-:numref:`fig-readualedge_1_1_ti`.
+:numref:`Figs. %s<fig-readualedge_1_1_ne>`, :numref:`%s<fig-readualedge_1_1_te>`
+:numref:`%s<fig-readualedge_1_1_ni1>`, :numref:`%s<fig-readualedge_1_1_ni2>` and
+:numref:`%s<fig-readualedge_1_1_ti>`.
 
 .. _fig-readualedge_1_1_datafield:
 
@@ -4192,11 +4194,11 @@ Figs. :numref:`fig-readualedge_1_1_ne`, :numref:`fig-readualedge_1_1_te`
 Furthermore, as an addition to this section, through the ParaView
 application interface the ``ReadUALEdge`` plugin allows straightforward
 comparative analysis of the IDS cases. As an example, comparison of size
-of the edge region between the AUG and ITER tokamak is shown in Fig.
+of the edge region between the AUG and ITER tokamak is shown in
 :numref:`fig-readualedge_aug_vs_iter_edge`, and a comparison of electron
 temperature in edge region with the use of single or separate views is
-shown in Figs. :numref:`fig-readualedge_aug_vs_iter_te1` and
-:numref:`fig-readualedge_aug_vs_iter_te2`.
+shown in :numref:`Figs. %s<fig-readualedge_aug_vs_iter_te1>` and
+:numref:`%s<fig-readualedge_aug_vs_iter_te2>`.
 
 .. _fig-readualedge_aug_vs_iter_edge:
 
@@ -4298,9 +4300,9 @@ The visualized contents of the first IDS data structure in the
 :numref:`fig-readualedge_16151_1001_gs`, while data fields on plasma
 properties, that being electron temperature, electron density, and ion
 temperature of the AUG tokamak edge region, are presented in
-Figs. :numref:`fig-readualedge_16151_1001_cells_te`,
-:numref:`fig-readualedge_16151_1001_cells_ne`
-and :numref:`fig-readualedge_16151_1001_cells_ti`.
+:numref:`Figs. %s<fig-readualedge_16151_1001_cells_te>`,
+:numref:`%s<fig-readualedge_16151_1001_cells_ne>`
+and :numref:`%s<fig-readualedge_16151_1001_cells_ti>`.
 
 
 .. _fig-readualedge_16151_1001_gs:
@@ -4344,9 +4346,9 @@ Next, the visualized contents of the second IDS data structure, Shot:
 properties, that being electron temperature, electron density, and ion
 temperature of this case ITER tokamak edge region, with *2D Cells* the
 grid subset selected, are presented in
-Figs. :numref:`fig-readualedge_535_1_cells_te`,
-:numref:`fig-readualedge_535_1_cells_ne`
-and :numref:`fig-readualedge_535_1_cells_ti`.
+:numref:`Figs. %s<fig-readualedge_535_1_cells_te>`,
+:numref:`%s<fig-readualedge_535_1_cells_ne>`
+and :numref:`%s<fig-readualedge_535_1_cells_ti>`.
 
 
 .. _fig-readualedge_535_1_cells_ne:
@@ -4400,8 +4402,8 @@ loaded and its contents displayed using the ``ReadUALEdge`` plugin.
 
 The visualized contents of the both created IDS data structures in the
 ``ReadUALEdge`` plugin are shown below. All 25 available grid subsets
-are presented in Figs. :numref:`fig-b2ualwrite_b2mod_AUG` and
-:numref:`fig-b2ualwrite_b2mod_ITER`. The plasma state quantities, such as
+are presented in :numref:`Figs. %s<fig-b2ualwrite_b2mod_AUG>` and
+:numref:`%s<fig-b2ualwrite_b2mod_ITER>`. The plasma state quantities, such as
 electron temperature etc., are very similar to the ones presented in
 :ref:`subsec-results_b2_ual_write_gsl`. The values of course vary a bit as the
 data was processed through first step.
