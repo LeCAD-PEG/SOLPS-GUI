@@ -3,9 +3,9 @@
 .. _initialize-run:
 
 
-================
-Initializing run
-================
+==========================
+Initializing run for C-mod
+==========================
 
 This tutorial should be done after the meshing tutorial :ref:`meshing`.
 
@@ -218,13 +218,43 @@ Now you are ready to start :guilabel:`b2mn`. Switch to the
 Remember, from now on, if there is an error in which a file is missing, you
 must have forgotten it to load from the baserun directory to the run directory.
 
-Now after you click it, it will work for some minutes, but sadly you will get
-an EIRENE error:
+Now after some minutes (about 5 minutes on ITER hpc) it will finish and towards
+the end the output will look like
 
 
 .. image:: initialize_run_5.png
    :align: center
 
-.. todo::
+.. image:: initialize_run_6.png
+   :align: center
 
-   Finish the run by figuring out why EIRENE failed.
+Now we can, for example, check the output graph for ``resall_D``. Head to the
+:menuselection:`Dashboard` tab and in the ``edit are for plot command`` type
+``resall_D``.
+
+.. image:: initialize_run_7.png
+   :align: center
+
+.. note::
+
+   All these steps are already prepared in
+   ``tutorial-DivGeo_C-Mod-InitializeRun.tar.gz``, which can be downloaded from
+   external data server.
+
+   Example::
+
+        $ stop
+        $ cd runs/examples
+        $ cmake . && make # Fetches all examples from external repository
+        $ tar xvzf tutorial-DivGeo_C-Mod-InitializeRun.tar.gz
+
+   If command ``cmake`` is not found, run ``module load cmake`` first.
+
+Additional information
+----------------------
+
+Under the ``Populate Baserun`` are also the following buttons:
+
+ - ``Clear log``: As the names suggests, it clears the log window
+ - ``Stop run``: This stops the current TCSH shell and restarts it
+ - ``Terminal input``: Used to give TCSH terminal commands to the TCSH terminal

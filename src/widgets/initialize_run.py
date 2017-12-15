@@ -32,13 +32,13 @@ class InitializeRun(TcshProcess):
         The upper half contains a combobox for either selecting a run directory
         or creating a new one.
 
-        The lower half contains buttons for starting ``setuo_eirene_links`` and
+        The lower half contains buttons for starting ``setup_eirene_links`` and
         ``b2run b2mn``.
 
         Attributes:
             runDirCombo (QComboBox): Contains the list of directories other
                 than baserun directory
-            textDisplay (QPlainTextEdit): Contains the output of
+            textDisplay (QPlainTextEdit): Displays the output of
                 :class:`tcsh_process.Tcsh`
         """
         mainLayout = QVBoxLayout()
@@ -90,7 +90,17 @@ class InitializeRun(TcshProcess):
 
         b2mn = QPushButton('b2mn')
         b2mn.clicked.connect(self.b2mn)
+
+        clearLog = QPushButton('Clear log')
+        clearLog.clicked.connect(self.clearLog)
+
+        stopB2mn = QPushButton('Stop run')
+        stopB2mn.clicked.connect(self.stopB2mn)
+
         groupLayout.addWidget(b2mn)
+        groupLayout.addWidget(clearLog)
+        groupLayout.addWidget(stopB2mn)
+
         groupLayout.addItem(QSpacerItem(40, 20, vPolicy=QSizePolicy.Expanding))
         groupBox2.setLayout(groupLayout)
         # Group Box 2
@@ -164,7 +174,7 @@ class InitializeRun(TcshProcess):
 
     def enterRunDirectory(self):
         """Checks whether the run directory specified in the QComboBox
-        :atr:`InitializeRun.runDirCombo` exists.
+        :attr:`InitializeRun.runDirCombo` exists.
         """
 
         baserunDir = self.getRunDir()
@@ -182,6 +192,8 @@ class InitializeRun(TcshProcess):
 
     @pyqtSlot()
     def setupEireneLinks(self):
+        """Runs the ``setup_baserun_eirene_links`` inside the run directory.
+        """
         if self.tcsh.state():
             # Get run directory
             runDirectory = self.enterRunDirectory()
@@ -244,6 +256,9 @@ class InitializeRun(TcshProcess):
 
     @pyqtSlot()
     def startTcsh(self):
+        """Starts a TCSH terminal with the SOLPS-ITER environment and enters
+        the run directory.
+        """
         super(InitializeRun, self).startTcsh()
         env = QSettings('ITER', 'solps-gui')
         device = env.value('device_environment', 'iter')
@@ -289,7 +304,28 @@ class InitializeRun(TcshProcess):
             self.startTcsh()
 
     def updateText(self, msg):
+        """Shows text in the QPlainTextEdit :attr:`textDisplay`.
+
+        Arguments:
+            msg (str): Message to show
+        """
         self.textDisplay.appendPlainText(msg)
+
+    @pyqtSlot()
+    def clearLog(self):
+        """Clears the QPlainTextEdit :attr:`textDisplay`
+        """
+        self.textDisplay.clear()
+
+    @pyqtSlot()
+    def stopB2mn(self):
+        """Stops the :meth:`tcsh_process.Tcsh` and restarts it.
+        """
+        if self.tcsh.state():
+            self.tcsh.kill()
+            self.tcsh.terminate()
+        self.textDisplay.appendPlainText('Stoped TCSH')
+        self.startTcsh()
 
 if __name__ == '__main__':
     from PyQt5.QtWidgets import QApplication, QMainWindow

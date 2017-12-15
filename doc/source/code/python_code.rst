@@ -159,3 +159,12 @@ It runs the script triang from ``SOLPSTOP/scripts`` folder.
 
 .. automodule:: triang
    :members:
+
+--------------
+Initialize run
+--------------
+
+This widget is used to initialize a run from a baserun directory.
+
+.. automodule:: initialize_run
+   :members:

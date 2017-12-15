@@ -3,7 +3,7 @@
 """
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
-from PyQt5.QtWidgets import QMenu
+from PyQt5.QtWidgets import QMenu, QAction
 
 import textwrap
 import functools
@@ -137,6 +137,9 @@ class AddMenu(QMenu):
                             a.setEnabled(True)
                         else:
                             a.setEnabled(False)
+                            if not isinstance(a, QAction):
+                                for a_ in a.actions():
+                                    a_.setEnabled(True)
                 else:
                     action.setEnabled(False)
         else:
