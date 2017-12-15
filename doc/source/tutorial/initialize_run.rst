@@ -4,31 +4,28 @@
 
 
 ==========================
-Initializing run for C-mod
+Initializing run for C-Mod
 ==========================
 
-This tutorial should be done after the meshing tutorial :ref:`meshing`.
+In this tutorial we will create a running case for coupled B2.5 and Eirene run.
 
-After we have prepared our baserun directory for the C-mod case. Besides the
-template and equilibrium file from the ``tutorial-DivGeo_C-Mod.tar.gz`` file,
-there are also some stencil files, i.e., input files for B2 that have an
-extension of ``*.stencil``.
+.. note::
 
-These will be used, as the names suggests, as a stencil or in other words a
-default template input files.
+   This tutorial should continue after the meshing tutorial :ref:`meshing`
+   inside ``$SOLPSTOP/runs/example/tutorial-DivGeo_C-Mod`` or start from the
+   completed meshing example by entering the following command lines::
 
-The list of stencil files:
+     $ stop
+     $ cd runs/examples
+     $ cmake . && make # Fetches all examples from external repository
+     $ tar xvzf tutorial-DivGeo_C-Mod-InitializeRun.tar.gz
+     $ cd tutorial-DivGeo_C-Mod-InitializeRun
+     $ rm -rf new_run # Will be created in this tutorial
 
-.. _listOfStencils:
+   After you have extracted the case, be sure to select the *baserun* inside
+   ``$SOLPSTOP/runs/example/tutorial-DivGeo_C-Mod-InitializeRun/``.
 
-  - b2mn.dat.stencil
-  - b2.transport.inputfile.stencil
-  - b2.numerics.parameters.stencil
-
-These are needed as user input files to start the run from the populated
-baserun.
-
-Also before proceding be sure to ``select`` the baserun directory you have
+Before proceeding be sure to ``select`` the baserun directory you have
 been working on in the ``Runs`` tab of ``SOLPS-GUI``.
 
 
@@ -47,12 +44,12 @@ in the :guilabel:`&Populate Baserun`.
    easier to look at the output in case there are some errors at with
    generating B2 input files.
 
-If you have finished with the previous tutorial :ref:`meshing` then you are set to
-initialize a run for C-mod and thus finish preparing the case for future
+If you have finished with the previous tutorial :ref:`meshing` then you are set
+to initialize a run for C-Mod and thus finish preparing the case for future
 simulations and runs with different settings.
 
-If you haven't done :ref:`meshing`, do it, because you cannot continue from this
-point.
+If you haven't done :ref:`meshing`, do it, because you cannot continue from
+this point.
 
 .. note::
 
@@ -140,7 +137,7 @@ There shouldn't be any problems and the output log should look like:
    :align: center
 
 
-Running coupled B2.5 with EIRENE
+Running coupled B2.5 with Eirene
 ================================
 
 
@@ -148,8 +145,8 @@ Create new run directory
 ------------------------
 
 Switch to :guilabel:`Initialize Run`. This widget helps the user to create run
-directories which in this case initiates a coupled B2.5 with EIRENE case for
-case C-mod.
+directories which in this case initiates a coupled B2.5 with Eirene case for
+case C-Mod.
 
 .. image:: initialize_run_1.png
    :align: center
@@ -182,12 +179,25 @@ The next step is clicking :guilabel:`setup_baserun_eirene_links`.
 .. image:: initialize_run_3.png
    :align: center
 
-
 Running "b2run b2mn"
 --------------------
 
-Now before hitting :guilabel:`b2mn` button, remember the list at
-listOfStencils_?
+Now before hitting :guilabel:`b2mn` button, we have to set the user B2 input
+files in our run directory.
+
+There are stencil files, i.e., input files for B2 that have an
+extension of ``*.stencil`` in the baserun directory.
+
+These act as the default templates for the B2 input files.
+
+The list of stencil files:
+
+  - b2mn.dat.stencil
+  - b2.transport.inputfile.stencil
+  - b2.numerics.parameters.stencil
+
+These are needed as user input files to start the run from the populated
+baserun.
 
 If we'd run :guilabel:`b2mn` now, a lot of errors of missing input files
 would cause the run to fail. This has to be fixed by going to the
@@ -235,20 +245,6 @@ Now we can, for example, check the output graph for ``resall_D``. Head to the
 .. image:: initialize_run_7.png
    :align: center
 
-.. note::
-
-   All these steps are already prepared in
-   ``tutorial-DivGeo_C-Mod-InitializeRun.tar.gz``, which can be downloaded from
-   external data server.
-
-   Example::
-
-        $ stop
-        $ cd runs/examples
-        $ cmake . && make # Fetches all examples from external repository
-        $ tar xvzf tutorial-DivGeo_C-Mod-InitializeRun.tar.gz
-
-   If command ``cmake`` is not found, run ``module load cmake`` first.
 
 Additional information
 ----------------------
