@@ -32,14 +32,18 @@ else:
 
     try:
         import imas
-    except ImportError as e:
+    except ImportError:
         if __name__ == '__main__':
             print('There is no IMAS module... Exiting.')
             sys.exit(2)
         else:
             ENABLED = False
-            pass
-
+    except FileNotFoundError:
+        print( __name__, 'Corrupted IMAS module!')
+        if __name__ == '__main__':
+            sys.exit(2)
+        else:
+            ENABLED = False
 
 class GetVars:
     names = ['SHOT', 'RUN', 'USER', 'DEVICE', 'VERSION', 'RUNNAME', 'DIRPATH']

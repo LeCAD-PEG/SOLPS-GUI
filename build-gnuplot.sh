@@ -1,7 +1,6 @@
 #!/bin/sh -x
-source setupenv.sh
 MAKE_JOBS=${MAKE_JOBS:-4}
-GNUPLOT_VERSION=${GNUPLOT_VERSION:-5.2.1}
+GNUPLOT_VERSION=${GNUPLOT_VERSION:-5.2.2}
 QT_VERSION=${QT_VERSION:-5.9.1}
 
 BUILDROOT=${PWD}
@@ -13,7 +12,7 @@ STAGING_QT=${STAGING_QT:-${STAGING_DIR}/qt/${QT_VERSION}}
 
 case $(hostname -f) in
   *.iter.org)
-        # module purge
+        module purge
         module load GCC/4.8.3 binutils/2.25 # libgd
 
         # DEPRECATED
@@ -28,6 +27,13 @@ case $(hostname -f) in
         # export QT_LIBS="-L${EBROOTANACONDA3}/lib -liconv ${QT_LIBS}"
         # GNUPLOT_INSTALL_DIR=${GNUPLOT_INSTALL_DIR:-${STAGING_DIR}}
 	   MAKE_JOBS=${MAKE_JOBS:-4}
+	;;
+   *.marconi.cineca.it)
+	module purge
+	module load cineca imasenv
+	module unload matlab
+	QT_VERSION=5.8.0
+	module load itm-qt/${QT_VERSION}
 	;;
 
   *)
@@ -67,7 +73,8 @@ if [ ! -e   ${GNUPLOT_SRC_DIR}/.built ]; then
   libtoolize
   export CXXFLAGS=" -std=c++11"
   ./configure --without-cairo --prefix=${GNUPLOT_INSTALL_DIR} \
-      --with-qt=qt5 --without-libcerf
+      --with-qt=qt5 --without-libcerf --disable-wxwidgets \
+      --with-texdir=${STAGING_DIR}/share/tex
   make -j ${MAKE_JOBS}
   make install
   touch ${GNUPLOT_SRC_DIR}/.built
