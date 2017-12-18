@@ -11,9 +11,9 @@ from PyQt5.QtWidgets import QLabel, QFrame, QVBoxLayout
 import logging
 import os
 
-from akter import Akter
+from tcsh_process import TcshProcess
 
-class B2plot(Akter):
+class B2plot(TcshProcess):
     """ B2plot(QWidget)
 
         Provides a custom widget to display a b2plot with properties and slots

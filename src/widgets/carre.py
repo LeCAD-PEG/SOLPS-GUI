@@ -2,14 +2,14 @@
 """ A PyQt widget for Carre process.
 """
 
-from PyQt5.QtWidgets import QPlainTextEdit, QLineEdit, QVBoxLayout, QInputDialog
+from PyQt5.QtWidgets import (QPlainTextEdit, QLineEdit, QVBoxLayout,
+                             QInputDialog)
 from PyQt5.QtCore import (pyqtSlot, pyqtSignal, QProcess, QSettings,
                           pyqtProperty, Qt)
-from akter import Akter
+from tcsh_process import tcshProcess
 
 
-
-class Carre(Akter):
+class Carre(tcshProcess):
 
     def __init__(self, parent=None):
         super(Carre, self).__init__(parent)

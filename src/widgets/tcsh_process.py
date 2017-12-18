@@ -156,9 +156,9 @@ class Tcsh(QProcess):
         return None
 
 
-class Akter(QWidget):
+class TcshProcess(QWidget):
     def __init__(self, parent=None):
-        super(Akter, self).__init__(parent)
+        super(TcshProcess, self).__init__(parent)
 
         self.runDir = None
         self.solpsTop = None

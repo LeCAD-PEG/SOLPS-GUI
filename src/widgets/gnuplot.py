@@ -7,7 +7,7 @@ from PyQt5.QtCore import (Qt, QProcess, QSize, pyqtSignal,
                           QProcessEnvironment)
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QLabel, QFrame, QVBoxLayout, QWidget, QGridLayout
-from akter import Akter
+from tcsh_process import TcshProcess
 
 import logging
 import os
@@ -24,7 +24,7 @@ def cleanTempFiles(*files):
         if file and os.path.exists(file):
             os.unlink(file)
 
-class Gnuplot(Akter):
+class Gnuplot(TcshProcess):
     """Gnuplot(QWidget)
     Provides a custom widget to display a gnuplot with properties and slots
     that can be used to customize its appearance.
