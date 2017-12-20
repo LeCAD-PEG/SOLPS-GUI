@@ -1,6 +1,6 @@
 .. highlight:: csh
 
-.. _meshing_iter:
+.. _meshing-iter:
 
 
 ========================================
@@ -21,6 +21,13 @@ located in the ``baserun`` run directory. The following commands repare the
      $ cmake . && make # Fetches all examples from external repository
      $ tar xvzf tutorial-DivGeo_ITER_baseline_scenario.tar.gz
      $ cd tutorial-DivGeo_ITER_baseline_scenario/baserun
+
+The list of files are:
+
+ - ITER.org : Template file for the ITER
+ - Baseline2008-li0.70.x4.equ: Equilibrium file
+ - ITER\_*.dg : Prepared DivGeo files
+
 
 The EFIT equilibrium file  which describes ITER tokamak in this case is
 ``baserun/Baseline2008-li0.70``.
@@ -76,26 +83,22 @@ This way you can either start from beginning or from any point of the steps.
 Make sure that when you either load a DivGeo file or start a new, to then save
 it to the ``baserun`` directory, alongside the equilibrium file.
 
-Import ITER baseline scenario geometry
---------------------------------------
+Import the ITER template
+------------------------
 
-The geometry files are located in the ``baserun`` directory.
-First open the prepared geometry file:
-:menuselection: `&File --> &Open --> ITER_0_step.dg`
-The import the equilibrium file by opening
-:menuselection:`&File --> &Import --> &Equilibrium` and load the
-``Baseline2008-li0.70.x4.equ``, which should be listed in the
-Equilibrium dialog box.
+The ITER template geometry file is located in the ``baserun`` directory. We
+will load the template file with
+:menuselection:`&File --> &Import --> &Template`. Because the template
+extenstion is ``.tpl``, we have to chang the filter in the DivGeo import dialog
+from ``*.ogr`` to ``*.tpl``.
 
-If you cannot see the equilibrium displayed as red (SOL) and blue (core and PFR)
-rectangles after it is loaded, then use :menuselection:`&View --> &Display`
-and make sure that the :guilabel:`Equilibrium` radio button is pressed.
-
-.. image:: divgeo_ITER_1.png
+.. image:: divgeo_ITER_pre_1.png
    :align: center
 
-.. note::
-   This step is available in ``ITER_1_step.dg``
+Click on load and the geometry is now loaded.
+
+.. image:: divgeo_ITER_pre_2.png
+   :align: center
 
 Converting the wall segments to geometry elements
 -------------------------------------------------
@@ -107,14 +110,73 @@ lines, which indicate the normal surfaces, will appear.
 .. image:: divgeo_ITER_2.png
    :align: center
 
-It is very important to notice that all surface normals are pointing away
-from the plasma. To reverse them can set the middle mouse button to
-`"Reverse normals”`. Then click :kbd:`Shift + Reverse normals` (middle
-button) somewhere on the vessel wall and all of the normals should flip.
+Now we will add extra elements to define external ports and other user defined
+areas in the divertor area.
+
+Click :menuselection:`&Edit --> &Create --> &Point` and create the following
+new points:
+
+ - The following points describe the upper external port
+    - ``(6801.1, 4646.7)``
+    - ``(7646.15, 4002.29)``
+ - The following points describe the middle external port
+    - ``(8998.42, 1668.53)``
+    - ``(8998.4, -425.311)``
+ - User defined ports to mark the plot area on the divertor dome.
+   - ``(4750.31, -3712.12)``
+   - ``(5130.15, -3828.01)``
+
+These are just points, now we have to connect them as shown in the following
+figures. Select the **middle mouse** function to ``Connect Points``.
+
+The external ports.
 
 .. image:: divgeo_ITER_3.png
    :align: center
 
+Now on the divertor area, the location what to connect is marked with squares.
+
+.. _divertorPoints:
+
+.. image:: divgeo_ITER_4.png
+   :align: center
+
+.. note::
+   This step is available in ``ITER_step_1_template.dg``
+
+It is very important that all surface normals are pointing away from the
+plasma. This convention is required by later steps in the grid triangulation
+and input build-up process. To reverse them can set the middle mouse button to
+`"Reverse normals”`. Then click :kbd:`Shift + Reverse normals` (middle
+button) somewhere on the vessel wall and all of the normals should flip.
+
+.. image:: divgeo_ITER_5.png
+   :align: center
+
+Do not be alarmed if you see normals in the bottom area facing "towards" the
+plasma. If you ``zoom`` into that area, you will see that the normals are
+facing away from plasma.
+
+.. note::
+   This step is available in ``ITER_step_2_revesre_normals.dg``
+
+Import ITER baseline scenario geometry
+--------------------------------------
+
+The geometry files are located in the ``baserun`` directory.
+First open the prepared geometry file:
+:menuselection: `&File --> &Import --> &Template --> ITER.ogr`
+Then import the equilibrium file by opening
+:menuselection:`&File --> &Import --> &Equilibrium` and load the
+``Baseline2008-li0.70.x4.equ``, which should be listed in the
+Equilibrium dialog box.
+
+If you cannot see the equilibrium displayed as red (SOL) and blue (core and PFR)
+rectangles after it is loaded, then use :menuselection:`&View --> &Display`
+and make sure that the :guilabel:`Equilibrium` radio button is pressed.
+
+.. image:: divgeo_ITER_6.png
+   :align: center
 
 Setting the magnetic topology
 -----------------------------
@@ -131,44 +193,74 @@ modelling grid should have. You can choose it by opening
 
 For ITER baseline scenario case select SN.
 
+.. note::
+   This step is available in ``ITER_step_3_equilibrium_and_topology.dg``
+
+Defining the extent of the targets
+----------------------------------
+
+The target definitions need to satisfy the following rules:
+
+    1. Each target segment needs to have a short wall element at each end,
+       which will not be part of the target, but will be used to separate the
+       target from the main wall in a subsequent setup step;
+    2. the targets must be closed polygons;
+    3. the surfaces normals of the closed polygon must all point inward;
+    4. the plasma-wetted part of the target must consist of at least two (2)
+       wall elements.
+
+In ITER case all the conditions are satisfied except the second. In which we
+have to have closed polygons for the targets.
+
+Select the **middle mouse** to connect points and connect the points as shown
+in the figure. Also make sure that the normal of the newly created line is
+facing inwards the polygon.
+
+.. image:: divgeo_ITER_8.png
+   :align: center
+
+.. note::
+   This step is available in ``ITER_ste_4_defining_the_extent_of_targets.dg``
+
 Setting the "Structure" variable for "Structure"
 ------------------------------------------------
 
 The structure variable is the primary definition for the vessel wall. You can
 define the vessel wall by opening :menuselection:`V&ariables --> Structure`
 
-Use the right mouse button (assigned to Mark) to select all segments except the
-short segments that are just outside the targets. Using SHIFT+right click will
-help a lot. Right clicking on a selected segment will un-select it.
+Use the right mouse button (assigned to Mark) to select all segments. Using
+:kbd:`SHIFT + Right Click` will help a lot. Right clicking on a selected
+segment will un-select it. When the highlighting is complete, left-click on
+`"Set"` in the `"Structure"` dialogue box, at the end of the line marked
+`"Structure"`.
 
-.. image:: divgeo_ITER_4.png
+.. image:: divgeo_ITER_9.png
    :align: center
 
-Use the right mouse button (assigned to Mark) to select all segments. Using
-:kbd:`SHIFT+Right Click` will help a lot. Right clicking on a selected
-segment will un-select it. When the highlighting is complete, left-click on
-`"Set”` in the `"Structure”` dialogue box, at the end of the line marked
-`"Structure”`.
+And with a more detail shown what is selected in the bottom area. Note that the
+marked elements with rectangles are **not** included.
+
+.. image:: divgeo_ITER_10.png
+   :align: center
+
 
 :kbd:`CTRL+U` to unmark everything.
-
-Setting the "Structure" variable for the targets
-------------------------------------------------
 
 As the same like the structure you can set the targets. Mark all of the
 segments for the inner target and then click on `"Set”`. Do not include the
 segments that are behind the target.
 
-.. image:: divgeo_ITER_5.png
+.. image:: divgeo_ITER_11.png
    :align: center
 
 The same steps are used for setting the outer target.
 
-.. image:: divgeo_ITER_6.png
+.. image:: divgeo_ITER_12.png
    :align: center
 
 .. note::
-   This step is available in ``ITER_2_step.dg``
+   This step is available in ``ITER_step_5_structure.dg``
+
 
 Setting elements that are to be ignored by EIRENE
 -------------------------------------------------
@@ -177,8 +269,11 @@ You can select which parts should EIRENE ignored, by opening
 :menuselection:`V&ariables --> &Add --> &Elements not for Eirene`. Mark
 the elements behind the targets and click `"Set”`.
 
-.. image:: divgeo_ITER_7.png
+.. image:: divgeo_ITER_13.png
    :align: center
+
+Only 6 elements are visible, but the two other are the small elements we
+created in :ref:`the divertor area <divertorPoints>`
 
 Setting the elements that are used by B2plot
 --------------------------------------------
@@ -187,11 +282,23 @@ Defining the wall surfaces that will be written to the mesh.extra file, that
 defines the wall specification in B2plot, can be done opening the
 :menuselection:`&Variables --> &Add --> &Input to b2plot`
 
-Mark everything except the segments behind the targets.
+Select everything in the core region. Select the targets without the element
+behind the target.
 
-.. image:: divgeo_ITER_8.png
+In the divertor area, there are elements that are grouped in two or three.
+
+.. todo::
+
+   Better description of what to do in the divertor area
+
+.. image:: divgeo_ITER_14.png
    :align: center
 
+.. image:: divgeo_ITER_15.png
+   :align: center
+
+.. note::
+   This step is available in ``ITER_step_6_not_for_Eirene_and_b2plot.dg``
 
 Setting the target specifications
 ---------------------------------
@@ -220,13 +327,13 @@ increase as one goes around the core plasma in a clockwise direction.
 Mark the upper-most segment on the inner target, which is in the Scrape-Off
 Layer, and click "Set" for "SOL edge" as shown in the following figure.
 
-.. image:: divgeo_ITER_9.png
+.. image:: divgeo_ITER_16.png
    :align: center
 
 Mark the segment that defines the lower extent of the target , and click
 "Set" for "PFR edge".
 
-.. image:: divgeo_ITER_10.png
+.. image:: divgeo_ITER_17.png
    :align: center
 
 Change "Target material" to W for this case, to match the ITER target
@@ -243,7 +350,7 @@ The "edge" settings for the targets have to intersect the outer radial boundary
 of the grid, but it’s not obvious where the SOL radial boundary edge will be at
 this stage.
 
-.. image:: divgeo_ITER_11.png
+.. image:: divgeo_ITER_18.png
    :align: center
 
 For "PFR edge", the segment indicated in the right-most figure is not the same
@@ -252,9 +359,11 @@ for the outer target – this is OK. The "PFR edge" is only set based on where
 the radial boundary of the grid will be, as determined by intersection with the
 divertor knee.
 
-.. image:: divgeo_ITER_12.png
+.. image:: divgeo_ITER_19.png
    :align: center
 
+.. note::
+   This step is available in ``ITER_step_7_target_specification.dg``
 
 Poloidal grid points
 --------------------
@@ -271,7 +380,7 @@ Then click Create to update the workspace. Repeat for the outer divertor. Set
 48 points in the SOL, with a roughly uniform distribution of points. The
 spacing of the grid points around the x-point should be symmetric.
 
-.. image:: divgeo_ITER_13.png
+.. image:: divgeo_ITER_20.png
    :align: center
 
 Repeat for the outer divertor.
@@ -283,11 +392,11 @@ The spacing of the grid points around the x-point should be symmetric. Meaning
 that set the grid points for SOL, click the :guilabel:`Reset` button and assign
 48 cells.
 
-.. image:: divgeo_ITER_14.png
+.. image:: divgeo_ITER_21.png
    :align: center
 
 .. note::
-   This step is available in ``ITER_3_step.dg``
+   This step is available in ``ITER_step_8_grid_points.dg``
 
 Radial surfaces
 ---------------
@@ -301,15 +410,34 @@ Set 18 surfaces in the SOL.
 Adjust the radial distribution to give higher spatial resolution near the
 separatrix.
 
-.. image:: divgeo_ITER_15.png
+.. image:: divgeo_ITER_22.png
+   :align: center
+
+Set 18 surfaces in the PFR.
+
+.. image:: divgeo_ITER_23.png
+   :align: center
+
+
+For the core region it is necessary to add a surface which will define the
+extent to which the grid penetrates into the core.
+
+Assign "Add surface" to the middle mouse button.
+
+Middle-click and hold somewhere in the core, and release the mouse button when
+happy with the location of the inner radial boundary.
+
+.. image:: divgeo_ITER_24.png
+   :align: center
+
+The number of radial surfaces in the core must be the same as for the PFR, i.e.
+18 in this case, using :menuselection:`&Edit --> &Create --> &Surface(s)...`
+
+.. image:: divgeo_ITER_25.png
    :align: center
 
 .. note::
-   This step is available in ``ITER_4_step.dg``
-
-There is an issue in the PFR for this particular case: the flux surface which
-is tangent to the "knee" will miss the bottom of the outer target and cross the
-entrance to the "plenum" in the sub-divertor.
+   This step is available in  ``ITER_step_9_radial_surfaces.dg``
 
 
 Setting the shadowing structure
@@ -326,7 +454,7 @@ First unselect everything with :kbd:`Ctrl + U`
 Mark all the segments likely to receive light from the plasma. The shadowing
 structure must be continuous and closed.
 
-.. image:: divgeo_ITER_16.png
+.. image:: divgeo_ITER_26.png
    :align: center
 
 
@@ -349,11 +477,11 @@ Y coordinates (in `mm`) of the point source location. You may input as few
 or as many point sources as you’d like. The point sources (if you choose to
 display them) are shown as white asterisks in the DG model.
 
-.. image:: divgeo_ITER_17.png
+.. image:: divgeo_ITER_27.png
    :align: center
 
 .. note::
-   This step is available in  ``ITER_5_step.dg``
+   This step is available in  ``ITER_step_10_radiation.sources.dg``
 
 Defining "plot zones"
 ---------------------
@@ -372,8 +500,50 @@ Give the zone a label (`Zone-label`) that will be used in
 the files created by b2plot (8 characters maximum, no spaces, stars or
 ellipses).
 
-.. image:: divgeo_ITER_18.png
+We will make 6 plots:
+
+ - Divertor dome
+ - Inner target
+ - Outer target
+ - Full divertor
+ - PFR region
+ - First wall
+
+The figures will show what are are selected for the plots and a rectangle
+showing which is the starting element
+
+.. figure:: divgeo_ITER_28.png
    :align: center
+
+   Divertor dome
+
+.. figure:: divgeo_ITER_29.png
+   :align: center
+
+   Inner target
+
+.. figure:: divgeo_ITER_30.png
+   :align: center
+
+   Outer target
+
+.. figure:: divgeo_ITER_31.png
+   :align: center
+
+   Full divertor
+
+.. figure:: divgeo_ITER_32.png
+   :align: center
+
+   PFR region
+
+.. figure:: divgeo_ITER_33.png
+   :align: center
+
+   First wall
+
+.. note::
+   This step is available in  ``ITER_step_11_plots.dg``
 
 Configuring the plasma species to be included in the simulations
 ----------------------------------------------------------------
@@ -381,9 +551,6 @@ Configuring the plasma species to be included in the simulations
 It is very important to definite plasma species which are included in the
 simulations. You definite them by clicking
 :menuselection:`Variables --> Plasma species D`.
-
-.. image:: divgeo_ITER_19.png
-   :align: center
 
 Also you can add it the impurity species with clicking
 :menuselection:`Variables --> Add --> Plasma species`.
@@ -402,9 +569,135 @@ be loaded is not limited. These files are to be found in the::
     $SOLPSTOP/modules/AMDS directory.
 
 
-One can also specify a simple boundary condition of either flux or value for
-the density of the highest ionization charge state of that species along the
-core boundaries.
+In this case we will use the species as shown in the following figure. Set the
+values as written in the fields.
+
+.. image:: divgeo_ITER_34.png
+   :align: center
+
+We will set a "Reference to AMDS" with
+:menuselection:`V&ariables --> &Add --> Reference to AMDS`. In the field for
+``AMDS file`` set the value to ``ALL-He_el.amds``.
+
+.. note::
+   This step is available in
+   ``ITER_step_12_plasma_species_and_AMDS_reference.dg``
+
+Gass puff
+---------
+
+We will set a gass puff for the external port on top, for **D2** and **Ne**.
+
+Click on :menuselection:`V&ariables --> &Add --> Gass puff`.
+
+For **D2** we will set the the puffed flux to ``2.70e22``, minimum history to
+500 and initialisation at 6001.
+
+For **Ne** we will set the the puffed flux to ``3.e20``, minimum history to
+500 and initialisation at 6001.
+
+For both of these we select the same area.
+
+.. image:: divgeo_ITER_35.png
+   :align: center
+
+.. note::
+   This step is available in ``ITER_step_13_gass_puff.dg``
+
+Surface special
+---------------
+
+With this we can select a group of elements for which some Eirene input data
+will be read from the B2 input file. This makes changing the parameters for the
+pumping later on easier, as we don't have to meddle with Eirene input data and
+can change it easily from B2 input data.
+
+We will set "Surface special" with
+:menuselection:`&Variables --> &Add --> &Surface special`. First we wil create
+the pump **Surface special**.Set the values and mark the areas as shown in the
+following image.
+
+.. image:: divgeo_ITER_36.png
+   :align: center
+
+Next is the PFR **Surface special**. Set the values as showing in the following
+image.
+
+When you select the elements, be sure to select, i.e., on the left side of the
+PFR, the two outermost lines of elements. Do the same on the right side of PFR.
+
+Do this by zooming in the area of the PFS and you will immediately see there
+are elements in three lines cluttered together.
+
+.. image:: divgeo_ITER_37.png
+   :align: center
+
+Mark the two outermost lines. Do the same on the other side. All in all you
+should have 32 elements marked.
+
+.. image:: divgeo_ITER_38.png
+   :align: center
+
+.. note::
+   This step is available in ``ITER_step_14_surface_special.dg``
+
+PFR surface group
+-----------------
+
+The purpose of "PFR surface group" is the same as "Surface special".
+
+We will create three "PFR surface groups" for the PFR region.
+
+Click on :menuselection`&Variables --> &Add --> PFR surface group`. In this
+case. First set the middle mouse to `Mark`. Then when you select the areas,
+click with :kbd:`Shift + Middle Mouse` in the inner are of the PFR region
+(that is under the divertor dome). In all cases, 8 elements will be marked.
+
+.. image:: divgeo_ITER_39.png
+   :align: center
+
+.. image:: divgeo_ITER_40.png
+   :align: center
+
+.. image:: divgeo_ITER_41.png
+   :align: center
+
+Now the important part is to set the ``Surface type`` of the marked elements to
+-3.
+
+Click :menuselection:`V&ariables --> General surface data`. Have the 24
+elements selected for the "PFR surface groups". Right click and  hold on
+the dialog. A context menu should show and in the context menu select display
+values. Do this by holding the right click. Indexes showing the surface type
+will be displayed.
+
+.. image:: divgeo_ITER_42.png
+   :align: center
+
+Now In the dialog, change the value of ``Surface Type``, **while** having the
+24 elements marked, to ``-3``.
+
+Again refresh the indexes by right click hold on the dialog and select display
+values (Wall material, Phys. sput. model, ...).
+
+You should see the following. Also fill in the other values, as shown in the
+following image.
+
+.. image:: divgeo_ITER_43.png
+   :align: center
+
+.. note::
+   This step is available in ``ITER_step_15_special_groups.dg``
+
+Grid Edge default
+-----------------
+
+Click on :menuselection:`V&ariables --> &Add --> Grid edge material`. Mark the
+element as shown in the following image and click on ``Set`` for
+``Reference wall segment``.
+
+.. image:: divgeo_ITER_44.png
+   :align: center
 
 EIRENE setup of the "void" regions outside the Carre grid
 ---------------------------------------------------------
@@ -415,20 +708,33 @@ and this variable defines the zones for the triangle mesh generator.
 Mark all of the main chamber elements, including the "SOL edge” segments for
 the targets. :menuselection:`&Variables --> &Add --> &TRIA-EIRENE parameters`
 
-Set index to -1 in the dialogue box, and :kbd:`"General Triangle size”`
+Set index to ``-1`` in the dialogue box, and :kbd:`"General Triangle size”`
 to 10.0, which will generate large triangles.
 
-.. image:: divgeo_ITER_20.png
+.. image:: divgeo_ITER_45.png
    :align: center
 
 Press kbd:`Ctrl + U` to unmark everything.
 
 Mark the the wall segments in the PFR, including the "PFR edge" elements. Set
-index to -2 in the dialogue box, and "General Triangle size" to 10.0.
+index to ``-2`` in the dialogue box, and "General Triangle size" to 10.0.
 
-.. image:: divgeo_ITER_21.png
+.. image:: divgeo_ITER_46.png
    :align: center
 
+.. image:: divgeo_ITER_47.png
+   :align: center
+
+Press kbd:`Ctrl + U` to unmark everything.
+
+Mark the divertor dome. Set the index to ``3`` in the dialogue box, and
+"General Triangle size" to 10.0.
+
+.. image:: divgeo_ITER_48.png
+   :align: center
+
+.. note::
+   This step is available in ``ITER_step_16_void_regions.dg``
 
 Local refinement of the EIRENE triangle grid
 --------------------------------------------
@@ -436,12 +742,11 @@ With DG it’s possible to increase the spatial resolution on sub-regions of the
 triangle mesh, i.e. the PFR. You can add it by clicking
 :menuselection:`&Variables --> &Add --> &Mesh Refinement Zones`
 
-Select wall elements that bound the region of interest (left-right,
-top-bottom), as shown on the right, and click "Set" for "Region
-identification". Set "Desired side length" to the desired characteristic
-scale size of the triangles in this region.
+Select wall elements that bound the region of interest as shown, and click
+"Set" for "Region identification". Set "Desired side length" to the desired
+characteristic scale size of the triangles in this region.
 
-.. image:: divgeo_ITER_22.png
+.. image:: divgeo_ITER_49.png
    :align: center
 
 
@@ -453,6 +758,14 @@ negative (real) number, such as -1.0, if you want to use the toroidal
 approximation instead of the cylindrical approximation.
 
 :menuselection:`Variables --> Global Eirene Data`
+
+In this case set the values as shown in the following image
+
+.. image:: divgeo_ITER_50.png
+   :align: center
+
+.. note::
+   This step is available in ``ITER_step_17_global_settings.dg``
 
 
 Write the output data files that are needed by later steps
@@ -513,7 +826,7 @@ Starting Carre
 
 Before starting carre we must first select our *DivGeo model*, we created
 previously. Simply click on the drop down button under ``DG model`` and there
-should be the name of our *DivGeo model*, ``ITER_5_step.dg``.
+should be the name of our *DivGeo model*.
 Click on it so it is selected.
 
 The reason why this must be done is that for the first time a linking
@@ -592,15 +905,15 @@ ask us for input, to change the grid parameters.
 .. image:: carre_ITER_5.png
    :align: center
 
-So now we click on :guilabel:'Terminal input', which shows a dialog in which
+So now we click on :guilabel:`Terminal input`, which shows a dialog in which
 we will write:
 
-    tgarde(1)=0.8
-    tgarde(2)=0.8
-    nrelax=1000
-    relax=0.4
-    rlcept=0.0001
-    end
+ | tgarde(1)=0.8
+ | tgarde(2)=0.8
+ | nrelax=1000
+ | relax=0.4
+ | rlcept=0.0001
+ | end
 
 .. image:: carre_ITER_6.png
    :align: center
@@ -674,10 +987,12 @@ Inspecting the mesh
 ===================
 
 Now we will check the generated mesh. Switch over to the DivGeo tab and if you
-have closed ``ITER_5_step.dg``, reopen it and if you wish dock it.
+have closed DivGeo, reopen it and if you wish dock it.
+
+Load the DivGeo file.
 
 In DivGeo click on :menuselection:`File --> Import --> Mesh` and open
-``ITER_5_step.dg.sno`` file. Note that DG can only read files in the
+``*.dg.sno`` file. Note that DG can only read files in the
 Sonnet format (\*.sno).
 
 .. image:: carre_ITER_10.png
@@ -715,8 +1030,37 @@ modifying the \*.sno grid file. You will need to save your modifications by
 exporting the mesh :menuselection:`File --> Export --> Mesh`.
 
 .. note::
-   This step is available in ``ITER_6_step.dg``
+   This step is available in ``ITER_18_mesh.dg``
 
+
+He pumping data
+---------------
+
+We are not finish yet. We have to specify the calculation of helium pumping.
+Click on :menuselection:`V&ariables --> &Add --> He pumping data`.
+
+First set the middle mouse to ``Mark``. Then :kbd:`Shift + Middle mouse` click
+on the bottom of the pump area. Be sure to mark the bottom line and not the
+upper line. Click on "Set" for ``Pumping duct``.
+
+.. image:: divgeo_ITER_51.png
+   :align: center
+
+Then make sure that the mesh details are enabled. To do this click on
+:menuselection:`&View --> &Display --> Mesh details`. Select the mesh cells
+(crosses not lines) as shown in the next image
+
+.. image:: divgeo_ITER_52.png
+   :align: center
+
+Also set the other values in the dialog as shown in the image.
+
+.. note::
+
+   This step is available in ``ITER_19_he_pumping_data.dg``
+
+Now we have to rebuild the DivGeo output files with
+:menuselection:`&File --> Out&put...`
 
 Triang
 ======
@@ -923,4 +1267,4 @@ Head back to DivGeo tab and import the resulting templates with
    :align: center
 
 .. note::
-   This step is available in ``ITER_7_step.dg``
+   This step is available in ``ITER_step_20_final_grids.dg``

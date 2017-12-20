@@ -126,8 +126,9 @@ lines, which indicate the normal surfaces, will appear.
 .. image:: divgeo_4.png
    :align: center
 
-It is very important to notice that all surface normals are pointing away
-from the plasma. To reverse them can set the middle mouse button to
+It is very important that all surface normals are pointing away from the
+plasma. This convention is required by later steps in the grid triangulation
+and input build-up process. To reverse them can set the middle mouse button to
 `"Reverse normals”`. Then click :kbd:`Shift + Reverse normals` (middle
 button) somewhere on the vessel wall and all of the normals should flip.
 
@@ -170,9 +171,9 @@ The target definitions need to satisfy the following rules:
     4. the plasma-wetted part of the target must consist of at least two (2)
        wall elements.
 
-In the C-Mod example only the first condition is satisfied. Therefore, a
-short segment needs to be added. To add the short segments change the assignment
-of the middle mouse button to `"Split element"`, and then click on the vertical
+In the C-Mod case first condition is not satisfied, therefore, a short segment
+needs to be added. To add the short segments change the assignment of the
+middle mouse button to `"Split element"`, and then click on the vertical
 segment just above the target, which adds a point on the wall and creates a
 new segment.
 Avoid making very short segments, which can cause problems for the triangle
@@ -220,13 +221,10 @@ help a lot. Right clicking on a selected segment will un-select it.
 Use the right mouse button (assigned to Mark) to select all segments. Using
 :kbd:`SHIFT+Right Click` will help a lot. Right clicking on a selected
 segment will un-select it. When the highlighting is complete, left-click on
-`"Set”` in the `"Structure”` dialogue box, at the end of the line marked
-`"Structure”`.
+`"Set"` in the `"Structure"` dialogue box, at the end of the line marked
+`"Structure"`.
 
 :kbd:`CTRL+U` to unmark everything.
-
-Setting the "Structure" variable for the targets
-------------------------------------------------
 
 As the same like the structure you can set the targets. Mark all of the
 segments for the inner target and then click on `"Set”`. Do not include the
@@ -445,7 +443,7 @@ Set 18 surfaces in the PFR.
 .. note::
    This step is available in  ``step_8_radial_surfaces_c_pfr.dg``
 
-For the core region t is necessary to add a surface which will define the
+For the core region it is necessary to add a surface which will define the
 extent to which the grid penetrates into the core.
 
 Assign "Add surface" to the middle mouse button.

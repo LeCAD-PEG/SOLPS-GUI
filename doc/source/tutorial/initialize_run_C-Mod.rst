@@ -1,6 +1,6 @@
 .. highlight:: csh
 
-.. _initialize-run:
+.. _initialize-run-C-Mod:
 
 
 ==========================
@@ -239,7 +239,7 @@ the end the output will look like
    :align: center
 
 Now we can, for example, check the output graph for ``resall_D``. Head to the
-:menuselection:`Dashboard` tab and in the ``edit are for plot command`` type
+:menuselection:`Dashboard` tab and in the ``edit area for plot command`` type
 ``resall_D``.
 
 .. image:: initialize_run_7.png

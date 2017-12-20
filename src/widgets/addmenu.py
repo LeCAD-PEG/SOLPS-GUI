@@ -125,6 +125,10 @@ class AddMenu(QMenu):
                     action.setEnabled(False)
                 else:
                     action.setEnabled(True)
+                    enable = 1
+                    for a in action.menu().actions():
+                        a.setEnabled(True)
+
         elif filename == 'input.dat':
             [action.setEnabled(False) for action in self.actions()]
         elif filename == 'b2ar.dat':
