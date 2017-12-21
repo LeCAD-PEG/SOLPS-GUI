@@ -3,9 +3,9 @@
 .. _meshing-iter:
 
 
-========================================
-Meshing toolchain-ITER Baseline scenario
-========================================
+==============================
+Meshing ITER Baseline scenario
+==============================
 
 DivGeo
 ======
