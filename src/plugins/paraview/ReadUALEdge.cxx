@@ -520,6 +520,28 @@ void fAddBlock2MultiBlock(  vtkSmartPointer<vtkMultiBlockDataSet> MB,
         vtkCompositeDataSet::NAME(), gridSubset_name.c_str());
 }
 
+/*
+*   Set Ion specie data field label.
+*   @param   is  Ion specie index
+*   @param   ic  Ion charge
+*/
+std::string fSetIonQuantityLabel(   std::string quantity_name, int is,
+                                    std::string ic )
+{
+    stringstream ion_species_num2str;
+    ion_species_num2str << is + 1;
+    std::string is_string = ion_species_num2str.str();
+    std::string ion_array_label;
+    if (is < 9)
+    {
+        ion_array_label = "Ion " + quantity_name + " 0" + is_string + ic;
+    } else
+    {
+        ion_array_label = "Ion " + quantity_name + " " + is_string + ic;
+    }
+    return ion_array_label;
+}
+
 /**
 *   Main ReadUALEdge function. It reads grid geometry, grid subset and plasma
 *   state data out of the IDSs and combines this data into display ready
@@ -616,6 +638,22 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // Get number of grid subsets
     int num_gridSubset = grid.grid_subset.extent(0);
     int num_ne_gri = grid.grid_subset.extent(0);
+
+    // Set array of plasma state (ion) quantity names (Density,
+    // etc. Temperature )
+    std::string edge_quantity_names[12];
+    edge_quantity_names[0] = "Temperature";
+    edge_quantity_names[1] = "Density";
+    edge_quantity_names[2] = "Density_Fast";
+    edge_quantity_names[3] = "Pressure";
+    edge_quantity_names[4] = "Pressure_Fast_Perpendicular";
+    edge_quantity_names[5] = "Pressure_Fast_Parallel";
+    edge_quantity_names[6] = "Velocity - Radial";
+    edge_quantity_names[7] = "Velocity - Diamagnetic";
+    edge_quantity_names[8] = "Velocity - Parallel";
+    edge_quantity_names[9] = "Velocity - Poloidal";
+    edge_quantity_names[10] = "Velocity - Toroidal";
+    edge_quantity_names[11] = "Energy Density Kinetic";
 
     // Loop through all grid subsets and extract data for each
     for(int i = 0; i < num_gridSubset; i++){
@@ -746,32 +784,121 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             int num_ion_species = ggd.ion.extent(0);
             for( int k = 0; k < num_ion_species; k++)
             {
-            // Assign values found in ion Temperature substructure to
-            // grid subsets objects (vertices)
-            readValues_GenericGridScalar(
-                "Ion Temperature" + k,
-                gridSubsetPointsUnstructuredGrid,
+                // Assign values found in ion Temperature substructure to
+                // grid subsets objects (vertices)
+                readValues_GenericGridScalar(
+                    "Ion Temperature" + k,
+                    gridSubsetPointsUnstructuredGrid,
                 ion(k).temperature );
-            // Assign values found in Ion Density substructure to grid
-            // subsets objects (vertices)
-            std::string ion_charge= ggd.ion(k).label;
-            stringstream ni_species_num2str;
-            ni_species_num2str << k+1;
-            string ni_species_num_str = ni_species_num2str.str();
-            std::string ni_array_label;
-            if (k < 9)
-            {
-                ni_array_label = "Ion Density 0" +
-                    ni_species_num_str + ion_charge;
-            } else
-            {
-                ni_array_label = "Ion Density " +
-                    ni_species_num_str + ion_charge;
-            }
-            readValues_GenericGridScalar(
-                ni_array_label,
-                gridSubsetPointsUnstructuredGrid,
-                ion(k).density );
+
+                /// Set ion specie label
+                std::string ion_charge= ggd.ion(k).label;
+                /// Set data field name
+                std::string array_label;
+                // Assign values found in Ion Density substructure to grid
+                // subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[1],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridScalar(
+                    array_label,
+                    gridSubsetPointsUnstructuredGrid,
+                    ion(k).density );
+                // Assign values found in Ion Density_Fast substructure to grid
+                // subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[2],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridScalar(
+                    array_label,
+                    gridSubsetPointsUnstructuredGrid,
+                    ion(k).density_fast );
+                // Assign values found in Ion Pressure substructure to grid
+                // subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[3],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridScalar(
+                    array_label,
+                    gridSubsetPointsUnstructuredGrid,
+                    ion(k).pressure );
+                // Assign values found in Ion Pressure_Fast_Perpendicular
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[4],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridScalar(
+                    array_label,
+                    gridSubsetPointsUnstructuredGrid,
+                    ion(k).pressure_fast_perpendicular );
+                // Assign values found in Ion Pressure_Fast_Parallel
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[5],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridScalar(
+                    array_label,
+                    gridSubsetPointsUnstructuredGrid,
+                    ion(k).pressure_fast_parallel );
+                // Assign values found in Ion Velocity - Radial
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[6],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridVectorComponents(
+                    array_label,
+                    gridSubsetPointsUnstructuredGrid,
+                    ion(k).velocity,
+                    "radial" );
+                // Assign values found in Ion Velocity - Diamagnetic
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[7],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridVectorComponents(
+                    array_label,
+                    gridSubsetPointsUnstructuredGrid,
+                    ion(k).velocity,
+                    "diamagnetic" );
+                // Assign values found in Ion Velocity - Parallel
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[8],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridVectorComponents(
+                    array_label,
+                    gridSubsetPointsUnstructuredGrid,
+                    ion(k).velocity,
+                    "parallel" );
+                // Assign values found in Ion Velocity - Poloidal
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[9],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridVectorComponents(
+                    array_label,
+                    gridSubsetPointsUnstructuredGrid,
+                    ion(k).velocity,
+                    "poloidal" );
+                // Assign values found in Ion Velocity - Toroidal
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[10],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridVectorComponents(
+                    array_label,
+                    gridSubsetPointsUnstructuredGrid,
+                    ion(k).velocity,
+                    "toroidal" );
+                // Assign values found in Ion Energy_Density_Kinetic
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[11],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridScalar(
+                    array_label,
+                    gridSubsetPointsUnstructuredGrid,
+                    ion(k).energy_density_kinetic );
         }
 
             // Add unstructured grid to main block
@@ -889,40 +1016,129 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 gridSubsetCellsUnstructuredGrid,
                 electrons.distribution_function );
 
-            // Assigning values (2D cells) - Ion species
+            //** Assigning values (2D cells) - Ion species
 
             // Assign values found in Ion substructure to grid subsets
             // objects (2D cells)
             int num_ion_species = ggd.ion.extent(0);
             for( int k = 0; k < num_ion_species; k++)
             {
-                // Assign values found in ion Temperature substructure to
-                // grid subsets objects (2D cells)
+
+                //* Assign values found in ion Temperature substructure to
+                //* grid subsets objects (2D cells)
                 readValues_GenericGridScalar(
                     "Ion Temperature" + k,
                     gridSubsetCellsUnstructuredGrid,
                     ion(k).temperature );
+
+                /// Set ion specie label
+                std::string ion_charge= ggd.ion(k).label;
+                /// Set data field name
+                std::string array_label;
                 // Assign values found in Ion Density substructure to grid
                 // subsets objects (2D cells)
-                // Set label
-                std::string ion_charge= ggd.ion(k).label;
-                stringstream ni_species_num2str;
-                ni_species_num2str << k+1;
-                string ni_species_num_str = ni_species_num2str.str();
-                std::string ni_array_label;
-                if (k < 9)
-                {
-                    ni_array_label = "Ion Density 0" +
-                        ni_species_num_str + ion_charge;
-                } else
-                {
-                    ni_array_label = "Ion Density " +
-                        ni_species_num_str + ion_charge;
-                }
+                array_label = fSetIonQuantityLabel( edge_quantity_names[1],
+                    k, ion_charge );
+                /// Assign values
                 readValues_GenericGridScalar(
-                    ni_array_label,
+                    array_label,
                     gridSubsetCellsUnstructuredGrid,
                     ion(k).density );
+                // Assign values found in Ion Density_Fast substructure to grid
+                // subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[2],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridScalar(
+                    array_label,
+                    gridSubsetCellsUnstructuredGrid,
+                    ion(k).density_fast );
+                // Assign values found in Ion Pressure substructure to grid
+                // subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[3],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridScalar(
+                    array_label,
+                    gridSubsetCellsUnstructuredGrid,
+                    ion(k).pressure );
+                // Assign values found in Ion Pressure_Fast_Perpendicular
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[4],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridScalar(
+                    array_label,
+                    gridSubsetCellsUnstructuredGrid,
+                    ion(k).pressure_fast_perpendicular );
+                // Assign values found in Ion Pressure_Fast_Parallel
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[5],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridScalar(
+                    array_label,
+                    gridSubsetCellsUnstructuredGrid,
+                    ion(k).pressure_fast_parallel );
+                // Assign values found in Ion Velocity - Radial
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[6],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridVectorComponents(
+                    array_label,
+                    gridSubsetCellsUnstructuredGrid,
+                    ion(k).velocity,
+                    "radial" );
+                // Assign values found in Ion Velocity - Diamagnetic
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[7],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridVectorComponents(
+                    array_label,
+                    gridSubsetCellsUnstructuredGrid,
+                    ion(k).velocity,
+                    "diamagnetic" );
+                // Assign values found in Ion Velocity - Parallel
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[8],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridVectorComponents(
+                    array_label,
+                    gridSubsetCellsUnstructuredGrid,
+                    ion(k).velocity,
+                    "parallel" );
+                // Assign values found in Ion Velocity - Poloidal
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[9],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridVectorComponents(
+                    array_label,
+                    gridSubsetCellsUnstructuredGrid,
+                    ion(k).velocity,
+                    "poloidal" );
+                // Assign values found in Ion Velocity - Toroidal
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[10],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridVectorComponents(
+                    array_label,
+                    gridSubsetCellsUnstructuredGrid,
+                    ion(k).velocity,
+                    "toroidal" );
+                // Assign values found in Ion Energy_Density_Kinetic
+                // substructure to grid subsets objects (2D cells)
+                array_label = fSetIonQuantityLabel( edge_quantity_names[11],
+                    k, ion_charge );
+                /// Assign values
+                readValues_GenericGridScalar(
+                    array_label,
+                    gridSubsetCellsUnstructuredGrid,
+                    ion(k).energy_density_kinetic );
             }
 
             // Add unstructured grid to main block
