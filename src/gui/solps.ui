@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>660</width>
-    <height>411</height>
+    <width>662</width>
+    <height>466</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -42,87 +42,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Device template:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QComboBox" name="comboBox">
-          <property name="currentText">
-           <string>ITER</string>
-          </property>
-          <item>
-           <property name="text">
-            <string>ITER</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>AUG</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>JET</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>COMPASS</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>MAST-U</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QCommandLinkButton" name="initializeRuns">
-          <property name="text">
-           <string>Initialize Runs</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Sequence script:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="Script" name="script_sequence">
-          <property name="plainText">
-           <string>for i in range(10):
-   cmd = &quot;mkdir run{0:02d}&quot;.format(i)
-   self.output.emit(cmd)
-self.output.emit(&quot;ls -ld run*&quot;)</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="TcshEdit" name="tcsh_sequence">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="3">
-         <widget class="QLabel" name="label_initialize_runs">
-          <property name="text">
-           <string>Please select working direcory in the Runs tab for sequence initialization.</string>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-         </widget>
+         <widget class="InitializeRun" name="initialize_run"/>
         </item>
        </layout>
       </widget>
@@ -148,6 +68,12 @@ self.output.emit(&quot;ls -ld run*&quot;)</string>
         </property>
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget_2">
+          <property name="maximumSize">
+           <size>
+            <width>16777207</width>
+            <height>16777215</height>
+           </size>
+          </property>
           <property name="tabPosition">
            <enum>QTabWidget::South</enum>
           </property>
@@ -155,7 +81,7 @@ self.output.emit(&quot;ls -ld run*&quot;)</string>
            <enum>QTabWidget::Triangular</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="tab_16">
            <attribute name="title">
@@ -242,6 +168,31 @@ self.output.emit(&quot;ls -ld run*&quot;)</string>
             </property>
             <item row="0" column="0">
              <widget class="Triang" name="triang"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_18">
+           <attribute name="title">
+            <string>B2 Input files</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_14">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="B2InputFiles" name="b2inputfiles"/>
             </item>
            </layout>
           </widget>
@@ -738,8 +689,8 @@ and starts the run</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>660</width>
-     <height>19</height>
+     <width>662</width>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -797,6 +748,11 @@ and starts the run</string>
  </widget>
  <customwidgets>
   <customwidget>
+   <class>B2InputFiles</class>
+   <extends>QWidget</extends>
+   <header>b2_input_files</header>
+  </customwidget>
+  <customwidget>
    <class>Carre</class>
    <extends>QWidget</extends>
    <header>carre</header>
@@ -823,14 +779,14 @@ and starts the run</string>
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>InitializeRun</class>
+   <extends>QWidget</extends>
+   <header>initialize_run</header>
+  </customwidget>
+  <customwidget>
    <class>PutIDS</class>
    <extends>QWidget</extends>
    <header>put_edge_ids</header>
-  </customwidget>
-  <customwidget>
-   <class>Script</class>
-   <extends>QPlainTextEdit</extends>
-   <header>script</header>
   </customwidget>
   <customwidget>
    <class>SolpsInput</class>
@@ -933,70 +889,6 @@ and starts the run</string>
     <hint type="destinationlabel">
      <x>101</x>
      <y>74</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>director</sender>
-   <signal>rundir_passthrough(QString)</signal>
-   <receiver>label_initialize_runs</receiver>
-   <slot>setText(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>42</x>
-     <y>351</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>101</x>
-     <y>357</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>initializeRuns</sender>
-   <signal>clicked()</signal>
-   <receiver>script_sequence</receiver>
-   <slot>run()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>352</x>
-     <y>61</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>197</x>
-     <y>170</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>script_sequence</sender>
-   <signal>output(QString)</signal>
-   <receiver>tcsh_sequence</receiver>
-   <slot>setAndExecuteTcshCommand(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>197</x>
-     <y>170</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>352</x>
-     <y>121</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>director</sender>
-   <signal>rundir_passthrough(QString)</signal>
-   <receiver>tcsh_sequence</receiver>
-   <slot>setRunDir(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>42</x>
-     <y>351</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>352</x>
-     <y>121</y>
     </hint>
    </hints>
   </connection>
@@ -1205,6 +1097,38 @@ and starts the run</string>
     <hint type="destinationlabel">
      <x>110</x>
      <y>396</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>b2inputfiles</receiver>
+   <slot>setRunDir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>31</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>330</x>
+     <y>231</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>initialize_run</receiver>
+   <slot>setRunDir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>120</x>
+     <y>413</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>330</x>
+     <y>244</y>
     </hint>
    </hints>
   </connection>

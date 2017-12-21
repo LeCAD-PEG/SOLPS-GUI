@@ -459,19 +459,23 @@ tooltips = {
 				""", '1'),
    
       'b2news_facdrift_dec' : ('', 'real', """
-					Ramping parameters for facdrift, which multiplies the diamagnetic terms. The code is started on the first time step with facdrift=facdrift_start. If facdrift_target.ne.facdrift_start, then, on each time step, facdrift is multiplied by facdrift_inc. If the code does not converge on the timestep, facdrift is decreased by facdrift_dec. A facdrift profile is also possible, see Numerics section for details.
+					Ramping parameters for facdrift, which multiplies the diamagnetic terms as well as the ion inertia current. The code is started on the first time step with facdrift=facdrift_start. If facdrift_target.ne.facdrift_start, then, on each time step, facdrift is multiplied by facdrift_inc. If the code does not converge on the timestep, facdrift is decreased by facdrift_dec. A facdrift profile is also possible, see Numerics section for details.
+					The ion-neutral friction current requires either facdrift or fac_ExB to be turned on as well.
 				""", '0.0'),
    
       'b2news_facdrift_inc' : ('', 'real', """
-					Ramping parameters for facdrift, which multiplies the diamagnetic terms. The code is started on the first time step with facdrift=facdrift_start. If facdrift_target.ne.facdrift_start, then, on each time step, facdrift is multiplied by facdrift_inc. If the code does not converge on the timestep, facdrift is decreased by facdrift_dec. A facdrift profile is also possible, see Numerics section for details.
+					Ramping parameters for facdrift, which multiplies the diamagnetic terms as well as the ion inertia current. The code is started on the first time step with facdrift=facdrift_start. If facdrift_target.ne.facdrift_start, then, on each time step, facdrift is multiplied by facdrift_inc. If the code does not converge on the timestep, facdrift is decreased by facdrift_dec. A facdrift profile is also possible, see Numerics section for details.
+					The ion-neutral friction current requires either facdrift or fac_ExB to be turned on as well.
 				""", '1.0'),
    
       'b2news_facdrift_start' : ('', 'real', """
-					Ramping parameters for facdrift, which multiplies the diamagnetic terms. The code is started on the first time step with facdrift=facdrift_start. If facdrift_target.ne.facdrift_start, then, on each time step, facdrift is multiplied by facdrift_inc. If the code does not converge on the timestep, facdrift is decreased by facdrift_dec. A facdrift profile is also possible, see Numerics section for details.
+					Ramping parameters for facdrift, which multiplies the diamagnetic terms as well as the ion inertia current. The code is started on the first time step with facdrift=facdrift_start. If facdrift_target.ne.facdrift_start, then, on each time step, facdrift is multiplied by facdrift_inc. If the code does not converge on the timestep, facdrift is decreased by facdrift_dec. A facdrift profile is also possible, see Numerics section for details.
+					The ion-neutral friction current requires either facdrift or fac_ExB to be turned on as well.
 				""", '0.0'),
    
       'b2news_facdrift_target' : ('', 'real', """
-					Ramping parameters for facdrift, which multiplies the diamagnetic terms. The code is started on the first time step with facdrift=facdrift_start. If facdrift_target.ne.facdrift_start, then, on each time step, facdrift is multiplied by facdrift_inc. If the code does not converge on the timestep, facdrift is decreased by facdrift_dec. A facdrift profile is also possible, see Numerics section for details.
+					Ramping parameters for facdrift, which multiplies the diamagnetic terms as well as the ion inertia current. The code is started on the first time step with facdrift=facdrift_start. If facdrift_target.ne.facdrift_start, then, on each time step, facdrift is multiplied by facdrift_inc. If the code does not converge on the timestep, facdrift is decreased by facdrift_dec. A facdrift profile is also possible, see Numerics section for details.
+					The ion-neutral friction current requires either facdrift or fac_ExB to be turned on as well.
 				""", '0.0'),
    
       'b2news_facExB_dec' : ('', 'real', """
@@ -537,7 +541,7 @@ tooltips = {
       'b2mndr_stim' : ('Run', 'real', """
 					stim specifies the initial time --- default 0.
 					If set to a positive or zero value, this overwrites the time value read from b2fstati.
-					If set to a negative value, the run continues from the time read in b2fstati.
+					If set to a negative value, the run continues from the time read in b2fstati. In that case, the tracing data is appended to the existing files, otherwise the tracing files are overwritten.
 				""", '0.0'),
    
       'b2mndr_etim' : ('Run', 'real', """
@@ -1874,6 +1878,10 @@ tooltips = {
 					When not equal to '0.0', adds contribution to divergence of viscosity tensor coming from x-variations in B.
 				""", '1.0'),
    
+      'b2siav_style_qip' : ('Physics', 'integer', """
+					If style_qip.eq.1, adds a classical ion heat conductivity term to the heat flux used to compute the heat viscosity current (see manual for full details).
+				""", '0'),
+   
       'b2npmo_b2sifr_' : ('Physics', 'integer', """
 					If b2sigp_style is set to '2', this switch has no effect.
 					When set to '1', the new correct form of the friction force is used, applicable for non-hydrogenic plasmas or hydrogenic mixtures.
@@ -1906,24 +1914,56 @@ tooltips = {
 					See also Run section on switches b2news_facExB_... for more details. A spatial fac_ExB profile is also possible, see Numerics section for details.
 				""", '0.0'),
    
+      'b2tiner_inert' : ('Physics', 'real', """
+					Real parameter which multiplies the ion inertial current.
+				""", '1.0'),
+   
+      'b2tfhe_dia_cur' : ('Physics', 'real', """
+					Real parameter which multiplies the diamagnetic current.
+				""", '1.0'),
+   
+      'b2tfhe_vdia_par' : ('Physics', 'real', """
+					Real parameter which multiplies the convective heat flux due to grad B-drift of guiding centers in non-modified heat fluxes of electrons and ions.
+				""", '1.0'),
+   
       'b2tfhe_neutral' : ('Physics', 'real', """
-					Real parameter which multiplies ion-neutral current.
-					If b2tfhe_neutral is 0 then ion-neutral current is switched off otherwise ion-neutral current is switched on.
+					Real parameter which multiplies the ion-neutral current.
+					If b2tfhe_neutral is 0 then the ion-neutral current is switched off otherwise the ion-neutral current is switched on.
+					The ion-neutral current also requires either the diamagnetic or ExB drifts to be turned on as well.
 				""", '0.0'),
    
+      'b2tinnt_fchin_in_core' : ('Physics', 'integer', """
+					Integer switch to turn off or on the ion-neutral current in the core region (applies to coupled runs only). This is recommended in cases where the neutral densities are very low in the core region and the ion-neutral current is likely to vary widely from one iteration to the next as a result of Monte-Carlo noise.
+					If fchin_in_core.eq.0 (default), then fchin is set to zero in the core.
+					If fchin_in_core.eq.1, then fchin is unchanged.
+				""", '0'),
+   
+      'b2tfhe_PSch' : ('Physics', 'real', """
+					Real parameter which multiplies the Pfirsch-Schlueter electron heat flux and conductivity.
+				""", '1.0'),
+   
       'b2tfhe_vis_par' : ('Physics', 'real', """
-					Real parameter which multiplies current driven by parallel viscosity.
-					If b2tfhe_vis_par is 0 then viscosity-driven current is switched off otherwise viscosity-driven current is switched on.
+					Real parameter which multiplies the current driven by parallel viscosity.
+					If b2tfhe_vis_par is 0 then the viscosity-driven current is switched off otherwise the viscosity-driven current is switched on.
 				""", '0.0'),
    
       'b2tfhe_vis_q' : ('Physics', 'real', """
-					Real parameter which multiplies current driven by heat viscosity effects.
+					Real parameter which multiplies the current driven by heat viscosity effects.
 				""", '1.0'),
    
       'b2tfhe_stochastic' : ('Physics', 'real', """
 					Real parameter which turns on stochastic current.
 					If b2tfhe_stochastic is 0 then stochastic current is switched off otherwise stochastic current is switched on.
 				""", '0.0'),
+   
+      'b2tstch_delta' : ('Physics', 'real', """
+					Width of the stochastic current layer (in meters), measured from the separatrix inward, along the poloidal index ixref (given by b2tqna_ixref).
+					If b2tfhe_stochastic.ne.0, then b2tstch_delta must be greater than zero.
+				""", '0.0'),
+   
+      'b2tstch_sig' : ('Physics', 'real', """
+					Multiplier to the magnetic field line stochastic diffusion coefficient, describing the stochastic conductivity.
+				""", '1.0'),
    
       'b2trno_con_e_stochastic' : ('Physics', 'real', """
 					Multiplier to the stochastic conductivity.
@@ -1981,7 +2021,7 @@ tooltips = {
 				""", '1.0'),
    
       'b2tfnb_vis_per' : ('Physics', 'real', """
-					vis_per is a multiplier to the perpendicular viscosity current contributions to the ion poloidal flows (particle and energy). Subservient to b2tfnb_xcur and b2tfnb_ycur.
+				    vis_per is a multiplier to the perpendicular viscosity current contributions to the ion poloidal flows (particle and energy). Subservient to b2tfnb_xcur and b2tfnb_ycur.
 				""", '0.0'),
    
       'b2tfnb_vis_q' : ('Physics', 'real', """
@@ -2087,7 +2127,7 @@ tooltips = {
 				""", '0.0'),
    
       'b2sral_style' : ('Physics', 'integer', """
-					When set to '0', in the expression of the electron particle flux (fne) the particle flux with drift terms is used and temporary drift velocities on the first call are calculated. When set to '1' or '2', the particle flux without drift terms is used in fne. It is recommended '2'.
+					When set to '0' or '2', the code calls the standard b2stbc routine, which uses the particle flux with drift terms included in the expression of the electron particle flux (fne). When set to '1', the code calls the b2stbc_spb routine instead, which uses the particle flux without drift terms in fne. It is recommended '2'.
 				""", '2'),
    
       'b2sqel_phm0' : ('Physics', 'real', """
@@ -2168,7 +2208,7 @@ tooltips = {
 					If &lt;&gt; 0 then recycles the neutral flux having crossed the core boundary within Eirene as ions. The recycling is surface-averaged, and neutrals come back as fully-stripped ions.
 					'eirene_ionizing_core' is an alias for this switch.
 					If the value = 1, then the flux is added by direct modification of the sources in the guard cells --- this will only work if a standard flux boundary condition is applied at that boundary.
-					If the value is &lt; 0, then the absolute value specifies which boundary in b2.boundary.parameters is to be used. This will only work for the new type 13 boundary condition.
+					If the value is &lt; 0, then the absolute value specifies which boundary in b2.boundary.parameters is to be used. This will only work for the type 13 boundary condition.
 				""", '0'),
    
       'eirene_background' : ('Physics', 'integer', """
@@ -2226,29 +2266,29 @@ tooltips = {
 				""", '1.0e+4'),
    
       'tallies_netcdf' : ('', 'integer', """
-					If tallies_netcdf.ne.0, the file 'b2tallies.nc' is created, which contains the regional tallies in CDF format.
-					If b2wall_netcdf.ne.0, the file 'b2wall.nc' is created, which contains the wall tallies in CDF format [written every b2wall_netcdf 'main calls'].
+					If tallies_netcdf.ne.0, the file 'b2tallies.nc' is created, which contains the regional tallies in CDF format. If b2mndr_stim.lt.0, data from the current run is appended to the existing b2tallies.nc file, otherwise the file is overwritten.
+					If b2wall_netcdf.ne.0, the file 'b2wall.nc' is created, which contains the wall tallies in CDF format [written every b2wall_netcdf 'main calls']. If b2mndr_stim.lt.0, data from the current run is appended to the existing b2wall.nc file, otherwise the file is overwritten.
 					If balance_netcdf.ne.0, the file 'balance.nc' is created, which contains all of the arrays required by the balance post-processing routines, in CDF format.
 					If balance_average.ne.0, the balance arrays are averaged over all b2mndr_ntim timesteps.
 				""", '0'),
    
       'b2stbr_b2wall_netcdf' : ('', 'integer', """
-					If tallies_netcdf.ne.0, the file 'b2tallies.nc' is created, which contains the regional tallies in CDF format.
-					If b2wall_netcdf.ne.0, the file 'b2wall.nc' is created, which contains the wall tallies in CDF format [written every b2wall_netcdf 'main calls'].
+					If tallies_netcdf.ne.0, the file 'b2tallies.nc' is created, which contains the regional tallies in CDF format. If b2mndr_stim.lt.0, data from the current run is appended to the existing b2tallies.nc file, otherwise the file is overwritten.
+					If b2wall_netcdf.ne.0, the file 'b2wall.nc' is created, which contains the wall tallies in CDF format [written every b2wall_netcdf 'main calls']. If b2mndr_stim.lt.0, data from the current run is appended to the existing b2wall.nc file, otherwise the file is overwritten.
 					If balance_netcdf.ne.0, the file 'balance.nc' is created, which contains all of the arrays required by the balance post-processing routines, in CDF format.
 					If balance_average.ne.0, the balance arrays are averaged over all b2mndr_ntim timesteps.
 				""", '0'),
    
       'balance_netcdf' : ('', 'integer', """
-					If tallies_netcdf.ne.0, the file 'b2tallies.nc' is created, which contains the regional tallies in CDF format.
-					If b2wall_netcdf.ne.0, the file 'b2wall.nc' is created, which contains the wall tallies in CDF format [written every b2wall_netcdf 'main calls'].
+					If tallies_netcdf.ne.0, the file 'b2tallies.nc' is created, which contains the regional tallies in CDF format. If b2mndr_stim.lt.0, data from the current run is appended to the existing b2tallies.nc file, otherwise the file is overwritten.
+					If b2wall_netcdf.ne.0, the file 'b2wall.nc' is created, which contains the wall tallies in CDF format [written every b2wall_netcdf 'main calls']. If b2mndr_stim.lt.0, data from the current run is appended to the existing b2wall.nc file, otherwise the file is overwritten.
 					If balance_netcdf.ne.0, the file 'balance.nc' is created, which contains all of the arrays required by the balance post-processing routines, in CDF format.
 					If balance_average.ne.0, the balance arrays are averaged over all b2mndr_ntim timesteps.
 				""", '0'),
    
       'balance_average' : ('', 'integer', """
-					If tallies_netcdf.ne.0, the file 'b2tallies.nc' is created, which contains the regional tallies in CDF format.
-					If b2wall_netcdf.ne.0, the file 'b2wall.nc' is created, which contains the wall tallies in CDF format [written every b2wall_netcdf 'main calls'].
+					If tallies_netcdf.ne.0, the file 'b2tallies.nc' is created, which contains the regional tallies in CDF format. If b2mndr_stim.lt.0, data from the current run is appended to the existing b2tallies.nc file, otherwise the file is overwritten.
+					If b2wall_netcdf.ne.0, the file 'b2wall.nc' is created, which contains the wall tallies in CDF format [written every b2wall_netcdf 'main calls']. If b2mndr_stim.lt.0, data from the current run is appended to the existing b2wall.nc file, otherwise the file is overwritten.
 					If balance_netcdf.ne.0, the file 'balance.nc' is created, which contains all of the arrays required by the balance post-processing routines, in CDF format.
 					If balance_average.ne.0, the balance arrays are averaged over all b2mndr_ntim timesteps.
 				""", '0'),
@@ -2282,7 +2322,7 @@ tooltips = {
 				""", 'pzmm'),
    
       'b2mndr_b2time' : ('Output', 'integer', """
-					Specifies the number of timesteps between writes of the time-dependent file. If b2time.gt.0, always writes out on the last timestep.
+					Specifies the number of timesteps between writes of the b2time.nc time-dependent file. If b2time.gt.0, always writes out on the last timestep. If b2mndr_stim.lt.0, data from the current run is appended to the existing b2time.nc file, otherwise the file is overwritten.
 				""", '1'),
    
       'b2mndr_tally' : ('Output', 'integer', """
@@ -2387,7 +2427,7 @@ tooltips = {
 				""", '1'),
    
       'ank_tracing' : ('Output', 'integer', """
-					If ank_tracing.ge.1, additional tracing output from Andrei Kukushkin is produced, in files to be found in the tracing/ directory inside the run directory. The traces will be written every ank_tracing iteration.
+					If ank_tracing.ge.1, additional tracing output from Andrei Kukushkin is produced, in files to be found in the tracing/ directory inside the run directory. The traces will be written every ank_tracing iteration. If b2mndr_stim.lt.0, data from the current run is appended to the existing files, otherwise the files are overwritten.
 				""", '0'),
    
       'b2stbc_diagno' : ('Output', 'integer', """
@@ -2961,7 +3001,8 @@ tooltips = {
 				""", '0'),
    
       'b2tfhe_vis_per' : ('Numerics', 'real', """
-					If '1.0', the electric potential equation is solved by the subroutine b2npp7 using a 7-point stencil.
+                    vis_per is a multiplier to the perpendicular viscosity current.
+					If vis_per.ne.0.0, the electric potential equation is solved by the subroutine b2npp7 using a 7-point stencil.
 					The value '1.0' is recommended for runs with drifts when perpendicular viscosity and corresponding perpendicular viscosity current is taken into account.
 				""", '0.0'),
    
@@ -3257,10 +3298,21 @@ tooltips = {
 					 It is recommended '1'.
 				""", '1'),
    
-      'b2tfnb_fnb_nodrift_style' : ('Numerics', 'integer', """
-					When set to '1', SPb's form of calculating no drift part of the particle fluxes is used.
-					It is recommended '1'.
-				""", '1'),
+      'b2tfnb_poleldr' : ('Numerics', 'real', """
+					Multiplier to the poloidal electrical drift velocity.
+				""", '1.0'),
+   
+      'b2tfnb_radeldr' : ('Numerics', 'real', """
+					Multiplier to the radial electrical drift velocity.
+				""", '1.0'),
+   
+      'b2tfnb_poldidr' : ('Numerics', 'real', """
+					Multiplier to the poloidal diamagnetic drift velocity.
+				""", '1.0'),
+   
+      'b2tfnb_raddidr' : ('Numerics', 'real', """
+					Multiplier to the radial diamagnetic drift velocity.
+				""", '1.0'),
    
       'b2tfnb_mdf' : ('Numerics', 'integer', """
 					If '1', Spb's new form of calculating particle flux is used.
@@ -3913,8 +3965,7 @@ tooltips = {
 						13 : particle density to achieve specified total flux,
 							CONPAR(,,1) is the specified flux crossing the flux surface 'b2stbc_type13_ref' steps away from the boundary,
 							CONPAR(,,2) is the strength of the feedback,
-							CONPAR(,,3)) when running with Eirene and the 'ionising core' switch is used,
-							CONPAR(,,2) is set internally to match the re-entering flux of ionised neutrals that crossed the core boundary (when running with Eirene and the 'ionising_core' option).
+							CONPAR(,,3), when running with Eirene and the 'ionising core' switch is used, is set internally to match the re-entering flux of ionised neutrals that crossed the core boundary (one must then have 'ionising_core'.eq.-IB where IB is the boundary index).
 							The feedback scheme can be further tweaked with the switches 'b2stbc_type13_norm' and 'b2stbc_type13_fac'. See code for details.
 						14 : sound speed velocity flux, CONPAR(,,1) is a multiplier to the outgoing sound speed C<sub>s</sub>.
 						15 : prescribe a radial leakage velocity, CONPAR(,,1) specifies the leakage velocity in units of the local thermal velocity.
@@ -4011,8 +4062,8 @@ tooltips = {
 						21 : from b2stbc_spb
 						22 : Radial leakage condition for the ion temperature. ENIPAR(,1) specifies the leakage velocity in units of the collective ion thermal velocity. A temperature gradient such that the diffusive flux is set to match this leakage is imposed.
 						23 : Prescribe the poloidally averaged value of the ion temperature and introduce a poloidal variation as close as possible to neoclassical solution. It is recommended to use this boundary condition together with corresponding condition on ion density (BCCON=21,22,23). The average is taken over all core boundaries with BCENI=23. ENIPAR(,1) specifies the temperature in eV
-						24 : Feedback boundary condition with prescribed total ion flux, constant poloidally averaged ion temperature	and a poloidal variation as close as possible to neoclassical solution. It is recommended to use this boundary condition together with corresponding condition on ion density (BCCON=21,22,23). The flux is	summed over all core boundaries with BCENI=24. ENIPAR(,1) specifies the energy flux in W
-						25 : Constant temperature feedback scaled by temperature on the ring bc_type21_ref away. ENIPAR(,1) specifies the desired ion temperature in eV . ENIPAR(,2) is the strength of the feedback
+						24 : Feedback boundary condition with prescribed total ion flux, constant poloidally averaged ion temperature and a poloidal variation as close as possible to neoclassical solution. It is recommended to use this boundary condition together with corresponding condition on ion density (BCCON=21,22,23). The flux is summed over all core boundaries with BCENI=24. ENIPAR(,1) specifies the energy flux in W
+						25 : Constant temperature feedback scaled by temperature on the ring bc_type21_ref away. ENIPAR(,1) specifies the desired ion temperature in eV. ENIPAR(,2) is the strength of the feedback
 						26 : Prescribe the poloidally averaged value of the ion temperature and introduce a poloidal variation in a simplified manner. This boundary condition is suitable for any plasma composition (i.e. when BCENI=23 fails). It is recommended to use this boundary condition together with corresponding condition on ion density (BCCON = 25,26,27). The average is taken over all core boundaries with BCENI=26. ENIPAR(,1) specifies the temperature in eV
 						27 : Feedback boundary condition with prescribed total ion heat flux, constant poloidally averaged ion temperature and a poloidal variation in a simplified manner. This boundary condition is suitable for any plasma composition (i.e. when BCENI=24 fails). It is recommended to use this boundary condition together with corresponding condition on ion density (BCCON = 25,26,27). The flux is summed over all core boundaries with BCENI=27. ENIPAR(,1) specifies the energy flux in W
 				""", ''),
@@ -4762,6 +4813,12 @@ tooltips = {
       'SPMP_NOM' : ('b2.user.parameters', 'real*8', """
 					Nominal pumping speed.
 				""", '0.0'),
+   
+      'FILEDATA' : ('b2.user.parameters', 'logical array of size 10', """
+					Switches to turn on/off the tracing files controlled by the ank_tracing switch. The files are defined in b2mod_diag, in order, starting with element 2 of the filedata array: test.trc, residuals.trc, sources.trc, blnn.trc, blne.trc, integral.trc, user.trc, blnm.trc, sepdata.trc.
+					If there is no b2.user.parameters file present, the flag for user.trc is set to .false..
+					If the tracing files are to be appended but a reading error occurs when opening them, the corresponding filedata element is overwritten to .false..
+				""", '.true.'),
    
       'USER_FILENAME' : ('b2.user.parameters', 'character*80', """
 					Filename where /USER/ namelist is stored.

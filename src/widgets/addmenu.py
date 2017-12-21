@@ -3,7 +3,7 @@
 """
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
-from PyQt5.QtWidgets import QMenu
+from PyQt5.QtWidgets import QMenu, QAction
 
 import textwrap
 import functools
@@ -125,6 +125,10 @@ class AddMenu(QMenu):
                     action.setEnabled(False)
                 else:
                     action.setEnabled(True)
+                    enable = 1
+                    for a in action.menu().actions():
+                        a.setEnabled(True)
+
         elif filename == 'input.dat':
             [action.setEnabled(False) for action in self.actions()]
         elif filename == 'b2ar.dat':
@@ -137,15 +141,32 @@ class AddMenu(QMenu):
                             a.setEnabled(True)
                         else:
                             a.setEnabled(False)
+                            if not isinstance(a, QAction):
+                                for a_ in a.actions():
+                                    a_.setEnabled(True)
                 else:
                     action.setEnabled(False)
         else:
             actions = self.actions()
-            for action in actions:
-                if filename[:-4] in action.text():
-                    action.setEnabled(True)
-                else:
+            strip = filename.rstrip('.dat')
+            if len(strip) == 4:
+                for action in self.actions():
                     action.setEnabled(False)
+                    enable = 1
+                    for a in action.menu().actions():
+                        if a.text().startswith(strip):
+                            if enable:
+                                action.setEnabled(True)
+                                enable = 0
+                            a.setEnabled(True)
+                        else:
+                            a.setEnabled(False)
+            else:
+                for action in actions:
+                    if filename[:-4] in action.text():
+                        action.setEnabled(True)
+                    else:
+                        action.setEnabled(False)
 
 
 if __name__ == "__main__":

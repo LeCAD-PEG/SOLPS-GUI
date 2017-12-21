@@ -1,8 +1,8 @@
 #!/bin/sh -x
-## Building PyQt with Python3 (or Python 2) and Qt5
+## Building PyQt with Python3 and Qt5
 ## Minimum GCC supported version for building Qt5 is 4.7
 
-PYTHON_VERSION=${PYTHON_VERSION:-3.6.3}
+PYTHON_VERSION=3.6.3
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
 QT_VERSION=5.9.1
 PyQT_VERSION=5.9.1 # should be the same as Qt
@@ -40,6 +40,8 @@ case $(hostname -f) in
 	# module unload itm-gcc/6.1.0 itm-python/2.7
 	#module switch itm-python/2.7.13.b1
 	#module unload itm-gcc/6.1.0 gcc/6.1.0
+	module unload matlab
+	module unload paraview
 	USE_QT_XCB="NO"
 	BUILD_XCB="NO"
 	BUILD_XLIB="NO"
@@ -92,17 +94,17 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
     sed -i -e "s,#SSL=.*,SSL=${ssl}," -e "/^#.*ssl/s/#//" \
 	-e '/ssl/s|-lcrypto|-lcrypto -Wl,-rpath,$(SSL)/lib|' Modules/Setup.dist
   fi
-  ./configure --prefix=${STAGING_DIR} --enable-shared --enable-optimizations
-  make # -j ${MAKE_JOBS}
+  ./configure --prefix=${STAGING_DIR} --enable-shared
+  make -j ${MAKE_JOBS}
   make install
-  ln -sf python${PYTHON_VERSION%%.*} ${STAGING_DIR}/bin/python
+  ln -sf python3 ${STAGING_DIR}/bin/python
   LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
   ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
-      --compile pip sphinx sphinx_rtd_theme matplotlib mock nose
+      pip sphinx sphinx_rtd_theme matplotlib mock nose
   # The following Python modules are preferred by IMAS
   LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
     ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
-      --compile Cython scipy luigi tornado deap decorator liac-arff ecdsa \
+      Cython scipy luigi tornado deap decorator liac-arff ecdsa \
       netaddr paramiko paycheck virtualenv
   touch ${PYTHON_SRC_DIR}/.built
 fi

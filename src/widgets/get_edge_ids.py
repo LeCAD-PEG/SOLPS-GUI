@@ -21,16 +21,29 @@ except ImportError as e:
 
 ENABLED = True
 
-try:
-    import imas
-except ImportError as e:
+if 'IMAS_PREFIX' not in os.environ and 'IMAS_VERSION' not in os.environ:
     if __name__ == '__main__':
-        print('There is no imas module... Exiting.')
-        sys.exit()
+        print('IMAS module is not loaded.')
+        sys.exit(2)
     else:
         ENABLED = False
-        pass
 
+else:
+
+    try:
+        import imas
+    except ImportError:
+        if __name__ == '__main__':
+            print('There is no IMAS module... Exiting.')
+            sys.exit(2)
+        else:
+            ENABLED = False
+    except FileNotFoundError:
+        print( __name__, 'Corrupted IMAS module!')
+        if __name__ == '__main__':
+            sys.exit(2)
+        else:
+            ENABLED = False
 
 class GetVars:
     names = ['SHOT', 'RUN', 'USER', 'DEVICE', 'VERSION', 'RUNNAME', 'DIRPATH']
