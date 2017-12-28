@@ -35,13 +35,12 @@ import os
 import shutil
 import socket
 import sys
-import queue
 import time
 
 from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
                           pyqtSignal, QThread, QAbstractItemModel, QVariant,
-                          QSortFilterProxyModel, QRegExp, QObject, QRect,
-                          QSize, QProcess)
+                          QSortFilterProxyModel, QRegExp, QRect, QSize,
+                          QProcess)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QFileDialog, QStyle, QStyledItemDelegate,
                              QLineEdit, QToolButton, QGridLayout, QLabel,
@@ -1122,66 +1121,6 @@ class RunsModel(QAbstractItemModel):
                           "' should be in 'name path status' format.")
 
 
-class LoggingHandler(logging.Handler):
-    def __init__(self, stream):
-        super(LoggingHandler, self).__init__()
-        self.stream = stream
-
-    def emit(self, record):
-        msg = self.format(record)
-        if record.levelno == logging.DEBUG:
-            self.stream.write('<font color="blue">' + msg + '</font>')
-        elif record.levelno == logging.INFO:
-            self.stream.write('<font color="orange">' + msg + '</font>')
-        elif record.levelno == logging.WARNING:
-            self.stream.write('<font color="blue">' + msg + '</font>')
-        elif record.levelno == logging.ERROR:
-            self.stream.write('<font color="red">' + msg + '</font>')
-        else:  # logging.CRITICAL
-            self.stream.write('<font color="magenta">' + msg + '</font>')
-
-
-class WriteStream(object):
-    """ The new Stream Object which replaces the default stream associated with
-    sys.stdout and sys.stderr. This object just puts data in a queue!
-
-    Args:
-        queue(queue.Queue) : thread safe queue created for the stream
-    """
-    def __init__(self, queue):
-        self.queue = queue
-
-    def flush(self):
-        pass
-
-    def fileno(self):
-        return -1
-
-    def write(self, text):
-        self.queue.put(text)
-
-
-class LogReceiver(QObject):
-    """ Receives log messages from Logging and sys.stdout.
-
-    A QObject (to be run in a QThread) which sits waiting for data to come
-    through a queue.Queue(). It blocks until data is available, and one it
-    has got something from the queue, it sends it to the "MainThread"
-    by emitting a Qt Signal.
-    """
-    log_signal = pyqtSignal(str)
-
-    def __init__(self, queue, *args, **kwargs):
-        QObject.__init__(self, *args, **kwargs)
-        self.queue = queue
-
-    @pyqtSlot()
-    def run(self):
-        while True:
-            text = self.queue.get()
-            self.log_signal.emit(text)
-
-
 class SOLPS_MainWindow(QMainWindow):
     """Main window of the SOLPS GUI
 
@@ -1240,40 +1179,7 @@ class SOLPS_MainWindow(QMainWindow):
         self.previous_tab_index = None   # For auto saving of Edit tab
         self.input_tab_index = self.tabWidget.indexOf(self.tab_Input)
 
-        # Create thread-safe Queue and redirect logging it
-        log_queue = queue.Queue()
-        log_stream = WriteStream(log_queue)
-        self.log_thread = QThread()
-        self.log_receiver = LogReceiver(log_queue)
-        self.log_receiver.log_signal.connect(
-            self.plainTextEdit_Log.appendHtml)
-        self.log_receiver.moveToThread(self.log_thread)
-        self.log_thread.started.connect(self.log_receiver.run)
-        self.log_thread.start()
-        log_handler = LoggingHandler(log_stream)
-        log_format = "%(asctime)s %(levelname)s: %(message)s"
-        log_handler.setFormatter(logging.Formatter(log_format))
-        logging.getLogger().addHandler(log_handler)
-        # get GUI settings
-        # TODO change/remove, we already used it
         settings = QSettings("ITER", "solps-gui")
-        log_levels = [logging.DEBUG, logging.INFO, logging.WARNING,
-                      logging.ERROR, logging.CRITICAL]
-        log_level = log_levels[int(settings.value('log_level', '1'))]
-        logging.getLogger().setLevel(log_level)
-
-        if REDIRECT_STDOUT_TO_LOG:
-            # Create thread-safe Queue and redirect sys.stdout to it
-            stdout_queue = queue.Queue()
-            sys.stdout = WriteStream(stdout_queue)
-            self.stdout_thread = QThread()
-            self.stdout_receiver = LogReceiver(stdout_queue)
-            self.stdout_receiver.log_signal.connect(
-                self.plainTextEdit_Log.insertPlainText)
-            self.stdout_receiver.moveToThread(self.stdout_thread)
-            self.stdout_thread.started.connect(self.stdout_receiver.run)
-            self.stdout_thread.start()
-
         settings.beginGroup("MainWindow")
         geometry = settings.value("Geometry")
         if geometry:
