@@ -22,8 +22,7 @@ this tutorial::
 
      $ stop
      $ cd runs/examples
-     $ cmake . && make # Fetches all examples from external repository
-     $ tar xvzf tutorial-DivGeo_C-Mod.tar.gz
+     $ make tutorial-DivGeo_C-Mod
      $ cd tutorial-DivGeo_C-Mod/baserun
 
 The EFIT equilibrium file  ``baserun/g.990429019.00940`` in this example

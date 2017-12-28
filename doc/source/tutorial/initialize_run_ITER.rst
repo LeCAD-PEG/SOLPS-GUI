@@ -18,8 +18,7 @@ In this tutorial we will create a running case for coupled B2.5 and Eirene run.
 
      $ stop
      $ cd runs/examples
-     $ cmake . && make # Fetches all examples from external repository
-     $ tar xvzf tutorial-DivGeo_ITER_baseline_scenario-InitializeRun.tar.gz
+     $ make tutorial-DivGeo_ITER_baseline_scenario-InitializeRun
      $ cd tutorial-DivGeo_ITER_baseline_scenario-InitializeRun
      $ rm -rf new_run # Will be created in this tutorial
 
