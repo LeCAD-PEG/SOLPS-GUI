@@ -16,8 +16,9 @@ case $(hostname -f) in
 
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
 	. /etc/profile.d.gw/modules.sh
-	module load imas/3.9.1/ual/3.5.3 blitz/0.10
-	module switch itm-python/2.7.13.b7
+	module load cineca imasenv cmake/3.5.2 blitz/0.10
+	module unload matlab
+	module switch itm-python/2.7
 	imasdb solps-iter
 	imasdb	
 	;;
@@ -36,5 +37,6 @@ STAGING_PARAVIEW=${STAGING_PARAVIEW:-$STAGING_DIR/paraview/$PARAVIEW_VERSION}
 
 #install -d /tmp/${USER}
 
-LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} ${STAGING_PARAVIEW}/bin/paraview $@
+#LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} \
+${STAGING_PARAVIEW}/bin/paraview $@
 

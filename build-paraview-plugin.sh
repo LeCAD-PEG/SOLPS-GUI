@@ -23,9 +23,15 @@ case $(hostname -f) in
 
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
 	. /etc/profile.d.gw/modules.sh
-	module load imas/3.9.1/ual/3.5.3
+	module purge
+	module load cineca imasenv cmake/3.5.2 
+	module switch itm-python/2.7
+	module unload matlab
+#	module load imas/3.9.1/ual/3.5.3
+	QT_VERSION=4.8.7
+	module load itm-qt/${QT_VERSION}
 	MAKE_JOBS=${MAKE_JOBS:-36}
-	export CXXFLAGS=-fpermissive
+#	export CXXFLAGS=-fpermissive
 	;;
   
   *)
