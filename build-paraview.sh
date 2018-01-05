@@ -1,8 +1,7 @@
 #!/bin/sh -x
 
 PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.1}
-QT_VERSION=${QT_VERSION:-4.8.7}
-CMAKE_VERSION=3.9.1
+CMAKE_VERSION=3.10.1
 
 case $(hostname -f) in
   *.iter.org)
@@ -26,9 +25,14 @@ case $(hostname -f) in
 	MAKE_JOBS=${MAKE_JOBS:-8}
 	;;
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
-	#. /etc/profile.d.gw/modules.sh
-	#module unload itm-gcc gnu
-	#module switch itm-python/2.7.13.b7
+	. /etc/profile.d.gw/modules.sh
+	module purge
+	module load cineca imasenv cmake/3.5.2 
+	module switch itm-python/2.7
+	module unload matlab
+	QT_VERSION=${QT_VERSION:-4.8.7}
+	module load itm-qt/${QT_VERSION}
+	STAGING_QT=${QTDIR}
 	MAKE_JOBS=${MAKE_JOBS:-36}
 	export CXXFLAGS=-fpermissive
 	PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-\
@@ -38,6 +42,7 @@ case $(hostname -f) in
 	;;
 esac
 
+QT_VERSION=${QT_VERSION:-4.8.7}
 MAKE_JOBS=${MAKE_JOBS:-4}
 
 BUILDROOT=${PWD}
@@ -86,31 +91,34 @@ if [ ${CMAKE} != cmake -a  ! -e  ${CMAKE_SRC_DIR}/.built ]; then
   touch ${CMAKE_SRC_DIR}/.built
 fi
 
-#Install QT
-QT_MAJOR_VERSION=${QT_VERSION%.*}
-QT_TAR="qt-everywhere-opensource-src-${QT_VERSION}.tar.gz"
-QT_DOWNLOAD="http://download.qt.io/official_releases/qt/${QT_MAJOR_VERSION}/${QT_VERSION}/${QT_TAR}"
-QT_SOURCE_DIR="${BUILD_DIR}/qt-everywhere-opensource-src-${QT_VERSION}"
+#Install QT if needed
+if ! test -x ${STAGING_QT}/bin/qmake ; then
+    QT_MAJOR_VERSION=${QT_VERSION%.*}
+    QT_TAR="qt-everywhere-opensource-src-${QT_VERSION}.tar.gz"
+    QT_SITE="http://download.qt.io/official_releases/qt"
+    QT_DOWNLOAD="${QT_SITE}/${QT_MAJOR_VERSION}/${QT_VERSION}/${QT_TAR}"
+    QT_SOURCE_DIR="${BUILD_DIR}/qt-everywhere-opensource-src-${QT_VERSION}"
 
-#Download tar and unpack
-if [ ! -f ${DOWNLOAD_DIR}/${QT_TAR} ]; then
-  cd ${DOWNLOAD_DIR}
-  wget ${QT_DOWNLOAD}
-fi
+    #Download tar and unpack
+    if [ ! -f ${DOWNLOAD_DIR}/${QT_TAR} ]; then
+	cd ${DOWNLOAD_DIR}
+	wget ${QT_DOWNLOAD}
+    fi
 
-if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
-  #Building QT
-  rm -rf ${QT_SOURCE_DIR}
-  cd ${BUILD_DIR}
-  tar xzf ${DOWNLOAD_DIR}/${QT_TAR}
+    if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
+	#Building QT
+	rm -rf ${QT_SOURCE_DIR}
+	cd ${BUILD_DIR}
+	tar xzf ${DOWNLOAD_DIR}/${QT_TAR}
 
-  cd ${QT_SOURCE_DIR}
-  ./configure --prefix=${STAGING_QT}  -opensource -confirm-license \
-      -no-javascript-jit -no-webkit -no-script -no-scripttools \
-      -no-sql-sqlite3 -no-accessibility
-  make -j ${MAKE_JOBS}
-  make install
-  touch ${QT_SOURCE_DIR}/.built
+	cd ${QT_SOURCE_DIR}
+	./configure --prefix=${STAGING_QT}  -opensource -confirm-license \
+	    -no-javascript-jit -no-webkit -no-script -no-scripttools \
+	    -no-sql-sqlite3 -no-accessibility
+	make -j ${MAKE_JOBS}
+	make install
+	touch ${QT_SOURCE_DIR}/.built
+    fi
 fi
 
 PARAVIEW_BUILD="${BUILD_DIR}/paraview"
@@ -121,10 +129,6 @@ PARAVIEW_SOURCE="ParaView-v${PARAVIEW_VERSION}.tar.gz"
 PARAVIEW_DATA="ParaViewData-v${PARAVIEW_VERSION}.tar.gz"
 PARAVIEW_DOWNLOAD="http://www.paraview.org/files/v${PARAVIEW_MAJOR_VERSION}"
 cd ${DOWNLOAD_DIR}
-#if [ ! -f ${PARAVIEW_DATA} ]; then # download examples and tutorials
-#    wget -O ${DOWNLOAD_DIR}/${PARAVIEW_DATA} --no-check-certificate \
-#        ${PARAVIEW_DOWNLOAD}/${PARAVIEW_DATA}
-#fi
 
 if [ ! -f ${PARAVIEW_SOURCE} ]; then
     wget -O ${DOWNLOAD_DIR}/${PARAVIEW_SOURCE} --no-check-certificate \
@@ -134,32 +138,34 @@ fi
 if [ ! -d ${PARAVIEW_SOURCE_DIR} ]; then
     cd ${BUILD_DIR}
     tar xzf ${DOWNLOAD_DIR}/${PARAVIEW_SOURCE}
-#    tar xzf ${DOWNLOAD_DIR}/${PARAVIEW_DATA}
-# See https://github.com/OpenFOAM/ThirdParty-dev/blob/master/README.org
-#    patch -p2 -d ${PARAVIEW_SOURCE_DIR} < \
-#        ${BUILDROOT}/src/patches/paraview-ui_pqExportStateWizard.patch
-#    patch -p1 -d ${PARAVIEW_SOURCE_DIR} < \
-#        ${BUILDROOT}/src/patches/paraview-vtk-storage-mkostemp.patch
+    # Ignore git describe tags as we are building ParaView from tar.gz
+    sed -i -e "/^determine_version/d" ${PARAVIEW_SOURCE_DIR}/CMakeLists.txt
 fi
 
 
-#Configure and build paraview
+#Configure and build ParaView
 if [ ! -e   ${PARAVIEW_BUILD}/.built ]; then
     rm -rf ${PARAVIEW_BUILD}
     install -d ${PARAVIEW_BUILD}
     cd ${PARAVIEW_BUILD}
 
+    if [ ${QT_VERSION%%.*} = 5 ]
+	then VTK_RENDERING_BACKEND=OpenGL2
+	else VTK_RENDERING_BACKEND=OpenGL
+    fi
+
     install -d ${STAGING_PARAVIEW}
     ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Release \
-	-DVTK_RENDERING_BACKEND:STRING=OpenGL \
-	-DPARAVIEW_QT_VERSION:STRING=4 \
+	-DVTK_RENDERING_BACKEND:STRING=${VTK_RENDERING_BACKEND} \
+	-DPARAVIEW_QT_VERSION:STRING=${QT_VERSION%%.*} \
+	-DVTK_QT_VERSION:STRING=${QT_VERSION%%.*} \
         -DBUILD_SHARED_LIBS:BOOL=ON  \
         -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
         -DBUILD_TESTING:BOOL=OFF \
         -DPARAVIEW_ENABLE_PYTHON:BOOL=ON \
         -DCMAKE_Fortran_COMPILER:STRING=ifort \
         -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_QT}/bin/qmake \
-        -DCMAKE_EXE_LINKER_FLAGS:STRING="-L${STAGING_QT}/lib" \
+        -DCMAKE_EXE_LINKER_FLAGS:STRING="-L${STAGING_QT}/lib -Wl,-rpath -Wl,${STAGING_QT/lib}" \
         -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
 	${PARAVIEW_EXTRA_FLAGS} ${PARAVIEW_SOURCE_DIR}
     find .  -name link.txt -exec \
@@ -172,7 +178,7 @@ if [ ! -e   ${PARAVIEW_BUILD}/.built ]; then
     touch .built
 fi
 
-PARAVIEW_DOC_VERSION=${PARAVIEW_DOC_VERSION:-${PARAVIEW_VERSION}}
+PARAVIEW_DOC_VERSION=${PARAVIEW_DOC_VERSION:-${PARAVIEW_MAJOR_VERSION}.0}
 STAGING_DOC=${STAGING_PARAVIEW}/share/paraview-${PARAVIEW_MAJOR_VERSION}/doc
 install -d ${STAGING_DOC}
 for file in ParaViewGettingStarted-${PARAVIEW_DOC_VERSION%-*}.pdf \
