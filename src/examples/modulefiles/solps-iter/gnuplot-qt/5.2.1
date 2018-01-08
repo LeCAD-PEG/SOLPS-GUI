@@ -1,0 +1,58 @@
+#%Module1.0###################################################################
+## Module for use under SOLPS-ITER modules
+##
+set ver [lindex [split $ModulesCurrentModulefile / ] end ]
+set name [lindex [split $ModulesCurrentModulefile / ] end-1 ]
+set loading [module-info mode load]
+set imas_home /work/imas
+#set fn [join [lrange [split $ModulesCurrentModulefile / ] 0 end-1 ] / ]/.desc
+#set desc [join [read [open $fn ]]]
+#proc ModulesHelp { } {
+#puts stderr "\tThis module sets the environment for $name v$ver"
+#}
+conflict $name
+#module-whatis "$desc (v$ver)"
+set prefix $::env(SOLPSTOP)/modules/solps-gui/staging
+
+# automatically added environment variables:
+# These variables *must* be defined! Please, check & uncomment
+setenv GNUPLOT_PREFIX     "$prefix"
+
+prepend-path PYTHONPATH "$prefix/lib/python3.6/site-packages"
+# actions on default environment variables:
+ prepend-path PATH     "$prefix/bin"
+# prepend-path LIBPATH  "$prefix/lib"
+# prepend-path LD_LIBRARY_PATH  "$prefix/lib"
+ prepend-path MANPATH  "$prefix/share/man"
+
+#module-whatis "$desc (v$ver.$minor)"
+
+
+
+proc ModulesHelp {} {
+  puts stderr "modulefile \"[module-info name]\""
+  puts stderr {
+module name: gnuplot-qt
+
+comment:     None
+
+brief description: Gnuplot with Qt terminal for SOLPS GUI etc.
+
+---------------------------------------------------------------------
+License type: free
+Web site:     http://www.gnuplot.info/
+---------------------------------------------------------------------
+
+Gnuplot is a portable command-line driven graphing utility.
+
+It supports many different types of 2D and 3D plots, and many different
+types of output:
+
+Interactive screen display: cross-platform (Qt, x11) or system-specific
+direct output to file: postscript (including eps), pdf, LaTeX, metafont,
+emf, svg, ... web display formats: svg
+
+}
+
+  return 0
+}

@@ -1,0 +1,1 @@
+This is a paraview plugin for reading EDGE data. If ParaView 5.4.1 is loaded then the plugins directory is added to PV_PLUGIN_PATH.

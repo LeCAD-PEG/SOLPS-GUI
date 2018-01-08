@@ -1,0 +1,17 @@
+#%Module1.0###################################################################
+## Module for use under SOLPS-ITER modules
+##
+set ver [lindex [split $ModulesCurrentModulefile / ] end ]
+set name [lindex [split $ModulesCurrentModulefile / ] end-1 ]
+set loading [module-info mode load]
+set imas_home /work/imas
+set fn [join [lrange [split $ModulesCurrentModulefile / ] 0 end-1 ] / ]/.desc
+set desc [join [read [open $fn ]]]
+proc ModulesHelp { } {
+puts stderr "\tThis module sets the environment for $name v$ver"
+}
+conflict $name
+module-whatis "$desc (v$ver)"
+
+setenv PARAVIEW_VERSION $ver
+prepend-path PATH $::env(SOLPSTOP)/modules/solps-gui/staging/paraview/$ver/bin

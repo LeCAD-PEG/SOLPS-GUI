@@ -1,0 +1,38 @@
+#%Module1.0###################################################################
+## Module for use under SOLPS-ITER modules
+##
+set ver [lindex [split $ModulesCurrentModulefile / ] end ]
+set name [lindex [split $ModulesCurrentModulefile / ] end-1 ]
+set loading [module-info mode load]
+set imas_home /work/imas
+set fn [join [lrange [split $ModulesCurrentModulefile / ] 0 end-1 ] / ]/.desc
+set desc [join [read [open $fn ]]]
+proc ModulesHelp { } {
+puts stderr "\tThis module sets the environment for $name v$ver"
+}
+conflict $name
+module-whatis "$desc (v$ver)"
+
+if { ! [ is-loaded imas ] } {
+  module load imas
+}
+
+module-whatis "$desc (v$ver)"
+
+prereq imas
+
+set solpsguihome  $::env(SOLPSTOP)/modules/solps-gui
+
+setenv SOLPSGUI $solpsguihome/src/gui
+
+prepend-path PYTHONPATH $solpsguihome/src/widgets
+prepend-path PYQTDESIGNERPATH $solpsguihome/src/plugins/designer
+
+set xdg_runtime_dir /tmp/solps-gui-xdg-$::env(USER)
+setenv XDG_RUNTIME_DIR $xdg_runtime_dir
+system install -d -m 0700 $xdg_runtime_dir
+
+set-alias solps {python3 \$SOLPSGUI/solps.py $*}
+set-alias solps_doc "xdg-open $solpsguihome/doc/build/html/index.html"
+set-alias eirene "python3 -m eirene $*"
+set-alias b2 "python3 -m b2 $*"
