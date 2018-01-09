@@ -246,8 +246,8 @@ class B2InputFiles(TcshProcess):
                     left, right = text.split("&B2InputFiles", 1)
                     center, right = right.split("&", 1)
 
-                    text = left + "&B2InputFiles\n" +'\n'.join(b2lines) + \
-                           "\n&" + right
+                    text = left + "&B2InputFiles\n" + '\n'.join(b2lines) + \
+                        "\n&" + right
 
                 else:
                     logging.info("No b2 block found in .status file!")
@@ -372,8 +372,7 @@ class B2InputFiles(TcshProcess):
 
         self.storeStatusFile(oldRunDir)
         self.readStatusFile(runDir)
-
-        oldSolpsTop = self.tcsh.findSolpsTop(oldRunDir)
+        oldSolpsTop = self.tcsh.findSolpsTop(oldRunDir) if oldRunDir else ''
         newSolpsTop = self.tcsh.findSolpsTop(runDir)
         super(B2InputFiles, self).setRunDir(runDir)
 

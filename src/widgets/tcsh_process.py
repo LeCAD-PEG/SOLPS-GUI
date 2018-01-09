@@ -146,7 +146,6 @@ class Tcsh(QProcess):
             solps_top(str): if found stup.csh or SOLPSTOP file. Else None
         """
         solpsTop = directory
-
         while(solpsTop):
             path = solpsTop + '/setup.csh'
             if os.path.exists(path) and os.access(path, os.R_OK):
