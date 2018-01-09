@@ -1,5 +1,5 @@
 
-.. _imas-howto:
+.. _ids-howto:
 
 .. highlight:: csh
 
@@ -38,7 +38,7 @@ These switches can be manually added to the b2mn.dat file or can be written
 inside SOLPS-GUI columns for the currently selected run. When such an edit
 happens, the b2mn.dat file is automatically updated accordingly.
 
-.. image:: imas_1.png
+.. image:: ids_1.png
    :align: center
 
 To edit the columns, double click it and to activate the edit mode of the
@@ -54,7 +54,7 @@ With the `Get IDS` button you can retrieve a runs input files. When you click
 the `Get IDS` button a dialog opens, prompting you for the shot number,
 run number, user name, machine, version number and for a new run name.
 
-.. image :: imas_2.png
+.. image :: ids_2.png
    :align: center
 
 The run name is the name for the directory to which the data is saved. Be
