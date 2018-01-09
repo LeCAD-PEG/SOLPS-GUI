@@ -44,7 +44,10 @@ happens, the b2mn.dat file is automatically updated accordingly.
 To edit the columns, double click it and to activate the edit mode of the
 field.
 
-For now only the input files are stored.
+When using this function, the ``b2_ual_write`` is called, which saves the
+**last state** of the run into an IDS whose descriptors are the ``b2mndr_id*``
+switches. Also the input files for the run are stored inside the IDS under the
+code.parameters attribute.
 
 
 Get IDS
@@ -65,5 +68,4 @@ the top dir and not inside another runs directory.
 When you click ok, the data is fetched and saved to the directory with the run
 name you provided inside the dialog.
 
-Since the `Put IDS` function only save the input files, the `Get IDS` function
-also retrieves only input files.
+The Get IDS creates a new run directory which will contain only input files.

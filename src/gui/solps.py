@@ -51,9 +51,6 @@ from PyQt5.uic import loadUi
 
 from addmenu import AddMenu
 
-# import put_edge_ids
-# import get_edge_ids
-
 REDIRECT_STDOUT_TO_LOG = False
 
 
@@ -494,7 +491,6 @@ class RetrieveRunsFolderInfo(QThread):
         progress(pyqtSignal(str)): Directory that is being processed
         statusChanged (pyqtSignal(QModelIndex, QModelIndex)) :
             Changed index range for table view update
-
     """
     status = pyqtSignal(str)
     progress = pyqtSignal(str)
@@ -604,7 +600,6 @@ class RetrieveRunsFolderInfo(QThread):
             # data[Column.label] = static_data[0]
             # Simulate delays with self.msleep(100)
             # Fill in static data into the columns that follow
-
             # Emit the range of columns that changed in the model
             self.statusChanged.emit(date_index, shot_index)
             self.progress.emit(path)
@@ -1129,9 +1124,17 @@ class SOLPS_MainWindow(QMainWindow):
         log_receiver(LogReceiver) : Receiving messages from logging thread.
         stdout_thread(QThread) : Redirected sys.stdout to Log tab.
         stdout_receiver(LogReceiver): Receiver for stdout thread.
+        b2_user (pyqtSignal(str)): Emits the string for user value
+        b2_run_number (pyqtSignal(str)): Emits the string for run value
+        b2_shot_number (pyqtSignal(str)): Emits the string for shot value
+        b2_device (pyqtSignal(str)): Emits the string for device value
     """
 
     runSelected = pyqtSignal(str)
+    b2_user = pyqtSignal(str)
+    b2_run_number = pyqtSignal(str)
+    b2_shot_number = pyqtSignal(str)
+    b2_device = pyqtSignal(str)
 
     def __init__(self, *args):
         super(SOLPS_MainWindow, self).__init__(*args)
@@ -1283,6 +1286,12 @@ class SOLPS_MainWindow(QMainWindow):
         # Activate debugging on DivGeo widget
         # self.divgeo.activateDebugging()
 
+        # Connect id signals to put_edge_ids object (solps.ui)
+        self.b2_device.connect(self.put_edge_ids.setDevice)
+        self.b2_user.connect(self.put_edge_ids.setUser)
+        self.b2_run_number.connect(self.put_edge_ids.setRun)
+        self.b2_shot_number.connect(self.put_edge_ids.setShot)
+
     @pyqtSlot()
     def on_pushButton_Archive_clicked(self):
         """ Selecting directory and pressing Archive will add
@@ -1378,6 +1387,32 @@ class SOLPS_MainWindow(QMainWindow):
             model = self.proxyModel
             index_path = model.index(index.row(), Column.path, index.parent())
             path = model.data(index_path, Qt.DisplayRole)
+
+            index_user = model.index(index.row(), Column.user, index.parent())
+            user = model.data(index_user, Qt.DisplayRole)
+
+            if user:
+                self.b2_user.emit(user)
+
+            index_device = model.index(index.row(), Column.device,
+                                       index.parent())
+            device = model.data(index_device, Qt.DisplayRole)
+            if device:
+                self.b2_device.emit(device)
+
+            index_run = model.index(index.row(), Column.run, index.parent())
+            run = model.data(index_run, Qt.DisplayRole)
+
+            if run:
+                self.b2_run_number.emit(run)
+
+            index_shot = model.index(index.row(), Column.shot, index.parent())
+            shot = model.data(index_shot, Qt.DisplayRole)
+
+            if shot:
+                self.b2_shot_number.emit(shot)
+
+
             self.runSelected.emit(path)
 
     @pyqtSlot()
@@ -1697,7 +1732,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     # app.setStyle("windows")
     main_window = SOLPS_MainWindow()
-    # Activate or deactivate PutIds/GetIds
     main_window.show()
     code = app.exec_()
     app.quit()
