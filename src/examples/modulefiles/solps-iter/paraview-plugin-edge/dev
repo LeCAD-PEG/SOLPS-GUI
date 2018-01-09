@@ -1,17 +1,17 @@
-#%Module1.0#####################################################################
+#%Module1.0###################################################################
+## Module for use under SOLPS-ITER modules
 ##
-## $name modulefile
-##
-set ver [lrange [split [ module-info name ] / ] 1 1 ]
-set name [lrange [split [ module-info name ] / ] 0 0 ]
-
-
+set ver [lindex [split $ModulesCurrentModulefile / ] end ]
+set name [lindex [split $ModulesCurrentModulefile / ] end-1 ]
 set loading [module-info mode load]
-
+set imas_home /work/imas
+set fn [join [lrange [split $ModulesCurrentModulefile / ] 0 end-1 ] / ]/.desc
+set desc [join [read [open $fn ]]]
 proc ModulesHelp { } {
 puts stderr "\tThis module sets the environment for $name v$ver"
 }
 conflict $name
+module-whatis "$desc (v$ver)"
 
 # Checking if paraview is loaded.
 if { ! [ is-loaded paraview ] } { 
@@ -28,4 +28,21 @@ if { ! [ is-loaded imas ] } {
 set paraview_version $::env(PARAVIEW_VERSION)
 set imas_version $::env(IMAS_VERSION)
 
-prepend-path PV_PLUGIN_PATH /home/ITER/kosl/solps-gui/staging/paraview-plugins/$paraview_version/$imas_version
+if { [file exists /home/ITER/kosl/solps-gui ] } {
+   set solpsguidir /home/ITER/kosl/solps-gui
+} elseif { [file exists /pfs/work/g2kosl/solps-gui ] } {
+   set solpsguidir /pfs/work/g2kosl/solps-gui
+} elseif { [file exists $::env(USER)/solps-gui } {
+   set solpsguidir $::env(USER)/solps-gui
+} else {
+   set solpsguidir $::env(SOLPSTOP)/modules/solps-gui
+}
+
+set pluginsdir  $solpsguidir/staging/paraview-plugins
+set plugindir $pluginsdir/$paraview_version/$imas_version
+if { [file exists $plugindir/libReadUALEdge.so] } {
+	prepend-path PV_PLUGIN_PATH  $plugindir
+} else {
+	puts stderr "Warning: Missing $plugindir/libReadUALEdge.so"
+	puts stderr "Try to rebuild it with 'cd $solpsguidir && ./build-paraview-plugin.sh'"
+}

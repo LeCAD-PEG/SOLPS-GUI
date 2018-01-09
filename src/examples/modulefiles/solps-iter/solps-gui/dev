@@ -1,6 +1,5 @@
 #%Module1.0###################################################################
-##
-## $name modulefile
+## Module for use under SOLPS-ITER modules
 ##
 set ver [lindex [split $ModulesCurrentModulefile / ] end ]
 set name [lindex [split $ModulesCurrentModulefile / ] end-1 ]
@@ -16,28 +15,28 @@ module-whatis "$desc (v$ver)"
 
 if { ! [ is-loaded imas ] } {
   module load imas
-  # module unload Anaconda3
 }
 
 module-whatis "$desc (v$ver)"
 
-if { ! [ is-loaded python/3.6 ] } {
-  module load python/3.6/3
-}
-
-prereq python/3.6
 prereq imas
 
-set solpsguihome /home/ITER/kosl/solps-gui
+if { [file exists /home/ITER/kosl/solps-gui ] } {
+   set solpsguidir /home/ITER/kosl/solps-gui
+} elseif { [file exists /pfs/work/g2kosl/solps-gui ] } {
+   set solpsguidir /pfs/work/g2kosl/solps-gui
+} elseif { [file exists $::env(USER)/solps-gui } {
+   set solpsguidir $::env(USER)/solps-gui
+} else {
+   set solpsguidir $::env(SOLPSTOP)/modules/solps-gui
+}
+
+set solpsguihome  $solpsguidir
 
 setenv SOLPSGUI $solpsguihome/src/gui
 
 prepend-path PYTHONPATH $solpsguihome/src/widgets
 prepend-path PYQTDESIGNERPATH $solpsguihome/src/plugins/designer
-
-#setenv LD_PRELOAD /usr/lib64/libfontconfig.so.1
-
-#prepend-path PYTHONPATH $::env(IMAS_PREFIX)/python/lib
 
 set xdg_runtime_dir /tmp/solps-gui-xdg-$::env(USER)
 setenv XDG_RUNTIME_DIR $xdg_runtime_dir

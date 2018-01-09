@@ -20,11 +20,19 @@ if { ! [ is-loaded paraview ] } {
 if { ! [ is-loaded blitz/10 ] } {
   module load blitz/0.10
 }
+
 if { ! [ is-loaded imas ] } {
   module load imas
 }
 
 set paraview_version $::env(PARAVIEW_VERSION)
 set imas_version $::env(IMAS_VERSION)
-
-prepend-path PV_PLUGIN_PATH  $::env(SOLPSTOP)/modules/solps-gui/staging/paraview-plugins/$paraview_version/$imas_version
+set solpsguidir $::env(SOLPSTOP)/modules/solps-gui
+set pluginsdir  $solpsguidir/staging/paraview-plugins
+set plugindir $pluginsdir/$paraview_version/$imas_version
+if { [file exists $plugindir/libReadUALEdge.so] } {
+	prepend-path PV_PLUGIN_PATH  $plugindir
+} else {
+	puts stderr "Warning: Missing $plugindir/libReadUALEdge.so"
+	puts stderr "Try to rebuild it with 'cd $solpsguidir && ./build-paraview-plugin.sh'"
+}
