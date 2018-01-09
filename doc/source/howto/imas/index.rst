@@ -2,9 +2,9 @@
 
 .. highlight:: csh
 
-=======================
- IMAS HOWTO
-=======================
+======
+ IMAS 
+======
 
 
 :Author: Dejan Penko, University of Ljubljana

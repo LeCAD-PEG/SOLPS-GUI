@@ -3,9 +3,9 @@
 
 .. highlight:: csh
 
-==================
-Input editor HOWTO
-==================
+============
+Input editor
+============
 
 :Author: Gregor Simič, University of Ljubljana
 

@@ -58,7 +58,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'SOLPS GUI'
-copyright = '2015, 2016, 2017, Leon Kos'
+copyright = '2015-2018, Leon Kos'
 author = 'Leon Kos'
 
 # The version info for the project you're documenting, acts as replacement for

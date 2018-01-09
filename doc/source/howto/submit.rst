@@ -2,9 +2,9 @@
 
 .. _submission-howto:
 
-====================
-Run Submission HOWTO
-====================
+==============
+Run Submission
+==============
 
 :Author: Leon Kos
 
@@ -30,6 +30,7 @@ Scripts that ease submission are site dependent:
  * sgesubmit
  * mephisubmit
  * spbstusubmit
+ * leuvensubmit
 
 and they all look for ``QSUB.*`` templates that should resist in
 ``${SOLPSTOP}/runs`` directories. Different runs can have additional

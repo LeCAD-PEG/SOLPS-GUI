@@ -2,9 +2,9 @@
 
 .. highlight:: csh
 
-=========================
-SOLPS-GUI Tunneling HOWTO
-=========================
+===================
+SOLPS-GUI Tunneling
+===================
 
 :Author: Leon Kos
 

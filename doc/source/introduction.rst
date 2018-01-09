@@ -234,9 +234,10 @@ post-processing.
 -  ``b2plot`` - Designed to take data from B2, B2.5 or B2.5-EIRENE and
    plot it under interactive control.
 
--  ``b2ts`` - An example post-processing program. it reads the basic
+-  ``b2ts`` - An example post-processing program. It reads the basic
    output files produced by b2mn and prints some simple geometric
    quantities.
+-  ``b2_ual_write`` - Writes IDS structures to IMAS database.
 
 -  ``b2yg`` - It reads and displays the geometry and magnetic field.
 

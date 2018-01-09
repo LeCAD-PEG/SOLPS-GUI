@@ -2,9 +2,9 @@
 
 .. highlight:: csh
    
-=======================
-ParaView Catalyst HOWTO
-=======================
+=================
+ParaView Catalyst
+=================
 
 
 :Author: Jure Bartol, University of Ljubljana

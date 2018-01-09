@@ -2,9 +2,9 @@
 
 .. highlight:: csh
 
-======================
-SOLPS-GUI Plugin HOWTO
-======================
+================
+SOLPS-GUI Plugin
+================
 
 :Author: Leon Kos
 
