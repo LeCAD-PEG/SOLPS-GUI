@@ -1,6 +1,7 @@
 #!/bin/sh -x
 
 PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.1}
+FORTRAN_COMPILER_FOR_CATALYST=${FORTRAN_COMPILER_FOR_CATALYST:-ifort}
 CMAKE_VERSION=3.10.1
 
 case $(hostname -f) in
@@ -9,13 +10,6 @@ case $(hostname -f) in
 	module load GCC/4.8.3 binutils/2.25 intel/12.0.2
 	module load Python/2.7.3-goolf-1.5.16
 	module load OpenSSL/1.0.2g-GCC-4.8.3
-	#module load Python/2.7.9-gompi-1.5.16-bare
-	#module load imas/3.10.1/ual/3.6.0 blitz/0.10 binutils/2.25
-        #module load OpenSSL/1.0.2g-GCC-4.8.3
-        #module load Python/2.7.9-goolf-1.5.16 # overwrite Anaconda
-	#module load libpng/1.6.12-goolf-1.5.16 # needed for Qt4.8.7
-	#module load freetype/2.6.2-goolf-1.5.16
-	#module load fontconfig/2.11.94-goolf-1.5.16
 	export CC=gcc
 	export CXX=g++
         CMAKE_EXTRA_FLAGS=${CMAKE_EXTRA_FLAGS:-\
@@ -45,7 +39,7 @@ esac
 QT_VERSION=${QT_VERSION:-4.8.7}
 MAKE_JOBS=${MAKE_JOBS:-4}
 
-BUILDROOT=${PWD}
+BUILDROOT=$(cd ${0%/*} && echo ${PWD})
 BUILD_DIR=${BUILDROOT}/build
 DOWNLOAD_DIR=${DOWNLOAD_DIR:-${BUILDROOT}/download}
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
@@ -65,31 +59,10 @@ CMAKE_TEST=$(hash cmake 2> /dev/null && cmake --version \
 if [ "${CMAKE_TEST}0" -ge 350 ]
  then CMAKE=cmake
  else CMAKE=${STAGING_DIR}/cmake/${CMAKE_VERSION}/bin/cmake
+ CMAKE_VERSION=${CMAKE_VERSION} MAKE_JOBS=${MAKE_JOBS} ./build-cmake.sh
 fi
 
 set -e
-
-# Install cmake as needed
-CMAKE_SRC_DIR="${BUILD_DIR}/cmake-${CMAKE_VERSION}"
-CMAKE_INSTALL_DIR="${STAGING_DIR}"/cmake/${CMAKE_VERSION}
-if [ ${CMAKE} != cmake -a  ! -e  ${CMAKE_SRC_DIR}/.built ]; then
-  CMAKE_SRC="cmake-${CMAKE_VERSION}.tar.gz"
-  CMAKE_MAIN_VERSION=${CMAKE_VERSION%.*}
-  CMAKE_SITE="https://cmake.org/files/v${CMAKE_MAIN_VERSION}"
-  CMAKE_DOWNLOAD="${CMAKE_SITE}/cmake-${CMAKE_VERSION}.tar.gz"
-  if [ ! -f ${DOWNLOAD_DIR}/${CMAKE_SRC} ]; then
-     wget  -O ${DOWNLOAD_DIR}/${CMAKE_SRC} --no-check-certificate \
-	 ${CMAKE_DOWNLOAD}
-  fi
-  rm -rf ${CMAKE_SRC_DIR}
-  cd ${BUILD_DIR}
-  tar xzf ${DOWNLOAD_DIR}/${CMAKE_SRC}
-  cd ${CMAKE_SRC_DIR}
-  ./bootstrap --prefix=${STAGING_DIR} -- ${CMAKE_EXTRA_FLAGS}
-  make -j ${MAKE_JOBS} VERBOSE=1
-  make install
-  touch ${CMAKE_SRC_DIR}/.built
-fi
 
 #Install QT if needed
 if ! test -x ${STAGING_QT}/bin/qmake ; then
@@ -163,7 +136,7 @@ if [ ! -e   ${PARAVIEW_BUILD}/.built ]; then
         -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
         -DBUILD_TESTING:BOOL=OFF \
         -DPARAVIEW_ENABLE_PYTHON:BOOL=ON \
-        -DCMAKE_Fortran_COMPILER:STRING=ifort \
+        -DCMAKE_Fortran_COMPILER:STRING=${FORTRAN_COMPILER_FOR_CATALYST} \
         -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_QT}/bin/qmake \
         -DCMAKE_EXE_LINKER_FLAGS:STRING="-L${STAGING_QT}/lib -Wl,-rpath -Wl,${STAGING_QT/lib}" \
         -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
