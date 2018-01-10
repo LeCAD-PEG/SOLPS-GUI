@@ -3,7 +3,7 @@
 QT_VERSION=${QT_VERSION:-5.9.1}
 PYTHON_VERSION=${PYTHON_VERSION:-3.6.4}
 
-BUILDROOT=${PWD}
+BUILDROOT=$(cd ${0%/*} && echo ${PWD})
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 QTDIR=${STAGING_DIR}/qt/${QT_VERSION}
 
@@ -17,7 +17,7 @@ OBJECTS_DIR=${OBJECTS_DIR:-${BUILDROOT}/build/gnuplotWidget}
 case $(hostname -f) in
     *.iter.org)
         module purge
-        module load GCC
+        module load GCC/4.8.3 binutils/2.25
         MAKE_JOBS=${MAKE_JOBS:-4}
         ;;
    *.marconi.cineca.it)
