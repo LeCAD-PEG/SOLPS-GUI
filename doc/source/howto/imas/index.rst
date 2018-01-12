@@ -2865,7 +2865,7 @@ the data of results. The main objective of the work in this section is
 to extract the required data [22]_ based on these "plasma state" files
 and properly [23]_ store the data to *edge_profiles* IDS. The B2.5
 plasma simulation output files and their edge plasma data covered in
-this chapter are (only regarding the **put_edge_ids**,  **b2_ual_write_archive**
+this chapter are (only regarding the **put_edge_ids**,  **b2_ual_write_deprecated**
 and **b2_ual_write_gsl** tool):
 
 -  **b2fgmtry**, holding data on edge geometry, and
@@ -2884,7 +2884,7 @@ principles as already previously discussed ``cpo2ids`` tool covered in
    step-by-step method of writing edge data to *edge_profiles*
    IDS,
 
--  **b2_ual_write_archive**, written in Fortran90 programming language. Same as previous
+-  **b2_ual_write_deprecated**, written in Fortran90 programming language. Same as previous
    tool this one too uses step-by-step method of writing edge data to
    *edge_profiles* IDS,
 
@@ -2929,28 +2929,28 @@ discussed tools is as follows:
 .. figure:: images/b2_data_to_IDS_schema.*
    :alt:  Data transfer of B2.5 plasma simulation results to
           *edge_profiles* IDS process schema. Note: This schema presents only
-          *put_edge_ids*, *b2_ual_write_archive* and *b2_ual_write_gsl* tools, but
+          *put_edge_ids*, *b2_ual_write_deprecated* and *b2_ual_write_gsl* tools, but
           the main concept is the same also for the *b2_ual_write_b2mod* tool
           (while this latest tool deals with many more data files etc.).
 
    Data transfer of B2.5 plasma simulation results to *edge_profiles*
    IDS process schema. Note: This schema presents only
-   *put_edge_ids*, *b2_ual_write_archive* and *b2_ual_write_gsl* tools, but
+   *put_edge_ids*, *b2_ual_write_deprecated* and *b2_ual_write_gsl* tools, but
    the main concept is the same also for the *b2_ual_write_b2mod* tool
    (while this latest tool deals with many more data files etc.).
 
-In the continuation of this chapter, a review of **b2_ual_write_archive** and
+In the continuation of this chapter, a review of **b2_ual_write_deprecated** and
 **b2_ual_write_gsl** code is presented. Full source codes of
-**put_edge_ids.py**, **b2_ual_write_archive.f90**,
+**put_edge_ids.py**, **b2_ual_write_deprecated.f90**,
 **b2_ual_write_gsl** and **b2_ual_write_b2mod** are available in the directory
 *SOLPS-GUI/src/widgets* and *B2.5/src/ids*.
 
 .. _sec-b25_write_tools:
 
-b2_ual_write_archive and b2_ual_write_gsl tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+b2_ual_write_deprecated and b2_ual_write_gsl tools
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The basic code structure of both ``b2_ual_write_archive`` and
+The basic code structure of both ``b2_ual_write_deprecated`` and
 ``b2_ual_write_gsl`` tools is identical, and it consists of the next
 essential subroutines:
 
@@ -2968,7 +2968,7 @@ essential subroutines:
    obtained by previously mentioned subroutines, to *edge_profiles* IDS.
 
 The difference between those two tools is in the
-``write_ids_edge_profiles`` subroutine, where the ``b2_ual_write_archive`` tool
+``write_ids_edge_profiles`` subroutine, where the ``b2_ual_write_deprecated`` tool
 uses the step-by-step method, manually setting and writing the data to
 IDS, while ``b2_ual_write_gsl`` tools uses Fortran90 *Grid Service
 Library* (GSL) and its routines to accomplish the same task. The latest
@@ -3210,7 +3210,7 @@ b2_ual_write_b2mod tool
 This code is used to generate b2_ual_write_b2mod.exe
 (main program), which is a post-processor for B2. It
 is the latest and the most advanced B2.5 writer. It was developed using
-the experience and concepts gained while developing the *b2_ual_write_archive*
+the experience and concepts gained while developing the *b2_ual_write_deprecated*
 and *b2_ual_write_gsl* tools. Same as the previous two tools it is written in
 Fortran90 programing language. It uses ported **IDS b2mod** routines that were
 originally designed to work only with the CPOs, and those **b2mod** routines
@@ -3466,7 +3466,7 @@ developed. This plugin was designed for analysis and visualization of 2D
 edge plasma data, stored in *edge_profiles* IDS, as shown in Fig.
 `fig-readualedge_visualization_process_scheme`. The data in
 *edge_profiles* IDS holds data stored beforehand by either ``cpo2ids``
-converter, ``put_edge_ids`` tool, ``b2_ual_write_archive`` /
+converter, ``put_edge_ids`` tool, ``b2_ual_write_deprecated`` /
 ``b2_ual_write_gsl`` tool, SOLPS-ITER code suite etc., however, it
 allows the visualization of any other *edge* plasma data, under the
 condition that the data is properly stored in the *edge_profiles* IDS
@@ -4471,8 +4471,8 @@ plasma data from CPO to IDS is possible, opening new way of potential
 use of the existing CPO cases and confirming the IDS as a more than
 suitable successor of the CPO, producing some of the first IDS cases
 containing the edge plasma data in the process. The same goes for the
-IDS tools ``put_edge_ids``, ``b2_ual_write_archive``, ``b2_ual_write_gsl`` and,
-the most advanced tool, ``b2_ual_write_b2mod``,
+IDS tools ``put_edge_ids``, ``b2_ual_write_deprecated``, ``b2_ual_write_gsl``
+and, the most advanced tools, ``b2_ual_write_b2mod`` and ``b2_ual_write``,
 developed with the intent of writing the B2.5 simulation output results
 IDS, providing the means of storing the most recent edge data to IDS
 from other sources other than pre-existing CPOs. Furthermore, all of the
