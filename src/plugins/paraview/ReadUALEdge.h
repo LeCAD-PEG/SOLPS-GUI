@@ -31,14 +31,17 @@ class ReadUALEdge : public vtkMultiBlockDataSetAlgorithm
     vtkGetMacro(Run,int);
     vtkSetMacro(Run,int);
 
-    vtkGetMacro(CPOLoad,int);
-    vtkSetMacro(CPOLoad,int);
+    vtkGetMacro(IDSList,int);
+    vtkSetMacro(IDSList,int);
 
     vtkSetStringMacro(User);
     vtkGetStringMacro(User);
 
     vtkSetStringMacro(Device);
     vtkGetStringMacro(Device);
+
+    vtkSetStringMacro(LoadIDS);
+    vtkGetStringMacro(LoadIDS);
 
 protected:
     ReadUALEdge();
@@ -47,10 +50,11 @@ protected:
     int Shot;
     int Run;
     int RefRun;
-    int CPOLoad;
+    int IDSList;
     char * User;
     char * Device;
     char * Version;
+    char * LoadIDS;
     vtkSmartPointer<vtkStringArray> stringArray;
 
     int RequestData(vtkInformation *, vtkInformationVector **,

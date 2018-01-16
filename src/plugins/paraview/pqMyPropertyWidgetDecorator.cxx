@@ -47,10 +47,10 @@ pqMyPropertyWidgetDecorator::pqMyPropertyWidgetDecorator(
     : Superclass(config, parentObject)
 {
     vtkSMProxy* proxy = parentObject->proxy();
-    vtkSMProperty* prop = proxy? proxy->GetProperty("CPOLoad") : NULL;
+    vtkSMProperty* prop = proxy? proxy->GetProperty("IDSList") : NULL;
     if (!prop)
     {
-        qDebug("Could not locate property named 'CPOLoad'. "
+        qDebug("Could not locate property named 'IDSList'. "
         "pqMyPropertyWidgetDecorator will have no effect.");
         return;
     }
@@ -83,7 +83,7 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
 {
     pqPropertyWidget* parentObject = this->parentWidget();
     vtkSMProxy* proxy = parentObject->proxy();
-    vtkSMProperty* prop = proxy? proxy->GetProperty("CPOLoad") : NULL;
+    vtkSMProperty* prop = proxy? proxy->GetProperty("IDSList") : NULL;
     if (prop)
     {
         double value = vtkSMUncheckedPropertyHelper(prop).GetAsInt();
@@ -93,10 +93,10 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
         }
     }
 
-    // Extracting available Shot/Runs from the user, defined in the 
-    // "User" text box, and adding them to the Shot/Run list 
+    // Extracting available Shot/Runs from the user, defined in the
+    // "User" text box, and adding them to the Shot/Run list
     vtkSMProperty* prop_user = proxy? proxy->GetProperty("User") : NULL;
-    vtkSMStringVectorProperty* prop_user_strVec = 
+    vtkSMStringVectorProperty* prop_user_strVec =
         dynamic_cast<vtkSMStringVectorProperty*>(proxy->GetProperty("User"));
     std::vector<std::string> UserShotRunList;
 
@@ -117,7 +117,7 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
         prop_list->PrintSelf(std::clog, vtkIndent());
     }
 
-    // Getting the users $HOME directory 
+    // Getting the users $HOME directory
     std::string cmd = "echo ~" + string(user);
     char buffer[128];
     std::string homedir = "";
@@ -126,7 +126,7 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
     if (!pipe) std::clog << "popen() failed!" << std::endl;
     try
     {
-        while (!feof(pipe)) 
+        while (!feof(pipe))
         {
             if (fgets(buffer, 128, pipe) != NULL)
                 homedir += buffer;
@@ -138,10 +138,10 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
     }
     pclose(pipe);
 
-    // Example of userIMASShotRunDir: 
+    // Example of userIMASShotRunDir:
     // /home/ITER/penkod/public/imasdb/solps-iter/3/0
     std::string userIMASShotRunDir = homedir + "/public/imasdb/solps-iter/3/0";
-    userIMASShotRunDir.erase(std::remove(userIMASShotRunDir.begin(), 
+    userIMASShotRunDir.erase(std::remove(userIMASShotRunDir.begin(),
         userIMASShotRunDir.end(), '\n'), userIMASShotRunDir.end());
     UserShotRunList = findShotRun(userIMASShotRunDir, string(user));
 
@@ -151,10 +151,10 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
     {
         qDebug("Could not locate property named 'ShotRunList'. "
         "pqMyPropertyWidgetDecorator will have no effect.");
-    } 
+    }
     else if (prop_SHlist)
     {
-        vtkSMStringVectorProperty* prop_SHlist_strVec = 
+        vtkSMStringVectorProperty* prop_SHlist_strVec =
             dynamic_cast<vtkSMStringVectorProperty*>(proxy->GetProperty(
             "ShotRunList"));
         for(int i = 0; i < UserShotRunList.size(); i++)

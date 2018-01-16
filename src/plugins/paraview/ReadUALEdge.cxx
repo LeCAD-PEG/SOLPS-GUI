@@ -124,6 +124,7 @@ ReadUALEdge::ReadUALEdge()
     this->Device = NULL;
     this->Version = NULL;
     this->RefRun = 0;
+    this->LoadIDS = NULL;
     this->SetNumberOfInputPorts(0);
     this->SetNumberOfOutputPorts(1);
     this->DebugOff();
@@ -595,12 +596,13 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     db.openEnv(this->User, this->Device, this->Version);
 
     std::clog << "IDS parameters:" << std::endl;
-    std::clog << "Shot:"     << this->Shot    << endl;
-    std::clog << "Run:"      << this->Run     << endl;
-    std::clog << "RefRun:"   << this->RefRun  << std::endl;
-    std::clog << "User:"     << this->User    << std::endl;
-    std::clog << "Device:"   << this->Device  << std::endl;
-    std::clog << "Version:"  << this->Version << std::endl;
+    std::clog << "Loaded IDS: " << this->LoadIDS << std::endl;
+    std::clog << "Shot: "       << this->Shot    << std::endl;
+    std::clog << "Run: "        << this->Run     << std::endl;
+    std::clog << "RefRun: "     << this->RefRun  << std::endl;
+    std::clog << "User: "       << this->User    << std::endl;
+    std::clog << "Device: "     << this->Device  << std::endl;
+    std::clog << "Version: "    << this->Version << std::endl;
 
     // Get IDS data
     db._edge_profiles.get();

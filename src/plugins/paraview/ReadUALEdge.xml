@@ -39,7 +39,7 @@
 				panel_visibility="default"
                 immediate_update="true">
                 <Documentation>
-                    This property specifies the user for the UAL Database. 
+                    This property specifies the user for the UAL Database.
                 </Documentation>
             </StringVectorProperty>
 
@@ -51,16 +51,36 @@
        	        default_values="solps-iter"
        	        panel_visibility="default">
                 <Documentation>
-                    This property specifies the Device for the UAL Database. 
+                    This property specifies the Device for the UAL Database.
                 </Documentation>
             </StringVectorProperty>
-		 
-            <Property name="Refresh" command="Modified" panel_widget="command_button" width="5"/>
+
+            <StringVectorProperty
+                name="LoadIDS"
+                label="Load IDS"
+                command="SetLoadIDS"
+                number_of_elements="1"
+                default_values="edge_profiles">
+                <StringListDomain name="LoadIDSstringList">
+                    <String value="edge_profiles"/>
+                    <String value="edge_sources"/>
+                    <String value="edge_transport"/>
+                </StringListDomain>
+                <Documentation>
+                    This property specifies the IDS to open.
+                </Documentation>
+            </StringVectorProperty>
+
+            <Property
+                name="Refresh"
+                command="Modified"
+                panel_widget="command_button"
+                width="5"/>
 
             <IntVectorProperty
-                name="CPOLoad"
+                name="IDSList"
                 label="List Shot/Runs"
-                command="SetCPOLoad"
+                command="SetIDSList"
                 number_of_elements="1"
                 default_values="0"
                 panel_visibility="default" >
@@ -69,14 +89,14 @@
 				    This checkbox opens the IDS list for specified user.
 		 	    </Documentation>
             </IntVectorProperty>
-		
+
             <StringVectorProperty
                 name="ShotRunList"
                 label="IDS Shot/Runs"
                 number_of_elements="0"
                 number_of_elements_per_command="2"
                 element_types="2"
-                repeat_command ="1" 
+                repeat_command ="1"
                 panel_visibility="default">
 		 	    <Documentation>
     			 	List of avaiable Shot/Run-s for specified user.
