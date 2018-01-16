@@ -47,17 +47,17 @@ pqMyPropertyWidgetDecorator::pqMyPropertyWidgetDecorator(
     : Superclass(config, parentObject)
 {
     vtkSMProxy* proxy = parentObject->proxy();
-    vtkSMProperty* prop = proxy? proxy->GetProperty("IDSList") : NULL;
-    if (!prop)
+    vtkSMProperty* prop_IDSListCheckBox = proxy? proxy->GetProperty("IDSListCheckBox") : NULL;
+    if (!prop_IDSListCheckBox)
     {
-        qDebug("Could not locate property named 'IDSList'. "
+        qDebug("Could not locate property named 'IDSListCheckBox'. "
         "pqMyPropertyWidgetDecorator will have no effect.");
         return;
     }
 
-    this->ObservedObject = prop;
+    this->ObservedObject = prop_IDSListCheckBox;
     this->ObserverId = pqCoreUtilities::connect(
-        prop, vtkCommand::UncheckedPropertyModifiedEvent,
+        prop_IDSListCheckBox, vtkCommand::UncheckedPropertyModifiedEvent,
         this, SIGNAL(visibilityChanged()));
 
     vtkSMProperty* prop_user = proxy? proxy->GetProperty("User") : NULL;
@@ -83,10 +83,10 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
 {
     pqPropertyWidget* parentObject = this->parentWidget();
     vtkSMProxy* proxy = parentObject->proxy();
-    vtkSMProperty* prop = proxy? proxy->GetProperty("IDSList") : NULL;
-    if (prop)
+    vtkSMProperty* prop_IDSListCheckBox = proxy? proxy->GetProperty("IDSListCheckBox") : NULL;
+    if (prop_IDSListCheckBox)
     {
-        double value = vtkSMUncheckedPropertyHelper(prop).GetAsInt();
+        double value = vtkSMUncheckedPropertyHelper(prop_IDSListCheckBox).GetAsInt();
         if (value ==0)
         {
             return false;
@@ -138,9 +138,28 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
     }
     pclose(pipe);
 
-    // Example of userIMASShotRunDir:
-    // /home/ITER/penkod/public/imasdb/solps-iter/3/0
+    // Setting imasdb directory using the Device textbox on Apply
+    // Default database directory
     std::string userIMASShotRunDir = homedir + "/public/imasdb/solps-iter/3/0";
+    // Read changed value
+    vtkSMProperty* prop_device = proxy? proxy->GetProperty("Device") : NULL;
+    vtkSMStringVectorProperty* prop_device_strVec =
+        dynamic_cast<vtkSMStringVectorProperty*>(proxy->GetProperty("Device"));
+    if(prop_device)
+    {
+        // Getting text currently in"User" checkbox to string on Apply
+        std::clog << "---prop_device Printself---: " << std::endl;
+        prop_device->PrintSelf(std::clog, vtkIndent());
+        std::clog << prop_device->GetXMLName() << std::endl;
+        // Read Device GUI text box and set this value to db_dir (short for
+        // database directory)
+        std::string db_dir = prop_device_strVec->GetElement(0);
+        userIMASShotRunDir = homedir + "/public/imasdb/" + db_dir + "/3/0";
+        // userIMASShotRunDir.erase(std::remove(userIMASShotRunDir.begin(),
+        //     userIMASShotRunDir.end(), '\n'), userIMASShotRunDir.end());
+        UserShotRunList = findShotRun(userIMASShotRunDir, string(user));
+    }
+
     userIMASShotRunDir.erase(std::remove(userIMASShotRunDir.begin(),
         userIMASShotRunDir.end(), '\n'), userIMASShotRunDir.end());
     UserShotRunList = findShotRun(userIMASShotRunDir, string(user));
@@ -157,6 +176,9 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
         vtkSMStringVectorProperty* prop_SHlist_strVec =
             dynamic_cast<vtkSMStringVectorProperty*>(proxy->GetProperty(
             "ShotRunList"));
+        // Clear list
+        prop_SHlist_strVec->ResetToXMLDefaults();
+        // Repopulate the list
         for(int i = 0; i < UserShotRunList.size(); i++)
         {
             // Filling the Shot/Run List
@@ -165,5 +187,14 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
         proxy->UpdatePropertyInformation(prop_SHlist_strVec);
         proxy->UpdateSelfAndAllInputs();
     }
+
+    // TODO
+    // "Load IDS" to show advanced options for some of the selected IDSs.
+    // Intended for insertion of custom .source(:) IDS structure (edge_sources)
+    // or .model(:) IDS structure (edge_transport)
+    // vtkSMProperty* prop_loadIDS = proxy? proxy->GetProperty("Load IDS") : NULL;
+    // vtkSMStringVectorProperty* prop_loadIDS_strVec =
+    //     dynamic_cast<vtkSMStringVectorProperty*>(proxy->GetProperty("Load IDS"));
+
     return this->Superclass::canShowWidget(show_advanced);
 }

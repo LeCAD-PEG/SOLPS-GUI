@@ -31,8 +31,8 @@ class ReadUALEdge : public vtkMultiBlockDataSetAlgorithm
     vtkGetMacro(Run,int);
     vtkSetMacro(Run,int);
 
-    vtkGetMacro(IDSList,int);
-    vtkSetMacro(IDSList,int);
+    vtkGetMacro(IDSListCheckBox,int);
+    vtkSetMacro(IDSListCheckBox,int);
 
     vtkSetStringMacro(User);
     vtkGetStringMacro(User);
@@ -50,7 +50,7 @@ protected:
     int Shot;
     int Run;
     int RefRun;
-    int IDSList;
+    int IDSListCheckBox;
     char * User;
     char * Device;
     char * Version;

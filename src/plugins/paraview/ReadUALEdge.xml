@@ -67,7 +67,9 @@
                     <String value="edge_transport"/>
                 </StringListDomain>
                 <Documentation>
-                    This property specifies the IDS to open.
+                    This property specifies the IDS to open. The geometry is
+                    currently taken from edge_profiles IDS, this selection
+                    affects which data fields are read.
                 </Documentation>
             </StringVectorProperty>
 
@@ -78,9 +80,9 @@
                 width="5"/>
 
             <IntVectorProperty
-                name="IDSList"
+                name="IDSListCheckBox"
                 label="List Shot/Runs"
-                command="SetIDSList"
+                command="SetIDSListCheckBox"
                 number_of_elements="1"
                 default_values="0"
                 panel_visibility="default" >
