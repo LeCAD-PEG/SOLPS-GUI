@@ -1,3 +1,4 @@
+
 /**
 *-------------------------------------------------------------------------------
 *   @file     ReadUALEdge.cxx
@@ -45,6 +46,7 @@
 #include <unistd.h>
 
 #define IMAS_IDS
+#define UAL_VERSION
 
 // Set macro to take:
 // - strName, name (string data type) of the plasma state quantity,
@@ -81,7 +83,7 @@
 //        "Electron Velocity - Radial",
 //        electrons.velocity,
 //        "radial" );
-#define readValues_GenericGridVectorComponents(strName, vtkUGtarget, IDStarget, strComponent) \
+#define readValues_GenericGridVectorComponents( strName, vtkUGtarget, IDStarget, strComponent) \
     num_IDStarget_gridSubsets = ggd.IDStarget.extent(0); \
     for (int n = 0; n < num_IDStarget_gridSubsets; n++) \
     { \
@@ -558,22 +560,30 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
         outInfo->Get(vtkMultiBlockDataSet::DATA_OBJECT()));
 
-    std::clog << "Shot:" << this->Shot << " Run:" << this->Run << std::endl;
-
 #ifdef IMAS_IDS
     using namespace IdsNs;
 
-    // Check IMAS and DD version
+    // Check IMAS and UAL version
     std::string imas_version = getenv("IMAS_VERSION");
+    std::string ual_version = getenv("UAL_VERSION");
     std::clog << "IMAS VERSION: " << imas_version << std::endl;
-    if (imas_version != "3.15.0")
+    std::clog << "UAL VERSION: " << ual_version << std::endl;
+    // Get UAL version as an integer (e.g. 3.6.3 -> 363)
+    std::string ual_version_str = std::string() + ual_version[0] +
+        ual_version[2] + ual_version [4];
+    int ual_version_int = std::stoi( ual_version_str );
+    // Latest UAL version, for which it is confirmed the plugin is compatible
+    // with ( in single integer form )
+    int ual_version_int_comp = 363;
+
+    if (ual_version_int < ual_version_int_comp )
     {
-        std::clog << "WARNING! This IMAS module version (and consequently \
-                      Data Dictionary) is outdated! ReadUALEdge plugin might \
-                      not be fully compatible with the currently used Data \
-                      Dictionary! The latest IMAS module, confirmed to be \
-                      compatible with the ReadUALEdge, is \
-                      imas/3.15.0/ual/3.6.4" << std::endl;
+        std::cerr << "WARNING! This UAL (and consequently "
+                    "Data Dictionary) is outdated! ReadUALEdge plugin might "
+                    "not be fully compatible with the currently used Data "
+                    "Dictionary! The latest UAL, confirmed to be "
+                    "compatible with the ReadUALEdge, is ual 3.6.3 "
+                    "( IMAS module imas/3.13.0/ual/3.6.3" << std::endl;
     }
 
     std::clog << "Reading IDS" << std::endl;
@@ -583,7 +593,15 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         this->Version = strdup("3");
     // Open IDS
     db.openEnv(this->User, this->Device, this->Version);
-    std::clog << "User: "<<this->User<<" Device: "<<this->Device<< std::endl;
+
+    std::clog << "IDS parameters:" << std::endl;
+    std::clog << "Shot:"     << this->Shot    << endl;
+    std::clog << "Run:"      << this->Run     << endl;
+    std::clog << "RefRun:"   << this->RefRun  << std::endl;
+    std::clog << "User:"     << this->User    << std::endl;
+    std::clog << "Device:"   << this->Device  << std::endl;
+    std::clog << "Version:"  << this->Version << std::endl;
+
     // Get IDS data
     db._edge_profiles.get();
 
@@ -698,6 +716,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
             // Assigning values (vertices) - Electrons
 
+
             // Assign values found in Electron Temperature substructure to
             // grid subsets objects (vertices)
             readValues_GenericGridScalar(
@@ -734,48 +753,63 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 "Electron Pressure_Fast_Parallel",
                 gridSubsetPointsUnstructuredGrid,
                 electrons.pressure_fast_parallel );
-            // Assign values found in Electron Velocity - Radial
-            // substructure to grid subsets objects (vertices)
-            readValues_GenericGridVectorComponents(
-                "Electron Velocity - Radial",
-                gridSubsetPointsUnstructuredGrid,
-                electrons.velocity,
-                "radial" );
-            // Assign values found in Electron Velocity - Diamagnetic
-            // substructure to grid subsets objects (vertices)
-            readValues_GenericGridVectorComponents(
-                "Electron Velocity - Diamagnetic",
-                gridSubsetPointsUnstructuredGrid,
-                electrons.velocity,
-                "diamagnetic" );
-            // Assign values found in Electron Velocity - Parallel
-            // substructure to grid subsets objects (vertices)
-            readValues_GenericGridVectorComponents(
-                "Electron Velocity - Parallel",
-                gridSubsetPointsUnstructuredGrid,
-                electrons.velocity,
-                "parallel" );
-            // Assign values found in Electron Velocity - Poloidal
-            // substructure to grid subsets objects (vertices)
-            readValues_GenericGridVectorComponents(
-                "Electron Velocity - Poloidal",
-                gridSubsetPointsUnstructuredGrid,
-                electrons.velocity,
-                "poloidal" );
-            // Assign values found in Electron Velocity - Toroidal
-            // substructure to grid subsets objects (vertices)
-            readValues_GenericGridVectorComponents(
-                "Electron Velocity - Toroidal",
-                gridSubsetPointsUnstructuredGrid,
-                electrons.velocity,
-                "toroidal" );
+
+            // The .velocity IDS structure is in UAL 3.6.2 and former a
+            // simple structure node, while in UAL 3.6.4 and above it is an
+            // array of structures node.
+            // Check if the node is an array of structures node
+            if( std::string( typeid( ggd.electrons.velocity ).name() ).find(
+                "Array" ) != std::string::npos)
+            {
+                // Assign values found in Electron Velocity - Radial
+                // substructure to grid subsets objects (vertices)
+                readValues_GenericGridVectorComponents(
+                    "Electron Velocity - Radial",
+                    gridSubsetPointsUnstructuredGrid,
+                    electrons.velocity,
+                    "radial" );
+                // Assign values found in Electron Velocity - Diamagnetic
+                // substructure to grid subsets objects (vertices)
+                readValues_GenericGridVectorComponents(
+                    "Electron Velocity - Diamagnetic",
+                    gridSubsetPointsUnstructuredGrid,
+                    electrons.velocity,
+                    "diamagnetic" );
+                // Assign values found in Electron Velocity - Parallel
+                // substructure to grid subsets objects (vertices)
+                readValues_GenericGridVectorComponents(
+                    "Electron Velocity - Parallel",
+                    gridSubsetPointsUnstructuredGrid,
+                    electrons.velocity,
+                    "parallel" );
+                // Assign values found in Electron Velocity - Poloidal
+                // substructure to grid subsets objects (vertices)
+                readValues_GenericGridVectorComponents(
+                    "Electron Velocity - Poloidal",
+                    gridSubsetPointsUnstructuredGrid,
+                    electrons.velocity,
+                    "poloidal" );
+                // Assign values found in Electron Velocity - Toroidal
+                // substructure to grid subsets objects (vertices)
+                readValues_GenericGridVectorComponents(
+                    "Electron Velocity - Toroidal",
+                    gridSubsetPointsUnstructuredGrid,
+                    electrons.velocity,
+                    "toroidal" );
+            }else{
+                std::cerr << "Electron Velocity data field skipped due to "
+                    "electrons.velocity being array of structures node while "
+                    "the ReadUALEdge plugin code is set to work with "
+                    "electron.velocity as an array of structures node "
+                    "(UAL version mismatch)!" << std::endl;
+            }
+
             // Assign values found in Electron Distribution Function
             // substructure to grid subsets objects (vertices)
             readValues_GenericGridScalar(
                 "Electron Distribution Function",
                 gridSubsetPointsUnstructuredGrid,
                 electrons.distribution_function );
-
 
             // Assigning values (vertices) - Ion species
 
@@ -840,56 +874,72 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                     array_label,
                     gridSubsetPointsUnstructuredGrid,
                     ion(k).pressure_fast_parallel );
-                // Assign values found in Ion Velocity - Radial
-                // substructure to grid subsets objects (2D cells)
-                array_label = fSetIonQuantityLabel( edge_quantity_names[6],
-                    k, ion_charge );
-                /// Assign values
-                readValues_GenericGridVectorComponents(
-                    array_label,
-                    gridSubsetPointsUnstructuredGrid,
-                    ion(k).velocity,
-                    "radial" );
-                // Assign values found in Ion Velocity - Diamagnetic
-                // substructure to grid subsets objects (2D cells)
-                array_label = fSetIonQuantityLabel( edge_quantity_names[7],
-                    k, ion_charge );
-                /// Assign values
-                readValues_GenericGridVectorComponents(
-                    array_label,
-                    gridSubsetPointsUnstructuredGrid,
-                    ion(k).velocity,
-                    "diamagnetic" );
-                // Assign values found in Ion Velocity - Parallel
-                // substructure to grid subsets objects (2D cells)
-                array_label = fSetIonQuantityLabel( edge_quantity_names[8],
-                    k, ion_charge );
-                /// Assign values
-                readValues_GenericGridVectorComponents(
-                    array_label,
-                    gridSubsetPointsUnstructuredGrid,
-                    ion(k).velocity,
-                    "parallel" );
-                // Assign values found in Ion Velocity - Poloidal
-                // substructure to grid subsets objects (2D cells)
-                array_label = fSetIonQuantityLabel( edge_quantity_names[9],
-                    k, ion_charge );
-                /// Assign values
-                readValues_GenericGridVectorComponents(
-                    array_label,
-                    gridSubsetPointsUnstructuredGrid,
-                    ion(k).velocity,
-                    "poloidal" );
-                // Assign values found in Ion Velocity - Toroidal
-                // substructure to grid subsets objects (2D cells)
-                array_label = fSetIonQuantityLabel( edge_quantity_names[10],
-                    k, ion_charge );
-                /// Assign values
-                readValues_GenericGridVectorComponents(
-                    array_label,
-                    gridSubsetPointsUnstructuredGrid,
-                    ion(k).velocity,
-                    "toroidal" );
+
+                // The .velocity IDS structure is in UAL 3.6.2 and former a
+                // simple structure node, while in UAL 3.6.4 and above it is an
+                // array of structures node.
+                // Check if the node is an array of structures node
+                if( std::string( typeid( ggd.ion(k).velocity ).name() ).find(
+                    "Array" ) != std::string::npos)
+                {
+                    // Assign values found in Ion Velocity - Radial
+                    // substructure to grid subsets objects (2D cells)
+                    array_label = fSetIonQuantityLabel( edge_quantity_names[6],
+                        k, ion_charge );
+                    /// Assign values
+                    readValues_GenericGridVectorComponents(
+                        array_label,
+                        gridSubsetPointsUnstructuredGrid,
+                        ion(k).velocity,
+                        "radial" );
+                    // Assign values found in Ion Velocity - Diamagnetic
+                    // substructure to grid subsets objects (2D cells)
+                    array_label = fSetIonQuantityLabel( edge_quantity_names[7],
+                        k, ion_charge );
+                    /// Assign values
+                    readValues_GenericGridVectorComponents(
+                        array_label,
+                        gridSubsetPointsUnstructuredGrid,
+                        ion(k).velocity,
+                        "diamagnetic" );
+                    // Assign values found in Ion Velocity - Parallel
+                    // substructure to grid subsets objects (2D cells)
+                    array_label = fSetIonQuantityLabel( edge_quantity_names[8],
+                        k, ion_charge );
+                    /// Assign values
+                    readValues_GenericGridVectorComponents(
+                        array_label,
+                        gridSubsetPointsUnstructuredGrid,
+                        ion(k).velocity,
+                        "parallel" );
+                    // Assign values found in Ion Velocity - Poloidal
+                    // substructure to grid subsets objects (2D cells)
+                    array_label = fSetIonQuantityLabel( edge_quantity_names[9],
+                        k, ion_charge );
+                    /// Assign values
+                    readValues_GenericGridVectorComponents(
+                        array_label,
+                        gridSubsetPointsUnstructuredGrid,
+                        ion(k).velocity,
+                        "poloidal" );
+                    // Assign values found in Ion Velocity - Toroidal
+                    // substructure to grid subsets objects (2D cells)
+                    array_label = fSetIonQuantityLabel( edge_quantity_names[10],
+                        k, ion_charge );
+                    /// Assign values
+                    readValues_GenericGridVectorComponents(
+                        array_label,
+                        gridSubsetPointsUnstructuredGrid,
+                        ion(k).velocity,
+                        "toroidal" );
+                }else{
+
+                    std::cerr << "Electron Velocity data field skipped due to "
+                        "ion(:).velocity being array of structures node "
+                        "while  the ReadUALEdge plugin code is set to work "
+                        " with electron.velocity as an array of structures node "
+                        "ion mismatch)!" << std::endl;
+                }
                 // Assign values found in Ion Energy_Density_Kinetic
                 // substructure to grid subsets objects (2D cells)
                 array_label = fSetIonQuantityLabel( edge_quantity_names[11],
@@ -966,7 +1016,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 gridSubsetCellsUnstructuredGrid->SetCells(
                     VTK_QUAD, gridSubsetCellArray);
             }
-
             // Set integer to be later used in the readValues_GenericGridScalar
             // macro
             int num_IDStarget_gridSubsets = 0;
@@ -1009,6 +1058,56 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 "Electron Pressure_Fast_Parallel",
                 gridSubsetCellsUnstructuredGrid,
                 electrons.pressure_fast_parallel );
+
+            // The .velocity IDS structure is in UAL 3.6.2 and former a
+            // simple structure node, while in UAL 3.6.4 and above it is an
+            // array of structures node.
+            // Check if the node is an array of structures node
+            if( std::string( typeid( ggd.electrons.velocity ).name() ).find(
+                "Array" ) != std::string::npos)
+            {
+                // Assign values found in Electron Velocity - Radial
+                // substructure to grid subsets objects (vertices)
+                readValues_GenericGridVectorComponents(
+                    "Electron Velocity - Radial",
+                    gridSubsetCellsUnstructuredGrid,
+                    electrons.velocity,
+                    "radial" );
+                // Assign values found in Electron Velocity - Diamagnetic
+                // substructure to grid subsets objects (vertices)
+                readValues_GenericGridVectorComponents(
+                    "Electron Velocity - Diamagnetic",
+                    gridSubsetCellsUnstructuredGrid,
+                    electrons.velocity,
+                    "diamagnetic" );
+                // Assign values found in Electron Velocity - Parallel
+                // substructure to grid subsets objects (vertices)
+                readValues_GenericGridVectorComponents(
+                    "Electron Velocity - Parallel",
+                    gridSubsetCellsUnstructuredGrid,
+                    electrons.velocity,
+                    "parallel" );
+                // Assign values found in Electron Velocity - Poloidal
+                // substructure to grid subsets objects (vertices)
+                readValues_GenericGridVectorComponents(
+                    "Electron Velocity - Poloidal",
+                    gridSubsetCellsUnstructuredGrid,
+                    electrons.velocity,
+                    "poloidal" );
+                // Assign values found in Electron Velocity - Toroidal
+                // substructure to grid subsets objects (vertices)
+                readValues_GenericGridVectorComponents(
+                    "Electron Velocity - Toroidal",
+                    gridSubsetCellsUnstructuredGrid,
+                    electrons.velocity,
+                    "toroidal" );
+            }else{
+                std::cerr << "Electron Velocity data field skipped due to "
+                    "electrons.velocity being array of structures node while "
+                    "the ReadUALEdge plugin code is set to work with "
+                    "electron.velocity as an array of structures node "
+                    "(UAL version mismatch)!" << std::endl;
+            }
             // Assign values found in Electron Distribution Function
             // substructure to grid subsets objects (vertices)
             readValues_GenericGridScalar(
@@ -1080,56 +1179,71 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                     array_label,
                     gridSubsetCellsUnstructuredGrid,
                     ion(k).pressure_fast_parallel );
-                // Assign values found in Ion Velocity - Radial
-                // substructure to grid subsets objects (2D cells)
-                array_label = fSetIonQuantityLabel( edge_quantity_names[6],
-                    k, ion_charge );
-                /// Assign values
-                readValues_GenericGridVectorComponents(
-                    array_label,
-                    gridSubsetCellsUnstructuredGrid,
-                    ion(k).velocity,
-                    "radial" );
-                // Assign values found in Ion Velocity - Diamagnetic
-                // substructure to grid subsets objects (2D cells)
-                array_label = fSetIonQuantityLabel( edge_quantity_names[7],
-                    k, ion_charge );
-                /// Assign values
-                readValues_GenericGridVectorComponents(
-                    array_label,
-                    gridSubsetCellsUnstructuredGrid,
-                    ion(k).velocity,
-                    "diamagnetic" );
-                // Assign values found in Ion Velocity - Parallel
-                // substructure to grid subsets objects (2D cells)
-                array_label = fSetIonQuantityLabel( edge_quantity_names[8],
-                    k, ion_charge );
-                /// Assign values
-                readValues_GenericGridVectorComponents(
-                    array_label,
-                    gridSubsetCellsUnstructuredGrid,
-                    ion(k).velocity,
-                    "parallel" );
-                // Assign values found in Ion Velocity - Poloidal
-                // substructure to grid subsets objects (2D cells)
-                array_label = fSetIonQuantityLabel( edge_quantity_names[9],
-                    k, ion_charge );
-                /// Assign values
-                readValues_GenericGridVectorComponents(
-                    array_label,
-                    gridSubsetCellsUnstructuredGrid,
-                    ion(k).velocity,
-                    "poloidal" );
-                // Assign values found in Ion Velocity - Toroidal
-                // substructure to grid subsets objects (2D cells)
-                array_label = fSetIonQuantityLabel( edge_quantity_names[10],
-                    k, ion_charge );
-                /// Assign values
-                readValues_GenericGridVectorComponents(
-                    array_label,
-                    gridSubsetCellsUnstructuredGrid,
-                    ion(k).velocity,
-                    "toroidal" );
+
+                // The .velocity IDS structure is in UAL 3.6.2 and former a
+                // simple structure node, while in UAL 3.6.4 and above it is an
+                // array of structures node.
+                // Check if the node is an array of structures node
+                if( std::string( typeid( ggd.electrons.velocity ).name() ).find(
+                    "Array" ) != std::string::npos)
+                {
+                    // Assign values found in Ion Velocity - Radial
+                    // substructure to grid subsets objects (2D cells)
+                    array_label = fSetIonQuantityLabel( edge_quantity_names[6],
+                        k, ion_charge );
+                    /// Assign values
+                    readValues_GenericGridVectorComponents(
+                        array_label,
+                        gridSubsetCellsUnstructuredGrid,
+                        ion(k).velocity,
+                        "radial" );
+                    // Assign values found in Ion Velocity - Diamagnetic
+                    // substructure to grid subsets objects (2D cells)
+                    array_label = fSetIonQuantityLabel( edge_quantity_names[7],
+                        k, ion_charge );
+                    /// Assign values
+                    readValues_GenericGridVectorComponents(
+                        array_label,
+                        gridSubsetCellsUnstructuredGrid,
+                        ion(k).velocity,
+                        "diamagnetic" );
+                    // Assign values found in Ion Velocity - Parallel
+                    // substructure to grid subsets objects (2D cells)
+                    array_label = fSetIonQuantityLabel( edge_quantity_names[8],
+                        k, ion_charge );
+                    /// Assign values
+                    readValues_GenericGridVectorComponents(
+                        array_label,
+                        gridSubsetCellsUnstructuredGrid,
+                        ion(k).velocity,
+                        "parallel" );
+                    // Assign values found in Ion Velocity - Poloidal
+                    // substructure to grid subsets objects (2D cells)
+                    array_label = fSetIonQuantityLabel( edge_quantity_names[9],
+                        k, ion_charge );
+                    /// Assign values
+                    readValues_GenericGridVectorComponents(
+                        array_label,
+                        gridSubsetCellsUnstructuredGrid,
+                        ion(k).velocity,
+                        "poloidal" );
+                    // Assign values found in Ion Velocity - Toroidal
+                    // substructure to grid subsets objects (2D cells)
+                    array_label = fSetIonQuantityLabel( edge_quantity_names[10],
+                        k, ion_charge );
+                    /// Assign values
+                    readValues_GenericGridVectorComponents(
+                        array_label,
+                        gridSubsetCellsUnstructuredGrid,
+                        ion(k).velocity,
+                        "toroidal" );
+                }else{
+                    std::cerr << "Electron Velocity data field skipped due to "
+                        "electrons.velocity being array of structures node while "
+                        "the ReadUALEdge plugin code is set to work with "
+                        "electron.velocity as an array of structures node "
+                        "(UAL version mismatch)!" << std::endl;
+                }
                 // Assign values found in Ion Energy_Density_Kinetic
                 // substructure to grid subsets objects (2D cells)
                 array_label = fSetIonQuantityLabel( edge_quantity_names[11],
@@ -1140,7 +1254,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                     gridSubsetCellsUnstructuredGrid,
                     ion(k).energy_density_kinetic );
             }
-
             // Add unstructured grid to main block
             fAddBlock2MultiBlock(mainMB, gridSubsetCellsUnstructuredGrid,
                 gridSubset_name );
