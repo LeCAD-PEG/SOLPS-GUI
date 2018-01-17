@@ -7,7 +7,7 @@ case $(hostname -f) in
   *.iter.org) 
 	module purge
 	# The following modules are needed for IMAS plugins
-        module load imas/3.10.1/ual/3.6.0 blitz/0.10 binutils/2.25
+        module load imas/3.15.0/ual/3.6.4 blitz/0.10 binutils/2.25
         module load OpenSSL/1.0.2g-GCC-4.8.3
         module load Python/2.7.9-goolf-1.5.16 # overwrite Anaconda
 	imasdb solps-iter
@@ -37,6 +37,6 @@ STAGING_PARAVIEW=${STAGING_PARAVIEW:-$STAGING_DIR/paraview/$PARAVIEW_VERSION}
 
 #install -d /tmp/${USER}
 
-#LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} \
+LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} \
 ${STAGING_PARAVIEW}/bin/paraview $@
 
