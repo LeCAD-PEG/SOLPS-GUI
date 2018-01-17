@@ -2,9 +2,9 @@
 
 .. highlight:: csh
    
-=======================
-ParaView Catalyst HOWTO
-=======================
+=================
+ParaView Catalyst
+=================
 
 
 :Author: Jure Bartol, University of Ljubljana
@@ -872,6 +872,9 @@ having B2.5 converged to machine accuracy, and a coupled B2.5-EIRENE
 case. We use one specific run for each case to show results - coupled
 B2.5-EIRENE *ITER 535* and standalone *AUG 16151*. For details on how to
 run each case refer to  and to  to run it with Catalyst.
+
+.. note::   A tutorial on the use of the **Catalyst**
+            is available in section :ref:`catalyst-tutorial`.
 
 Running the case
 ----------------

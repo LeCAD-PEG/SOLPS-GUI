@@ -18,8 +18,7 @@ In this tutorial we will create a running case for coupled B2.5 and Eirene run.
 
      $ stop
      $ cd runs/examples
-     $ cmake . && make # Fetches all examples from external repository
-     $ tar xvzf tutorial-DivGeo_ITER_baseline_scenario-InitializeRun.tar.gz
+     $ make tutorial-DivGeo_ITER_baseline_scenario-InitializeRun
      $ cd tutorial-DivGeo_ITER_baseline_scenario-InitializeRun
      $ rm -rf new_run # Will be created in this tutorial
 
@@ -250,6 +249,9 @@ Additional information
 
 Under the ``Populate Baserun`` are also the following buttons:
 
+ - ``Save to IDS``: This runs ``b2run b2_ual_write`` and saves the last state
+   of the run to IDS, with ID descriptors ``b2mndr_id*`` switches in
+   ``b2mn.dat``
  - ``Clear log``: As the names suggests, it clears the log window
  - ``Stop run``: This stops the current TCSH shell and restarts it
  - ``Terminal input``: Used to give TCSH terminal commands to the TCSH terminal

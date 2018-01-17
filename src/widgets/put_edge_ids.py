@@ -16,6 +16,12 @@
 # $ imasdb solps-iter
 # -----------------------------------------------------------------------------
 
+from PyQt5.QtCore import pyqtSlot, QThread, pyqtProperty, pyqtSignal
+from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit,
+                             QGridLayout, QDialogButtonBox, QPushButton,
+                             QFormLayout)
+from PyQt5.QtGui import QIntValidator
+
 import sys
 import getopt
 import logging
@@ -23,11 +29,7 @@ import os
 import tarfile
 import base64
 
-from PyQt5.QtCore import pyqtSlot, QThread, pyqtProperty, pyqtSignal
-from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit,
-                             QGridLayout, QDialogButtonBox, QPushButton,
-                             QWidget, QFormLayout)
-from PyQt5.QtGui import QIntValidator
+from tcsh_process import TcshProcess
 
 try:
     import BytesIO
@@ -54,14 +56,11 @@ else:
         else:
             ENABLED = False
     except FileNotFoundError:
-        print( __name__, 'Corrupted IMAS module!')
+        print(__name__, 'Corrupted IMAS module!')
         if __name__ == '__main__':
             sys.exit(2)
         else:
             ENABLED = False
-
-        
-
 
 input_files = [
     'input.dat',
@@ -159,19 +158,25 @@ class PutDialog(QDialog):
         return variables
 
 
-class PutIDS(QWidget):
+class PutIDS(TcshProcess):
     """Widget representation of the PutIDS functionality. A normal QPushButton
     that encapsulates the PutIDS QThread that does the putting data to the IDS.
     """
 
     def __init__(self, parent=None):
         super(PutIDS, self).__init__(parent)
+        self.cleanupFlag = False
         self.vars = {}
         for i in range(PutVars.numOfParams):
             self.vars[i] = ''
 
         self.thread = PutIDSQThread(self)
         self.thread.finished.connect(self.cleanUp)
+
+        # Because of mix STD and ERR output from the thread, both channels
+        # has to be parsed.
+        self.tcsh.stdOutput.connect(self.processTcshOutput)
+        self.tcsh.stdErrOutput.connect(self.processTcshOutput)
 
         self.pushButton = QPushButton(self)
         self.pushButton.setText("Put IDS")
@@ -186,13 +191,9 @@ class PutIDS(QWidget):
         self.setLayout(layout)
 
     @pyqtSlot(str)
-    def setRunDir(self, rundir):
-        self.vars[PutVars.runDirPath] = rundir
-
-    def getRunDir(self):
-        return self.vars[PutVars.runDirPath]
-
-    runDir = pyqtProperty(str, getRunDir, setRunDir)
+    def setRunDir(self, runDir):
+        self.vars[PutVars.runDirPath] = runDir
+        super(PutIDS, self).setRunDir(runDir)
 
     @pyqtSlot(str)
     def setUser(self, user):
@@ -273,9 +274,59 @@ class PutIDS(QWidget):
         if not self.checkParameters():
             self.cleanUp()
             return
+        self.pushButton.setEnabled(False)
 
-        self.thread.setParameters(self.vars)
-        self.thread.start()
+        # Start the :attr:`tcsh` in the run directory
+        self.startTcsh()  # Tcsh started in run directory
+        if not self.tcsh.state():
+            # Failed to start
+            self.cleanUp()
+
+        if not os.access(self.getRunDir() + '/b2mn.dat', os.F_OK | os.R_OK):
+            logging.error('No b2mn.dat in this directory!')
+
+        logging.info('Figuring out if the run is coupled or stand alone?')
+        # Checking if inpud.dat is in run directory
+
+        if os.access(self.getRunDir() + '/input.dat', os.F_OK):
+            COUPLED = True
+        else:
+            COUPLED = False
+
+        self.tcsh.write('cd %s\n' % self.getRunDir())
+        self.tcsh.write('imasdb solps-iter\n')
+
+        cmd = 'b2run '
+
+        if not COUPLED:
+            logging.info('Run is standalone')
+            cmd += '-s '
+        else:
+            logging.info('Run is coupled')
+
+        cmd += 'b2_ual_write\n'
+        logging.info('Starting %s in %s' % (cmd, self.getRunDir()))
+        cmd += 'echo "Cleanup"\n'
+
+        self.tcsh.write(cmd)
+
+    def processTcshOutput(self, msg):
+        """First run ``b2_mod_ual_writer``
+        """
+        if 'IDS write finished' in msg:
+            logging.info('b2_ual_write complete.')
+            self.cleanupFlag = True
+
+        if 'Cleanup' in msg:
+            if not self.cleanupFlag:
+                # B2 ual write failed
+                logging.error('b2_ual_write failed in %s', self.getRunDir())
+                self.pushButton.setEnabled(True)
+                self.cleanUp()
+            else:
+                logging.info('b2_ual_write finished.')
+                self.thread.setParameters(self.vars)
+                self.thread.start()
 
     @pyqtSlot()
     def cleanUp(self):
@@ -320,56 +371,6 @@ def getB2path(dir_path, file_name):
         return ''
 
 
-def readB2output(file_path, file_name, variables):
-    """This function reads the B2 output file and according to input variables
-    it returns values for those variables.
-
-    The way the file is written is that every line that starts with **\*cf**,
-    tells us two things, the type of the variable and the name of the variable.
-
-    Therefore instead of writing numerous functions for reading specific
-    variables, the user needs only provide which variables needs to be read
-    from the output file and the result comes in the form of a dictionary, with
-    the variable names being the keys for arrays.
-
-    Arguments:
-        file_path (str): Run directory.
-        file_name (str): b2output file name.
-        variables (array): Array of variables to read from the b2output file.
-
-    Returns:
-        arrays (dict): A dictionary containing the values read from the
-          b2output file for each variable in the array variables.
-    """
-
-    arrays = {el: [] for el in variables}
-    with open(file_path + '/' + file_name, 'r') as f:
-
-        while 1:
-            line = f.readline()
-            if not line:
-                break
-
-            if line.startswith('*cf'):
-                stripLine = line.strip()
-
-                if any([stripLine.endswith(key) for key in arrays]):
-                    splitLine = stripLine.split()
-                    ar = arrays[splitLine[-1]]
-
-                    N = int(splitLine[-2])
-
-                    counter = 0
-                    while counter < N:
-                        line = f.readline().split()
-                        counter += len(line)
-                        ar += [float(el) for el in line]
-                else:
-                    continue
-
-    return arrays
-
-
 class PutIDSQThread(QThread):
     """QThread for storing data to IDS. Note that it gets the attributes
     necessary to open an IDS and create a data entry, from PutIDS instances.
@@ -400,21 +401,7 @@ class PutIDSQThread(QThread):
         and input files to the given IDS entry.
         """
         logging.info('Reading files...')
-        b2out = False
         runDir = self.vars[PutVars.runDirPath]
-        if os.path.exists(runDir + '/' + 'b2fgmtry') and \
-           os.path.exists(runDir + '/' + 'b2fstati'):
-            coorAr = readB2output(runDir, 'b2fgmtry',
-                                  variables=['nx,ny', 'crx', 'cry'])
-            logging.info('B2fmtry read.')
-            tempAr = readB2output(runDir, 'b2fstati',
-                                  variables=['ne', 'te', 'ti'])
-            logging.info('B2fstati read.')
-            b2out = True
-        else:
-            logging.info('No b2ouput files found, skipping writing'
-                                  ' output files to IDS.')
-
         code_parameters = tarInputFiles(runDir)
         logging.info('Code parameters read.')
         logging.info('Creating IDS object.')
@@ -423,22 +410,9 @@ class PutIDSQThread(QThread):
         if not ids.connected():
             logging.info('Failed to create IDS entry. Canceling.')
             return
-        ids.basicInit()
-        logging.info('Basic IDS initialization done.')
-        ids.writeDescription(' directory: ' + runDir)
-        logging.info('Description added.')
         ids.writeCodeParameters(code_parameters)
         logging.info('Code parameters added.')
 
-        if b2out:
-            ids.writeCoordinates(coorAr['crx'], coorAr['cry'],
-                                 int(coorAr['nx,ny'][0]),
-                                 int(coorAr['nx,ny'][1]))
-            logging.info('Coordinates written added.')
-            ids.writeTe(tempAr['te'])
-            ids.writeTi(tempAr['ti'])
-            ids.writeNe(tempAr['ne'])
-            logging.info('Te, Ti and Ne written.')
         logging.info('Now saving data entry.')
         ids.save()
 
@@ -498,206 +472,12 @@ class PutIDSwrapper:
         """Checks whether the data entry has been created."""
         return self.imas_obj.isConnected()
 
-    def basicInit(self):
-        """ Basic IDS space allocation.
-        """
-        self.imas_obj.edge_profiles.profiles_1d.resize(1)
-        self.imas_obj.edge_profiles.ggd.resize(1)
-        self.imas_obj.edge_profiles.putNonTimed()
-        self.imas_obj.edge_profiles.time.resize(1)
-        self.imas_obj.edge_profiles.time[0] = 1
-        self.imas_obj.edge_profiles.ids_properties.homogeneous_time = 1
-
-    def writeDescription(self, msg=''):
-        """Writing simple description to IDS."""
-        grid_description = "IDS:" + " shot=" + str(self.vars[PutVars.shot]) + \
-                           " run=" + str(self.vars[PutVars.run]) + \
-                           " user=" + self.vars[PutVars.user] + \
-                           " device=" + self.vars[PutVars.device] + \
-                           " version=" + self.vars[PutVars.version] + msg
-        # Put IDS grid description
-        self.imas_obj.edge_profiles.ggd[0].grid.identifier.description = \
-            grid_description
-
     def writeCodeParameters(self, code_parameters):
         """ Writing code parameters, which is basically tar-balled input files
         for SOLPS run and then encoded with base64 to avoid null terminations.
         """
         logging.info('Writing code parameters.')
         self.imas_obj.edge_profiles.code.parameters = code_parameters
-
-    def writeCoordinates(self, rC, zC, dimR, dimZ):
-        """ Writing R, Z coordinates to IDS. ``Coordinates`` are stored in
-        **Nodes** and the ``cells`` are storred in **Cells**.
-        The functions used for this are **writeNodes** and **writeCells**.
-        """
-        logging.info('Writing coordinates.')
-        grid = self.imas_obj.edge_profiles.ggd[0].grid
-        grid.space.resize(1)
-        # Set (IDS substructure shortcut variable) space0
-        space0 = grid.space[0]
-        space0.objects_per_dimension.resize(3)  # Allocation
-
-        num_gridSubsets = 2 # Number of grid subsets to write (Cells and Nodes)
-
-        space0.coordinates_type.resize(2)
-        space0.coordinates_type[0] = 4  # R
-        space0.coordinates_type[1] = 5  # Z
-
-        # Allocating grid subsets. 2 are allocated for Nodes and Cells
-        grid.grid_subset.resize(num_gridSubsets)
-
-        self.writeNodes(rC, zC)
-        self.writeCells(dimR, dimZ)
-
-    def writeNodes(self, rC, zC):
-        """Writes points (0D elements) to Nodes inside the IDS.
-        """
-        logging.info('Writing nodes.')
-        # -- Put DATA FOR GRID SUBSET "Nodes" --
-        # (grid subset index: 2, objects forming the grid subset: nodes, 0D)
-        # Note:  All indices must be put in Fortran index notation
-        # (starting with 1), not in C++/python index notation(starts with 0)!
-        # So in our case: Python_Index == Fortran_Index -1 !
-
-        gridSubset_index = 2    # grid subset index of grid subset Nodes
-                                # (Indexing of grid subsets follows the ITM CPO
-                                # edge examples :
-                                # shot: 1, run:1, # device: iter; and
-                                # shot: 16151, run: 1000; device: aug
-        gridSubset_name = "Nodes"
-        gridSubset_dim_index = 1 # Grid subset Nodes consists of
-                                 # points -> 0D objects -> dimension index = 1
-                                 # (edges -> 1D objects -> dimension index = 2
-                                 # cells  -> 2D objects -> dimension index = 3)
-        grid = self.imas_obj.edge_profiles.ggd[0].grid
-        space0 = grid.space[0]
-        num_obj_0D = len(rC)  # Number of nodes (len(rC) == len(zC))
-                              # have 2D coordinates, P(x,y)
-        # Write all available 0D objects (all of them form the grid subset
-        # Nodes
-        # Set (IDS substructure shortcut variable) dim0
-        dim0 = space0.objects_per_dimension[gridSubset_dim_index - 1]
-        dim0.object.resize(num_obj_0D)
-        for i in range(num_obj_0D):
-            dim0.object[i].nodes.resize(1)
-            dim0.object[i].nodes[0] = i
-            dim0.object[i].geometry.resize(2)
-            dim0.object[i].geometry[0] = rC[i]
-            dim0.object[i].geometry[1] = zC[i]
-
-        # Set(IDS substructure shortcut variable) gridSubsetBaseData
-        gridSubsetBaseData = grid.grid_subset[gridSubset_index - 1]
-        # Put base grid subset data/parameters (name, index)
-        gridSubsetBaseData.identifier.name = gridSubset_name
-        gridSubsetBaseData.identifier.index = gridSubset_index
-        # Put grid subset element and element object data
-
-        # Providing index to elements that point into a Node.
-        gridSubsetBaseData.element.resize(num_obj_0D)
-        for i in range(num_obj_0D):
-            gridSubsetBaseData.element[i].object.resize(1)
-            gridSubsetBaseData.element[i].object[0].space = 0 + 1
-            gridSubsetBaseData.element[i].object[0].dimension = \
-                gridSubset_dim_index
-            gridSubsetBaseData.element[i].object[0].index = i + 1
-
-    def writeCells(self, dimR, dimZ):
-        """Writes cells (2D elements) to Cells inside the IDS.
-        """
-        logging.info('Writing cells.')
-        # -- Put DATA FOR GRUD SUBSET "Cells"
-        # (grid subset index: 1, objects forming the grid subset: cells, 2D)
-        grid = self.imas_obj.edge_profiles.ggd[0].grid
-        space0 = grid.space[0]
-        numCellsX = dimR + 2
-        numCellsY = dimZ + 2
-        num_cells = numCellsX * numCellsY
-        num_obj_2D = num_cells
-        gridSubset_index = 1
-        gridSubset_name = "Cells"
-        gridSubset_dim_index = 3
-
-        # Write all available 2D objects (all of them form the grid subset
-        # Cells
-        dim2 = space0.objects_per_dimension[gridSubset_dim_index - 1]
-        dim2.object.resize(num_obj_2D)
-        for i in range(num_obj_2D):
-            dim2.object[i].nodes.resize(4)
-        Id = 1  # Cell ID.
-        for j in range(numCellsY):
-            for i in range(numCellsX):
-                dim2.object[Id - 1].nodes[0] = Id + 0 * numCellsX * numCellsY
-                dim2.object[Id - 1].nodes[1] = Id + 1 * numCellsX * numCellsY
-                dim2.object[Id - 1].nodes[2] = Id + 3 * numCellsX * numCellsY
-                dim2.object[Id - 1].nodes[3] = Id + 2 * numCellsX * numCellsY
-                Id += 1
-
-        # Set (IDS substructure shortcut variable) subgridDaseData for
-        # Cells grid subset
-        gridSubsetBaseData = grid.grid_subset[gridSubset_index - 1]
-        # Put base grid subset data/parameters (name, index)
-        gridSubsetBaseData.identifier.name = gridSubset_name
-        gridSubsetBaseData.identifier.index = gridSubset_index
-        # Put grid subset element and element object data
-        gridSubsetBaseData.element.resize(num_obj_2D)
-        for i in range(num_obj_2D):
-            element = gridSubsetBaseData.element[i]
-            element.object.resize(1)
-            element.object[0].space = 0 + 1
-            element.object[0].dimension = gridSubset_dim_index
-            element.object[0].index = i + 1
-
-    def writeTe(self, te):
-        """Writes the electron temperature to the IDS. These values colors the
-        cells.
-        """
-        num_te_gridSubset = 1
-        num_te_values = len(te)
-        el = self.imas_obj.edge_profiles.ggd[0].electrons
-        el.temperature.resize(num_te_gridSubset)
-        tePath = el.temperature[num_te_gridSubset - 1]
-        tePath.grid_subset_index = 1  # gridSubset_index for Cells.
-        tePath.values.resize(num_te_values)
-        for n in range(num_te_values):
-            # convert to eV (1 J = 6.242e18 eV)
-            tePath.values[n] = te[n] *(6.242e18)
-
-    def writeTi(self, ti):
-        """Writes the ion temperature to the IDS. These values colors the the
-        cells.
-        """
-        num_ti_gridSubset = 1
-        num_ti_values = len(ti)
-        num_ti_species = 1  # Number of ion species, as in
-                            # number of different ion charges.
-        ion_specie = 1
-        # Ion specie is linked with the ion density of each ion charge,
-        # as ion temperature is taken as the same for all ion charges.
-        ion = self.imas_obj.edge_profiles.ggd[0].ion
-        ion.resize(num_ti_species)
-        ion[ion_specie - 1].temperature.resize(num_ti_gridSubset)
-        tiPath = ion[ion_specie - 1].temperature[num_ti_gridSubset - 1]
-        tiPath.grid_subset_index = 1  # gridSubset_index for Cells.
-        tiPath.values.resize(num_ti_values)
-        for n in range(num_ti_values):
-            # convert to eV (1 J = 6.242e18 eV)
-            tiPath.values[n] = ti[n] * (6.242e18)
-
-    def writeNe(self, ne):
-        """Writes electron density to the IDS.
-        """
-        # PUT VALUES for "Cells" grid subset
-        # Put ne (electron density)
-        num_ne_gridSubset = 1
-        num_ne_values = len(ne)
-        elDensity = self.imas_obj.edge_profiles.ggd[0].electrons.density
-        elDensity.resize(num_ne_gridSubset)
-        nePath = elDensity[num_ne_gridSubset - 1]
-        nePath.grid_subset_index = 1  # gridSubset_index for Cells.
-        nePath.values.resize(num_ne_values)
-        for n in range(num_ne_values):
-            nePath.values[n] = ne[n]
 
     def save(self):
         """Saves changes to IDS.edge_profiles with the put function.

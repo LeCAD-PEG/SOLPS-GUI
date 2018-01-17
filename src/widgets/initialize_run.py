@@ -5,9 +5,9 @@ directory.
 from PyQt5.QtWidgets import (QVBoxLayout, QGridLayout, QGroupBox, QComboBox,
                              QFormLayout, QLabel, QSpacerItem, QSizePolicy,
                              QPushButton, QPlainTextEdit, QFileDialog,
-                             QMessageBox, QInputDialog)
+                             QMessageBox, QInputDialog, QCheckBox)
 from PyQt5.QtGui import QTextCursor
-from PyQt5.QtCore import pyqtSlot, QSettings
+from PyQt5.QtCore import pyqtSlot, QSettings, Qt
 from tcsh_process import TcshProcess
 import os
 
@@ -23,6 +23,7 @@ class InitializeRun(TcshProcess):
         self.tcsh.setTcshPath('/usr/bin/tcsh')
         self.tcsh.stdOutput.connect(self.updateText)
         self.tcsh.stdErrOutput.connect(self.updateText)
+        self.completedSuccessfully = False
 
     def prepareUserInterface(self):
         """This prepares the user interface for the
@@ -94,10 +95,14 @@ class InitializeRun(TcshProcess):
         clearLog = QPushButton('Clear log')
         clearLog.clicked.connect(self.clearLog)
 
+        saveToIDS = QPushButton('Save to IDS')
+        saveToIDS.clicked.connect(self.saveToIDS)
+
         stopB2mn = QPushButton('Stop run')
         stopB2mn.clicked.connect(self.stopB2mn)
 
         groupLayout.addWidget(b2mn)
+        groupLayout.addWidget(saveToIDS)
         groupLayout.addWidget(clearLog)
         groupLayout.addWidget(stopB2mn)
 
@@ -181,44 +186,101 @@ class InitializeRun(TcshProcess):
         runDir = baserunDir.rstrip('baserun') + \
             self.runDirCombo.currentText()
         if not runDir:
-            self.textDisplay('No run directory specified!')
+            self.textDisplay.appendPlainText('No run directory specified!')
             return ''
 
         if not os.path.exists(runDir):
-            self.textDisplay('Run directory: ' + runDir + ' does not exist!')
+            self.textDisplay.appendPlainText('Run directory: ' + runDir +
+                                             ' does not exist!')
             return ''
 
         return runDir
+
+    def executeCommand(self, info, cmd):
+        if self.tcsh.state():
+            runDirectory = self.enterRunDirectory()
+            if not runDirectory:
+                return
+            baseRunDirectory = os.path.basename(runDirectory)
+            self.textDisplay.appendPlainText('In %s :' % baseRunDirectory +
+                                             info)
+            self.tcsh.write('cd ' + runDirectory + '\n')
+            self.tcsh.write(cmd)
 
     @pyqtSlot()
     def setupEireneLinks(self):
         """Runs the ``setup_baserun_eirene_links`` inside the run directory.
         """
-        if self.tcsh.state():
-            # Get run directory
-            runDirectory = self.enterRunDirectory()
-            if not runDirectory:
-                return
-            self.textDisplay.appendPlainText('Running: '
-                'setup_baserun_eirene_links in ' +
-                os.path.basename(runDirectory))
-            self.tcsh.write('cd ' + runDirectory + '\n')
-            self.tcsh.write('setup_baserun_eirene_links && echo Done '
-                            'performing setup_baserun_eirene_links\n')
-
+        info = "Running - setup_baserun_eirene_links"
+        cmd = 'setup_baserun_eirene_links && echo Done performing ' \
+              'setup_baserun_eirene_links\n'
+        self.executeCommand(info, cmd)
 
     @pyqtSlot()
     def b2mn(self):
         """Runs ``b2run b2mn`` if the TCSH terminal is running in run directory
         """
-        if self.tcsh.state():
-            runDirectory = self.enterRunDirectory()
-            if not runDirectory:
-                return
-            self.textDisplay.appendPlainText('Running: b2run b2mn in ' +
-                os.path.basename(runDirectory) + '!')
-            self.tcsh.write('cd ' + runDirectory + '\n')
-            self.tcsh.write('b2run b2mn && echo Done running b2run b2mn\n')
+        info = "Running - b2run b2mn"
+        cmd = "b2run b2mn && echo Done running b2run b2mn\n"
+        self.executeCommand(info, cmd)
+
+    def saveToIDS(self):
+        """If the QCheckBox :attr:`saveToIDS` is checked, run the fortran
+        routine.
+        """
+
+        info = "Running - Saving data to IDS"
+        cmd = 'b2run b2_ual_write\n'
+        # Get SHOT, RUN, USERNAME, VERSION, DEVICE
+        SHOT, RUN, USER, VERSION, DEVICE = self.readRunID()
+        if not (SHOT and RUN and USER and VERSION and DEVICE):
+            self.textDisplay.appendPlainText('Missing IDS id settings:')
+            if not SHOT:
+                self.textDisplay.appendPlainText('    shot')
+            if not RUN:
+                self.textDisplay.appendPlainText('    run')
+            if not USER:
+                self.textDisplay.appendPlainText('    user')
+            if not VERSION:
+                self.textDisplay.appendPlainText('    version')
+            if not DEVICE:
+                self.textDisplay.appendPlainText('    device')
+
+            self.textDisplay.appendPlainText('Fill the required id settings in'
+                                             ' either b2mn.dat or b2md.dat')
+            return
+        self.textDisplay.appendPlainText(cmd)
+        self.executeCommand(info, cmd)
+
+    def readRunID(self):
+        runDirectory = self.enterRunDirectory()
+
+        # Read b2mn.dat for:
+        # - b2mndr_run_number
+        # - b2mndr_shot_number
+        # - b2mndr_device
+        # - b2mndr_user
+        VERSION = '3'
+        SHOT, RUN, USER, DEVICE = 4 * (None,)
+
+        if os.access(runDirectory + '/b2mn.dat', os.F_OK | os.R_OK):
+            with open(runDirectory + '/b2mn.dat', 'r') as f:
+                for line in f:
+                    if 'b2mndr_run_number' in line:
+                        RUN = line.split()[-1].strip("'")
+
+                    elif 'b2mndr_shot_number' in line:
+                        SHOT = line.split()[-1].strip("'")
+
+                    elif 'b2mndr_device' in line:
+                        DEVICE = line.split()[-1].strip("'")
+
+                    elif 'b2mndr_user' in line:
+                        USER = line.split()[-1].strip("'")
+
+
+
+        return SHOT, RUN, USER, VERSION, DEVICE
 
     @pyqtSlot()
     def manualInput(self):
@@ -249,9 +311,7 @@ class InitializeRun(TcshProcess):
                 :attr:`InitializeRun.textDisplay`
         """
         self.textDisplay.moveCursor(QTextCursor.End)
-        if msg.endswith('\n'):
-            msg = msg[:-1]
-        self.textDisplay.insertPlainText('\n' + msg)
+        self.textDisplay.insertPlainText('\n' + msg.rstrip())
         self.textDisplay.moveCursor(QTextCursor.End)
 
     @pyqtSlot()
@@ -267,7 +327,6 @@ class InitializeRun(TcshProcess):
         self.tcsh.write('cd ' + self.getRunDir() + '\n')
         self.textDisplay.appendPlainText('Switched to directory: ' +
                                          self.getRunDir())
-
 
     @pyqtSlot(str)
     def setRunDir(self, newRunDir):

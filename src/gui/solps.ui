@@ -192,7 +192,7 @@
              <number>0</number>
             </property>
             <item row="0" column="0">
-             <widget class="B2InputFiles" name="b2inputfiles"/>
+             <widget class="B2InputFiles" name="b2inputfiles" native="true"/>
             </item>
            </layout>
           </widget>
@@ -655,27 +655,23 @@ and starts the run</string>
         <string>&amp;Log</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_6">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item row="0" column="0">
-         <widget class="QPlainTextEdit" name="plainTextEdit_Log">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="acceptDrops">
-           <bool>false</bool>
-          </property>
-          <property name="autoFillBackground">
-           <bool>false</bool>
-          </property>
-          <property name="lineWrapMode">
-           <enum>QPlainTextEdit::WidgetWidth</enum>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="placeholderText">
-           <string notr="true"/>
-          </property>
-         </widget>
+         <widget class="Log" name="log"/>
         </item>
        </layout>
       </widget>
@@ -690,7 +686,7 @@ and starts the run</string>
      <x>0</x>
      <y>0</y>
      <width>662</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -748,11 +744,6 @@ and starts the run</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>B2InputFiles</class>
-   <extends>QWidget</extends>
-   <header>b2_input_files</header>
-  </customwidget>
-  <customwidget>
    <class>Carre</class>
    <extends>QWidget</extends>
    <header>carre</header>
@@ -784,6 +775,11 @@ and starts the run</string>
    <header>initialize_run</header>
   </customwidget>
   <customwidget>
+   <class>Log</class>
+   <extends>QPlainTextEdit</extends>
+   <header>log</header>
+  </customwidget>
+  <customwidget>
    <class>PutIDS</class>
    <extends>QWidget</extends>
    <header>put_edge_ids</header>
@@ -808,6 +804,11 @@ and starts the run</string>
    <class>Triang</class>
    <extends>QWidget</extends>
    <header>triang</header>
+  </customwidget>
+  <customwidget>
+   <class>B2InputFiles</class>
+   <extends>QWidget</extends>
+   <header>b2_input_files</header>
   </customwidget>
  </customwidgets>
  <resources/>

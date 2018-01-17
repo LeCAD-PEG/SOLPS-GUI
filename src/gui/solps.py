@@ -35,13 +35,12 @@ import os
 import shutil
 import socket
 import sys
-import queue
 import time
 
 from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
                           pyqtSignal, QThread, QAbstractItemModel, QVariant,
-                          QSortFilterProxyModel, QRegExp, QObject, QRect,
-                          QSize, QProcess)
+                          QSortFilterProxyModel, QRegExp, QRect, QSize,
+                          QProcess)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QFileDialog, QStyle, QStyledItemDelegate,
                              QLineEdit, QToolButton, QGridLayout, QLabel,
@@ -51,9 +50,6 @@ from PyQt5.uic import loadUi
 
 
 from addmenu import AddMenu
-
-# import put_edge_ids
-# import get_edge_ids
 
 REDIRECT_STDOUT_TO_LOG = False
 
@@ -495,7 +491,6 @@ class RetrieveRunsFolderInfo(QThread):
         progress(pyqtSignal(str)): Directory that is being processed
         statusChanged (pyqtSignal(QModelIndex, QModelIndex)) :
             Changed index range for table view update
-
     """
     status = pyqtSignal(str)
     progress = pyqtSignal(str)
@@ -605,7 +600,6 @@ class RetrieveRunsFolderInfo(QThread):
             # data[Column.label] = static_data[0]
             # Simulate delays with self.msleep(100)
             # Fill in static data into the columns that follow
-
             # Emit the range of columns that changed in the model
             self.statusChanged.emit(date_index, shot_index)
             self.progress.emit(path)
@@ -1122,66 +1116,6 @@ class RunsModel(QAbstractItemModel):
                           "' should be in 'name path status' format.")
 
 
-class LoggingHandler(logging.Handler):
-    def __init__(self, stream):
-        super(LoggingHandler, self).__init__()
-        self.stream = stream
-
-    def emit(self, record):
-        msg = self.format(record)
-        if record.levelno == logging.DEBUG:
-            self.stream.write('<font color="blue">' + msg + '</font>')
-        elif record.levelno == logging.INFO:
-            self.stream.write('<font color="orange">' + msg + '</font>')
-        elif record.levelno == logging.WARNING:
-            self.stream.write('<font color="blue">' + msg + '</font>')
-        elif record.levelno == logging.ERROR:
-            self.stream.write('<font color="red">' + msg + '</font>')
-        else:  # logging.CRITICAL
-            self.stream.write('<font color="magenta">' + msg + '</font>')
-
-
-class WriteStream(object):
-    """ The new Stream Object which replaces the default stream associated with
-    sys.stdout and sys.stderr. This object just puts data in a queue!
-
-    Args:
-        queue(queue.Queue) : thread safe queue created for the stream
-    """
-    def __init__(self, queue):
-        self.queue = queue
-
-    def flush(self):
-        pass
-
-    def fileno(self):
-        return -1
-
-    def write(self, text):
-        self.queue.put(text)
-
-
-class LogReceiver(QObject):
-    """ Receives log messages from Logging and sys.stdout.
-
-    A QObject (to be run in a QThread) which sits waiting for data to come
-    through a queue.Queue(). It blocks until data is available, and one it
-    has got something from the queue, it sends it to the "MainThread"
-    by emitting a Qt Signal.
-    """
-    log_signal = pyqtSignal(str)
-
-    def __init__(self, queue, *args, **kwargs):
-        QObject.__init__(self, *args, **kwargs)
-        self.queue = queue
-
-    @pyqtSlot()
-    def run(self):
-        while True:
-            text = self.queue.get()
-            self.log_signal.emit(text)
-
-
 class SOLPS_MainWindow(QMainWindow):
     """Main window of the SOLPS GUI
 
@@ -1190,9 +1124,17 @@ class SOLPS_MainWindow(QMainWindow):
         log_receiver(LogReceiver) : Receiving messages from logging thread.
         stdout_thread(QThread) : Redirected sys.stdout to Log tab.
         stdout_receiver(LogReceiver): Receiver for stdout thread.
+        b2_user (pyqtSignal(str)): Emits the string for user value
+        b2_run_number (pyqtSignal(str)): Emits the string for run value
+        b2_shot_number (pyqtSignal(str)): Emits the string for shot value
+        b2_device (pyqtSignal(str)): Emits the string for device value
     """
 
     runSelected = pyqtSignal(str)
+    b2_user = pyqtSignal(str)
+    b2_run_number = pyqtSignal(str)
+    b2_shot_number = pyqtSignal(str)
+    b2_device = pyqtSignal(str)
 
     def __init__(self, *args):
         super(SOLPS_MainWindow, self).__init__(*args)
@@ -1240,40 +1182,7 @@ class SOLPS_MainWindow(QMainWindow):
         self.previous_tab_index = None   # For auto saving of Edit tab
         self.input_tab_index = self.tabWidget.indexOf(self.tab_Input)
 
-        # Create thread-safe Queue and redirect logging it
-        log_queue = queue.Queue()
-        log_stream = WriteStream(log_queue)
-        self.log_thread = QThread()
-        self.log_receiver = LogReceiver(log_queue)
-        self.log_receiver.log_signal.connect(
-            self.plainTextEdit_Log.appendHtml)
-        self.log_receiver.moveToThread(self.log_thread)
-        self.log_thread.started.connect(self.log_receiver.run)
-        self.log_thread.start()
-        log_handler = LoggingHandler(log_stream)
-        log_format = "%(asctime)s %(levelname)s: %(message)s"
-        log_handler.setFormatter(logging.Formatter(log_format))
-        logging.getLogger().addHandler(log_handler)
-        # get GUI settings
-        # TODO change/remove, we already used it
         settings = QSettings("ITER", "solps-gui")
-        log_levels = [logging.DEBUG, logging.INFO, logging.WARNING,
-                      logging.ERROR, logging.CRITICAL]
-        log_level = log_levels[int(settings.value('log_level', '1'))]
-        logging.getLogger().setLevel(log_level)
-
-        if REDIRECT_STDOUT_TO_LOG:
-            # Create thread-safe Queue and redirect sys.stdout to it
-            stdout_queue = queue.Queue()
-            sys.stdout = WriteStream(stdout_queue)
-            self.stdout_thread = QThread()
-            self.stdout_receiver = LogReceiver(stdout_queue)
-            self.stdout_receiver.log_signal.connect(
-                self.plainTextEdit_Log.insertPlainText)
-            self.stdout_receiver.moveToThread(self.stdout_thread)
-            self.stdout_thread.started.connect(self.stdout_receiver.run)
-            self.stdout_thread.start()
-
         settings.beginGroup("MainWindow")
         geometry = settings.value("Geometry")
         if geometry:
@@ -1377,6 +1286,12 @@ class SOLPS_MainWindow(QMainWindow):
         # Activate debugging on DivGeo widget
         # self.divgeo.activateDebugging()
 
+        # Connect id signals to put_edge_ids object (solps.ui)
+        self.b2_device.connect(self.put_edge_ids.setDevice)
+        self.b2_user.connect(self.put_edge_ids.setUser)
+        self.b2_run_number.connect(self.put_edge_ids.setRun)
+        self.b2_shot_number.connect(self.put_edge_ids.setShot)
+
     @pyqtSlot()
     def on_pushButton_Archive_clicked(self):
         """ Selecting directory and pressing Archive will add
@@ -1472,6 +1387,32 @@ class SOLPS_MainWindow(QMainWindow):
             model = self.proxyModel
             index_path = model.index(index.row(), Column.path, index.parent())
             path = model.data(index_path, Qt.DisplayRole)
+
+            index_user = model.index(index.row(), Column.user, index.parent())
+            user = model.data(index_user, Qt.DisplayRole)
+
+            if user:
+                self.b2_user.emit(user)
+
+            index_device = model.index(index.row(), Column.device,
+                                       index.parent())
+            device = model.data(index_device, Qt.DisplayRole)
+            if device:
+                self.b2_device.emit(device)
+
+            index_run = model.index(index.row(), Column.run, index.parent())
+            run = model.data(index_run, Qt.DisplayRole)
+
+            if run:
+                self.b2_run_number.emit(run)
+
+            index_shot = model.index(index.row(), Column.shot, index.parent())
+            shot = model.data(index_shot, Qt.DisplayRole)
+
+            if shot:
+                self.b2_shot_number.emit(shot)
+
+
             self.runSelected.emit(path)
 
     @pyqtSlot()
@@ -1791,7 +1732,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     # app.setStyle("windows")
     main_window = SOLPS_MainWindow()
-    # Activate or deactivate PutIds/GetIds
     main_window.show()
     code = app.exec_()
     app.quit()

@@ -3,7 +3,7 @@ SOLPS-ITER GUI
 
 ## Build environment
 
-Prepare Python 3, PyQt and ParaView with GCC 4.7+
+Prepare Python 3, PyQt and ParaView with GCC 4.8+
 
     ./build-pyqt.sh
     ./build-paraview.sh

@@ -2,6 +2,7 @@
 
 .. catalyst_:
 
+.. _catalyst-tutorial:
 
 =======================
 Using ParaView Catalyst
@@ -10,6 +11,9 @@ Using ParaView Catalyst
 With this tutorial we'll show how to instrument the SOLPS-ITER code with
 *in situ* visualization using ParaView Catalyst. SOLPS-ITER code needs to be
 compiled and linked with ParaView Catalyst libraries.
+
+.. note::   A short video tutorial on the use of the **Catalyst** is
+            available `here <https://youtu.be/PQwG3V4f2-U>`_.
 
 Building SOLPS-ITER with Catalyst
 ---------------------------------

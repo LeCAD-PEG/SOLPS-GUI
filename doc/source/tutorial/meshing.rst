@@ -3,9 +3,12 @@
 .. _meshing:
 
 
-=======================
-Meshing toolchain C-mod
-=======================
+=============
+Meshing C-Mod
+=============
+
+.. note::   A short video tutorial on the **Meshing toolchain** is
+            available `here <https://youtu.be/MtwH4vPCVic>`_.
 
 DivGeo
 ======
@@ -19,8 +22,7 @@ this tutorial::
 
      $ stop
      $ cd runs/examples
-     $ cmake . && make # Fetches all examples from external repository
-     $ tar xvzf tutorial-DivGeo_C-Mod.tar.gz
+     $ make tutorial-DivGeo_C-Mod
      $ cd tutorial-DivGeo_C-Mod/baserun
 
 The EFIT equilibrium file  ``baserun/g.990429019.00940`` in this example
@@ -75,7 +77,7 @@ DivGeo area after DivGeo appears in standalone window.
    :align: center
 
 Additionally the ``tutorial-DivGeo_C-Mod/`` contains DivGeo files for different
-stages in the tutorial in preparing the DivGeo model for the C-mod tokamak.
+stages in the tutorial in preparing the DivGeo model for the C-Mod tokamak.
 This way you can either start from beginning or from any point of the steps.
 
 Make sure that when you either load a DivGeo file or start a new, to then save

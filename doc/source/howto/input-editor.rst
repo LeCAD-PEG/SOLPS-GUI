@@ -3,9 +3,9 @@
 
 .. highlight:: csh
 
-==================
-Input editor HOWTO
-==================
+============
+Input editor
+============
 
 :Author: Gregor Simič, University of Ljubljana
 
@@ -39,6 +39,9 @@ path of the input file to the Eirene editor .py file. e.g.:
 .. code-block:: bash
 
     python3 eirene.py /PATH/TO/THE/INPUT/FILE
+
+.. note::   A tutorial on the use of the Eirene editor is
+            available :ref:`editors`.
 
 B2 editor
 =========

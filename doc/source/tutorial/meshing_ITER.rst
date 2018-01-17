@@ -3,9 +3,9 @@
 .. _meshing-iter:
 
 
-========================================
-Meshing toolchain-ITER Baseline scenario
-========================================
+==============================
+Meshing ITER Baseline scenario
+==============================
 
 DivGeo
 ======
@@ -18,8 +18,7 @@ located in the ``baserun`` run directory. The following commands repare the
 
      $ stop
      $ cd runs/examples
-     $ cmake . && make # Fetches all examples from external repository
-     $ tar xvzf tutorial-DivGeo_ITER_baseline_scenario.tar.gz
+     $ make tutorial-DivGeo_ITER_baseline_scenario
      $ cd tutorial-DivGeo_ITER_baseline_scenario/baserun
 
 The list of files are:
