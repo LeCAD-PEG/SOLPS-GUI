@@ -12,7 +12,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 case $(hostname -f) in
   *.iter.org)
         module purge
-        module load imas/3.12.0/ual/3.6.3 blitz/0.10 binutils/2.25
+        module load imas/3.15.0/ual/3.6.4 blitz/0.10 binutils/2.25
         module load OpenSSL/1.0.2g-GCC-4.8.3
         module unload zlib
         module load Python/2.7.9-goolf-1.5.16 # overwrite Anaconda2
