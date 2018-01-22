@@ -1,0 +1,612 @@
+/*
+* This file provides C++ routines for reading the plasma state out of
+* edge_profiles IDS.
+*/
+
+#include "read_ps_edge.h"
+#include "VTK_IDS_utility.h"
+#include "VTK_IDS_utility.cxx"
+#include <UALClasses.h>
+#include <vtkSmartPointer.h>
+#include <fstream>
+#include <iostream>
+#include <string>
+
+#define PLUGIN_UAL_VERSION_DIGIT UAL_VERSION_DIGIT
+
+using namespace std;
+using namespace IdsNs;
+
+
+/* Main function used to fully read plasma state from the edge_profiles IDS
+* and set the data properly to specified vtkUnstructuredGrid
+* @param inputVtkUnstructuredGrid   Input vtkUnstructuredGrid to fill
+* @param loc_ggd            \b edge_profiles_time_slice ggd IDS data structure
+* @param gridSubset_index   Grid subset index of the corresponding grid subset
+*                           to the vtkUnstructuredGrid
+* @param num_gridSubset_el  Number of grid subset elements forming the grid
+*                           subset
+*/
+template< typename EP1 >
+void readPSEdge::setAllDataFields_edge_profiles(
+    vtkSmartPointer<vtkUnstructuredGrid> inputVtkUnstructuredGrid,
+    EP1 loc_ggd,
+    int gridSubset_index,
+    int num_gridSubset_el)
+{
+    utilityVTKIDS vtkids_obj_ep;
+
+    // Set default value
+    int num_IDStarget_gridSubsets = 0;
+
+    // Assigning values - Electrons
+
+    // Assign values found in Electrons Temperature array of structures node to
+    // grid subsets objects
+    num_IDStarget_gridSubsets = loc_ggd.electrons.temperature.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Temperature",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.temperature(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Electrons Density array of structures node to
+    // grid subsets objects
+    num_IDStarget_gridSubsets = loc_ggd.electrons.density.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Density",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.density(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Electrons Density_Fast array of structures node to
+    // grid subsets objects
+    num_IDStarget_gridSubsets = loc_ggd.electrons.density_fast.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Density_Fast",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.density_fast(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Electrons Pressure array of structures node to
+    // grid subsets objects
+    num_IDStarget_gridSubsets = loc_ggd.electrons.pressure.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Pressure",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.pressure(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Electrons Pressure_Fast_Perpendicular array of
+    // structures node to grid subsets objects
+    num_IDStarget_gridSubsets =
+        loc_ggd.electrons.pressure_fast_perpendicular.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Pressure_Fast_Perpendicular",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.pressure_fast_perpendicular(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Electrons Pressure_Fast_Parallel array of
+    // structures  node to grid subsets objects
+    num_IDStarget_gridSubsets =
+        loc_ggd.electrons.pressure_fast_parallel.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Pressure_Fast_Parallel",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.pressure_fast_parallel(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // In UAL 3.6.3 and older versions the .velocity IDS data structure is
+    // simple structure node, while in 3.6.4 it was changed to array
+    // of structures node
+#if UAL_VERSION_DIGIT >= 364
+    // Reading Electron velocity ( GenericGridVectorComponents data structure
+    // type )
+    num_IDStarget_gridSubsets = loc_ggd.electrons.velocity.extent(0);
+    // Assign values found in Electrons Velocity array of structures
+    // node - Radial simple structure node to grid subsets objects
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+            "Electron Velocity - Radial",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.velocity(n),
+            "radial",
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Electrons Velocity array of structures
+    // node - Diamagnetic simple structure node to grid subsets objects
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+            "Electron Velocity - Diamagnetic",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.velocity(n),
+            "diamagnetic",
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Electrons Velocity array of structures
+    // node - Parallel simple structure node to grid subsets objects
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+            "Electron Velocity - Parallel",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.velocity(n),
+            "parallel",
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Electrons Velocity array of structures
+    // node - Poloidal simple structure node to grid subsets objects
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+            "Electron Velocity - Poloidal",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.velocity(n),
+            "poloidal",
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Electrons Velocity array of structures
+    // node - Toroidal simple structure node to grid subsets objects
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+            "Electron Velocity - Toroidal",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.velocity(n),
+            "toroidal",
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+#endif
+
+    // Assign values found in Electrons Distribution Function array of structures
+    // node to grid subsets objects
+    num_IDStarget_gridSubsets =
+        loc_ggd.electrons.distribution_function.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Distribution Function",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.distribution_function(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Ion substructure to grid subsets
+    // objects (2D cells)
+    int num_ion_species = loc_ggd.ion.extent(0);
+    for( int k = 0; k < num_ion_species; k++)
+    {
+        // Set ion specie label
+        std::string ion_charge= loc_ggd.ion(k).label;
+        std::string ion_array_label;
+
+        // Assign values found in Ion Temperature array of structures
+        // node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel( "Temperature", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).temperature.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).temperature(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+        // Assign values found in Ion Density array of structures
+        // node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel( "Density", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).density.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).density(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+        // Assign values found in Ion Density_Fast array of structures
+        // node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel( "Density_Fast", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).density_fast.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).density_fast(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+        // Assign values found in Ion Pressure array of structures
+        // node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel( "Pressure", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).pressure.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).pressure(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+        // Assign values found in Ion Pressure - Fast Perpendicular array of
+        // structures node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Pressure - Fast Perpendicular", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).pressure_fast_perpendicular.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).pressure_fast_perpendicular(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+        // Assign values found in Ion Pressure - Fast Parallel array of
+        // structures node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Pressure - Fast Parallel", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).pressure_fast_parallel.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).pressure_fast_parallel(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+    // In UAL 3.6.3 and older versions the .velocity IDS data structure is
+    // simple structure node, while in 3.6.4 it was changed to array
+    // of structures node
+#if UAL_VERSION_DIGIT >= 364
+        // Reading Ion velocity ( GenericGridVectorComponents data structure
+        // type )
+        num_IDStarget_gridSubsets = loc_ggd.ion(k).velocity.extent(0);
+        // Assign values found in Ion Velocity array of structures
+        // node - Radial simple structure node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Velocity - Radial", k, ion_charge );
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).velocity(n),
+                "radial",
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+        // Assign values found in Ion Velocity array of structures
+        // node - Diamagnetic simple structure node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Velocity - Diamagnetic", k, ion_charge );
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).velocity(n),
+                "diamagnetic",
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+        // Assign values found in Ion Velocity array of structures
+        // node - Parallel simple structure node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Velocity - Parallel", k, ion_charge );
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).velocity(n),
+                "parallel",
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+        // Assign values found in Ion Velocity array of structures
+        // node - Poloidal simple structure node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Velocity - Poloidal", k, ion_charge );
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).velocity(n),
+                "poloidal",
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+        // Assign values found in Ion Velocity array of structures
+        // node - Toroidal simple structure node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Velocity - Toroidal", k, ion_charge );
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).velocity(n),
+                "toroidal",
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+#endif
+
+        // Assign values found in Ion Energy Density Kinetic array of structures
+        // node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Energy Density Kinetic", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).energy_density_kinetic.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).energy_density_kinetic(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+    }
+}
+
+/* Main function used to fully read plasma state from the edge_sources IDS
+* and set the data properly to specified vtkUnstructuredGrid
+* @param inputVtkUnstructuredGrid   Input vtkUnstructuredGrid to fill
+* @param loc_ggd            \b edge_profiles_time_slice ggd IDS data structure
+* @param gridSubset_index   Grid subset index of the corresponding grid subset
+*                           to the vtkUnstructuredGrid
+* @param num_gridSubset_el  Number of grid subset elements forming the grid
+*                           subset
+*/
+template< typename ES1 >
+void readPSEdge::setAllDataFields_edge_sources(
+    vtkSmartPointer<vtkUnstructuredGrid> inputVtkUnstructuredGrid,
+    ES1 loc_ggd,
+    int gridSubset_index,
+    int num_gridSubset_el)
+{
+    utilityVTKIDS vtkids_obj_ep;
+
+    // Set default value
+    int num_IDStarget_gridSubsets = 0;
+
+    // Assigning values - Electrons
+
+    // Assign values found in Electrons Particles array of structures node to
+    // grid subsets objects
+    num_IDStarget_gridSubsets = loc_ggd.electrons.particles.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Particles",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.particles(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Electrons Energy array of structures node to
+    // grid subsets objects
+    num_IDStarget_gridSubsets = loc_ggd.electrons.energy.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Energy",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.energy(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Ion substructure to grid subsets
+    // objects (2D cells)
+    int num_ion_species = loc_ggd.ion.extent(0);
+    for( int k = 0; k < num_ion_species; k++)
+    {
+        // Set ion specie label
+        std::string ion_charge= loc_ggd.ion(k).label;
+        std::string ion_array_label;
+
+        // Assign values found in Ion Particles array of structures
+        // node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Particles", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).particles.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).particles(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+
+        // Assign values found in Ion Energy array of structures
+        // node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Energy", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).energy.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).energy(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+    }
+}
+
+/* Main function used to fully read plasma state from the edge_sources IDS
+* and set the data properly to specified vtkUnstructuredGrid
+* @param inputVtkUnstructuredGrid   Input vtkUnstructuredGrid to fill
+* @param loc_ggd            \b edge_profiles_time_slice ggd IDS data structure
+* @param gridSubset_index   Grid subset index of the corresponding grid subset
+*                           to the vtkUnstructuredGrid
+* @param num_gridSubset_el  Number of grid subset elements forming the grid
+*                           subset
+*/
+template< typename ET1 >
+void readPSEdge::setAllDataFields_edge_transport(
+    vtkSmartPointer<vtkUnstructuredGrid> inputVtkUnstructuredGrid,
+    ET1 loc_ggd,
+    int gridSubset_index,
+    int num_gridSubset_el)
+{
+    utilityVTKIDS vtkids_obj_ep;
+
+    // Set default value
+    int num_IDStarget_gridSubsets = 0;
+
+    // Assigning values - Electrons
+
+    // Assign values found in Electrons Particles - Flux array of structures
+    // node to grid subsets objects
+    num_IDStarget_gridSubsets = loc_ggd.electrons.particles.flux.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Particles - Flux",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.particles.flux(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Electrons Energy - Flux array of structures
+    // node to grid subsets objects
+    num_IDStarget_gridSubsets = loc_ggd.electrons.energy.flux.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Energy - Flux",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.energy.flux(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Ion substructure to grid subsets
+    // objects (2D cells)
+    int num_ion_species = loc_ggd.ion.extent(0);
+    for( int k = 0; k < num_ion_species; k++)
+    {
+        // Set ion specie label
+        std::string ion_charge= loc_ggd.ion(k).label;
+        std::string ion_array_label;
+
+        // Assign values found in Ion Particles - Flux array of structures
+        // node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Particles - Flux", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).particles.flux.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).particles.flux(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+        // Assign values found in Ion Energy - Flux array of structures
+        // node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Energy - Flux", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).energy.flux.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).energy.flux(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+    }
+}

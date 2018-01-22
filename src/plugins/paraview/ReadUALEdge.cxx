@@ -14,8 +14,8 @@
 
 #include "ReadUALEdge.h"
 #include <UALClasses.h>
-#include "read_ps_edge_profiles.h"
-#include "read_ps_edge_profiles.cxx"
+#include "read_ps_edge.h"
+#include "read_ps_edge.cxx"
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkDataObject.h>
@@ -349,6 +349,19 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // Get IDS data
     db._edge_profiles.get();
 
+    // For "edge_sources" selection in "Load IDS" text box
+    // (currently the geometry is still read fro the edge_profiles IDS)
+    if( std::string(LoadIDS).find( "edge_sources" ) != std::string::npos )
+    {
+        std::clog << "Reading edge_sources IDS." << std::endl;
+        db._edge_sources.get();
+    }else if( std::string(LoadIDS).find( "edge_transport" )
+        != std::string::npos )
+    {
+        std::clog << "Reading edge_transport IDS." << std::endl;
+        db._edge_transport.get();
+    }
+
     int num_ggd_slices = db._edge_profiles.ggd.extent(0);
     std::clog << "Number of GGD slices:" << num_ggd_slices << std::endl;
 
@@ -362,8 +375,10 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     }
 
     // Set class shortcuts for IDS substructures
-    class IDS::edge_profiles & edge = db._edge_profiles;
-    class IDS::edge_profiles::ggd & ggd = edge.ggd(0);
+    class IDS::edge_profiles & edge_profiles = db._edge_profiles;
+    class IDS::edge_sources  & edge_sources = db._edge_sources;
+    class IDS::edge_transport  & edge_transport = db._edge_transport;
+    class IDS::edge_profiles::ggd & ggd = edge_profiles.ggd(0);
     class IDS::edge_profiles::ggd::grid & grid = ggd.grid;
     class IDS::edge_profiles::ggd::grid::space & space = grid.space(0);
     // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
@@ -399,6 +414,9 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
     // Get number of grid subsets
     int num_gridSubset = grid.grid_subset.extent(0);
+
+    // Object declaration for readPSEdge routines
+    readPSEdge psep_obj;
 
     // Loop through all grid subsets and extract data for each
     for(int i = 0; i < num_gridSubset; i++){
@@ -443,12 +461,32 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             // For "edge_profiles" selection in "Load IDS" text box
             if( std::string(LoadIDS).find( "edge_profiles" ) != std::string::npos)
             {
-
-                // Using readPSEdgeProfiles function
-                readPSEdgeProfiles psep_obj1;
-                psep_obj1.EP_SetAllDataFields(
+                // Using readPSEdge function
+                psep_obj.setAllDataFields_edge_profiles(
                     gridSubsetPointsUnstructuredGrid,
-                    edge.ggd(0),
+                    edge_profiles.ggd(0),
+                    gridSubset_index,
+                    num_gridSubset_el);
+            // For "edge_sources" selection in "Load IDS" text box
+            }else if( std::string(LoadIDS).find( "edge_sources" ) !=
+                std::string::npos )
+            {
+                // Assigning values (2D cells)
+                // Using readPSEdge function
+                psep_obj.setAllDataFields_edge_sources(
+                    gridSubsetPointsUnstructuredGrid,
+                    edge_sources.source(0).ggd(0),
+                    gridSubset_index,
+                    num_gridSubset_el);
+            // For "edge_transport" selection in "Load IDS" text box
+            }else if( std::string(LoadIDS).find( "edge_transport" ) !=
+                std::string::npos )
+            {
+                // Assigning values (2D cells)
+                // Using readPSEdge function
+                psep_obj.setAllDataFields_edge_transport(
+                    gridSubsetPointsUnstructuredGrid,
+                    edge_transport.model(0).ggd(0),
                     gridSubset_index,
                     num_gridSubset_el);
             }
@@ -523,17 +561,40 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             int num_IDStarget_gridSubsets = 0;
 
             // For "edge_profiles" selection in "Load IDS" text box
-            if( std::string(LoadIDS).find( "edge_profiles" ) != std::string::npos)
+            if( std::string(LoadIDS).find( "edge_profiles" ) !=
+                std::string::npos )
             {
                 // Assigning values (2D cells)
-                // Using readPSEdgeProfiles function
-                readPSEdgeProfiles psep_obj2;
-                psep_obj2.EP_SetAllDataFields(
+                // Using readPSEdge function
+                psep_obj.setAllDataFields_edge_profiles(
                     gridSubsetCellsUnstructuredGrid,
-                    edge.ggd(0),
+                    edge_profiles.ggd(0),
+                    gridSubset_index,
+                    num_gridSubset_el);
+            // For "edge_sources" selection in "Load IDS" text box
+            }else if( std::string(LoadIDS).find( "edge_sources" ) !=
+                std::string::npos )
+            {
+                // Assigning values (2D cells)
+                // Using readPSEdge function
+                psep_obj.setAllDataFields_edge_sources(
+                    gridSubsetCellsUnstructuredGrid,
+                    edge_sources.source(0).ggd(0),
+                    gridSubset_index,
+                    num_gridSubset_el);
+            // For "edge_transport" selection in "Load IDS" text box
+            }else if( std::string(LoadIDS).find( "edge_transport" ) !=
+                std::string::npos )
+            {
+                // Assigning values (2D cells)
+                // Using readPSEdge function
+                psep_obj.setAllDataFields_edge_transport(
+                    gridSubsetCellsUnstructuredGrid,
+                    edge_transport.model(0).ggd(0),
                     gridSubset_index,
                     num_gridSubset_el);
             }
+
             // Add unstructured grid to main block
             fAddBlock2MultiBlock(mainMB, gridSubsetCellsUnstructuredGrid,
                 gridSubset_name );
