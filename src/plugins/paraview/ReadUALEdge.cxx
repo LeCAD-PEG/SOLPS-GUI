@@ -14,8 +14,8 @@
 
 #include "ReadUALEdge.h"
 #include <UALClasses.h>
-#include <read_ps_edge_profiles.h>
-#include <read_ps_edge_profiles.cxx>
+#include "read_ps_edge_profiles.h"
+#include "read_ps_edge_profiles.cxx"
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkDataObject.h>
@@ -400,22 +400,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // Get number of grid subsets
     int num_gridSubset = grid.grid_subset.extent(0);
 
-    // Set array of plasma state (ion) quantity names (Density,
-    // etc. Temperature )
-    std::string edge_quantity_names[12];
-    edge_quantity_names[0] = "Temperature";
-    edge_quantity_names[1] = "Density";
-    edge_quantity_names[2] = "Density_Fast";
-    edge_quantity_names[3] = "Pressure";
-    edge_quantity_names[4] = "Pressure_Fast_Perpendicular";
-    edge_quantity_names[5] = "Pressure_Fast_Parallel";
-    edge_quantity_names[6] = "Velocity - Radial";
-    edge_quantity_names[7] = "Velocity - Diamagnetic";
-    edge_quantity_names[8] = "Velocity - Parallel";
-    edge_quantity_names[9] = "Velocity - Poloidal";
-    edge_quantity_names[10] = "Velocity - Toroidal";
-    edge_quantity_names[11] = "Energy Density Kinetic";
-
     // Loop through all grid subsets and extract data for each
     for(int i = 0; i < num_gridSubset; i++){
         class IDS::edge_profiles::ggd::grid::grid_subset & grid_subset =
@@ -461,8 +445,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             {
 
                 // Using readPSEdgeProfiles function
-                utilityPSEdgeProfiles psep_obj1;
-                psep_obj1.EPmain_setAllValues_GenericGridScalar(
+                readPSEdgeProfiles psep_obj1;
+                psep_obj1.EP_SetAllDataFields(
                     gridSubsetPointsUnstructuredGrid,
                     edge.ggd(0),
                     gridSubset_index,
@@ -543,8 +527,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             {
                 // Assigning values (2D cells)
                 // Using readPSEdgeProfiles function
-                utilityPSEdgeProfiles psep_obj2;
-                psep_obj2.EPmain_setAllValues_GenericGridScalar(
+                readPSEdgeProfiles psep_obj2;
+                psep_obj2.EP_SetAllDataFields(
                     gridSubsetCellsUnstructuredGrid,
                     edge.ggd(0),
                     gridSubset_index,
