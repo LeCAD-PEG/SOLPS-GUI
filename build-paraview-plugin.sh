@@ -8,7 +8,6 @@ QT_VERSION=${QT_VERSION:-4.8.7}
 DOWNLOAD_DIR=${DOWNLOAD_DIR:-${BUILDROOT}/download}
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 
-
 case $(hostname -f) in
   *.iter.org)
         module purge
@@ -74,10 +73,14 @@ export PATH=${STAGING_DIR}/qt/${QT_VERSION}/bin:${PATH}
 
 name=Edge
 [ -d ${BUILD_DIR}/Plugins-ReadUAL${name} ] && rm ${BUILD_DIR}/Plugins-ReadUAL${name}/CMakeCache.txt
+# Set new environment variable to store UAL_VERSION as single digit to be used as preprocessor variable while compiling the plugin
+UAL_VERSION_DIGIT=$(echo "$UAL_VERSION" | sed "s/\.//g")
 install -d ${BUILD_DIR}/Plugins-ReadUAL${name}
 install -d ${STAGING_PLUGINS}
 cd ${BUILD_DIR}/Plugins-ReadUAL${name}
+BUILDROOT=${BUILDROOT} \
 PATH=${STAGING_DIR}/bin:${PATH} \
+UAL_VERSION_DIGIT=${UAL_VERSION_DIGIT} \
  ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Debug \
     -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
     -DParaView_DIR:PATH=${STAGING_PARAVIEW} \

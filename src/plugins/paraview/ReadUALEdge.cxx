@@ -48,7 +48,7 @@
 #include <vector>
 
 #define IMAS_IDS
-#define UAL_VERSION
+#define PLUGIN_UAL_VERSION_DIGIT UAL_VERSION_DIGIT
 
 // From ggd/f90/src/service/ids_grid_common.f90
 // First cartesian coordinate in the horizontal plane [m]
@@ -276,26 +276,57 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     using namespace IdsNs;
 
     // Check IMAS and UAL version
-    std::string imas_version = getenv("IMAS_VERSION");
-    std::string ual_version = getenv("UAL_VERSION");
-    std::clog << "IMAS VERSION: " << imas_version << std::endl;
-    std::clog << "UAL VERSION: " << ual_version << std::endl;
-    // Get UAL version as an integer (e.g. 3.6.3 -> 363)
-    std::string ual_version_str = std::string() + ual_version[0] +
-        ual_version[2] + ual_version [4];
-    int ual_version_int = std::stoi( ual_version_str );
+    std::string load_IV = getenv("IMAS_VERSION");
+    std::string load_UV = getenv("UAL_VERSION");
+    // Get UAL version digit, used to compile the plugin, as a string
+    // (e.g. 363 -> 3.6.3)
+    std::string plugin_UV = std::to_string(PLUGIN_UAL_VERSION_DIGIT);
+    plugin_UV = std::string() + plugin_UV[0] +
+        "." + plugin_UV[1] + "." + plugin_UV [2];
+    // Get currently loaded UAL version as an integer (e.g. 3.6.3 -> 363)
+    std::string load_UV_str = std::string() + load_UV[0] +
+        load_UV[2] + load_UV [4];
+    int load_UV_DIGIT = std::stoi( load_UV_str );
     // Latest UAL version, for which it is confirmed the plugin is compatible
     // with ( in single integer form )
-    int ual_version_int_comp = 364;
+    std::string UV_latest_string = "3.6.4";
+    int UV_latest_DIGIT = 364;
 
-    if (ual_version_int < ual_version_int_comp )
+    std::clog << "LOADED IMAS VERSION: " << load_IV << std::endl;
+    std::clog << "LOADED UAL VERSION: " << load_UV << std::endl;
+    std::clog << "PLUGIN UAL VERSION: " << plugin_UV << std::endl;
+
+    // UAL version checks
+    if( load_UV_DIGIT < UV_latest_DIGIT )
     {
         std::cerr << "WARNING! This UAL (and consequently "
                     "Data Dictionary) is outdated! ReadUALEdge plugin might "
-                    "not be fully compatible with the currently used Data "
-                    "Dictionary! The latest UAL, confirmed to be "
+                    "not be fully compatible with the currently loaded Data "
+                    "Dictionary! "
+                    "The latest UAL, confirmed to be "
+                    "compatible with the ReadUALEdge plugin, is ual 3.6.4 "
+                    "( IMAS module imas/3.15.0/ual/3.6.4 ) while the oldest "
+                    "is UAL 3.5.0 ( IMAS module imas/3.8.0/ual/3.5.0)."
+                    << std::endl;
+    }
+    if( load_UV_DIGIT != PLUGIN_UAL_VERSION_DIGIT )
+    {
+        std::cerr << "WARNING! For best practice it is recommended that the "
+                    "same IMAS/UAL version is used for writing the IDSs, "
+                    "compiling the ReadUALEdge plugin and then for loading "
+                    "the plugin within the ParaView application."
+                    << std::endl;
+    }
+    if( PLUGIN_UAL_VERSION_DIGIT < UV_latest_DIGIT)
+    {
+        std::cerr << "WARNING! The UAL version (and consequently "
+                    "Data Dictionary), used to compile the ReadUALEdge plugin, "
+                    "is outdated! "
+                    "The latest UAL, confirmed to be "
                     "compatible with the ReadUALEdge, is ual 3.6.4 "
-                    "( IMAS module imas/3.15.0/ual/3.6.4" << std::endl;
+                    "( IMAS module imas/3.15.0/ual/3.6.4 ) while the oldest "
+                    "is UAL 3.5.0 ( IMAS module imas/3.8.0/ual/3.5.0)."
+                    << std::endl;
     }
 
     std::clog << "Reading IDS" << std::endl;

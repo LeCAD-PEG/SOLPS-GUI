@@ -118,7 +118,10 @@ void utilityPSEdgeProfiles::EPmain_setAllValues_GenericGridScalar(
             num_gridSubset_el );
     }
 
-
+    // In UAL 3.6.3 and older versions the .velocity IDS data structure is
+    // simple structure node, while in 3.6.4 it was changed to array
+    // of structures node
+#if UAL__VERSION_DIGIT >= 364
     // Reading Electron velocity ( GenericGridVectorComponents data structure
     // type )
     num_IDStarget_gridSubsets = loc_ggd.electrons.velocity.extent(0);
@@ -186,6 +189,7 @@ void utilityPSEdgeProfiles::EPmain_setAllValues_GenericGridScalar(
             gridSubset_index,
             num_gridSubset_el );
     }
+#endif
 
     // Assign values found in Electron Distribution Function array of structures
     // node to grid subsets objects
@@ -308,6 +312,10 @@ void utilityPSEdgeProfiles::EPmain_setAllValues_GenericGridScalar(
                 num_gridSubset_el );
         }
 
+    // In UAL 3.6.3 and older versions the .velocity IDS data structure is
+    // simple structure node, while in 3.6.4 it was changed to array
+    // of structures node
+#if UAL__VERSION_DIGIT >= 364
         // Reading Ion velocity ( GenericGridVectorComponents data structure
         // type )
         num_IDStarget_gridSubsets = loc_ggd.ion(k).velocity.extent(0);
@@ -390,6 +398,7 @@ void utilityPSEdgeProfiles::EPmain_setAllValues_GenericGridScalar(
                 gridSubset_index,
                 num_gridSubset_el );
         }
+#endif
 
         // Assign values found in Ion Energy Density Kinetic array of structures
         // node to grid subsets objects
