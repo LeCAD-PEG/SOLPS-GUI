@@ -12,7 +12,7 @@
 #include <iostream>
 #include <string>
 
-#define PLUGIN_UAL_VERSION_DIGIT UAL_VERSION_DIGIT
+#define PLUGIN_IMAS_VERSION_DIGIT IMAS_VERSION_DIGIT
 
 using namespace std;
 using namespace IdsNs;
@@ -121,10 +121,10 @@ void readPSEdge::setAllDataFields_edge_profiles(
             num_gridSubset_el );
     }
 
-    // In UAL 3.6.3 and older versions the .velocity IDS data structure is
+    // In IMAS 3.15.0 and older versions the .velocity IDS data structure is
     // simple structure node, while in 3.6.4 it was changed to array
     // of structures node
-#if UAL_VERSION_DIGIT >= 364
+#if IMAS_VERSION_DIGIT >= 3150
     // Reading Electron velocity ( GenericGridVectorComponents data structure
     // type )
     num_IDStarget_gridSubsets = loc_ggd.electrons.velocity.extent(0);
@@ -315,10 +315,10 @@ void readPSEdge::setAllDataFields_edge_profiles(
                 num_gridSubset_el );
         }
 
-    // In UAL 3.6.3 and older versions the .velocity IDS data structure is
+    // In IMAS 3.15.0 and older versions the .velocity IDS data structure is
     // simple structure node, while in 3.6.4 it was changed to array
     // of structures node
-#if UAL_VERSION_DIGIT >= 364
+#if IMAS_VERSION_DIGIT >= 3150
         // Reading Ion velocity ( GenericGridVectorComponents data structure
         // type )
         num_IDStarget_gridSubsets = loc_ggd.ion(k).velocity.extent(0);

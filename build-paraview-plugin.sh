@@ -73,14 +73,14 @@ export PATH=${STAGING_DIR}/qt/${QT_VERSION}/bin:${PATH}
 
 name=Edge
 [ -d ${BUILD_DIR}/Plugins-ReadUAL${name} ] && rm ${BUILD_DIR}/Plugins-ReadUAL${name}/CMakeCache.txt
-# Set new environment variable to store UAL_VERSION as single digit to be used as preprocessor variable while compiling the plugin
-UAL_VERSION_DIGIT=$(echo "$UAL_VERSION" | sed "s/\.//g")
+# Set new environment variable to store IMAS_VERSION as single digit to be used as preprocessor variable while compiling the plugin
+IMAS_VERSION_DIGIT=$(echo "$IMAS_VERSION" | sed "s/\.//g")
 install -d ${BUILD_DIR}/Plugins-ReadUAL${name}
 install -d ${STAGING_PLUGINS}
 cd ${BUILD_DIR}/Plugins-ReadUAL${name}
 BUILDROOT=${BUILDROOT} \
 PATH=${STAGING_DIR}/bin:${PATH} \
-UAL_VERSION_DIGIT=${UAL_VERSION_DIGIT} \
+IMAS_VERSION_DIGIT=${IMAS_VERSION_DIGIT} \
  ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Debug \
     -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
     -DParaView_DIR:PATH=${STAGING_PARAVIEW} \
