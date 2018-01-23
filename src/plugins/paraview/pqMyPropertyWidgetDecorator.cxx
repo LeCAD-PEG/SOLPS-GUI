@@ -29,8 +29,13 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqMyPropertyWidgetDecorator.h"
 
+/*
+* This source file specifies the behaviour of the 'ShotRunList' widget
+* in relation to the 'IDSListCheckBox' and 'user' widget.
+*/
+
+#include "pqMyPropertyWidgetDecorator.h"
 #include "pqCoreUtilities.h"
 #include "pqPropertyWidget.h"
 #include "vtkCommand.h"
@@ -47,7 +52,8 @@ pqMyPropertyWidgetDecorator::pqMyPropertyWidgetDecorator(
     : Superclass(config, parentObject)
 {
     vtkSMProxy* proxy = parentObject->proxy();
-    vtkSMProperty* prop_IDSListCheckBox = proxy? proxy->GetProperty("IDSListCheckBox") : NULL;
+    vtkSMProperty* prop_IDSListCheckBox =
+        proxy? proxy->GetProperty("IDSListCheckBox") : NULL;
     if (!prop_IDSListCheckBox)
     {
         qDebug("Could not locate property named 'IDSListCheckBox'. "
@@ -64,9 +70,6 @@ pqMyPropertyWidgetDecorator::pqMyPropertyWidgetDecorator(
     this->ObserverId = pqCoreUtilities::connect(
         prop_user, vtkCommand::UncheckedPropertyModifiedEvent,
         this, SIGNAL(visibilityChanged()));
-
-
-    vtkSMProperty* prop_list = proxy? proxy->GetProperty("ShotRunList") : NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -83,11 +86,17 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
 {
     pqPropertyWidget* parentObject = this->parentWidget();
     vtkSMProxy* proxy = parentObject->proxy();
-    vtkSMProperty* prop_IDSListCheckBox = proxy? proxy->GetProperty("IDSListCheckBox") : NULL;
+    vtkSMProperty* prop_IDSListCheckBox =
+        proxy? proxy->GetProperty("IDSListCheckBox") : NULL;
+
+    // This shows/hides the list if the IDSListCheckBox is enabled/disabled
     if (prop_IDSListCheckBox)
     {
-        double value = vtkSMUncheckedPropertyHelper(prop_IDSListCheckBox).GetAsInt();
-        if (value ==0)
+        double value =
+            vtkSMUncheckedPropertyHelper(prop_IDSListCheckBox).GetAsInt();
+        // While the check box is set as disabled it will give value 0. Until
+        // the value changes to 1 the 'ShotRunList' will remain to be hidden
+        if (value == 0)
         {
             return false;
         }
@@ -187,14 +196,6 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
         proxy->UpdatePropertyInformation(prop_SHlist_strVec);
         proxy->UpdateSelfAndAllInputs();
     }
-
-    // TODO
-    // "Load IDS" to show advanced options for some of the selected IDSs.
-    // Intended for insertion of custom .source(:) IDS structure (edge_sources)
-    // or .model(:) IDS structure (edge_transport)
-    // vtkSMProperty* prop_loadIDS = proxy? proxy->GetProperty("Load IDS") : NULL;
-    // vtkSMStringVectorProperty* prop_loadIDS_strVec =
-    //     dynamic_cast<vtkSMStringVectorProperty*>(proxy->GetProperty("Load IDS"));
 
     return this->Superclass::canShowWidget(show_advanced);
 }

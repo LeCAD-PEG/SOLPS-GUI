@@ -44,12 +44,13 @@
             </StringVectorProperty>
 
             <StringVectorProperty
-				name="Device"
-       	        label="Device"
-       	        command="SetDevice"
-       	        number_of_elements="1"
-       	        default_values="solps-iter"
-       	        panel_visibility="default">
+                name="Device"
+                label="Device"
+                command="SetDevice"
+                number_of_elements="1"
+                default_values="solps-iter"
+                panel_visibility="default"
+                immediate_update="true">
                 <Documentation>
                     This property specifies the Device for the UAL Database.
                 </Documentation>
@@ -60,7 +61,8 @@
                 label="Load IDS"
                 command="SetLoadIDS"
                 number_of_elements="1"
-                default_values="edge_profiles">
+                default_values="edge_profiles"
+                immediate_update="true">
                 <StringListDomain name="LoadIDSstringList">
                     <String value="edge_profiles"/>
                     <String value="edge_sources"/>
@@ -72,6 +74,24 @@
                     affects which data fields are read.
                 </Documentation>
             </StringVectorProperty>
+
+            <IntVectorProperty
+                name="EdgeSourcesSource"
+                label="Edge_Sources.source(:) structure array"
+                command="SetEdgeSourcesSource"
+                number_of_elements="1"
+                default_values="1"
+                panel_visibility="default" >
+                <IntRangeDomain name="range"/>
+                <Documentation>
+                    This property specifies the Edge_Sources.source(:)
+                    structure array. Takes value from 1 forward (1, 2, ...).
+                </Documentation>
+                <Hints>
+                   <WidgetHeight number_of_rows="1" />
+                   <PropertyWidgetDecorator type="my_decorator_EdgeSources"/>
+                </Hints>
+            </IntVectorProperty>
 
             <Property
                 name="Refresh"
@@ -101,7 +121,7 @@
                 repeat_command ="1"
                 panel_visibility="default">
 		 	    <Documentation>
-    			 	List of avaiable Shot/Run-s for specified user.
+    			 	List of available Shot/Run-s for specified user.
 		 	    </Documentation>
 		 	    <Hints>
 			 	   <WidgetHeight number_of_rows="12" />

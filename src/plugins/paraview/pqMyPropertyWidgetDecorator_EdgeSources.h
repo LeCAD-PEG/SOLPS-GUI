@@ -29,30 +29,30 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqMyPropertyWidgetDecorator_h
-#define __pqMyPropertyWidgetDecorator_h
+#ifndef __pqMyPropertyWidgetDecorator_EdgeSources_h
+#define __pqMyPropertyWidgetDecorator_EdgeSources_h
 
 /*
-* This source file specifies the behaviour of the 'ShotRunList' widget
-* in relation to the 'IDSListCheckBox' and 'user' widget.
+* This source file specifies the behaviour of the EdgeSourcesSource widget
+* in relation to the LoadIDS widget.
 */
 
 #include "pqPropertyWidgetDecorator.h"
 #include "vtkWeakPointer.h"
 class vtkObject;
 
-class pqMyPropertyWidgetDecorator : public pqPropertyWidgetDecorator
+class pqMyPropertyWidgetDecorator_EdgeSources : public pqPropertyWidgetDecorator
 {
     Q_OBJECT
     typedef pqPropertyWidgetDecorator Superclass;
 public:
-    pqMyPropertyWidgetDecorator(
+    pqMyPropertyWidgetDecorator_EdgeSources(
         vtkPVXMLElement* config, pqPropertyWidget* parentObject);
-    virtual ~pqMyPropertyWidgetDecorator();
+    virtual ~pqMyPropertyWidgetDecorator_EdgeSources();
 
     virtual bool canShowWidget(bool show_advanced) const;
 private:
-    Q_DISABLE_COPY(pqMyPropertyWidgetDecorator)
+    Q_DISABLE_COPY(pqMyPropertyWidgetDecorator_EdgeSources)
 
     vtkWeakPointer<vtkObject> ObservedObject;
     unsigned long ObserverId;
