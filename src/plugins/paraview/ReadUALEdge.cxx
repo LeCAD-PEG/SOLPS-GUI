@@ -489,7 +489,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 // Using readPSEdge function
                 psep_obj.setAllDataFields_edge_sources(
                     gridSubsetPointsUnstructuredGrid,
-                    edge_sources.source(0).ggd(0),
+                    edge_sources.source(this->EdgeSourcesSource).ggd(0),
                     gridSubset_index,
                     num_gridSubset_el);
             // For "edge_transport" selection in "Load IDS" text box
@@ -593,7 +593,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 // Using readPSEdge function
                 psep_obj.setAllDataFields_edge_sources(
                     gridSubsetCellsUnstructuredGrid,
-                    edge_sources.source(0).ggd(0),
+                    edge_sources.source(this->EdgeSourcesSource).ggd(0),
                     gridSubset_index,
                     num_gridSubset_el);
             // For "edge_transport" selection in "Load IDS" text box

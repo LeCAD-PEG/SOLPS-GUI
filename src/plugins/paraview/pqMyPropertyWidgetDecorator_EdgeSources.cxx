@@ -86,8 +86,9 @@ bool pqMyPropertyWidgetDecorator_EdgeSources::
 
     if (prop_IDSLoad)
     {
-        const char* ids_value = vtkSMUncheckedPropertyHelper(prop_IDSLoad).GetAsString();
-        if( std::string(ids_value).find( "edge_sources" ) == std::string::npos )
+        const char* ids_value =
+            vtkSMUncheckedPropertyHelper(prop_IDSLoad).GetAsString();
+        if (std::string(ids_value).find( "edge_sources" ) == std::string::npos)
         {
             return false;
         }
@@ -96,22 +97,23 @@ bool pqMyPropertyWidgetDecorator_EdgeSources::
     vtkSMProperty* prop_EdgeSourcesSource =
         proxy? proxy->GetProperty("EdgeSourcesSource") : NULL;
     vtkSMStringVectorProperty* prop_EdgeSourcesSource_strVec =
-        dynamic_cast<vtkSMStringVectorProperty*>(proxy->GetProperty("EdgeSourcesSource"));
+        dynamic_cast<vtkSMStringVectorProperty*>(proxy->
+        GetProperty("EdgeSourcesSource"));
 
     int EdgeSources_source_int;
-    if(prop_EdgeSourcesSource)
+    if (prop_EdgeSourcesSource)
     {
         // Getting integer currently in"EdgeSourcesSource" checkbox to string
-        std::clog << "---prop_EdgeSourcesSource Printself---: " << std::endl;
-        prop_EdgeSourcesSource->PrintSelf(std::clog, vtkIndent());
+        // std::clog << "---prop_EdgeSourcesSource Printself---: " << std::endl;
+        // prop_EdgeSourcesSource->PrintSelf(std::clog, vtkIndent());
         EdgeSources_source_int =
             vtkSMPropertyHelper(prop_EdgeSourcesSource).GetAsInt();
     }
-    if(prop_IDSLoad)
+    if (prop_IDSLoad)
     {
         // Getting text currently in"User" checkbox to string
-        std::clog << "---prop_IDSLoad Printself---: " << std::endl;
-        prop_IDSLoad->PrintSelf(std::clog, vtkIndent());
+        // std::clog << "---prop_IDSLoad Printself---: " << std::endl;
+        // prop_IDSLoad->PrintSelf(std::clog, vtkIndent());
     }
     return this->Superclass::canShowWidget(show_advanced);
 }

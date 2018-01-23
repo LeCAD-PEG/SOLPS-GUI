@@ -70,6 +70,11 @@ pqMyPropertyWidgetDecorator::pqMyPropertyWidgetDecorator(
     this->ObserverId = pqCoreUtilities::connect(
         prop_user, vtkCommand::UncheckedPropertyModifiedEvent,
         this, SIGNAL(visibilityChanged()));
+
+    vtkSMProperty* prop_device = proxy? proxy->GetProperty("Device") : NULL;
+    this->ObserverId = pqCoreUtilities::connect(
+        prop_device, vtkCommand::UncheckedPropertyModifiedEvent,
+        this, SIGNAL(visibilityChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -115,15 +120,15 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
     if(prop_user)
     {
         // Getting text currently in"User" checkbox to string
-        std::clog << "---prop_user Printself---: " << std::endl;
-        prop_user->PrintSelf(std::clog, vtkIndent());
+        // std::clog << "---prop_user Printself---: " << std::endl;
+        // prop_user->PrintSelf(std::clog, vtkIndent());
         user = vtkSMUncheckedPropertyHelper(prop_user).GetAsString();
     }
     if(prop_list)
     {
         // Getting text currently in"User" checkbox to string
-        std::clog << "---prop_list Printself---: " << std::endl;
-        prop_list->PrintSelf(std::clog, vtkIndent());
+        // std::clog << "---prop_list Printself---: " << std::endl;
+        // prop_list->PrintSelf(std::clog, vtkIndent());
     }
 
     // Getting the users $HOME directory
@@ -147,22 +152,23 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
     }
     pclose(pipe);
 
-    // Setting imasdb directory using the Device textbox on Apply
+    /// Setting imasdb directory using the Device textbox on Apply
     // Default database directory
     std::string userIMASShotRunDir = homedir + "/public/imasdb/solps-iter/3/0";
-    // Read changed value
+    // Get changed value
     vtkSMProperty* prop_device = proxy? proxy->GetProperty("Device") : NULL;
     vtkSMStringVectorProperty* prop_device_strVec =
         dynamic_cast<vtkSMStringVectorProperty*>(proxy->GetProperty("Device"));
     if(prop_device)
     {
         // Getting text currently in"User" checkbox to string on Apply
-        std::clog << "---prop_device Printself---: " << std::endl;
-        prop_device->PrintSelf(std::clog, vtkIndent());
+        // std::clog << "---prop_device Printself---: " << std::endl;
+        // prop_device->PrintSelf(std::clog, vtkIndent());
         std::clog << prop_device->GetXMLName() << std::endl;
-        // Read Device GUI text box and set this value to db_dir (short for
-        // database directory)
-        std::string db_dir = prop_device_strVec->GetElement(0);
+        // Get Device GUI text box string and set this value to db_dir
+        // (short for database directory)
+        std::string db_dir =
+            vtkSMUncheckedPropertyHelper(prop_device).GetAsString();
         userIMASShotRunDir = homedir + "/public/imasdb/" + db_dir + "/3/0";
         // userIMASShotRunDir.erase(std::remove(userIMASShotRunDir.begin(),
         //     userIMASShotRunDir.end(), '\n'), userIMASShotRunDir.end());

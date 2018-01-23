@@ -80,12 +80,13 @@
                 label="Edge_Sources.source(:) structure array"
                 command="SetEdgeSourcesSource"
                 number_of_elements="1"
-                default_values="1"
+                default_values="0"
                 panel_visibility="default" >
                 <IntRangeDomain name="range"/>
                 <Documentation>
                     This property specifies the Edge_Sources.source(:)
-                    structure array. Takes value from 1 forward (1, 2, ...).
+                    structure array. Python notation (0, 1, 2, ...).
+                    Default value = 0.
                 </Documentation>
                 <Hints>
                    <WidgetHeight number_of_rows="1" />

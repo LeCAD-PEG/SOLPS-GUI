@@ -72,8 +72,8 @@ export PATH=${STAGING_DIR}/qt/${QT_VERSION}/bin:${PATH}
 
 
 name=Edge
-[ -d ${BUILD_DIR}/Plugins-ReadUAL${name} ] && /
-    rm -f ${BUILD_DIR}/Plugins-ReadUAL${name}/CMakeCache.txt
+# [ -d ${BUILD_DIR}/Plugins-ReadUAL${name} ] && /
+#     rm -f ${BUILD_DIR}/Plugins-ReadUAL${name}/CMakeCache.txt
 # Set new environment variable to store IMAS_VERSION as single digit to be used as preprocessor variable while compiling the plugin
 IMAS_VERSION_DIGIT=$(echo "$IMAS_VERSION" | sed "s/\.//g")
 install -d ${BUILD_DIR}/Plugins-ReadUAL${name}
