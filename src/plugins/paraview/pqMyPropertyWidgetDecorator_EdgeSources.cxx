@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 
 /*
-* This source file specifies the behaviour of the EdgeSourcesSource widget
+* This source file specifies the behaviour of the EdgeSourcesSourceID widget
 * in relation to the LoadIDS widget.
 */
 
@@ -94,20 +94,20 @@ bool pqMyPropertyWidgetDecorator_EdgeSources::
         }
     }
 
-    vtkSMProperty* prop_EdgeSourcesSource =
-        proxy? proxy->GetProperty("EdgeSourcesSource") : NULL;
-    vtkSMStringVectorProperty* prop_EdgeSourcesSource_strVec =
+    vtkSMProperty* prop_EdgeSourcesSourceID =
+        proxy? proxy->GetProperty("EdgeSourcesSourceID") : NULL;
+    vtkSMStringVectorProperty* prop_EdgeSourcesSourceID_strVec =
         dynamic_cast<vtkSMStringVectorProperty*>(proxy->
-        GetProperty("EdgeSourcesSource"));
+        GetProperty("EdgeSourcesSourceID"));
 
     int EdgeSources_source_int;
-    if (prop_EdgeSourcesSource)
+    if (prop_EdgeSourcesSourceID)
     {
-        // Getting integer currently in"EdgeSourcesSource" checkbox to string
-        // std::clog << "---prop_EdgeSourcesSource Printself---: " << std::endl;
-        // prop_EdgeSourcesSource->PrintSelf(std::clog, vtkIndent());
+        // Getting integer currently in "EdgeSourcesSourceID" checkbox to string
+        // std::clog << "---prop_EdgeSourcesSourceID Printself---: " << std::endl;
+        // prop_EdgeSourcesSourceID->PrintSelf(std::clog, vtkIndent());
         EdgeSources_source_int =
-            vtkSMPropertyHelper(prop_EdgeSourcesSource).GetAsInt();
+            vtkSMPropertyHelper(prop_EdgeSourcesSourceID).GetAsInt();
     }
     if (prop_IDSLoad)
     {

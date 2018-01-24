@@ -90,7 +90,8 @@ ReadUALEdge::ReadUALEdge()
 *   the found shot/runs into vector for later use
 */
 std::vector<std::string> findShotRun(   std::string userIMASShotRunDir,
-                                        std::string user)
+                                        std::string user,
+                                        std::string device)
 {
     DIR *pDIR = NULL;
     struct dirent *entry = NULL;
@@ -110,8 +111,9 @@ std::vector<std::string> findShotRun(   std::string userIMASShotRunDir,
     // Check if the directory exists
     if (stat(dirPath.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))
     {
-        std::clog <<"IDS directory from user " << user <<
-            " found. Reading available IDS shot/runs." << std::endl;
+        std::clog <<"IDS imasdb directory '" << device << "' from user '" <<
+            user << "' found: '" << userIMASShotRunDir <<
+            "' Reading available IDS shot/runs." << std::endl;
         if( pDIR=opendir(dirPath.c_str()))
         {
             while(entry = readdir(pDIR))
@@ -489,7 +491,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 // Using readPSEdge function
                 psep_obj.setAllDataFields_edge_sources(
                     gridSubsetPointsUnstructuredGrid,
-                    edge_sources.source(this->EdgeSourcesSource).ggd(0),
+                    edge_sources.source(this->EdgeSourcesSourceID).ggd(0),
                     gridSubset_index,
                     num_gridSubset_el);
             // For "edge_transport" selection in "Load IDS" text box
@@ -593,7 +595,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 // Using readPSEdge function
                 psep_obj.setAllDataFields_edge_sources(
                     gridSubsetCellsUnstructuredGrid,
-                    edge_sources.source(this->EdgeSourcesSource).ggd(0),
+                    edge_sources.source(this->EdgeSourcesSourceID).ggd(0),
                     gridSubset_index,
                     num_gridSubset_el);
             // For "edge_transport" selection in "Load IDS" text box

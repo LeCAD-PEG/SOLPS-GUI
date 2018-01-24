@@ -11,10 +11,10 @@
                 command="SetShot"
                 number_of_elements="1"
                 default_values="16151"
-                panel_visibility="default" >
+                panel_visibility="default">
                 <IntRangeDomain name="range"/>
                 <Documentation>
-                    The values of this property sets the Shot number.
+                    The values of this property sets the case Shot number.
                 </Documentation>
             </IntVectorProperty>
 
@@ -23,10 +23,10 @@
                 command="SetRun"
                 number_of_elements="1"
                 default_values="1000"
-                panel_visibility="default" >
+                panel_visibility="default">
                 <IntRangeDomain name="range"/>
                 <Documentation>
-                    The values of this property sets the Run number.
+                    The values of this property sets the case Run number.
                 </Documentation>
             </IntVectorProperty>
 
@@ -58,7 +58,7 @@
 
             <StringVectorProperty
                 name="LoadIDS"
-                label="Load IDS"
+                label="IDS to load"
                 command="SetLoadIDS"
                 number_of_elements="1"
                 default_values="edge_profiles"
@@ -71,25 +71,26 @@
                 <Documentation>
                     This property specifies the IDS to open. The geometry is
                     currently taken from edge_profiles IDS, this selection
-                    affects which data fields are read.
+                    affects what data fields are read.
                 </Documentation>
             </StringVectorProperty>
 
             <IntVectorProperty
-                name="EdgeSourcesSource"
-                label="Edge_Sources.source(:) structure array"
-                command="SetEdgeSourcesSource"
+                name="EdgeSourcesSourceID"
+                label=".source(#)"
+                command="SetEdgeSourcesSourceID"
                 number_of_elements="1"
                 default_values="0"
-                panel_visibility="default" >
+                panel_visibility="advanced">
                 <IntRangeDomain name="range"/>
                 <Documentation>
                     This property specifies the Edge_Sources.source(:)
-                    structure array. Python notation (0, 1, 2, ...).
+                    structure array index. Python notation (0, 1, 2, ...).
                     Default value = 0.
                 </Documentation>
                 <Hints>
-                   <WidgetHeight number_of_rows="1" />
+                   <WidgetHeight number_of_rows="1"/>
+                   <WidgetWidth number_of_rows="1"/>
                    <PropertyWidgetDecorator type="my_decorator_EdgeSources"/>
                 </Hints>
             </IntVectorProperty>
@@ -102,20 +103,21 @@
 
             <IntVectorProperty
                 name="IDSListCheckBox"
-                label="List Shot/Runs"
+                label="Show list of available IDS Shot/Run cases"
                 command="SetIDSListCheckBox"
                 number_of_elements="1"
                 default_values="0"
-                panel_visibility="default" >
+                panel_visibility="default">
 		 	    <BooleanDomain name="bool"/>
 		 	    <Documentation>
-				    This checkbox opens the IDS list for specified user.
+				    This checkbox opens the list of available IDSs for
+                    specified user.
 		 	    </Documentation>
             </IntVectorProperty>
 
             <StringVectorProperty
                 name="ShotRunList"
-                label="IDS Shot/Runs"
+                label="IDS List"
                 number_of_elements="0"
                 number_of_elements_per_command="2"
                 element_types="2"
@@ -125,12 +127,12 @@
     			 	List of available Shot/Run-s for specified user.
 		 	    </Documentation>
 		 	    <Hints>
-			 	   <WidgetHeight number_of_rows="12" />
+			 	   <WidgetHeight number_of_rows="12"/>
 			 	   <PropertyWidgetDecorator type="my_decorator"/>
 		 	    </Hints>
             </StringVectorProperty>
             <Hints>
-                <ShowInMenu category="IMAS" />
+                <ShowInMenu category="IMAS"/>
             </Hints>
         </SourceProxy>
     </ProxyGroup>

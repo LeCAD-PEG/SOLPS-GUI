@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqMyPropertyWidgetDecorator_EdgeSources_h
 
 /*
-* This source file specifies the behaviour of the EdgeSourcesSource widget
+* This source file specifies the behaviour of the EdgeSourcesSourceID widget
 * in relation to the LoadIDS widget.
 */
 

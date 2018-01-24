@@ -14,7 +14,7 @@
 using namespace std;
 
 std::vector<std::string> findShotRun(
-    std::string userIMASShotRunDir, std::string user);
+    std::string userIMASShotRunDir, std::string user, std::string device);
 
 class ReadUALEdge : public vtkMultiBlockDataSetAlgorithm
 {
@@ -34,8 +34,8 @@ class ReadUALEdge : public vtkMultiBlockDataSetAlgorithm
     vtkGetMacro(IDSListCheckBox,int);
     vtkSetMacro(IDSListCheckBox,int);
 
-    vtkGetMacro(EdgeSourcesSource,int);
-    vtkSetMacro(EdgeSourcesSource,int);
+    vtkGetMacro(EdgeSourcesSourceID,int);
+    vtkSetMacro(EdgeSourcesSourceID,int);
 
     vtkSetStringMacro(User);
     vtkGetStringMacro(User);
@@ -54,7 +54,7 @@ protected:
     int Run;
     int RefRun;
     int IDSListCheckBox;
-    int EdgeSourcesSource;
+    int EdgeSourcesSourceID;
     char * User;
     char * Device;
     char * Version;
