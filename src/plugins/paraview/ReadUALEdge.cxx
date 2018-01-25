@@ -27,6 +27,7 @@
 #include <vtkLine.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
+#include <vtkOutputWindow.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
@@ -83,6 +84,37 @@ ReadUALEdge::ReadUALEdge()
     this->SetNumberOfOutputPorts(1);
     this->DebugOff();
     this->stringArray=vtkSmartPointer<vtkStringArray>::New();
+}
+
+/* Function used to display complex message in ParaView 'Output Message'
+* window with the use of stringstream
+* @param msg        Message text to display
+* @param ms_type    message type (info/error/warning)
+*/
+void msgToOutputWindow( std::stringstream& msg, std::string msg_type = "info" )
+{
+    const std::string msg_str = msg.str();
+    const char* msg_cstr = msg_str.c_str();
+
+    if (msg_type == "info" || msg_type == "i")
+    {
+        vtkOutputWindowDisplayText(msg_cstr);
+    }
+    else if (msg_type == "error" || msg_type == "e")
+    {
+        vtkOutputWindowDisplayErrorText(msg_cstr);
+    }
+    else if (msg_type == "warning" || msg_type == "w")
+    {
+        vtkOutputWindowDisplayWarningText(msg_cstr);
+    }
+    else
+    {
+        vtkOutputWindowDisplayWarningText("Warning: Output Window message type "
+            "not found!");
+    }
+    // Clean stringstream
+    msg.str(std::string());
 }
 
 /**
@@ -274,8 +306,16 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
         outInfo->Get(vtkMultiBlockDataSet::DATA_OBJECT()));
 
+    // If PromptUser is set to true then each time a line of text is displayed,
+    // the user is asked if they want to keep getting messages.
+    vtkOutputWindow::GetInstance()->PromptUserOff();
+    // Set stringstream to be used for displaying more complex messages to
+    // ParaView 'Output messages' window
+    std::stringstream msg;
+
 #ifdef IMAS_IDS
     using namespace IdsNs;
+
 
     // Check IMAS and UAL version
     std::string load_IV = getenv("IMAS_VERSION");
@@ -345,7 +385,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                     << std::endl;
     }
 
-    std::clog << "Reading IDS" << std::endl;
+    vtkOutputWindowDisplayText("Reading IDS \n");
+
     // Set IDSs shot and run
     IDS db(this->Shot, this->Run, this->Shot, this->RefRun);
     if (!this->Version)
@@ -353,14 +394,15 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // Open IDS
     db.openEnv(this->User, this->Device, this->Version);
 
-    std::clog << "IDS parameters:" << std::endl;
-    std::clog << "Loaded IDS: " << this->LoadIDS << std::endl;
-    std::clog << "Shot: "       << this->Shot    << std::endl;
-    std::clog << "Run: "        << this->Run     << std::endl;
-    std::clog << "RefRun: "     << this->RefRun  << std::endl;
-    std::clog << "User: "       << this->User    << std::endl;
-    std::clog << "Device: "     << this->Device  << std::endl;
-    std::clog << "Version: "    << this->Version << std::endl;
+    msg  << "IDS parameters:" << "\n" <<
+        " - Loaded IDS: " << this->LoadIDS << "\n" <<
+        " - Shot:       " << this->Shot    << "\n" <<
+        " - Run:        " << this->Run     << "\n" <<
+        " - RefRun:     " << this->RefRun  << "\n" <<
+        " - User:       " << this->User    << "\n" <<
+        " - Device:     " << this->Device  << "\n" <<
+        " - Version:    " << this->Version << "\n";
+    msgToOutputWindow( msg );
 
     // Get IDS data
     db._edge_profiles.get();

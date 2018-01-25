@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "pqPropertyWidgetDecorator.h"
-#include "vtkWeakPointer.h"
+#include <vtkWeakPointer.h>
 class vtkObject;
 
 class pqMyPropertyWidgetDecorator_EdgeSources : public pqPropertyWidgetDecorator
