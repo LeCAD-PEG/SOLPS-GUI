@@ -6,9 +6,55 @@
 *   @brief    This is the main C++ file of the ParaView ReadUALEdge file
 *   DESCRIPTION
 *   ParaView ReadUALEdge plugin is a tool used to visualize and analyze data,
-*   obtained by fusion simulations (electron temperature/density, ion
-*   temperature/density) stored in CPO and/or IDS database.
-*   The focus of plugin development is on data stored in IDS "edge_profiles".
+*   obtained by fusion simulations stored IDS database.
+*   The focus of plugin development is on data stored in 'edge_profiles',
+*   'edge_sources' and 'edge_transport' IDSs.
+*
+*   Currently the plugin allows to display:
+*       - grid geometry from any of the above IDSs;
+*       - plasma state:
+*           ~ edge_profiles:
+*               - electrons:
+*                   - temperature;
+*                   - density;
+*                   - density_fast;
+*                   - pressure;
+*                   - pressure_fast_perpendicular;
+*                   - velocity:
+*                       - radial;
+*                       - diamagnetic;
+*                       - parallel;
+*                       - poloidal;
+*                       - toroidal;
+*                   - distribution_function;
+*               - ion:
+*                   - temperature;
+*                   - density;
+*                   - density_fast;
+*                   - pressure;
+*                   - pressure_fast_perpendicular;
+*                   - velocity:
+*                       - radial;
+*                       - diamagnetic;
+*                       - parallel;
+*                       - poloidal;
+*                       - toroidal;
+*                   - distribution_function;
+*           ~ edge_sources:
+*               - electrons:
+*                   - particles
+*                   - energy
+*               - ion:
+*                   - particles
+*                   - energy
+*           ~ edge_transport:
+*               - electrons:
+*                   - particles - flux
+*                   - energy - flux
+*               - ion:
+*                   - particles - flux
+*                   - energy - flux
+*
 *-------------------------------------------------------------------------------
 */
 
@@ -219,7 +265,6 @@ vtkSmartPointer<vtkPoints> fSetVtkPoints(
     return pointsArray;
 }
 
-
 /**
 *   Function used to fill predefined (size, label...) vtkCellArray.
 */
@@ -302,9 +347,9 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                                 vtkInformationVector **vtkNotUsed(inputVector),
                                 vtkInformationVector *outputVector)
 {
-    // get the info object
+    // Get the info object
     vtkInformation *outInfo = outputVector->GetInformationObject(0);
-    // get the output
+    // Get the output
     vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
         outInfo->Get(vtkMultiBlockDataSet::DATA_OBJECT()));
 
@@ -317,7 +362,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
 #ifdef IMAS_IDS
     using namespace IdsNs;
-
 
     // Check IMAS and UAL version
     std::string load_IV = getenv("IMAS_VERSION");
@@ -393,6 +437,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // Open IDS
     db.openEnv(this->User, this->Device, this->Version);
 
+    // Print IDS info
     msg  << "IDS parameters:" << "\n" <<
         " - Loaded IDS: " << this->LoadIDS << "\n" <<
         " - Shot:       " << this->Shot    << "\n" <<
@@ -403,12 +448,36 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         " - Version:    " << this->Version << "\n\n";
     msgToOutputWindow( msg );
 
-    // Get IDS data
-    vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
-    db._edge_profiles.get();
+    // Get GGD structure array index to internal variable
+    int ggd_slice_index = this->GGDslice;
+    // Get edge_sources.source(:) structure array index to internal variable
+    int source_index = this->EdgeSourcesSourceID;
+    // Get edge_transport.model(:) structure array index to internal variable
+    int model_index = this->EdgeTransportModelID;
 
-    // For "edge_sources" selection in "Load IDS" text box
-    // (currently the geometry is still read fro the edge_profiles IDS)
+    // Get grid geometry from one of the IDSs (currently ready from
+    // edge_profiles IDS only!)
+    // TODO: Implement LoadIDSGeom.
+    db._edge_profiles.get();
+    // if( std::string(LoadIDSGeom).find("edge_profiles") != std::string::npos )
+    // {
+    //     vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
+    //     db._edge_profiles.get();
+    // }
+    // else if( std::string(LoadIDSGeom).find("edge_sources")
+    //     != std::string::npos )
+    // {
+    //     vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
+    //     db._edge_sources.get();
+    // }
+    // else if( std::string(LoadIDSGeom).find("edge_transport")
+    //     != std::string::npos )
+    // {
+    //     vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
+    //     db._edge_transport.get();
+    // }
+
+    // Get plasma state from one of the IDSs
     if( std::string(LoadIDS).find( "edge_sources" ) != std::string::npos )
     {
         vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
@@ -424,18 +493,27 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     vtkOutputWindowDisplayText(std::string( "Number of GGD slices:" +
         std::to_string(num_ggd_slices) + "\n").c_str());
 
+    // Checks regarding GGD slice
     if (num_ggd_slices == 0)
     {
-        vtkOutputWindowDisplayWarningText("ERROR! Either selected database "
-            "doesn't exist or it's empty! \n\n");
+        vtkOutputWindowDisplayWarningText("ERROR! No filled GGD slice found! "
+            "Either selected database doesn't exist or it's empty! \n\n");
         return 0;
+    }
+    if (ggd_slice_index > num_ggd_slices - 1)
+    {
+        vtkOutputWindowDisplayWarningText("ERROR! The input GGD structure "
+            "array index does not correspond to any existing GGD structure! "
+            "Reverting the GGD structure array index to 0! \n\n");
+        ggd_slice_index = 0;
     }
 
     // Set class shortcuts for IDS substructures
     class IDS::edge_profiles & edge_profiles = db._edge_profiles;
     class IDS::edge_sources  & edge_sources = db._edge_sources;
     class IDS::edge_transport  & edge_transport = db._edge_transport;
-    class IDS::edge_profiles::ggd & ggd = edge_profiles.ggd(0);
+
+    class IDS::edge_profiles::ggd & ggd = edge_profiles.ggd(ggd_slice_index);
     class IDS::edge_profiles::ggd::grid & grid = ggd.grid;
     class IDS::edge_profiles::ggd::grid::space & space = grid.space(0);
     // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
@@ -448,6 +526,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     class IDS::edge_profiles::ggd::grid::space::objects_per_dimension &
         dim_obj_2D = space.objects_per_dimension(2);
 
+    // Set variables to later hold number of elements
     int num_obj_0D = 0; // Node/Point/vertice == 0D object
     int num_obj_1D = 0; // Edge    == 1D object
     int num_obj_2D = 0; // 2D Cell == 2D object
@@ -532,7 +611,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 // Using readPSEdge function
                 psep_obj.setAllDataFields_edge_profiles(
                     gridSubsetPointsUnstructuredGrid,
-                    edge_profiles.ggd(0),
+                    edge_profiles.ggd(ggd_slice_index),
                     gridSubset_index,
                     num_gridSubset_el);
             // For "edge_sources" selection in "Load IDS" text box
@@ -543,7 +622,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 // Using readPSEdge function
                 psep_obj.setAllDataFields_edge_sources(
                     gridSubsetPointsUnstructuredGrid,
-                    edge_sources.source(this->EdgeSourcesSourceID).ggd(0),
+                    edge_sources.source(this->EdgeSourcesSourceID).ggd(ggd_slice_index),
                     gridSubset_index,
                     num_gridSubset_el);
             // For "edge_transport" selection in "Load IDS" text box
@@ -554,7 +633,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 // Using readPSEdge function
                 psep_obj.setAllDataFields_edge_transport(
                     gridSubsetPointsUnstructuredGrid,
-                    edge_transport.model(0).ggd(0),
+                    edge_transport.model(0).ggd(ggd_slice_index),
                     gridSubset_index,
                     num_gridSubset_el);
             }
@@ -638,7 +717,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 // Using readPSEdge function
                 psep_obj.setAllDataFields_edge_profiles(
                     gridSubsetCellsUnstructuredGrid,
-                    edge_profiles.ggd(0),
+                    edge_profiles.ggd(ggd_slice_index),
                     gridSubset_index,
                     num_gridSubset_el);
             // For "edge_sources" selection in "Load IDS" text box
@@ -649,7 +728,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 // Using readPSEdge function
                 psep_obj.setAllDataFields_edge_sources(
                     gridSubsetCellsUnstructuredGrid,
-                    edge_sources.source(this->EdgeSourcesSourceID).ggd(0),
+                    edge_sources.source(this->EdgeSourcesSourceID).ggd(ggd_slice_index),
                     gridSubset_index,
                     num_gridSubset_el);
             // For "edge_transport" selection in "Load IDS" text box
@@ -660,7 +739,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 // Using readPSEdge function
                 psep_obj.setAllDataFields_edge_transport(
                     gridSubsetCellsUnstructuredGrid,
-                    edge_transport.model(0).ggd(0),
+                    edge_transport.model(0).ggd(ggd_slice_index),
                     gridSubset_index,
                     num_gridSubset_el);
             }

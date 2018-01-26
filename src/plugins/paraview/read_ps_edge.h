@@ -1,9 +1,16 @@
 #ifndef __read_ps_edge_h
 #define __read_ps_edge_h
 
-/*
-* This file provides C++ routines for reading the plasma state out of
-* edge_profiles IDS.
+/**
+*-------------------------------------------------------------------------------
+*   @file     read_ps_edge.h
+*   @Author   Dejan Penko, University of Ljubljana
+*   @brief    This is the C++ header of the ParaView ReadUALEdge file for
+*             handling data fields.
+*   DESCRIPTION
+*   This file provides C++ routines for reading the plasma state out of
+*   edge_profiles IDS.
+*-------------------------------------------------------------------------------
 */
 
 #include <UALClasses.h>

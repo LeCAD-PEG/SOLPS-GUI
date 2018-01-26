@@ -1,6 +1,59 @@
-/*
-* This file provides C++ routines for reading the plasma state out of
-* edge_profiles IDS.
+/**
+*-------------------------------------------------------------------------------
+*   @file     read_ps_edge.cxx
+*   @Author   Dejan Penko, University of Ljubljana
+*   @brief    This is the C++ file of the ParaView ReadUALEdge file for
+*             handling data fields.
+*   DESCRIPTION
+*   This file provides C++ routines for reading the plasma state out of
+*   edge_profiles IDS.
+*
+*   Currently the included data fields are:
+*       - grid geometry from any of the above IDSs;
+*       - plasma state:
+*           ~ edge_profiles:
+*               - electrons:
+*                   - temperature;
+*                   - density;
+*                   - density_fast;
+*                   - pressure;
+*                   - pressure_fast_perpendicular;
+*                   - velocity:
+*                       - radial;
+*                       - diamagnetic;
+*                       - parallel;
+*                       - poloidal;
+*                       - toroidal;
+*                   - distribution_function;
+*               - ion:
+*                   - temperature;
+*                   - density;
+*                   - density_fast;
+*                   - pressure;
+*                   - pressure_fast_perpendicular;
+*                   - velocity:
+*                       - radial;
+*                       - diamagnetic;
+*                       - parallel;
+*                       - poloidal;
+*                       - toroidal;
+*                   - distribution_function;
+*           ~ edge_sources:
+*               - electrons:
+*                   - particles
+*                   - energy
+*               - ion:
+*                   - particles
+*                   - energy
+*           ~ edge_transport:
+*               - electrons:
+*                   - particles - flux
+*                   - energy - flux
+*               - ion:
+*                   - particles - flux
+*                   - energy - flux
+*
+*-------------------------------------------------------------------------------
 */
 
 #include "read_ps_edge.h"
@@ -220,7 +273,8 @@ void readPSEdge::setAllDataFields_edge_profiles(
         // Assign values found in Ion Temperature array of structures
         // node to grid subsets objects
         // Set data field label
-        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel( "Temperature", k, ion_charge );
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Temperature", k, ion_charge );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).temperature.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -236,7 +290,8 @@ void readPSEdge::setAllDataFields_edge_profiles(
         // Assign values found in Ion Density array of structures
         // node to grid subsets objects
         // Set data field label
-        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel( "Density", k, ion_charge );
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Density", k, ion_charge );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).density.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -252,7 +307,8 @@ void readPSEdge::setAllDataFields_edge_profiles(
         // Assign values found in Ion Density_Fast array of structures
         // node to grid subsets objects
         // Set data field label
-        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel( "Density_Fast", k, ion_charge );
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Density_Fast", k, ion_charge );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).density_fast.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -268,7 +324,8 @@ void readPSEdge::setAllDataFields_edge_profiles(
         // Assign values found in Ion Pressure array of structures
         // node to grid subsets objects
         // Set data field label
-        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel( "Pressure", k, ion_charge );
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Pressure", k, ion_charge );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).pressure.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)

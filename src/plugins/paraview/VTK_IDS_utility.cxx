@@ -1,6 +1,12 @@
-/*
-* This file provides C++ utility routines for setting the IDS objects into the
-* VTK objects and other utility routines.
+/**
+*-------------------------------------------------------------------------------
+*   @file     VTK_IDS_utility.cxx
+*   @Author   Dejan Penko, University of Ljubljana
+*   @brief    This is the utility C++ file of the ParaView ReadUALEdge
+*   DESCRIPTION
+*   This file provides C++ utility routines for setting the IDS objects into the
+*   VTK objects and other utility routines.
+*-------------------------------------------------------------------------------
 */
 
 #include "VTK_IDS_utility.h"

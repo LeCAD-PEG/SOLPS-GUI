@@ -56,7 +56,8 @@ INCLUDE(${PARAVIEW_USE_FILE})
 if (PARAVIEW_BUILD_QT_GUI)
   qt4_wrap_cpp(moc_srcs
     pqMyPropertyWidgetDecorator.h
-    pqMyPropertyWidgetDecorator_EdgeSources.h)
+    pqMyPropertyWidgetDecorator_EdgeSources.h
+    pqMyPropertyWidgetDecorator_EdgeTransport.h)
 
   set (outifaces0)
   set (outsrcs0)
@@ -68,19 +69,26 @@ if (PARAVIEW_BUILD_QT_GUI)
   add_paraview_property_widget_decorator(outifaces1 outsrcs1
     TYPE "my_decorator_EdgeSources"
     CLASS_NAME pqMyPropertyWidgetDecorator_EdgeSources)
-
+  set (outifaces2)
+  set (outsrcs2)
+  add_paraview_property_widget_decorator(outifaces2 outsrcs2
+    TYPE "my_decorator_EdgeTransport"
+    CLASS_NAME pqMyPropertyWidgetDecorator_EdgeTransport)
 
    #Now, create the plugin.
   add_paraview_plugin(ReadUALEdge "1.0"
                       SERVER_MANAGER_XML ReadUALEdge.xml
                       GUI_INTERFACES ${outifaces0}
                                      ${outifaces1}
+                                     ${outifaces2}
                       SERVER_MANAGER_SOURCES ReadUALEdge.cxx
                       SOURCES  ${outsrcs0}
                                ${outsrcs1}
+                               ${outsrcs2}
                                ${moc_srcs}
                                pqMyPropertyWidgetDecorator.cxx
-                               pqMyPropertyWidgetDecorator_EdgeSources.cxx)
+                               pqMyPropertyWidgetDecorator_EdgeSources.cxx
+                               pqMyPropertyWidgetDecorator_EdgeTransport.cxx)
 target_include_directories(ReadUALEdge PUBLIC ${IMASCPP_INCLUDE_DIRS})
 target_include_directories(ReadUALEdge PUBLIC ${BLITZ_INCLUDE_DIRS})
 #target_include_directories(ReadUALEdge PUBLIC ${MDSPLUS_INCLUDE_DIRS})

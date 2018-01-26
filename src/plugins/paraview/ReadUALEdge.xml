@@ -84,7 +84,7 @@
                 panel_visibility="advanced">
                 <IntRangeDomain name="range"/>
                 <Documentation>
-                    This property specifies the Edge_Sources.source(:)
+                    This property specifies the edge_sources.source(:) IDS
                     structure array index. Python notation (0, 1, 2, ...).
                     Default value = 0.
                 </Documentation>
@@ -94,6 +94,63 @@
                    <PropertyWidgetDecorator type="my_decorator_EdgeSources"/>
                 </Hints>
             </IntVectorProperty>
+
+            <IntVectorProperty
+                name="EdgeTransportModelID"
+                label=".model(#)"
+                command="SetEdgeTransportModelID"
+                number_of_elements="1"
+                default_values="0"
+                panel_visibility="advanced">
+                <IntRangeDomain name="range"/>
+                <Documentation>
+                    This property specifies the edge_transport.model(:) IDS
+                    structure array index. Python notation (0, 1, 2, ...).
+                    Default value = 0.
+                </Documentation>
+                <Hints>
+                   <WidgetHeight number_of_rows="1"/>
+                   <WidgetWidth number_of_rows="1"/>
+                   <PropertyWidgetDecorator type="my_decorator_EdgeTransport"/>
+                </Hints>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                name="GGDslice"
+                label=".ggd(#)"
+                command="SetGGDslice"
+                number_of_elements="1"
+                default_values="0"
+                panel_visibility="advanced">
+                <IntRangeDomain name="range"/>
+                <Documentation>
+                    The values of this property sets the GGD
+                    structure array index. Python notation (0, 1, 2, ...).
+                    Default value = 0.
+                </Documentation>
+            </IntVectorProperty>
+
+            <StringVectorProperty
+                name="LoadIDSGeom"
+                label="Take geometry from"
+                command="SetLoadIDSGeom"
+                number_of_elements="1"
+                default_values="edge_profiles"
+                panel_visibility="advanced"
+                immediate_update="true">
+                <StringListDomain name="LoadIDSGeomstringList">
+                    <String value="edge_profiles"/>
+                    <String value="edge_sources"/>
+                    <String value="edge_transport"/>
+                </StringListDomain>
+                <Documentation>
+                    This property specifies the IDS from which the geometry is
+                    to be read. This is implemented due to cases when grid
+                    geometry, stored in edge_profiles IDS, was shared with
+                    edge_sources and edge_transport IDSs, while each IDS
+                    had its own stored data fields.
+                </Documentation>
+            </StringVectorProperty>
 
             <Property
                 name="Refresh"
