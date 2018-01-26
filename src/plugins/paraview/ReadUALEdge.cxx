@@ -143,9 +143,11 @@ std::vector<std::string> findShotRun(   std::string userIMASShotRunDir,
     // Check if the directory exists
     if (stat(dirPath.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))
     {
-        std::clog <<"IDS imasdb directory '" << device << "' from user '" <<
-            user << "' found: '" << userIMASShotRunDir <<
-            "' Reading available IDS shot/runs." << std::endl;
+        vtkOutputWindowDisplayText(std::string("IDS imasdb directory '" +
+            device + "' from user '" + user + "' found: '" +
+            userIMASShotRunDir + "' Reading available IDS shot/runs." +
+            "\n\n").c_str());
+
         if( pDIR=opendir(dirPath.c_str()))
         {
             while(entry = readdir(pDIR))
@@ -348,41 +350,38 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     std::string IV_latest_string = "3.15.0";
     int IV_latest_DIGIT = 3150;
 
-    std::clog << "LOADED IMAS VERSION: " << load_IV << std::endl;
-    std::clog << "LOADED UAL VERSION: " << load_UV << std::endl;
-    std::clog << "PLUGIN IMAS VERSION: " << plugin_IV << std::endl;
+    // Display IMAS and UAL versions
+    vtkOutputWindowDisplayText(std::string("LOADED IMAS VERSION: " + load_IV +
+        "\n").c_str());
+    vtkOutputWindowDisplayText(std::string("LOADED UAL VERSION: " + load_UV +
+        "\n").c_str());
+    vtkOutputWindowDisplayText(std::string("PLUGIN IMAS VERSION: " + plugin_IV +
+        "\n\n").c_str());
 
     // IMAS version checks
     if( load_IV_DIGIT < IV_latest_DIGIT )
     {
-        std::cerr << "WARNING! This IMAS (and consequently "
-                    "Data Dictionary) is outdated! ReadUALEdge plugin might "
-                    "not be fully compatible with the currently loaded Data "
-                    "Dictionary! "
-                    "The latest IMAS module, confirmed to be "
-                    "compatible with the ReadUALEdge plugin, is"
-                    "imas/3.15.0/ual/3.6.4 while the oldest "
-                    "is imas/3.8.0/ual/3.5.0."
-                    << std::endl;
+        vtkOutputWindowDisplayWarningText("WARNING! This IMAS (and "
+            "consequently Data Dictionary) is outdated! ReadUALEdge plugin "
+            "might not be fully compatible with the currently loaded Data "
+            "Dictionary! The latest IMAS module, confirmed to be compatible "
+            "with the ReadUALEdge plugin, is imas/3.15.0/ual/3.6.4 while the "
+            "oldest is imas/3.8.0/ual/3.5.0. \n\n");
     }
     if( load_IV_DIGIT != PLUGIN_IMAS_VERSION_DIGIT )
     {
-        std::cerr << "WARNING! For best practice it is recommended that the "
-                    "same IMAS/DD version is used for writing the IDSs, "
-                    "compiling the ReadUALEdge plugin and then for loading "
-                    "the plugin within the ParaView application."
-                    << std::endl;
+        vtkOutputWindowDisplayWarningText("WARNING! For best practice it is "
+            "recommended that the same IMAS/DD version is used for writing "
+            "the IDSs, compiling the ReadUALEdge plugin and then for loading "
+            "the plugin within the ParaView application. \n\n");
     }
     if( PLUGIN_IMAS_VERSION_DIGIT < IV_latest_DIGIT)
     {
-        std::cerr << "WARNING! The IMAS version (and consequently "
-                    "Data Dictionary), used to compile the ReadUALEdge plugin, "
-                    "is outdated! "
-                    "The latest IMAS module, confirmed to be "
-                    "compatible with the ReadUALEdge, is "
-                    "imas/3.15.0/ual/3.6.4 while the oldest "
-                    "is imas/3.8.0/ual/3.5.0."
-                    << std::endl;
+        vtkOutputWindowDisplayWarningText("WARNING! The IMAS version (and "
+            "consequently Data Dictionary), used to compile the ReadUALEdge "
+            "plugin, is outdated! The latest IMAS module, confirmed to be "
+            "compatible with the ReadUALEdge, is imas/3.15.0/ual/3.6.4 while "
+            "the oldest is imas/3.8.0/ual/3.5.0. \n\n");
     }
 
     vtkOutputWindowDisplayText("Reading IDS \n");
@@ -401,34 +400,34 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         " - RefRun:     " << this->RefRun  << "\n" <<
         " - User:       " << this->User    << "\n" <<
         " - Device:     " << this->Device  << "\n" <<
-        " - Version:    " << this->Version << "\n";
+        " - Version:    " << this->Version << "\n\n";
     msgToOutputWindow( msg );
 
     // Get IDS data
+    vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
     db._edge_profiles.get();
 
     // For "edge_sources" selection in "Load IDS" text box
     // (currently the geometry is still read fro the edge_profiles IDS)
     if( std::string(LoadIDS).find( "edge_sources" ) != std::string::npos )
     {
-        std::clog << "Reading edge_sources IDS." << std::endl;
+        vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
         db._edge_sources.get();
     }else if( std::string(LoadIDS).find( "edge_transport" )
         != std::string::npos )
     {
-        std::clog << "Reading edge_transport IDS." << std::endl;
+        vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
         db._edge_transport.get();
     }
 
     int num_ggd_slices = db._edge_profiles.ggd.extent(0);
-    std::clog << "Number of GGD slices:" << num_ggd_slices << std::endl;
+    vtkOutputWindowDisplayText(std::string( "Number of GGD slices:" +
+        std::to_string(num_ggd_slices) + "\n").c_str());
 
     if (num_ggd_slices == 0)
     {
-        std::clog << "ERROR! Either selected database doesn't exist \
-                      or it's empty!" << std::endl;
-        vtkErrorMacro(<<"ERROR! Either selected database doesn't exist \
-                         or it's empty!");
+        vtkOutputWindowDisplayWarningText("ERROR! Either selected database "
+            "doesn't exist or it's empty! \n\n");
         return 0;
     }
 
@@ -459,9 +458,12 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     num_obj_1D = dim_obj_1D.object.extent(0);
     num_obj_2D = dim_obj_2D.object.extent(0);
 
-    std::clog << "num_obj_0D: " << num_obj_0D << std::endl;
-    std::clog << "num_obj_1D: " << num_obj_1D << std::endl;
-    std::clog << "num_obj_2D: " << num_obj_2D << std::endl;
+    vtkOutputWindowDisplayText(std::string( "Number of found 0D objects: " +
+        std::to_string(num_obj_0D) + "\n").c_str());
+    vtkOutputWindowDisplayText(std::string( "Number of found 1D objects: " +
+        std::to_string(num_obj_1D) + "\n").c_str());
+    vtkOutputWindowDisplayText(std::string( "Number of found 2D objects: " +
+        std::to_string(num_obj_2D) + "\n\n").c_str());
 
     vtkSmartPointer<vtkMultiBlockDataSet> mainMB =
         vtkSmartPointer<vtkMultiBlockDataSet>::New();
@@ -486,14 +488,25 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         // Get size/number of elements forming current grid subset
         int num_gridSubset_el = grid_subset.element.extent(0);
 
-        std::clog << "num_gridSubset_el: " << num_gridSubset_el <<
-            " gridSubset_name: "<< gridSubset_name << std::endl;
-
         // Get dimension of the objects forming this grid subset
-        int gridSubset_obj_dim = grid_subset.element(0).object(0).dimension;
+        int gridSubset_obj_cls = grid_subset.element(0).object(0).dimension;
+        int gridSubset_obj_dim = gridSubset_obj_cls - 1;
+
+        // Print grid subset info
+        vtkOutputWindowDisplayText(std::string("Grid subset " +
+            std::to_string(gridSubset_index) + ":" + "\n").c_str());
+        vtkOutputWindowDisplayText(std::string(" - Name: " + gridSubset_name +
+            "\n").c_str());
+        vtkOutputWindowDisplayText(std::string(" - Class: " +
+            std::to_string(gridSubset_obj_cls) + "\n").c_str());
+        vtkOutputWindowDisplayText(std::string(" - Dimension: " +
+            std::to_string(gridSubset_obj_dim) + "\n").c_str());
+        vtkOutputWindowDisplayText(std::string(
+            " - Number of elements: " +
+            std::to_string(num_gridSubset_el) + "\n").c_str());
 
         // ------ SET POINTS/NODES -----
-        if (gridSubset_obj_dim == 1)
+        if (gridSubset_obj_cls == 1)
         {
             // Set vtkUnstructuredGrid dataset
             vtkSmartPointer<vtkUnstructuredGrid> gridSubsetPointsUnstructuredGrid =
@@ -505,16 +518,13 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             // Set vtkCellArray for nodes/points
             vtkSmartPointer<vtkCellArray> gridSubsetVertices =
                 vtkSmartPointer<vtkCellArray>::New();
-            gridSubsetVertices = fSetCellArray(gridSubsetVertex, grid_subset, grid);
+            gridSubsetVertices =
+                fSetCellArray(gridSubsetVertex, grid_subset, grid);
 
             // Assign vtkCellArray to vtkUnstructuredGrid
             gridSubsetPointsUnstructuredGrid->SetPoints(obj_0D_vtkPointsArray);
             gridSubsetPointsUnstructuredGrid->SetCells(
                 VTK_VERTEX, gridSubsetVertices);
-
-            // Set integer to be later used in the readValues_GenericGridScalar
-            // macro
-            int num_IDStarget_gridSubsets = 0;
 
             // For "edge_profiles" selection in "Load IDS" text box
             if( std::string(LoadIDS).find( "edge_profiles" ) != std::string::npos)
@@ -554,7 +564,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 gridSubset_name );
         }
         // ------ SET LINES -----
-        else if (gridSubset_obj_dim == 2)
+        else if (gridSubset_obj_cls == 2)
         {
             vtkSmartPointer<vtkUnstructuredGrid> gridSubsetLinesUnstructuredGrid =
                 vtkSmartPointer<vtkUnstructuredGrid>::New();
@@ -564,7 +574,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 vtkSmartPointer<vtkCellArray>::New();
             vtkSmartPointer<vtkLine> gridSubsetLine =
                 vtkSmartPointer<vtkLine>::New();
-            gridSubsetLinesArray = fSetCellArray(gridSubsetLine, grid_subset, grid);
+            gridSubsetLinesArray =
+                fSetCellArray(gridSubsetLine, grid_subset, grid);
 
             // Assign vtkCellArray to vtkUnstructuredGrid
             gridSubsetLinesUnstructuredGrid->SetPoints(obj_0D_vtkPointsArray);
@@ -576,7 +587,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 gridSubset_name );
         }
         // ------ SET 2D CELLS -----
-        else if (gridSubset_obj_dim == 3)
+        else if (gridSubset_obj_cls == 3)
         {
             // Set vtk array for 2D cells
             vtkSmartPointer<vtkUnstructuredGrid> gridSubsetCellsUnstructuredGrid =
@@ -592,31 +603,32 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             // whether they are triangles or quad (all other 2D cells of the
             // same grid should be of the same type for now)
             int num_obj_nodes_first =
-                grid.space(0).objects_per_dimension(gridSubset_obj_dim - 1).
+                grid.space(0).objects_per_dimension(gridSubset_obj_cls - 1).
                 object(0).nodes.extent(0);
             // Cells-Triangles
             if (num_obj_nodes_first == 3)
             {
-                gridSubsetCellArray = fSetCellArray(gridSubsetTriangle, grid_subset, grid);
+                gridSubsetCellArray =
+                    fSetCellArray(gridSubsetTriangle, grid_subset, grid);
 
                 // Assign vtkCellArray to vtkUnstructuredGrid
-                gridSubsetCellsUnstructuredGrid->SetPoints(obj_0D_vtkPointsArray);
+                gridSubsetCellsUnstructuredGrid
+                    ->SetPoints(obj_0D_vtkPointsArray);
                 gridSubsetCellsUnstructuredGrid->SetCells(
                     VTK_TRIANGLE, gridSubsetCellArray);
             }
             // Cells-Quad
             else if (num_obj_nodes_first == 4)
             {
-                gridSubsetCellArray = fSetCellArray(gridSubsetQuad, grid_subset, grid);
+                gridSubsetCellArray =
+                    fSetCellArray(gridSubsetQuad, grid_subset, grid);
 
                 // Assign vtkCellArray to vtkUnstructuredGrid
-                gridSubsetCellsUnstructuredGrid->SetPoints(obj_0D_vtkPointsArray);
+                gridSubsetCellsUnstructuredGrid
+                    ->SetPoints(obj_0D_vtkPointsArray);
                 gridSubsetCellsUnstructuredGrid->SetCells(
                     VTK_QUAD, gridSubsetCellArray);
             }
-            // Set integer to be later used in the readValues_GenericGridScalar
-            // macro
-            int num_IDStarget_gridSubsets = 0;
 
             // For "edge_profiles" selection in "Load IDS" text box
             if( std::string(LoadIDS).find( "edge_profiles" ) !=
