@@ -49,6 +49,10 @@ public:
     std::string VTK_IDS_SetIonQuantityLabel(
         std::string quantity_name, int is,
         std::string ic );
+
+    std::vector<std::string> findShotRun(
+        std::string userIMASShotRunDir, std::string user, std::string device);
+
 };
 
 #endif

@@ -26,9 +26,6 @@
 
 using namespace std;
 
-std::vector<std::string> findShotRun(
-    std::string userIMASShotRunDir, std::string user, std::string device);
-
 void msgToOutputWindow( std::stringstream& msg, std::string msg_type );
 
 class ReadUALEdge : public vtkMultiBlockDataSetAlgorithm

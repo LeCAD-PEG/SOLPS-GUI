@@ -85,7 +85,7 @@
 #include <vtkVersion.h>
 #include <vtkVertex.h>
 #include <vtkTriangle.h>
-#include <dirent.h>
+// #include <dirent.h>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -167,86 +167,6 @@ void msgToOutputWindow( std::stringstream& msg, std::string msg_type = "info" )
     }
     // Clean stringstream
     msg.str(std::string());
-}
-
-/**
-*   Function used to read directory holding the IDSs and put
-*   the found shot/runs into vector for later use
-*/
-std::vector<std::string> findShotRun(   std::string userIMASShotRunDir,
-                                        std::string user,
-                                        std::string device)
-{
-    DIR *pDIR = NULL;
-    struct dirent *entry = NULL;
-    std::string dirPath = userIMASShotRunDir;
-    std::vector<std::string> availableShotRun;
-    std::string d_name_str;
-    int digitInStrCount = 0;
-    std::string stripShot;
-    std::string stripRun;
-
-    struct stat sb;
-    if(string(user) == "")
-    {
-        char *loginUserName = getlogin();
-        user = string(loginUserName);
-    }
-    // Check if the directory exists
-    if (stat(dirPath.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))
-    {
-        vtkOutputWindowDisplayText(std::string("IDS imasdb directory '" +
-            device + "' from user '" + user + "' found: '" +
-            userIMASShotRunDir + "' Reading available IDS shot/runs." +
-            "\n\n").c_str());
-
-        if( pDIR=opendir(dirPath.c_str()))
-        {
-            while(entry = readdir(pDIR))
-            {
-                if( strcmp(entry->d_name, ".") != 0 &&
-                    strcmp(entry->d_name, "..") != 0 )
-                {
-                    // Read all files in directory
-                    d_name_str = std::string(entry->d_name);
-                    int d_name_str_len = d_name_str.length();
-                    if(d_name_str.substr( d_name_str_len - 5 ) == ".tree")
-                    {
-                        // Work only with .tree files
-                        for(int i = 0; i < d_name_str.length(); i++)
-                        {
-                            if(isdigit(d_name_str[i]))
-                                digitInStrCount++;
-                        }
-                        int numExtCh = 5;   // 5 is for ".tree" == 5 characters
-                        int numRunMax = 4;  // Run consists of max 4 characters
-                                            // (from 0000 to 9999).
-                        stripShot = d_name_str.substr(
-                            d_name_str_len-numExtCh - digitInStrCount,
-                            digitInStrCount-numRunMax);
-                        stripRun = d_name_str.substr(
-                            d_name_str_len-numExtCh - numRunMax,numRunMax);
-                        // Get rid of excess zeros in Run number
-                        // (example 0011->11).
-                        int stripRunStartLen = stripRun.length();
-                        int eraseCount = 0;
-                        while(stripRun[0] == '0' &&
-                              eraseCount < stripRunStartLen-1)
-                        {
-                            stripRun.erase(0,1);
-                            eraseCount++;
-                        }
-                        // Set stripShot and stripRun in proper form
-                        availableShotRun.push_back(stripShot);
-                        availableShotRun.push_back(stripRun);
-                        digitInStrCount = 0;
-                    }
-                }
-            }
-            closedir(pDIR);
-        }
-    }
-    return availableShotRun;
 }
 
 #if IMAS_VERSION_DIGIT >= 3151
@@ -357,6 +277,11 @@ vtkSmartPointer<vtkPoints> fSetVtkPoints(
 
 /**
 *   Function used to fill predefined (size, label...) vtkCellArray.
+*   @param  el_data_type    VTK data type (vtkVertex etc.)
+*   @param  loc_gridSubset  Type of edge_profiles IDS data structure, designed
+*                           for handling grid subset data
+*   @param  grid            Type of edge_profiles IDS data structure, designed
+*                           for handling full grid data
 */
 template <typename V>
 vtkSmartPointer<vtkCellArray> fSetCellArray(
@@ -417,7 +342,10 @@ vtkSmartPointer<vtkCellArray> fSetCellArray(
 #endif
 
 /**
-*   Function to add unstructured grid to main multiblock
+*   Function to add unstructured grid to main VTK multiblock
+*   @param  MB  Main VTK MultiBlock Data Set object
+*   @param  UG  VTK Unstructured Grid to add as bloc to MultiBlock
+*   @param  gridSubset_name     Block label
 */
 void fAddBlock2MultiBlock(  vtkSmartPointer<vtkMultiBlockDataSet> MB,
                             vtkSmartPointer<vtkUnstructuredGrid>  UG,
@@ -632,6 +560,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     class IDS::edge_profiles::ggd::grid::space::objects_per_dimension &
         dim_obj_2D = space.objects_per_dimension(2);
 #endif
+
 
     // Set variables to later hold number of elements
     int num_obj_0D = 0; // Node/Point/vertice == 0D object

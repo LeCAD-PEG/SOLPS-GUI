@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "ReadUALEdge.h"
+#include "VTK_IDS_utility.h"
 #include "pqPropertyLinks.h"
 
 //-----------------------------------------------------------------------------
@@ -152,6 +153,9 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
     }
     pclose(pipe);
 
+    // Object declaration for readPSEdge routines
+    utilityVTKIDS uvi_obj;
+
     /// Setting imasdb directory using the Device textbox on Apply
     // Default database directory
     std::string userIMASShotRunDir = homedir + "/public/imasdb/solps-iter/3/0";
@@ -168,17 +172,18 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
         // std::clog << prop_device->GetXMLName() << std::endl;
         // Get Device GUI text box string and set this value to db_dir
         // (short for database directory)
-        db_dir =
-            vtkSMUncheckedPropertyHelper(prop_device).GetAsString();
+        db_dir = vtkSMUncheckedPropertyHelper(prop_device).GetAsString();
         userIMASShotRunDir = homedir + "/public/imasdb/" + db_dir + "/3/0";
         // userIMASShotRunDir.erase(std::remove(userIMASShotRunDir.begin(),
         //     userIMASShotRunDir.end(), '\n'), userIMASShotRunDir.end());
-        UserShotRunList = findShotRun(userIMASShotRunDir, string(user), string(db_dir));
+        UserShotRunList = uvi_obj.findShotRun(userIMASShotRunDir, string(user),
+            string(db_dir));
     }
 
     userIMASShotRunDir.erase(std::remove(userIMASShotRunDir.begin(),
         userIMASShotRunDir.end(), '\n'), userIMASShotRunDir.end());
-    UserShotRunList = findShotRun(userIMASShotRunDir, string(user), string(db_dir));
+    UserShotRunList = uvi_obj.findShotRun(userIMASShotRunDir, string(user),
+        string(db_dir));
 
     vtkSMProperty* prop_SHlist = proxy? proxy->GetProperty(
         "ShotRunList") : NULL;
