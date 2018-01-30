@@ -131,24 +131,19 @@
             </IntVectorProperty>
 
             <StringVectorProperty
-                name="LoadIDSGeom"
-                label="Take geometry from"
-                command="SetLoadIDSGeom"
+                name="IDSGridSource"
+                label="Get grid from"
+                command="SetIDSGridSource"
                 number_of_elements="1"
                 default_values="edge_profiles"
-                panel_visibility="advanced"
                 immediate_update="true">
-                <StringListDomain name="LoadIDSGeomstringList">
+                <StringListDomain name="IDSGridSourcestringList">
                     <String value="edge_profiles"/>
                     <String value="edge_sources"/>
                     <String value="edge_transport"/>
                 </StringListDomain>
                 <Documentation>
-                    This property specifies the IDS from which the geometry is
-                    to be read. This is implemented due to cases when grid
-                    geometry, stored in edge_profiles IDS, was shared with
-                    edge_sources and edge_transport IDSs, while each IDS
-                    had its own stored data fields.
+                    Tralala
                 </Documentation>
             </StringVectorProperty>
 

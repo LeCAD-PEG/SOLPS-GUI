@@ -121,11 +121,17 @@ vtkStandardNewMacro(ReadUALEdge);
 
 ReadUALEdge::ReadUALEdge()
 {
+    this->Shot = 0;
+    this->Run = 0;
     this->User = NULL;
     this->Device = NULL;
     this->Version = NULL;
     this->RefRun = 0;
     this->LoadIDS = NULL;
+    this->GGDslice = 0;
+    this->EdgeTransportModelID = 0;
+    this->EdgeSourcesSourceID = 0;
+    this->IDSGridSource = NULL;
     this->SetNumberOfInputPorts(0);
     this->SetNumberOfOutputPorts(1);
     this->DebugOff();
@@ -457,20 +463,20 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
     // Get grid geometry from one of the IDSs (currently ready from
     // edge_profiles IDS only!)
-    // TODO: Implement LoadIDSGeom.
+    // TODO: Implement IDSGridSource.
     db._edge_profiles.get();
-    // if( std::string(LoadIDSGeom).find("edge_profiles") != std::string::npos )
+    // if( std::string(IDSGridSource).find("edge_profiles") != std::string::npos )
     // {
     //     vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
     //     db._edge_profiles.get();
     // }
-    // else if( std::string(LoadIDSGeom).find("edge_sources")
+    // else if( std::string(IDSGridSource).find("edge_sources")
     //     != std::string::npos )
     // {
     //     vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
     //     db._edge_sources.get();
     // }
-    // else if( std::string(LoadIDSGeom).find("edge_transport")
+    // else if( std::string(IDSGridSource).find("edge_transport")
     //     != std::string::npos )
     // {
     //     vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");

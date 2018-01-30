@@ -59,8 +59,9 @@ class ReadUALEdge : public vtkMultiBlockDataSetAlgorithm
     vtkSetMacro(EdgeTransportModelID,int);
     vtkGetMacro(GGDslice,int);
     vtkSetMacro(GGDslice,int);
-    vtkSetStringMacro(LoadIDSGeom);
-    vtkGetStringMacro(LoadIDSGeom);
+    vtkSetStringMacro(IDSGridSource);
+    vtkGetStringMacro(IDSGridSource);
+
 
 protected:
     ReadUALEdge();
@@ -79,7 +80,7 @@ protected:
     char * Device;
     char * Version;
     char * LoadIDS;
-    char * LoadIDSGeom;
+    char * IDSGridSource;
     vtkSmartPointer<vtkStringArray> stringArray;
 
     int RequestData(vtkInformation *, vtkInformationVector **,
