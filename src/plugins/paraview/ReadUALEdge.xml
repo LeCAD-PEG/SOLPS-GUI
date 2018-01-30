@@ -143,7 +143,11 @@
                     <String value="edge_transport"/>
                 </StringListDomain>
                 <Documentation>
-                    Tralala
+                    This property specifies the IDS from which the geometry is
+                    to be read. This is implemented due to cases when grid
+                    geometry, stored in edge_profiles IDS, was shared with
+                    edge_sources and edge_transport IDSs, while each IDS
+                    had its own stored data fields.
                 </Documentation>
             </StringVectorProperty>
 

@@ -272,7 +272,11 @@ std::string utilityVTKIDS::VTK_IDS_SetIonQuantityLabel(
 
 /**
 *   Function used to read directory holding the IDSs and put
-*   the found shot/runs into vector for later use
+*   the found shot/runs into vector
+*   @param userIMASShotRunDir   IMAS database directory (imasdb), containing
+*                               IDS cases
+*   @param user                 Owner of the IDS cases
+*   @param device               IDS case device
 */
 std::vector<std::string> utilityVTKIDS::findShotRun(
     std::string userIMASShotRunDir, std::string user, std::string device)
