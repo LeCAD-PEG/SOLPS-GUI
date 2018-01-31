@@ -6,7 +6,7 @@
 *             handling data fields.
 *   DESCRIPTION
 *   This file provides C++ routines for reading the plasma state out of
-*   edge_profiles IDS.
+*   edge_profiles, edge_sources and edge_transport IDSs.
 *
 *   Currently the included data fields are:
 *       - grid geometry from any of the above IDSs;
@@ -124,7 +124,8 @@ void readPSEdge::setUnstructuredGridDataFields(
         // Using readPSEdge function
         psep_obj.setAllDataFields_edge_sources(
             UG,
-            UG_db._edge_sources.source(UG_EdgeSourcesSourceID).ggd(UG_ggd_slice_index),
+            UG_db._edge_sources.source(UG_EdgeSourcesSourceID).
+                ggd(UG_ggd_slice_index),
             UG_gridSubset_index,
             UG_num_gridSubset_el);
     // For "edge_transport" selection in "Load IDS" text box
@@ -135,7 +136,8 @@ void readPSEdge::setUnstructuredGridDataFields(
         // Using readPSEdge function
         psep_obj.setAllDataFields_edge_transport(
             UG,
-            UG_db._edge_transport.model(UG_EdgeTransportModelID).ggd(UG_ggd_slice_index),
+            UG_db._edge_transport.model(UG_EdgeTransportModelID).
+                ggd(UG_ggd_slice_index),
             UG_gridSubset_index,
             UG_num_gridSubset_el);
     }

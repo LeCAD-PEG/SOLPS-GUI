@@ -49,8 +49,7 @@ void utilityVTKIDS::VTK_IDS_Val2UnstrGrid_GenericGridScalar(
 
         // Define vtkDoubleArray and set its label and size
         vtkSmartPointer<vtkDoubleArray> newVtkDoubleArray =
-            VTK_IDS_setValuesArrayBase(    num_gridSubset_el,
-                                    values_array_label);
+            VTK_IDS_setValuesArrayBase( num_gridSubset_el, values_array_label);
         // In correctly written IDS the number of grid subset
         // objects and grid subset values (scalars) is equal
         newVtkDoubleArray->

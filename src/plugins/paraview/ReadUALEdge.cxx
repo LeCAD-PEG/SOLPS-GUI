@@ -60,6 +60,8 @@
 
 #include "ReadUALEdge.h"
 #include <UALClasses.h>
+#include "read_gmtry_edge.h"
+#include "read_gmtry_edge.cxx"
 #include "read_ps_edge.h"
 #include "read_ps_edge.cxx"
 #include <vtkCellArray.h>
@@ -169,117 +171,69 @@ void msgToOutputWindow( std::stringstream& msg, std::string msg_type = "info" )
     msg.str(std::string());
 }
 
-#if IMAS_VERSION_DIGIT >= 3151
-/**
-*   Function used to get the geometry/coordinates of all 0D objects/points
-*   P[R, Z] forming this grid
-*/
-template <typename SP1>
-vtkSmartPointer<vtkPoints> fSetVtkPoints(
-    SP1& space)
-{
-    class IdsNs::IDS::edge_profiles::grid_ggd::space::objects_per_dimension&
-        dim_obj_0D = space.objects_per_dimension(0);
-    // Get number of 0D objects / points
-    int num_obj_0D = dim_obj_0D.object.extent(0);
-    vtkSmartPointer<vtkPoints> pointsArray =
-        vtkSmartPointer<vtkPoints>::New();
-    for(int i=0; i < num_obj_0D; ++i){
-    pointsArray->InsertNextPoint(
-        dim_obj_0D.object(i).geometry(0),
-        dim_obj_0D.object(i).geometry(1),
-        0.0);
-    }
-    return pointsArray;
-}
-#else
-/**
-*   Function used to get the geometry/coordinates of all 0D objects/points
-*   P[R, Z] forming this grid
-*/
-template <typename SP1>
-vtkSmartPointer<vtkPoints> fSetVtkPoints(
-    SP1& space)
-{
-    class IdsNs::IDS::edge_profiles::ggd::grid::space::objects_per_dimension&
-        dim_obj_0D = space.objects_per_dimension(0);
-    // Get number of 0D objects / points
-    int num_obj_0D = dim_obj_0D.object.extent(0);
-    vtkSmartPointer<vtkPoints> pointsArray =
-        vtkSmartPointer<vtkPoints>::New();
-    for(int i=0; i < num_obj_0D; ++i){
-    pointsArray->InsertNextPoint(
-        dim_obj_0D.object(i).geometry(0),
-        dim_obj_0D.object(i).geometry(1),
-        0.0);
-    }
-    return pointsArray;
-}
-#endif
+// /**
+// *   Function used to fill predefined (size, label...) vtkCellArray.
+// *   @param  el_data_type    VTK data type (vtkVertex etc.)
+// *   @param  loc_gridSubset  Type of edge_profiles IDS data structure, designed
+// *                           for handling grid subset data
+// *   @param  grid            Type of edge_profiles IDS data structure, designed
+// *                           for handling full grid data
+// */
+// template <typename V1, typename V2, typename V3>
+// vtkSmartPointer<vtkCellArray> setVTKCellArray(
+//     V1 const& el_data_type,
+//     V2& loc_gridSubset,
+//     V3& grid)
+// {
+//     vtkSmartPointer<vtkCellArray> newCellArray =
+//         vtkSmartPointer<vtkCellArray>::New();
 
-/**
-*   Function used to fill predefined (size, label...) vtkCellArray.
-*   @param  el_data_type    VTK data type (vtkVertex etc.)
-*   @param  loc_gridSubset  Type of edge_profiles IDS data structure, designed
-*                           for handling grid subset data
-*   @param  grid            Type of edge_profiles IDS data structure, designed
-*                           for handling full grid data
-*/
-template <typename V1, typename V2, typename V3>
-vtkSmartPointer<vtkCellArray> fSetCellArray(
-    V1 const& el_data_type,
-    V2& loc_gridSubset,
-    V3& grid)
-{
-    vtkSmartPointer<vtkCellArray> newCellArray =
-        vtkSmartPointer<vtkCellArray>::New();
+//     // Get size/number of elements forming current grid subset
+//     // Currently ReadUALEdge works only with elements containing one object
+//     // (one scalar value is provided per element).
+//     int num_gridSubset_el = loc_gridSubset.element.extent(0);
 
-    // Get size/number of elements forming current grid subset
-    // Currently ReadUALEdge works only with elements containing one object
-    // (one scalar value is provided per element).
-    int num_gridSubset_el = loc_gridSubset.element.extent(0);
+//     // Get dimension of the objects forming this grid subset
+//     // NOTE :  Each grid subset is formed with objects of the same
+//     //         dimension
+//     //         (either only 0D nodes, 1D edges, 2D cells...).
+//     //         So in that case is enough to read only the dimension of
+//     //         the first object forming the grid subset.
+//     int obj_dimension = loc_gridSubset.element(0).object(0).dimension;
 
-    // Get dimension of the objects forming this grid subset
-    // NOTE :  Each grid subset is formed with objects of the same
-    //         dimension
-    //         (either only 0D nodes, 1D edges, 2D cells...).
-    //         So in that case is enough to read only the dimension of
-    //         the first object forming the grid subset.
-    int obj_dimension = loc_gridSubset.element(0).object(0).dimension;
+//     for (int j = 0; j < num_gridSubset_el; j++)
+//     {
+//         // Get objects space index, dimension and index
+//         // Note that in IDS indices are written in Fortran notation
+//         // (1,2,3,...) while C++ notation starts with 0 (0,1,2,...)
+//         // so c++_index = fortran_index - 1
 
-    for (int j = 0; j < num_gridSubset_el; j++)
-    {
-        // Get objects space index, dimension and index
-        // Note that in IDS indices are written in Fortran notation
-        // (1,2,3,...) while C++ notation starts with 0 (0,1,2,...)
-        // so c++_index = fortran_index - 1
+//         // Get space index of the object
+//         int obj_space = loc_gridSubset.element(j).object(0).space;
 
-        // Get space index of the object
-        int obj_space = loc_gridSubset.element(j).object(0).space;
+//         // Get object index of the object
+//         int obj_index = loc_gridSubset.element(j).object(0).index;
 
-        // Get object index of the object
-        int obj_index = loc_gridSubset.element(j).object(0).index;
+//         // Get number of nodes/points forming the object
+//         int num_obj_nodes = grid.space(obj_space - 1).
+//             objects_per_dimension(obj_dimension - 1).
+//             object(obj_index - 1).nodes.extent(0);
 
-        // Get number of nodes/points forming the object
-        int num_obj_nodes = grid.space(obj_space - 1).
-            objects_per_dimension(obj_dimension - 1).
-            object(obj_index - 1).nodes.extent(0);
-
-        // Fill the el_data_type (it must be either vtkVertex,
-        // vtkLine, vtkTriangle or vtkQuad data type)
-        for(int k = 0; k < num_obj_nodes; k++)
-        {
-            int node_ind = grid.space(obj_space - 1).
-                objects_per_dimension(obj_dimension - 1).
-                object(obj_index - 1).nodes(k);
-            el_data_type->GetPointIds()->
-                SetId(k, node_ind - 1);
-        }
-        // Assign the <el_data_type> list of data types to vtkCellArray
-        newCellArray->InsertNextCell(el_data_type);
-    }
-    return newCellArray;
-}
+//         // Fill the el_data_type (it must be either vtkVertex,
+//         // vtkLine, vtkTriangle or vtkQuad data type)
+//         for(int k = 0; k < num_obj_nodes; k++)
+//         {
+//             int node_ind = grid.space(obj_space - 1).
+//                 objects_per_dimension(obj_dimension - 1).
+//                 object(obj_index - 1).nodes(k);
+//             el_data_type->GetPointIds()->
+//                 SetId(k, node_ind - 1);
+//         }
+//         // Assign the <el_data_type> list of data types to vtkCellArray
+//         newCellArray->InsertNextCell(el_data_type);
+//     }
+//     return newCellArray;
+// }
 
 /**
 *   Function to add unstructured grid to main VTK multiblock
@@ -523,15 +477,23 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     vtkSmartPointer<vtkMultiBlockDataSet> mainMB =
         vtkSmartPointer<vtkMultiBlockDataSet>::New();
 
+    readGmtryEdge gmtrye_obj;
+
     // Get the geometry/coordinates of all nodes/points N[R, Z]
-    // forming this grid
-    vtkSmartPointer<vtkPoints> obj_0D_vtkPointsArray = fSetVtkPoints(space);
+    // forming this grid using routine 'setVtkPoints'
+    vtkSmartPointer<vtkPoints> obj_0D_vtkPointsArray = gmtrye_obj.setVtkPoints(
+        db,
+        std::string(this->IDSGridSource),
+        ggd_slice_index,
+        this->EdgeSourcesSourceID,
+        this->EdgeTransportModelID);
+
 
     // Get number of grid subsets
     int num_gridSubset = grid.grid_subset.extent(0);
 
     // Object declaration for readPSEdge routines
-    readPSEdge psep_obj;
+    readPSEdge pse_obj;
 
     // Loop through all grid subsets and extract data for each
     for(int i = 0; i < num_gridSubset; i++)
@@ -580,7 +542,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             vtkSmartPointer<vtkCellArray> gridSubsetVertices =
                 vtkSmartPointer<vtkCellArray>::New();
             gridSubsetVertices =
-                fSetCellArray(gridSubsetVertex, grid_subset, grid);
+                gmtrye_obj.setVTKCellArray(gridSubsetVertex, grid_subset, grid);
 
             // Assign vtkCellArray to vtkUnstructuredGrid
             gridSubsetPointsUnstructuredGrid->SetPoints(obj_0D_vtkPointsArray);
@@ -589,7 +551,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
             // Set data fields to vtkunstructuredGrid for selected IDS with the
             // help of 'setUnstructuredGridDataFields' routine
-            psep_obj.setUnstructuredGridDataFields(
+            pse_obj.setUnstructuredGridDataFields(
                 gridSubsetPointsUnstructuredGrid,
                 db,
                 gridSubset_index,
@@ -615,7 +577,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             vtkSmartPointer<vtkLine> gridSubsetLine =
                 vtkSmartPointer<vtkLine>::New();
             gridSubsetLinesArray =
-                fSetCellArray(gridSubsetLine, grid_subset, grid);
+                gmtrye_obj.setVTKCellArray(gridSubsetLine, grid_subset, grid);
 
             // Assign vtkCellArray to vtkUnstructuredGrid
             gridSubsetLinesUnstructuredGrid->SetPoints(obj_0D_vtkPointsArray);
@@ -649,7 +611,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             if (num_obj_nodes_first == 3)
             {
                 gridSubsetCellArray =
-                    fSetCellArray(gridSubsetTriangle, grid_subset, grid);
+                    gmtrye_obj.setVTKCellArray(gridSubsetTriangle, grid_subset, grid);
 
                 // Assign vtkCellArray to vtkUnstructuredGrid
                 gridSubsetCellsUnstructuredGrid
@@ -661,7 +623,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             else if (num_obj_nodes_first == 4)
             {
                 gridSubsetCellArray =
-                    fSetCellArray(gridSubsetQuad, grid_subset, grid);
+                    gmtrye_obj.setVTKCellArray(gridSubsetQuad, grid_subset, grid);
 
                 // Assign vtkCellArray to vtkUnstructuredGrid
                 gridSubsetCellsUnstructuredGrid
@@ -672,7 +634,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
             // Set data fields to vtkunstructuredGrid for selected IDS with the
             // help of 'setUnstructuredGridDataFields' routine
-            psep_obj.setUnstructuredGridDataFields(
+            pse_obj.setUnstructuredGridDataFields(
                 gridSubsetCellsUnstructuredGrid,
                 db,
                 gridSubset_index,
