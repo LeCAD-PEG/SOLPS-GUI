@@ -171,70 +171,6 @@ void msgToOutputWindow( std::stringstream& msg, std::string msg_type = "info" )
     msg.str(std::string());
 }
 
-// /**
-// *   Function used to fill predefined (size, label...) vtkCellArray.
-// *   @param  el_data_type    VTK data type (vtkVertex etc.)
-// *   @param  loc_gridSubset  Type of edge_profiles IDS data structure, designed
-// *                           for handling grid subset data
-// *   @param  grid            Type of edge_profiles IDS data structure, designed
-// *                           for handling full grid data
-// */
-// template <typename V1, typename V2, typename V3>
-// vtkSmartPointer<vtkCellArray> setVTKCellArray(
-//     V1 const& el_data_type,
-//     V2& loc_gridSubset,
-//     V3& grid)
-// {
-//     vtkSmartPointer<vtkCellArray> newCellArray =
-//         vtkSmartPointer<vtkCellArray>::New();
-
-//     // Get size/number of elements forming current grid subset
-//     // Currently ReadUALEdge works only with elements containing one object
-//     // (one scalar value is provided per element).
-//     int num_gridSubset_el = loc_gridSubset.element.extent(0);
-
-//     // Get dimension of the objects forming this grid subset
-//     // NOTE :  Each grid subset is formed with objects of the same
-//     //         dimension
-//     //         (either only 0D nodes, 1D edges, 2D cells...).
-//     //         So in that case is enough to read only the dimension of
-//     //         the first object forming the grid subset.
-//     int obj_dimension = loc_gridSubset.element(0).object(0).dimension;
-
-//     for (int j = 0; j < num_gridSubset_el; j++)
-//     {
-//         // Get objects space index, dimension and index
-//         // Note that in IDS indices are written in Fortran notation
-//         // (1,2,3,...) while C++ notation starts with 0 (0,1,2,...)
-//         // so c++_index = fortran_index - 1
-
-//         // Get space index of the object
-//         int obj_space = loc_gridSubset.element(j).object(0).space;
-
-//         // Get object index of the object
-//         int obj_index = loc_gridSubset.element(j).object(0).index;
-
-//         // Get number of nodes/points forming the object
-//         int num_obj_nodes = grid.space(obj_space - 1).
-//             objects_per_dimension(obj_dimension - 1).
-//             object(obj_index - 1).nodes.extent(0);
-
-//         // Fill the el_data_type (it must be either vtkVertex,
-//         // vtkLine, vtkTriangle or vtkQuad data type)
-//         for(int k = 0; k < num_obj_nodes; k++)
-//         {
-//             int node_ind = grid.space(obj_space - 1).
-//                 objects_per_dimension(obj_dimension - 1).
-//                 object(obj_index - 1).nodes(k);
-//             el_data_type->GetPointIds()->
-//                 SetId(k, node_ind - 1);
-//         }
-//         // Assign the <el_data_type> list of data types to vtkCellArray
-//         newCellArray->InsertNextCell(el_data_type);
-//     }
-//     return newCellArray;
-// }
-
 /**
 *   Function to add unstructured grid to main VTK multiblock
 *   @param  MB  Main VTK MultiBlock Data Set object
@@ -403,81 +339,27 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         db._edge_transport.get();
     }
 
-    int num_ggd_slices = db._edge_profiles.ggd.extent(0);
-    vtkOutputWindowDisplayText(std::string( "Number of GGD slices:" +
-        std::to_string(num_ggd_slices) + "\n").c_str());
-
-    // Checks regarding GGD slice
-    if (num_ggd_slices == 0)
-    {
-        vtkOutputWindowDisplayWarningText("ERROR! No filled GGD slice found! "
-            "Either selected database doesn't exist or it's empty! \n\n");
-        return 0;
-    }
-    if (ggd_slice_index > num_ggd_slices - 1)
-    {
-        vtkOutputWindowDisplayWarningText("ERROR! The input GGD structure "
-            "array index does not correspond to any existing GGD structure! "
-            "Reverting the GGD structure array index to 0! \n\n");
-        ggd_slice_index = 0;
-    }
+    // Set object to readGmtryEdge class
+    readGmtryEdge gmtrye_obj;
+    //
+    gmtrye_obj.ggdCheck(db, ggd_slice_index);
 
     // Set class shortcuts for IDS substructures
     class IDS::edge_profiles & edge_profiles = db._edge_profiles;
-    class IDS::edge_sources  & edge_sources = db._edge_sources;
-    class IDS::edge_transport  & edge_transport = db._edge_transport;
+    // class IDS::edge_sources  & edge_sources = db._edge_sources;
+    // class IDS::edge_transport  & edge_transport = db._edge_transport;
     class IDS::edge_profiles::ggd & ggd = edge_profiles.ggd(ggd_slice_index);
 
 #if IMAS_VERSION_DIGIT >= 3151
     class IDS::edge_profiles::grid_ggd & grid = edge_profiles.grid_ggd(0);
     class IDS::edge_profiles::grid_ggd::space & space = grid.space(0);
-    // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
-    class IDS::edge_profiles::grid_ggd::space::objects_per_dimension &
-        dim_obj_0D = space.objects_per_dimension(0);
-    // objects_per_dimensions(1) holds every 1D object (edges)
-    class IDS::edge_profiles::grid_ggd::space::objects_per_dimension &
-        dim_obj_1D = space.objects_per_dimension(1);
-    // objects_per_dimensions(2) holds every 2D object (faces/2D cells)
-    class IDS::edge_profiles::grid_ggd::space::objects_per_dimension &
-        dim_obj_2D = space.objects_per_dimension(2);
-
 #else
     class IDS::edge_profiles::ggd::grid & grid = ggd.grid;
     class IDS::edge_profiles::ggd::grid::space & space = grid.space(0);
-    // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
-    class IDS::edge_profiles::ggd::grid::space::objects_per_dimension &
-        dim_obj_0D = space.objects_per_dimension(0);
-    // objects_per_dimensions(1) holds every 1D object (edges)
-    class IDS::edge_profiles::ggd::grid::space::objects_per_dimension &
-        dim_obj_1D = space.objects_per_dimension(1);
-    // objects_per_dimensions(2) holds every 2D object (faces/2D cells)
-    class IDS::edge_profiles::ggd::grid::space::objects_per_dimension &
-        dim_obj_2D = space.objects_per_dimension(2);
 #endif
-
-
-    // Set variables to later hold number of elements
-    int num_obj_0D = 0; // Node/Point/vertice == 0D object
-    int num_obj_1D = 0; // Edge    == 1D object
-    int num_obj_2D = 0; // 2D Cell == 2D object
-
-    // Check for nodes, edges and cells data in current IDS database and
-    // get number of objects for each dimension
-    num_obj_0D = dim_obj_0D.object.extent(0);
-    num_obj_1D = dim_obj_1D.object.extent(0);
-    num_obj_2D = dim_obj_2D.object.extent(0);
-
-    vtkOutputWindowDisplayText(std::string( "Number of found 0D objects: " +
-        std::to_string(num_obj_0D) + "\n").c_str());
-    vtkOutputWindowDisplayText(std::string( "Number of found 1D objects: " +
-        std::to_string(num_obj_1D) + "\n").c_str());
-    vtkOutputWindowDisplayText(std::string( "Number of found 2D objects: " +
-        std::to_string(num_obj_2D) + "\n\n").c_str());
 
     vtkSmartPointer<vtkMultiBlockDataSet> mainMB =
         vtkSmartPointer<vtkMultiBlockDataSet>::New();
-
-    readGmtryEdge gmtrye_obj;
 
     // Get the geometry/coordinates of all nodes/points N[R, Z]
     // forming this grid using routine 'setVtkPoints'
@@ -487,7 +369,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         ggd_slice_index,
         this->EdgeSourcesSourceID,
         this->EdgeTransportModelID);
-
 
     // Get number of grid subsets
     int num_gridSubset = grid.grid_subset.extent(0);

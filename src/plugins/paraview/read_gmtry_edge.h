@@ -28,6 +28,11 @@ class readGmtryEdge
 {
 public:
 
+    template <typename IDS3>
+    void ggdCheck(
+        IDS3 & GG_db,
+        int GG_ggd_slice_index);
+
     template <typename IDS2>
     vtkSmartPointer<vtkPoints> setVtkPoints(
         IDS2 & PNT_db,
