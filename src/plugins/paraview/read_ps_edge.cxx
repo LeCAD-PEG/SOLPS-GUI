@@ -70,6 +70,77 @@
 using namespace std;
 using namespace IdsNs;
 
+/**
+*   Fill predefined vtkUnstructuredGrid (should already contain n-dimensional
+*   geometry ) with plasma state data found in the specified IDS.
+*
+*   @param UG                       vtkUnstructuredGrid to be filled with
+*                                   data fields
+*   @param UG_db                    Base type of IDS data structure (IdsNs::IDS)
+*   @param UG_gridSubset_index      Grid subset index of which data corresponds
+*                                   to the current vtkUnstructuredGrid
+*   @param UG_num_gridSubset_el     Number of elements of the relevant grid
+*                                   subset
+*   @param UG_LoadIDS_string        String containing name of the IDS of which
+*                                   data fields are to be added to
+*                                   vtkUnstructuredGrid
+*   @param UG_ggd_slice_index       Array index of the ggd(:) array of
+*                                   structures node
+*   @param UG_EdgeSourcesSourceID   Array index of the source(:) array of
+*                                   structures node (relevant only to
+*                                   edge_sources IDS)
+*   @param UG_EdgeTransportModelID  Array index of the model(:) array of
+*                                   structures node (relevant only to
+*                                   edge_transport IDS)
+*/
+template <typename IDS1>
+void readPSEdge::setUnstructuredGridDataFields(
+    vtkSmartPointer<vtkUnstructuredGrid> UG,
+    IDS1 & UG_db,
+    int UG_gridSubset_index = 0,
+    int UG_num_gridSubset_el = 0,
+    std::string UG_LoadIDS_string = "edge_profiles",
+    int UG_ggd_slice_index = 0,
+    int UG_EdgeSourcesSourceID = 0,
+    int UG_EdgeTransportModelID = 0)
+{
+    // Object declaration for readPSEdge routines
+    readPSEdge psep_obj;
+
+    // For "edge_profiles" selection in "Load IDS" text box
+    if( UG_LoadIDS_string.find( "edge_profiles" ) != std::string::npos)
+    {
+        // Using readPSEdge function
+        psep_obj.setAllDataFields_edge_profiles(
+            UG,
+            UG_db._edge_profiles.ggd(UG_ggd_slice_index),
+            UG_gridSubset_index,
+            UG_num_gridSubset_el);
+    // For "edge_sources" selection in "Load IDS" text box
+    }else if( UG_LoadIDS_string.find( "edge_sources" ) !=
+        std::string::npos )
+    {
+        // Assigning values (2D cells)
+        // Using readPSEdge function
+        psep_obj.setAllDataFields_edge_sources(
+            UG,
+            UG_db._edge_sources.source(UG_EdgeSourcesSourceID).ggd(UG_ggd_slice_index),
+            UG_gridSubset_index,
+            UG_num_gridSubset_el);
+    // For "edge_transport" selection in "Load IDS" text box
+    }else if( UG_LoadIDS_string.find( "edge_transport" ) !=
+        std::string::npos )
+    {
+        // Assigning values (2D cells)
+        // Using readPSEdge function
+        psep_obj.setAllDataFields_edge_transport(
+            UG,
+            UG_db._edge_transport.model(UG_EdgeTransportModelID).ggd(UG_ggd_slice_index),
+            UG_gridSubset_index,
+            UG_num_gridSubset_el);
+    }
+}
+
 
 /* Main function used to fully read plasma state from the edge_profiles IDS
 * and set the data properly to specified vtkUnstructuredGrid

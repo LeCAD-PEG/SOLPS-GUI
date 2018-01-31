@@ -25,6 +25,18 @@ using namespace std;
 class readPSEdge
 {
 public:
+
+    template <typename IDS1>
+    void setUnstructuredGridDataFields(
+        vtkSmartPointer<vtkUnstructuredGrid> UG,
+        IDS1 & UG_db,
+        int UG_gridSubset_index,
+        int UG_num_gridSubset_el,
+        std::string UG_LoadIDS_string,
+        int UG_ggd_slice_index,
+        int UG_EdgeSourcesSourceID,
+        int UG_EdgeTransportModelID);
+
     template< typename EP1>
     void setAllDataFields_edge_profiles(
         vtkSmartPointer<vtkUnstructuredGrid> inputVtkUnstructuredGrid,

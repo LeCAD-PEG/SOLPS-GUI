@@ -25,7 +25,7 @@ using namespace std;
 using namespace IdsNs;
 
 /**
-*   Function used to fill predefined (size, label...) vtkDoubleArray with
+*   Fill predefined (size, label...) vtkDoubleArray with
 *   quantity values stored in generic_grid_scalar IDS data structure
 *   and assign it to vtkUnstructuredGrid.
 *   (after each full vtkDoubleArray definition process is required

@@ -587,38 +587,17 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             gridSubsetPointsUnstructuredGrid->SetCells(
                 VTK_VERTEX, gridSubsetVertices);
 
-            // For "edge_profiles" selection in "Load IDS" text box
-            if( std::string(LoadIDS).find( "edge_profiles" ) != std::string::npos)
-            {
-                // Using readPSEdge function
-                psep_obj.setAllDataFields_edge_profiles(
-                    gridSubsetPointsUnstructuredGrid,
-                    edge_profiles.ggd(ggd_slice_index),
-                    gridSubset_index,
-                    num_gridSubset_el);
-            // For "edge_sources" selection in "Load IDS" text box
-            }else if( std::string(LoadIDS).find( "edge_sources" ) !=
-                std::string::npos )
-            {
-                // Assigning values (2D cells)
-                // Using readPSEdge function
-                psep_obj.setAllDataFields_edge_sources(
-                    gridSubsetPointsUnstructuredGrid,
-                    edge_sources.source(this->EdgeSourcesSourceID).ggd(ggd_slice_index),
-                    gridSubset_index,
-                    num_gridSubset_el);
-            // For "edge_transport" selection in "Load IDS" text box
-            }else if( std::string(LoadIDS).find( "edge_transport" ) !=
-                std::string::npos )
-            {
-                // Assigning values (2D cells)
-                // Using readPSEdge function
-                psep_obj.setAllDataFields_edge_transport(
-                    gridSubsetPointsUnstructuredGrid,
-                    edge_transport.model(0).ggd(ggd_slice_index),
-                    gridSubset_index,
-                    num_gridSubset_el);
-            }
+            // Set data fields to vtkunstructuredGrid for selected IDS with the
+            // help of 'setUnstructuredGridDataFields' routine
+            psep_obj.setUnstructuredGridDataFields(
+                gridSubsetPointsUnstructuredGrid,
+                db,
+                gridSubset_index,
+                num_gridSubset_el,
+                std::string(LoadIDS),
+                ggd_slice_index,
+                this->EdgeSourcesSourceID,
+                this->EdgeTransportModelID);
 
             // Add unstructured grid to main block
             fAddBlock2MultiBlock( mainMB, gridSubsetPointsUnstructuredGrid,
@@ -691,40 +670,17 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                     VTK_QUAD, gridSubsetCellArray);
             }
 
-            // For "edge_profiles" selection in "Load IDS" text box
-            if( std::string(LoadIDS).find( "edge_profiles" ) !=
-                std::string::npos )
-            {
-                // Assigning values (2D cells)
-                // Using readPSEdge function
-                psep_obj.setAllDataFields_edge_profiles(
-                    gridSubsetCellsUnstructuredGrid,
-                    edge_profiles.ggd(ggd_slice_index),
-                    gridSubset_index,
-                    num_gridSubset_el);
-            // For "edge_sources" selection in "Load IDS" text box
-            }else if( std::string(LoadIDS).find( "edge_sources" ) !=
-                std::string::npos )
-            {
-                // Assigning values (2D cells)
-                // Using readPSEdge function
-                psep_obj.setAllDataFields_edge_sources(
-                    gridSubsetCellsUnstructuredGrid,
-                    edge_sources.source(this->EdgeSourcesSourceID).ggd(ggd_slice_index),
-                    gridSubset_index,
-                    num_gridSubset_el);
-            // For "edge_transport" selection in "Load IDS" text box
-            }else if( std::string(LoadIDS).find( "edge_transport" ) !=
-                std::string::npos )
-            {
-                // Assigning values (2D cells)
-                // Using readPSEdge function
-                psep_obj.setAllDataFields_edge_transport(
-                    gridSubsetCellsUnstructuredGrid,
-                    edge_transport.model(0).ggd(ggd_slice_index),
-                    gridSubset_index,
-                    num_gridSubset_el);
-            }
+            // Set data fields to vtkunstructuredGrid for selected IDS with the
+            // help of 'setUnstructuredGridDataFields' routine
+            psep_obj.setUnstructuredGridDataFields(
+                gridSubsetCellsUnstructuredGrid,
+                db,
+                gridSubset_index,
+                num_gridSubset_el,
+                std::string(LoadIDS),
+                ggd_slice_index,
+                this->EdgeSourcesSourceID,
+                this->EdgeTransportModelID);
 
             // Add unstructured grid to main block
             fAddBlock2MultiBlock(mainMB, gridSubsetCellsUnstructuredGrid,
