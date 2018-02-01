@@ -12,8 +12,6 @@
 */
 
 #include "read_gmtry_edge.h"
-// #include "VTK_IDS_utility.h"
-// #include "VTK_IDS_utility.cxx"
 #include <UALClasses.h>
 #include <vtkCellArray.h>
 #include <vtkPoints.h>
