@@ -332,6 +332,39 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // Get number of grid subsets
     int num_gridSubset = 0;
 
+#if IMAS_VERSION_DIGIT >= 3151
+    if( std::string(IDSGridSource).find("edge_profiles") != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
+        // db._edge_profiles.get();
+        // Get number of grid subsets in the selected IDS
+        // (IDSGridSource selection box)
+        num_gridSubset = db._edge_profiles.
+            grid_ggd(ggd_slice_index).grid_subset.extent(0);
+    }
+    else if( std::string(IDSGridSource).find("edge_sources")
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
+        // db._edge_sources.get();
+        // Get number of grid subsets in the selected IDS
+        // (IDSGridSource selection box)
+        num_gridSubset = db._edge_sources.grid_ggd(ggd_slice_index).
+            grid_subset.extent(0);
+    }
+    else if( std::string(IDSGridSource).find("edge_transport")
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
+        // db._edge_transport.get();
+        // Get number of grid subsets in the selected IDS
+        // (IDSGridSource selection box)
+        num_gridSubset = db._edge_transport.grid_ggd(ggd_slice_index).
+            grid_subset.extent(0);
+    }
+
+#else
+
     if( std::string(IDSGridSource).find("edge_profiles") != std::string::npos )
     {
         vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
@@ -361,6 +394,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         num_gridSubset = db._edge_transport.model(model_index).
             ggd(ggd_slice_index).grid.grid_subset.extent(0);
     }
+#endif
 
     // Get plasma state from one of the IDSs
     if( std::string(LoadIDS).find("edge_profiles")
@@ -405,6 +439,28 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // Loop through all grid subsets and extract data for each
     for(int i = 0; i < num_gridSubset; i++)
     {
+#if IMAS_VERSION_DIGIT >= 3151
+        std::string gridSubset_name;
+        gridSubset_name = db._edge_profiles.
+            grid_ggd(ggd_slice_index).grid_subset(i).identifier.name;
+        int gridSubset_index;
+        gridSubset_index= db._edge_profiles.
+            grid_ggd(ggd_slice_index).grid_subset(i).identifier.index;
+
+        // Get size/number of elements forming current grid subset
+        int num_gridSubset_el;
+        num_gridSubset_el = db._edge_profiles.grid_ggd(ggd_slice_index).
+            grid_subset(i).element.extent(0);
+
+        // Get dimension of the objects forming this grid subset
+        int gridSubset_obj_cls;
+        gridSubset_obj_cls = db._edge_profiles.grid_ggd(ggd_slice_index).
+            grid_subset(i).element(0).object(0).dimension;
+        int gridSubset_obj_dim;
+        gridSubset_obj_dim = gridSubset_obj_cls - 1;
+
+#else
+
         std::string gridSubset_name;
         gridSubset_name = db._edge_profiles.
             ggd(ggd_slice_index).grid.grid_subset(i).identifier.name;
@@ -423,6 +479,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             grid_subset(i).element(0).object(0).dimension;
         int gridSubset_obj_dim;
         gridSubset_obj_dim = gridSubset_obj_cls - 1;
+#endif
 
         // Print grid subset info
         vtkOutputWindowDisplayText(std::string("Grid subset " +
