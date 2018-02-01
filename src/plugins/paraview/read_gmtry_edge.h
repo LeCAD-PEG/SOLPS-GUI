@@ -33,6 +33,31 @@ public:
         IDS3 & GG_db,
         int GG_ggd_slice_index);
 
+    template <typename IDS4>
+    void setGridSubset0DGeometry2UnstructuredGrid(
+        IDS4 & GS_db,
+        vtkSmartPointer<vtkUnstructuredGrid> unstructuredGrid,
+        vtkSmartPointer<vtkPoints> vtk_grid_points,
+        int GS_ggd_slice_index,
+        int GS_gridSubset_index);
+
+    template <typename IDS5>
+    void setGridSubset1DGeometry2UnstructuredGrid(
+        IDS5 & GS_db,
+        vtkSmartPointer<vtkUnstructuredGrid> unstructuredGrid,
+        vtkSmartPointer<vtkPoints> vtk_grid_points,
+        int GS_ggd_slice_index,
+        int GS_gridSubset_index);
+
+    template <typename IDS6>
+    void setGridSubset2DGeometry2UnstructuredGrid(
+        IDS6 & GS_db,
+        vtkSmartPointer<vtkUnstructuredGrid> unstructuredGrid,
+        vtkSmartPointer<vtkPoints> vtk_grid_points,
+        int GS_ggd_slice_index,
+        int GS_gridSubset_index,
+        int GS_gridSubset_obj_cls);
+
     template <typename IDS2>
     vtkSmartPointer<vtkPoints> setVtkPoints(
         IDS2 & PNT_db,

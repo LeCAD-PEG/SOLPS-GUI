@@ -79,14 +79,210 @@ void readGmtryEdge::ggdCheck(
         std::to_string(num_obj_2D) + "\n\n").c_str());
 }
 
+/**
+*   Set grid subset geometry of class 1 (contains only 0D objects - vertices) to
+*   vtkUnstructuredGrid.
+*   @param GS_db                        Base type of IDS data structure
+*                                       (IdsNs::IDS)
+*   @param unstructuredGrid             vtkUnstructuredGrid to hold grid subset
+*                                       geometry
+*   @param vtk_grid_points              vtkPoints object, containing the required
+*                                       0D objects (points) of the full grid
+*   @param GS_ggd_slice_index           Array index of the ggd(:) array of
+*                                       structures node
+*   @param GS_gridSubset_index          Index of the grid subset which
+*                                       geometry data is to be set to
+*                                       vtkUnstructuredGrid
+*/
+template <typename IDS4>
+void readGmtryEdge::setGridSubset0DGeometry2UnstructuredGrid(
+    IDS4 & GS_db,
+    vtkSmartPointer<vtkUnstructuredGrid> unstructuredGrid,
+    vtkSmartPointer<vtkPoints> vtk_grid_points,
+    int GS_ggd_slice_index,
+    int GS_gridSubset_index)
+{
+    // Set vtkVertex vtk data type
+    vtkSmartPointer<vtkVertex> gridSubsetVertex =
+        vtkSmartPointer<vtkVertex>::New();
+
+    // Set vtkCellArray for nodes/points
+    vtkSmartPointer<vtkCellArray> gridSubsetVertices =
+        vtkSmartPointer<vtkCellArray>::New();
+
+#if IMAS_VERSION_DIGIT >= 3151
+    gridSubsetVertices = setVTKCellArray(
+        gridSubsetVertex,
+        GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).grid_subset(GS_gridSubset_index),
+        GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index));
+#else
+    gridSubsetVertices = setVTKCellArray(
+        gridSubsetVertex,
+        GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.grid_subset(GS_gridSubset_index),
+        GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
+#endif
+
+    // Assign vtkCellArray to vtkUnstructuredGrid
+    unstructuredGrid->SetPoints(vtk_grid_points);
+    unstructuredGrid->SetCells(
+        VTK_VERTEX, gridSubsetVertices);
+}
+
+/**
+*   Set grid subset geometry of class 2 (contains only 1D objects - edges) to
+*   vtkUnstructuredGrid.
+*   @param GS_db                        Base type of IDS data structure
+*                                       (IdsNs::IDS)
+*   @param unstructuredGrid             vtkUnstructuredGrid to hold grid subset
+*                                       geometry
+*   @param vtk_grid_points              vtkPoints object, containing the required
+*                                       0D objects (points) of the full grid
+*   @param GS_ggd_slice_index           Array index of the ggd(:) array of
+*                                       structures node
+*   @param GS_gridSubset_index          Index of the grid subset which
+*                                       geometry data is to be set to
+*                                       vtkUnstructuredGrid
+*/
+template <typename IDS5>
+void readGmtryEdge::setGridSubset1DGeometry2UnstructuredGrid(
+    IDS5 & GS_db,
+    vtkSmartPointer<vtkUnstructuredGrid> unstructuredGrid,
+    vtkSmartPointer<vtkPoints> vtk_grid_points,
+    int GS_ggd_slice_index,
+    int GS_gridSubset_index)
+{
+    // Set vtkCellArray for edges
+    vtkSmartPointer<vtkCellArray> gridSubsetLinesArray =
+        vtkSmartPointer<vtkCellArray>::New();
+    vtkSmartPointer<vtkLine> gridSubsetLine =
+        vtkSmartPointer<vtkLine>::New();
+
+#if IMAS_VERSION_DIGIT >= 3151
+    gridSubsetLinesArray = setVTKCellArray(
+        gridSubsetLine,
+        GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).grid_subset(GS_gridSubset_index),
+        GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index));
+#else
+    gridSubsetLinesArray = setVTKCellArray(
+        gridSubsetLine,
+        GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.grid_subset(GS_gridSubset_index),
+        GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
+#endif
+    // Assign vtkCellArray to vtkUnstructuredGrid
+    unstructuredGrid->SetPoints(vtk_grid_points);
+    unstructuredGrid->SetCells(
+        VTK_LINE, gridSubsetLinesArray);
+}
+
+/**
+*   Set grid subset geometry of class 3 (contains only 2D objects - 2D cells) to
+*   vtkUnstructuredGrid.
+*   @param GS_db                        Base type of IDS data structure
+*                                       (IdsNs::IDS)
+*   @param unstructuredGrid             vtkUnstructuredGrid to hold grid subset
+*                                       geometry
+*   @param vtk_grid_points              vtkPoints object, containing the required
+*                                       0D objects (points) of the full grid
+*   @param GS_ggd_slice_index           Array index of the ggd(:) array of
+*                                       structures node
+*   @param GS_gridSubset_index          Index of the grid subset which
+*                                       geometry data is to be set to
+*                                       vtkUnstructuredGrid
+*/
+template <typename IDS6>
+void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
+    IDS6 & GS_db,
+    vtkSmartPointer<vtkUnstructuredGrid> unstructuredGrid,
+    vtkSmartPointer<vtkPoints> vtk_grid_points,
+    int GS_ggd_slice_index,
+    int GS_gridSubset_index,
+    int GS_gridSubset_obj_cls)
+{
+    vtkSmartPointer<vtkQuad> gridSubsetQuad =
+        vtkSmartPointer<vtkQuad>::New();
+    vtkSmartPointer<vtkTriangle> gridSubsetTriangle =
+        vtkSmartPointer<vtkTriangle>::New();
+    vtkSmartPointer<vtkCellArray> gridSubsetCellArray =
+        vtkSmartPointer<vtkCellArray>::New();
+
+#if IMAS_VERSION_DIGIT >= 3151
+    // Get number of nodes of the first 2D cell in order to find out
+    // whether they are triangles or quad (all other 2D cells of the
+    // same grid should be of the same type for now)
+    int num_obj_nodes_first = GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
+        space(0).objects_per_dimension(GS_gridSubset_obj_cls - 1).object(0).
+        nodes.extent(0);
+
+    // Cells-Triangles
+    if (num_obj_nodes_first == 3)
+    {
+        gridSubsetCellArray = setVTKCellArray(gridSubsetTriangle,
+            GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
+                grid_subset(GS_gridSubset_index),
+            GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index));
+
+        // Assign vtkCellArray to vtkUnstructuredGrid
+        unstructuredGrid->SetPoints(vtk_grid_points);
+        unstructuredGrid->SetCells(VTK_TRIANGLE, gridSubsetCellArray);
+    }
+    // Cells-Quad
+    else if (num_obj_nodes_first == 4)
+    {
+        gridSubsetCellArray = setVTKCellArray(gridSubsetQuad,
+            GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
+                grid_subset(GS_gridSubset_index),
+            GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index));
+
+        // Assign vtkCellArray to vtkUnstructuredGrid
+        unstructuredGrid->SetPoints(vtk_grid_points);
+        unstructuredGrid->SetCells(VTK_QUAD, gridSubsetCellArray);
+    }
+
+}
+
+#else
+
+    // Get number of nodes of the first 2D cell in order to find out
+    // whether they are triangles or quad (all other 2D cells of the
+    // same grid should be of the same type for now)
+    int num_obj_nodes_first =
+        GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.space(0).
+        objects_per_dimension(GS_gridSubset_obj_cls - 1).object(0).nodes.extent(0);
+
+    // Cells-Triangles
+    if (num_obj_nodes_first == 3)
+    {
+        gridSubsetCellArray = setVTKCellArray(gridSubsetTriangle,
+            GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
+                grid_subset(GS_gridSubset_index),
+            GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
+        // Assign vtkCellArray to vtkUnstructuredGrid
+        unstructuredGrid->SetPoints(vtk_grid_points);
+        unstructuredGrid->SetCells(VTK_TRIANGLE, gridSubsetCellArray);
+    }
+    // Cells-Quad
+    else if (num_obj_nodes_first == 4)
+    {
+        gridSubsetCellArray = setVTKCellArray(gridSubsetQuad,
+            GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
+                grid_subset(GS_gridSubset_index),
+            GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
+
+        // Assign vtkCellArray to vtkUnstructuredGrid
+        unstructuredGrid->SetPoints(vtk_grid_points);
+        unstructuredGrid->SetCells(VTK_QUAD, gridSubsetCellArray);
+    }
+
+}
+#endif
 
 #if IMAS_VERSION_DIGIT >= 3151
 /**
 *   Function used to get the geometry/coordinates of all 0D objects/points
-*   P[R, Z] forming this grid
-*   @param  PNT_db                      Base type of IDS data structure
+*   P[R, Z] forming this grid and set it to vtkPoints
+*   @param PNT_db                       Base type of IDS data structure
 *                                       (IdsNs::IDS)
-*   @param  PNT_IDSGridSource_string    String containing name of the IDS of
+*   @param PNT_IDSGridSource_string     String containing name of the IDS of
 *                                       which grid geometry points
 *                                       added to vtkPoints
 *   @param PNT_ggd_slice_index          Array index of the ggd(:) array of
@@ -106,7 +302,6 @@ vtkSmartPointer<vtkPoints> readGmtryEdge::setVtkPoints(
     int PNT_EdgeSourcesSourceID = 0,
     int PNT_EdgeTransportModelID = 0)
 {
-
     int num_obj_0D = 0;
     vtkSmartPointer<vtkPoints> pointsArray = vtkSmartPointer<vtkPoints>::New();
     // For "edge_profiles" selection in "IDSGridSource" text box

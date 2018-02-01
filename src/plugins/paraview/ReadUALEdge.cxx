@@ -298,6 +298,11 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         " - Version:    " << this->Version << "\n\n";
     msgToOutputWindow( msg );
 
+    // Get all three IDS databases
+    db._edge_profiles.get();
+    db._edge_sources.get();
+    db._edge_transport.get();
+
     // Get GGD structure array index to internal variable
     int ggd_slice_index = this->GGDslice;
     // Get edge_sources.source(:) structure array index to internal variable
@@ -308,41 +313,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // Get grid geometry from one of the IDSs (currently ready from
     // edge_profiles IDS only!)
     // TODO: Implement IDSGridSource.
-    db._edge_profiles.get();
-    // if( std::string(IDSGridSource).find("edge_profiles") != std::string::npos )
-    // {
-    //     vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
-    //     db._edge_profiles.get();
-    // }
-    // else if( std::string(IDSGridSource).find("edge_sources")
-    //     != std::string::npos )
-    // {
-    //     vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
-    //     db._edge_sources.get();
-    // }
-    // else if( std::string(IDSGridSource).find("edge_transport")
-    //     != std::string::npos )
-    // {
-    //     vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
-    //     db._edge_transport.get();
-    // }
-
-    // Get plasma state from one of the IDSs
-    if( std::string(LoadIDS).find( "edge_sources" ) != std::string::npos )
-    {
-        vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
-        db._edge_sources.get();
-    }else if( std::string(LoadIDS).find( "edge_transport" )
-        != std::string::npos )
-    {
-        vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
-        db._edge_transport.get();
-    }
-
-    // Set object to readGmtryEdge class
-    readGmtryEdge gmtrye_obj;
-    //
-    gmtrye_obj.ggdCheck(db, ggd_slice_index);
+    // db._edge_profiles.get();
 
     // Set class shortcuts for IDS substructures
     class IDS::edge_profiles & edge_profiles = db._edge_profiles;
@@ -358,6 +329,64 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     class IDS::edge_profiles::ggd::grid::space & space = grid.space(0);
 #endif
 
+    // Get number of grid subsets
+    int num_gridSubset = 0;
+
+    if( std::string(IDSGridSource).find("edge_profiles") != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
+        // db._edge_profiles.get();
+        // Get number of grid subsets in the selected IDS
+        // (IDSGridSource selection box)
+        num_gridSubset = db._edge_profiles.
+            ggd(ggd_slice_index).grid.grid_subset.extent(0);
+    }
+    else if( std::string(IDSGridSource).find("edge_sources")
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
+        // db._edge_sources.get();
+        // Get number of grid subsets in the selected IDS
+        // (IDSGridSource selection box)
+        num_gridSubset = db._edge_sources.source(source_index).
+            ggd(ggd_slice_index).grid.grid_subset.extent(0);
+    }
+    else if( std::string(IDSGridSource).find("edge_transport")
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
+        // db._edge_transport.get();
+        // Get number of grid subsets in the selected IDS
+        // (IDSGridSource selection box)
+        num_gridSubset = db._edge_transport.model(model_index).
+            ggd(ggd_slice_index).grid.grid_subset.extent(0);
+    }
+
+    // Get plasma state from one of the IDSs
+    if( std::string(LoadIDS).find("edge_profiles")
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
+        // db._edge_profiles.get();
+    }
+    else if( std::string(LoadIDS).find( "edge_sources" )
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
+        // db._edge_sources.get();
+    }else if( std::string(LoadIDS).find( "edge_transport" )
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
+        // db._edge_transport.get();
+    }
+
+    // Set object to readGmtryEdge class
+    readGmtryEdge gmtrye_obj;
+    //
+    gmtrye_obj.ggdCheck(db, ggd_slice_index);
+
+
     vtkSmartPointer<vtkMultiBlockDataSet> mainMB =
         vtkSmartPointer<vtkMultiBlockDataSet>::New();
 
@@ -370,31 +399,30 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         this->EdgeSourcesSourceID,
         this->EdgeTransportModelID);
 
-    // Get number of grid subsets
-    int num_gridSubset = grid.grid_subset.extent(0);
-
     // Object declaration for readPSEdge routines
     readPSEdge pse_obj;
 
     // Loop through all grid subsets and extract data for each
     for(int i = 0; i < num_gridSubset; i++)
     {
-#if IMAS_VERSION_DIGIT >= 3151
-    class IDS::edge_profiles::grid_ggd::grid_subset & grid_subset =
-        grid.grid_subset(i);
-#else
-        class IDS::edge_profiles::ggd::grid::grid_subset & grid_subset =
-            grid.grid_subset(i);
-#endif
-        std::string gridSubset_name = grid_subset.identifier.name;
-        int gridSubset_index = grid_subset.identifier.index;
+        std::string gridSubset_name;
+        gridSubset_name = db._edge_profiles.
+            ggd(ggd_slice_index).grid.grid_subset(i).identifier.name;
+        int gridSubset_index;
+        gridSubset_index= db._edge_profiles.
+            ggd(ggd_slice_index).grid.grid_subset(i).identifier.index;
 
         // Get size/number of elements forming current grid subset
-        int num_gridSubset_el = grid_subset.element.extent(0);
+        int num_gridSubset_el;
+        num_gridSubset_el = db._edge_profiles.ggd(ggd_slice_index).grid.
+            grid_subset(i).element.extent(0);
 
         // Get dimension of the objects forming this grid subset
-        int gridSubset_obj_cls = grid_subset.element(0).object(0).dimension;
-        int gridSubset_obj_dim = gridSubset_obj_cls - 1;
+        int gridSubset_obj_cls;
+        gridSubset_obj_cls = db._edge_profiles.ggd(ggd_slice_index).grid.
+            grid_subset(i).element(0).object(0).dimension;
+        int gridSubset_obj_dim;
+        gridSubset_obj_dim = gridSubset_obj_cls - 1;
 
         // Print grid subset info
         vtkOutputWindowDisplayText(std::string("Grid subset " +
@@ -412,23 +440,18 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         // ------ SET POINTS/NODES -----
         if (gridSubset_obj_cls == 1)
         {
-            // Set vtkUnstructuredGrid dataset
+            // Set vtkUnstructuredGrid dataset for grid subset, containing
+            // only 0D objects
             vtkSmartPointer<vtkUnstructuredGrid> gridSubsetPointsUnstructuredGrid =
                 vtkSmartPointer<vtkUnstructuredGrid>::New();
 
-            vtkSmartPointer<vtkVertex> gridSubsetVertex =
-                vtkSmartPointer<vtkVertex>::New();
-
-            // Set vtkCellArray for nodes/points
-            vtkSmartPointer<vtkCellArray> gridSubsetVertices =
-                vtkSmartPointer<vtkCellArray>::New();
-            gridSubsetVertices =
-                gmtrye_obj.setVTKCellArray(gridSubsetVertex, grid_subset, grid);
-
-            // Assign vtkCellArray to vtkUnstructuredGrid
-            gridSubsetPointsUnstructuredGrid->SetPoints(obj_0D_vtkPointsArray);
-            gridSubsetPointsUnstructuredGrid->SetCells(
-                VTK_VERTEX, gridSubsetVertices);
+            // Set grid subset 0D geometry to vtkUnstructuredGrid
+            gmtrye_obj.setGridSubset0DGeometry2UnstructuredGrid(
+                db,
+                gridSubsetPointsUnstructuredGrid,
+                obj_0D_vtkPointsArray,
+                ggd_slice_index,
+                i);
 
             // Set data fields to vtkunstructuredGrid for selected IDS with the
             // help of 'setUnstructuredGridDataFields' routine
@@ -452,18 +475,13 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             vtkSmartPointer<vtkUnstructuredGrid> gridSubsetLinesUnstructuredGrid =
                 vtkSmartPointer<vtkUnstructuredGrid>::New();
 
-            // Set vtkCellArray for edges
-            vtkSmartPointer<vtkCellArray> gridSubsetLinesArray =
-                vtkSmartPointer<vtkCellArray>::New();
-            vtkSmartPointer<vtkLine> gridSubsetLine =
-                vtkSmartPointer<vtkLine>::New();
-            gridSubsetLinesArray =
-                gmtrye_obj.setVTKCellArray(gridSubsetLine, grid_subset, grid);
-
-            // Assign vtkCellArray to vtkUnstructuredGrid
-            gridSubsetLinesUnstructuredGrid->SetPoints(obj_0D_vtkPointsArray);
-            gridSubsetLinesUnstructuredGrid->SetCells(
-                VTK_LINE, gridSubsetLinesArray);
+            // Set grid subset 1D geometry to vtkUnstructuredGrid
+            gmtrye_obj.setGridSubset1DGeometry2UnstructuredGrid(
+                db,
+                gridSubsetLinesUnstructuredGrid,
+                obj_0D_vtkPointsArray,
+                ggd_slice_index,
+                i);
 
             // Add unstructured grid to main block
             fAddBlock2MultiBlock(mainMB, gridSubsetLinesUnstructuredGrid,
@@ -475,43 +493,15 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             // Set vtk array for 2D cells
             vtkSmartPointer<vtkUnstructuredGrid> gridSubsetCellsUnstructuredGrid =
                 vtkSmartPointer<vtkUnstructuredGrid>::New();
-            vtkSmartPointer<vtkQuad> gridSubsetQuad =
-                vtkSmartPointer<vtkQuad>::New();
-            vtkSmartPointer<vtkTriangle> gridSubsetTriangle =
-                vtkSmartPointer<vtkTriangle>::New();
-            vtkSmartPointer<vtkCellArray> gridSubsetCellArray =
-                vtkSmartPointer<vtkCellArray>::New();
 
-            // Get number of nodes of the first 2D cell in order to find out
-            // whether they are triangles or quad (all other 2D cells of the
-            // same grid should be of the same type for now)
-            int num_obj_nodes_first =
-                grid.space(0).objects_per_dimension(gridSubset_obj_cls - 1).
-                object(0).nodes.extent(0);
-            // Cells-Triangles
-            if (num_obj_nodes_first == 3)
-            {
-                gridSubsetCellArray =
-                    gmtrye_obj.setVTKCellArray(gridSubsetTriangle, grid_subset, grid);
-
-                // Assign vtkCellArray to vtkUnstructuredGrid
-                gridSubsetCellsUnstructuredGrid
-                    ->SetPoints(obj_0D_vtkPointsArray);
-                gridSubsetCellsUnstructuredGrid->SetCells(
-                    VTK_TRIANGLE, gridSubsetCellArray);
-            }
-            // Cells-Quad
-            else if (num_obj_nodes_first == 4)
-            {
-                gridSubsetCellArray =
-                    gmtrye_obj.setVTKCellArray(gridSubsetQuad, grid_subset, grid);
-
-                // Assign vtkCellArray to vtkUnstructuredGrid
-                gridSubsetCellsUnstructuredGrid
-                    ->SetPoints(obj_0D_vtkPointsArray);
-                gridSubsetCellsUnstructuredGrid->SetCells(
-                    VTK_QUAD, gridSubsetCellArray);
-            }
+            // Set grid subset 2D geometry to vtkUnstructuredGrid
+            gmtrye_obj.setGridSubset2DGeometry2UnstructuredGrid(
+                db,
+                gridSubsetCellsUnstructuredGrid,
+                obj_0D_vtkPointsArray,
+                ggd_slice_index,
+                i,
+                gridSubset_obj_cls);
 
             // Set data fields to vtkunstructuredGrid for selected IDS with the
             // help of 'setUnstructuredGridDataFields' routine
