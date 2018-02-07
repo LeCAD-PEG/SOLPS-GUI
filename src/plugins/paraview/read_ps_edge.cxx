@@ -104,14 +104,11 @@ void readPSEdge::setUnstructuredGridDataFields(
     int UG_EdgeSourcesSourceID = 0,
     int UG_EdgeTransportModelID = 0)
 {
-    // Object declaration for readPSEdge routines
-    readPSEdge psep_obj;
-
     // For "edge_profiles" selection in "Load IDS" text box
     if( UG_LoadIDS_string.find( "edge_profiles" ) != std::string::npos)
     {
         // Using readPSEdge function
-        psep_obj.setAllDataFields_edge_profiles(
+        setAllDataFields_edge_profiles(
             UG,
             UG_db._edge_profiles.ggd(UG_ggd_slice_index),
             UG_gridSubset_index,
@@ -122,7 +119,7 @@ void readPSEdge::setUnstructuredGridDataFields(
     {
         // Assigning values (2D cells)
         // Using readPSEdge function
-        psep_obj.setAllDataFields_edge_sources(
+        setAllDataFields_edge_sources(
             UG,
             UG_db._edge_sources.source(UG_EdgeSourcesSourceID).
                 ggd(UG_ggd_slice_index),
@@ -134,7 +131,7 @@ void readPSEdge::setUnstructuredGridDataFields(
     {
         // Assigning values (2D cells)
         // Using readPSEdge function
-        psep_obj.setAllDataFields_edge_transport(
+        setAllDataFields_edge_transport(
             UG,
             UG_db._edge_transport.model(UG_EdgeTransportModelID).
                 ggd(UG_ggd_slice_index),
