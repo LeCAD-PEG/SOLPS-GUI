@@ -18,7 +18,7 @@
 *                   - density_fast;
 *                   - pressure;
 *                   - pressure_fast_perpendicular;
-*                   - velocity:
+*                   - velocity:     @note: only for IMAS version <= 3.15.0
 *                       - radial;
 *                       - diamagnetic;
 *                       - parallel;
@@ -31,7 +31,7 @@
 *                   - density_fast;
 *                   - pressure;
 *                   - pressure_fast_perpendicular;
-*                   - velocity:
+*                   - velocity:     @note: only for IMAS version <= 3.15.0
 *                       - radial;
 *                       - diamagnetic;
 *                       - parallel;
@@ -47,11 +47,27 @@
 *                   - energy
 *           ~ edge_transport:
 *               - electrons:
-*                   - particles - flux
-*                   - energy - flux
+*                   - particles:
+*                       - d
+*                       - v
+*                       - flux
+*                       - flux_limiter
+*                   - energy:
+*                       - d
+*                       - v
+*                       - flux
+*                       - flux_limiter
 *               - ion:
-*                   - particles - flux
-*                   - energy - flux
+*                   - particles:
+*                       - d
+*                       - v
+*                       - flux
+*                       - flux_limiter
+*                   - energy:
+*                       - d
+*                       - v
+*                       - flux
+*                       - flux_limiter
 *
 *-------------------------------------------------------------------------------
 */
