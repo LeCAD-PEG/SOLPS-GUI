@@ -314,20 +314,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // TODO: Implement IDSGridSource.
     // db._edge_profiles.get();
 
-    // Set class shortcuts for IDS substructures
-//     class IDS::edge_profiles & edge_profiles = db._edge_profiles;
-//     // class IDS::edge_sources  & edge_sources = db._edge_sources;
-//     // class IDS::edge_transport  & edge_transport = db._edge_transport;
-//     class IDS::edge_profiles::ggd & ggd = edge_profiles.ggd(ggd_slice_index);
-
-// #if IMAS_VERSION_DIGIT >= 3151
-//     class IDS::edge_profiles::grid_ggd & grid = edge_profiles.grid_ggd(0);
-//     class IDS::edge_profiles::grid_ggd::space & space = grid.space(0);
-// #else
-//     class IDS::edge_profiles::ggd::grid & grid = ggd.grid;
-//     class IDS::edge_profiles::ggd::grid::space & space = grid.space(0);
-// #endif
-
     // Get number of grid subsets
     int num_gridSubset = 0;
 

@@ -11,7 +11,8 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 case $(hostname -f) in
   *.iter.org)
         module purge
-        module load imas/3.15.0/ual/3.6.4 blitz/0.10 binutils/2.25
+        # module load imas/3.15.0/ual/3.6.4 blitz/0.10 binutils/2.25
+        module load imas/3.15.1/ual/3.7.0 blitz/0.10 binutils/2.25
         module load OpenSSL/1.0.2g-GCC-4.8.3
         module unload zlib
         module load Python/2.7.9-goolf-1.5.16 # overwrite Anaconda2
@@ -72,8 +73,8 @@ export PATH=${STAGING_DIR}/qt/${QT_VERSION}/bin:${PATH}
 
 
 name=Edge
-# [ -d ${BUILD_DIR}/Plugins-ReadUAL${name} ] && /
-#     rm -f ${BUILD_DIR}/Plugins-ReadUAL${name}/CMakeCache.txt
+[ -d ${BUILD_DIR}/Plugins-ReadUAL${name} ] && \
+    rm -f ${BUILD_DIR}/Plugins-ReadUAL${name}/CMakeCache.txt
 # Set new environment variable to store IMAS_VERSION as single digit to be used as preprocessor variable while compiling the plugin
 IMAS_VERSION_DIGIT=$(echo "$IMAS_VERSION" | sed "s/\.//g")
 install -d ${BUILD_DIR}/Plugins-ReadUAL${name}

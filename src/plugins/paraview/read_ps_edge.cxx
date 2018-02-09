@@ -104,6 +104,850 @@ void readPSEdge::setUnstructuredGridDataFields(
     int UG_EdgeSourcesSourceID = 0,
     int UG_EdgeTransportModelID = 0)
 {
+//   @note   Below  is a variant of 'setUnstructuredGridDataFields_IMAS' routine,
+//           made specifically for IMAS 3.15.1 due many issues with IMAS 3.15.1
+//           ( while with IMAS 3.15.0 it works great).
+//           It includes also full code of 'setAllDataFields_edge_profiles',
+//           'setAllDataFields_edge_sources' and 'setAllDataFields_edge_profiles'
+//           routines. For some strange reason those routines doesn't work with
+//           IMAS 3.15.1 (the plugin freezes etc.).
+#if IMAS_VERSION_DIGIT >= 3151
+    // Object declaration for readPSEdge routines
+
+    // For "edge_profiles" selection in "Load IDS" text box
+    if( UG_LoadIDS_string.find( "edge_profiles" ) != std::string::npos)
+    {
+
+        utilityVTKIDS vtkids_obj_ep;
+        // Set default value
+        int num_IDStarget_gridSubsets = 0;
+
+        // Assigning values - Electrons
+
+        // Assign values found in Electrons Temperature array of structures
+        // node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._edge_profiles
+            .ggd(UG_ggd_slice_index).electrons.temperature.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Temperature",
+                UG,
+                UG_db._edge_profiles.ggd(UG_ggd_slice_index).electrons.temperature(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+
+        }
+        // Assign values found in Electrons Density array of structures node to
+        // grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._edge_profiles
+            .ggd(UG_ggd_slice_index).electrons.density.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Density",
+                UG,
+                UG_db._edge_profiles.ggd(UG_ggd_slice_index).electrons.density(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+#if 1
+
+        // Assign values found in Electrons Density_Fast array of structures
+        // node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._edge_profiles
+            .ggd(UG_ggd_slice_index).electrons.density_fast.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Density_Fast",
+                UG,
+                UG_db._edge_profiles.ggd(UG_ggd_slice_index).electrons
+                    .density_fast(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in Electrons Pressure array of structures node to
+        // grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._edge_profiles.ggd(UG_ggd_slice_index)
+            .electrons.pressure.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Pressure",
+                UG,
+                UG_db._edge_profiles.ggd(UG_ggd_slice_index).electrons
+                    .pressure(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in Electrons Pressure_Fast_Perpendicular array of
+        // structures node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._edge_profiles.ggd(UG_ggd_slice_index).electrons
+            .pressure_fast_perpendicular.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Pressure_Fast_Perpendicular",
+                UG,
+                UG_db._edge_profiles.ggd(UG_ggd_slice_index).electrons
+                    .pressure_fast_perpendicular(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in Electrons Pressure_Fast_Parallel array of
+        // structures  node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._edge_profiles
+            .ggd(UG_ggd_slice_index).electrons.pressure_fast_parallel.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Pressure_Fast_Parallel",
+                UG,
+                UG_db._edge_profiles.ggd(UG_ggd_slice_index).electrons
+                    .pressure_fast_parallel(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+#endif
+#if 0
+
+        // In IMAS 3.15.0 and older versions the .velocity IDS data structure is
+        // simple structure node, while in 3.6.4 it was changed to array
+        // of structures node
+    #if IMAS_VERSION_DIGIT >= 3150
+        // Reading Electron velocity ( GenericGridVectorComponents data structure
+        // type )
+        num_IDStarget_gridSubsets = UG_db._edge_profiles.ggd(UG_ggd_slice_index)
+            .electrons.velocity.extent(0);
+        // Assign values found in Electrons Velocity array of structures
+        // node - Radial simple structure node to grid subsets objects
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+                "Electron Velocity - Radial",
+                UG,
+                UG_db._edge_profiles.ggd(UG_ggd_slice_index).electrons.velocity(n),
+                "radial",
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in Electrons Velocity array of structures
+        // node - Diamagnetic simple structure node to grid subsets objects
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+                "Electron Velocity - Diamagnetic",
+                UG,
+                UG_db._edge_profiles.ggd(UG_ggd_slice_index).electrons.velocity(n),
+                "diamagnetic",
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in Electrons Velocity array of structures
+        // node - Parallel simple structure node to grid subsets objects
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+                "Electron Velocity - Parallel",
+                UG,
+                UG_db._edge_profiles.ggd(UG_ggd_slice_index).electrons.velocity(n),
+                "parallel",
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in Electrons Velocity array of structures
+        // node - Poloidal simple structure node to grid subsets objects
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+                "Electron Velocity - Poloidal",
+                UG,
+                UG_db._edge_profiles.ggd(UG_ggd_slice_index).electrons.velocity(n),
+                "poloidal",
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in Electrons Velocity array of structures
+        // node - Toroidal simple structure node to grid subsets objects
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+                "Electron Velocity - Toroidal",
+                UG,
+                UG_db._edge_profiles.ggd(UG_ggd_slice_index).electrons.velocity(n),
+                "toroidal",
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+    #endif
+
+        // Assign values found in Electrons Distribution Function array of
+        // structures node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._edge_profiles
+            .ggd(UG_ggd_slice_index).electrons.distribution_function.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Distribution Function",
+                UG,
+                UG_db._edge_profiles.ggd(UG_ggd_slice_index).electrons
+                    .distribution_function(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+#endif
+
+        // Assign values found in Ion substructure to grid subsets
+        // objects (2D cells)
+        int num_ion_species = UG_db._edge_profiles
+            .ggd(UG_ggd_slice_index).ion.extent(0);
+        for( int k = 0; k < num_ion_species; k++)
+        {
+            // Set ion specie label
+            std::string ion_charge= UG_db._edge_profiles
+                .ggd(UG_ggd_slice_index).ion(k).label;
+            std::string ion_array_label;
+
+            // Assign values found in Ion Temperature array of structures
+            // node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Temperature", k, ion_charge );
+            num_IDStarget_gridSubsets = UG_db._edge_profiles
+                .ggd(UG_ggd_slice_index).ion(k).temperature.extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k)
+                        .temperature(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el );
+            }
+
+            // Assign values found in Ion Density array of structures
+            // node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Density", k, ion_charge );
+            num_IDStarget_gridSubsets = UG_db._edge_profiles
+                .ggd(UG_ggd_slice_index).ion(k).density.extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k)
+                        .density(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el );
+            }
+
+            // Assign values found in Ion Density_Fast array of structures
+            // node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Density_Fast", k, ion_charge );
+            num_IDStarget_gridSubsets = UG_db._edge_profiles
+                .ggd(UG_ggd_slice_index).ion(k).density_fast.extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k)
+                        .density_fast(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el );
+            }
+
+            // Assign values found in Ion Pressure array of structures
+            // node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Pressure", k, ion_charge );
+            num_IDStarget_gridSubsets = UG_db._edge_profiles
+                .ggd(UG_ggd_slice_index).ion(k).pressure.extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k)
+                        .pressure(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el );
+            }
+
+            // Assign values found in Ion Pressure - Fast Perpendicular array of
+            // structures node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Pressure - Fast Perpendicular", k, ion_charge );
+            num_IDStarget_gridSubsets = UG_db._edge_profiles
+                .ggd(UG_ggd_slice_index).ion(k).pressure_fast_perpendicular
+                .extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k)
+                        .pressure_fast_perpendicular(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el );
+            }
+
+            // Assign values found in Ion Pressure - Fast Parallel array of
+            // structures node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Pressure - Fast Parallel", k, ion_charge );
+            num_IDStarget_gridSubsets = UG_db._edge_profiles
+                .ggd(UG_ggd_slice_index).ion(k).pressure_fast_parallel.extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k)
+                        .pressure_fast_parallel(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el );
+            }
+
+#if 0
+        // In IMAS 3.15.0 and older versions the .velocity IDS data structure is
+        // simple structure node, while in 3.6.4 it was changed to array
+        // of structures node
+    #if IMAS_VERSION_DIGIT >= 3150
+            // Reading Ion velocity ( GenericGridVectorComponents data structure
+            // type )
+            num_IDStarget_gridSubsets = UG_db._edge_profiles
+                .ggd(UG_ggd_slice_index).ion(k).velocity.extent(0);
+            // Assign values found in Ion Velocity array of structures
+            // node - Radial simple structure node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Velocity - Radial", k, ion_charge );
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k)
+                        .velocity(n),
+                    "radial",
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el );
+            }
+
+            // Assign values found in Ion Velocity array of structures
+            // node - Diamagnetic simple structure node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Velocity - Diamagnetic", k, ion_charge );
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k)
+                        .velocity(n),
+                    "diamagnetic",
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el );
+            }
+
+            // Assign values found in Ion Velocity array of structures
+            // node - Parallel simple structure node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Velocity - Parallel", k, ion_charge );
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k)
+                        .velocity(n),
+                    "parallel",
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el );
+            }
+
+            // Assign values found in Ion Velocity array of structures
+            // node - Poloidal simple structure node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Velocity - Poloidal", k, ion_charge );
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k)
+                        .velocity(n),
+                    "poloidal",
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el );
+            }
+
+            // Assign values found in Ion Velocity array of structures
+            // node - Toroidal simple structure node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Velocity - Toroidal", k, ion_charge );
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k)
+                        .velocity(n),
+                    "toroidal",
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el );
+            }
+    #endif
+#endif
+
+            // Assign values found in Ion Energy Density Kinetic array of
+            // structures node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Energy Density Kinetic", k, ion_charge );
+            num_IDStarget_gridSubsets = UG_db._edge_profiles
+                .ggd(UG_ggd_slice_index).ion(k).energy_density_kinetic.extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k)
+                        .energy_density_kinetic(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el );
+            }
+        }
+    // For "edge_sources" selection in "Load IDS" text box
+    }else if( UG_LoadIDS_string.find( "edge_sources" ) !=
+        std::string::npos )
+    {
+        utilityVTKIDS vtkids_obj_ep;
+        // Set default value
+        int num_IDStarget_gridSubsets = 0;
+
+        // Assigning values - Electrons
+
+        // Assign values found in Electrons Particles array of structures node to
+        // grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._edge_sources
+            .source(UG_EdgeSourcesSourceID).ggd(UG_ggd_slice_index)
+            .electrons.particles.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Particles",
+                UG,
+                UG_db._edge_sources.source(UG_EdgeSourcesSourceID)
+                    .ggd(UG_ggd_slice_index).electrons.particles(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in Electrons Energy array of structures node to
+        // grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._edge_sources
+            .source(UG_EdgeSourcesSourceID).ggd(UG_ggd_slice_index)
+            .electrons.energy.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Energy",
+                UG,
+                UG_db._edge_sources.source(UG_EdgeSourcesSourceID)
+                    .ggd(UG_ggd_slice_index).electrons.energy(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in Ion substructure to grid subsets
+        // objects (2D cells)
+        int num_ion_species = UG_db._edge_sources
+            .source(UG_EdgeSourcesSourceID).ggd(UG_ggd_slice_index).ion
+            .extent(0);
+        for( int k = 0; k < num_ion_species; k++)
+        {
+            // Set ion specie label
+            std::string ion_charge= UG_db._edge_sources
+                .source(UG_EdgeSourcesSourceID).ggd(UG_ggd_slice_index)
+                .ion(k).label;
+            std::string ion_array_label;
+
+            // Assign values found in Ion Particles array of structures
+            // node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Particles", k, ion_charge );
+            num_IDStarget_gridSubsets = UG_db._edge_sources
+                .source(UG_EdgeSourcesSourceID).ggd(UG_ggd_slice_index)
+                .ion(k).particles.extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_sources.source(UG_EdgeSourcesSourceID)
+                        .ggd(UG_ggd_slice_index).ion(k).particles(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el );
+            }
+
+
+            // Assign values found in Ion Energy array of structures
+            // node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Energy", k, ion_charge );
+            num_IDStarget_gridSubsets =UG_db._edge_sources
+                .source(UG_EdgeSourcesSourceID).ggd(UG_ggd_slice_index)
+                .ion(k).energy.extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_sources.source(UG_EdgeSourcesSourceID)
+                        .ggd(UG_ggd_slice_index).ion(k).energy(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el );
+            }
+        }
+    // For "edge_transport" selection in "Load IDS" text box
+    }else if( UG_LoadIDS_string.find( "edge_transport" ) !=
+        std::string::npos )
+    {
+        utilityVTKIDS vtkids_obj_ep;
+
+        // Set default value
+        int num_IDStarget_gridSubsets = 0;
+
+        // Assigning values - Electrons
+
+        // Assign values found in Electrons Particles - Effective Diffusivity (d)
+        // array of structures node to grid subsets objects
+        num_IDStarget_gridSubsets =
+            UG_db._edge_transport.model(UG_EdgeTransportModelID)
+            .ggd(UG_ggd_slice_index).electrons.particles.d.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Particles - Effective Diffusivity",
+                UG,
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).electrons.particles.d(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el);
+        }
+
+        // Assign values found in Electrons Particles - Effective Convection (v)
+        // array of structures node to grid subsets objects
+        num_IDStarget_gridSubsets =
+            UG_db._edge_transport.model(UG_EdgeTransportModelID)
+            .ggd(UG_ggd_slice_index).electrons.particles.v.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Particles - Effective Convection",
+                UG,
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).electrons.particles.v(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el);
+        }
+
+        // Assign values found in Electrons Particles - Flux array of structures
+        // node to grid subsets objects
+        num_IDStarget_gridSubsets =
+            UG_db._edge_transport.model(UG_EdgeTransportModelID)
+            .ggd(UG_ggd_slice_index).electrons.particles.flux.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Particles - Flux",
+                UG,
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).electrons.particles.flux(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el);
+        }
+
+        // Assign values found in Electrons Particles - Flux Limiter array of
+        // structures node to grid subsets objects
+        num_IDStarget_gridSubsets =
+            UG_db._edge_transport.model(UG_EdgeTransportModelID)
+            .ggd(UG_ggd_slice_index).electrons.particles.flux_limiter.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Particles - Flux Limiter",
+                UG,
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).electrons.particles.flux_limiter(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el);
+        }
+
+        // Assign values found in Electrons Energy - Effective Diffusivity (d)
+        // array of structures node to grid subsets objects
+        num_IDStarget_gridSubsets =
+            UG_db._edge_transport.model(UG_EdgeTransportModelID)
+            .ggd(UG_ggd_slice_index).electrons.energy.d.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Energy - Effective Diffusivity",
+                UG,
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).electrons.energy.d(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el);
+        }
+
+        // Assign values found in Electrons Energy - Effective convection (d)
+        // array of structures node to grid subsets objects
+        num_IDStarget_gridSubsets =
+            UG_db._edge_transport.model(UG_EdgeTransportModelID)
+            .ggd(UG_ggd_slice_index).electrons.energy.v.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Energy - Effective Convection",
+                UG,
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).electrons.energy.v(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el);
+        }
+
+
+        // Assign values found in Electrons Energy - Flux array of structures
+        // node to grid subsets objects
+        num_IDStarget_gridSubsets =
+            UG_db._edge_transport.model(UG_EdgeTransportModelID)
+            .ggd(UG_ggd_slice_index).electrons.energy.flux.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Energy - Flux",
+                UG,
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).electrons.energy.flux(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el);
+        }
+
+        // Assign values found in Electrons Energy - Flux Limiter array of
+        // structures node to grid subsets objects
+        num_IDStarget_gridSubsets =
+            UG_db._edge_transport.model(UG_EdgeTransportModelID)
+            .ggd(UG_ggd_slice_index).electrons.energy.flux_limiter.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Energy - Flux Limiter",
+                UG,
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).electrons.energy.flux_limiter(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el);
+        }
+
+        // Assign values found in Ion substructure to grid subsets
+        // objects (2D cells)
+        int num_ion_species =
+            UG_db._edge_transport.model(UG_EdgeTransportModelID)
+            .ggd(UG_ggd_slice_index).ion.extent(0);
+        for( int k = 0; k < num_ion_species; k++)
+        {
+            // Set ion specie label
+            std::string ion_charge= UG_db._edge_transport
+                .model(UG_EdgeTransportModelID).ggd(UG_ggd_slice_index)
+                .ion(k).label;
+            std::string ion_array_label;
+
+            // Assign values found in Ion Particles - Effective Diffusivity (d)
+            // array of structures node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Particles - Effective Diffusivity", k, ion_charge );
+            num_IDStarget_gridSubsets =
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).ion(k).particles.d.extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                        .ggd(UG_ggd_slice_index).ion(k).particles.d(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el);
+            }
+
+            // Assign values found in Ion Particles - Effective Convection (v)
+            // array of structures node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Particles - Effective Convection", k, ion_charge );
+            num_IDStarget_gridSubsets =
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).ion(k).particles.v.extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                        .ggd(UG_ggd_slice_index).ion(k).particles.v(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el);
+            }
+
+
+            // Assign values found in Ion Particles - Flux array of structures
+            // node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Particles - Flux", k, ion_charge );
+            num_IDStarget_gridSubsets =
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).ion(k).particles.flux.extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                        .ggd(UG_ggd_slice_index).ion(k).particles.flux(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el);
+            }
+
+            // Assign values found in Ion Particles - Flux Limiter array of
+            // structures node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Particles - Flux Limiter", k, ion_charge );
+            num_IDStarget_gridSubsets =
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).ion(k).particles.flux_limiter
+                    .extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                        .ggd(UG_ggd_slice_index).ion(k).particles.flux_limiter(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el);
+            }
+
+            // Assign values found in Ion Energy - Effective Diffusivity (d)
+            // array of structures node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Energy - Effective Diffusivity", k, ion_charge );
+            num_IDStarget_gridSubsets =
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).ion(k).energy.d.extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                        .ggd(UG_ggd_slice_index).ion(k).energy.d(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el);
+            }
+
+            // Assign values found in Ion Energy - Effective Convection (v)
+            // array of structures node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Energy - Effective Convection", k, ion_charge );
+            num_IDStarget_gridSubsets =
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).ion(k).energy.v.extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                        .ggd(UG_ggd_slice_index).ion(k).energy.v(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el);
+            }
+
+
+            // Assign values found in Ion Energy - Flux array of structures
+            // node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Energy - Flux", k, ion_charge );
+            num_IDStarget_gridSubsets =
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).ion(k).energy.flux.extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                        .ggd(UG_ggd_slice_index).ion(k).energy.flux(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el);
+            }
+
+            // Assign values found in Ion Energy - Flux Limiter array of
+            // structures node to grid subsets objects
+            // Set data field label
+            ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+                "Energy - Flux Limiter ", k, ion_charge );
+            num_IDStarget_gridSubsets =
+                UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                    .ggd(UG_ggd_slice_index).ion(k).energy.flux_limiter
+                    .extent(0);
+            for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+            {
+                vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                    ion_array_label,
+                    UG,
+                    UG_db._edge_transport.model(UG_EdgeTransportModelID)
+                        .ggd(UG_ggd_slice_index).ion(k).energy.flux_limiter(n),
+                    UG_gridSubset_index,
+                    UG_num_gridSubset_el);
+            }
+        }
+    }
+
+#else   // Working for IMAS modules of versions lower than 3.15.1
+
     // For "edge_profiles" selection in "Load IDS" text box
     if( UG_LoadIDS_string.find( "edge_profiles" ) != std::string::npos)
     {
@@ -138,6 +982,7 @@ void readPSEdge::setUnstructuredGridDataFields(
             UG_gridSubset_index,
             UG_num_gridSubset_el);
     }
+#endif
 }
 
 
@@ -667,6 +1512,32 @@ void readPSEdge::setAllDataFields_edge_transport(
 
     // Assigning values - Electrons
 
+    // Assign values found in Electrons Particles - Effective Diffusivity (d)
+    // array of structures node to grid subsets objects
+    num_IDStarget_gridSubsets = loc_ggd.electrons.particles.d.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Particles - Effective Diffusivity",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.particles.d(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Electrons Particles - Effective Convection (v)
+    // array of structures node to grid subsets objects
+    num_IDStarget_gridSubsets = loc_ggd.electrons.particles.v.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Particles - Effective Convection",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.particles.v(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
     // Assign values found in Electrons Particles - Flux array of structures
     // node to grid subsets objects
     num_IDStarget_gridSubsets = loc_ggd.electrons.particles.flux.extent(0);
@@ -679,6 +1550,46 @@ void readPSEdge::setAllDataFields_edge_transport(
             gridSubset_index,
             num_gridSubset_el );
     }
+
+    // Assign values found in Electrons Particles - Flux Limiter array of
+    // structures node to grid subsets objects
+    num_IDStarget_gridSubsets = loc_ggd.electrons.particles.flux_limiter.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Particles - Flux Limiter",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.particles.flux_limiter(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Electrons Energy - Effective Diffusivity (d)
+    // array of structures node to grid subsets objects
+    num_IDStarget_gridSubsets = loc_ggd.electrons.energy.d.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Energy - Effective Diffusivity",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.energy.d(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
+    // Assign values found in Electrons Energy - Effective convection (d)
+    // array of structures node to grid subsets objects
+    num_IDStarget_gridSubsets = loc_ggd.electrons.energy.v.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Energy - Effective Convection",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.energy.v(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
 
     // Assign values found in Electrons Energy - Flux array of structures
     // node to grid subsets objects
@@ -693,6 +1604,19 @@ void readPSEdge::setAllDataFields_edge_transport(
             num_gridSubset_el );
     }
 
+    // Assign values found in Electrons Energy - Flux Limiter array of
+    // structures node to grid subsets objects
+    num_IDStarget_gridSubsets = loc_ggd.electrons.energy.flux_limiter.extent(0);
+    for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+    {
+        vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+            "Electron Energy - Flux Limiter",
+            inputVtkUnstructuredGrid,
+            loc_ggd.electrons.energy.flux_limiter(n),
+            gridSubset_index,
+            num_gridSubset_el );
+    }
+
     // Assign values found in Ion substructure to grid subsets
     // objects (2D cells)
     int num_ion_species = loc_ggd.ion.extent(0);
@@ -701,6 +1625,41 @@ void readPSEdge::setAllDataFields_edge_transport(
         // Set ion specie label
         std::string ion_charge= loc_ggd.ion(k).label;
         std::string ion_array_label;
+
+        // Assign values found in Ion Particles - Effective Diffusivity (d)
+        // array of structures node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Particles - Effective Diffusivity", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).particles.d.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).particles.d(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+        // Assign values found in Ion Particles - Effective Convection (v)
+        // array of structures node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Particles - Effective Convection", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).particles.v.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).particles.v(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
 
         // Assign values found in Ion Particles - Flux array of structures
         // node to grid subsets objects
@@ -719,6 +1678,58 @@ void readPSEdge::setAllDataFields_edge_transport(
                 num_gridSubset_el );
         }
 
+        // Assign values found in Ion Particles - Flux Limiter array of
+        // structures node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Particles - Flux Limiter", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).particles.flux_limiter.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).particles.flux_limiter(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+        // Assign values found in Ion Energy - Effective Diffusivity (d)
+        // array of structures node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Energy - Effective Diffusivity", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).energy.d.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).energy.d(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+        // Assign values found in Ion Energy - Effective Convection (v)
+        // array of structures node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Energy - Effective Convection", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).energy.v.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).energy.v(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+
         // Assign values found in Ion Energy - Flux array of structures
         // node to grid subsets objects
         // Set data field label
@@ -732,6 +1743,23 @@ void readPSEdge::setAllDataFields_edge_transport(
                 ion_array_label,
                 inputVtkUnstructuredGrid,
                 loc_ggd.ion(k).energy.flux(n),
+                gridSubset_index,
+                num_gridSubset_el );
+        }
+
+        // Assign values found in Ion Energy - Flux Limiter array of structures
+        // node to grid subsets objects
+        // Set data field label
+        ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
+            "Energy - Flux Limiter ", k, ion_charge );
+        num_IDStarget_gridSubsets =
+            loc_ggd.ion(k).energy.flux_limiter.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+            vtkids_obj_ep.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                ion_array_label,
+                inputVtkUnstructuredGrid,
+                loc_ggd.ion(k).energy.flux_limiter(n),
                 gridSubset_index,
                 num_gridSubset_el );
         }

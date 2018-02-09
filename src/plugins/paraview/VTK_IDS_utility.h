@@ -29,7 +29,7 @@ public:
     void VTK_IDS_Val2UnstrGrid_GenericGridScalar(
         std::string values_array_label,
         vtkSmartPointer<vtkUnstructuredGrid> inputVtkUnstructuredGrid,
-        LQ2 loc_quantity,
+        LQ2 & loc_quantity,
         int gridSubset_index,
         int num_gridSubset_el);
 

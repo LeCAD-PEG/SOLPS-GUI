@@ -36,11 +36,11 @@ template< typename LQ2 >
 void utilityVTKIDS::VTK_IDS_Val2UnstrGrid_GenericGridScalar(
     std::string values_array_label,
     vtkSmartPointer<vtkUnstructuredGrid> inputVtkUnstructuredGrid,
-    LQ2 loc_quantity,
+    LQ2 & loc_quantity,
     int gridSubset_index,
     int num_gridSubset_el)
 {
-// Skip if the node structure is empty, otherwise continue
+    // Skip if the node structure is empty, otherwise continue
     int quantity_gridSubset_index = loc_quantity.grid_subset_index;
     int num_values = loc_quantity.values.extent(0);
     if (gridSubset_index == quantity_gridSubset_index &&
