@@ -4507,13 +4507,13 @@ class EireneEdit(QTreeWidget):
         for j in range(1, 6):
             line = self.getline()
             if len(line.split()) == 2:
-                self.getline(['S', 'PL3A(j) IPLTS(j)'])
+                self.getline(['S', 'PL3A(j)', 'IPLTS(j)'])
             else:
                 self.getline(['S', 'These are settings for graphical output for standalone eirene runs!'])
         for j in range(1, 4):
             line = self.getline()
             if len(line.split()) == 2:
-                self.getline(['S', 'PL3A(j) IPLTS(j)'])
+                self.getline(['S', 'PL3A(j)', 'IPLTS(j)'])
             else:
                 self.getline(['S', 'These are settings for graphical output for standalone eirene runs!'])
 
