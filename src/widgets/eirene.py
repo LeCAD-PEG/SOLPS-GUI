@@ -2416,7 +2416,7 @@ species index, ICLVS must be set equal to 1.""",
 'ICLVT' : """number of default volume averaged tally, which is to be replaced
 by this collision estimated tally.""",
 
-'ICLVR' : """as IADVR above, for collision estimated tally (subroutine
+'ICLRC' : """as IADVR above, for collision estimated tally (subroutine
 UPCUSR).""",
 
 'ALSTRNG' : """<p>character string which is interpreted as an algebraic
@@ -2528,6 +2528,282 @@ procedure""",
 
 'TRCCEN' : """printout from census array stored in time dependent mode: species
 and stratum resolved census fluxes""",
+
+'TRCSRC(i)' : """The selected global, volumetric and surface crossing tallies
+are printed for those strata for which TRCSTR(ISTRA) = .TRUE.. In case
+TRCSTR(0) = .TRUE., the results after summation over all strata is printed for
+these tallies.
+Note: printout for individual strata is only possible if the data for strata
+    have been saved
+on file (NFILE-N=1,2 option, input block 1). Otherwise only the last stratum
+currently on storage arrays (mostly: sum over strata) is available.
+""",
+
+'NVOLPR': """Total number of volume averaged tallies to be printed.""",
+
+'NSPCPR': """Flag for printout of surface or cell based spectra (defined in
+input block 10F) If NSPCPR &gt; 0 : spectra are printed on output stream
+fort.(20+ioff), name: spectra.out""",
+
+'NPRTLV': """Index of the tally to be printed (first column in
+table 5.1 or 5.2).  If the tally has a species index, it is printed for all
+species, for which the integral of the tally over the computational area is
+nonzero. Otherwise the statement
+
+ZERO INTEGRAL FOR SPECIES ISPZ = ......
+
+is printed below the header for this tally.   The term "species index" is
+used here in a more general sense for the first index (if any) for any given
+tally.  In case of some "additional tallies" or other tallies,  in which the
+first index does not label a particle species but something else, this term
+"species index" then is to be understood in a more general sense.
+If NPRTLV = 0, then the user defined post processing routine TALUSR is
+called (3.7.
+""",
+
+'NFLGV': """Flag to specify the level of printout
+<dl>
+  <dt>= -1</dt><dd>print only header</dd>
+  <dt>= 0</dt><dd>additionally: print global quantities
+  (total and block averages)</dd>
+  <dt>= 1</dt><dd>additionally:  print 1D profiles (if any), averaged over all
+  (if any) higher dimen-sions</dd>
+  <dt>= 2</dt><dd>additionally:  print 2D profiles (if any), averaged over all
+  (if any) higher dimen-sions</dd>
+  <dt>= 3</dt><dd>additionally:  print 3D profiles (if any), averaged over all
+  (if any) higher dimen-sions</dd>
+  <dt>= 4</dt><dd>print 3D profiles, but no lower dimensional averages</dd>
+</dl>""",
+
+'NSPZV1': """If NSPEZV(..,1) &ne; 0, then this tally is printed only for the
+species index range: I1 = NSPEZV(...,1) to I2 = MAX(I1,NSPEZV(...,2)), rather
+than for all species relevant for the specified tally.""",
+
+'NSPZV2': """If NSPEZV(..,1) &ne; 0, then this tally is printed only for the
+species index range: I1 = NSPEZV(...,1) to I2 = MAX(I1,NSPEZV(...,2)), rather
+than for all species relevant for the specified tally.""",
+
+'NTLV': """In addition to the standard output stream fort.IUNOUT, this tally
+is also printed onto output stream fort.NTLVFL, for all species selected,
+and also the corresponding standard deviations are printed, if available.
+The format for this extra output stream is specified in subroutine PRTTAL,
+in code segment EIRASS.""",
+
+'NSURPR': """Total number of surfaces, for which surface averaged tallies are
+to be printed.""",
+
+'NSRF': """Index of the surface to be printed. By default all tallies listed
+in tables (5.3, 5.4, 5.7) (depending on code version) are printed for this
+surface.""",
+
+'NTLS': """These next flags are only needed for those surfaces, for which a
+further spatial resolution within one surface is provided (this is enabled by
+providing storage through setting the flag NGSTAL = 1 in input block1). Their
+meaning then corresponds to the meaning of flags NPRTLV(J), NFLAGV(J),
+NSPEZV(J,1), NSPEZV(J,2) for volume tallies, respectively.  If the NPRTLS,...
+flags are not specified (i.e.: default=0), then no spatially resolved surface
+tallies are printed.""",
+
+'NFLGS': """These next flags are only needed for those surfaces, for which a
+further spatial resolution within one surface is provided (this is enabled by
+providing storage through setting the flag NGSTAL = 1 in input block1). Their
+meaning then corresponds to the meaning of flags NPRTLV(J), NFLAGV(J),
+NSPEZV(J,1), NSPEZV(J,2) for volume tallies, respectively.  If the NPRTLS,...
+flags are not specified (i.e.: default=0), then no spatially resolved surface
+tallies are printed.""",
+
+'NSPZS1': """These next flags are only needed for those surfaces, for which a
+further spatial resolution within one surface is provided (this is enabled by
+providing storage through setting the flag NGSTAL = 1 in input block1). Their
+meaning then corresponds to the meaning of flags NPRTLV(J), NFLAGV(J),
+NSPEZV(J,1), NSPEZV(J,2) for volume tallies, respectively.  If the NPRTLS,...
+flags are not specified (i.e.: default=0), then no spatially resolved surface
+tallies are printed.""",
+
+'NSPZS2': """These next flags are only needed for those surfaces, for which a
+further spatial resolution within one surface is provided (this is enabled by
+providing storage through setting the flag NGSTAL = 1 in input block1). Their
+meaning then corresponds to the meaning of flags NPRTLV(J), NFLAGV(J),
+NSPEZV(J,1), NSPEZV(J,2) for volume tallies, respectively.  If the NPRTLS,...
+flags are not specified (i.e.: default=0), then no spatially resolved surface
+tallies are printed.""",
+
+'NTLSF': """The  spatially  resolved  tallies  (if  any)  and/or  the  flux
+energy  spectra  (if  any, see input block 10F) are printed on additional
+output stream fort.NTLSFL(J) for this surface.
+""",
+
+'NTLVOUT': """total number of volume averaged tallies to be explicitly
+abandoned or enabled""",
+
+'NUMTAL(J)': """Number of a tally from table 5.2, e.g. NUMTAL(J)=1 for neutral
+atom density tally PDENA. The tally with this number NUMTAL(J) is explicitly
+enabled.  With an additional  negative  sign  this  tally  is  removed  from
+the  run  (and  the  balances),  e.g. NUMTAL(J)=-2 would remove the evaluation
+(and storage) of tally PDENM from this run.""",
+
+'NTLSOUT': """To be written""",
+
+'PL1ST': """plot the x- (radial) standard grid surfaces into a 2D geometry
+plot""",
+
+'PL2ND': """plot the y- (poloidal) standard grid surfaces into a 2D geometry
+plot""",
+
+'PL3RD': """plot the z- (toroidal) standard grid surfaces into a 2D geometry
+plot""",
+
+'PLADD': """plot the additional surfaces into a 2D geometry plot""",
+
+'PLHST': """Plot the track of some selected test particle histories into the
+geometry plot (2D or 3D).""",
+
+'PLCUT(i)': """Flag for the choice of a plane, in which the 3 dimensional
+geometrical configuration is plotted in case of a 2D geometry plot.
+This plane may be defined by either x = CONST, y = CONST or by z = CONST.
+<dl>
+  <dt>=PLCUT(1) = .TRUE.</dt><dd>x = CONST ; plotting plane is the yz-plane.
+y is the ordinate, z is the abscissa</dd>
+  <dt>=PLCUT(2) = .TRUE.</dt><dd>ay = CONST ; plotting plane is the xz plane.
+z is the ordinate, x is the abscissa</dd>
+  <dt>=PLCUT(3) = .TRUE.</dt><dd>z = CONST ; plotting plane is the xy plane.
+y is the ordinate, x is the abscissa</dd>
+</dl>""",
+
+'PLBOX': """plot box defined by surface inequalities in addition to valid part
+of surface""",
+
+'PLSTOR': """produce file of coordinates along 2D projections of
+"additional surfaces" for later use in some graphics ("PATRAN format",  also
+for RAPS-graphics,  see below,  sub-block:  11B3).  These coordinates are
+stored on arrays XPL2D, YPL2D in subroutine STCOOR called from subroutine
+PLTADD.""",
+
+'PLNUMV': """print cell number into standard mesh cells""",
+
+'PLNUMS': """print numbers near additional surfaces""",
+
+'PLARR': """plot arrows to indicate surface normal vector""",
+
+'CH2MX': """horizontal half width of 2D plot window (cm)""",
+
+'CH2MY': """vertical half width of 2D plot window (cm)""",
+
+'CH2X0': """horizontal co-ordinate of midpoint of 2D plot window (cm).""",
+
+'CH2Y0': """vertical co-ordinate of midpoint of 2D plot window (cm).""",
+
+'CH2Z0': """distance CONST of plotting plane to origin.""",
+
+'NPLINR': """radial standard surfaces with labels IR1ST = NPLINR, NPLOTR,
+NPLDLR are plotted.""",
+
+'NPLOTR': """radial standard surfaces with labels IR1ST = NPLINR, NPLOTR,
+NPLDLR are plotted.""",
+
+'NPLDLR': """radial standard surfaces with labels IR1ST = NPLINR, NPLOTR,
+NPLDLR are plotted.""",
+
+'NPLINP': """poloidal standard surfaces with labels IP2ND= NPLINP, NPLOTP,
+NPLDLP are plotted.""",
+
+'NPLOTP': """poloidal standard surfaces with labels IP2ND= NPLINP, NPLOTP,
+NPLDLP are plotted.""",
+
+'NPLDLP': """poloidal standard surfaces with labels IP2ND= NPLINP, NPLOTP,
+NPLDLP are plotted.""",
+
+'NPLINT': """toroidal standard surfaces with labels IT3RD= NPLINT, NPLOTT,
+NPLDLT are plotted.""",
+
+'NPLOTT': """toroidal standard surfaces with labels IT3RD= NPLINT, NPLOTT,
+NPLDLT are plotted.""",
+
+'NPLDLT': """toroidal standard surfaces with labels IT3RD= NPLINT, NPLOTT,
+NPLDLT are plotted.""",
+
+'CH3MX': """half width of plot chamber in x- direction, used for 3D geometry plot""",
+
+'CH3MY': """half width of plot chamber in y- direction, used for 3D geometry plot""",
+
+'CH3MZ': """half width of plot chamber in z- direction, used for 3D geometry plot""",
+
+'CH3X0': """x-co-ordinate of midpoint of plot-chamber in user co-ordinates,
+3D geometry plot only""",
+
+'CH3Y0': """y-co-ordinate of midpoint of plot-chamber in user co-ordinates, 3D
+geometry plot only""",
+
+'CH3Z0': """z-co-ordinate of midpoint of plot-chamber in user co-ordinates, 3D
+ geometry plot only""",
+
+'ANGLE1': """First viewing angle for 3D geometry plot""",
+
+'ANGLE2': """Second viewing angle for 3D geometry plot""",
+
+'PL3A(j)': """logical flag, indicating if the additional surfaces specified in
+this card are to be plotted or not. If PL3A=.FALSE., the rest of this card is
+irrelevant""",
+
+'TEXTLA': """text written onto plot, characterizing this group of additional
+surfaces""",
+
+'IPLTA': """number of different subgroups of additional surfaces comprising
+this group""",
+
+'IPLAA': """each subgroup consists of additional surfaces ranging from no.
+IPLAA(J) to IPLEA(J), J=1,IPLTA""",
+
+'IPLEA': """each subgroup consists of additional surfaces ranging from no.
+IPLAA(J) to IPLEA(J), J=1,IPLTA""",
+
+'I1TRC': """Number of first particle history to be traced in printout and/or 2D
+or 3D plot""",
+
+'I2TRC': """Number of last particle history to be traced in printout and/or 2D
+or 3D plot""",
+
+'ISYPLT(i)': """Indices to plot symbols along the particle tracks for different
+ events. Up to 8 different events can be picked in any order in the array
+ ISYPLT.
+
+<dl>
+  <dt>0</dt><dd>no symbol</dd>
+  <dt>1</dt><dd>symbol at particle’s birth point (at primary source)</dd>
+  <dt>2</dt><dd>symbol at the point of an electron impact collision event</dd>
+  <dt>3</dt><dd>symbol at the point of a hard elastic collision event</dd>
+  <dt>4</dt><dd>symbol at the point of a charge exchange event</dd>
+  <dt>5</dt><dd>symbol at the point of a soft elastic collision event</dd>
+  <dt>6</dt><dd>symbol at an intersection with a "non-default" or "additional"
+  surface</dd>
+  <dt>7</dt><dd>symbol at a non-analog particle splitting point</dd>
+  <dt>8</dt><dd>symbol at a non-analog particle killing point
+  ("Russian Roulette")</dd>
+  <dt>9</dt><dd>symbol at a periodicity surface intersection point</dd>
+  <dt>10</dt><dd>symbol at restart after splitting</dd>
+  <dt>11</dt><dd>symbol at collision point saved for conditional exp.
+  estimator</dd>
+  <dt>12</dt><dd>symbol at a continuation of track for conditional exp.
+  estimator</dd>
+  <dt>13</dt><dd>symbol at a particle stopped at time limit (t-dep. mode)</dd>
+  <dt>14</dt><dd>symbol at a particle stopped at generation limit (t-dep.
+  mode)</dd>
+  <dt>15</dt><dd>If an error is detected, by default a symbol is always
+  plotted. Plotting this symbol cannot be abandoned.</dd>
+</dl>
+""",
+
+'ILINIE': """
+<dl>
+  <dt>&ne; 0</dt><dd>connect two successive events by a straight line.  If a
+continuation of a track is computed for the conditional expectation
+estimators, this part is represented by a dotted line, see eq. (1.2.5).</dd>
+  <dt>= 0</dt><dd> only symbols (if any selected) will be plotted along the
+history</dd>
+</dl>
+""",
+
+'NVOLPL': """Total number of pictures from volume averaged tallies.""",
 
 'TRCDUMM' : no_description_in_manual,
 'TRCDBG2' : """CVK TRACING FOR DEBUGGING:  not in use in present eirene""",
@@ -3499,10 +3775,10 @@ class EireneEdit(QTreeWidget):
                 continue
             except Exception as e:
                 if type(e) != IndexError:
-                    # print('Block: ', i + 1)
-                    # print('Line: ', self.currentLine)
-                    # print('Error type:', type(e))
-                    # print('Error:', e)
+                    print('Block: ', i + 1)
+                    print('Line: ', self.currentLine)
+                    print('Error type:', type(e))
+                    print('Error:', e)
                     self.successful_reading = 0
 
             try:
@@ -4025,10 +4301,15 @@ class EireneEdit(QTreeWidget):
         self.getline(['R5', 'ALLOC', 'AMPTS'])
 
         for i in range(1, self.values['NSTRAI'] + 1):
+            INDSRC = self.values['INDSRC(%d)' % (i)]
+            if INDSRC == 6:
+                continue
+            # If indsrc[i] == 6 then skip reading the currant strai and go to
+            # the next one
             line = self.getline()
+            self.row += 1
             self.curr_par = self.createItem(self.grup_par,
                                             line, ['S', 'TXTSOU'])
-            self.row += 1
 
             self.getline(['L', 'NLAVRP', 'NLAVRT', 'NLSYMP', 'NLSYMT'])
             self.getline(['I', 'NPTS', 'NINITL', 'NEMODS', 'NAMODS',
@@ -4103,25 +4384,55 @@ class EireneEdit(QTreeWidget):
     def block_10(self):
         self.getline(['I', 'NADVI', 'NCLVI', 'NALVI', 'NADSI', 'NALSI',
                       'NADSPC'])
+        line = self.getline()
+        self.row += 1
+        self.curr_par = self.createItem(self.grup_par,
+                                        line, ['S', 'Tracklength estimator'])
+
         for i in range(1, self.values['NADVI'] + 1):
-            self.getline(['R5', 'IADVE(i)', 'IADVS(i)', 'IADVT(i)', 'IADVR(i)',
-                               'TXTTAL(i,NTALA)', 'TXTSPC(i,NTALA)',
-                               'TXTUNT(i,NTALA)'])
+            self.getline(['I', 'IADVE', 'IADVS', 'IADVT', 'IADVR'])
+            self.getline(['S', 'TXTTAL'])
+            self.getline(['S', 'TXTSPC', 'TXTUNT'])
+
+        line = self.getline()
+        self.row += 1
+        self.curr_par = self.createItem(self.grup_par,
+                                        line, ['S', 'Collisional estimator'])
 
         for i in range(1, self.values['NCLVI'] + 1):
-            self.getline(['R5', 'ICLVE(i)', 'ICLVS(i)', 'ICLVT(i)', 'ICLVR(i)',
-                               'TXTTAL(i,NTALC)', 'TXTSPC(i,NTALC)',
-                               'TXTUNT(i,NTALC)'])
+            self.getline(['I', 'ICLVE', 'ICLVS', 'ICLVT', 'ICLRC'])
+            self.getline(['S', 'TXTTAL'])
+            self.getline(['S', 'TXTSPC', 'TXTUNT'])
+        line = self.getline()
+        self.row += 1
+        self.curr_par = self.createItem(self.grup_par,
+                                        line, ['S', 'Algebraic expressions'])
+
         for i in range(1, self.values['NALVI'] + 1):
-            self.getline(['R5', 'ALSTRNG', 'XTTAL(i,NTALR)', 'TXTSPC(i,NTALR)',
-                               'TXTUNT(i,NTALR)'])
+            self.getline(['S', 'ALSTRNG'])
+            self.getline(['S', 'TXTTAL'])
+            self.getline(['S', 'TXTSPC', 'TXTUNT'])
+
+        line = self.getline()
+        self.row += 1
+        self.curr_par = self.createItem(self.grup_par,
+                                        line, ['S',
+                                        'Additional surface tallies'])
+
         for i in range(1, self.values['NADSI'] + 1):
-            self.getline(['R5', 'IADSE(i)','IADSS(i)', 'IADST(i)', 'IADSR(i)',
-                               'TXTTAL(i,NTLSA)', 'TXTSPC(i,NTLSA)',
-                               'TXTUNT(i,NTLSA)'])
+            self.getline(['I', 'IADSE','IADSS', 'IADST', 'IADSR'])
+            self.getline(['S', 'TXTTAL'])
+            self.getline(['S', 'TXTSPC', 'TXTUNT'])
+
+        line = self.getline()
+        self.row += 1
+        self.curr_par = self.createItem(self.grup_par,
+                                        line, ['S', 'Tracklength estimator'])
+
         for i in range(1, self.values['NALSI'] + 1):
-            self.getline(['R5', 'ALSTRNG', 'TXTTAL(i,NTLSR)',
-                                'TXTSPC(i,NTLSR)', 'TXTUNT(i,NTLSR)'])
+            self.getline(['S', 'ALSTRNG'])
+            self.getline(['S', 'TXTTAL'])
+            self.getline(['S', 'TXTSPC', 'TXTUNT'])
 
     def block_11(self):
         self.getline(['L', 'TRCPLT', 'TRCHST', 'TRCNAL', 'TRCREA', 'TRCSIG',
@@ -4138,7 +4449,7 @@ class EireneEdit(QTreeWidget):
             role += ['TRCSRC(i)']
         self.getline(role)
 
-        self.getline(['I', 'NVOLPR', 'NVLPR'])
+        self.getline(['I', 'NVOLPR', 'NSPCPR'])
 
         for i in range(self.values['NVOLPR']):
             self.getline(['I', 'NTLV', 'NFLGV', 'NSPZV1', 'NSPZV2', 'NTLVF'])
@@ -4157,10 +4468,10 @@ class EireneEdit(QTreeWidget):
             NTLVOUT = self.values['NTLVOUT']
             ITLVOUT = 0
             while NTLVOUT > 0 and ITLVOUT < NTLVOUT:
-                self.getline(['I', 'NUMTAL(1)', 'NUMTAL(2)', 'NUMTAL(3)',
-                                   'NUMTAL(4)', 'NUMTAL(5)', 'NUMTAL(6)',
-                                   'NUMTAL(7)', 'NUMTAL(8)', 'NUMTAL(9)',
-                                   'NUMTAL(10)', 'NUMTAL(11)', 'NUMTAL(12)'])
+                self.getline(['I', 'NUMTAL(j)', 'NUMTAL(j)', 'NUMTAL(j)',
+                                   'NUMTAL(j)', 'NUMTAL(j)', 'NUMTAL(j)',
+                                   'NUMTAL(j)', 'NUMTAL(j)', 'NUMTAL(j)',
+                                   'NUMTAL(j)', 'NUMTAL(j)', 'NUMTAL(j)'])
                 ITLVOUT += 12
 
 
@@ -4168,17 +4479,17 @@ class EireneEdit(QTreeWidget):
             NTLSOUT = self.values['NTLSOUT']
             ITLSOUT = 0
             while NTLSOUT > 0 and ITLSOUT < NTLSOUT:
-                self.getline(['I', 'NUMTAL(1)', 'NUMTAL(2)', 'NUMTAL(3)',
-                                   'NUMTAL(4)', 'NUMTAL(5)', 'NUMTAL(6)',
-                                   'NUMTAL(7)', 'NUMTAL(8)', 'NUMTAL(9)',
-                                   'NUMTAL(10)', 'NUMTAL(11)', 'NUMTAL(12)'])
+                self.getline(['I', 'NUMTAL(j)', 'NUMTAL(j)', 'NUMTAL(j)',
+                                   'NUMTAL(j)', 'NUMTAL(j)', 'NUMTAL(j)',
+                                   'NUMTAL(j)', 'NUMTAL(j)', 'NUMTAL(j)',
+                                   'NUMTAL(j)', 'NUMTAL(j)', 'NUMTAL(j)'])
                 ITLSOUT += 12
 
         # Reading logicals
         self.getline(['L', 'PL1ST', 'PL2ND', 'PL3RD', 'PLADD', 'PLHST',
-                           'PLCUT(1)', 'PLCUT(2)', 'PLCUT(3)', 'PLBOX',
+                           'PLCUT(i)', 'PLCUT(i)', 'PLCUT(i)', 'PLBOX',
                            'PLSTOR', 'PLNUMV', 'PLNUMS', 'PLARR', 'LRPSCUT',
-                           'PLIDL'])
+                           'PLIDL', 'PLVTK'])
         # Reading integers
         self.getline(['I', 'NPLINR', 'NPLOTR', 'NPLDLR', 'NPLINL', 'NPLOTP',
                            'NPLDLP', 'NPLINT', 'NPLOTT', 'NPLDLT', 'nsrflcs'])
