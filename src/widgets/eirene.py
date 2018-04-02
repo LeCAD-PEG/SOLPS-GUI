@@ -4268,14 +4268,44 @@ class EireneEdit(QTreeWidget):
         while 'path' in line or 'PATH' in line:
             self.getline(['S', 'PATH CARD'])
 
-        self.getline(['R5'] + ['DATD(i)' for i in
-                     range(1, self.values['NATMI'] + 1)])
-        self.getline(['R5'] + ['DMLD(i)' for i in
-                     range(1, self.values['NMOLI'] + 1)])
-        self.getline(['R5'] + ['DIOD(i)' for i in
-                     range(1, self.values['NIONI'] + 1)])
-        self.getline(['R5'] + ['DPLD(i)' for i in
-                     range(1, self.values['NPLSI'] + 1)])
+        # The switches NATMI, NMOLI, NIONI, NPLSI can be greater than 6,
+        # which means that the real numbers will go to the next line
+        NATMI = self.values['NATMI']
+        N_NATMI = NATMI // 6
+        R_NATMI = NATMI % 6
+        CARD_TYPE = ['DATD(i)' for i in range(6)]
+        for i in range(N_NATMI):
+            self.getline(['R5'] + CARD_TYPE)
+        if R_NATMI:
+            self.getline(['R5'] + ['DATD(i)' for i in range(R_NATMI)])
+
+        NMOLI = self.values['NMOLI']
+        N_NMOLI = NMOLI // 6
+        R_NMOLI = NMOLI % 6
+        CARD_TYPE = ['DMLD(i)' for i in range(6)]
+        for i in range(N_NMOLI):
+            self.getline(['R5'] + CARD_TYPE)
+        if R_NMOLI:
+            self.getline(['R5'] + ['DMLD(i)' for i in range(R_NMOLI)])
+
+        NIONI = self.values['NIONI']
+        N_NIONI = NIONI // 6
+        R_NIONI = NIONI % 6
+        CARD_TYPE = ['DIODI(i)' for i in range(6)]
+        for i in range(N_NIONI):
+            self.getline(['R5'] + CARD_TYPE)
+        if R_NIONI:
+            self.getline(['R5'] + ['DIOD(i)' for i in range(R_NIONI)])
+
+        NPLSI = self.values['NPLSI']
+        N_NPLSI = NPLSI // 6
+        R_NPLSI = NPLSI % 6
+        CARD_TYPE = ['DPLD(i)' for i in range(6)]
+        for i in range(N_NPLSI):
+            self.getline(['R5'] + CARD_TYPE)
+        if R_NPLSI:
+            self.getline(['R5'] + ['DPLD(i)' for i in range(R_NPLSI)])
+
         if self.values['NPHOTI'] > 0:
             self.getline(['R5'] + ['DPHT(i)' for i in
                  range(1, self.values['NPLSI'] + 1)])
