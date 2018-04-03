@@ -563,7 +563,7 @@ Run
 
 
     These switches server as identification for the simulation. They can be inherited from SOLPS-GUI:
-    Run number : The number of the run.
+    Run number : The number of the run. Must be positive and no more than a 4-digit integer (i.e. span from 0 to 9999).
     Shot number : Shot number identifying the run. Defaults to the last number found in shotnumber.history, or 0 if the file is not found.
     Device : The device where the simulation was run.
     User : The user who ran the simulation.
@@ -2229,6 +2229,13 @@ Output
     If append.eq.1, the \*.dat output files are appended upon every write, instead of being rewritten every time.
     
 
+.. index:: my_out_digits
+
+``my_out_digits``    type: ``integer``    default: ``6 or 15``
+    Specifies the number of significant digits with which the \*.dat files are written out. Defaults to 6 in normal mode and 15 in debug mode.
+    Must be positive.
+    
+
 .. index:: b2mndr_old_style
 
 ``b2mndr_old_style``    type: ``integer``    default: ``0``
@@ -2259,7 +2266,7 @@ Output
   - ``b2mndr_ua_eps``  -     type: ``real``    default: ``1.0e+4``
 
 
-    The five switches above are safeguards numbers for when printing changes after a time-step. The change is computed as: deltaX = abs((X(t)-X(t-1))/(X(t)+X\_eps))
+    The five switches above are safeguards numbers for when printing changes after a time step. The change is computed as: deltaX = abs((X(t)-X(t-1))/(X(t)+X\_eps))
     
 .. index::
    single: b2mndr_*; b2mndr_na_eps
@@ -2511,6 +2518,7 @@ Output
    single: Output; b2mndr_plasmatim
    single: Output; b2wdat_iout
    single: Output; b2wdat_append
+   single: Output; my_out_digits
    single: Output; b2mndr_old_style
    single: Output; b2mndr_av_read
    single: Output; b2mndr_*
@@ -2690,7 +2698,7 @@ Numerics
 .. index:: eirene_ank_mods
 
 ``eirene_ank_mods``    type: ``integer``    default: ``0``
-    If ank\_mods.ne.0, then uses an additional scheme to ensure particle balance as the B2 solution evolves, due to the internal iteration scheme, away from the plasma background on which the Eirene sources were originally computed at the beginning of the time-step. The user is referred to the text in $SOLPSTOP/doc/Source\_Scaling\_in\_B2.pdf for a full description of the method used.
+    If ank\_mods.ne.0, then uses an additional scheme to ensure particle balance as the B2 solution evolves, due to the internal iteration scheme, away from the plasma background on which the Eirene sources were originally computed at the beginning of the time step. The user is referred to the text in $SOLPSTOP/doc/Source\_Scaling\_in\_B2.pdf for a full description of the method used.
     
 
 .. index:: eirene_dpc_fix
@@ -2862,12 +2870,6 @@ Numerics
     Can be applied <>1 during the convergence and turned off for the final stage of calculations. Use with caution.
     
 
-.. index:: b2upco_c_corr_core_dn
-
-``b2upco_c_corr_core_dn``    type: ``real``    default: ``1.0``
-    Smoothing parameter for the pressure correction on closed field lines.
-    
-
 .. index:: b2ux5p_mult_nonzero
 
 ``b2ux5p_mult_nonzero``    type: ``integer``    default: ``10``
@@ -2902,9 +2904,9 @@ Numerics
 
 .. index:: b2ux7p_style
 
-``b2ux7p_style``    type: ``integer``    default: ``3``
-    Choose the type of matrix solver. Style.eq.0 = iluter, Style.eq.1 = 5-pt stencil, Style.eq.2 = MA28copy. Style.eq.3 = SDRV from YSMP
-    NOTE: Only style.eq.3 will give good results. Other values are NOT recommended!
+``b2ux7p_style``    type: ``integer``    default: ``2``
+    Choose the type of matrix solver. Style.eq.0 = iluter, Style.eq.1 = 5-pt stencil, Style.eq.2 = MA28copy3. Style.eq.3 = SDRV from YSMP
+    NOTE: Only style.eq.2 will give good results. Applying of style.eq.3 should be corrected and is no longer recommended. It might give slow convergence or even divergence of the potential equation. Other values are NOT recommended!
     
 
 .. index:: b2ux9p_style
@@ -3364,12 +3366,6 @@ Numerics
    single: b2nph*; b2nph9_style
 
 
-.. index:: b2npp7_style
-
-``b2npp7_style``    type: ``integer``    default: ``1``
-    When set to '1', SPb's form of the program b2usp7\_ is called. It is recommended '1'.
-    
-
 .. index:: b2npmo_rxg
 
 ``b2npmo_rxg``    type: ``real``    default: ``1.0e6``
@@ -3493,7 +3489,7 @@ Numerics
   - ``b2srdt_phm5``  -     type: ``real``    default: ``1.0``
 
 
-    Multipliers to the density, parallel momentum, heat, potential, and electron prticle time-derivative source terms, respectively.
+    Multipliers to the density, parallel momentum, heat, potential, and electron particle time-derivative source terms, respectively.
     'phm4' is normally zero since the potential equation contains no source terms.
     
 .. index::
@@ -3724,7 +3720,6 @@ Numerics
    single: Numerics; ._upwind
    single: Numerics; b2tfnb_pflux_cor
    single: Numerics; b2trcl_cvsa_mltpl
-   single: Numerics; b2upco_c_corr_core_dn
    single: Numerics; b2ux5p_mult_nonzero
    single: Numerics; b2ux5p_mult_solvdim*
    single: Numerics; b2ux5p_style
@@ -3767,7 +3762,6 @@ Numerics
    single: Numerics; b2npht_pcm*
    single: Numerics; b2npht_rxg
    single: Numerics; b2nph*
-   single: Numerics; b2npp7_style
    single: Numerics; b2npmo_rxg
    single: Numerics; b2news_poteq
    single: Numerics; b2nxdv_style
@@ -4095,7 +4089,7 @@ b2.neutrals.parameters
 
 .. index:: L_NEUTFLUX
 
-``L_NEUTFLUX``    type: ``integer``
+``L_NEUTFLUX``    type: ``integer``    default: ``0 for coupled cases, -1 otherwise``
     If l\_neutflux >=0, then correct treatment of the incident fluxes in B2 and b2plot; if <0, then old (approximate) treatment
     
 
@@ -5747,6 +5741,24 @@ b2.numerics.parameters
     Multiplier to the timestep in the core. Only active is less than 1. Should be larger than 0. Multiplies each successive core ring of cells (increasing IY) by CORE\_DT\_FACTOR, until the local time step multiplier is equal to 1.
     
 
+.. index:: CORR_CORE_DN
+
+``CORR_CORE_DN``    type: ``real*8 array of size (0:NS-1)``    default: ``1.0``
+    Pressure correction speed-up parameter α\_a, acting on the density contribution from species a.
+
+    |	See Pressure\_correction\_speed-up.pdf in $SOLPSTOP/doc for a full description. Should be roughly equal to corr\_core\_dt below.
+
+    
+
+.. index:: CORR_CORE_DT
+
+``CORR_CORE_DT``    type: ``real*8``    default: ``1.0``
+    Pressure correction speed-up parameter α\_T, acting on the temperature contributions.
+
+    |	See Pressure\_correction\_speed-up.pdf in $SOLPSTOP/doc for a full description. Should be roughly equal to corr\_core\_dn above.
+
+    
+
 .. index:: NUMERICS_FILENAME
 
 ``NUMERICS_FILENAME``    type: ``character*256``    default: ``b2.numerics.namelist``
@@ -5784,6 +5796,8 @@ b2.numerics.parameters
    single: b2.numerics.parameters; TIME_FACTOR_REQUIRED
    single: b2.numerics.parameters; CORE_DT_SUPPRESSION
    single: b2.numerics.parameters; CORE_DT_FACTOR
+   single: b2.numerics.parameters; CORR_CORE_DN
+   single: b2.numerics.parameters; CORR_CORE_DT
    single: b2.numerics.parameters; NUMERICS_FILENAME
    single: b2.numerics.parameters; NUMERICS_TIME_MOD
    single: b2.numerics.parameters; NUMERICS_TIME_SWITCH
@@ -6073,14 +6087,14 @@ b2.user.parameters
 
 .. index:: J_H_AT
 
-``J_H_AT``    type: ``integer``
-    Species index of the hydrogen atoms in Eirene. The code attempts to find a match by default.
+``J_H_AT``    type: ``integer array of size (3)``
+    Species indices of the hydrogen isotopes in Eirene. If using only one hydrogen species, only the first element needs to be provided. Otherwise the 3 elements correspond to H/D/T. The code attempts to find a match by default.
     
 
 .. index:: L_H_MOL
 
-``L_H_MOL``    type: ``integer array of size (NMOL)``
-    Number of hydrogen nuclei for molecules in Eirene. The code attempts to find a match by default.
+``L_H_MOL``    type: ``integer array of size (NMOL,3)``
+    Number of hydrogen isotope nuclei for molecules in Eirene. If using only one hydrogen species, only the first element needs to be provided. Otherwise the 3 elements correspond to H/D/T. The code attempts to find a match by default.
     
 
 .. index:: FUSION_POWER
