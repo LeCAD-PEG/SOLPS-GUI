@@ -168,7 +168,6 @@ void readPSEdge::setUnstructuredGridDataFields(
                 UG_gridSubset_index,
                 UG_num_gridSubset_el );
         }
-#if 1
 
         // Assign values found in Electrons Density_Fast array of structures
         // node to grid subsets objects
@@ -229,13 +228,11 @@ void readPSEdge::setUnstructuredGridDataFields(
                 UG_gridSubset_index,
                 UG_num_gridSubset_el );
         }
-#endif
-#if 0
 
         // In IMAS 3.15.0 and older versions the .velocity IDS data structure is
-        // simple structure node, while in 3.6.4 it was changed to array
+        // simple structure node, while in 3.15.1 it was changed to array
         // of structures node
-    #if IMAS_VERSION_DIGIT >= 3150
+    #if IMAS_VERSION_DIGIT >= 3170
         // Reading Electron velocity ( GenericGridVectorComponents data structure
         // type )
         num_IDStarget_gridSubsets = UG_db._edge_profiles.ggd(UG_ggd_slice_index)
@@ -320,8 +317,6 @@ void readPSEdge::setUnstructuredGridDataFields(
                 UG_gridSubset_index,
                 UG_num_gridSubset_el );
         }
-
-#endif
 
         // Assign values found in Ion substructure to grid subsets
         // objects (2D cells)
@@ -443,11 +438,10 @@ void readPSEdge::setUnstructuredGridDataFields(
                     UG_num_gridSubset_el );
             }
 
-#if 0
         // In IMAS 3.15.0 and older versions the .velocity IDS data structure is
         // simple structure node, while in 3.6.4 it was changed to array
         // of structures node
-    #if IMAS_VERSION_DIGIT >= 3150
+    #if IMAS_VERSION_DIGIT >= 3170
             // Reading Ion velocity ( GenericGridVectorComponents data structure
             // type )
             num_IDStarget_gridSubsets = UG_db._edge_profiles
@@ -537,7 +531,6 @@ void readPSEdge::setUnstructuredGridDataFields(
                     UG_num_gridSubset_el );
             }
     #endif
-#endif
 
             // Assign values found in Ion Energy Density Kinetic array of
             // structures node to grid subsets objects
