@@ -6,8 +6,13 @@
                 short_help="Read an Edge IDS">
             </Documentation>
 
+            <!-- "&#160;" is a XML blank space. In this case it is used to
+                achieve consistent width of GUI property widgets by modifying
+                'Shot' name (otherwise it is changing when enabling/disabling
+                advanced settings).
+            -->
             <IntVectorProperty
-                name="Shot"
+                name="Shot &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
                 command="SetShot"
                 number_of_elements="1"
                 default_values="33"
@@ -110,7 +115,8 @@
                 <Documentation>
                     This property specifies the edge_sources.source(:) IDS
                     structure array index. Python notation (0, 1, 2, ...).
-                    Default value = 0.
+                    Default value = 0. NOTE: This same value is taken into
+                    account for both, grid geometry and plasma state data.
                 </Documentation>
                 <Hints>
                    <WidgetHeight number_of_rows="1"/>
@@ -130,7 +136,8 @@
                 <Documentation>
                     This property specifies the edge_transport.model(:) IDS
                     structure array index. Python notation (0, 1, 2, ...).
-                    Default value = 0.
+                    Default value = 0. NOTE: This same value is taken into
+                    account for both, grid geometry and plasma state data.
                 </Documentation>
                 <Hints>
                    <WidgetHeight number_of_rows="1"/>
@@ -148,9 +155,10 @@
                 panel_visibility="advanced">
                 <IntRangeDomain name="range"/>
                 <Documentation>
-                    The values of this property sets the GGD
-                    structure array index. Python notation (0, 1, 2, ...).
-                    Default value = 0.
+                    The values of this property sets the GGD time slice. Python
+                    notation (0, 1, 2, ...). Default value = 0. NOTE: This
+                    same value is taken into account for both, grid geometry and
+                    plasma state data.
                 </Documentation>
             </IntVectorProperty>
 

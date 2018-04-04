@@ -54,8 +54,10 @@ public:
 private:
     Q_DISABLE_COPY(pqMyPropertyWidgetDecorator_EdgeTransport)
 
-    vtkWeakPointer<vtkObject> ObservedObject;
-    unsigned long ObserverId;
+    vtkWeakPointer<vtkObject> ObservedObject1;
+    unsigned long ObserverId1;
+    vtkWeakPointer<vtkObject> ObservedObject2;
+    unsigned long ObserverId2;
 };
 
 #endif

@@ -274,8 +274,9 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             "consequently Data Dictionary) is outdated! ReadUALEdge plugin "
             "might not be fully compatible with the currently loaded Data "
             "Dictionary! The latest IMAS module, confirmed to be compatible "
-            "with the ReadUALEdge plugin, is imas/3.15.0/ual/3.6.4 while the "
-            "oldest is imas/3.8.0/ual/3.5.0. \n\n");
+            "with the ReadUALEdge plugin, is imas/3.17.0/ual/3.8.0 while the "
+            "oldest is imas/3.8.0/ual/3.5.0. Using the last confirmed "
+            "compatible IMAS version is recommended. \n\n");
     }
     if( load_IV_DIGIT != PLUGIN_IMAS_VERSION_DIGIT )
     {
@@ -289,8 +290,9 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         vtkOutputWindowDisplayWarningText("WARNING! The IMAS version (and "
             "consequently Data Dictionary), used to compile the ReadUALEdge "
             "plugin, is outdated! The latest IMAS module, confirmed to be "
-            "compatible with the ReadUALEdge, is imas/3.15.0/ual/3.6.4 while "
-            "the oldest is imas/3.8.0/ual/3.5.0. \n\n");
+            "compatible with the ReadUALEdge, is imas/3.17.0/ual/3.8.0 while "
+            "the oldest is imas/3.8.0/ual/3.5.0. Using the last confirmed "
+            "compatible IMAS version is recommended.\n\n");
     }
 
     vtkOutputWindowDisplayText("Reading IDS \n");

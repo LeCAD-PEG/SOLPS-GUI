@@ -60,9 +60,23 @@ pqMyPropertyWidgetDecorator_EdgeTransport::pqMyPropertyWidgetDecorator_EdgeTrans
         return;
     }
 
-    this->ObservedObject = prop_IDSLoad;
-    this->ObserverId = pqCoreUtilities::connect(
+    this->ObservedObject1 = prop_IDSLoad;
+    this->ObserverId1 = pqCoreUtilities::connect(
         prop_IDSLoad, vtkCommand::UncheckedPropertyModifiedEvent,
+        this, SIGNAL(visibilityChanged()));
+
+    vtkSMProperty* prop_IDSPlasmaStateSource =
+        proxy? proxy->GetProperty("IDSPlasmaStateSource") : NULL;
+    if (!prop_IDSPlasmaStateSource)
+    {
+        qDebug("Could not locate property named 'IDSPlasmaStateSource'. "
+        "pqMyPropertyWidgetDecorator_EdgeSources will have no effect.");
+        return;
+    }
+
+    this->ObservedObject2 = prop_IDSPlasmaStateSource;
+    this->ObserverId2 = pqCoreUtilities::connect(
+        prop_IDSPlasmaStateSource, vtkCommand::UncheckedPropertyModifiedEvent,
         this, SIGNAL(visibilityChanged()));
 }
 
@@ -70,9 +84,13 @@ pqMyPropertyWidgetDecorator_EdgeTransport::pqMyPropertyWidgetDecorator_EdgeTrans
 pqMyPropertyWidgetDecorator_EdgeTransport::
     ~pqMyPropertyWidgetDecorator_EdgeTransport()
 {
-    if (this->ObservedObject && this->ObserverId)
+    if (this->ObservedObject1 && this->ObserverId1)
     {
-        this->ObservedObject->RemoveObserver(this->ObserverId);
+        this->ObservedObject1->RemoveObserver(this->ObserverId1);
+    }
+    if (this->ObservedObject1 && this->ObserverId2)
+    {
+        this->ObservedObject1->RemoveObserver(this->ObserverId2);
     }
 }
 
@@ -84,37 +102,52 @@ bool pqMyPropertyWidgetDecorator_EdgeTransport::
     vtkSMProxy* proxy = parentObject->proxy();
     vtkSMProperty* prop_IDSLoad = proxy? proxy->GetProperty("LoadIDS") : NULL;
 
-    if (prop_IDSLoad)
+    vtkSMProperty* prop_IDSPlasmaStateSource =
+        proxy? proxy->GetProperty("IDSPlasmaStateSource") : NULL;
+
+    // If 'IDSLoad' and 'IDSPlasmaStateSource' widgets are found
+    if (prop_IDSLoad && prop_IDSPlasmaStateSource)
     {
-        const char* ids_value =
+        // Get value selected in the 'IDSLoad' widget
+        const char* ids_value1 =
             vtkSMUncheckedPropertyHelper(prop_IDSLoad).GetAsString();
-        if (std::string(ids_value).find( "edge_transport" ) == std::string::npos)
+        // Get value selected in the 'IDSPlasmaStateSource' widget
+        const char* ids_value2 =
+            vtkSMUncheckedPropertyHelper(prop_IDSPlasmaStateSource).GetAsString();
+
+        // If 'edge_transport' is found in any of the two widgets ('LoadIDS' and
+        // IDSPlasmaStateSource), then proceed to show the 'EdgeTransportModelID'
+        // widget (in advanced options only)
+        // Note: If the string is not found then value -1 is returned and
+        // std::string::npos == -1
+        if ((std::string(ids_value1).find( "edge_transport" ) != std::string::npos) ||
+             (std::string(ids_value2).find( "edge_transport" ) != std::string::npos))
         {
+            // Do nothing and continue the process of showing the
+            // 'EdgeTransportModelID' widget
+        }else
+        {
+            // Return false (the widget 'EdgeTransportModelID' won't be
+            // displayed)
             return false;
         }
-    }
 
-    vtkSMProperty* prop_EdgeTransportModelID =
-        proxy? proxy->GetProperty("EdgeTransportModelID") : NULL;
-    vtkSMStringVectorProperty* prop_EdgeTransportModelID_strVec =
-        dynamic_cast<vtkSMStringVectorProperty*>(proxy->
-        GetProperty("EdgeTransportModelID"));
+        vtkSMProperty* prop_EdgeTransportModelID =
+            proxy? proxy->GetProperty("EdgeTransportModelID") : NULL;
+        vtkSMStringVectorProperty* prop_EdgeTransportModelID_strVec =
+            dynamic_cast<vtkSMStringVectorProperty*>(proxy->
+            GetProperty("EdgeTransportModelID"));
 
-    int EdgeTransport_model_int;
-    if (prop_EdgeTransportModelID)
-    {
-        // Getting integer currently in "EdgeTransportModelID" checkbox to string
-        // std::clog << "---prop_EdgeTransportModelID Printself---: " << std::endl;
-        // prop_EdgeTransportModelID->PrintSelf(std::clog, vtkIndent());
-        EdgeTransport_model_int =
-            vtkSMPropertyHelper(prop_EdgeTransportModelID).GetAsInt();
+        int EdgeTransport_model_int;
+        if (prop_EdgeTransportModelID)
+        {
+            // Getting integer currently in "EdgeTransportModelID" checkbox
+            // to string
+            // std::clog << "---prop_EdgeTransportModelID Printself---: " << std::endl;
+            // prop_EdgeTransportModelID->PrintSelf(std::clog, vtkIndent());
+            EdgeTransport_model_int =
+                vtkSMPropertyHelper(prop_EdgeTransportModelID).GetAsInt();
+        }
+        return this->Superclass::canShowWidget(show_advanced);
     }
-    if (prop_IDSLoad)
-    {
-
-        // Getting text currently in"User" checkbox to string
-        // std::clog << "---prop_IDSLoad Printself---: " << std::endl;
-        // prop_IDSLoad->PrintSelf(std::clog, vtkIndent());
-    }
-    return this->Superclass::canShowWidget(show_advanced);
 }
