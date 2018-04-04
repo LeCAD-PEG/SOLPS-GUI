@@ -148,7 +148,7 @@ ReadUALEdge::ReadUALEdge()
     this->GGDslice = 0;
     this->EdgeTransportModelID = 0;
     this->EdgeSourcesSourceID = 0;
-    this->IDSGridSource = NULL;
+    this->IDSPlasmaStateSource = NULL;
     this->SetNumberOfInputPorts(0);
     this->SetNumberOfOutputPorts(1);
     this->DebugOff();
@@ -313,6 +313,20 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         " - Version:    " << this->Version << "\n\n";
     msgToOutputWindow( msg );
 
+    // Set default variable to hold the IDS source for plasma state data fields
+    // (can be specified by the IDSPlasmaDataSource advanced option)
+    std::string IDS_plasmaStateSource = "edge_profiles";
+
+    if( std::string(this->IDSPlasmaStateSource) == "Option not set")
+    {
+        IDS_plasmaStateSource = std::string(this->LoadIDS);
+    }
+    else
+    {
+        IDS_plasmaStateSource = std::string(this->IDSPlasmaStateSource);
+    }
+
+
     // Get all three IDS databases
     db._edge_profiles.get();
     db._edge_sources.get();
@@ -327,71 +341,70 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
     // Get grid geometry from one of the IDSs (currently ready from
     // edge_profiles IDS only!)
-    // TODO: Implement IDSGridSource.
     // db._edge_profiles.get();
 
     // Get number of grid subsets
     int num_gridSubset = 0;
 
 #if IMAS_VERSION_DIGIT >= 3151
-    if( std::string(IDSGridSource).find("edge_profiles") != std::string::npos )
+    if( std::string(this->LoadIDS).find("edge_profiles") != std::string::npos )
     {
         vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
         // db._edge_profiles.get();
         // Get number of grid subsets in the selected IDS
-        // (IDSGridSource selection box)
+        // (this->LoadIDS selection box)
         num_gridSubset = db._edge_profiles.
             grid_ggd(ggd_slice_index).grid_subset.extent(0);
     }
-    else if( std::string(IDSGridSource).find("edge_sources")
+    else if( std::string(this->LoadIDS).find("edge_sources")
         != std::string::npos )
     {
         vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
         // db._edge_sources.get();
         // Get number of grid subsets in the selected IDS
-        // (IDSGridSource selection box)
+        // (this->LoadIDS selection box)
         num_gridSubset = db._edge_sources.grid_ggd(ggd_slice_index).
             grid_subset.extent(0);
     }
-    else if( std::string(IDSGridSource).find("edge_transport")
+    else if( std::string(this->LoadIDS).find("edge_transport")
         != std::string::npos )
     {
         vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
         // db._edge_transport.get();
         // Get number of grid subsets in the selected IDS
-        // (IDSGridSource selection box)
+        // (this->LoadIDS selection box)
         num_gridSubset = db._edge_transport.grid_ggd(ggd_slice_index).
             grid_subset.extent(0);
     }
 
 #else
 
-    if( std::string(IDSGridSource).find("edge_profiles") != std::string::npos )
+    if( std::string(this->LoadIDS).find("edge_profiles") != std::string::npos )
     {
         vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
         // db._edge_profiles.get();
         // Get number of grid subsets in the selected IDS
-        // (IDSGridSource selection box)
+        // (this->LoadIDS selection box)
         num_gridSubset = db._edge_profiles.
             ggd(ggd_slice_index).grid.grid_subset.extent(0);
     }
-    else if( std::string(IDSGridSource).find("edge_sources")
+    else if( std::string(this->LoadIDS).find("edge_sources")
         != std::string::npos )
     {
         vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
         // db._edge_sources.get();
         // Get number of grid subsets in the selected IDS
-        // (IDSGridSource selection box)
+        // (this->LoadIDS selection box)
         num_gridSubset = db._edge_sources.source(source_index).
             ggd(ggd_slice_index).grid.grid_subset.extent(0);
     }
-    else if( std::string(IDSGridSource).find("edge_transport")
+    else if( std::string(this->LoadIDS).find("edge_transport")
         != std::string::npos )
     {
         vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
         // db._edge_transport.get();
         // Get number of grid subsets in the selected IDS
-        // (IDSGridSource selection box)
+        // (this->LoadIDS selection box)
         num_gridSubset = db._edge_transport.model(model_index).
             ggd(ggd_slice_index).grid.grid_subset.extent(0);
     }
@@ -429,7 +442,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // forming this grid using routine 'setVtkPoints'
     vtkSmartPointer<vtkPoints> obj_0D_vtkPointsArray = gmtrye_obj.setVtkPoints(
         db,
-        std::string(this->IDSGridSource),
+        std::string(this->LoadIDS),
         ggd_slice_index,
         this->EdgeSourcesSourceID,
         this->EdgeTransportModelID);
@@ -518,7 +531,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 db,
                 gridSubset_index,
                 num_gridSubset_el,
-                std::string(LoadIDS),
+                IDS_plasmaStateSource,
                 ggd_slice_index,
                 this->EdgeSourcesSourceID,
                 this->EdgeTransportModelID);
@@ -568,7 +581,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 db,
                 gridSubset_index,
                 num_gridSubset_el,
-                std::string(LoadIDS),
+                IDS_plasmaStateSource,
                 ggd_slice_index,
                 this->EdgeSourcesSourceID,
                 this->EdgeTransportModelID);

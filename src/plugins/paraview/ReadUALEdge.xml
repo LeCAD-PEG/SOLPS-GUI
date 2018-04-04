@@ -10,7 +10,7 @@
                 name="Shot"
                 command="SetShot"
                 number_of_elements="1"
-                default_values="16151"
+                default_values="33"
                 panel_visibility="default">
                 <IntRangeDomain name="range"/>
                 <Documentation>
@@ -22,7 +22,7 @@
                 name="Run"
                 command="SetRun"
                 number_of_elements="1"
-                default_values="1000"
+                default_values="3"
                 panel_visibility="default">
                 <IntRangeDomain name="range"/>
                 <Documentation>
@@ -35,7 +35,7 @@
 				label="User"
 				command="SetUser"
 				number_of_elements="1"
-				default_values="kosl"
+				default_values="penkod"
 				panel_visibility="default"
                 immediate_update="true">
                 <Documentation>
@@ -48,7 +48,7 @@
                 label="Device"
                 command="SetDevice"
                 number_of_elements="1"
-                default_values="solps-iter"
+                default_values="test"
                 panel_visibility="default"
                 immediate_update="true">
                 <Documentation>
@@ -58,7 +58,7 @@
 
             <StringVectorProperty
                 name="LoadIDS"
-                label="IDS to load"
+                label="Edge IDS"
                 command="SetLoadIDS"
                 number_of_elements="1"
                 default_values="edge_profiles"
@@ -69,9 +69,33 @@
                     <String value="edge_transport"/>
                 </StringListDomain>
                 <Documentation>
-                    This property specifies the IDS to open. The geometry is
-                    currently taken from edge_profiles IDS, this selection
-                    affects what data fields are read.
+                    This property specifies the IDS from which the grid
+                    geometry and plasma state are to be read. Note: If required,
+                    the grid geometry can be read from other IDS by setting the
+                    'Edge IDS grid' option in advanced options.
+                </Documentation>
+            </StringVectorProperty>
+
+            <StringVectorProperty
+                name="IDSPlasmaStateSource"
+                label="Edge IDS plasma state source"
+                command="SetIDSPlasmaStateSource"
+                number_of_elements="1"
+                default_values="Option not set"
+                immediate_update="true"
+                panel_visibility="advanced">
+                <StringListDomain name="IDSGridSourcestringList">
+                    <String value="Option not set"/>
+                    <String value="edge_profiles"/>
+                    <String value="edge_sources"/>
+                    <String value="edge_transport"/>
+                </StringListDomain>
+                <Documentation>
+                    This property specifies the IDS from which the plasma state
+                    is to be read in the case when the grid geometry of one IDS
+                    corresponds to multiple IDS plasma states. In case
+                    this option is not set, the plasma state is taken from the
+                    IDS specified in the main 'Edge IDS' option.
                 </Documentation>
             </StringVectorProperty>
 
@@ -129,27 +153,6 @@
                     Default value = 0.
                 </Documentation>
             </IntVectorProperty>
-
-            <StringVectorProperty
-                name="IDSGridSource"
-                label="Get grid from"
-                command="SetIDSGridSource"
-                number_of_elements="1"
-                default_values="edge_profiles"
-                immediate_update="true">
-                <StringListDomain name="IDSGridSourcestringList">
-                    <String value="edge_profiles"/>
-                    <String value="edge_sources"/>
-                    <String value="edge_transport"/>
-                </StringListDomain>
-                <Documentation>
-                    This property specifies the IDS from which the geometry is
-                    to be read. This is implemented due to cases when grid
-                    geometry, stored in edge_profiles IDS, was shared with
-                    edge_sources and edge_transport IDSs, while each IDS
-                    had its own stored data fields.
-                </Documentation>
-            </StringVectorProperty>
 
             <Property
                 name="Refresh"
