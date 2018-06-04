@@ -450,8 +450,10 @@ class PutIDSwrapper:
         self.imas_obj = imas.ids(shot, run, shot, run)
 
         # See if the entry is already existing
-        self.imas_obj.open_env(user, device, version)
-        if not self.connected():
+        try:
+            self.imas_obj.open_env(user, device, version)
+        except Exception as e:
+            logging.info('IDS does not exist... Creating IDS')
             # Create data entry
             self.imas_obj.create_env(user, device, version)
         self.state = self.connected()
