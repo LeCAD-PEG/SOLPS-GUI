@@ -1,4 +1,5 @@
 # source this bash file for local environment if PyQT is provided locally
+export QT_QPA_FONTDIR=/usr/share/fonts/dejavu
 export QTDIR="${PWD}/staging/qt/5.9.1"
 export PARAVIEW_PREFIX="${PWD}/staging/paraview/5.4.1"
 export PATH="${PWD}/staging/bin:${QTDIR}/bin:${PARAVIEW_PREFIX}/bin:${PATH}"

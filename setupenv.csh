@@ -1,4 +1,5 @@
 # source this csh file for local setup environment if PyQT is provided locally
+setenv QT_QPA_FONTDIR /usr/share/fonts/dejavu
 setenv QTDIR "${PWD}/staging/qt/5.9.1"
 setenv PARAVIEW_PREFIX ${PWD}/staging/paraview/5.4.1
 
