@@ -19,7 +19,7 @@ b2mn_menu = {
         ],
          """
 					These switches server as identification for the simulation. They can be inherited from SOLPS-GUI:
-					Run number : The number of the run.
+					Run number : The number of the run. Must be positive and no more than a 4-digit integer (i.e. span from 0 to 9999).
 					Shot number : Shot number identifying the run. Defaults to the last number found in shotnumber.history, or 0 if the file is not found.
 					Device : The device where the simulation was run.
 					User : The user who ran the simulation.
@@ -322,6 +322,11 @@ b2mn_menu = {
 					If append.eq.1, the *.dat output files are appended upon every write, instead of being rewritten every time.
 				"""),
       
+         ( 'my_out_digits', 'integer', '6 or 15', """
+					Specifies the number of significant digits with which the *.dat files are written out. Defaults to 6 in normal mode and 15 in debug mode.
+					Must be positive.
+				"""),
+      
          ( 'b2mndr_old_style', 'integer', '0', """
 					If old_style.gt.0, old-fashioned (SOLPS4 style) output is added at the end of the b2mn.prt file.
 				"""),
@@ -343,7 +348,7 @@ b2mn_menu = {
                ('b2mndr_ua_eps', 'real', '1.0e+4',''''''), 
         ],
          """
-					The five switches above are safeguards numbers for when printing changes after a time-step. The change is computed as: deltaX = abs((X(t)-X(t-1))/(X(t)+X_eps))
+					The five switches above are safeguards numbers for when printing changes after a time step. The change is computed as: deltaX = abs((X(t)-X(t-1))/(X(t)+X_eps))
 				"""),
          ( 'b2mndr_trantim', 'real', '0.0', """
 					Produces a numbered 'tran' file every trantim real-time seconds. An endstate file is written if it falls between scheduled write-up times. Only available within the -DJET environment.
@@ -1712,7 +1717,7 @@ b2mn_menu = {
 					If l_neutrad &gt;= 0, then the radiated power due to the neutrals atoms is taken directly from the Eirene calculation, instead of being recomputed by B2.
 				"""),
       
-         ( 'L_NEUTFLUX', 'integer', '', """
+         ( 'L_NEUTFLUX', 'integer', '0 for coupled cases, -1 otherwise', """
 					If l_neutflux &gt;=0, then correct treatment of the incident fluxes in B2 and b2plot; if &lt;0, then old (approximate) treatment
 				"""),
       
@@ -2676,6 +2681,16 @@ b2mn_menu = {
 					Multiplier to the timestep in the core. Only active is less than 1. Should be larger than 0. Multiplies each successive core ring of cells (increasing IY) by CORE_DT_FACTOR, until the local time step multiplier is equal to 1.
 				"""),
       
+         ( 'CORR_CORE_DN', 'real*8 array of size (0:NS-1)', '1.0', """
+				Pressure correction speed-up parameter α_a, acting on the density contribution from species a.
+					See Pressure_correction_speed-up.pdf in $SOLPSTOP/doc for a full description. Should be roughly equal to corr_core_dt below.
+				"""),
+      
+         ( 'CORR_CORE_DT', 'real*8', '1.0', """
+				Pressure correction speed-up parameter α_T, acting on the temperature contributions.
+					See Pressure_correction_speed-up.pdf in $SOLPSTOP/doc for a full description. Should be roughly equal to corr_core_dn above.
+				"""),
+      
          ( 'NUMERICS_FILENAME', 'character*256', 'b2.numerics.namelist', """
 					Name of the next file to use for reading a new /NUMERICS/ namelist.
 				"""),
@@ -2838,7 +2853,7 @@ b2mn_menu = {
 					If l_neutrad &gt;= 0, then the radiated power due to the neutrals atoms is taken directly from the Eirene calculation, instead of being recomputed by B2.
 				"""),
       
-         ( 'L_NEUTFLUX', 'integer', '', """
+         ( 'L_NEUTFLUX', 'integer', '0 for coupled cases, -1 otherwise', """
 					If l_neutflux &gt;=0, then correct treatment of the incident fluxes in B2 and b2plot; if &lt;0, then old (approximate) treatment
 				"""),
       
@@ -3238,12 +3253,12 @@ b2mn_menu = {
 					Species index of the neon atoms in Eirene. The code attempts to find a match by default.
 				"""),
       
-         ( 'J_H_AT', 'integer', '', """
-					Species index of the hydrogen atoms in Eirene. The code attempts to find a match by default.
+         ( 'J_H_AT', 'integer array of size (3)', '', """
+					Species indices of the hydrogen isotopes in Eirene. If using only one hydrogen species, only the first element needs to be provided. Otherwise the 3 elements correspond to H/D/T. The code attempts to find a match by default.
 				"""),
       
-         ( 'L_H_MOL', 'integer array of size (NMOL)', '', """
-					Number of hydrogen nuclei for molecules in Eirene. The code attempts to find a match by default.
+         ( 'L_H_MOL', 'integer array of size (NMOL,3)', '', """
+					Number of hydrogen isotope nuclei for molecules in Eirene. If using only one hydrogen species, only the first element needs to be provided. Otherwise the 3 elements correspond to H/D/T. The code attempts to find a match by default.
 				"""),
       
          ( 'FUSION_POWER', 'real*8', '0.0', """

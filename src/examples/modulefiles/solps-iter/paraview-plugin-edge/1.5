@@ -34,5 +34,5 @@ if { [file exists $plugindir/libReadUALEdge.so] } {
 	prepend-path PV_PLUGIN_PATH  $plugindir
 } else {
 	puts stderr "Warning: Missing $plugindir/libReadUALEdge.so"
-	puts stderr "Try to rebuild it with 'cd $solpsguidir && ./build-paraview-plugin.sh'"
+	puts stderr "Try to rebuild it with '$solpsguidir/build-paraview-plugin.sh'"
 }

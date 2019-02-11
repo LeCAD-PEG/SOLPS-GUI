@@ -1,4 +1,4 @@
-.. highlight:: csh
+.. highlight:: sh
 
 .. _install-howto:
 
@@ -11,9 +11,38 @@ SOLPS GUI Installation
 
 SOLPS GUI consist of the following components:
 
- - GUI writen in PyQt5 and Python3
- - ParaView with IMAS plugin (optional)
- - Gnuplot 5 and PyQt5 widget (optional)
+ 1. GUI writen in Python3 using PyQt5 library
+ 2. ParaView with Catalyst and IMAS plugin (optional)
+ 3. Gnuplot5 with Qt5 terminal and PyQt5 widget (optional)
+
+Essentially, only the first component is needed for running SOLPS GUI and
+in principle does not need to be compiled at all if the system provides
+Python 3 and PyQt library. However, it turns out that these run-time tools
+requirements are not always easily satisfied. To remedy these difficulties
+we are providing build scripts written in (ba)sh shell that are capable of
+building the missing components by a single command line.
+
+On supported systems these scripts should build all missing libraries
+without a problem by downloading the sources from internet, unpacking,
+patching, configuring, building and installing into *staging* directory.
+Standalone users and system administrators should be able to use these
+*shell* scripts, residing in the project top directory, to build required
+components for system wide installation or personal (standalone) use. As
+always, it is recommended that system administrators build these tools in
+order to save the time of the users and machine.
+
+On untested systems the build scripts can be used mostly unalterred as many
+of the configuration parameters can be specified in the command line just
+before launching the script. It is advised that specific site reqirements
+are then added into site-specific section of the script that override
+default configuration variables without the need of specifying them in the
+command line in future runs and thus recording this *tweaks* as build
+instructions.
+
+Optional components (ParaView, Gnuplot QT) are usually not provided on the
+system in a correct manner as they are application specific with many
+configuration options possible and not suited for use in the SOLPS GUI
+framework.
 
 System requirements
 ===================

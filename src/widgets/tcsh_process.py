@@ -132,7 +132,10 @@ class Tcsh(QProcess):
             return
 
         logging.info("TCSH started in " + self.solpsTop + ".")
-        cmd = "cd " + self.solpsTop + '\nsource setup.csh\necho TCSH READY\n'
+        env = QSettings('ITER', 'solps-gui')
+        device = env.value('device_environment', 'iter')
+        cmd = 'setenv DEVICE %s\n' % device
+        cmd += 'cd %s\nsource setup.csh\necho TCSH READY\n' % self.solpsTop
         self.cwd = self.solpsTop
         self.write(cmd)
 

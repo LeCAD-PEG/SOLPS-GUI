@@ -589,11 +589,9 @@ class Carre(TcshProcess):
             self.startTcsh()
             self.tcsh.waitForStarted()
 
-            env = QSettings('ITER', 'solps-gui')
-            device = env.value('device_environment', 'iter')
-            cmd = 'module load libpng\n'
-            cmd += 'setenv DEVICE ' + device + '\n'
-            cmd += 'cd ' + runDir + '\n'
+            # device = env.value('device_environment', 'iter')
+            # cmd = 'module load libpng\n'
+            cmd = 'cd ' + runDir + '\n'
             if not self.vars[CarreVars.lns]:
                 cmd += 'lns ' + dgModel + '\n'  # Link .sno DivGeo file
                 self.vars[CarreVars.lns] = 1

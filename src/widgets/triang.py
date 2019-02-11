@@ -337,7 +337,7 @@ class Triang(TcshProcess):
                         logging.error("Not enough arguments on line: " + line)
 
                 if line.startswith('&Triang'):
-                    reading = 1 # We are reading the block
+                    reading = 1  # We are reading the block
                     TriangBlocks += 1
                     if TriangBlocks > 1:
                         logging.error("Multiple Triang block in .status file "
@@ -602,10 +602,7 @@ class Triang(TcshProcess):
             self.startTcsh()
             self.tcsh.waitForStarted()
 
-            env = QSettings('ITER', 'solps-gui')
-            device = env.value('device_environment', 'iter')
-            cmd = 'setenv DEVICE ' + device + '\n'
-            cmd += 'cd ' + runDir + '\n'
+            cmd = 'cd ' + runDir + '\n'
             self.textDisplay.appendPlainText('Sourcing setup.csh. It will '
                                              'take a while.')
             self.tcsh.write(cmd)

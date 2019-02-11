@@ -57,7 +57,7 @@ USE_QT_XCB=${USE_QT_XCB:-NO} # Use Qt provided XCB. Not for RHEL5
 BUILD_XCB=${BUILD_XCB:-NO}   # YES if having problems with -qt-xcb
 BUILD_XLIB=${BUILD_XLIB:-NO} # If having libX11-xcb < 1.3.2
 
-BUILDROOT=${PWD}
+BUILDROOT=$(cd ${0%/*} && echo ${PWD})
 BUILD_DIR=${BUILDROOT}/build
 PATCH_DIR=${BUILDROOT}/src/patches
 DOWNLOAD_DIR=${BUILDROOT}/download
