@@ -88,7 +88,12 @@ if (PARAVIEW_BUILD_QT_GUI)
                                ${moc_srcs}
                                pqMyPropertyWidgetDecorator.cxx
                                pqMyPropertyWidgetDecorator_EdgeSources.cxx
-                               pqMyPropertyWidgetDecorator_EdgeTransport.cxx)
+                               pqMyPropertyWidgetDecorator_EdgeTransport.cxx
+                               test.cxx
+                               readGmtryEdge.cxx
+                               readPsEdge.cxx
+                               VTKIDSutility.cxx
+                               VTKIDSutilityTemplateClasses.cxx)
 target_include_directories(ReadUALEdge PUBLIC ${IMASCPP_INCLUDE_DIRS})
 target_include_directories(ReadUALEdge PUBLIC ${BLITZ_INCLUDE_DIRS})
 #target_include_directories(ReadUALEdge PUBLIC ${MDSPLUS_INCLUDE_DIRS})

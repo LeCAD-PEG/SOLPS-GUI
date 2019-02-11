@@ -25,7 +25,7 @@ case $(hostname -f) in
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
 	. /etc/profile.d.gw/modules.sh
 	module purge
-	module load cineca imasenv/3.12.1 cmake/3.5.2
+	module load cineca imasenv/3.20.0 #cmake/3.12.0
 	module switch itm-python/2.7
 	module unload matlab
 	QT_VERSION=4.8.7

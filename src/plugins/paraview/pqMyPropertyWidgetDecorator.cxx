@@ -44,7 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "ReadUALEdge.h"
-#include "VTK_IDS_utility.h"
+#include "VTKIDSutility.h"
+//#include "VTKIDSutility.cxx"
 #include "pqPropertyLinks.h"
 
 //-----------------------------------------------------------------------------
@@ -153,8 +154,8 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
     }
     pclose(pipe);
 
-    // Object declaration for readPSEdge routines
-    utilityVTKIDS uvi_obj;
+    // Object declaration for readPsEdge routines
+    VTKIDSutility uvi_obj;
 
     /// Setting imasdb directory using the Device textbox on Apply
     // Default database directory
