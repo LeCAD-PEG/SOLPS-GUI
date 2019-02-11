@@ -89,7 +89,6 @@ if (PARAVIEW_BUILD_QT_GUI)
                                pqMyPropertyWidgetDecorator.cxx
                                pqMyPropertyWidgetDecorator_EdgeSources.cxx
                                pqMyPropertyWidgetDecorator_EdgeTransport.cxx
-                               test.cxx
                                readGmtryEdge.cxx
                                readPsEdge.cxx
                                VTKIDSutility.cxx
