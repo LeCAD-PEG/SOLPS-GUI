@@ -11,13 +11,14 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 case $(hostname -f) in
   *.iter.org)
         module purge
-        module load imas/3.17.0/ual/3.8.0 blitz/0.10-GCC-4.8.3  binutils/2.25
+	module load IMAS/3.21.0-3.8.6
         module load OpenSSL/1.0.2g-GCC-4.8.3
-        module unload zlib
-        module load Python/2.7.9-goolf-1.5.16 # overwrite Anaconda2
-        module load paraview/5.4.1
-        module load qt/4.8.7
-	export CC=gcc
+	module load ParaView/5.4.1-intel-2018a-mpi
+	module unload Python/2.7.14-intel-2018a
+	module load Python/3.6.4-intel-2018a
+	# export PARAVIEW_PREFIX=${EBROOTPARAVIEW}
+	export CMAKE_PREFIX_PATH=${EBROOTPARAVIEW}/lib/cmake/paraview-5.4
+	export CC=gcc -E
 	export CXX=g++
 	MAKE_JOBS=${MAKE_JOBS:-4}
 	;;
@@ -25,7 +26,7 @@ case $(hostname -f) in
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
 	. /etc/profile.d.gw/modules.sh
 	module purge
-	module load cineca imasenv/3.20.0 #cmake/3.12.0
+	module load cineca imasenv/3.12.1 cmake/3.5.2
 	module switch itm-python/2.7
 	module unload matlab
 	QT_VERSION=4.8.7
