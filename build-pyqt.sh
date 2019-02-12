@@ -251,9 +251,10 @@ if [ ! -e   ${SIP_SRC_DIR}/.built ]; then
   tar xzf ${DOWNLOAD_DIR}/${SIP_SRC}
   cd ${SIP_SRC_DIR}
   LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
-  ${PYTHON} configure.py
+                 ${PYTHON} configure.py
   make -j ${MAKE_JOBS}
-  make install
+  LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
+                 make install
   touch ${SIP_SRC_DIR}/.built
 fi
 
