@@ -55,7 +55,7 @@ void readGmtryEdge::ggdCheck(
     int num_obj_1D = 0; // Edge    == 1D object
     int num_obj_2D = 0; // 2D Cell == 2D object
 
-// #if IMAS_VERSION_DIGIT >= 3151
+#if IMAS_VERSION_DIGIT >= 3151
     // Check for nodes, edges and cells data in current IDS database and
     // get number of objects for each dimension
     // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
@@ -67,19 +67,19 @@ void readGmtryEdge::ggdCheck(
     // objects_per_dimensions(2) holds every 2D object (faces/2D cells)
     num_obj_2D = GG_db._edge_profiles.grid_ggd(GG_ggd_slice_index).space(0).
         objects_per_dimension(2).object.extent(0);
-// #else
-//     // Check for nodes, edges and cells data in current IDS database and
-//     // get number of objects for each dimension
-//     // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
-//     num_obj_0D = GG_db._edge_profiles.ggd(GG_ggd_slice_index).grid.space(0).
-//         objects_per_dimension(0).object.extent(0);
-//     // objects_per_dimensions(1) holds every 1D object (edges)
-//     num_obj_1D = GG_db._edge_profiles.ggd(GG_ggd_slice_index).grid.space(0).
-//         objects_per_dimension(1).object.extent(0);
-//     // objects_per_dimensions(2) holds every 2D object (faces/2D cells)
-//     num_obj_2D = GG_db._edge_profiles.ggd(GG_ggd_slice_index).grid.space(0).
-//         objects_per_dimension(2).object.extent(0);
-// #endif
+#else
+    // Check for nodes, edges and cells data in current IDS database and
+    // get number of objects for each dimension
+    // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
+    num_obj_0D = GG_db._edge_profiles.ggd(GG_ggd_slice_index).grid.space(0).
+        objects_per_dimension(0).object.extent(0);
+    // objects_per_dimensions(1) holds every 1D object (edges)
+    num_obj_1D = GG_db._edge_profiles.ggd(GG_ggd_slice_index).grid.space(0).
+        objects_per_dimension(1).object.extent(0);
+    // objects_per_dimensions(2) holds every 2D object (faces/2D cells)
+    num_obj_2D = GG_db._edge_profiles.ggd(GG_ggd_slice_index).grid.space(0).
+        objects_per_dimension(2).object.extent(0);
+#endif
 
     vtkOutputWindowDisplayText(std::string("GGD slice: " +
         std::to_string(GG_ggd_slice_index) + "\n").c_str());
@@ -122,17 +122,17 @@ void readGmtryEdge::setGridSubset0DGeometry2UnstructuredGrid(
     vtkSmartPointer<vtkCellArray> gridSubsetVertices =
         vtkSmartPointer<vtkCellArray>::New();
 
-// #if IMAS_VERSION_DIGIT >= 3151
+#if IMAS_VERSION_DIGIT >= 3151
     gridSubsetVertices = setVTKCellArray(gridSubsetVertex,
         GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
             grid_subset(GS_gridSubset_index),
         GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index));
-// #else
-//     gridSubsetVertices = setVTKCellArray(gridSubsetVertex,
-//         GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
-//             grid_subset(GS_gridSubset_index),
-//         GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
-// #endif
+#else
+    gridSubsetVertices = setVTKCellArray(gridSubsetVertex,
+        GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
+            grid_subset(GS_gridSubset_index),
+        GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
+#endif
 
     // Assign vtkCellArray to vtkUnstructuredGrid
     unstructuredGrid->SetPoints(vtk_grid_points);
@@ -169,17 +169,17 @@ void readGmtryEdge::setGridSubset1DGeometry2UnstructuredGrid(
     vtkSmartPointer<vtkLine> gridSubsetLine =
         vtkSmartPointer<vtkLine>::New();
 
-// #if IMAS_VERSION_DIGIT >= 3151
+#if IMAS_VERSION_DIGIT >= 3151
     gridSubsetLinesArray = setVTKCellArray(gridSubsetLine,
         GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
             grid_subset(GS_gridSubset_index),
         GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index));
-// #else
-//     gridSubsetLinesArray = setVTKCellArray(gridSubsetLine,
-//         GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
-//             grid_subset(GS_gridSubset_index),
-//         GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
-// #endif
+#else
+    gridSubsetLinesArray = setVTKCellArray(gridSubsetLine,
+        GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
+            grid_subset(GS_gridSubset_index),
+        GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
+#endif
     // Assign vtkCellArray to vtkUnstructuredGrid
     unstructuredGrid->SetPoints(vtk_grid_points);
     unstructuredGrid->SetCells(
@@ -217,7 +217,7 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
     vtkSmartPointer<vtkCellArray> gridSubsetCellArray =
         vtkSmartPointer<vtkCellArray>::New();
 
-// #if IMAS_VERSION_DIGIT >= 3151
+#if IMAS_VERSION_DIGIT >= 3151
     // Get number of nodes of the first 2D cell in order to find out
     // whether they are triangles or quad (all other 2D cells of the
     // same grid should be of the same type for now)
@@ -251,42 +251,42 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
     }
 }
 
-// #else
+#else
 
-//     // Get number of nodes of the first 2D cell in order to find out
-//     // whether they are triangles or quad (all other 2D cells of the
-//     // same grid should be of the same type for now)
-//     int num_obj_nodes_first = GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
-//         space(0).objects_per_dimension(GS_gridSubset_obj_cls - 1).object(0).
-//         nodes.extent(0);
+    // Get number of nodes of the first 2D cell in order to find out
+    // whether they are triangles or quad (all other 2D cells of the
+    // same grid should be of the same type for now)
+    int num_obj_nodes_first = GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
+        space(0).objects_per_dimension(GS_gridSubset_obj_cls - 1).object(0).
+        nodes.extent(0);
 
-//     // Cells-Triangles
-//     if (num_obj_nodes_first == 3)
-//     {
-//         gridSubsetCellArray = setVTKCellArray(gridSubsetTriangle,
-//             GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
-//                 grid_subset(GS_gridSubset_index),
-//             GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
-//         // Assign vtkCellArray to vtkUnstructuredGrid
-//         unstructuredGrid->SetPoints(vtk_grid_points);
-//         unstructuredGrid->SetCells(VTK_TRIANGLE, gridSubsetCellArray);
-//     }
-//     // Cells-Quad
-//     else if (num_obj_nodes_first == 4)
-//     {
-//         gridSubsetCellArray = setVTKCellArray(gridSubsetQuad,
-//             GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
-//                 grid_subset(GS_gridSubset_index),
-//             GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
+    // Cells-Triangles
+    if (num_obj_nodes_first == 3)
+    {
+        gridSubsetCellArray = setVTKCellArray(gridSubsetTriangle,
+            GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
+                grid_subset(GS_gridSubset_index),
+            GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
+        // Assign vtkCellArray to vtkUnstructuredGrid
+        unstructuredGrid->SetPoints(vtk_grid_points);
+        unstructuredGrid->SetCells(VTK_TRIANGLE, gridSubsetCellArray);
+    }
+    // Cells-Quad
+    else if (num_obj_nodes_first == 4)
+    {
+        gridSubsetCellArray = setVTKCellArray(gridSubsetQuad,
+            GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
+                grid_subset(GS_gridSubset_index),
+            GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
 
-//         // Assign vtkCellArray to vtkUnstructuredGrid
-//         unstructuredGrid->SetPoints(vtk_grid_points);
-//         unstructuredGrid->SetCells(VTK_QUAD, gridSubsetCellArray);
-//     }
-// }
-// #endif
+        // Assign vtkCellArray to vtkUnstructuredGrid
+        unstructuredGrid->SetPoints(vtk_grid_points);
+        unstructuredGrid->SetCells(VTK_QUAD, gridSubsetCellArray);
+    }
+}
+#endif
 
-// #if IMAS_VERSION_DIGIT >= 3151
+#if IMAS_VERSION_DIGIT >= 3151
 /**
 *   Function used to get the geometry/coordinates of all 0D objects/points
 *   P[R, Z] forming this grid and set it to vtkPoints
@@ -368,96 +368,96 @@ vtkSmartPointer<vtkPoints> readGmtryEdge::setVtkPoints(
     }
     return pointsArray;
 }
-// #else
-// /**
-// *   Function used to get the geometry/coordinates of all 0D objects/points
-// *   P[R, Z] forming this grid
-// *   @param  PNT_db                      Base type of IDS data structure
-// *                                       (IdsNs::IDS)
-// *   @param  PNT_IDSGridSource_string    String containing name of the IDS of
-// *                                       which grid geometry points
-// *                                       added to vtkPoints
-// *   @param PNT_ggd_slice_index          Array index of the ggd(:) array of
-// *                                       structures node
-// *   @param PNT_EdgeSourcesSourceID      Array index of the source(:) array of
-// *                                       structures node (relevant only to
-// *                                       edge_sources IDS)
-// *   @param PNT_EdgeTransportModelID     Array index of the model(:) array of
-// *                                       structures node (relevant only to
-// *                                       edge_transport IDS)
-// */
-// template <typename IDS2>
-// vtkSmartPointer<vtkPoints> readGmtryEdge::setVtkPoints(
-//     IDS2 & PNT_db,
-//     std::string PNT_IDSGridSource_string = "edge_profiles",
-//     int PNT_ggd_slice_index = 0,
-//     int PNT_EdgeSourcesSourceID = 0,
-//     int PNT_EdgeTransportModelID = 0)
-// {
+#else
+/**
+*   Function used to get the geometry/coordinates of all 0D objects/points
+*   P[R, Z] forming this grid
+*   @param  PNT_db                      Base type of IDS data structure
+*                                       (IdsNs::IDS)
+*   @param  PNT_IDSGridSource_string    String containing name of the IDS of
+*                                       which grid geometry points
+*                                       added to vtkPoints
+*   @param PNT_ggd_slice_index          Array index of the ggd(:) array of
+*                                       structures node
+*   @param PNT_EdgeSourcesSourceID      Array index of the source(:) array of
+*                                       structures node (relevant only to
+*                                       edge_sources IDS)
+*   @param PNT_EdgeTransportModelID     Array index of the model(:) array of
+*                                       structures node (relevant only to
+*                                       edge_transport IDS)
+*/
+template <typename IDS2>
+vtkSmartPointer<vtkPoints> readGmtryEdge::setVtkPoints(
+    IDS2 & PNT_db,
+    std::string PNT_IDSGridSource_string = "edge_profiles",
+    int PNT_ggd_slice_index = 0,
+    int PNT_EdgeSourcesSourceID = 0,
+    int PNT_EdgeTransportModelID = 0)
+{
 
-//     int num_obj_0D = 0;
-//     vtkSmartPointer<vtkPoints> pointsArray = vtkSmartPointer<vtkPoints>::New();
-//     // For "edge_profiles" selection in "IDSGridSource" text box
-//     if( PNT_IDSGridSource_string.find( "edge_profiles" ) != std::string::npos)
-//     {
-//         // Get number of 0D objects / points
-//         num_obj_0D = PNT_db._edge_profiles.ggd(PNT_ggd_slice_index).grid.
-//             space(0).objects_per_dimension(0).object.extent(0);
+    int num_obj_0D = 0;
+    vtkSmartPointer<vtkPoints> pointsArray = vtkSmartPointer<vtkPoints>::New();
+    // For "edge_profiles" selection in "IDSGridSource" text box
+    if( PNT_IDSGridSource_string.find( "edge_profiles" ) != std::string::npos)
+    {
+        // Get number of 0D objects / points
+        num_obj_0D = PNT_db._edge_profiles.ggd(PNT_ggd_slice_index).grid.
+            space(0).objects_per_dimension(0).object.extent(0);
 
-//         for(int i = 0; i < num_obj_0D; ++i)
-//         {
-//             pointsArray->InsertNextPoint(
-//                 PNT_db._edge_profiles.ggd(PNT_ggd_slice_index).grid.
-//                     space(0).objects_per_dimension(0).object(i).geometry(0),
-//                 PNT_db._edge_profiles.ggd(PNT_ggd_slice_index).grid.
-//                     space(0).objects_per_dimension(0).object(i).geometry(1),
-//                 0.0);
-//         }
-//     // For "edge_sources" selection in "Load IDS" text box
-//     }else if( PNT_IDSGridSource_string.find( "edge_sources" ) !=
-//         std::string::npos )
-//     {
-//         // Get number of 0D objects / points
-//         num_obj_0D = PNT_db._edge_sources.source(PNT_EdgeSourcesSourceID).
-//             ggd(PNT_ggd_slice_index).grid.
-//             space(0).objects_per_dimension(0).object.extent(0);
+        for(int i = 0; i < num_obj_0D; ++i)
+        {
+            pointsArray->InsertNextPoint(
+                PNT_db._edge_profiles.ggd(PNT_ggd_slice_index).grid.
+                    space(0).objects_per_dimension(0).object(i).geometry(0),
+                PNT_db._edge_profiles.ggd(PNT_ggd_slice_index).grid.
+                    space(0).objects_per_dimension(0).object(i).geometry(1),
+                0.0);
+        }
+    // For "edge_sources" selection in "Load IDS" text box
+    }else if( PNT_IDSGridSource_string.find( "edge_sources" ) !=
+        std::string::npos )
+    {
+        // Get number of 0D objects / points
+        num_obj_0D = PNT_db._edge_sources.source(PNT_EdgeSourcesSourceID).
+            ggd(PNT_ggd_slice_index).grid.
+            space(0).objects_per_dimension(0).object.extent(0);
 
-//         for(int i = 0; i < num_obj_0D; ++i)
-//         {
-//             pointsArray->InsertNextPoint(
-//                 PNT_db._edge_sources.source(PNT_EdgeSourcesSourceID).
-//                     ggd(PNT_ggd_slice_index).grid.
-//                     space(0).objects_per_dimension(0).object(i).geometry(0),
-//                 PNT_db._edge_sources.source(PNT_EdgeSourcesSourceID).
-//                     ggd(PNT_ggd_slice_index).grid.
-//                     space(0).objects_per_dimension(0).object(i).geometry(1),
-//                 0.0);
-//         }
+        for(int i = 0; i < num_obj_0D; ++i)
+        {
+            pointsArray->InsertNextPoint(
+                PNT_db._edge_sources.source(PNT_EdgeSourcesSourceID).
+                    ggd(PNT_ggd_slice_index).grid.
+                    space(0).objects_per_dimension(0).object(i).geometry(0),
+                PNT_db._edge_sources.source(PNT_EdgeSourcesSourceID).
+                    ggd(PNT_ggd_slice_index).grid.
+                    space(0).objects_per_dimension(0).object(i).geometry(1),
+                0.0);
+        }
 
-//     // For "edge_transport" selection in "Load IDS" text box
-//     }else if( PNT_IDSGridSource_string.find( "edge_transport" ) !=
-//         std::string::npos )
-//     {
-//         // Get number of 0D objects / points
-//         num_obj_0D = PNT_db._edge_transport.model(PNT_EdgeTransportModelID).
-//             ggd(PNT_ggd_slice_index).grid.
-//             space(0).objects_per_dimension(0).object.extent(0);
+    // For "edge_transport" selection in "Load IDS" text box
+    }else if( PNT_IDSGridSource_string.find( "edge_transport" ) !=
+        std::string::npos )
+    {
+        // Get number of 0D objects / points
+        num_obj_0D = PNT_db._edge_transport.model(PNT_EdgeTransportModelID).
+            ggd(PNT_ggd_slice_index).grid.
+            space(0).objects_per_dimension(0).object.extent(0);
 
-//         for(int i = 0; i < num_obj_0D; ++i)
-//         {
-//             pointsArray->InsertNextPoint(
-//                 PNT_db._edge_transport.model(PNT_EdgeTransportModelID).
-//                     ggd(PNT_ggd_slice_index).grid.
-//                     space(0).objects_per_dimension(0).object(i).geometry(0),
-//                 PNT_db._edge_transport.model(PNT_EdgeTransportModelID).
-//                     ggd(PNT_ggd_slice_index).grid.
-//                     space(0).objects_per_dimension(0).object(i).geometry(1),
-//                 0.0);
-//         }
-//     }
-//     return pointsArray;
-// }
-// #endif
+        for(int i = 0; i < num_obj_0D; ++i)
+        {
+            pointsArray->InsertNextPoint(
+                PNT_db._edge_transport.model(PNT_EdgeTransportModelID).
+                    ggd(PNT_ggd_slice_index).grid.
+                    space(0).objects_per_dimension(0).object(i).geometry(0),
+                PNT_db._edge_transport.model(PNT_EdgeTransportModelID).
+                    ggd(PNT_ggd_slice_index).grid.
+                    space(0).objects_per_dimension(0).object(i).geometry(1),
+                0.0);
+        }
+    }
+    return pointsArray;
+}
+#endif
 
 /**
 *   Function used to fill predefined (size, label...) vtkCellArray.

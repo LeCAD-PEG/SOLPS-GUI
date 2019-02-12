@@ -74,8 +74,6 @@
 
 #include "readPsEdge.h"
 #include "VTKIDSutility.h"
-//#include "VTKIDSutility.cxx"
-// #include "VTKIDSutilityTemplateClasses.h"
 #include "VTKIDSutilityTemplateClasses.cxx"
 #include <UALClasses.h>
 #include <vtkSmartPointer.h>
@@ -129,7 +127,7 @@ void readPsEdge::setUnstructuredGridDataFields(
 //           'setAllDataFields_edge_sources' and 'setAllDataFields_edge_profiles'
 //           routines. For some strange reason those routines doesn't work with
 //           IMAS 3.15.1 (the plugin freezes etc.).
-// #if IMAS_VERSION_DIGIT >= 3151
+#if IMAS_VERSION_DIGIT >= 3151
     // Object declaration for readPsEdge routines
 
     // For "edge_profiles" selection in "Load IDS" text box
@@ -235,7 +233,7 @@ void readPsEdge::setUnstructuredGridDataFields(
         // In IMAS 3.15.0 and older versions the .velocity IDS data structure is
         // simple structure node, while in 3.15.1 it was changed to array
         // of structures node
-    // #if IMAS_VERSION_DIGIT >= 3170
+    #if IMAS_VERSION_DIGIT >= 3170
         // Reading Electron velocity ( GenericGridVectorComponents data structure
         // type )
         num_IDStarget_gridSubsets = UG_db._edge_profiles.ggd(UG_ggd_slice_index)
@@ -304,7 +302,7 @@ void readPsEdge::setUnstructuredGridDataFields(
                 UG_gridSubset_index,
                 UG_num_gridSubset_el );
         }
-    // #endif
+    #endif
 
         // Assign values found in Electrons Distribution Function array of
         // structures node to grid subsets objects
@@ -444,7 +442,7 @@ void readPsEdge::setUnstructuredGridDataFields(
         // In IMAS 3.15.0 and older versions the .velocity IDS data structure is
         // simple structure node, while in 3.6.4 it was changed to array
         // of structures node
-    // #if IMAS_VERSION_DIGIT >= 3170
+    #if IMAS_VERSION_DIGIT >= 3170
             // Reading Ion velocity ( GenericGridVectorComponents data structure
             // type )
             num_IDStarget_gridSubsets = UG_db._edge_profiles
@@ -533,7 +531,7 @@ void readPsEdge::setUnstructuredGridDataFields(
                     UG_gridSubset_index,
                     UG_num_gridSubset_el );
             }
-    // #endif
+    #endif
 
             // Assign values found in Ion Energy Density Kinetic array of
             // structures node to grid subsets objects
@@ -960,43 +958,43 @@ void readPsEdge::setUnstructuredGridDataFields(
         }
     }
 
-// #else   // Working for IMAS modules of versions lower than 3.15.1
+#else   // Working for IMAS modules of versions lower than 3.15.1
 
-//     // For "edge_profiles" selection in "Load IDS" text box
-//     if( UG_LoadIDS_string.find( "edge_profiles" ) != std::string::npos)
-//     {
-//         // Using readPsEdge function
-//         setAllDataFields_edge_profiles(
-//             UG,
-//             UG_db._edge_profiles.ggd(UG_ggd_slice_index),
-//             UG_gridSubset_index,
-//             UG_num_gridSubset_el);
-//     // For "edge_sources" selection in "Load IDS" text box
-//     }else if( UG_LoadIDS_string.find( "edge_sources" ) !=
-//         std::string::npos )
-//     {
-//         // Assigning values (2D cells)
-//         // Using readPsEdge function
-//         setAllDataFields_edge_sources(
-//             UG,
-//             UG_db._edge_sources.source(UG_EdgeSourcesSourceID).
-//                 ggd(UG_ggd_slice_index),
-//             UG_gridSubset_index,
-//             UG_num_gridSubset_el);
-//     // For "edge_transport" selection in "Load IDS" text box
-//     }else if( UG_LoadIDS_string.find( "edge_transport" ) !=
-//         std::string::npos )
-//     {
-//         // Assigning values (2D cells)
-//         // Using readPsEdge function
-//         setAllDataFields_edge_transport(
-//             UG,
-//             UG_db._edge_transport.model(UG_EdgeTransportModelID).
-//                 ggd(UG_ggd_slice_index),
-//             UG_gridSubset_index,
-//             UG_num_gridSubset_el);
-//     }
-// #endif
+    // For "edge_profiles" selection in "Load IDS" text box
+    if( UG_LoadIDS_string.find( "edge_profiles" ) != std::string::npos)
+    {
+        // Using readPsEdge function
+        setAllDataFields_edge_profiles(
+            UG,
+            UG_db._edge_profiles.ggd(UG_ggd_slice_index),
+            UG_gridSubset_index,
+            UG_num_gridSubset_el);
+    // For "edge_sources" selection in "Load IDS" text box
+    }else if( UG_LoadIDS_string.find( "edge_sources" ) !=
+        std::string::npos )
+    {
+        // Assigning values (2D cells)
+        // Using readPsEdge function
+        setAllDataFields_edge_sources(
+            UG,
+            UG_db._edge_sources.source(UG_EdgeSourcesSourceID).
+                ggd(UG_ggd_slice_index),
+            UG_gridSubset_index,
+            UG_num_gridSubset_el);
+    // For "edge_transport" selection in "Load IDS" text box
+    }else if( UG_LoadIDS_string.find( "edge_transport" ) !=
+        std::string::npos )
+    {
+        // Assigning values (2D cells)
+        // Using readPsEdge function
+        setAllDataFields_edge_transport(
+            UG,
+            UG_db._edge_transport.model(UG_EdgeTransportModelID).
+                ggd(UG_ggd_slice_index),
+            UG_gridSubset_index,
+            UG_num_gridSubset_el);
+    }
+#endif
 }
 
 
