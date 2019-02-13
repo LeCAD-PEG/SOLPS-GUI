@@ -7,9 +7,7 @@ case $(hostname -f) in
   *.iter.org) 
 	module purge
 	# The following modules are needed for IMAS plugins
-        module load imas/3.15.0/ual/3.6.4 blitz/0.10 binutils/2.25
-        module load OpenSSL/1.0.2g-GCC-4.8.3
-        module load Python/2.7.9-goolf-1.5.16 # overwrite Anaconda
+	module load IMAS/3.21.0-3.8.6 binutils/2.28-GCCcore-6.4.0 Blitz++/0.10-GCCcore-6.4.0
 	imasdb solps-iter
 	imasdb
 	;;

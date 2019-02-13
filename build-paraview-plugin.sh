@@ -13,11 +13,12 @@ case $(hostname -f) in
         module purge
 	module load IMAS/3.21.0-3.8.6
         module load OpenSSL/1.0.2g-GCC-4.8.3
-	module load ParaView/5.4.1-intel-2018a-mpi
 	module unload Python/2.7.14-intel-2018a
 	module load Python/3.6.4-intel-2018a
-	# export PARAVIEW_PREFIX=${EBROOTPARAVIEW}
-	export CMAKE_PREFIX_PATH=${EBROOTPARAVIEW}/lib/cmake/paraview-5.4
+	# BUILDING PLUGIN FOR ITER PARAVIEW (available as a module) 
+	#module load ParaView/5.4.1-intel-2018a-mpi
+	#export PARAVIEW_PREFIX=${EBROOTPARAVIEW}
+	#export CMAKE_PREFIX_PATH=${EBROOTPARAVIEW}/lib/cmake/paraview-5.4
 	export CC=gcc -E
 	export CXX=g++
 	MAKE_JOBS=${MAKE_JOBS:-4}
@@ -26,7 +27,7 @@ case $(hostname -f) in
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
 	. /etc/profile.d.gw/modules.sh
 	module purge
-	module load cineca imasenv/3.12.1 cmake/3.5.2
+	module load cineca imasenv/3.20.0 #cmake/3.12.0
 	module switch itm-python/2.7
 	module unload matlab
 	QT_VERSION=4.8.7

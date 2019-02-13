@@ -7,9 +7,10 @@ CMAKE_VERSION=3.10.1
 case $(hostname -f) in
   *.iter.org)
 	module purge
-	module load GCC/4.8.3 binutils/2.25 intel/12.0.2
-	module load Python/2.7.3-goolf-1.5.16
-	module load OpenSSL/1.0.2g-GCC-4.8.3
+	module load GCCcore/6.4.0 binutils/2.28-GCCcore-6.4.0 intel/2018a GCC/6.4.0-2.28 Blitz++/0.10-GCCcore-6.4.0
+	module load Python/2.7.14-GCCcore-6.4.0-bare
+	# module load OpenSSL/1.0.2g-GCC-4.8.3
+	module load OpenSSL/1.0.2g-goolf-1.5.16
 	export CC=gcc
 	export CXX=g++
         CMAKE_EXTRA_FLAGS=${CMAKE_EXTRA_FLAGS:-\
