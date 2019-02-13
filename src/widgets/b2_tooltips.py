@@ -344,7 +344,7 @@ tooltips = {
    
       'b2mndr_run_number' : ('', 'integer', """
 					These switches server as identification for the simulation. They can be inherited from SOLPS-GUI:
-					Run number : The number of the run.
+					Run number : The number of the run. Must be positive and no more than a 4-digit integer (i.e. span from 0 to 9999).
 					Shot number : Shot number identifying the run. Defaults to the last number found in shotnumber.history, or 0 if the file is not found.
 					Device : The device where the simulation was run.
 					User : The user who ran the simulation.
@@ -352,7 +352,7 @@ tooltips = {
    
       'b2mndr_shot_number' : ('', 'integer', """
 					These switches server as identification for the simulation. They can be inherited from SOLPS-GUI:
-					Run number : The number of the run.
+					Run number : The number of the run. Must be positive and no more than a 4-digit integer (i.e. span from 0 to 9999).
 					Shot number : Shot number identifying the run. Defaults to the last number found in shotnumber.history, or 0 if the file is not found.
 					Device : The device where the simulation was run.
 					User : The user who ran the simulation.
@@ -360,7 +360,7 @@ tooltips = {
    
       'b2mndr_device' : ('', 'string', """
 					These switches server as identification for the simulation. They can be inherited from SOLPS-GUI:
-					Run number : The number of the run.
+					Run number : The number of the run. Must be positive and no more than a 4-digit integer (i.e. span from 0 to 9999).
 					Shot number : Shot number identifying the run. Defaults to the last number found in shotnumber.history, or 0 if the file is not found.
 					Device : The device where the simulation was run.
 					User : The user who ran the simulation.
@@ -368,7 +368,7 @@ tooltips = {
    
       'b2mndr_user' : ('', 'string', """
 					These switches server as identification for the simulation. They can be inherited from SOLPS-GUI:
-					Run number : The number of the run.
+					Run number : The number of the run. Must be positive and no more than a 4-digit integer (i.e. span from 0 to 9999).
 					Shot number : Shot number identifying the run. Defaults to the last number found in shotnumber.history, or 0 if the file is not found.
 					Device : The device where the simulation was run.
 					User : The user who ran the simulation.
@@ -2246,23 +2246,23 @@ tooltips = {
 				""", '3'),
    
       'b2mndr_na_eps' : ('', 'real', """
-					The five switches above are safeguards numbers for when printing changes after a time-step. The change is computed as: deltaX = abs((X(t)-X(t-1))/(X(t)+X_eps))
+					The five switches above are safeguards numbers for when printing changes after a time step. The change is computed as: deltaX = abs((X(t)-X(t-1))/(X(t)+X_eps))
 				""", '1.0e19'),
    
       'b2mndr_po_eps' : ('', 'real', """
-					The five switches above are safeguards numbers for when printing changes after a time-step. The change is computed as: deltaX = abs((X(t)-X(t-1))/(X(t)+X_eps))
+					The five switches above are safeguards numbers for when printing changes after a time step. The change is computed as: deltaX = abs((X(t)-X(t-1))/(X(t)+X_eps))
 				""", '1.0e+1'),
    
       'b2mndr_te_eps' : ('', 'real', """
-					The five switches above are safeguards numbers for when printing changes after a time-step. The change is computed as: deltaX = abs((X(t)-X(t-1))/(X(t)+X_eps))
+					The five switches above are safeguards numbers for when printing changes after a time step. The change is computed as: deltaX = abs((X(t)-X(t-1))/(X(t)+X_eps))
 				""", '1.0e+1'),
    
       'b2mndr_ti_eps' : ('', 'real', """
-					The five switches above are safeguards numbers for when printing changes after a time-step. The change is computed as: deltaX = abs((X(t)-X(t-1))/(X(t)+X_eps))
+					The five switches above are safeguards numbers for when printing changes after a time step. The change is computed as: deltaX = abs((X(t)-X(t-1))/(X(t)+X_eps))
 				""", '1.0e+1'),
    
       'b2mndr_ua_eps' : ('', 'real', """
-					The five switches above are safeguards numbers for when printing changes after a time-step. The change is computed as: deltaX = abs((X(t)-X(t-1))/(X(t)+X_eps))
+					The five switches above are safeguards numbers for when printing changes after a time step. The change is computed as: deltaX = abs((X(t)-X(t-1))/(X(t)+X_eps))
 				""", '1.0e+4'),
    
       'tallies_netcdf' : ('', 'integer', """
@@ -2395,6 +2395,11 @@ tooltips = {
       'b2wdat_append' : ('Output', 'integer', """
 					If append.eq.1, the *.dat output files are appended upon every write, instead of being rewritten every time.
 				""", '0'),
+   
+      'my_out_digits' : ('Output', 'integer', """
+					Specifies the number of significant digits with which the *.dat files are written out. Defaults to 6 in normal mode and 15 in debug mode.
+					Must be positive.
+				""", '6 or 15'),
    
       'b2mndr_old_style' : ('Output', 'integer', """
 					If old_style.gt.0, old-fashioned (SOLPS4 style) output is added at the end of the b2mn.prt file.
@@ -2881,27 +2886,27 @@ tooltips = {
 				""", '1.0'),
    
       'b2srdt_phm0' : ('', 'real', """
-					Multipliers to the density, parallel momentum, heat, potential, and electron prticle time-derivative source terms, respectively.
+					Multipliers to the density, parallel momentum, heat, potential, and electron particle time-derivative source terms, respectively.
 					'phm4' is normally zero since the potential equation contains no source terms.
 				""", '1.0'),
    
       'b2srdt_phm1' : ('', 'real', """
-					Multipliers to the density, parallel momentum, heat, potential, and electron prticle time-derivative source terms, respectively.
+					Multipliers to the density, parallel momentum, heat, potential, and electron particle time-derivative source terms, respectively.
 					'phm4' is normally zero since the potential equation contains no source terms.
 				""", '1.0'),
    
       'b2srdt_phm3' : ('', 'real', """
-					Multipliers to the density, parallel momentum, heat, potential, and electron prticle time-derivative source terms, respectively.
+					Multipliers to the density, parallel momentum, heat, potential, and electron particle time-derivative source terms, respectively.
 					'phm4' is normally zero since the potential equation contains no source terms.
 				""", '1.0'),
    
       'b2srdt_phm4' : ('', 'real', """
-					Multipliers to the density, parallel momentum, heat, potential, and electron prticle time-derivative source terms, respectively.
+					Multipliers to the density, parallel momentum, heat, potential, and electron particle time-derivative source terms, respectively.
 					'phm4' is normally zero since the potential equation contains no source terms.
 				""", '0.0'),
    
       'b2srdt_phm5' : ('', 'real', """
-					Multipliers to the density, parallel momentum, heat, potential, and electron prticle time-derivative source terms, respectively.
+					Multipliers to the density, parallel momentum, heat, potential, and electron particle time-derivative source terms, respectively.
 					'phm4' is normally zero since the potential equation contains no source terms.
 				""", '1.0'),
    
@@ -2966,7 +2971,7 @@ tooltips = {
 				""", '1'),
    
       'eirene_ank_mods' : ('Numerics', 'integer', """
-					If ank_mods.ne.0, then uses an additional scheme to ensure particle balance as the B2 solution evolves, due to the internal iteration scheme, away from the plasma background on which the Eirene sources were originally computed at the beginning of the time-step. The user is referred to the text in $SOLPSTOP/doc/Source_Scaling_in_B2.pdf for a full description of the method used.
+					If ank_mods.ne.0, then uses an additional scheme to ensure particle balance as the B2 solution evolves, due to the internal iteration scheme, away from the plasma background on which the Eirene sources were originally computed at the beginning of the time step. The user is referred to the text in $SOLPSTOP/doc/Source_Scaling_in_B2.pdf for a full description of the method used.
 				""", '0'),
    
       'eirene_dpc_fix' : ('Numerics', 'integer', """
@@ -3053,10 +3058,6 @@ tooltips = {
 					Can be applied &lt;&gt;1 during the convergence and turned off for the final stage of calculations. Use with caution.
 				""", '1.0'),
    
-      'b2upco_c_corr_core_dn' : ('Numerics', 'real', """
-					Smoothing parameter for the pressure correction on closed field lines.
-				""", '1.0'),
-   
       'b2ux5p_mult_nonzero' : ('Numerics', 'integer', """
 					Number of expected nonzero matrix elements per matrix row.
 				""", '10'),
@@ -3067,9 +3068,9 @@ tooltips = {
 				""", '2'),
    
       'b2ux7p_style' : ('Numerics', 'integer', """
-					Choose the type of matrix solver. Style.eq.0 = iluter, Style.eq.1 = 5-pt stencil, Style.eq.2 = MA28copy. Style.eq.3 = SDRV from YSMP
-					NOTE: Only style.eq.3 will give good results. Other values are NOT recommended!
-				""", '3'),
+				Choose the type of matrix solver. Style.eq.0 = iluter, Style.eq.1 = 5-pt stencil, Style.eq.2 = MA28copy3. Style.eq.3 = SDRV from YSMP
+				NOTE: Only style.eq.2 will give good results. Applying of style.eq.3 should be corrected and is no longer recommended. It might give slow convergence or even divergence of the potential equation. Other values are NOT recommended!
+				""", '2'),
    
       'b2ux9p_style' : ('Numerics', 'integer', """
 					Choose the type of matrix solver. Style.eq.0 = iluter, Style.eq.1 = 5-pt stencil, Style.eq.2 = MA28copy.
@@ -3201,10 +3202,6 @@ tooltips = {
       'b2npht_rxg' : ('Numerics', 'real', """
 					rxg specifies a special under-relaxation parameter. A term of the form "abs(residual)/rxg" is added to the diagonal of the matrix of the correction equation, with the effect of limiting the computed correction. rxg is dimensionless and of order unity; smaller values of rxg imply stronger damping.
 				""", '1.0'),
-   
-      'b2npp7_style' : ('Numerics', 'integer', """
-					When set to '1', SPb's form of the program b2usp7_ is called. It is recommended '1'.
-				""", '1'),
    
       'b2npmo_rxg' : ('Numerics', 'real', """
 					Normalisation factor for the parallel momentum equation.
@@ -3521,7 +3518,7 @@ tooltips = {
    
       'L_NEUTFLUX' : ('b2.neutrals.parameters', 'integer', """
 					If l_neutflux &gt;=0, then correct treatment of the incident fluxes in B2 and b2plot; if &lt;0, then old (approximate) treatment
-				""", ''),
+				""", '0 for coupled cases, -1 otherwise'),
    
       'LSTRASCL' : ('b2.neutrals.parameters', 'integer array of size (NSTRAT,0:natm)', """
 					Indicates with which Eirene atomic species to scale the Eirene stratum (istra) (0 means no scaling, default). Atomic species 0 stands for electrons.
@@ -4533,6 +4530,16 @@ tooltips = {
 					Multiplier to the timestep in the core. Only active is less than 1. Should be larger than 0. Multiplies each successive core ring of cells (increasing IY) by CORE_DT_FACTOR, until the local time step multiplier is equal to 1.
 				""", '1.0'),
    
+      'CORR_CORE_DN' : ('b2.numerics.parameters', 'real*8 array of size (0:NS-1)', """
+				Pressure correction speed-up parameter α_a, acting on the density contribution from species a.
+					See Pressure_correction_speed-up.pdf in $SOLPSTOP/doc for a full description. Should be roughly equal to corr_core_dt below.
+				""", '1.0'),
+   
+      'CORR_CORE_DT' : ('b2.numerics.parameters', 'real*8', """
+				Pressure correction speed-up parameter α_T, acting on the temperature contributions.
+					See Pressure_correction_speed-up.pdf in $SOLPSTOP/doc for a full description. Should be roughly equal to corr_core_dn above.
+				""", '1.0'),
+   
       'NUMERICS_FILENAME' : ('b2.numerics.parameters', 'character*256', """
 					Name of the next file to use for reading a new /NUMERICS/ namelist.
 				""", 'b2.numerics.namelist'),
@@ -4750,12 +4757,12 @@ tooltips = {
 					Species index of the neon atoms in Eirene. The code attempts to find a match by default.
 				""", ''),
    
-      'J_H_AT' : ('b2.user.parameters', 'integer', """
-					Species index of the hydrogen atoms in Eirene. The code attempts to find a match by default.
+      'J_H_AT' : ('b2.user.parameters', 'integer array of size (3)', """
+					Species indices of the hydrogen isotopes in Eirene. If using only one hydrogen species, only the first element needs to be provided. Otherwise the 3 elements correspond to H/D/T. The code attempts to find a match by default.
 				""", ''),
    
-      'L_H_MOL' : ('b2.user.parameters', 'integer array of size (NMOL)', """
-					Number of hydrogen nuclei for molecules in Eirene. The code attempts to find a match by default.
+      'L_H_MOL' : ('b2.user.parameters', 'integer array of size (NMOL,3)', """
+					Number of hydrogen isotope nuclei for molecules in Eirene. If using only one hydrogen species, only the first element needs to be provided. Otherwise the 3 elements correspond to H/D/T. The code attempts to find a match by default.
 				""", ''),
    
       'FUSION_POWER' : ('b2.user.parameters', 'real*8', """

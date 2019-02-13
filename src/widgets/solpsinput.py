@@ -176,14 +176,14 @@ class SolpsInput(QTabWidget):
                 if not os.access(path, os.W_OK):
                     plainTextEdit.setReadOnly(True)
                 try:
-                    with open(path) as file:
+                    with open(path, encoding='latin1') as file:
                         text = file.read()
                     if text:
                         plainTextEdit.setPlainText(text)
                     else:
                         plainTextEdit.setPlaceholderText("File " + filename +
                                                          " is empty!")
-                except PermissionError as error:
+                except (PermissionError, UnicodeDecodeError) as error:
                     plainTextEdit.setPlaceholderText(str(error))
                     plainTextEdit.setEnabled(False)
             else:

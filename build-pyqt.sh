@@ -2,20 +2,21 @@
 ## Building PyQt with Python3 and Qt5
 ## Minimum GCC supported version for building Qt5 is 4.7
 
-PYTHON_VERSION=3.6.4
+PYTHON_VERSION=3.6.8
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
 QT_VERSION=5.9.1
 PyQT_VERSION=5.9.1 # should be the same as Qt
-SIP_VERSION=4.19.4
+SIP_VERSION=4.19.13
 
 # Site specific defaults
 case $(hostname -f) in
-  *.iter.org) # RHEL5.11 with GCC 4.2
+  *.iter.org) # RHEL7
 	module purge
-	module load GCC/4.8.3 binutils/2.25 python/2.7/11 #gperf
+	#module load GCC/4.8.3 binutils/2.25 python/2.7/11 #gperf
         #module load imas/3.7.2/ual/3.3.14
 	USE_QT_XCB="NO"
-	BUILD_XCB="YES"
+	BUILD_XCB="NO"
+        MAKE_JOBS ?= 14
 	unset CXX CC # Remove ICC to be selected by chance
         QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:-\
                         -D GLX_GLXEXT_LEGACY \
@@ -105,7 +106,7 @@ if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
   LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
     ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
       Cython scipy luigi tornado deap decorator liac-arff ecdsa \
-      netaddr paramiko paycheck virtualenv
+      netaddr paramiko virtualenv
   touch ${PYTHON_SRC_DIR}/.built
 fi
 
@@ -187,7 +188,7 @@ if [ ! -e ${QT_SOURCE_DIR}/.configured ]; then # Configuring Qt
   cd ${QT_SOURCE_DIR}
   sed -i.orig -e 's/-Wno-error=return-type//' \
       qtlocation/src/3rdparty/poly2tri/poly2tri.pro
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-openssl.patch
+  #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-openssl.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-no-offscreen.patch
   #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
   patch -p 1 -d ${QT_SOURCE_DIR}<${PATCH_DIR}/qglxintegration-glx-context.patch
@@ -196,7 +197,7 @@ if [ ! -e ${QT_SOURCE_DIR}/.configured ]; then # Configuring Qt
   #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qsimd.cpp-gcc4.2.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qdbusinternalfilters.patch
   patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-invoke-static.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qtbase-platformsupport-fbconveniance-qfbvthandler.patch
+  #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qtbase-platformsupport-fbconveniance-qfbvthandler.patch
   sed -i -e '/auto/d' qtdeclarative/tests/tests.pro \
                       qtmultimedia/tests/tests.pro \
                       qtgraphicaleffects/tests/tests.pro
@@ -250,9 +251,10 @@ if [ ! -e   ${SIP_SRC_DIR}/.built ]; then
   tar xzf ${DOWNLOAD_DIR}/${SIP_SRC}
   cd ${SIP_SRC_DIR}
   LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
-  ${PYTHON} configure.py
+                 ${PYTHON} configure.py
   make -j ${MAKE_JOBS}
-  make install
+  LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
+                 make install
   touch ${SIP_SRC_DIR}/.built
 fi
 

@@ -108,7 +108,8 @@ def read_identification_parameters(directory):
     if os.path.exists(path):
         try:
             with open(path) as file:
-                lines = file.read(1024).splitlines()
+                header = file.read(1024)
+                lines = header.splitlines()
             for i, line in enumerate(lines):
                 if 'label' in line:
                     label = lines[i + 1].strip("'")
@@ -120,8 +121,11 @@ def read_identification_parameters(directory):
                     user = extract_value(line)
                 elif 'b2mndr_device' in line:
                     device = extract_value(line)
-        except OSError:
+        except OSError as e:
             label = run = shot = user = device = 'b2mn.dat unreadable'
+        except UnicodeDecodeError as e:
+            logging.error(e)
+            logging.error('File %s contains non-ASCII characters' % path)
 
     path = directory + '/b2md.dat'
     if (not shot or not run) and os.path.exists(path):
@@ -547,6 +551,9 @@ class RetrieveRunsFolderInfo(QThread):
                 return qtime, 'run.log without status', static_data
             except OSError:
                 return qtime, 'run.log permission denied', static_data
+            except UnicodeDecodeError as e:
+                logging.error(e)
+                logging.error('File %s contains non-ASCII characters' % path)
 
         # Retrieve last line of .status
         path = directory + '/.status'

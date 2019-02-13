@@ -7,9 +7,8 @@ import os
 import logging
 
 from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal, pyqtProperty
-from PyQt5.QtWidgets import (QApplication, QDialog, QLineEdit, QPushButton,
-                             QGridLayout, QDialogButtonBox, QWidget,
-                             QFormLayout)
+from PyQt5.QtWidgets import (QDialog, QLineEdit, QPushButton, QGridLayout,
+                             QDialogButtonBox, QWidget, QFormLayout)
 from PyQt5.QtGui import QIntValidator
 import getopt
 
@@ -20,30 +19,24 @@ except ImportError as e:
 
 
 ENABLED = True
+# ERROR used for CLI usage.
+ERROR = None # 1 for IMAS module not loaded
+             # 2 for no IMAS module
+             # 3 for corrupted imas module
 
 if 'IMAS_PREFIX' not in os.environ and 'IMAS_VERSION' not in os.environ:
-    if __name__ == '__main__':
-        print('IMAS module is not loaded.')
-        sys.exit(2)
-    else:
-        ENABLED = False
+    ERROR = 1
+    ENABLED = False
 
 else:
-
     try:
         import imas
     except ImportError:
-        if __name__ == '__main__':
-            print('There is no IMAS module... Exiting.')
-            sys.exit(2)
-        else:
-            ENABLED = False
+        ERROR = 2
+        ENABLED = False
     except FileNotFoundError:
-        print( __name__, 'Corrupted IMAS module!')
-        if __name__ == '__main__':
-            sys.exit(2)
-        else:
-            ENABLED = False
+        ERROR = 3
+        ENABLED = False
 
 class GetVars:
     names = ['SHOT', 'RUN', 'USER', 'DEVICE', 'VERSION', 'RUNNAME', 'DIRPATH']
@@ -391,6 +384,7 @@ class GetIDSWrapper:
 
 
 if __name__ == '__main__':
+    from PyQt5.QtCore import QCoreApplication
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
     ch = logging.StreamHandler(sys.stdout)
@@ -451,7 +445,18 @@ python3 get_edge_ids.py --shot=1001 --run=1001 --user=%s \
         print('For help: -h / --help')
         sys.exit(2)
 
-    app = QApplication(sys.argv)
+    if ERROR:
+        if ERROR == 1:
+            print('IMAS module is not loaded.')
+        elif ERROR == 2:
+            print('There is no IMAS module... Exiting.')
+        elif ERROR == 3:
+            print(__name__, 'Corrupted IMAS module!')
+        else:
+            print('Unknown error with IMAS')
+        sys.exit(2)
+
+    app = QCoreApplication(sys.argv)
     t = GetIDSQThread()
     t.setParameters(Vars)
     t.finished.connect(app.exit)
