@@ -11,7 +11,7 @@ Using ParaView ReadUALEdge plugin
 
 This tutorial covers the basic instructions about running and using
 ParaView application [1]_ and how to run and use ReadUALEdge
-ParaView plugin on hpc-app1.iter.org or hpc-login4.iter.org login nodes.
+ParaView plugin on ITER hpc-login02.iter.org login node.
 
 
 Introduction to ParaView
@@ -32,62 +32,51 @@ ParaView ReadUALEdge plugin
 
 ParaView ReadUALEdge plugin is a tool used to visualize and analyze data,
 obtained by fusion simulations (electron temperature/density, ion
-temperature/density) stored in CPO and/or IDS database.
+temperature/density) stored in the IMAS database - edge_profiles, edge_transport
+and edge_sources IDSs.
 
 Here we'll demonstrate how to launch and use the ReadUALEdge plugin using
-two different IDS databases, first being shot: ``16151; run: 1000`` [2]_
-and  ``shot: 1; run: 1`` [3]_
+IDS case with parameters shot: ``122264; run: 1; user: 'public';
+device/database: 'iterdb'``
 
-.. [1] During the time of writing this  tutorial ParaView version 5.1.0 was used.
-.. [2] ``user: kosl; tokamak: aug; version: 4.10a``.
-.. [3] ``user: kosl; tokamak: aug; version: 4.10a``. IDS database for
-       now doesn't take in those three parameters as the CPO database does.
+.. [1] During the time of writing this  tutorial ParaView version 5.4.1 was used.
 
 Using ParaView and plugin on ITER cluster
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Precompiled ParaView 5.2 exists on ITER cluster. What is needed is to load
-precompiled ``libReadUALEdge.so`` plugin from
-``/home/ITER/kosl/solps-gui/staging/paraview-plugins/5.2.0`` directory.
-To launch the paraview use the following commands::
+Precompiled ParaView 5.4.1 is available on ITER cluster as a module. To set the
+environment use the following commands::
 
-   module purge
-   module load imas/3.9.1/ual/3.5.3 blitz/0.10
-   imasdb solps-iter
-   module load paraview/5.2.0
-   paraview
+ module purge
+ module load IMAS/3.21.0-3.8.6
+ module load ParaView/5.4.1-intel-2018a-mpi
+ paraview
 
-and then find ``/home/ITER/kosl/solps-gui/staging/paraview-plugins/5.2.0``
-directory  with :menuselection:`Tools --> Manage Plugins --> Load New` and
-select ``libReadUALEdge.so`` plugin that should appear under 
-:menuselection:`Sources --> IMAS` and then follow the rest of the tutorial
-on the use of plugin.
+A ParaView opening window will appear. How to load and use the plugin is
+described in section :ref:`loading_plugin`.
 
 Development use of ParaView
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For *standalone* use on cluster when having compiled ParaView by your own
-then you can copy examples in this tutorial by the following commands::
+For *standalone* use on cluster when having compiled your own ParaView provided
+by SOLPS-GUI then use the commands::
 
- % install -d ~/public/imasdb
- % cp -r ~kosl/public/imasdb/solps-iter ~/public/imasdb/
- % cd ~/solps-gui
- % ./run-paraview.sh
+ cd ~/solps-gui
+ ./run-paraview.sh
 
 
-Command ``run-paraview.sh`` command provides the following module and 
+Command ``run-paraview.sh`` command provides the following module and
 environments ::
 
- % module load imas/3.5.3/ual/3.8.8 GCC/4.8.3 blitz/0.10
- % module switch python/2.7/11
- % imasdb solps-iter
+ module load IMAS/3.21.0-3.8.6 binutils/2.28-GCCcore-6.4.0 Blitz++/0.10-GCCcore-6.4.0
+ imasdb solps-iter
 
 Additional commands to check available modules::
 
- % module avail imas
- % module display imas/develop/3/ual/develop
+ module avail IMAS
+ module avail imas # listing older IMAS versions
 
-
+.. _loading_plugin:
 
 Loading the plugin
 ------------------
@@ -125,7 +114,9 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
 
      Plugin Manager window
 
-3. Navigate to and select the plugin library file then press :guilabel:`OK`
+3. Navigate to and select the plugin library file ``libReadUALEdge.so``
+   available in ``/home/ITER/penkod/public/ParaView-plugin-ReadUALEdge/imas/3.21.0``
+   directory. Press :guilabel:`OK` button.
 
   .. figure:: images/4_plugin_manager2.png
      :alt: Navigating and selecting plugin library file
@@ -144,13 +135,12 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
      Loading the ReadUALEdge plugin
 
 5. Run the plugin by navigating from Menu Bar to
-   :menuselection:`Sources --> UAL Edge` (see
+   :menuselection:`Sources --> IMAS --> UAL Edge IDS` (see
    :numref:`pv-run-plugin-1`). The Pipeline Browser will change and
    after choosing the desired database parameters press button
    :guilabel:`Apply` (see :numref:`pv-run-plugin-2`). The database
    will be loaded and visualized on the View Browser as seen in
-   :numref:`pv-run-plugin-3` for AUG tokamak and in
-   :numref:`pv-run-plugin-4` for ITER tokamak.
+   :numref:`pv-run-plugin-3` for ITER tokamak.
 
   .. _pv-run-plugin-1:
   .. figure:: images/6_running_plugin.png
@@ -166,17 +156,11 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
 
   .. _pv-run-plugin-3:
   .. figure:: images/8_plugin_run2.png
-     :alt: Example of visualized data gathered from tokamak ``Aug`` database
+     :alt: Example of visualized data gathered from public ``iterdb`` database
 
-     Example of visualized data gathered from tokamak ``Aug``  database
+     Example of visualized data gathered from public ``iterdb``  database
 
-  .. _pv-run-plugin-4:
-  .. figure:: images/10_plugin_loaded3.png
-     :alt: Example of visualizied data gathered from tokamak ``ITER`` database
-
-     Example of visualizied data gathered from tokamak ``ITER`` database
-
-.. note:: 
+.. note::
    Sometimes after opening Iter tokamak database **no** visual
    change in the ``View`` ``Browser`` can be seen, because of the
    default zoom. To solve that press twice the :guilabel:`Reset`
@@ -186,17 +170,17 @@ Data analysis
 -------------
 
 In previous chapter we can notice that we have loaded data, but no
-useful information could be seen, just the geometry of the tokamak using
-a lot of colors. In this tutorial we'll first explain what those multiple
-color represent and then how to display full information we want.
+useful information could be seen, just the geometry of the tokamak displaying
+a lot of colored grid elements. In this tutorial we'll first explain what
+those multiple colors represent and then how to display full information we want.
 
-Subgrids and Multi-Block Inspector
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Grid subsets and Multi-Block Inspector
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Briefly said, subgrid is “a piece” of geometry. In our case, the
-**Multi-Block Inspector** uses the subgrids as blocks of data, using a
-different color for each block of data, as seen in Figures
-:numref:`pv-run-plugin-3` and :numref:`pv-run-plugin-4`, and it
+Briefly said, grid subset is “a part” of the full grid geometry. In our case,
+the **Multi-Block Inspector** uses the grid subsets as blocks of data,
+displaying them in different colors with one color per block of data
+as seen in Figure :numref:`pv-run-plugin-3`, and it
 is used to select and display only the wanted blocks of data.
 
 To load the Multi-Block Inspector, go to Menu bar
@@ -317,7 +301,7 @@ Pipeline Browser as seen in :numref:`pv-python-calculator3`.
    Python Calculator start in Pipeline Browser
 
 This filter takes a case sensitive *Expression*, an *Array Association*
-and custom *Array Name*. An example is shown in 
+and custom *Array Name*. An example is shown in
 :numref:`pv-python-calculator6`, where convert
 all values from data array ``Ion Temperature`` from *eV* to *joules*
 (``Te[J] = Te[Ev]/6.242e18``)using Python Calculator
@@ -334,8 +318,8 @@ The expression and options are:
 
    Ion Temperature data array values converted from Joules to eV
 
-In the next example we'll use Python Calculator to make a sum of 
-*Ion Density 01 D0* and *Ion Density 02 D+1* data arrays and create a new data 
+In the next example we'll use Python Calculator to make a sum of
+*Ion Density 01 D0* and *Ion Density 02 D+1* data arrays and create a new data
 array called *Custom Array Name*.
 The expression and options are:
 
