@@ -13,7 +13,6 @@ This tutorial covers the basic instructions about running and using
 ParaView application [1]_ and how to run and use ReadUALEdge
 ParaView plugin on ITER hpc-login02.iter.org login node.
 
-
 Introduction to ParaView
 -------------------------
 
@@ -156,6 +155,7 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
 
   .. _pv-run-plugin-3:
   .. figure:: images/8_plugin_run2.png
+     :width: 60%
      :alt: Example of visualized data gathered from public ``iterdb`` database
 
      Example of visualized data gathered from public ``iterdb``  database
@@ -211,18 +211,21 @@ selected. We can also choose multiple blocks at once, as shown in
 .. _pv-mbinscp-cells:
 .. figure:: images/13_mbinsp_cells.png
    :alt: Displaying Cells block using Multi-Block Inspector
+   :width: 60%
 
    Displaying Cells block using Multi-Block Inspector
 
 .. _pv-mbinscp-nodes:
 .. figure:: images/14_mbinsp_nodes.png
    :alt: Displaying Nodes block using Multi-Block Inspector
+   :width: 60%
 
    Displaying Nodes block using Multi-Block Inspector
 
 .. _pv-mbinspc-sol-odivertor:
 .. figure:: images/15_mbinsp_sol-odivertor.png
    :alt: Displaying SOL and Outer Divertor blocks using Multi-Block Inspector
+   :width: 60%
 
    Displaying SOL and Outer Divertor blocks using Multi-Block Inspector
 
@@ -246,28 +249,34 @@ navigate through **List of Data Arrays** found in Toolbar, as seen in
    List of data arrays
 
 .. _pv-data-arrays-list-ne:
+
 .. figure:: images/17_data_arrays_ne_full.png
-   :scale: 80%
+   :width: 60%
    :alt: Data layer Electron Density using Cell block
 
    Data layer Electron Density using Cell block
 
 .. _pv-data-arrays-list-te:
+
 .. figure:: images/18_data_arrays_te.png
-   :scale: 60%
+   :width: 45%
    :alt: Data layer Electron Temperature using Cell block
 
    Data layer Electron Temperature using Cell block
 
 .. _pv-data-arrays-list-te-core-sol:
+
 .. figure:: images/19_data_arrays_te_core_sol.png
-   :scale: 60%
+   :width: 45%
    :alt: Data layer Electron Temperature using Core and SOL block
 
    Data layer Electron Temperature using Core and SOL block
 
 Other useful ParaView tools
 ---------------------------
+
+.. note::
+   The tutorial below was made with ParaView 5.2.0.
 
 .. _paraview-python-filter:
 
