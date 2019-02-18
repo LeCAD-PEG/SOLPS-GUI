@@ -1,0 +1,223 @@
+#!/bin/bash
+
+# Copyright (c) 2015, ITER Organization
+# Route de Vinon-sur-Verdon, CS 90 046, 13067 St-Paul-lez-Durance Cedex, France
+#
+# Script to (create and) set IMAS DB directories.
+#
+
+# Beware: This script is run as follows:
+# eval `/path/to/this/script arguments...`
+# So stdout output of this script will be executed in current shell.
+
+ps --no-header c -o cmd $$ | grep 'csh' >/dev/null && \
+echo "You are running *csh, please run this script as:" && \
+echo 'eval `path/to/imasdb arguments`' && \
+exit 1
+
+# If the script is run by bash, but its parent is -csh,
+# We know we should output csh syntax to set environment.
+ppid=`ps --no-header -o ppid $$ | xargs`
+test -z "$ppid" && ppid=$PPID
+test -z "$ppid" && { echo "Could not find PPID?" >&2 ; return 1 ; }
+if ps -o args= "$ppid" | grep 'csh' >/dev/null ;then
+  OUTPUT_CSH=true
+else
+  OUTPUT_CSH=false
+fi
+# User may override what shell-type should be output.
+if test -n "$IMASDB_SHELL" ;then
+  case "$IMASDB_SHELL" in
+    "bash") OUTPUT_CSH=false;;
+    "tcsh"|"csh") OUTPUT_CSH=true;;
+  esac
+fi
+
+# avoid using shell's aliases:
+SED="command -p sed"
+GREP="command -p grep"
+FIND="command -p find"
+LS="command -p ls"
+
+imasdb_version() {
+  printf "IMAS Installer Tools 1.7.0 (Built for IMAS 3.19.1/ual/3.8.2).\n" >&2
+}
+
+imasdb_usage() {
+  printf "%-80s\n\n" "Set MDSPLUS_TREE_BASE_* environment variables to <treename>/\$IMAS_MAJOR_VERSION or default." >&2
+  printf "%-35s %-40s\n\n" "imasdb [command]" "set to default or do <command>." >&2
+  printf "%-35s %-40s\n" "Commands:" "" >&2
+  printf "%-35s %-40s\n" "      [treename]" "set environment to <treename>." >&2
+  printf "%-35s %-40s\n" "                " "set to a /full/path to override the default ~/public." >&2
+  printf "%-35s %-40s\n" "      -u|--unset" "unset environment variable." >&2
+  printf "%-35s %-40s\n" "      -r|--remove <treename>" "rmdir <treename>/\$IMAS_VERSION (if empty)." >&2
+  printf "%-35s %-40s\n" "      -R|--remove-hard <treename>" "rm -rf <treename>\$IMAS_VERSION." >&2
+  printf "%-35s %-40s\n" "      -RR|--remove-all <treename>" "rm -rf <treename>." >&2
+  printf "%-35s %-40s\n" "      -l|--list" "list created trees. (* marks current env.)" >&2
+  printf "%-35s %-40s\n" "      -L|--list-more [treename]" "list all dir (or dirs for one <treename>)." >&2
+  printf "%-35s %-40s\n" "      -v|--version" "print version information." >&2
+  printf "%-35s %-40s\n" "      -h|--help" "this help message." >&2
+  printf "\n%-80s\n" "Depends on module \`imas/\$IMAS_VERSION'. You may overwrite \$IMAS_VERSION or \$IMAS_MAJOR_VERSION." >&2
+  printf "Found loaded module: $(echo "$LOADEDMODULES" | ${SED} '/imas/!d;s|.*imas/\(.*\)/ual.*|\1|')\n" >&2
+}
+
+imasdb_list() {
+  if test -n "$MDSPLUS_TREE_BASE_0";then
+    if test ! -d "$MDSPLUS_TREE_BASE_0" ;then
+      printf "Warning: \$MDSPLUS_TREE_BASE_0 is set to a directory that does not exist.\n" >&2
+    fi
+    current_dir="$MDSPLUS_TREE_BASE_0"
+  else
+    current_dir="/dev/null"
+    printf "Warning: \$MDSPLUS_TREE_BASE_0 is not in environment.\n" >&2
+  fi
+  # Display loaded
+  if test `$LS -1 "$HOME/public/imasdb" | wc -l` -ge 1 ;then
+    ${FIND} "$HOME/public/imasdb" "$current_dir" -type d -name "0" | sort |uniq |while read fulldir ;do
+      test "$fulldir" == "$current_dir" && S="*" || S=""
+      printf "%1s %s\n" "$S" "$fulldir" >&2
+    done
+  fi
+}
+
+
+imasdb_main() {
+  if test -z "$IMAS_MAJOR_VERSION" ;then
+    if test -z "$IMAS_VERSION" ;then
+      local IMAS_VERSION="$(echo "$LOADEDMODULES" | ${SED} '/imas/!d;s|.*imas/\(.*\)/ual.*|\1|')"
+    fi
+    # Grep the first number that you can ${FIND}:
+    local IMAS_MAJOR_VERSION="$(echo "$IMAS_VERSION" | ${GREP} -o '[0-9]\+' | ${SED} 1q)"
+  fi
+  if test -z "$IMAS_MAJOR_VERSION" ;then
+    if test -z "$IMAS_VERSION" ;then
+      printf "IMAS_VERSION is empty.\n" >&2
+      return 1
+    else
+      printf "IMAS_VERSION is set but could not extract a MAJOR version to use. Please provide IMAS_MAJOR_VERSION.\n" >&2
+      return 1
+    fi
+  fi
+  local TREENAME=""
+  local MODE=create
+  case $# in
+    2)
+      case "$1" in
+        --bash) OUTPUT_CSH=false; TREENAME=$2;;
+        -L|--list-more) MODE=listmoretree; TREENAME=$2 ;;
+        -r|--remove) MODE=remove; TREENAME="$2" ;;
+        -R|--remove-hard) MODE=removehard; TREENAME="$2" ;;
+        -RR|--remove-all) MODE=removeall; TREENAME="$2" ;;
+        *) imasdb_usage ; return 1 ;;
+      esac
+    ;;
+    1)
+      case "$1" in
+        -v|--version) imasdb_version ; return 0 ;;
+        -l|--list) MODE=list ;;
+        -L|--list-more) MODE=listmore ;;
+        -u|--unset) MODE=unset ;;
+        -*) imasdb_usage ; return 1 ;;
+        *) TREENAME=$1 ;;
+      esac
+    ;;
+    0) MODE=list ;;
+    *) imasdb_usage ; return 1 ;;
+  esac
+
+  if test -z "$TREENAME" ;then
+    TREENAME=default
+  fi
+
+  if test -n "`echo "$TREENAME" | grep ^/`" ;then
+    # Treename starts with /
+    if test -d "$TREENAME" ;then
+      local BASEPATH="$TREENAME"
+      local FULLPATH="$BASEPATH"
+    else
+      printf "Tree %s not found. Absolute path trees require a manual mkdir first.\n" "$TREENAME" >&2
+      return 1
+    fi
+  else
+    local BASEPATH="$HOME/public/imasdb/$TREENAME"
+    local FULLPATH="$BASEPATH/$IMAS_MAJOR_VERSION"
+  fi
+
+  case $MODE in
+    unset)
+      for N in 0 1 2 3 4 5 6 7 8 9 ;do
+        # Unset environment variable
+        if $OUTPUT_CSH ;then
+          echo unsetenv MDSPLUS_TREE_BASE_$N
+        else
+          echo unset MDSPLUS_TREE_BASE_$N
+        fi
+      done
+    ;;
+    removehard|removeall)
+      if test "$MODE" == "removeall" ;then
+        RMPATH="$BASEPATH"
+      else
+        RMPATH="$FULLPATH"
+      fi
+      if test -d "$RMPATH" ;then
+        printf "Force removal of %s and all files? [y/n]" "$RMPATH" >&2
+        if read yn ;then
+          if printf "$yn" | ${GREP} "^y$" >/dev/null ;then
+            rm -vrf "$RMPATH" >&2
+          fi
+        fi
+      else
+        printf "Directory '%s' does not exist.\n" "$FULLPATH" >&2
+      fi
+    ;;
+    remove)
+      RMPATH="$FULLPATH"
+      if test -d "$RMPATH" ;then
+        printf "Remove directory %s? [y/n]" "$RMPATH" >&2
+        if read yn ;then
+          if printf "$yn" | ${GREP} "^y$" >/dev/null ;then
+            if test 0 -ne `${FIND} "$RMPATH" -type f | wc -l 2>/dev/null` ;then
+              printf "Files found below path. Aborting. Force removal with -R.\n" >&2
+              return 1
+            else
+              ${FIND} "$RMPATH" -type d |sort -r | xargs -n1 rmdir -v >&2
+            fi
+          fi
+        fi
+      else
+        printf "Directory '%s' does not exist.\n" "$RMPATH" >&2
+      fi
+    ;;
+    list) imasdb_list;;
+    listmore) ${FIND} "`dirname $BASEPATH`" >&2 ;;
+    listmoretree) ${FIND} "$BASEPATH" >&2 ;;
+    create)
+
+      # Create dirs if not existent
+      if test ! -d "$FULLPATH" ;then
+	  mkdir -p "$FULLPATH" || { printf "Could not create dir %s.\n" "$FULLPATH" >&2 ; return 1; }
+      fi
+      for N in 0 1 2 3 4 5 6 7 8 9 ;do
+        if test ! -d "$FULLPATH/$N" ;then
+           mkdir "$FULLPATH/$N" || { printf "Could not create dir %s.\n" "$FULLPATH/$N" >&2 ; return 1; }
+        fi
+      done
+      for N in 0 1 2 3 4 5 6 7 8 9 ;do
+        # Set environment variable
+        if test -d "$FULLPATH/$N" ;then
+          if $OUTPUT_CSH ;then
+            # Output to stdout, to be evaluated by parent csh.
+            echo setenv MDSPLUS_TREE_BASE_$N "$FULLPATH/$N" \;
+          else
+            echo export MDSPLUS_TREE_BASE_$N="$FULLPATH/$N" \;
+          fi
+        fi
+      done
+    ;;
+  esac
+}
+
+imasdb_main $@
+unset imasdb_main imasdb_list imasdb_usage imasdb_version SED GREP FIND
+
