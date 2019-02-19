@@ -97,7 +97,7 @@ setenv MDSPLUS_DIR ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
 
 if ( -f /etc/redhat-release ) then
     setenv NCARG_ROOT /usr/lib64/ncarg
-    setenv MPDIR /usr/lib64/openmpi
+    # setenv MPDIR /usr/lib64/openmpi
     module load mpi/openmpi-x86_64
 else
     setenv NCARG_ROOT /usr/lib/x86_64-linux-gnu/ncarg
