@@ -76,7 +76,7 @@ endif
 setenv LD_LIBRARY_PATH ${STAGING_DIR}/lib:${LD_LIBRARY_PATH}
 
 # System LD_LIBRARY_PATH
-set GCC_VERSION=$(gcc -dumpversion)
+set GCC_VERSION="`gcc -dumpversion`"
 # Debian
 setenv LD_LIBRARY_PATH /usr/lib/x86_64-linux-gnu:/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION}:${LD_LIBRARY_PATH}
 # CentOS
