@@ -48,6 +48,8 @@ ggd: imas
 solps-iter: imas gr gli OpenBLAS mscl ggd
 	# Copy imasdb script for setting up IMAS MDSPLUS_TREE environment
 	cp ${BUILDROOT}/imasdb ${BUILDROOT}/bin
+	IMASUAL_VERSION=${IMASUAL_VERSION} \
+	IMASDD_VERSION=${IMASDD_VERSION} \
 	./build-solps-iter.csh
 query-%:
 	@echo $($(*))

@@ -157,14 +157,18 @@ the use of package managers:
 Ubuntu 9.6 (stretch):
     apt-get install libncarg-dev libcairo2-dev libfontconfig1-dev \
     libxrender-dev libx11-dev libfreetype6-dev ksh libxslt1-dev openjdk-8-jdk \
-    libreadline-dev xsltproc libopenmpi-dev
+    libreadline-dev xsltproc libopenmpi-dev libmotif-dev libnetcdf-dev \
+    texlive texlive-latex-recommended texlive-binaries emacs25-bin-common
 
     apt-get install build-essential
 
 CentOS7:
     yum install ncl-devel cairo-devel fontconfig-devel libXrender-devel \
     libX11-devel freetype-devel ksh libxslt java-1.8.0-openjdk-devel \
-    readline-devel xsltproc openmpi-dev
+    readline-devel xsltproc openmpi-dev motif-devel netcdf-devel \
+    netcdf-fortran-devel ctags-etags texlive texlive-latex \
+    texlive-latex-bin-bin-svn14050.0-43.20130427_r30134.el7.noarch \
+    texlive-collection-latexrecommended.noarch
 
     yum groupinstall "Development tools"
 

@@ -274,7 +274,7 @@ if [ ! -e ${IMASUAL_SRC_DIR}/.built ]; then
     set +e
     if ! grep -Fxq "Version: - ${IMASDD_VERSION}-${IMASUAL_VERSION}" ${STAGING_DIR}/access-layer/${IMASUAL_VERSION}/lib/pkgconfig/imas-gfortran.pc
     then
-    	sed -i -e 's/Version: -/Version: - ${IMASDD_VERSION}-${IMASUAL_VERSION}/g' ${STAGING_DIR}/access-layer/${IMASUAL_VERSION}/lib/pkgconfig/imas-gfortran.pc
+    	sed -i -e "s/Version: -/Version: - ${IMASDD_VERSION}-${IMASUAL_VERSION}/g" ${STAGING_DIR}/access-layer/${IMASUAL_VERSION}/lib/pkgconfig/imas-gfortran.pc
     fi
     # Enable the fail on error
     set -e

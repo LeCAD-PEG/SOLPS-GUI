@@ -62,9 +62,10 @@ setenv PKG_CONFIG_PATH /usr/lib/pkgconfig:${PKG_CONFIG_PATH}
 # Debian
 setenv PKG_CONFIG_PATH /usr/lib/x86_64-linux-gnu/pkgconfig:${PKG_CONFIG_PATH}
 # CentOS
-setenv PKG_CONFIG_PATH /usr/lib64/pkgconfig
+setenv PKG_CONFIG_PATH /usr/lib64/pkgconfig:${PKG_CONFIG_PATH}
 
 setenv PKG_CONFIG_PATH ${STAGING_DIR}/ggd/${GGD_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
+
 setenv PKG_CONFIG_PATH ${SOLPS_SRC_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}
 
 if !($?LD_LIBRARY_PATH) then
@@ -88,13 +89,22 @@ setenv CPATH /usr/include:/usr/include/x86_64-linux-gnu:/usr/include/freetype:/u
 
 
 # solps-iter/SETUP/config.*.gfortran packages locations
+setenv NCDIR /usr
 setenv MSCL_ROOT ${STAGING_DIR}
 setenv GR_ROOT ${STAGING_DIR}
 setenv GLI_HOME ${STAGING_DIR}/gli
-setenv NCARG_ROOT /usr/lib/x86_64-linux-gnu/ncarg
 setenv MDSPLUS_DIR ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
-setenv MPDIR /usr/lib/x86_64-linux-gnu/openmpi
-setenv OPENBLAS_ROOT ${STAGING_DIR}
+
+if ( -f /etc/redhat-release ) then
+    setenv NCARG_ROOT /usr/lib64/ncarg
+    setenv MPDIR /usr/lib64/openmpi
+    module load mpi/openmpi-x86_64
+else
+    setenv NCARG_ROOT /usr/lib/x86_64-linux-gnu/ncarg
+    setenv MPDIR /usr/lib/x86_64-linux-gnu/openmpi
+endif
+
+setenv OPENBLAS_ROOT ${STAGING_DIR}/lib
 
 if (! -e ${SOLPS_SRC_DIR}/.git) then
     git clone --branch feature/config-LECAD ${SOLPS_GIT} --single-branch ${SOLPS_SRC_DIR}

@@ -42,6 +42,8 @@ if [ ! -e ${GGD_SRC_DIR}/.built ]; then
     ./configure \
         --prefix=${STAGING_DIR}/ggd/${GGD_VERSION} \
         --enable-doc --enable-tests \
+        --enable-modulefile \
+        --with-module-prefix=${STAGING_DIR}/ggd/${GGD_VERSION}/include \
         FC=gfortran
     make
     make install
