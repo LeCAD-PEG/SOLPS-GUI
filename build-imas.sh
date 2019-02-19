@@ -267,6 +267,18 @@ if [ ! -e ${IMASUAL_SRC_DIR}/.built ]; then
     IMAS_PREFIX=${STAGING_DIR}/access-layer/${IMASUAL_VERSION} \
     make install IMAS_INSTALL_DIR=${STAGING_DIR}/access-layer/${IMASUAL_VERSION}
 
+    # For some reason the version of IMAS is not written into the pkg-config
+    # file. Fixing that if the version is not in the *.pc file
+
+    # Disable the fail on error
+    set +e
+    if ! grep -Fxq "Version: - ${IMASDD_VERSION}-${IMASUAL_VERSION}" ${STAGING_DIR}/access-layer/${IMASUAL_VERSION}/lib/pkgconfig/imas-gfortran.pc
+    then
+    	sed -i -e 's/Version: -/Version: - ${IMASDD_VERSION}-${IMASUAL_VERSION}/g' ${STAGING_DIR}/access-layer/${IMASUAL_VERSION}/lib/pkgconfig/imas-gfortran.pc
+    fi
+    # Enable the fail on error
+    set -e
+
     # Link imas as imas, so you can simply say import imas in python!
     A=$(echo "imas_${IMASDD_VERSION}_ual_${IMASUAL_VERSION}"|tr . _)
     B=$(uname -m) # Get system bitness

@@ -45,11 +45,11 @@ ggd: imas
 	IMASDD_VERSION=${IMASDD_VERSION} \
 	MDSPLUS_VERSION=${MDSPLUS_VERSION} \
 	./build-ggd.sh
-solps-iter: # imas gr gli OpenBLAS mscl ggd
+solps-iter: imas gr gli OpenBLAS mscl ggd
 	# Copy imasdb script for setting up IMAS MDSPLUS_TREE environment
-	cp ${BUILDROOT}/imasdb ${STAGING_DIR}/bin
+	cp ${BUILDROOT}/imasdb ${BUILDROOT}/bin
 	./build-solps-iter.csh
 query-%:
 	@echo $($(*))
 deep-clean:
-	rm -rf ${DOWNLOAD_DIR} ${BUILD_DIR} ${STAGING_DIR}
+	rm -rf ${BUILDROOT}/download ${BUILDROOT}/build ${BUILDROOT}/staging

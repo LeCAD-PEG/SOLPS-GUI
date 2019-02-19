@@ -58,8 +58,18 @@ else
 endif
 
 setenv PKG_CONFIG_PATH ${STAGING_DIR}/ggd/${GGD_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
-setenv PKG_CONFIG_PATH ${PWD}/lib/pkgconfig:${PKG_CONFIG_PATH}
-setenv PKG_CONFIG_PATH ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
+setenv PKG_CONFIG_PATH ${SOLPS_SRC_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}
+
+if !($?LD_LIBRARY_PATH) then
+    setenv LD_LIBRARY_PATH ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib
+else
+    setenv LD_LIBRARY_PATH ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib:${LD_LIBRARY_PATH}
+endif
+
+setenv LD_LIBRARY_PATH ${STAGING_DIR}/lib:${LD_LIBRARY_PATH}
+
+# setenv PKG_CONFIG_PATH ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
+
 setenv CPATH /usr/include:/usr/include/x86_64-linux-gnu:/usr/include/freetype:/usr/include/cairo
 
 setenv MSCL_ROOT ${STAGING_DIR}
@@ -78,4 +88,4 @@ endif
 
 cd ${SOLPS_SRC_DIR}
 source ${SOLPS_SRC_DIR}/setup.csh gfortran
-make solps
+make solps solps_openmp solps_mpi
