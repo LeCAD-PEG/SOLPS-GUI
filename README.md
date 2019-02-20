@@ -37,7 +37,7 @@ in Qt with the following commands:
 
     $ src/gui/solps.py # or simply type "solps" alias
 
-## Buiding documentation 
+## Buiding documentation
 On the ITER cluster the following modules and commands are needed
 for building documentation (and running SOLPS GUI):
 
@@ -138,7 +138,7 @@ files. To build the Anaconda3 binary-compatible gnuplot and PyQt widget do:
     export GNUPLOT_INSTALL_DIR=/work/imas/opt/gnuplot/5.2.1
     MAKE_JOBS=16 ./build-gnuplot.sh
 
-Building PyQt based Gnuplot widget with build-gnuplot-widget.sh has been 
+Building PyQt based Gnuplot widget with build-gnuplot-widget.sh has been
 unsucessful so far.
 
 ## Importing IMAS Python modules into local Python
@@ -147,3 +147,35 @@ is used from local build using setupenv.sh then one can install IMAS
 package by
 
     pip3 install --user --compile ${IMAS_PREFIX}/python/dist/imas*.tar.gz
+
+## Compiling SOLPS-ITER
+
+Scripts have been added for compiling SOLPS-ITER and it's prerequisites into
+the same build environment as SOLPS-GUI. Some packages can be installed with
+the use of package managers:
+
+Ubuntu 9.6 (stretch):
+    apt-get install libncarg-dev libcairo2-dev libfontconfig1-dev \
+    libxrender-dev libx11-dev libfreetype6-dev ksh libxslt1-dev openjdk-8-jdk \
+    libreadline-dev xsltproc libopenmpi-dev libmotif-dev libnetcdf-dev \
+    texlive texlive-latex-recommended texlive-binaries emacs25-bin-common
+
+    apt-get install build-essential
+
+CentOS7:
+    yum install ncl-devel cairo-devel fontconfig-devel libXrender-devel \
+    libX11-devel freetype-devel ksh libxslt java-1.8.0-openjdk-devel \
+    readline-devel xsltproc openmpi-dev motif-devel netcdf-devel \
+    netcdf-fortran-devel ctags-etags texlive texlive-latex \
+    texlive-latex-bin-bin texlive-collection-latexrecommended \
+    environment-modules
+
+    yum groupinstall "Development tools"
+
+The configuration of SOLPS-ITER used GNU gcc/gfortran compiler toolchain. Along
+SOLPS-ITER other packages are compiled, such as IMAS, OpenBLAS.
+
+To start building the packages, run the following command:
+
+    cd solps-gui
+    make solps-iter

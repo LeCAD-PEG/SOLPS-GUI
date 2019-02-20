@@ -19,7 +19,7 @@ esac
 
 MAKE_JOBS=${MAKE_JOBS:-4}
 
-BUILDROOT=$(cd ${0%/*} && echo ${PWD})
+BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
 BUILD_DIR=${BUILDROOT}/build
 DOWNLOAD_DIR=${DOWNLOAD_DIR:-${BUILDROOT}/download}
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}

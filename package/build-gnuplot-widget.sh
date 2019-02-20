@@ -3,7 +3,7 @@
 QT_VERSION=${QT_VERSION:-5.9.1}
 PYTHON_VERSION=${PYTHON_VERSION:-3.6.4}
 
-BUILDROOT=$(cd ${0%/*} && echo ${PWD})
+BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 QTDIR=${STAGING_DIR}/qt/${QT_VERSION}
 
@@ -37,7 +37,7 @@ export PATH="${STAGING_DIR}/bin:${QTDIR}/bin:${PATH}"
 export LD_LIBRARY_PATH="${STAGING_DIR}/lib:${QTDIR}/lib:${LD_LIBRARY_PATH}"
 export PKG_CONFIG_PATH="${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}"
 
-PYVER=${PYTHON_VERSION%.*} # just major.minor version 
+PYVER=${PYTHON_VERSION%.*} # just major.minor version
 INSTALL_DIR=${INSTALL_DIR:-${STAGING_DIR}/lib/python${PYVER}/site-packages}
 GNUPLOT_WIDGET_DIR=${GNUPLOT_WIDGET_DIR:-${BUILDROOT}/src/gnuplot-widget}
 GNUPLOT_WIDGET_SRC_DIR=${GNUPLOT_WIDGET_DIR}/src

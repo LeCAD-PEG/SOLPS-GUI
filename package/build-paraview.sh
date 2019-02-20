@@ -22,7 +22,7 @@ case $(hostname -f) in
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
 	. /etc/profile.d.gw/modules.sh
 	module purge
-	module load cineca imasenv cmake/3.5.2 
+	module load cineca imasenv cmake/3.5.2
 	module switch itm-python/2.7
 	module unload matlab
 	QT_VERSION=${QT_VERSION:-4.8.7}
@@ -40,7 +40,7 @@ esac
 QT_VERSION=${QT_VERSION:-4.8.7}
 MAKE_JOBS=${MAKE_JOBS:-4}
 
-BUILDROOT=$(cd ${0%/*} && echo ${PWD})
+BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
 BUILD_DIR=${BUILDROOT}/build
 DOWNLOAD_DIR=${DOWNLOAD_DIR:-${BUILDROOT}/download}
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
@@ -69,7 +69,7 @@ set -e
 if ! test -x ${STAGING_QT}/bin/qmake ; then
     QT_MAJOR_VERSION=${QT_VERSION%.*}
     QT_TAR="qt-everywhere-opensource-src-${QT_VERSION}.tar.gz"
-    QT_SITE="http://download.qt.io/official_releases/qt"
+    QT_SITE="http://download.qt.io/archive/qt/"
     QT_DOWNLOAD="${QT_SITE}/${QT_MAJOR_VERSION}/${QT_VERSION}/${QT_TAR}"
     QT_SOURCE_DIR="${BUILD_DIR}/qt-everywhere-opensource-src-${QT_VERSION}"
 

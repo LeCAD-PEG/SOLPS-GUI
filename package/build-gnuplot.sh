@@ -3,7 +3,7 @@ MAKE_JOBS=${MAKE_JOBS:-4}
 GNUPLOT_VERSION=${GNUPLOT_VERSION:-5.2.2}
 QT_VERSION=${QT_VERSION:-5.9.1}
 
-BUILDROOT=$(cd ${0%/*} && echo ${PWD})
+BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
 BUILD_DIR=${BUILDROOT}/build
 PATCH_DIR=${BUILDROOT}/src/patches
 DOWNLOAD_DIR=${BUILDROOT}/download
