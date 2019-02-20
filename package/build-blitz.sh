@@ -4,10 +4,10 @@ BLITZ_VERSION=${BLITZ_VERSION:-1.0.0} # Apparently this is the same as 0.10.0
 BLITZ_SOURCE="blitz-${BLITZ_VERSION}.tar.gz"
 BLITZ_DOWNLOAD="https://github.com/blitzpp/blitz/archive/${BLITZ_VERSION}.tar.gz"
 BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
-echo $BUILDROOT
-exit
+
 BUILD_DIR=${BUILDROOT}/build
-STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
+STAGING_DIR=${BUILDROOT}/staging
+DOWNLOAD_DIR=${BUILDROOT}/download
 
 MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
 

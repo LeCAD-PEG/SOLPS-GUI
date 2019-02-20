@@ -68,7 +68,7 @@ set -e
 if ! test -x ${STAGING_QT}/bin/qmake ; then
     QT_MAJOR_VERSION=${QT_VERSION%.*}
     QT_TAR="qt-everywhere-opensource-src-${QT_VERSION}.tar.gz"
-    QT_SITE="http://download.qt.io/official_releases/qt"
+    QT_SITE="http://download.qt.io/archive/qt/"
     QT_DOWNLOAD="${QT_SITE}/${QT_MAJOR_VERSION}/${QT_VERSION}/${QT_TAR}"
     QT_SOURCE_DIR="${BUILD_DIR}/qt-everywhere-opensource-src-${QT_VERSION}"
 

@@ -118,4 +118,5 @@ endif
 
 cd ${SOLPS_SRC_DIR}
 source ${SOLPS_SRC_DIR}/setup.csh gfortran
-make solps solps_openmp solps_mpi
+# make solps solps_openmp solps_mpi # Problem with manual, maybe because it is being called three times?
+make carre divgeo b25eirene uinp triang amds sonnet-light b25eirene_openmp b25eirene_mpi uinp_mpi amds_mpi manual
