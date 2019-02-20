@@ -6,7 +6,10 @@
 
 
 if !($?BUILDROOT) then
-    setenv BUILDROOT "${PWD}"
+    # Hack for getting the BUILDROOT directory when executing the script.
+    set tmp_builddir = `dirname $0`
+    set abs_tmp_builddir = `cd ${tmp_builddir}/.. && pwd`
+    setenv BUILDROOT "${abs_tmp_builddir}"
 endif
 
 if !($?SOLPS_VERSION) then

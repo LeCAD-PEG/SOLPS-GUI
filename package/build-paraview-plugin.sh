@@ -1,7 +1,7 @@
 #!/bin/sh -x
 
 MAKE_JOBS=${MAKE_JOBS:-4}
-BUILDROOT=$(cd ${0%/*} && echo ${PWD})
+BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
 BUILD_DIR=${BUILDROOT}/build
 PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.1}
 QT_VERSION=${QT_VERSION:-4.8.7}
@@ -10,7 +10,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 
 
 case $(hostname -f) in
-  *.iter.org) 
+  *.iter.org)
         module purge
         module load imas/3.12.0/ual/3.6.3 blitz/0.10 binutils/2.25
         module load OpenSSL/1.0.2g-GCC-4.8.3
@@ -26,14 +26,14 @@ case $(hostname -f) in
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
 	. /etc/profile.d.gw/modules.sh
 	module purge
-	module load cineca imasenv/3.12.1 cmake/3.5.2 
+	module load cineca imasenv/3.12.1 cmake/3.5.2
 	module switch itm-python/2.7
 	module unload matlab
 	QT_VERSION=4.8.7
 	module load itm-qt/${QT_VERSION}
 	MAKE_JOBS=${MAKE_JOBS:-36}
 	;;
-  
+
   *)
 	;;
 esac
@@ -80,7 +80,7 @@ PATH=${STAGING_DIR}/bin:${PATH} \
  ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Debug \
     -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
     -DParaView_DIR:PATH=${STAGING_PARAVIEW} \
-    ${BUILDROOT}/src/plugins/paraview 
+    ${BUILDROOT}/src/plugins/paraview
 make -j ${MAKE_JOBS} VERBOSE=1 all
 install -d ${STAGING_PLUGINS}
 install ${BUILD_DIR}/Plugins-ReadUAL${name}/libReadUAL${name}.so \

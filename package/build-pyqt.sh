@@ -2,18 +2,18 @@
 ## Building PyQt with Python3 and Qt5
 ## Minimum GCC supported version for building Qt5 is 4.7
 
-PYTHON_VERSION=3.6.8
+PYTHON_VERSION=${PYTHON_VERSION:-3.6.8}
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
-QT_VERSION=5.9.1
-PyQT_VERSION=5.9.1 # should be the same as Qt
-SIP_VERSION=4.19.13
+QT_VERSION=${QT_VERSION:-5.9.1}
+PyQT_VERSION=${PyQT_VERSION:-5.9.1} # should be the same as Qt
+SIP_VERSION=${SIP_VERSION:-4.19.13}
 
 # Site specific defaults
 case $(hostname -f) in
   *.iter.org) # RHEL7
 	module purge
-	#module load GCC/4.8.3 binutils/2.25 python/2.7/11 #gperf
-        #module load imas/3.7.2/ual/3.3.14
+	# module load GCC/4.8.3 binutils/2.25 python/2.7/11 #gperf
+    # module load imas/3.7.2/ual/3.3.14
 	USE_QT_XCB="NO"
 	BUILD_XCB="NO"
         MAKE_JOBS ?= 14
@@ -57,7 +57,7 @@ USE_QT_XCB=${USE_QT_XCB:-NO} # Use Qt provided XCB. Not for RHEL5
 BUILD_XCB=${BUILD_XCB:-NO}   # YES if having problems with -qt-xcb
 BUILD_XLIB=${BUILD_XLIB:-NO} # If having libX11-xcb < 1.3.2
 
-BUILDROOT=$(cd ${0%/*} && echo ${PWD})
+BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
 BUILD_DIR=${BUILDROOT}/build
 PATCH_DIR=${BUILDROOT}/src/patches
 DOWNLOAD_DIR=${BUILDROOT}/download
@@ -71,44 +71,6 @@ set -e
 install -d ${BUILD_DIR}
 install -d ${STAGING_DIR}
 install -d ${DOWNLOAD_DIR}
-
-## Install Python3
-
-PYTHON_SRC="Python-${PYTHON_VERSION}.tgz"
-PYTHON_SITE="https://www.python.org/ftp/python"
-PYTHON_DOWNLOAD="${PYTHON_SITE}/${PYTHON_VERSION}/${PYTHON_SRC}"
-
-if [ ! -f ${DOWNLOAD_DIR}/${PYTHON_SRC} ]; then
-    wget  -O ${DOWNLOAD_DIR}/${PYTHON_SRC} ${PYTHON_DOWNLOAD}
-fi
-
-PYTHON_SRC_DIR="${BUILD_DIR}/Python-${PYTHON_VERSION}"
-PYTHON_INSTALL_DIR="${STAGING_DIR}"
-
-if [ ! -e   ${PYTHON_SRC_DIR}/.built ]; then
-  rm -rf ${PYTHON_SRC_DIR}
-  cd ${BUILD_DIR}
-  tar xzf ${DOWNLOAD_DIR}/${PYTHON_SRC}
-  cd ${PYTHON_SRC_DIR}
-  if pkg-config --exists libssl; then
-    ssl=$(pkg-config --variable=prefix libssl)
-    sed -i -e "s,#SSL=.*,SSL=${ssl}," -e "/^#.*ssl/s/#//" \
-	-e '/ssl/s|-lcrypto|-lcrypto -Wl,-rpath,$(SSL)/lib|' Modules/Setup.dist
-  fi
-  ./configure --prefix=${STAGING_DIR} --enable-shared
-  make -j ${MAKE_JOBS}
-  make install
-  ln -sf python3 ${STAGING_DIR}/bin/python
-  LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
-  ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
-      pip sphinx sphinx_rtd_theme matplotlib mock nose
-  # The following Python modules are preferred by IMAS
-  LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
-    ${STAGING_DIR}/bin/pip3 --trusted-host pypi.python.org install --upgrade \
-      Cython scipy luigi tornado deap decorator liac-arff ecdsa \
-      netaddr paramiko virtualenv
-  touch ${PYTHON_SRC_DIR}/.built
-fi
 
 XCB_FLAGS="-xcb -no-xcb-xlib" # XCB is mandatory for Linux
 if [ "${USE_QT_XCB}" = "YES" ]; then # build QT with QT-provided XCB libs

@@ -167,8 +167,8 @@ CentOS7:
     libX11-devel freetype-devel ksh libxslt java-1.8.0-openjdk-devel \
     readline-devel xsltproc openmpi-dev motif-devel netcdf-devel \
     netcdf-fortran-devel ctags-etags texlive texlive-latex \
-    texlive-latex-bin-bin-svn14050.0-43.20130427_r30134.el7.noarch \
-    texlive-collection-latexrecommended.noarch
+    texlive-latex-bin-bin texlive-collection-latexrecommended \
+    environment-modules
 
     yum groupinstall "Development tools"
 

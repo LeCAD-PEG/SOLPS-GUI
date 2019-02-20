@@ -9,7 +9,7 @@ esac
 MAKE_JOBS=${MAKE_JOBS:-$(nproc)} # Should use all threads of a system
 
 
-BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD})}
+BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
 BUILD_DIR=${BUILDROOT}/build
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 
