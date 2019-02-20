@@ -9,6 +9,7 @@ QT_VERSION=${QT_VERSION:-4.8.7}
 DOWNLOAD_DIR=${DOWNLOAD_DIR:-${BUILDROOT}/download}
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 IMASUAL_VERSION=${IMASUAL_VERSION:-3.8.4}
+MDSPLUS_VERSION=${MDSPLUS_VERSION:-stable_release-7-7-8}
 
 case $(hostname -f) in
   *.iter.org)
@@ -43,11 +44,12 @@ case $(hostname -f) in
 	export PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}
 	# export LD_LIBRARY_PATH=${STAGING_DIR}/access-layer/${IMASUAL_VERSION}/lib:${LD_LIBRARY_PATH}
 	# export LD_LIBRARY_PATH=${STAGING_DIR}/qt/${QT_VERSION}/lib:${LD_LIBRARY_PATH}
+	# export LD_LIBRARY_PATH=${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib:${LD_LIBRARY_PATH}
 	export PATH=${STAGING_DIR}/paraview/${PARAVIEW_VERSION}/bin:${PATH}
 	# export CMAKE_MODULE_PATH=${STAGING_DIR}/paraview/${PARAVIEW_VERSION}/lib/cmake/paraview-${PARAVIEW_MAINVERSION}:${CMAKE_MODULE_PATH}
 	# echo ${STAGING_DIR}/paraview/${PARAVIEW_VERSION}/lib/cmake/paraview-${PARAVIEW_MAINVERSION}
 	# exit
-	# export MDSPLUS_DIR=${STAGING_DIR}/mdsplus/
+	export MDSPLUS_DIR=${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
 	;;
 esac
 
