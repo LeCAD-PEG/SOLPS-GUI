@@ -42,6 +42,7 @@ case $(hostname -f) in
 	export IMAS_VERSION=${IMASDD_VERSION}
 	export PKG_CONFIG_PATH=${STAGING_DIR}/access-layer/${IMASUAL_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
 	export PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}
+	export LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH}
 	# export LD_LIBRARY_PATH=${STAGING_DIR}/access-layer/${IMASUAL_VERSION}/lib:${LD_LIBRARY_PATH}
 	# export LD_LIBRARY_PATH=${STAGING_DIR}/qt/${QT_VERSION}/lib:${LD_LIBRARY_PATH}
 	# export LD_LIBRARY_PATH=${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib:${LD_LIBRARY_PATH}
@@ -85,7 +86,6 @@ set -e
 
 export PKG_CONFIG_PATH=${STAGING_DIR}/qt/${QT_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
 export PATH=${STAGING_DIR}/qt/${QT_VERSION}/bin:${PATH}
-
 
 name=Edge
 [ -d ${BUILD_DIR}/Plugins-ReadUAL${name} ] && \

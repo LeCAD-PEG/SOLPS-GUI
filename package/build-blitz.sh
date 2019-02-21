@@ -25,7 +25,7 @@ if [ ! -e ${BLITZ_SRC_DIR}/.built ]; then
     cd ${BUILD_DIR}
     tar xzf ${DOWNLOAD_DIR}/${BLITZ_SOURCE}
     cd ${BLITZ_SRC_DIR}
-    CXX=g++ ./configure --prefix=${STAGING_DIR} --with-pic
+    CXX=g++ ./configure --prefix=${STAGING_DIR} --with-pic --enable-shared
     make #-j ${MAKE_JOBS}
     make install
     touch ${BLITZ_SRC_DIR}/.built

@@ -77,7 +77,7 @@ pyqt: python
 
 gnuplot: pyqt
 	BUILDROOT=${BUILDROOT} \
-	GNUPLOT_VERSION=${BUILDROOT} \
+	GNUPLOT_VERSION=${GNUPLOT_VERSION} \
 	QT_VERSION=${QT_VERSION} \
 	./package/build-gnuplot.sh
 
