@@ -99,7 +99,7 @@ paraview: cmake
 	PARAVIEW_VERSION=${PARAVIEW_VERSION} \
 	./package/build-paraview.sh
 
-paraview-plugin: cmake paraview
+paraview-plugin: imas cmake paraview
 	BUILDROOT=${BUILDROOT} \
 	PARAVIEW_VERSION=${PARAVIEW_VERSION} \
 	QT_VERSION=${PARAVIEW_QT_VERSION} \
@@ -136,7 +136,7 @@ solps-iter: imas gr gli OpenBLAS mscl ggd python
 	IMASDD_VERSION=${IMASDD_VERSION} \
 	./package/build-solps-iter.csh
 
-solps-gui: imas pyqt
+solps-gui: imas pyqt gnuplot gnuplot-widget
 
 query-%:
 	@echo $($(*))
