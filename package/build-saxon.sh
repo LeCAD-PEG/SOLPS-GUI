@@ -28,7 +28,7 @@ install -d ${DOWNLOAD_DIR}
 
 # Download source
 if [ ! -f ${DOWNLOAD_DIR}/${SOURCE} ]; then
-    wget --insecure --no-check-certificate -O ${DOWNLOAD_DIR}/${SOURCE} \
+    wget --no-check-certificate -O ${DOWNLOAD_DIR}/${SOURCE} \
         ${DOWNLOAD}
 fi
 
