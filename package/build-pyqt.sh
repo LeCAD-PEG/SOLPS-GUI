@@ -63,6 +63,9 @@ PATCH_DIR=${BUILDROOT}/src/patches
 DOWNLOAD_DIR=${BUILDROOT}/download
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 STAGING_QT=${STAGING_QT:-${STAGING_DIR}/qt/${QT_VERSION}}
+SIP_INSTALL_DIR="${STAGING_DIR}/SIP/${SIP_VERSION}"
+PYTHON_INSTALL_DIR=${STAGING_DIR}/Python/${PYTHON_VERSION}
+PyQT_INSTALL_DIR="${STAGING_DIR}/PyQt5/${PyQT_VERSION}"
 
 set -e
 
@@ -82,7 +85,7 @@ fi
 # https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-rhel5-linux-centos-5-7
 # See http://kate-editor.org/2014/12/22/qt-5-4-on-red-hat-enterprise-5/
 
-URLS="http://xmlsoft.org/sources/libxml2-2.9.3.tar.gz"
+# URLS="http://xmlsoft.org/sources/libxml2-2.9.3.tar.gz"
 if [ "${BUILD_XCB}" = "YES" ]; then
   URLS="${URLS} \
   http://xorg.freedesktop.org/archive/individual/proto/xproto-7.0.28.tar.gz\
@@ -95,8 +98,8 @@ if [ "${BUILD_XCB}" = "YES" ]; then
   http://xcb.freedesktop.org/dist/xcb-util-wm-0.4.1.tar.gz \
   http://xcb.freedesktop.org/dist/xcb-util-renderutil-0.3.9.tar.gz"
 #  http://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.1.tar.gz"
-  XCB_INCLUDES="-I${STAGING_DIR}/include -I${STAGING_DIR}/include/libxml2"
-  XCB_LIBS="-L${STAGING_DIR}/lib"
+  XCB_INCLUDES="-I${INSTALL_DIR}/include -I${INSTALL_DIR}/include/libxml2"
+  XCB_LIBS="-L${INSTALL_DIR}/lib"
   XCB_FLAGS="${XCB_FLAGS} ${XCB_INCLUDES} ${XCB_LIBS}"
 fi
 
@@ -119,7 +122,7 @@ for url in ${URLS}; do
   then configopt="--without-python --without-zlib"
   else configopt=
   fi
-  PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH} \
+  PKG_CONFIG_PATH=${PYTHON_INSTALL_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH} \
   ./configure --prefix=${STAGING_DIR} ${configopt}
   make -j ${MAKE_JOBS}
   make install
@@ -163,7 +166,6 @@ if [ ! -e ${QT_SOURCE_DIR}/.configured ]; then # Configuring Qt
   sed -i -e '/auto/d' qtdeclarative/tests/tests.pro \
                       qtmultimedia/tests/tests.pro \
                       qtgraphicaleffects/tests/tests.pro
-  PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH} \
     ./configure -v --prefix=${STAGING_QT} -opensource -confirm-license \
       -shared \
       -skip qtmultimedia \
@@ -203,8 +205,7 @@ if [ ! -f ${DOWNLOAD_DIR}/${SIP_SRC} ]; then
 fi
 
 SIP_SRC_DIR="${BUILD_DIR}/sip-${SIP_VERSION}"
-SIP_INSTALL_DIR="${STAGING_DIR}"
-PYTHON="${STAGING_DIR}/bin/python${PYTHON_MAINVERSION}"
+PYTHON="${PYTHON_INSTALL_DIR}/bin/python3"
 
 
 if [ ! -e   ${SIP_SRC_DIR}/.built ]; then
@@ -212,10 +213,14 @@ if [ ! -e   ${SIP_SRC_DIR}/.built ]; then
   cd ${BUILD_DIR}
   tar xzf ${DOWNLOAD_DIR}/${SIP_SRC}
   cd ${SIP_SRC_DIR}
-  LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
-                 ${PYTHON} configure.py
+  LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
+                 ${PYTHON} configure.py \
+                 --bindir=${SIP_INSTALL_DIR}/bin \
+                 --destdir=${SIP_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
+
+  LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
   make -j ${MAKE_JOBS}
-  LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
+  LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
                  make install
   touch ${SIP_SRC_DIR}/.built
 fi
@@ -234,18 +239,116 @@ if [ ! -f ${DOWNLOAD_DIR}/${PyQT_SRC} ]; then
 fi
 
 PyQT_SRC_DIR="${BUILD_DIR}/PyQt5_gpl-${PyQT_VERSION}"
-PyQT_INSTALL_DIR="${STAGING_DIR}"
 
 if [ ! -e   ${PyQT_SRC_DIR}/.built ]; then
-  rm -rf ${PyQT_SRC_DIR}
+  # rm -rf ${PyQT_SRC_DIR}
   cd ${BUILD_DIR}
-  tar xzf ${DOWNLOAD_DIR}/${PyQT_SRC}
+  # tar xzf ${DOWNLOAD_DIR}/${PyQT_SRC}
   cd ${PyQT_SRC_DIR}
-  LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
+  LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH} \
+  LD_LIBRARY_PATH=${SIP_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}:${LD_LIBRARY_PATH} \
+  PYTHONPATH= \
   ${PYTHON} configure.py --confirm-license --verbose \
       --qmake=${STAGING_DIR}/qt/${QT_VERSION}/bin/qmake \
-      --sip=${STAGING_DIR}/bin/sip
+      --sip=${SIP_INSTALL_DIR}/bin/sip \
+      --destdir=${PyQT_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
   make -j ${MAKE_JOBS}
   make install
   touch ${PyQT_SRC_DIR}/.built
 fi
+
+# Generate Modulefile
+MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
+
+if [ ! -d ${MODULE_DIR}/SIP ]; then
+	install -d ${MODULE_DIR}/SIP
+fi
+
+cat << EOF > ${MODULE_DIR}/SIP/${SIP_VERSION}
+#%Module1.0#####################################################################
+##
+## \$name modulefile
+##
+proc ModulesHelp { } {
+    puts stderr { SIP is a tool that makes it very easy to create Python bindings for C and C++ libraries. - Homepage: http://www.riverbankcomputing.com/software/sip/
+    }
+}
+
+module-whatis {Description: SIP is a tool that makes it very easy to create Python bindings for C and C++ libraries. - Homepage: http://www.riverbankcomputing.com/software/sip/}
+if { ![ is-loaded Python/${PYTHON_VERSION} ] } {
+    module load Python/${PYTHON_VERSION}
+}
+
+conflict SIP
+prepend-path PATH               ${SIP_INSTALL_DIR}/bin
+prepend-path CPATH              ${SIP_INSTALL_DIR}/include
+prepend-path PYTHONPATH         ${SIP_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
+
+EOF
+
+
+if [ ! -d ${MODULE_DIR}/Qt5 ]; then
+	install -d ${MODULE_DIR}/Qt5
+fi
+
+cat << EOF > ${MODULE_DIR}/Qt5/${QT_VERSION}
+#%Module1.0#####################################################################
+##
+## \$name modulefile
+##
+proc ModulesHelp { } {
+    puts stderr { Qt is a comprehensive cross-platform C++ application framework. - Homepage: http://qt.io/
+    }
+}
+
+module-whatis {Description: Qt is a comprehensive cross-platform C++ application framework. - Homepage: http://qt.io/}
+conflict Qt5
+prepend-path CPATH              ${STAGING_QT}/include
+prepend-path LD_LIBRARY_PATH    ${STAGING_QT}/lib
+prepend-path LIBRARY_DIR        ${STAGING_QT}/lib
+prepend-path PKG_CONFIG_PATH    ${STAGING_QT}/lib/pkgconfig
+prepend-path PATH               ${STAGING_QT}/bin
+EOF
+
+if [ ! -d ${MODULE_DIR}/PyQt5 ]; then
+	install -d ${MODULE_DIR}/PyQt5
+fi
+
+cat << EOF > ${MODULE_DIR}/PyQt5/${PyQT_VERSION}
+#%Module1.0#####################################################################
+##
+## \$name modulefile
+##
+proc ModulesHelp { } {
+    puts stderr {
+
+Description
+===========
+PyQt5 is a set of Python bindings for v5 of the Qt application framework from The Qt Company.
+
+
+More information
+================
+ - Homepage: http://www.riverbankcomputing.co.uk/software/pyqt
+    }
+}
+
+if { ![ is-loaded Python/${PYTHON_VERSION} ] } {
+    module load Python/${PYTHON_VERSION}
+}
+
+if { ![ is-loaded SIP/${SIP_VERSION} ] } {
+    module load SIP/${SIP_VERSION}
+}
+
+if { ![ is-loaded Qt5/${QT_VERSION} ] } {
+    module load Qt5/${QT_VERSION}
+}
+
+module-whatis {Description: PyQt5 is a set of Python bindings for v5 of the Qt application framework from The Qt Company.}
+module-whatis {Homepage: http://www.riverbankcomputing.co.uk/software/pyqt}
+
+conflict PyQt5
+prepend-path PYTHONPATH         ${PyQT_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
+EOF
+

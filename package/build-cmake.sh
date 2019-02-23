@@ -23,13 +23,14 @@ BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
 BUILD_DIR=${BUILDROOT}/build
 DOWNLOAD_DIR=${DOWNLOAD_DIR:-${BUILDROOT}/download}
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
-CMAKE_INSTALL_DIR=${CMAKE_INSTALL_DIR:-${STAGING_DIR}/cmake/${CMAKE_VERSION}}
+CMAKE_INSTALL_DIR=${STAGING_DIR}/cmake/${CMAKE_VERSION}
 
 #Initialize directories
 
 install -d ${BUILD_DIR}
 install -d ${DOWNLOAD_DIR}
 install -d ${STAGING_DIR}
+install -d ${CMAKE_INSTALL_DIR}
 
 set -e
 
@@ -54,6 +55,22 @@ if ! test -e  ${CMAKE_SRC_DIR}/.built ; then
   touch ${CMAKE_SRC_DIR}/.built
 fi
 
+# Generate Modulefile
+MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
+if [ ! -d ${MODULE_DIR}/cmake ]; then
+	install -d ${MODULE_DIR}/cmake
+fi
 
+cat << EOF > ${MODULE_DIR}/cmake/${CMAKE_VERSION}
+#%Module1.0#####################################################################
+##
+## \$name modulefile
+##
+proc ModulesHelp { } {
+puts stderr "\tThis module sets the environment for cmake v${CMAKE_VERSION}"
+}
+module-whatis "CMake is an open-source, cross-platform family of tools designed to build, test and package software. (v${CMAKE_VERSION}"
 
-
+conflict cmake
+prepend-path PATH               ${CMAKE_INSTALL_DIR}/bin
+EOF

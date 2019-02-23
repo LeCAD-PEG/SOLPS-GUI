@@ -1,6 +1,10 @@
-BUILDROOT=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+
+# Use realpath for the last time to remove trailing slash
+BUILDROOT=$(realpath $(dir $(realpath $(firstword $(MAKEFILE_LIST)))))
+STAGING_DIR ?= ${BUILDROOT}/staging
 
 GLI_VERSION=4.5.30
+GR_VERSION=0.0.94
 OPENBLAS_VERSION=0.3.5
 PYTHON_VERSION=3.6.8
 NUMPY_VERSION=1.16.1
@@ -17,12 +21,16 @@ IMASDD_VERSION=3.21.0
 IMASUAL_VERSION=3.8.4
 GGD_VERSION=1.8.3
 SOLPS_VERSION=3.0.7
+MSCL_VERSION=1.1.1
 
 #Paraview specific version
 PARAVIEW_VERSION=5.4.1
 PARAVIEW_QT_VERSION=4.8.7
 CMAKE_VERSION=3.10.1
 
+# Get module environment
+#
+MODULE_CMD:=${MODULE_CMD:-module}
 
 .PHONY: gr gli OpenBLAS mscl ggd python libxml2 saxon blitz cmake mdsplus \
 	imas solps-iter pyqt solps-gui
@@ -30,7 +38,7 @@ CMAKE_VERSION=3.10.1
 all: solps-iter solps-gui
 
 gr:
-	BUILDROOT=${BUILDROOT} ./package/build-GR.sh
+	BUILDROOT=${BUILDROOT} GR_VERSION=${GR_VERSION} ./package/build-GR.sh
 
 gli:
 	BUILDROOT=${BUILDROOT} GLI_VERSION=${GLI_VERSION} ./package/build-GLI.sh
@@ -51,6 +59,7 @@ cmake:
 
 mdsplus: libxml2
 	BUILDROOT=${BUILDROOT} \
+	LIBXML2_VERSION=${LIBXML2_VERSION} \
 	./package/build-mdsplus.sh
 
 OpenBLAS:
@@ -58,13 +67,14 @@ OpenBLAS:
 	./package/build-OpenBLAS.sh
 
 mscl:
-	BUILDROOT=${BUILDROOT} ./package/build-mscl.sh
+	BUILDROOT=${BUILDROOT} MSCL_VERSION=${MSCL_VERSION} ./package/build-mscl.sh
 
 python: OpenBLAS
 	BUILDROOT=${BUILDROOT} \
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	NUMPY_VERSION=${NUMPY_VERSION} \
 	SCIPY_VERSION=${SCIPY_VERSION} \
+	OPENBLAS_VERSION=${OPENBLAS_VERSION} \
 	./package/build-python.sh
 
 pyqt: python
@@ -81,15 +91,19 @@ gnuplot: pyqt
 	QT_VERSION=${QT_VERSION} \
 	./package/build-gnuplot.sh
 
-gnuplot-widget: gnuplot
+gnuplot-widget: gnuplot pyqt
 	BUILDROOT=${BUILDROOT} \
 	QT_VERSION=${QT_VERSION} \
 	PYTHON_VERSION=${PYTHON_VERSION} \
+	PyQT_VERSION=${PyQT_VERSION} \
+	SIP_VERSION=${SIP_VERSION} \
+	GNUPLOT_VERSION=${GNUPLOT_VERSION} \
 	./package/build-gnuplot-widget.sh
 
 libxml2: python
 	BUILDROOT=${BUILDROOT} \
 	LIBXML2_VERSION=${LIBXML2_VERSION} \
+	PYTHON_VERSION=${PYTHON_VERSION} \
 	./package/build-libxml2.sh
 
 paraview: cmake
@@ -99,7 +113,7 @@ paraview: cmake
 	PARAVIEW_VERSION=${PARAVIEW_VERSION} \
 	./package/build-paraview.sh
 
-paraview-plugin: imas cmake paraview
+paraview-plugin: imas cmake paraview blitz
 	BUILDROOT=${BUILDROOT} \
 	PARAVIEW_VERSION=${PARAVIEW_VERSION} \
 	QT_VERSION=${PARAVIEW_QT_VERSION} \
@@ -119,6 +133,7 @@ imas: python OpenBLAS saxon mdsplus blitz libxml2
 	SAXON_VERSION=${SAXON_VERSION} \
 	IMASDD_VERSION=${IMASDD_VERSION} \
 	IMASUAL_VERSION=${IMASUAL_VERSION} \
+	MSCL_VERSION=${MSCL_VERSION} \
 	./package/build-imas.sh
 
 ggd: imas
@@ -128,10 +143,10 @@ ggd: imas
 	IMASDD_VERSION=${IMASDD_VERSION} \
 	MDSPLUS_VERSION=${MDSPLUS_VERSION} \
 	./package/build-ggd.sh
+	cp ${BUILDROOT}/imasdb ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps/bin
 
 solps-iter: imas gr gli OpenBLAS mscl ggd python
 	# Copy imasdb script for setting up IMAS MDSPLUS_TREE environment
-	cp ${BUILDROOT}/imasdb ${BUILDROOT}/staging/bin
 	IMASUAL_VERSION=${IMASUAL_VERSION} \
 	IMASDD_VERSION=${IMASDD_VERSION} \
 	./package/build-solps-iter.csh

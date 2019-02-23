@@ -3,6 +3,7 @@
 PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.1}
 FORTRAN_COMPILER_FOR_CATALYST=${FORTRAN_COMPILER_FOR_CATALYST:-ifort}
 CMAKE_VERSION=3.10.1
+QT_VERSION=${QT_VERSION:-4.8.7}
 
 case $(hostname -f) in
   *.iter.org)
@@ -37,7 +38,6 @@ case $(hostname -f) in
 	;;
 esac
 
-QT_VERSION=${QT_VERSION:-4.8.7}
 MAKE_JOBS=${MAKE_JOBS:-4}
 
 BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
@@ -139,9 +139,9 @@ if [ ! -e   ${PARAVIEW_BUILD}/.built ]; then
         -DPARAVIEW_ENABLE_PYTHON:BOOL=ON \
         -DCMAKE_Fortran_COMPILER:STRING=${FORTRAN_COMPILER_FOR_CATALYST} \
         -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_QT}/bin/qmake \
-        -DCMAKE_EXE_LINKER_FLAGS:STRING="-L${STAGING_QT}/lib -Wl,-rpath -Wl,${STAGING_QT/lib}" \
         -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
 	${PARAVIEW_EXTRA_FLAGS} ${PARAVIEW_SOURCE_DIR}
+    # -DCMAKE_EXE_LINKER_FLAGS:STRING="-L${STAGING_QT}/lib -Wl,-rpath -Wl,${STAGING_QT/lib}" \
     find .  -name link.txt -exec \
 	sed -i -e "s|-lQt|-L${STAGING_QT}/lib -lQt|" \
         -e "s|-L${STAGING_QT}/lib|-L${STAGING_QT}/lib -lQtCore -lQtGui|" {} \;
@@ -169,6 +169,68 @@ for file in ParaViewGettingStarted-${PARAVIEW_DOC_VERSION%-*}.pdf \
     install -m 444 ${DOWNLOAD_DIR}/${file} ${STAGING_DOC}/${target}
 done
 
+# Generate Modulefile
+MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
+if [ ! -d ${MODULE_DIR}/Qt4 ]; then
+	install -d ${MODULE_DIR}/Qt4
+fi
+cat << EOF > ${MODULE_DIR}/Qt4/${QT_VERSION}
+#%Module1.0#####################################################################
+##
+## \$name modulefile
+##
+
+proc ModulesHelp { } {
+    puts stderr { Qt is a comprehensive cross-platform C++ application framework. - Homepage: http://qt.io/
+    }
+}
+
+module-whatis {Description: Qt is a comprehensive cross-platform C++ application framework. - Homepage: http://qt.io/}
+conflict Qt4
+prepend-path CPATH              ${STAGING_QT}/include
+prepend-path LD_LIBRARY_PATH    ${STAGING_QT}/lib
+prepend-path LIBRARY_DIR        ${STAGING_QT}/lib
+prepend-path PKG_CONFIG_PATH    ${STAGING_QT}/lib/pkgconfig
+prepend-path PATH               ${STAGING_QT}/bin
+EOF
 
 
+# Generate Modulefile
+MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
+if [ ! -d ${MODULE_DIR}/ParaView ]; then
+	install -d ${MODULE_DIR}/ParaView
+fi
 
+cat << EOF > ${MODULE_DIR}/ParaView/${PARAVIEW_VERSION}
+#%Module1.0#####################################################################
+##
+## \$name modulefile
+##
+proc ModulesHelp { } {
+    puts stderr {
+
+Description
+===========
+ParaView is a scientific parallel visualizer.
+
+
+More information
+================
+ - Homepage: http://www.paraview.org
+    }
+}
+
+module-whatis {Description: ParaView is a scientific parallel visualizer.}
+module-whatis {Homepage: http://www.paraview.org}
+
+if { ![ is-loaded Qt4/${QT_VERSION} ] } {
+    module load Qt4/${QT_VERSION}
+}
+
+conflict ParaView
+prepend-path CPATH              ${STAGING_PARAVIEW}/include
+prepend-path LD_LIBRARY_PATH    ${STAGING_PARAVIEW}/lib
+prepend-path LIBRARY_DIR        ${STAGING_PARAVIEW}/lib
+prepend-path PKG_CONFIG_PATH    ${STAGING_PARAVIEW}/lib/pkgconfig
+prepend-path PATH               ${STAGING_PARAVIEW}/bin
+EOF

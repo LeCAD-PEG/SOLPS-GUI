@@ -6,14 +6,16 @@ BLITZ_DOWNLOAD="https://github.com/blitzpp/blitz/archive/${BLITZ_VERSION}.tar.gz
 BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
 
 BUILD_DIR=${BUILDROOT}/build
-STAGING_DIR=${BUILDROOT}/staging
+STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
+BLITZ_INSTALL_DIR=${STAGING_DIR}/blitz/${BLITZ_VERSION}
 
 MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
 
 install -d ${BUILD_DIR}
 install -d ${STAGING_DIR}
 install -d ${DOWNLOAD_DIR}
+install -d ${BLITZ_INSTALL_DIR}
 
 if [ ! -f ${DOWNLOAD_DIR}/${BLITZ_SOURCE} ]; then
     wget -O ${DOWNLOAD_DIR}/${BLITZ_SOURCE} ${BLITZ_DOWNLOAD}
@@ -25,8 +27,31 @@ if [ ! -e ${BLITZ_SRC_DIR}/.built ]; then
     cd ${BUILD_DIR}
     tar xzf ${DOWNLOAD_DIR}/${BLITZ_SOURCE}
     cd ${BLITZ_SRC_DIR}
-    CXX=g++ ./configure --prefix=${STAGING_DIR} --with-pic --enable-shared
+    CXX=g++ ./configure --prefix=${BLITZ_INSTALL_DIR} --with-pic --enable-shared
     make #-j ${MAKE_JOBS}
     make install
     touch ${BLITZ_SRC_DIR}/.built
 fi
+
+# Generate Modulefile
+MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
+if [ ! -d ${MODULE_DIR}/blitz ]; then
+	install -d ${MODULE_DIR}/blitz
+fi
+
+cat << EOF > ${MODULE_DIR}/blitz/${BLITZ_VERSION}
+#%Module1.0#####################################################################
+##
+## \$name modulefile
+##
+proc ModulesHelp { } {
+puts stderr "\tThis module sets the environment for blitz v${BLITZ_VERSION}"
+}
+module-whatis  "Blitz++ is a (LGPLv3+) licensed meta-template library for array manipulation in C++ with a speed comparable to Fortran implementations, while preserving an object-oriented interface. (v${BLITZ_VERSION})"
+
+conflict blitz
+prepend-path CPATH              ${BLITZ_INSTALL_DIR}/include
+prepend-path LD_LIBRARY_PATH    ${BLITZ_INSTALL_DIR}/lib
+prepend-path LIBRARY_DIR        ${BLITZ_INSTALL_DIR}/lib
+prepend-path PKG_CONFIG_PATH    ${BLITZ_INSTALL_DIR}/lib/pkgconfig
+EOF

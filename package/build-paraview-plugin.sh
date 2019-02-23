@@ -10,6 +10,7 @@ DOWNLOAD_DIR=${DOWNLOAD_DIR:-${BUILDROOT}/download}
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 IMASUAL_VERSION=${IMASUAL_VERSION:-3.8.4}
 MDSPLUS_VERSION=${MDSPLUS_VERSION:-stable_release-7-7-8}
+BLITZ_VERSION=${BLITZ_VERSION:-1.0.0}
 
 case $(hostname -f) in
   *.iter.org)
@@ -40,9 +41,9 @@ case $(hostname -f) in
 
   *)
 	export IMAS_VERSION=${IMASDD_VERSION}
-	export PKG_CONFIG_PATH=${STAGING_DIR}/access-layer/${IMASUAL_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
-	export PKG_CONFIG_PATH=${STAGING_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}
-	export LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH}
+	export PKG_CONFIG_PATH=${STAGING_DIR}/imas/${IMASDD_VERSION}/solps/lib/pkgconfig:${PKG_CONFIG_PATH}
+	export PKG_CONFIG_PATH=${STAGING_DIR}/blitz/${BLITZ_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
+	# export LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH}
 	# export LD_LIBRARY_PATH=${STAGING_DIR}/access-layer/${IMASUAL_VERSION}/lib:${LD_LIBRARY_PATH}
 	# export LD_LIBRARY_PATH=${STAGING_DIR}/qt/${QT_VERSION}/lib:${LD_LIBRARY_PATH}
 	# export LD_LIBRARY_PATH=${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib:${LD_LIBRARY_PATH}
@@ -61,8 +62,7 @@ fi
 
 STAGING_PARAVIEW=${STAGING_PARAVIEW:-\
     ${STAGING_DIR}/paraview/${PARAVIEW_VERSION}}
-STAGING_PLUGINS=${STAGING_PLUGINS:-\
-    ${STAGING_DIR}/paraview-plugins/${PARAVIEW_VERSION}/${IMAS_VERSION}}
+STAGING_PLUGINS=${STAGING_DIR}/paraview-plugins/${PARAVIEW_VERSION}/${IMAS_VERSION}
 
 
 CMAKE_VERSION=${CMAKE_VERSION:-3.10.1}
@@ -103,7 +103,39 @@ IMAS_VERSION_DIGIT=${IMAS_VERSION_DIGIT} \
     -DParaView_DIR:PATH=${STAGING_PARAVIEW} \
     ${BUILDROOT}/src/plugins/paraview
 make -j ${MAKE_JOBS} VERBOSE=1 all
-install -d ${STAGING_PLUGINS}
+
 install ${BUILD_DIR}/Plugins-ReadUAL${name}/libReadUAL${name}.so \
 	${STAGING_PLUGINS}
 
+# Generate Modulefile
+MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
+if [ ! -d ${MODULE_DIR}/paraview-plugin-edge ]; then
+	install -d ${MODULE_DIR}/paraview-plugin-edge
+fi
+
+cat << EOF > ${MODULE_DIR}/paraview-plugin-edge/1.5
+#%Module1.0#####################################################################
+##
+## \$name modulefile
+##
+proc ModulesHelp { } {
+puts stderr "\tThis module sets the environment for blitz "
+}
+module-whatis  "ReadUAL-EDGE plugin for ParaView."
+
+conflict paraview-plugin
+
+if { ![ is-loaded imas/${IMASDD_VERSION}/solps ] } {
+ 	module load imas/${IMASDD_VERSION}/solps
+}
+
+if { ![ is-loaded ParaView/${PARAVIEW_VERSION} ] } {
+    module load ParaView/${PARAVIEW_VERSION}
+}
+
+if { ![ is-loaded MDSplus/${MDSPLUS_VERSION} ] } {
+    module load MDSplus/${MDSPLUS_VERSION}
+}
+
+prepend-path PYTHONPATH              ${STAGING_PLUGINS}
+EOF
