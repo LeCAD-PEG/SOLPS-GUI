@@ -78,15 +78,17 @@ done
 if [ ! -d ${INSTALL_DIR}/share/sip/PyQt5 ]; then
     install -d ${INSTALL_DIR}/share/sip/PyQt5
 fi
+
+if [ ! -d ${BUILD_DIR}/gnuplotWidget ]; then
+    install -d ${BUILD_DIR}/gnuplotWidget
+fi
+
 python3 configure.py --verbose --sipdir=${INSTALL_DIR}/share/sip/PyQt5 \
         --outdir=${BUILD_DIR}/gnuplotWidget --srcdir=${SRC_DIR}/src \
         --incdir=${SRC_DIR}/src --destdir=${INSTALL_DIR}
 
 
 # Build
-if [ ! -d ${BUILD_DIR}/gnuplotWidget ]; then
-    install -d ${BUILD_DIR}/gnuplotWidget
-fi
 
 cd ${SRC_DIR}/src
 make -j${MAKE_JOBS}
