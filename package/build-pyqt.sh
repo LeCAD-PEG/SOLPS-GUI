@@ -20,7 +20,7 @@ PATCH_DIR=${BUILDROOT}/src/patches
 VERSION=${VERSION:-5.9.1} # should be the same as Qt
 SOURCE="PyQt5_gpl-${VERSION}.tar.gz"
 DOWNLOAD="http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-${VERSION}/${SOURCE}/download"
-SRC_DIR="${BUILD_DIR}/"
+SRC_DIR="${BUILD_DIR}/PyQt5_gpl-${VERSION}"
 INSTALL_DIR="${STAGING_DIR}/PyQt5/${VERSION}"
 
 # Site specific defaults
@@ -61,7 +61,7 @@ case $(hostname -f) in
         QT_VERSION=${QT_VERSION:-5.9.1}
         SIP_VERSION=${SIP_VERSION:-4.19.13}
         STAGING_QT=${STAGING_QT:-${STAGING_DIR}/qt/${QT_VERSION}}
-        SIP_INSTALL_DIR="${STAGING_DIR}/SIP/${SIP_VERSION}"
+        SIP_INSTALL_DIR="${STAGING_DIR}/sip/${SIP_VERSION}"
         PYTHON_INSTALL_DIR=${STAGING_DIR}/Python/${PYTHON_VERSION}
 
         export PATH=${PYTHON_INSTALL_DIR}/bin:${PATH}
@@ -88,6 +88,8 @@ cd ${BUILD_DIR}
 if [ ! -d ${SRC_DIR} ]; then
     tar xzf ${DOWNLOAD_DIR}/${SOURCE}
 fi
+
+cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then

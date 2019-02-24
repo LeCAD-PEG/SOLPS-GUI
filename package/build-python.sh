@@ -106,16 +106,18 @@ More information
 
 Included extensions
 ===================
-asn1crypto-0.24.0, bcrypt-3.1.4, bitstring-3.1.5, blist-1.3.6,
-certifi-2018.1.18, cffi-1.11.5, chardet-3.0.4, cryptography-2.1.4,
-Cython-0.27.3, deap-1.2.2, decorator-4.1.2, docopt-0.6.2, ecdsa-0.13,
-idna-2.6, joblib-0.11, liac-arff-2.1.1, mock-2.0.0, mpi4py-3.0.0,
-netaddr-0.7.19, netifaces-0.10.6, nose-1.3.7, numpy-1.14.0, pandas-0.22.0,
-paramiko-2.4.0, paycheck-1.0.2, pbr-3.1.1, pip-9.0.1,
-py_expression_eval-0.3.4, pyasn1-0.4.2, pycparser-2.18, pycrypto-2.6.1,
-PyNaCl-1.2.1, pyparsing-2.2.0, python-dateutil-2.6.1, pytz-2017.3,
-requests-2.18.4, scipy-1.0.0, setuptools-38.4.0, six-1.11.0, urllib3-1.22,
-virtualenv-15.1.0, xlrd-1.1.0
+alabaster==0.7.12, asn1crypto==0.24.0, Babel==2.6.0, bcrypt==3.1.6,
+certifi==2018.11.29, cffi==1.12.1, chardet==3.0.4, cryptography==2.5,
+cycler==0.10.0, Cython==0.29.5, deap==1.2.2, decorator==4.3.2, docutils==0.14,
+ecdsa==0.13, idna==2.8, imagesize==1.1.0, Jinja2==2.10, kiwisolver==1.0.1,
+liac-arff==2.4.0, lockfile==0.12.2, luigi==2.8.3, MarkupSafe==1.1.0,
+matplotlib==3.0.2, mock==2.0.0, netaddr==0.7.19, nose==1.3.7,
+numpy==1.16.1, packaging==19.0, paramiko==2.4.2, pbr==5.1.2, pyasn1==0.4.5,
+pycparser==2.19, Pygments==2.3.1, PyNaCl==1.3.0, pyparsing==2.3.1,
+python-daemon==2.1.2, python-dateutil==2.7.5, pytz==2018.9, PyVTK==0.5.18,
+requests==2.21.0, six==1.12.0, snowballstemmer==1.2.1, Sphinx==1.8.4,
+sphinx-rtd-theme==0.4.3, sphinxcontrib-websupport==1.1.0, tornado==5.1.1,
+urllib3==1.24.1, virtualenv==16.4.1,
     }
 }
 

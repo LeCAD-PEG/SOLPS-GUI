@@ -16,7 +16,7 @@ DOWNLOAD_DIR=${BUILDROOT}/download
 VERSION=${VERSION:-3.8.4}
 GIT="ssh://git@git.iter.org/imas/access-layer.git"
 SRC_DIR="${BUILD_DIR}/access-layer-${VERSION}"
-INSTALL_DIR=${STAGING_DIR}/imas/${VERSION}/solps
+INSTALL_DIR=${STAGING_DIR}/imas/${VERSION}/solps # Use IMASDD version later.
 
 # Environment dependencies
 case $(hostname -f) in

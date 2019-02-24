@@ -14,7 +14,7 @@ DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
 VERSION=${VERSION:-1.0.0}
-SRC_DIR=${BUILDROOT}/src/gnuplot-widget}
+SRC_DIR=${BUILDROOT}/src/gnuplot-widget
 INSTALL_DIR=${STAGING_DIR}/gnuplot-widget/python-${PYTHON_VERSION}-qt-${QT_VERSION}
 
 # Environment dependencies
@@ -34,7 +34,7 @@ case $(hostname -f) in
     *)
         QT_VERSION=${QT_VERSION:-5.9.1}
         PyQT_VERSION=${PyQT_VERSION:-5.9.1}
-        PYTHON_VERSION=${PYTHON_VERSION:-3.6.4}
+        PYTHON_VERSION=${PYTHON_VERSION:-3.6.8}
         SIP_VERSION=${SIP_VERSION:-4.19.13}
         PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
         GNUPLOT_VERSION=${GNUPLOT_VERSION:-5.2.2}
@@ -42,17 +42,17 @@ case $(hostname -f) in
         QTDIR=${STAGING_DIR}/qt/${QT_VERSION}
         PYTHON_INSTALL_DIR=${STAGING_DIR}/Python/${PYTHON_VERSION}
         PyQt_INSTALL_DIR=${STAGING_DIR}/PyQt5/${PyQT_VERSION}
-        SIP_INSTALL_DIR=${STAGING_DIR}/SIP/${SIP_VERSION}
+        SIP_INSTALL_DIR=${STAGING_DIR}/sip/${SIP_VERSION}
 
         export QTDIR
-        export PATH="${PYTHON_INSTALL_DIR}/bin:${QTDIR}/bin:${PATH}"
+        export PATH="${PYTHON_INSTALL_DIR}/bin:${QTDIR}/bin:${SIP_INSTALL_DIR}/bin:${PATH}"
         export LD_LIBRARY_PATH="${PYTHON_INSTALL_DIR}/lib:${QTDIR}/lib:${LD_LIBRARY_PATH}"
         export PKG_CONFIG_PATH="${PYTHON_INSTALL_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}"
         export PYTHONPATH=${PyQt_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages:${PYTHONPATH}
-        export PYTHONPATH=${SIP_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages:${PYTHONPATH}
+        export PYTHONPATH=${PYTHON_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages:${PYTHONPATH}
+        export PYTHONPATH=${SIP_INSTALL_DIR}/lib/python/site-packages:${PYTHONPATH}
         ;;
 esac
-
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}
@@ -65,17 +65,22 @@ install -d ${DOWNLOAD_DIR}
 
 cd ${SRC_DIR}
 # Configure
-SOURCE_FILES="${SRC_DIR}/Qt*.h ${SRC_DIR}/gnuplotWidget.h"
+SOURCE_FILES="${SRC_DIR}/src/Qt*.h ${SRC_DIR}/src/gnuplotWidget.h"
 for file in ${SOURCE_FILES} # MOCing .h files
-  cpp_file=${SRC_DIR}/moc_$(basename ${file} .h).cpp
-  if [ ! -e $(cpp_file) ]; then
-    do moc ${file} -o ${SRC_DIR}/moc_$(basename ${file} .h).cpp
+do
+  echo $file
+  cpp_file="${SRC_DIR}/src/moc_$(basename ${file} .h).cpp"
+  if [ ! -e ${cpp_file} ]; then
+    moc ${file} -o ${SRC_DIR}/moc_$(basename ${file} .h).cpp
   fi
 done
 
-python3 configure.py --verbose --sipdir=${INSTALL_DIR}/shape/sip/PyQt5 \
-        --outdir=${BUILD_DIR}/gnuplotWidget --srcdir=${SRC_DIR} \
-        --incdir=${SRC_DIR} --destdir=${INSTALL_DIR}
+if [ ! -d ${INSTALL_DIR}/share/sip/PyQt5 ]; then
+    install -d ${INSTALL_DIR}/share/sip/PyQt5
+fi
+python3 configure.py --verbose --sipdir=${INSTALL_DIR}/share/sip/PyQt5 \
+        --outdir=${BUILD_DIR}/gnuplotWidget --srcdir=${SRC_DIR}/src \
+        --incdir=${SRC_DIR}/src --destdir=${INSTALL_DIR}
 
 
 # Build
@@ -83,11 +88,9 @@ if [ ! -d ${BUILD_DIR}/gnuplotWidget ]; then
     install -d ${BUILD_DIR}/gnuplotWidget
 fi
 
+cd ${SRC_DIR}/src
 make -j${MAKE_JOBS}
 
-if [ ! -d ${INSTALL_DIR}/shape/sip/PyQt5 ]
-    install -d ${INSTALL_DIR}/shape/sip/PyQt5
-fi
 
 # Install
 make install

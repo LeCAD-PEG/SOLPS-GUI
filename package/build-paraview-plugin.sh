@@ -50,6 +50,7 @@ case $(hostname -f) in
     PARAVIEW_MAINVERSION=${PARAVIEW_VERSION%.*}
     QT_VERSION=${QT_VERSION:-4.8.7}
     IMASUAL_VERSION=${IMASUAL_VERSION:-3.8.4}
+    IMASDD_VERSION=${IMASDD_VERSION:-3.21.0}
     MDSPLUS_VERSION=${MDSPLUS_VERSION:-stable_release-7-7-8}
     BLITZ_VERSION=${BLITZ_VERSION:-1.0.0}
     CMAKE_VERSION=${CMAKE_VERSION:-3.10.1}
@@ -91,7 +92,7 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
-    IMAS_VERSION_DIGIT=$(echo "$IMAS_VERSION" | sed "s/\.//g")
+    IMAS_VERSION_DIGIT=$(echo "$IMAS_VERSION" | sed "s/\.//g") \
     ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Debug \
     -DParaView_DIR:PATH=${STAGING_DIR}/ParaView/${PARAVIEW_VERSION} \
     ${BUILDROOT}/src/plugins/paraview
@@ -107,7 +108,7 @@ fi
 # Install
 if [ ! -d ${INSTALL_DIR} ]; then
     install -d ${INSTALL_DIR}
-    install ${SRC_DIR}/libReadUAL${name}.so ${INSTALL_DIR}
+    install ${SRC_DIR}/libReadUALEdge.so ${INSTALL_DIR}
 fi
 
 # Generate Modulefile

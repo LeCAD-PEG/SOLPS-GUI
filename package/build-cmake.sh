@@ -16,7 +16,7 @@ DOWNLOAD_DIR=${BUILDROOT}/download
 VERSION=${VERSION:-3.10.1}
 MAIN_VERSION=${VERSION%.*}
 SOURCE="cmake-${VERSION}.tar.gz"
-DOWNLOAD="https://cmake.org/files/v${CMAKE_MAIN_VERSION}/cmake-${VERSION}.tar.gz"
+DOWNLOAD="https://cmake.org/files/v${MAIN_VERSION}/cmake-${VERSION}.tar.gz"
 SRC_DIR="${BUILD_DIR}/cmake-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/cmake/${VERSION}
 

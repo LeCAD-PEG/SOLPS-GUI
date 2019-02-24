@@ -14,8 +14,8 @@ DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
 VERSION=${VERSION:-5.4.1}
-SOURCE="ParaView-v${PARAVIEW_VERSION}.tar.gz"
-DOWNLOAD="http://www.paraview.org/files/v${VERSION%.*}"
+SOURCE="ParaView-v${VERSION}.tar.gz"
+DOWNLOAD="http://www.paraview.org/files/v${VERSION%.*}/${SOURCE}"
 SRC_DIR="${BUILD_DIR}/ParaView-v${VERSION}"
 INSTALL_DIR=${INSTALL_DIR:-${STAGING_DIR}/paraview/${VERSION}}
 
@@ -53,8 +53,10 @@ case $(hostname -f) in
     ;;
   *)
     QT_VERSION=${QT_VERSION:-4.8.7}
+    STAGING_QT=${BUILDROOT}/staging/qt/${QT_VERSION}
     CMAKE_VERSION=${CMAKE_VERSION:-3.10.1}
     export PATH=${STAGING_DIR}/cmake/${CMAKE_VERSION}/bin:${PATH}
+    export PATH=${STAGING_QT}/bin:${PATH}
     export LD_LIBRARY_PATH=${STAGING_DIR}/qt/${QT_VERSION}/lib:${LD_LIBRARY_PATH}
 
     ;;
@@ -81,8 +83,8 @@ fi
 if [ ! -e ${SRC_DIR}/.configured ]; then
     # Ignore git describe tags as we are building ParaView from tar.gz
     sed -i -e "/^determine_version/d" ${SRC_DIR}/CMakeLists.txt
-    install -d ${SRC_DIR}
-    cd ${SRC_DIR}
+    install -d ${BUILD_DIR}/paraview-${VERSION}
+    cd ${BUILD_DIR}/paraview-${VERSION}
 
     if [ ${QT_VERSION%%.*} = 5 ]
         then VTK_RENDERING_BACKEND=OpenGL2
@@ -100,7 +102,7 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
         -DCMAKE_Fortran_COMPILER:STRING=${FORTRAN_COMPILER_FOR_CATALYST} \
         -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_DIR}/qt/${QT_VERSION}/bin/qmake \
         -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_DIR} \
-    ${PARAVIEW_EXTRA_FLAGS} ${BUILD_DIR}/${SOURCE%.tar*}
+    ${PARAVIEW_EXTRA_FLAGS} ${SRC_DIR}
     touch ${SRC_DIR}/.configured
 fi
 
@@ -119,14 +121,14 @@ fi
 
 # Post Installation
 DOC_VERSION=${DOC_VERSION:-${VERSION%.*}.0}
-INSTALL_DOC_DIR=${STAGING_PARAVIEW}/share/paraview-${VERSION%.*}/doc
+INSTALL_DOC_DIR=${INSTALL_DIR}/share/paraview-${VERSION%.*}/doc
 install -d ${INSTALL_DOC_DIR}
 for file in ParaViewGettingStarted-${DOC_VERSION%-*}.pdf \
     ParaViewTutorial.pdf  ParaViewGuide-${DOC_VERSION%-*}.pdf \
     ParaViewCatalystGuide-${DOC_VERSION%-*}.pdf  ; do
     if [ ! -f ${DOWNLOAD_DIR}/${file} ]; then
          wget -O ${DOWNLOAD_DIR}/${file} --no-check-certificate \
-             ${DOWNLOAD}/${file}
+             http://www.paraview.org/files/v${VERSION%.*}/${file}
     fi
     noParaView=${file#ParaView}
     noVersion=${noParaView%-*}
@@ -141,7 +143,7 @@ if [ ! -d ${MODULE_DIR}/ParaView ]; then
     install -d ${MODULE_DIR}/ParaView
 fi
 
-cat << EOF > ${MODULE_DIR}/ParaView/${PARAVIEW_VERSION}
+cat << EOF > ${MODULE_DIR}/ParaView/${VERSION}
 #%Module1.0#####################################################################
 ##
 ## \$name modulefile

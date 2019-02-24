@@ -44,21 +44,21 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
-    sed -i.orig -e 's/-Wno-error=return-type//' \
-        qtlocation/src/3rdparty/poly2tri/poly2tri.pro
+    # sed -i.orig -e 's/-Wno-error=return-type//' \
+    #     qtlocation/src/3rdparty/poly2tri/poly2tri.pro
     #patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-openssl.patch
-    patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-no-offscreen.patch
-    #patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
-    patch -p 1 -d ${SRC_DIR}<${PATCH_DIR}/qglxintegration-glx-context.patch
-    #patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-qxcbconnection.patch
-    patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-qbenchmarkperfevents.patch
-    #patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qsimd.cpp-gcc4.2.patch
-    patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-qdbusinternalfilters.patch
-    patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-invoke-static.patch
-    #patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-qtbase-platformsupport-fbconveniance-qfbvthandler.patch
-    sed -i -e '/auto/d' qtdeclarative/tests/tests.pro \
-                      qtmultimedia/tests/tests.pro \
-                      qtgraphicaleffects/tests/tests.pro
+    # patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-no-offscreen.patch
+    # #patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
+    # patch -p 1 -d ${SRC_DIR}<${PATCH_DIR}/qglxintegration-glx-context.patch
+    # #patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-qxcbconnection.patch
+    # patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-qbenchmarkperfevents.patch
+    # #patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qsimd.cpp-gcc4.2.patch
+    # patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-qdbusinternalfilters.patch
+    # patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-invoke-static.patch
+    # #patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-qtbase-platformsupport-fbconveniance-qfbvthandler.patch
+    # sed -i -e '/auto/d' qtdeclarative/tests/tests.pro \
+    #                   qtmultimedia/tests/tests.pro \
+    #                   qtgraphicaleffects/tests/tests.pro
     ./configure -v --prefix=${INSTALL_DIR} -opensource -confirm-license \
       -shared \
       -skip qtmultimedia \
@@ -69,7 +69,8 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
       -skip qtwebsockets \
       -skip qtwebview \
       -skip qt3d ${XCB_FLAGS} ${QT_EXTRA_FLAGS} \
-      -qt-xkbcommon -xkb-config-root /usr/share/X11/xkb
+      -qt-xkbcommon -xkb-config-root /usr/share/X11/xkb \
+      -nomake tests
     touch ${SRC_DIR}/.configured
 fi
 
@@ -89,7 +90,6 @@ if [ ! -d ${INSTALL_DIR} ]; then
     make -C qtbase/src html_docs
     make qmake_all
     make -j ${MAKE_JOBS} docs install_docs
-    make -j ${MAKE_JOBS} install_docs}
 fi
 
 # Generate Modulefile

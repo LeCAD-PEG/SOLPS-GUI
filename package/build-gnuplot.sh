@@ -15,7 +15,7 @@ DOWNLOAD_DIR=${BUILDROOT}/download
 # Package variables
 VERSION=${VERSION:-5.2.2}
 SOURCE="gnuplot-${VERSION}.tar.gz"
-DOWNLOAD="http://sourceforge.net/projects/gnuplot/files/gnuplot/${GNUPLOT_VERSION}/${GNUPLOT_SRC}/download"
+DOWNLOAD="http://sourceforge.net/projects/gnuplot/files/gnuplot/${VERSION}/${SOURCE}/download"
 SRC_DIR="${BUILD_DIR}/gnuplot-${VERSION}"
 INSTALL_DIR="${STAGING_DIR}/gnuplot/${VERSION}"
 

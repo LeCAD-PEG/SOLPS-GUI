@@ -86,7 +86,7 @@ if [ ! -d ${INSTALL_DIR} ]; then
 fi
 
 # Check
-if [ ! -d ${SRC_DIR}/.checked ]; then
+if [ ! -e ${SRC_DIR}/.checked ]; then
     make check
     touch ${SRC_DIR}/.checked
 fi
