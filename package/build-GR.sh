@@ -2,44 +2,66 @@
 set -e
 
 
+# Variables
+BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
+MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
+
+# Buildroot directories
+MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
+BUILD_DIR=${BUILDROOT}/build
+STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
+DOWNLOAD_DIR=${BUILDROOT}/download
+
+# Package variables
+VERSION=${VERSION:-0.0.94}
+GIT="ssh://git@git.iter.org/lib/gr-software.git"
+SRC_DIR="${BUILD_DIR}/gr-${VERSION}"
+INSTALL_DIR=${STAGING_DIR}/GR/${VERSION}
+
+
+# Environment dependencies
 case $(hostname -f) in
     *)
 esac
 
-MAKE_JOBS=${MAKE_JOBS:-$(nproc)} # Should use all threads of a system
-
-
-BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
-BUILD_DIR=${BUILDROOT}/build
-STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
-GR_VERSION=${GR_VERSION:-0.0.94}
-GR_INSTALL_DIR=${STAGING_DIR}/GR/${GR_VERSION}
-GR_GIT="ssh://git@git.iter.org/lib/gr-software.git"
-
-
+# Prepare directories for download and building
 install -d ${BUILD_DIR}
 install -d ${STAGING_DIR}
-install -d ${GR_INSTALL_DIR}
-install -d ${GR_INSTALL_DIR}/lib
+install -d ${DOWNLOAD_DIR}
 
-GR_SRC_DIR="${BUILD_DIR}/gr-software-${GR_VERSION}"
-if [ ! -e ${GR_SRC_DIR}/.built ]; then
-    rm -rf ${GR_SRC_DIR}
-    cd ${BUILD_DIR}
-    git clone --branch ${GR_VERSION} ${GR_GIT} ${GR_SRC_DIR}
-    cd ${GR_SRC_DIR}
-    make SOLPS_LIB=${GR_INSTALL_DIR}/lib BLDFLAG="ar cr" RANLIB=echo allf CFLAGS="-fPIC" F77=gfortran
-    make install BLDFLAG="ar cr" RANLIB=echo SOLPS_LIB=${GR_INSTALL_DIR}/lib CFLAGS="-FPIC" F77=gfortran
-    touch .built
+# Download source
+
+# Unpack sources
+if [ ! -d ${SRC_DIR} ]; then
+    git clone --branch ${VERSION} --single-branch ${GIT} ${SRC_DIR}
+fi
+
+cd ${SRC_DIR}
+
+# Configure
+
+# Build
+if [ ! -e ${SRC_DIR}/.built ]; then
+    SOLPS_LIB=${INSTALL_DIR}/lib BLDFLAG="ar cr" RANLIB=echo CFLAGS="-fPIC" \
+    F77=gfortran \
+    make libgr.a
+    touch ${SRC_DIR}/.built
+fi
+
+# Install
+if [ ! -d ${INSTALL_DIR} ]; then
+    install -d ${INSTALL_DIR}/lib
+    SOLPS_LIB=${INSTALL_DIR}/lib BLDFLAG="ar cr" RANLIB=echo CFLAGS="-fPIC" \
+    F77=gfortran \
+    make install
 fi
 
 # Generate Modulefile
-MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
 if [ ! -d ${MODULE_DIR}/gr ]; then
 	install -d ${MODULE_DIR}/GR
 fi
 
-cat << EOF > ${MODULE_DIR}/GR/${GR_VERSION}
+cat << EOF > ${MODULE_DIR}/GR/${VERSION}
 #%Module1.0#####################################################################
 ##
 ## \$name modulefile
@@ -68,6 +90,6 @@ module-whatis {Description:
 module-whatis {Homepage: https://gr-framework.org/index.html}
 
 conflict GR
-prepend-path LD_LIBRARY_PATH    ${GR_INSTALL_DIR}/lib
-prepend-path LIBRARY_DIR        ${GR_INSTALL_DIR}/lib
+prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
+prepend-path LIBRARY_DIR        ${INSTALL_DIR}/lib
 EOF

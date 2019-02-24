@@ -13,19 +13,22 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-2.9.1}
-SOURCE="libxml2-${VERSION}.tar.gz"
-DOWNLOAD="ftp://xmlsoft.org/libxml2/libxml2-${VERSION}.tar.gz"
-SRC_DIR="${BUILD_DIR}/libxml2-${VERSION}"
-INSTALL_DIR=${STAGING_DIR}/libxml2/${VERSION}
+VERSION=${VERSION:-1.2.1}
+SOURCE="scipy-${VERSION}.tar.gz"
+DOWNLOAD="https://github.com/scipy/scipy/releases/download/v${VERSION}/scipy-${VERSION}.tar.gz"
+SRC_DIR="${BUILD_DIR}/scipy-${VERSION}"
 
 # Environment dependencies
 case $(hostname -f) in
-  *)
+    *)
         PYTHON_VERSION=${PYTHON_VERSION:-3.6.8}
+        PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
         PYTHON_INSTALL_DIR=${STAGING_DIR}/Python/${PYTHON_VERSION}
+        OPENBLAS_VERSION=${OPENBLAS_VERSION:-0.3.5}
+        OPENBLAS_INSTALL_DIR=${STAGING_DIR}/OpenBLAS/${OPENBLAS_VERSION}
         export PATH=${PYTHON_INSTALL_DIR}/bin:${PATH}
         export PYTHONPATH=${PYTHON_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
+        export LD_LIBRARY_PATH=${OPENBLAS_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
         export LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
         ;;
 esac
@@ -51,47 +54,27 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
-    ./configure --with-python=${PYTHON_INSTALL_DIR} \
-                --prefix=${INSTALL_DIR}
+    cat <<EOF > site.cfg
+[openblas]
+libraries = openblas
+library_dirs = ${OPENBLAS_INSTALL_DIR}/lib
+include_dirs = ${OPENBLAS_INSTALL_DIR}/include
+runtime_library_dirs = ${OPENBLAS_INSTALL_DIR}/lib
+EOF
     touch ${SRC_DIR}/.configured
 fi
 
 # Build
 if [ ! -e ${SRC_DIR}/.built ]; then
-    make -j${MAKE_JOBS}
+    python3 setup.py build
     touch ${SRC_DIR}/.built
 fi
 
 # Install
-if [ ! -d ${INSTALL_DIR} ]; then
+set +e
+pip3 show numpy
+if [ $? -ne 0 ]; then
     install -d ${INSTALL_DIR}
-    make install
+    python3 setup.py build install --prefix=${PYTHON_INSTALL_DIR}
 fi
-
-# Generate Modulefile
-if [ ! -d ${MODULE_DIR}/libxml2 ]; then
-	install -d ${MODULE_DIR}/libxml2
-fi
-
-cat << EOF > ${MODULE_DIR}/libxml2/${VERSION}
-#%Module1.0#####################################################################
-##
-## \$name modulefile
-##
-proc ModulesHelp { } {
-puts stderr "\tThis module sets the environment for libxml2 v${VERSION}"
-}
-
-module-whatis "Libxml2 is the XML C parser and toolkit developed for the Gnome project (but usable outside of the Gnome platform). (v${VERSION}"
-
-conflict libxml2
-
-if { ![ is-loaded Python/${PYTHON_VERSION} ] } {
-    module load Python/${PYTHON_VERSION}
-}
-
-prepend-path PATH  					${INSTALL_DIR}/bin
-prepend-path CPATH 					${INSTALL_DIR}/include
-prepend-path LD_LIBRARY_PATH		${INSTALL_DIR}/lib
-prepend-path PKG_CONFIG_PATH		${INSTALL_DIR}/lib/pkgconfig
-EOF
+set -e

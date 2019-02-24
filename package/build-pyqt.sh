@@ -1,320 +1,121 @@
 #!/bin/sh -x
-## Building PyQt with Python3 and Qt5
-## Minimum GCC supported version for building Qt5 is 4.7
-
-PYTHON_VERSION=${PYTHON_VERSION:-3.6.8}
-PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
-QT_VERSION=${QT_VERSION:-5.9.1}
-PyQT_VERSION=${PyQT_VERSION:-5.9.1} # should be the same as Qt
-SIP_VERSION=${SIP_VERSION:-4.19.13}
-
-# Site specific defaults
-case $(hostname -f) in
-  *.iter.org) # RHEL7
-	module purge
-	# module load GCC/4.8.3 binutils/2.25 python/2.7/11 #gperf
-    # module load imas/3.7.2/ual/3.3.14
-	USE_QT_XCB="NO"
-	BUILD_XCB="NO"
-        MAKE_JOBS ?= 14
-	unset CXX CC # Remove ICC to be selected by chance
-        QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:-\
-                        -D GLX_GLXEXT_LEGACY \
-                        -D _X_INLINE=inline \
-                        -D FC_WEIGHT_EXTRABLACK=215 \
-                        -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK}
-	;;
-  # SLES 11.4 WPCD Gateway (incompatible XCB, Xlib and GL libraries)
-  tok*.bc.rzg.mpg.de) # IPP MPG
-        MAKE_JOBS=${MAKE_JOBS:-16}
-	USE_QT_XCB="NO"
-	BUILD_XCB="YES"
-	BUILD_XLIB="YES"
-        QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:--no-sql-mysql -no-opengl \
-			                 -skip qtcanvas3d  -skip qtpurchasing \
-					 -skip qtvirtualkeyboard}
-	;;
-
-  *.marconi.cineca.it) # EU-IM Gateway CentOS 7 with GCC 6.1
-        MAKE_JOBS=${MAKE_JOBS:-16}
-	#. /etc/profile.d.gw/modules.sh
-	# module unload itm-gcc/6.1.0 itm-python/2.7
-	#module switch itm-python/2.7.13.b1
-	#module unload itm-gcc/6.1.0 gcc/6.1.0
-	module unload matlab
-	module unload paraview
-	USE_QT_XCB="NO"
-	BUILD_XCB="NO"
-	BUILD_XLIB="NO"
-	export CXXFLAGS="-fpermissive"
-	QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:--no-sql-sqlite}
-	;;
-
-esac
-
-MAKE_JOBS=${MAKE_JOBS:-4}    # Safe default nowadays
-USE_QT_XCB=${USE_QT_XCB:-NO} # Use Qt provided XCB. Not for RHEL5
-BUILD_XCB=${BUILD_XCB:-NO}   # YES if having problems with -qt-xcb
-BUILD_XLIB=${BUILD_XLIB:-NO} # If having libX11-xcb < 1.3.2
-
-BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
-BUILD_DIR=${BUILDROOT}/build
-PATCH_DIR=${BUILDROOT}/src/patches
-DOWNLOAD_DIR=${BUILDROOT}/download
-STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
-STAGING_QT=${STAGING_QT:-${STAGING_DIR}/qt/${QT_VERSION}}
-SIP_INSTALL_DIR="${STAGING_DIR}/SIP/${SIP_VERSION}"
-PYTHON_INSTALL_DIR=${STAGING_DIR}/Python/${PYTHON_VERSION}
-PyQT_INSTALL_DIR="${STAGING_DIR}/PyQt5/${PyQT_VERSION}"
-
 set -e
 
-## Initialize directories
-
-install -d ${BUILD_DIR}
-install -d ${STAGING_DIR}
-install -d ${DOWNLOAD_DIR}
-
-XCB_FLAGS="-xcb -no-xcb-xlib" # XCB is mandatory for Linux
-if [ "${USE_QT_XCB}" = "YES" ]; then # build QT with QT-provided XCB libs
-  XCB_FLAGS="${XCB_FLAGS} -qt-xcb"
-fi
-
-## Build XCB Xlib and libXML for Qt5 locally instead of Qt provided XCB libs.
 # For Qt5.x build problems on RHEL5 see
 # https://forum.qt.io/topic/37757/howto-building-qt-5-2-1-including-webkit-on-rhel5-linux-centos-5-7
 # See http://kate-editor.org/2014/12/22/qt-5-4-on-red-hat-enterprise-5/
 
-# URLS="http://xmlsoft.org/sources/libxml2-2.9.3.tar.gz"
-if [ "${BUILD_XCB}" = "YES" ]; then
-  URLS="${URLS} \
-  http://xorg.freedesktop.org/archive/individual/proto/xproto-7.0.28.tar.gz\
-  http://xcb.freedesktop.org/dist/xcb-proto-1.11.tar.gz \
-  http://xcb.freedesktop.org/dist/libpthread-stubs-0.3.tar.gz \
-  http://xcb.freedesktop.org/dist/libxcb-1.11.1.tar.gz \
-  http://xcb.freedesktop.org/dist/xcb-util-0.4.0.tar.gz \
-  http://xcb.freedesktop.org/dist/xcb-util-image-0.4.0.tar.gz \
-  http://xcb.freedesktop.org/dist/xcb-util-keysyms-0.4.0.tar.gz \
-  http://xcb.freedesktop.org/dist/xcb-util-wm-0.4.1.tar.gz \
-  http://xcb.freedesktop.org/dist/xcb-util-renderutil-0.3.9.tar.gz"
-#  http://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.1.tar.gz"
-  XCB_INCLUDES="-I${INSTALL_DIR}/include -I${INSTALL_DIR}/include/libxml2"
-  XCB_LIBS="-L${INSTALL_DIR}/lib"
-  XCB_FLAGS="${XCB_FLAGS} ${XCB_INCLUDES} ${XCB_LIBS}"
+# Variables
+BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
+MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
+
+# Buildroot directories
+MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
+BUILD_DIR=${BUILDROOT}/build
+STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
+DOWNLOAD_DIR=${BUILDROOT}/download
+PATCH_DIR=${BUILDROOT}/src/patches
+
+# Package variables
+VERSION=${VERSION:-5.9.1} # should be the same as Qt
+SOURCE="PyQt5_gpl-${VERSION}.tar.gz"
+DOWNLOAD="http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-${VERSION}/${SOURCE}/download"
+SRC_DIR="${BUILD_DIR}/"
+INSTALL_DIR="${STAGING_DIR}/PyQt5/${VERSION}"
+
+# Site specific defaults
+case $(hostname -f) in
+     *.iter.org) # RHEL7
+        module purge
+        # module load GCC/4.8.3 binutils/2.25 python/2.7/11 #gperf
+        # module load imas/3.7.2/ual/3.3.14
+            MAKE_JOBS ?= 14
+        unset CXX CC # Remove ICC to be selected by chance
+            QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:-\
+                            -D GLX_GLXEXT_LEGACY \
+                            -D _X_INLINE=inline \
+                            -D FC_WEIGHT_EXTRABLACK=215 \
+                            -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK}
+        ;;
+    # SLES 11.4 WPCD Gateway (incompatible XCB, Xlib and GL libraries)
+    tok*.bc.rzg.mpg.de) # IPP MPG
+        MAKE_JOBS=${MAKE_JOBS:-16}
+        QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:--no-sql-mysql -no-opengl \
+            -skip qtcanvas3d  -skip qtpurchasing -skip qtvirtualkeyboard}
+        ;;
+
+    *.marconi.cineca.it) # EU-IM Gateway CentOS 7 with GCC 6.1
+        MAKE_JOBS=${MAKE_JOBS:-16}
+        #. /etc/profile.d.gw/modules.sh
+        # module unload itm-gcc/6.1.0 itm-python/2.7
+        #module switch itm-python/2.7.13.b1
+        #module unload itm-gcc/6.1.0 gcc/6.1.0
+        module unload matlab
+        module unload paraview
+        export CXXFLAGS="-fpermissive"
+        QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:--no-sql-sqlite}
+        ;;
+    *)
+        PYTHON_VERSION=${PYTHON_VERSION:-3.6.8}
+        PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
+        QT_VERSION=${QT_VERSION:-5.9.1}
+        SIP_VERSION=${SIP_VERSION:-4.19.13}
+        STAGING_QT=${STAGING_QT:-${STAGING_DIR}/qt/${QT_VERSION}}
+        SIP_INSTALL_DIR="${STAGING_DIR}/SIP/${SIP_VERSION}"
+        PYTHON_INSTALL_DIR=${STAGING_DIR}/Python/${PYTHON_VERSION}
+
+        export PATH=${PYTHON_INSTALL_DIR}/bin:${PATH}
+        export LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
+        export LD_LIBRARY_PATH=${SIP_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}:${LD_LIBRARY_PATH}
+        export PYTHONPATH=
+
+        ;;
+esac
+
+# Prepare directories for download and building
+install -d ${BUILD_DIR}
+install -d ${STAGING_DIR}
+install -d ${DOWNLOAD_DIR}
+
+# Download source
+if [ ! -f ${DOWNLOAD_DIR}/${SOURCE} ]; then
+    wget -O ${DOWNLOAD_DIR}/${SOURCE} --no-check-certificate ${DOWNLOAD}
 fi
 
-if [ "${BUILD_XLIB}" = "YES" ] ; then
-  URLS="${URLS} http://www.x.org/releases/X11R7.7/src/lib/libX11-1.5.0.tar.gz"
+cd ${BUILD_DIR}
+
+# Unpack sources
+if [ ! -d ${SRC_DIR} ]; then
+    tar xzf ${DOWNLOAD_DIR}/${SOURCE}
 fi
 
-install -d  ${BUILD_DIR}/libs
-cd ${BUILD_DIR}/libs
-for url in ${URLS}; do
-  file=${url##*/}
-  test -f ${DOWNLOAD_DIR}/${file} || wget --no-check-certificate \
-      -O ${DOWNLOAD_DIR}/${file} ${url}
-  pkgdir=${file%.*.*}
-  test -e ${pkgdir}/.built && continue
-  rm -rf ${pkgdir}
-  tar xf ${DOWNLOAD_DIR}/${file}
-  cd ${pkgdir}
-  if [ "${pkgdir%%-*}" = "libxml2" ]
-  then configopt="--without-python --without-zlib"
-  else configopt=
-  fi
-  PKG_CONFIG_PATH=${PYTHON_INSTALL_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH} \
-  ./configure --prefix=${STAGING_DIR} ${configopt}
-  make -j ${MAKE_JOBS}
-  make install
-  touch .built
-  cd ..
-done
-
-## Install QT
-
-QT_MAJOR_VERSION=${QT_VERSION%.*}
-QT_TAR="qt-everywhere-opensource-src-${QT_VERSION}.tar.xz"
-QT_SITE="http://download.qt.io/official_releases/qt"
-#QT_SITE="http://download.qt.io/development_releases/qt/"
-QT_DOWNLOAD="${QT_SITE}/${QT_MAJOR_VERSION}/${QT_VERSION}/single/${QT_TAR}"
-
-QT_SOURCE_DIR="${BUILD_DIR}/qt-everywhere-opensource-src-${QT_VERSION}"
-
-if [ ! -f ${DOWNLOAD_DIR}/${QT_TAR} ]; then
-  wget -P ${DOWNLOAD_DIR} ${QT_DOWNLOAD}
+# Configure
+if [ ! -e ${SRC_DIR}/.configured ]; then
+    python3 configure.py --confirm-license --verbose \
+        --qmake=${STAGING_DIR}/qt/${QT_VERSION}/bin/qmake \
+        --sip=${SIP_INSTALL_DIR}/bin/sip \
+        --destdir=${INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
+    touch ${SRC_DIR}/.configured
 fi
 
-
-if [ ! -e ${QT_SOURCE_DIR}/.configured ]; then # Configuring Qt
-  rm -rf ${QT_SOURCE_DIR} ${STAGING_QT}
-  cd ${BUILD_DIR}
-  #tar cf ${DOWNLOAD_DIR}/${QT_TAR}
-  xzcat ${DOWNLOAD_DIR}/${QT_TAR} | tar -xf -
-  cd ${QT_SOURCE_DIR}
-  sed -i.orig -e 's/-Wno-error=return-type//' \
-      qtlocation/src/3rdparty/poly2tri/poly2tri.pro
-  #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-openssl.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-no-offscreen.patch
-  #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
-  patch -p 1 -d ${QT_SOURCE_DIR}<${PATCH_DIR}/qglxintegration-glx-context.patch
-  #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qxcbconnection.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qbenchmarkperfevents.patch
-  #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qsimd.cpp-gcc4.2.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qdbusinternalfilters.patch
-  patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-invoke-static.patch
-  #patch -p 1 -d ${QT_SOURCE_DIR} < ${PATCH_DIR}/qt5-qtbase-platformsupport-fbconveniance-qfbvthandler.patch
-  sed -i -e '/auto/d' qtdeclarative/tests/tests.pro \
-                      qtmultimedia/tests/tests.pro \
-                      qtgraphicaleffects/tests/tests.pro
-    ./configure -v --prefix=${STAGING_QT} -opensource -confirm-license \
-      -shared \
-      -skip qtmultimedia \
-      -skip qtwayland \
-      -skip qtgamepad \
-      -skip qtwebchannel \
-      -skip qtwebengine \
-      -skip qtwebsockets \
-      -skip qtwebview \
-      -skip qt3d ${XCB_FLAGS} ${QT_EXTRA_FLAGS} \
-      -qt-xkbcommon -xkb-config-root /usr/share/X11/xkb
-  touch ${QT_SOURCE_DIR}/.configured
+# Build
+if [ ! -e ${SRC_DIR}/.built ]; then
+    make -j${MAKE_JOBS}
+    touch ${SRC_DIR}/.built
 fi
 
-if [ ! -e ${QT_SOURCE_DIR}/.built ]; then  ## Building Qt and docs
-  cd ${QT_SOURCE_DIR}
-  make -j ${MAKE_JOBS}
-  make install
-  # Building Qt documentation
-  PATH="${STAGING_QT}/bin:${PATH}" make -C qttools/src sub-qdoc
-  PATH="${STAGING_QT}/bin:${PATH}" make -C qtbase/src html_docs
-  PATH="${STAGING_QT}/bin:${PATH}" make qmake_all
-  PATH="${STAGING_QT}/bin:${PATH}" make -j ${MAKE_JOBS} docs install_docs
-  PATH="${STAGING_QT}/bin:${PATH}" make -j ${MAKE_JOBS} install_docs
-  touch ${QT_SOURCE_DIR}/.built
-fi # building Qt
-
-## Install sip
-
-SIP_SRC="sip-${SIP_VERSION}.tar.gz"
-SIP_SITE="http://sourceforge.net/projects/pyqt/files/sip"
-SIP_DOWNLOAD="${SIP_SITE}/sip-${SIP_VERSION}/${SIP_SRC}/download"
-
-if [ ! -f ${DOWNLOAD_DIR}/${SIP_SRC} ]; then
-    wget -O ${DOWNLOAD_DIR}/${SIP_SRC} --no-check-certificate \
-          ${SIP_DOWNLOAD}
-fi
-
-SIP_SRC_DIR="${BUILD_DIR}/sip-${SIP_VERSION}"
-PYTHON="${PYTHON_INSTALL_DIR}/bin/python3"
-
-
-if [ ! -e   ${SIP_SRC_DIR}/.built ]; then
-  rm -rf ${SIP_SRC_DIR}
-  cd ${BUILD_DIR}
-  tar xzf ${DOWNLOAD_DIR}/${SIP_SRC}
-  cd ${SIP_SRC_DIR}
-  LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
-                 ${PYTHON} configure.py \
-                 --bindir=${SIP_INSTALL_DIR}/bin \
-                 --destdir=${SIP_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
-
-  LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
-  make -j ${MAKE_JOBS}
-  LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH} PYTHONPATH= \
-                 make install
-  touch ${SIP_SRC_DIR}/.built
-fi
-
-## Install PyQT
-
-PyQT_SRC="PyQt5_gpl-${PyQT_VERSION}.tar.gz"
-PyQT_SITE="http://sourceforge.net/projects/pyqt/files/PyQt5"
-#PyQT_SITE="https://www.riverbankcomputing.com/static/Downloads/PyQt5}"
-PyQT_DOWNLOAD="${PyQT_SITE}/PyQt-${PyQT_VERSION}/${PyQT_SRC}/download"
-
-
-if [ ! -f ${DOWNLOAD_DIR}/${PyQT_SRC} ]; then
-    wget  -O ${DOWNLOAD_DIR}/${PyQT_SRC} --no-check-certificate \
-        ${PyQT_DOWNLOAD}
-fi
-
-PyQT_SRC_DIR="${BUILD_DIR}/PyQt5_gpl-${PyQT_VERSION}"
-
-if [ ! -e   ${PyQT_SRC_DIR}/.built ]; then
-  # rm -rf ${PyQT_SRC_DIR}
-  cd ${BUILD_DIR}
-  # tar xzf ${DOWNLOAD_DIR}/${PyQT_SRC}
-  cd ${PyQT_SRC_DIR}
-  LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH} \
-  LD_LIBRARY_PATH=${SIP_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}:${LD_LIBRARY_PATH} \
-  PYTHONPATH= \
-  ${PYTHON} configure.py --confirm-license --verbose \
-      --qmake=${STAGING_DIR}/qt/${QT_VERSION}/bin/qmake \
-      --sip=${SIP_INSTALL_DIR}/bin/sip \
-      --destdir=${PyQT_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
-  make -j ${MAKE_JOBS}
-  make install
-  touch ${PyQT_SRC_DIR}/.built
+# Install
+if [ ! -d ${INSTALL_DIR} ]; then
+    install -d ${INSTALL_DIR}
+    make install
 fi
 
 # Generate Modulefile
-MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
-
-if [ ! -d ${MODULE_DIR}/SIP ]; then
-	install -d ${MODULE_DIR}/SIP
-fi
-
-cat << EOF > ${MODULE_DIR}/SIP/${SIP_VERSION}
-#%Module1.0#####################################################################
-##
-## \$name modulefile
-##
-proc ModulesHelp { } {
-    puts stderr { SIP is a tool that makes it very easy to create Python bindings for C and C++ libraries. - Homepage: http://www.riverbankcomputing.com/software/sip/
-    }
-}
-
-module-whatis {Description: SIP is a tool that makes it very easy to create Python bindings for C and C++ libraries. - Homepage: http://www.riverbankcomputing.com/software/sip/}
-if { ![ is-loaded Python/${PYTHON_VERSION} ] } {
-    module load Python/${PYTHON_VERSION}
-}
-
-conflict SIP
-prepend-path PATH               ${SIP_INSTALL_DIR}/bin
-prepend-path CPATH              ${SIP_INSTALL_DIR}/include
-prepend-path PYTHONPATH         ${SIP_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
-
-EOF
-
-
-if [ ! -d ${MODULE_DIR}/Qt5 ]; then
-	install -d ${MODULE_DIR}/Qt5
-fi
-
-cat << EOF > ${MODULE_DIR}/Qt5/${QT_VERSION}
-#%Module1.0#####################################################################
-##
-## \$name modulefile
-##
-proc ModulesHelp { } {
-    puts stderr { Qt is a comprehensive cross-platform C++ application framework. - Homepage: http://qt.io/
-    }
-}
-
-module-whatis {Description: Qt is a comprehensive cross-platform C++ application framework. - Homepage: http://qt.io/}
-conflict Qt5
-prepend-path CPATH              ${STAGING_QT}/include
-prepend-path LD_LIBRARY_PATH    ${STAGING_QT}/lib
-prepend-path LIBRARY_DIR        ${STAGING_QT}/lib
-prepend-path PKG_CONFIG_PATH    ${STAGING_QT}/lib/pkgconfig
-prepend-path PATH               ${STAGING_QT}/bin
-EOF
-
 if [ ! -d ${MODULE_DIR}/PyQt5 ]; then
-	install -d ${MODULE_DIR}/PyQt5
+    install -d ${MODULE_DIR}/PyQt5
 fi
 
-cat << EOF > ${MODULE_DIR}/PyQt5/${PyQT_VERSION}
+cat << EOF > ${MODULE_DIR}/PyQt5/${VERSION}
 #%Module1.0#####################################################################
 ##
 ## \$name modulefile
@@ -349,6 +150,6 @@ module-whatis {Description: PyQt5 is a set of Python bindings for v5 of the Qt a
 module-whatis {Homepage: http://www.riverbankcomputing.co.uk/software/pyqt}
 
 conflict PyQt5
-prepend-path PYTHONPATH         ${PyQT_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
+prepend-path PYTHONPATH         ${INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
 EOF
 

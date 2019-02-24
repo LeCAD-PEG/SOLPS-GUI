@@ -1,204 +1,144 @@
 #!/bin/sh -x
-
-PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.1}
-FORTRAN_COMPILER_FOR_CATALYST=${FORTRAN_COMPILER_FOR_CATALYST:-ifort}
-CMAKE_VERSION=3.10.1
-QT_VERSION=${QT_VERSION:-4.8.7}
-
-case $(hostname -f) in
-  *.iter.org)
-	module purge
-	module load GCCcore/6.4.0 binutils/2.28-GCCcore-6.4.0 intel/2018a GCC/6.4.0-2.28 Blitz++/0.10-GCCcore-6.4.0
-	module load Python/2.7.14-GCCcore-6.4.0-bare
-	# module load OpenSSL/1.0.2g-GCC-4.8.3
-	module load OpenSSL/1.0.2g-goolf-1.5.16
-	export CC=gcc
-	export CXX=g++
-        CMAKE_EXTRA_FLAGS=${CMAKE_EXTRA_FLAGS:-\
-          -DCMAKE_EXE_LINKER_FLAGS:STRING=-L${EBROOTOPENSSL}/lib}
-	#PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-\
-        #          -DPARAVIEW_ENABLE_PYTHON:BOOL=OFF}
-	MAKE_JOBS=${MAKE_JOBS:-8}
-	;;
-  *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
-	. /etc/profile.d.gw/modules.sh
-	module purge
-	module load cineca imasenv cmake/3.5.2
-	module switch itm-python/2.7
-	module unload matlab
-	QT_VERSION=${QT_VERSION:-4.8.7}
-	module load itm-qt/${QT_VERSION}
-	STAGING_QT=${QTDIR}
-	MAKE_JOBS=${MAKE_JOBS:-36}
-	export CXXFLAGS=-fpermissive
-	PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-\
-                        -DPARAVIEW_USE_MPI:BOOL=ON}
-	;;
-  *)
-	;;
-esac
-
-MAKE_JOBS=${MAKE_JOBS:-4}
-
-BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
-BUILD_DIR=${BUILDROOT}/build
-DOWNLOAD_DIR=${DOWNLOAD_DIR:-${BUILDROOT}/download}
-STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
-#STAGING_DIR=${SWITMDIR}
-STAGING_QT=${STAGING_QT:-${STAGING_DIR}/qt/${QT_VERSION}}
-STAGING_PARAVIEW=${STAGING_PARAVIEW:-$STAGING_DIR/paraview/$PARAVIEW_VERSION}
-
-#Initialize directories
-
-install -d ${BUILD_DIR}
-install -d ${DOWNLOAD_DIR}
-install -d ${STAGING_DIR}
-
-# We need recent CMAKE for building ParaView 5.x
-CMAKE_TEST=$(hash cmake 2> /dev/null && cmake --version \
-             | sed -e 's/[^0-9]//g;s/^\(.\{2\}\).*/\1/')
-if [ "${CMAKE_TEST}0" -ge 350 ]
- then CMAKE=cmake
- else CMAKE=${STAGING_DIR}/cmake/${CMAKE_VERSION}/bin/cmake
- CMAKE_VERSION=${CMAKE_VERSION} MAKE_JOBS=${MAKE_JOBS} ./build-cmake.sh
-fi
-
 set -e
 
-#Install QT if needed
-if ! test -x ${STAGING_QT}/bin/qmake ; then
-    QT_MAJOR_VERSION=${QT_VERSION%.*}
-    QT_TAR="qt-everywhere-opensource-src-${QT_VERSION}.tar.gz"
-    QT_SITE="http://download.qt.io/archive/qt/"
-    QT_DOWNLOAD="${QT_SITE}/${QT_MAJOR_VERSION}/${QT_VERSION}/${QT_TAR}"
-    QT_SOURCE_DIR="${BUILD_DIR}/qt-everywhere-opensource-src-${QT_VERSION}"
 
-    #Download tar and unpack
-    if [ ! -f ${DOWNLOAD_DIR}/${QT_TAR} ]; then
-	cd ${DOWNLOAD_DIR}
-	wget ${QT_DOWNLOAD}
-    fi
+# Variables
+BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
+MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
 
-    if [ ! -e   ${QT_SOURCE_DIR}/.built ]; then
-	#Building QT
-	rm -rf ${QT_SOURCE_DIR}
-	cd ${BUILD_DIR}
-	tar xzf ${DOWNLOAD_DIR}/${QT_TAR}
+# Buildroot directories
+MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
+BUILD_DIR=${BUILDROOT}/build
+STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
+DOWNLOAD_DIR=${BUILDROOT}/download
 
-	cd ${QT_SOURCE_DIR}
-	./configure --prefix=${STAGING_QT}  -opensource -confirm-license \
-	    -no-javascript-jit -no-webkit -no-script -no-scripttools \
-	    -no-sql-sqlite3 -no-accessibility
-	make -j ${MAKE_JOBS}
-	make install
-	touch ${QT_SOURCE_DIR}/.built
-    fi
+# Package variables
+VERSION=${VERSION:-5.4.1}
+SOURCE="ParaView-v${PARAVIEW_VERSION}.tar.gz"
+DOWNLOAD="http://www.paraview.org/files/v${VERSION%.*}"
+SRC_DIR="${BUILD_DIR}/ParaView-v${VERSION}"
+INSTALL_DIR=${INSTALL_DIR:-${STAGING_DIR}/paraview/${VERSION}}
+
+
+# Environment dependencies
+FORTRAN_COMPILER_FOR_CATALYST=${FORTRAN_COMPILER_FOR_CATALYST:-ifort}
+case $(hostname -f) in
+  *.iter.org)
+    module purge
+    module load GCCcore/6.4.0 binutils/2.28-GCCcore-6.4.0 intel/2018a GCC/6.4.0-2.28 Blitz++/0.10-GCCcore-6.4.0
+    module load Python/2.7.14-GCCcore-6.4.0-bare
+    # module load OpenSSL/1.0.2g-GCC-4.8.3
+    module load OpenSSL/1.0.2g-goolf-1.5.16
+    export CC=gcc
+    export CXX=g++
+        CMAKE_EXTRA_FLAGS=${CMAKE_EXTRA_FLAGS:-\
+          -DCMAKE_EXE_LINKER_FLAGS:STRING=-L${EBROOTOPENSSL}/lib}
+    #PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-\
+        #          -DPARAVIEW_ENABLE_PYTHON:BOOL=OFF}
+    MAKE_JOBS=${MAKE_JOBS:-8}
+    ;;
+  *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
+    . /etc/profile.d.gw/modules.sh
+    module purge
+    module load cineca imasenv cmake/3.5.2
+    module switch itm-python/2.7
+    module unload matlab
+    QT_VERSION=${QT_VERSION:-4.8.7}
+    module load itm-qt/${QT_VERSION}
+    STAGING_QT=${QTDIR}
+    MAKE_JOBS=${MAKE_JOBS:-36}
+    export CXXFLAGS=-fpermissive
+    PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-\
+                        -DPARAVIEW_USE_MPI:BOOL=ON}
+    ;;
+  *)
+    QT_VERSION=${QT_VERSION:-4.8.7}
+    CMAKE_VERSION=${CMAKE_VERSION:-3.10.1}
+    export PATH=${STAGING_DIR}/cmake/${CMAKE_VERSION}/bin:${PATH}
+    export LD_LIBRARY_PATH=${STAGING_DIR}/qt/${QT_VERSION}/lib:${LD_LIBRARY_PATH}
+
+    ;;
+esac
+
+# Prepare directories for download and building
+install -d ${BUILD_DIR}
+install -d ${STAGING_DIR}
+install -d ${DOWNLOAD_DIR}
+
+# Download source
+if [ ! -f ${DOWNLOAD_DIR}/${SOURCE} ]; then
+    wget -O ${DOWNLOAD_DIR}/${SOURCE} --no-check-certificate ${DOWNLOAD}
 fi
 
-PARAVIEW_BUILD="${BUILD_DIR}/paraview"
-PARAVIEW_SOURCE_DIR="${BUILD_DIR}/ParaView-v${PARAVIEW_VERSION}"
-#Download Paraview
-PARAVIEW_MAJOR_VERSION=${PARAVIEW_VERSION%.*}
-PARAVIEW_SOURCE="ParaView-v${PARAVIEW_VERSION}.tar.gz"
-PARAVIEW_DATA="ParaViewData-v${PARAVIEW_VERSION}.tar.gz"
-PARAVIEW_DOWNLOAD="http://www.paraview.org/files/v${PARAVIEW_MAJOR_VERSION}"
-cd ${DOWNLOAD_DIR}
+cd ${BUILD_DIR}
 
-if [ ! -f ${PARAVIEW_SOURCE} ]; then
-    wget -O ${DOWNLOAD_DIR}/${PARAVIEW_SOURCE} --no-check-certificate \
-        ${PARAVIEW_DOWNLOAD}/${PARAVIEW_SOURCE}
+# Unpack sources
+if [ ! -d ${BUILD_DIR}/${SOURCE%.tar*} ]; then
+    tar xzf ${DOWNLOAD_DIR}/${SOURCE}
 fi
 
-if [ ! -d ${PARAVIEW_SOURCE_DIR} ]; then
-    cd ${BUILD_DIR}
-    tar xzf ${DOWNLOAD_DIR}/${PARAVIEW_SOURCE}
+# Configure
+if [ ! -e ${SRC_DIR}/.configured ]; then
     # Ignore git describe tags as we are building ParaView from tar.gz
-    sed -i -e "/^determine_version/d" ${PARAVIEW_SOURCE_DIR}/CMakeLists.txt
-fi
-
-
-#Configure and build ParaView
-if [ ! -e   ${PARAVIEW_BUILD}/.built ]; then
-    rm -rf ${PARAVIEW_BUILD}
-    install -d ${PARAVIEW_BUILD}
-    cd ${PARAVIEW_BUILD}
+    sed -i -e "/^determine_version/d" ${SRC_DIR}/CMakeLists.txt
+    install -d ${SRC_DIR}
+    cd ${SRC_DIR}
 
     if [ ${QT_VERSION%%.*} = 5 ]
-	then VTK_RENDERING_BACKEND=OpenGL2
-	else VTK_RENDERING_BACKEND=OpenGL
+        then VTK_RENDERING_BACKEND=OpenGL2
+        else VTK_RENDERING_BACKEND=OpenGL
     fi
 
-    install -d ${STAGING_PARAVIEW}
-    ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Release \
-	-DVTK_RENDERING_BACKEND:STRING=${VTK_RENDERING_BACKEND} \
-	-DPARAVIEW_QT_VERSION:STRING=${QT_VERSION%%.*} \
-	-DVTK_QT_VERSION:STRING=${QT_VERSION%%.*} \
+    cmake -DCMAKE_BUILD_TYPE:STRING=Release \
+    -DVTK_RENDERING_BACKEND:STRING=${VTK_RENDERING_BACKEND} \
+    -DPARAVIEW_QT_VERSION:STRING=${QT_VERSION%%.*} \
+    -DVTK_QT_VERSION:STRING=${QT_VERSION%%.*} \
         -DBUILD_SHARED_LIBS:BOOL=ON  \
         -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
         -DBUILD_TESTING:BOOL=OFF \
         -DPARAVIEW_ENABLE_PYTHON:BOOL=ON \
         -DCMAKE_Fortran_COMPILER:STRING=${FORTRAN_COMPILER_FOR_CATALYST} \
-        -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_QT}/bin/qmake \
-        -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
-	${PARAVIEW_EXTRA_FLAGS} ${PARAVIEW_SOURCE_DIR}
-    # -DCMAKE_EXE_LINKER_FLAGS:STRING="-L${STAGING_QT}/lib -Wl,-rpath -Wl,${STAGING_QT/lib}" \
-    find .  -name link.txt -exec \
-	sed -i -e "s|-lQt|-L${STAGING_QT}/lib -lQt|" \
-        -e "s|-L${STAGING_QT}/lib|-L${STAGING_QT}/lib -lQtCore -lQtGui|" {} \;
-
-    LD_LIBRARY_PATH=${STAGING_QT}/lib:${LD_LIBRARY_PATH} \
-	make -j ${MAKE_JOBS} VERBOSE=0
-    make install
-    touch .built
+        -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_DIR}/qt/${QT_VERSION}/bin/qmake \
+        -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_DIR} \
+    ${PARAVIEW_EXTRA_FLAGS} ${BUILD_DIR}/${SOURCE%.tar*}
+    touch ${SRC_DIR}/.configured
 fi
 
-PARAVIEW_DOC_VERSION=${PARAVIEW_DOC_VERSION:-${PARAVIEW_MAJOR_VERSION}.0}
-STAGING_DOC=${STAGING_PARAVIEW}/share/paraview-${PARAVIEW_MAJOR_VERSION}/doc
-install -d ${STAGING_DOC}
-for file in ParaViewGettingStarted-${PARAVIEW_DOC_VERSION%-*}.pdf \
-    ParaViewTutorial.pdf  ParaViewGuide-${PARAVIEW_DOC_VERSION%-*}.pdf \
-    ParaViewCatalystGuide-${PARAVIEW_DOC_VERSION%-*}.pdf  ; do
+
+# Build
+if [ ! -e ${SRC_DIR}/.built ]; then
+    make -j${MAKE_JOBS} VERBOSE=0
+    touch ${SRC_DIR}/.built
+fi
+
+# Install
+if [ ! -d ${INSTALL_DIR} ]; then
+    install -d ${INSTALL_DIR}
+    make install
+fi
+
+# Post Installation
+DOC_VERSION=${DOC_VERSION:-${VERSION%.*}.0}
+INSTALL_DOC_DIR=${STAGING_PARAVIEW}/share/paraview-${VERSION%.*}/doc
+install -d ${INSTALL_DOC_DIR}
+for file in ParaViewGettingStarted-${DOC_VERSION%-*}.pdf \
+    ParaViewTutorial.pdf  ParaViewGuide-${DOC_VERSION%-*}.pdf \
+    ParaViewCatalystGuide-${DOC_VERSION%-*}.pdf  ; do
     if [ ! -f ${DOWNLOAD_DIR}/${file} ]; then
          wget -O ${DOWNLOAD_DIR}/${file} --no-check-certificate \
-             ${PARAVIEW_DOWNLOAD}/${file}
+             ${DOWNLOAD}/${file}
     fi
     noParaView=${file#ParaView}
     noVersion=${noParaView%-*}
     noPdf=${noVersion%.pdf}
     target=${noPdf}.pdf
-    install -m 444 ${DOWNLOAD_DIR}/${file} ${STAGING_DOC}/${target}
+    install -m 444 ${DOWNLOAD_DIR}/${file} ${INSTALL_DOC_DIR}/${target}
 done
 
-# Generate Modulefile
-MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
-if [ ! -d ${MODULE_DIR}/Qt4 ]; then
-	install -d ${MODULE_DIR}/Qt4
-fi
-cat << EOF > ${MODULE_DIR}/Qt4/${QT_VERSION}
-#%Module1.0#####################################################################
-##
-## \$name modulefile
-##
-
-proc ModulesHelp { } {
-    puts stderr { Qt is a comprehensive cross-platform C++ application framework. - Homepage: http://qt.io/
-    }
-}
-
-module-whatis {Description: Qt is a comprehensive cross-platform C++ application framework. - Homepage: http://qt.io/}
-conflict Qt4
-prepend-path CPATH              ${STAGING_QT}/include
-prepend-path LD_LIBRARY_PATH    ${STAGING_QT}/lib
-prepend-path LIBRARY_DIR        ${STAGING_QT}/lib
-prepend-path PKG_CONFIG_PATH    ${STAGING_QT}/lib/pkgconfig
-prepend-path PATH               ${STAGING_QT}/bin
-EOF
-
 
 # Generate Modulefile
-MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
 if [ ! -d ${MODULE_DIR}/ParaView ]; then
-	install -d ${MODULE_DIR}/ParaView
+    install -d ${MODULE_DIR}/ParaView
 fi
 
 cat << EOF > ${MODULE_DIR}/ParaView/${PARAVIEW_VERSION}
@@ -228,9 +168,9 @@ if { ![ is-loaded Qt4/${QT_VERSION} ] } {
 }
 
 conflict ParaView
-prepend-path CPATH              ${STAGING_PARAVIEW}/include
-prepend-path LD_LIBRARY_PATH    ${STAGING_PARAVIEW}/lib
-prepend-path LIBRARY_DIR        ${STAGING_PARAVIEW}/lib
-prepend-path PKG_CONFIG_PATH    ${STAGING_PARAVIEW}/lib/pkgconfig
-prepend-path PATH               ${STAGING_PARAVIEW}/bin
+prepend-path CPATH              ${INSTALL_DIR}/include
+prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
+prepend-path LIBRARY_DIR        ${INSTALL_DIR}/lib
+prepend-path PKG_CONFIG_PATH    ${INSTALL_DIR}/lib/pkgconfig
+prepend-path PATH               ${INSTALL_DIR}/bin
 EOF

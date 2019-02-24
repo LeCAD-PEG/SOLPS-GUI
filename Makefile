@@ -69,7 +69,7 @@ OpenBLAS:
 mscl:
 	BUILDROOT=${BUILDROOT} MSCL_VERSION=${MSCL_VERSION} ./package/build-mscl.sh
 
-python: OpenBLAS
+python:
 	BUILDROOT=${BUILDROOT} \
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	NUMPY_VERSION=${NUMPY_VERSION} \
@@ -77,7 +77,22 @@ python: OpenBLAS
 	OPENBLAS_VERSION=${OPENBLAS_VERSION} \
 	./package/build-python.sh
 
-pyqt: python
+matplotlib-numpy: python OpenBLAS
+	./package/build-numpy.sh
+
+scipy: python OpenBLAS
+	./package/build-scipy.sh
+
+sip: python
+	./package/build-sip.sh
+
+qt5:
+	./package/build-qt5.sh
+
+qt4:
+	./package/build-qt4.sh
+
+pyqt: python qt5 sip
 	BUILDROOT=${BUILDROOT} \
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	QT_VERSION=${QT_VERSION} \
@@ -106,7 +121,7 @@ libxml2: python
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	./package/build-libxml2.sh
 
-paraview: cmake
+paraview: cmake qt4
 	BUILDROOT=${BUILDROOT} \
 	CMAKE_VERSION=${CMAKE_VERSION} \
 	QT_VERSION=${PARAVIEW_QT_VERSION} \
@@ -122,7 +137,13 @@ paraview-plugin: imas cmake paraview blitz
 	IMASUAL_VERSION=${IMASUAL_VERSION} \
 	./package/build-paraview-plugin.sh
 
-imas: python OpenBLAS saxon mdsplus blitz libxml2
+imasdd: saxon python
+	VERSION=${IMASDD_VERSION} \
+	PYTHON_VERSION=${PYTHON_VERSION} \
+	SAXON_VERSION=${SAXON_VERSION} \
+	./package/build-imasdd.sh
+
+imas: python matplotlib-numpy scipy saxon mdsplus blitz libxml2 imasdd
 	BUILDROOT=${BUILDROOT} \
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	NUMPY_VERSION=${NUMPY_VERSION} \

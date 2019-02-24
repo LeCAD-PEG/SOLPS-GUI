@@ -13,11 +13,11 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-0.3.5}
-SOURCE="OpenBLAS-${VERSION}.tar.gz"
-DOWNLOAD="https://github.com/xianyi/OpenBLAS/archive/v${VERSION}.tar.gz"
-SRC_DIR="${BUILD_DIR}/OpenBLAS-${VERSION}"
-INSTALL_DIR=${STAGING_DIR}/OpenBLAS/${VERSION}
+VERSION=${VERSION:-4.8.7}
+SOURCE="qt-everywhere-opensource-src-${VERSION}.tar.gz"
+DOWNLOAD="http://download.qt.io/archive/qt/${VERSION%.*}/${VERSION}/${SOURCE}"
+SRC_DIR="${BUILD_DIR}/qt-everywhere-opensource-src-${VERSION}"
+INSTALL_DIR=${INSTALL_DIR:-${STAGING_DIR}/qt/${VERSION}}
 
 # Environment dependencies
 
@@ -41,6 +41,12 @@ fi
 cd ${SRC_DIR}
 
 # Configure
+if [ ! -e ${SRC_DIR}/.configured ]; then
+    ./configure --prefix=${INSTALL_DIR}  -opensource -confirm-license \
+                -no-javascript-jit -no-webkit -no-script -no-scripttools \
+                -no-sql-sqlite3 -no-accessibility
+    touch ${SRC_DIR}/.configured
+fi
 
 # Build
 if [ ! -e ${SRC_DIR}/.built ]; then
@@ -51,40 +57,30 @@ fi
 # Install
 if [ ! -d ${INSTALL_DIR} ]; then
     install -d ${INSTALL_DIR}
-    make install PREFIX=${INSTALL_DIR}
+    make install
 fi
 
 # Generate Modulefile
-if [ ! -d ${MODULE_DIR}/OpenBLAS ]; then
-	install -d ${MODULE_DIR}/OpenBLAS
+if [ ! -d ${MODULE_DIR}/Qt4 ]; then
+    install -d ${MODULE_DIR}/Qt4
 fi
-
-cat << EOF > ${MODULE_DIR}/OpenBLAS/${VERSION}
+cat << EOF > ${MODULE_DIR}/Qt4/${VERSION}
 #%Module1.0#####################################################################
 ##
 ## \$name modulefile
 ##
+
 proc ModulesHelp { } {
-    puts stderr {
-
-Description
-===========
-OpenBLAS is an optimized BLAS library based on GotoBLAS2 1.13 BSD version.
-
-
-More information
-================
- - Homepage: http://xianyi.github.com/OpenBLAS/
+    puts stderr { Qt is a comprehensive cross-platform C++ application framework. - Homepage: http://qt.io/
     }
 }
 
-module-whatis {Description: OpenBLAS is an optimized BLAS library based on GotoBLAS2 1.13 BSD version.}
-module-whatis {Homepage: http://xianyi.github.com/OpenBLAS/}
-
-conflict OpenBLAS
-
+module-whatis {Description: Qt is a comprehensive cross-platform C++ application framework. - Homepage: http://qt.io/}
+conflict Qt4
 prepend-path CPATH              ${INSTALL_DIR}/include
 prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
 prepend-path LIBRARY_DIR        ${INSTALL_DIR}/lib
 prepend-path PKG_CONFIG_PATH    ${INSTALL_DIR}/lib/pkgconfig
+prepend-path PATH               ${INSTALL_DIR}/bin
 EOF
+

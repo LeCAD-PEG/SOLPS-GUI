@@ -1,17 +1,23 @@
 #!/bin/sh -x
+set -e
 
-MAKE_JOBS=${MAKE_JOBS:-4}
+
+# Variables
 BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
-BUILD_DIR=${BUILDROOT}/build
-PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.1}
-PARAVIEW_MAINVERSION=${PARAVIEW_VERSION%.*}
-QT_VERSION=${QT_VERSION:-4.8.7}
-DOWNLOAD_DIR=${DOWNLOAD_DIR:-${BUILDROOT}/download}
-STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
-IMASUAL_VERSION=${IMASUAL_VERSION:-3.8.4}
-MDSPLUS_VERSION=${MDSPLUS_VERSION:-stable_release-7-7-8}
-BLITZ_VERSION=${BLITZ_VERSION:-1.0.0}
+MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
 
+# Buildroot directories
+MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
+BUILD_DIR=${BUILDROOT}/build
+STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
+DOWNLOAD_DIR=${BUILDROOT}/download
+
+# Package variables
+VERSION=${VERSION:-1.5.0}
+SRC_DIR="${BUILD_DIR}/Plugins-ReadUALEdge"
+INSTALL_DIR=${STAGING_DIR}/ReadUALEdge-Plugin/${VERSION}
+
+# Environment dependencies
 case $(hostname -f) in
   *.iter.org)
         module purge
@@ -40,75 +46,71 @@ case $(hostname -f) in
 	;;
 
   *)
-	export IMAS_VERSION=${IMASDD_VERSION}
-	export PKG_CONFIG_PATH=${STAGING_DIR}/imas/${IMASDD_VERSION}/solps/lib/pkgconfig:${PKG_CONFIG_PATH}
-	export PKG_CONFIG_PATH=${STAGING_DIR}/blitz/${BLITZ_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
-	# export LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH}
-	# export LD_LIBRARY_PATH=${STAGING_DIR}/access-layer/${IMASUAL_VERSION}/lib:${LD_LIBRARY_PATH}
-	# export LD_LIBRARY_PATH=${STAGING_DIR}/qt/${QT_VERSION}/lib:${LD_LIBRARY_PATH}
-	# export LD_LIBRARY_PATH=${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib:${LD_LIBRARY_PATH}
-	export PATH=${STAGING_DIR}/paraview/${PARAVIEW_VERSION}/bin:${PATH}
-	# export CMAKE_MODULE_PATH=${STAGING_DIR}/paraview/${PARAVIEW_VERSION}/lib/cmake/paraview-${PARAVIEW_MAINVERSION}:${CMAKE_MODULE_PATH}
-	# echo ${STAGING_DIR}/paraview/${PARAVIEW_VERSION}/lib/cmake/paraview-${PARAVIEW_MAINVERSION}
-	# exit
-	export MDSPLUS_DIR=${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
-	;;
+    PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.1}
+    PARAVIEW_MAINVERSION=${PARAVIEW_VERSION%.*}
+    QT_VERSION=${QT_VERSION:-4.8.7}
+    IMASUAL_VERSION=${IMASUAL_VERSION:-3.8.4}
+    MDSPLUS_VERSION=${MDSPLUS_VERSION:-stable_release-7-7-8}
+    BLITZ_VERSION=${BLITZ_VERSION:-1.0.0}
+    CMAKE_VERSION=${CMAKE_VERSION:-3.10.1}
+    CMAKE=${STAGING_DIR}/cmake/${CMAKE_VERSION}/bin/cmake
+
+    export IMAS_VERSION=${IMASDD_VERSION}
+
+    export PKG_CONFIG_PATH=${STAGING_DIR}/imas/${IMAS_VERSION}/solps/lib/pkgconfig:${PKG_CONFIG_PATH}
+    export PKG_CONFIG_PATH=${STAGING_DIR}/blitz/${BLITZ_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
+    export PKG_CONFIG_PATH=${STAGING_DIR}/qt/${QT_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
+
+    # export LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH}
+    # export LD_LIBRARY_PATH=${STAGING_DIR}/access-layer/${IMASUAL_VERSION}/lib:${LD_LIBRARY_PATH}
+    # export LD_LIBRARY_PATH=${STAGING_DIR}/qt/${QT_VERSION}/lib:${LD_LIBRARY_PATH}
+    # export LD_LIBRARY_PATH=${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib:${LD_LIBRARY_PATH}
+
+    export PATH=${STAGING_DIR}/paraview/${PARAVIEW_VERSION}/bin:${PATH}
+    export PATH=${STAGING_DIR}/qt/${QT_VERSION}/bin:${PATH}
+
+    export MDSPLUS_DIR=${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
+    ;;
 esac
 
-if test -z "${IMAS_VERSION}" ; then
-    echo "Required IMAS module not present"
-    exit 2
-fi
-
-STAGING_PARAVIEW=${STAGING_PARAVIEW:-\
-    ${STAGING_DIR}/paraview/${PARAVIEW_VERSION}}
-STAGING_PLUGINS=${STAGING_DIR}/paraview-plugins/${PARAVIEW_VERSION}/${IMAS_VERSION}
-
-
-CMAKE_VERSION=${CMAKE_VERSION:-3.10.1}
-
-#Initialize directories
-
+# Prepare directories for download and building
 install -d ${BUILD_DIR}
-install -d ${DOWNLOAD_DIR}
 install -d ${STAGING_DIR}
+install -d ${DOWNLOAD_DIR}
 
-# We need recent CMAKE for building ParaView 5.x
-CMAKE_TEST=$(hash cmake 2> /dev/null && cmake --version \
-             | sed -e 's/[^0-9]//g;s/^\(.\{2\}\).*/\1/')
-if [ "${CMAKE_TEST}0" -ge 350 ]
- then CMAKE=cmake
- else CMAKE=${STAGING_DIR}/cmake/${CMAKE_VERSION}/bin/cmake
- CMAKE_VERSION=${CMAKE_VERSION} MAKE_JOBS=${MAKE_JOBS} ./build-cmake.sh
+# Download source
+
+cd ${BUILD_DIR}
+
+# Unpack sources
+if [ ! -d ${SRC_DIR} ]; then
+    install -d ${SRC_DIR}
 fi
 
-set -e
+cd ${SRC_DIR}
 
-export PKG_CONFIG_PATH=${STAGING_DIR}/qt/${QT_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
-export PATH=${STAGING_DIR}/qt/${QT_VERSION}/bin:${PATH}
-
-name=Edge
-[ -d ${BUILD_DIR}/Plugins-ReadUAL${name} ] && \
-    rm -f ${BUILD_DIR}/Plugins-ReadUAL${name}/CMakeCache.txt
-# Set new environment variable to store IMAS_VERSION as single digit to be used as preprocessor variable while compiling the plugin
-IMAS_VERSION_DIGIT=$(echo "$IMAS_VERSION" | sed "s/\.//g")
-install -d ${BUILD_DIR}/Plugins-ReadUAL${name}
-install -d ${STAGING_PLUGINS}
-cd ${BUILD_DIR}/Plugins-ReadUAL${name}
-BUILDROOT=${BUILDROOT} \
-PATH=${STAGING_DIR}/bin:${PATH} \
-IMAS_VERSION_DIGIT=${IMAS_VERSION_DIGIT} \
- ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Debug \
-    -DCMAKE_INSTALL_PREFIX:PATH=${STAGING_PARAVIEW} \
-    -DParaView_DIR:PATH=${STAGING_PARAVIEW} \
+# Configure
+if [ ! -e ${SRC_DIR}/.configured ]; then
+    IMAS_VERSION_DIGIT=$(echo "$IMAS_VERSION" | sed "s/\.//g")
+    ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Debug \
+    -DParaView_DIR:PATH=${STAGING_DIR}/ParaView/${PARAVIEW_VERSION} \
     ${BUILDROOT}/src/plugins/paraview
-make -j ${MAKE_JOBS} VERBOSE=1 all
+    touch ${SRC_DIR}/.configured
+fi
 
-install ${BUILD_DIR}/Plugins-ReadUAL${name}/libReadUAL${name}.so \
-	${STAGING_PLUGINS}
+# Build
+if [ ! -e ${SRC_DIR}/.built ]; then
+    make -j${MAKE_JOBS} VERBOSE=1
+    touch ${SRC_DIR}/.built
+fi
+
+# Install
+if [ ! -d ${INSTALL_DIR} ]; then
+    install -d ${INSTALL_DIR}
+    install ${SRC_DIR}/libReadUAL${name}.so ${INSTALL_DIR}
+fi
 
 # Generate Modulefile
-MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
 if [ ! -d ${MODULE_DIR}/paraview-plugin-edge ]; then
 	install -d ${MODULE_DIR}/paraview-plugin-edge
 fi
@@ -125,8 +127,8 @@ module-whatis  "ReadUAL-EDGE plugin for ParaView."
 
 conflict paraview-plugin
 
-if { ![ is-loaded imas/${IMASDD_VERSION}/solps ] } {
- 	module load imas/${IMASDD_VERSION}/solps
+if { ![ is-loaded imas/${IMAS_VERSION}/solps ] } {
+ 	module load imas/${IMAS_VERSION}/solps
 }
 
 if { ![ is-loaded ParaView/${PARAVIEW_VERSION} ] } {
@@ -137,5 +139,5 @@ if { ![ is-loaded MDSplus/${MDSPLUS_VERSION} ] } {
     module load MDSplus/${MDSPLUS_VERSION}
 }
 
-prepend-path PYTHONPATH              ${STAGING_PLUGINS}
+prepend-path PV_PLUGIN_PATH          ${STAGING_PLUGINS}
 EOF

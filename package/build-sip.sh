@@ -12,21 +12,22 @@ BUILD_DIR=${BUILDROOT}/build
 STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
-# Package variables
-VERSION=${VERSION:-2.9.1}
-SOURCE="libxml2-${VERSION}.tar.gz"
-DOWNLOAD="ftp://xmlsoft.org/libxml2/libxml2-${VERSION}.tar.gz"
-SRC_DIR="${BUILD_DIR}/libxml2-${VERSION}"
-INSTALL_DIR=${STAGING_DIR}/libxml2/${VERSION}
+# Package Variables
+VERSION=${VERSION:-4.19.13}
+SOURCE="sip-${VERSION}.tar.gz"
+DOWNLOAD="http://sourceforge.net/projects/pyqt/files/sip/sip-${VERSION}/${SOURCE}/download"
+SRC_DIR=${BUILD_DIR}/sip-${VERSION}
+INSTALL_DIR=${STAGING_DIR}/sip/${VERSION}
 
 # Environment dependencies
 case $(hostname -f) in
   *)
         PYTHON_VERSION=${PYTHON_VERSION:-3.6.8}
+        PYTHON_MAINVERSION=${PYTHONPATH:%.*}
         PYTHON_INSTALL_DIR=${STAGING_DIR}/Python/${PYTHON_VERSION}
-        export PATH=${PYTHON_INSTALL_DIR}/bin:${PATH}
-        export PYTHONPATH=${PYTHON_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
+        PYTHON="${PYTHON_INSTALL_DIR}/bin/python3"
         export LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
+        export PYTHONPATH=
         ;;
 esac
 
@@ -51,8 +52,8 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
-    ./configure --with-python=${PYTHON_INSTALL_DIR} \
-                --prefix=${INSTALL_DIR}
+    ${PYTHON} configure.py --bindir=${INSTALL_DIR}/bin \
+        --destdir=${INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
     touch ${SRC_DIR}/.configured
 fi
 
@@ -69,29 +70,34 @@ if [ ! -d ${INSTALL_DIR} ]; then
 fi
 
 # Generate Modulefile
-if [ ! -d ${MODULE_DIR}/libxml2 ]; then
-	install -d ${MODULE_DIR}/libxml2
+if [ ! -d ${MODULE_DIR}/SIP ]; then
+    install -d ${MODULE_DIR}/SIP
 fi
-
-cat << EOF > ${MODULE_DIR}/libxml2/${VERSION}
+cat << EOF > ${MODULE_DIR}/SIP/${VERSION}
 #%Module1.0#####################################################################
 ##
 ## \$name modulefile
 ##
 proc ModulesHelp { } {
-puts stderr "\tThis module sets the environment for libxml2 v${VERSION}"
+    puts stderr { SIP is a tool that makes it very easy to create Python bindings for C and C++ libraries. - Homepage: http://www.riverbankcomputing.com/software/sip/
+    }
 }
 
-module-whatis "Libxml2 is the XML C parser and toolkit developed for the Gnome project (but usable outside of the Gnome platform). (v${VERSION}"
-
-conflict libxml2
-
+module-whatis {Description: SIP is a tool that makes it very easy to create Python bindings for C and C++ libraries. - Homepage: http://www.riverbankcomputing.com/software/sip/}
 if { ![ is-loaded Python/${PYTHON_VERSION} ] } {
     module load Python/${PYTHON_VERSION}
 }
 
-prepend-path PATH  					${INSTALL_DIR}/bin
-prepend-path CPATH 					${INSTALL_DIR}/include
-prepend-path LD_LIBRARY_PATH		${INSTALL_DIR}/lib
-prepend-path PKG_CONFIG_PATH		${INSTALL_DIR}/lib/pkgconfig
+conflict SIP
+prepend-path PATH               ${INSTALL_DIR}/bin
+prepend-path CPATH              ${INSTALL_DIR}/include
+prepend-path PYTHONPATH         ${INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
 EOF
+
+
+
+
+
+
+
+

@@ -1,23 +1,31 @@
 #!/bin/sh -x
-MAKE_JOBS=${MAKE_JOBS:-4}
-GNUPLOT_VERSION=${GNUPLOT_VERSION:-5.2.2}
-QT_VERSION=${QT_VERSION:-5.9.1}
+set -e
 
+
+# Variables
 BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
+MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
+
+# Buildroot directories
+MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
 BUILD_DIR=${BUILDROOT}/build
-PATCH_DIR=${BUILDROOT}/src/patches
+STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
-STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
-STAGING_QT=${STAGING_QT:-${STAGING_DIR}/qt/${QT_VERSION}}
+# Package variables
+VERSION=${VERSION:-5.2.2}
+SOURCE="gnuplot-${VERSION}.tar.gz"
+DOWNLOAD="http://sourceforge.net/projects/gnuplot/files/gnuplot/${GNUPLOT_VERSION}/${GNUPLOT_SRC}/download"
+SRC_DIR="${BUILD_DIR}/gnuplot-${VERSION}"
+INSTALL_DIR="${STAGING_DIR}/gnuplot/${VERSION}"
 
-GNUPLOT_INSTALL_DIR=${STAGING_DIR}/gnuplot/${GNUPLOT_VERSION}
 
+
+# Environment dependencies
 case $(hostname -f) in
-  *.iter.org)
+    *.iter.org)
         module purge
         #module load GCC/4.8.3 binutils/2.25 # libgd
-
         # DEPRECATED
         # module load imas binutils
         # module unload Anaconda2
@@ -29,69 +37,71 @@ case $(hostname -f) in
         # QT_LIBS="-Wl,-rpath=${EBROOTANACONDA3}/lib ${QT_LIBS}"
         # export QT_LIBS="-L${EBROOTANACONDA3}/lib -liconv ${QT_LIBS}"
         # GNUPLOT_INSTALL_DIR=${GNUPLOT_INSTALL_DIR:-${STAGING_DIR}}
-	   MAKE_JOBS=${MAKE_JOBS:-4}
-	;;
-   *.marconi.cineca.it)
-	module purge
-	module load cineca imasenv
-	module unload matlab
-	QT_VERSION=5.8.0
-	module load itm-qt/${QT_VERSION}
-	;;
-
-  *)
-	LD_LIBRARY_PATH="${STAGING_DIR}/lib:${LD_LIBRARY_PATH}"
-	export LD_LIBRARY_PATH
-	PKG_CONFIG_PATH="${STAGING_DIR}/qt/${QT_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}"
-	export PKG_CONFIG_PATH
-	;;
+       MAKE_JOBS=${MAKE_JOBS:-4}
+        ;;
+    *.marconi.cineca.it)
+        module purge
+        module load cineca imasenv
+        module unload matlab
+        QT_VERSION=5.8.0
+        module load itm-qt/${QT_VERSION}
+        ;;
+    *)
+        QT_VERSION=${QT_VERSION:-5.9.1}
+        export LD_LIBRARY_PATH="${STAGING_DIR}/lib:${LD_LIBRARY_PATH}"
+        export PKG_CONFIG_PATH="${STAGING_DIR}/qt/${QT_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}"
+        ;;
 esac
 
-set -e
 
-#Initialize directories
-
+# Prepare directories for download and building
 install -d ${BUILD_DIR}
 install -d ${STAGING_DIR}
 install -d ${DOWNLOAD_DIR}
-install -d ${GNUPLOT_INSTALL_DIR}
 
 
-
-
-GNUPLOT_SRC="gnuplot-${GNUPLOT_VERSION}.tar.gz"
-GNUPLOT_SITE="http://sourceforge.net/projects/gnuplot/files/gnuplot"
-GNUPLOT_DOWNLOAD="${GNUPLOT_SITE}/${GNUPLOT_VERSION}/${GNUPLOT_SRC}/download"
-
-if [ ! -f ${DOWNLOAD_DIR}/${GNUPLOT_SRC} ]; then
-    wget  -O ${DOWNLOAD_DIR}/${GNUPLOT_SRC} ${GNUPLOT_DOWNLOAD} \
-        --no-check-certificate
+# Download source
+if [ ! -f ${DOWNLOAD_DIR}/${SOURCE} ]; then
+    wget -O ${DOWNLOAD_DIR}/${SOURCE} ${DOWNLOAD} --no-check-certificate
 fi
 
-GNUPLOT_SRC_DIR=${BUILD_DIR}/gnuplot-${GNUPLOT_VERSION}
+cd ${BUILD_DIR}
 
-if [ ! -e   ${GNUPLOT_SRC_DIR}/.built ]; then
-  rm -rf ${GNUPLOT_SRC_DIR}
-  cd ${BUILD_DIR}
-  tar xzf ${DOWNLOAD_DIR}/${GNUPLOT_SRC}
-  cd ${GNUPLOT_SRC_DIR}
-  libtoolize
-  export CXXFLAGS=" -std=c++11"
-  ./configure --without-cairo --prefix=${GNUPLOT_INSTALL_DIR} \
-      --with-qt=qt5 --without-libcerf --disable-wxwidgets \
-      --with-texdir=${GNUPLOT_INSTALL_DIR}/share/tex
-  make -j ${MAKE_JOBS}
-  make install
-  touch ${GNUPLOT_SRC_DIR}/.built
+# Unpack sources
+if [ ! -d ${SRC_DIR} ]; then
+    tar xzf ${DOWNLOAD_DIR}/${SOURCE}
+fi
+
+cd ${SRC_DIR}
+
+# Configure
+if [ ! -e ${SRC_DIR}/.configured ]; then
+    libtoolize
+    CXXFLAGS=" -std=c++11" \
+    ./configure --without-cairo --prefix=${INSTALL_DIR} \
+        --with-qt=qt5 --without-libcerf --disable-wxwidgets \
+        --with-texdir=${INSTALL_DIR}/share/tex
+    touch ${SRC_DIR}/.configured
+fi
+
+# Build
+if [ ! -e ${SRC_DIR}/.built ]; then
+    make -j${MAKE_JOBS}
+    touch ${SRC_DIR}/.built
+fi
+
+# Install
+if [ ! -d ${INSTALL_DIR} ]; then
+    install -d ${INSTALL_DIR}
+    make install
 fi
 
 # Generate Modulefile
-MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
 if [ ! -d ${MODULE_DIR}/gnuplot ]; then
-	install -d ${MODULE_DIR}/gnuplot
+    install -d ${MODULE_DIR}/gnuplot
 fi
 
-cat << EOF > ${MODULE_DIR}/gnuplot/${GNUPLOT_VERSION}-qt-${QT_VERSION}
+cat << EOF > ${MODULE_DIR}/gnuplot/${VERSION}-qt-${QT_VERSION}
 #%Module1.0#####################################################################
 ##
 ## \$name modulefile
@@ -119,5 +129,5 @@ if { ![ is-loaded Qt5/${QT_VERSION} ] } {
     module load Qt5/${QT_VERSION}
 }
 
-prepend-path PATH               ${GNUPLOT_INSTALL_DIR}/bin
+prepend-path PATH               ${INSTALL_DIR}/bin
 EOF
