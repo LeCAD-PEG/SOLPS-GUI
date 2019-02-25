@@ -134,7 +134,7 @@ libxml2: python
 
 paraview: cmake qt4
 	BUILDROOT=${BUILDROOT} \
-	VERSION=${CMAKE_VERSION} \
+	VERSION=${PARAVIEW_VERSION} \
 	QT_VERSION=${PARAVIEW_QT_VERSION} \
 	PARAVIEW_VERSION=${PARAVIEW_VERSION} \
 	./package/build-paraview.sh
