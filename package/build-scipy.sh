@@ -72,7 +72,7 @@ fi
 
 # Install
 set +e
-pip3 show numpy
+pip3 show scipy
 if [ $? -ne 0 ]; then
     install -d ${INSTALL_DIR}
     python3 setup.py build install --prefix=${PYTHON_INSTALL_DIR}

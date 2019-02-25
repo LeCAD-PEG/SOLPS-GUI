@@ -16,7 +16,7 @@ QT4_VERSION=4.8.7
 PyQt_Version=5.9.1
 SIP_VERSION=4.19.13
 MDSPLUS_VERSION=stable_release-7-7-8
-BLITZ_VERISON=1.0.0
+BLITZ_VERSION=1.0.0
 LIBXML2_VERSION=2.9.1
 SAXON_VERSION=HE9-8-0-12J
 IMASDD_VERSION=3.21.0
@@ -40,70 +40,97 @@ SETUP_FILE="setupenv.sh"
 
 all: solps-iter solps-gui
 
-gr:
+${STAGING_DIR}/GR/${GR_VERSION}:
 	BUILDROOT=${BUILDROOT} GR_VERSION=${GR_VERSION} ./package/build-GR.sh
+gr: ${STAGING_DIR}/GR/${GR_VERSION}
 
-gli:
+${STAGING_DIR}/GLI/${GLI_VERSION}:
 	BUILDROOT=${BUILDROOT} GLI_VERSION=${GLI_VERSION} ./package/build-GLI.sh
 
-saxon:
+gli: ${STAGING_DIR}/GLI/${GLI_VERSION}
+
+${STAGING_DIR}/saxon/${SAXON_VERSION}:
 	BUILDROOT=${BUILDROOT} \
 	VERSION=${SAXON_VERSION} \
 	./package/build-saxon.sh
 
-blitz:
+saxon: ${STAGING_DIR}/saxon/${SAXON_VERSION}
+
+${STAGING_DIR}/blitz/${BLITZ_VERSION}:
 	BUILDROOT=${BUILDROOT} \
 	./package/build-blitz.sh
 
-cmake:
+blitz: ${STAGING_DIR}/blitz/${BLITZ_VERSION}
+
+${STAGING_DIR}/cmake/${CMAKE_VERSION}:
 	BUILDROOT=${BUILDROOT} \
 	VERSION=${CMAKE_VERSION} \
 	./package/build-cmake.sh
 
-mdsplus: libxml2
+cmake: ${STAGING_DIR}/cmake/${CMAKE_VERSION}
+
+${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}:
 	BUILDROOT=${BUILDROOT} \
 	LIBXML2_VERSION=${LIBXML2_VERSION} \
 	VERSION=${MDSPLUS_VERSION} \
 	./package/build-mdsplus.sh
 
-OpenBLAS:
+mdsplus: libxml2 ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
+
+${STAGING_DIR}/OpenBLAS/${OPENBLAS_VERSION}:
 	BUILDROOT=${BUILDROOT}
 	VERSION=${OPENBLAS_VERSION} \
 	./package/build-OpenBLAS.sh
 
-mscl:
+OpenBLAS: ${STAGING_DIR}/OpenBLAS/${OPENBLAS_VERSION}
+
+${STAGING_DIR}/mscl/${MSCL_VERSION}:
 	BUILDROOT=${BUILDROOT} \
 	VERSION=${MSCL_VERSION} \
 	./package/build-mscl.sh
 
-python:
+mscl: ${STAGING_DIR}/mscl/${MSCL_VERSION}
+
+${STAGING_DIR}/Python/${PYTHON_VERSION}:
 	BUILDROOT=${BUILDROOT} \
 	VERSION=${PYTHON_VERSION} \
 	./package/build-python.sh
 
-matplotlib-numpy: python OpenBLAS
+python: ${STAGING_DIR}/Python/${PYTHON_VERSION}
+
+${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages/numpy-${NUMPY_VERSION}-py${PYTHON_MAINVERSION}-linux-x86_64.egg:
 	VERSION=${NUMPY_VERSION} \
 	./package/build-numpy.sh
 
-scipy: python OpenBLAS
+matplotlib-numpy: python OpenBLAS ${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages/numpy-${NUMPY_VERSION}-py${PYTHON_MAINVERSION}-linux-x86_64.egg
+
+${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages/scipy-${NUMPY_VERSION}-py${PYTHON_MAINVERSION}-linux-x86_64.egg:
 	VERSION=${SCIPY_VERSION} \
 	./package/build-scipy.sh
 
-sip: python
+scipy: python OpenBLAS ${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages/scipy-${SCIPY_VERSION}-py${PYTHON_MAINVERSION}-linux-x86_64.egg
+
+${STAGING_DIR}/sip/${SIP_VERSION}:
 	VERSION=${SIP_VERSION} \
 	./package/build-sip.sh
 
-qt5:
+sip: python ${STAGING_DIR}/sip/${SIP_VERSION}
+
+${STAGING_DIR}/qt/${QT_VERSION}:
 	BUILDROOT=${BUILDROOT} \
 	VERSION=${QT_VERSION} \
 	./package/build-qt5.sh
 
-qt4:
+qt5: ${STAGING_DIR}/qt/${QT_VERSION}
+
+${STAGING_DIR}/qt/${QT4_VERSION}:
 	BUILDROOT=${BUILDROOT} \
 	VERSION=${PARAVIEW_QT_VERSION} \
 	./package/build-qt4.sh
 
-pyqt: python qt5 sip
+qt4: ${STAGING_DIR}/qt/${QT4_VERSION}
+
+${STAGING_DIR}/PyQt5/${PyQt_Version}:
 	BUILDROOT=${BUILDROOT} \
 	VERSION=${PyQt_Version} \
 	PYTHON_VERSION=${PYTHON_VERSION} \
@@ -111,13 +138,17 @@ pyqt: python qt5 sip
 	SIP_VERSION=${SIP_VERSION} \
 	./package/build-pyqt.sh
 
-gnuplot: pyqt
+pyqt: python qt5 sip ${STAGING_DIR}/PyQt5/${PyQt_Version}
+
+${STAGING_DIR}/gnuplot/${GNUPLOT_VERSION}:
 	BUILDROOT=${BUILDROOT} \
 	VERSION=${GNUPLOT_VERSION} \
 	QT_VERSION=${QT_VERSION} \
 	./package/build-gnuplot.sh
 
-gnuplot-widget: gnuplot pyqt
+gnuplot: pyqt ${STAGING_DIR}/gnuplot/${GNUPLOT_VERSION}
+
+${STAGING_DIR}/gnuplot-widget/python-${PYTHON_VERSION}-qt-${QT_VERSION}:
 	BUILDROOT=${BUILDROOT} \
 	QT_VERSION=${QT_VERSION} \
 	PYTHON_VERSION=${PYTHON_VERSION} \
@@ -126,20 +157,26 @@ gnuplot-widget: gnuplot pyqt
 	GNUPLOT_VERSION=${GNUPLOT_VERSION} \
 	./package/build-gnuplot-widget.sh
 
-libxml2: python
+gnuplot-widget: gnuplot pyqt ${STAGING_DIR}/gnuplot-widget/python-${PYTHON_VERSION}-qt-${QT_VERSION}
+
+${STAGING_DIR}/libxml2/${LIBXML2_VERSION}:
 	BUILDROOT=${BUILDROOT} \
 	VERSION=${LIBXML2_VERSION} \
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	./package/build-libxml2.sh
 
-paraview: cmake qt4
+libxml2: python ${STAGING_DIR}/libxml2/${LIBXML2_VERSION}
+
+${STAGING_DIR}/paraview/${PARAVIEW_VERSION}:
 	BUILDROOT=${BUILDROOT} \
 	VERSION=${PARAVIEW_VERSION} \
 	QT_VERSION=${PARAVIEW_QT_VERSION} \
 	PARAVIEW_VERSION=${PARAVIEW_VERSION} \
 	./package/build-paraview.sh
 
-paraview-plugin: imas cmake paraview blitz
+paraview: cmake qt4 ${STAGING_DIR}/paraview/${PARAVIEW_VERSION}
+
+${STAGING_DIR}/ReadUALEdge-Plugin/1.5.0:
 	BUILDROOT=${BUILDROOT} \
 	PARAVIEW_VERSION=${PARAVIEW_VERSION} \
 	QT_VERSION=${PARAVIEW_QT_VERSION} \
@@ -148,13 +185,18 @@ paraview-plugin: imas cmake paraview blitz
 	IMASUAL_VERSION=${IMASUAL_VERSION} \
 	./package/build-paraview-plugin.sh
 
-imasdd: saxon python
+paraview-plugin: imas cmake paraview blitz ${STAGING_DIR}/ReadUALEdge-Plugin/1.5.0
+
+${BUILDROOT}/build/data-dictionary-${IMASDD_VERSION}/.installed:
+	@echo ${BUILDROOT}/data-dictionary-${IMASDD_VERSION}/.installed
 	VERSION=${IMASDD_VERSION} \
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	SAXON_VERSION=${SAXON_VERSION} \
 	./package/build-imasdd.sh
 
-imas: python matplotlib-numpy scipy saxon mdsplus blitz libxml2 imasdd
+imasdd: saxon python ${BUILDROOT}/build/data-dictionary-${IMASDD_VERSION}/.installed
+
+${STAGING_DIR}/imas/${IMASDD_VERSION}/solps:
 	BUILDROOT=${BUILDROOT} \
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	NUMPY_VERSION=${NUMPY_VERSION} \
@@ -167,18 +209,23 @@ imas: python matplotlib-numpy scipy saxon mdsplus blitz libxml2 imasdd
 	IMASUAL_VERSION=${IMASUAL_VERSION} \
 	MSCL_VERSION=${MSCL_VERSION} \
 	./package/build-imas.sh
+	cp ${BUILDROOT}/imasdb ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps/bin
 
-ggd: imas
+imas: python matplotlib-numpy scipy saxon mdsplus blitz libxml2 imasdd ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps
+
+${STAGING_DIR}/GGD/${GGD_VERSION}:
 	BUILDROOT=${BUILDROOT} \
 	VERSION=${GGD_VERSION} \
 	IMASUAL_VERSION=${IMASUAL_VERSION} \
 	IMASDD_VERSION=${IMASDD_VERSION} \
 	MDSPLUS_VERSION=${MDSPLUS_VERSION} \
 	./package/build-ggd.sh
-	cp ${BUILDROOT}/imasdb ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps/bin
 
-solps-iter: imas gr gli OpenBLAS mscl ggd python
+ggd: imas ${STAGING_DIR}/GGD/${GGD_VERSION}
+
+${STAGING_DIR}/solps-iter/${SOLPS_VERSION}:
 	# Copy imasdb script for setting up IMAS MDSPLUS_TREE environment
+	SOLPS_VERSION=${SOLPS_VERSION} \
 	IMASUAL_VERSION=${IMASUAL_VERSION} \
 	IMASDD_VERSION=${IMASDD_VERSION} \
 	GGD_VERSION=${GGD_VERSION} \
@@ -189,9 +236,11 @@ solps-iter: imas gr gli OpenBLAS mscl ggd python
 	OPENBLAS_VERSION=${OPENBLAS_VERSION} \
 	./package/build-solps-iter.csh
 
-solps-gui: imas pyqt gnuplot gnuplot-widget setupenv
+solps-iter: imas gr gli OpenBLAS mscl ggd python ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}
 
-setupenv:
+solps-gui: imas pyqt gnuplot gnuplot-widget setupenv.sh
+
+setupenv.sh:
 	@echo "Writing environemnt to ${BUILDROOT}/${SETUP_FILE}"
 	@echo "INSTALL_DIR=${STAGING_DIR}" > ${SETUP_FILE}
 	@echo "" >> ${SETUP_FILE}
