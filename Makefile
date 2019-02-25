@@ -230,6 +230,7 @@ setupenv:
 	@echo "export PYQTDESIGNERPATH=${BUILDROOT}/src/plugins/designer:\$${PYQTDESIGNERPATH}" >> ${SETUP_FILE}
 	@echo "export IMAS_VERSION=${IMASDD_VERSION}" >> ${SETUP_FILE}
 	@echo "export UAL_VERSION=${IMASUAL_VERSION}" >> ${SETUP_FILE}
+	@echo "export PV_PLUGIN_PATH=\$${INSTALL_DIR}/ReadUALEdge-Plugin/1.5.0" >> ${SETUP_FILE}
 	@echo "" >> ${SETUP_FILE}
 	@echo "# Setting aliases" >> ${SETUP_FILE}
 	@echo "alias solps=\"python3 ${BUILDROOT}/src/gui/solps.py\"" >> ${SETUP_FILE}

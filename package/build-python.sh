@@ -52,6 +52,7 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
     ./configure --prefix=${INSTALL_DIR} --enable-shared
     touch ${SRC_DIR}/.configured
 fi

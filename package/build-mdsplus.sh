@@ -49,6 +49,7 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
     CFLAGS=-I${LIBXML2_INSTALL_DIR}/include/libxml2 \
     ./configure --prefix=${INSTALL_DIR} \
                 --enable-shared --disable-doxygen-doc \
@@ -72,7 +73,7 @@ fi
 
 # Generate Modulefile
 if [ ! -d ${MODULE_DIR}/MDSplus ]; then
-	install -d ${MODULE_DIR}/MDSplus
+    install -d ${MODULE_DIR}/MDSplus
 fi
 
 cat << EOF > ${MODULE_DIR}/MDSplus/${VERSION}

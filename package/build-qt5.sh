@@ -44,6 +44,7 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
     # sed -i.orig -e 's/-Wno-error=return-type//' \
     #     qtlocation/src/3rdparty/poly2tri/poly2tri.pro
     #patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-openssl.patch

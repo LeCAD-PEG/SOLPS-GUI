@@ -42,6 +42,7 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
     ./configure --prefix=${INSTALL_DIR}  -opensource -confirm-license \
                 -no-javascript-jit -no-webkit -no-script -no-scripttools \
                 -no-sql-sqlite3 -no-accessibility

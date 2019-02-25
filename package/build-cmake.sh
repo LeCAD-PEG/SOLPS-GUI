@@ -57,6 +57,7 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
     ./bootstrap --prefix=${INSTALL_DIR} -- ${CMAKE_EXTRA_FLAGS}
     touch ${SRC_DIR}/.configured
 fi

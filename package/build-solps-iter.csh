@@ -128,13 +128,13 @@ endif
 setenv OPENBLAS_ROOT ${STAGING_DIR}/OpenBLAS/${OPENBLAS_VERSION}/lib
 
 if (! -e ${SOLPS_SRC_DIR}/.git) then
-    git clone --branch feature/config-LECAD ${SOLPS_GIT} --single-branch ${SOLPS_SRC_DIR}
+    git clone --branch feature/config-LECAD ${SOLPS_GIT} --single-branch --recursive ${SOLPS_SRC_DIR}
     cd ${SOLPS_SRC_DIR}
     git pull
-    git submodule update --init
+    # git submodule update --init
 endif
 
 cd ${SOLPS_SRC_DIR}
 source ${SOLPS_SRC_DIR}/setup.csh gfortran
 # make solps solps_openmp solps_mpi # Problem with manual, maybe because it is being called three times?
-make carre divgeo b25eirene uinp triang amds sonnet-light b25eirene_openmp b25eirene_mpi uinp_mpi amds_mpi manual
+make carre divgeo b25eirene uinp triang amds sonnet-light b25eirene_openmp b25eirene_mpi uinp_mpi amds_mpi

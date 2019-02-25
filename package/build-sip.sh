@@ -52,6 +52,7 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
     ${PYTHON} configure.py --bindir=${INSTALL_DIR}/bin \
         --destdir=${INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
     touch ${SRC_DIR}/.configured

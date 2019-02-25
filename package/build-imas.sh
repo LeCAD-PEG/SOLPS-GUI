@@ -81,6 +81,10 @@ fi
 cd ${SRC_DIR}
 
 # Configure
+if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
+    touch ${SRC_DIR}/.configured
+fi
 
 # Build
 if [ ! -e ${SRC_DIR}/.built ]; then
@@ -127,7 +131,7 @@ fi
 
 # Generate Modulefile
 if [ ! -d ${MODULE_DIR}/imas/${IMAS_VERSION} ]; then
-	install -d ${MODULE_DIR}/imas/${IMAS_VERSION}
+    install -d ${MODULE_DIR}/imas/${IMAS_VERSION}
 fi
 
 cat << EOF > ${MODULE_DIR}/imas/${IMAS_VERSION}/solps
@@ -143,8 +147,8 @@ proc ModulesHelp { } {
 
 conflict imas
 
-if { ![ is-loaded mdsplus/${MDSPLUS_VERSION} ] } {
-    module load mdsplus/${MDSPLUS_VERSION}
+if { ![ is-loaded MDSplus/${MDSPLUS_VERSION} ] } {
+    module load MDSplus/${MDSPLUS_VERSION}
 }
 
 if { ![ is-loaded blitz/${BLITZ_VERSION} ] } {
@@ -169,10 +173,10 @@ if { ![ is-loaded Python/${PYTHON_VERSION} ] } {
 
 setenv       IMAS_VERSION       ${IMAS_VERSION}
 setenv       UAL_VERSION        ${VERSION}
-setenv 		 IMAS_PREFIX		${INSTALL_DIR}
+setenv       IMAS_PREFIX        ${INSTALL_DIR}
 prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
 prepend-path PKG_CONFIG_PATH    ${INSTALL_DIR}/lib/pkgconfig
 prepend-path PYTHONPATH         ${INSTALL_DIR}/python/lib.linux-${B}-${PYTHON_MAINVERSION}
-setenv       ids_path 			${INSTALL_DIR}/models/mdsplus
+setenv       ids_path           ${INSTALL_DIR}/models/mdsplus
 
 EOF

@@ -93,6 +93,7 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
     python3 configure.py --confirm-license --verbose \
         --qmake=${STAGING_DIR}/qt/${QT_VERSION}/bin/qmake \
         --sip=${SIP_INSTALL_DIR}/bin/sip \

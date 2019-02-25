@@ -51,6 +51,7 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
     ./configure --with-python=${PYTHON_INSTALL_DIR} \
                 --prefix=${INSTALL_DIR}
     touch ${SRC_DIR}/.configured
@@ -70,7 +71,7 @@ fi
 
 # Generate Modulefile
 if [ ! -d ${MODULE_DIR}/libxml2 ]; then
-	install -d ${MODULE_DIR}/libxml2
+    install -d ${MODULE_DIR}/libxml2
 fi
 
 cat << EOF > ${MODULE_DIR}/libxml2/${VERSION}
@@ -90,8 +91,8 @@ if { ![ is-loaded Python/${PYTHON_VERSION} ] } {
     module load Python/${PYTHON_VERSION}
 }
 
-prepend-path PATH  					${INSTALL_DIR}/bin
-prepend-path CPATH 					${INSTALL_DIR}/include
-prepend-path LD_LIBRARY_PATH		${INSTALL_DIR}/lib
-prepend-path PKG_CONFIG_PATH		${INSTALL_DIR}/lib/pkgconfig
+prepend-path PATH                   ${INSTALL_DIR}/bin
+prepend-path CPATH                  ${INSTALL_DIR}/include
+prepend-path LD_LIBRARY_PATH        ${INSTALL_DIR}/lib
+prepend-path PKG_CONFIG_PATH        ${INSTALL_DIR}/lib/pkgconfig
 EOF

@@ -81,6 +81,7 @@ fi
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
     # Ignore git describe tags as we are building ParaView from tar.gz
     sed -i -e "/^determine_version/d" ${SRC_DIR}/CMakeLists.txt
     install -d ${BUILD_DIR}/paraview-${VERSION}

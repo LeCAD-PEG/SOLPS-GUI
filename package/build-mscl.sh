@@ -39,6 +39,7 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
     cat <<EOF > ${SRC_DIR}/config/compiler.UNKNOWN.gfortran
 CC       = gcc
 CFLAGS   = -O3 -fPIC -fsecond-underscore
@@ -71,7 +72,7 @@ fi
 
 # Generate Modulefile
 if [ ! -d ${MODULE_DIR}/mscl ]; then
-	install -d ${MODULE_DIR}/mscl
+    install -d ${MODULE_DIR}/mscl
 fi
 
 cat << EOF > ${MODULE_DIR}/mscl/${VERSION}

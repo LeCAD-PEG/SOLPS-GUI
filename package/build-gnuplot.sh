@@ -76,6 +76,7 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
     libtoolize
     CXXFLAGS=" -std=c++11" \
     ./configure --without-cairo --prefix=${INSTALL_DIR} \

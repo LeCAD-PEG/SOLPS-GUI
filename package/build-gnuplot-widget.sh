@@ -104,7 +104,7 @@ rm -f moc_* sippy* sipAPI* pyQtGnuplot.*
 rm -rf ${OBJECTS_DIR}
 
 if [ ! -d ${MODULE_DIR}/gnuplot-widget ]; then
-	install -d ${MODULE_DIR}/gnuplot-widget
+    install -d ${MODULE_DIR}/gnuplot-widget
 fi
 cat << EOF > ${MODULE_DIR}/gnuplot-widget/python-${PYTHON_VERSION}-qt-${QT_VERSION}
 #%Module1.0#####################################################################

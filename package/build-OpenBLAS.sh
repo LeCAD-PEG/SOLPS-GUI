@@ -41,7 +41,10 @@ fi
 cd ${SRC_DIR}
 
 # Configure
-
+if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
+    touch ${SRC_DIR}/.configured
+fi
 # Build
 if [ ! -e ${SRC_DIR}/.built ]; then
     make -j${MAKE_JOBS}
@@ -56,7 +59,7 @@ fi
 
 # Generate Modulefile
 if [ ! -d ${MODULE_DIR}/OpenBLAS ]; then
-	install -d ${MODULE_DIR}/OpenBLAS
+    install -d ${MODULE_DIR}/OpenBLAS
 fi
 
 cat << EOF > ${MODULE_DIR}/OpenBLAS/${VERSION}

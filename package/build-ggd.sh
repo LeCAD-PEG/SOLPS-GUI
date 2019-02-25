@@ -66,6 +66,7 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
     ./bootstrap
     ./configure --prefix=${INSTALL_DIR} --enable-doc --enable-tests \
                 --enable-modulefile \
@@ -80,7 +81,7 @@ if [ ! -e ${SRC_DIR}/.built ]; then
 fi
 
 # Install
-if [ ! -d ${INSTALL_DIR} ]; then
+if [ ! -e ${INSTALL_DIR} ]; then
     install -d ${INSTALL_DIR}
     make install
 fi

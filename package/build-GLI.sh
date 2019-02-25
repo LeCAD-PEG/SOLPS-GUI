@@ -17,7 +17,7 @@ VERSION=${VERSION:-4.5.30}
 SOURCE="gli-${VERSION}.tar.gz"
 DOWNLOAD="http://iffwww.iff.kfa-juelich.de/gli/gli-${VERSION}.tar.gz"
 SRC_DIR="${BUILD_DIR}/gli"
-INSTALL_DIR=${STAGING_DIR}/GLI/${GLI_VERSION}
+INSTALL_DIR=${STAGING_DIR}/GLI/${VERSION}
 
 # Environment dependencies
 
@@ -42,6 +42,7 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
     cd ${SRC_DIR}/src
     ./configure CFLAGS="-DUSE_INTERP_RESULT"
     touch ${SRC_DIR}/.configured

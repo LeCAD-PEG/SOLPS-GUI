@@ -92,6 +92,7 @@ cd ${SRC_DIR}
 
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
+    rm -rf ${INSTALL_DIR}
     IMAS_VERSION_DIGIT=$(echo "$IMAS_VERSION" | sed "s/\.//g") \
     ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Debug \
     -DParaView_DIR:PATH=${STAGING_DIR}/ParaView/${PARAVIEW_VERSION} \
@@ -140,5 +141,5 @@ if { ![ is-loaded MDSplus/${MDSPLUS_VERSION} ] } {
     module load MDSplus/${MDSPLUS_VERSION}
 }
 
-prepend-path PV_PLUGIN_PATH          ${STAGING_PLUGINS}
+prepend-path PV_PLUGIN_PATH          ${INSTALL_DIR}
 EOF
