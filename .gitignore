@@ -1,4 +1,4 @@
-setupenv
+setupenv.sh
 modules
 download
 build
