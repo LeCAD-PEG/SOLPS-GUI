@@ -71,7 +71,7 @@ do
   echo $file
   cpp_file="${SRC_DIR}/src/moc_$(basename ${file} .h).cpp"
   if [ ! -e ${cpp_file} ]; then
-    moc ${file} -o ${SRC_DIR}/moc_$(basename ${file} .h).cpp
+    moc ${file} -o ${SRC_DIR}/src/moc_$(basename ${file} .h).cpp
   fi
 done
 

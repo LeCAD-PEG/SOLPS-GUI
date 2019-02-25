@@ -71,6 +71,12 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
       -skip qt3d ${XCB_FLAGS} ${QT_EXTRA_FLAGS} \
       -qt-xkbcommon -xkb-config-root /usr/share/X11/xkb \
       -nomake tests
+
+    # Check if INSTALL directory has been already created
+    if [ -d ${INSTALL_DIR} ]; then
+    	rm -r ${INSTALL_DIR}
+    fi
+
     touch ${SRC_DIR}/.configured
 fi
 

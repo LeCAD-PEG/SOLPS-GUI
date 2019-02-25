@@ -46,6 +46,11 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
                 -no-javascript-jit -no-webkit -no-script -no-scripttools \
                 -no-sql-sqlite3 -no-accessibility
     touch ${SRC_DIR}/.configured
+
+    # Check if INSTALL directory has been already created
+    if [ -d ${INSTALL_DIR} ]; then
+    	rm -r ${INSTALL_DIR}
+    fi
 fi
 
 # Build
