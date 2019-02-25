@@ -137,4 +137,6 @@ endif
 cd ${SOLPS_SRC_DIR}
 source ${SOLPS_SRC_DIR}/setup.csh gfortran
 # make solps solps_openmp solps_mpi # Problem with manual, maybe because it is being called three times?
-make carre divgeo b25eirene uinp triang amds sonnet-light b25eirene_openmp b25eirene_mpi uinp_mpi amds_mpi
+make carre divgeo eirene b25 b25eirene uinp triang amds sonnet-light b25eirene_openmp b25eirene_mpi uinp_mpi amds_mpi
+make manual # thumbspdf fails, but it is ignored, but not by makefile. So run it again!
+make manual
