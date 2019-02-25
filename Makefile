@@ -104,7 +104,7 @@ ${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/python${PYTHON_MAINVERSION}/site-pac
 
 matplotlib-numpy: python OpenBLAS ${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages/numpy-${NUMPY_VERSION}-py${PYTHON_MAINVERSION}-linux-x86_64.egg
 
-${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages/scipy-${NUMPY_VERSION}-py${PYTHON_MAINVERSION}-linux-x86_64.egg:
+${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages/scipy-${SCIPY_VERSION}-py${PYTHON_MAINVERSION}-linux-x86_64.egg:
 	VERSION=${SCIPY_VERSION} \
 	./package/build-scipy.sh
 
