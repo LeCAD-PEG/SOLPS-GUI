@@ -78,7 +78,7 @@ system:
      - PyQt5
  2. ParaView 5.x compiled with Catalyst including
      - IMAS library for ParaView plugin
-     - CMake 3.5+ 
+     - CMake 3.5+
  3. Gnuplot 5.x with
      - PyQt5 Gnuplot widget for better user experience under SOLPS GUI
 
@@ -89,7 +89,44 @@ above runtime software.
 .. note::
 
    We strongly suggest to build the required SOLPS GUI software components
-   by build scipts provided in SOLPS GUI top directory as they were tested
+   by build scripts provided in SOLPS GUI top directory as they were tested
    many times and guarantee compatibility when compiling GUI widget
    and PyQt5 Gnuplot plugin.
+
+=======================
+SOLPS ITER installation
+=======================
+
+We now also provides scripts for building the SOLPS-ITER suite along with it's
+required packages. Some of the requirements are written in the README.md. For
+others, scripts are written that download, compile and install the code. At the
+end of each package compilation, module files are generated and are, by
+default, written into ``solps-gui/modules`` directory.
+
+To compile the SOLPS-ITER suite, run the following command from the solps-gui
+folder::
+
+    cd solps-gui
+    make solps-iter # It may take several hours
+
+When it finishes compiling, the environment-module application can be used for
+loading the SOLPS-ITER environment::
+
+    cd solps-gui
+    module use modules
+    module av
+    --------------------- /local/work/solps-gui/modules ---------------------
+    blitz/1.0.0                           OpenBLAS/0.3.5
+    cmake/3.10.1                          paraview-plugin-edge/1.5
+    GGD/1.8.3                             ParaView/5.4.1
+    GLI/4.5.30                            PyQt5/5.9.1
+    gnuplot-widget/python-3.6.8-qt-5.9.1  Python/3.6.8
+    gnuplot/5.2.2-qt-5.9.1                Qt4/4.8.7
+    GR/0.0.94                             Qt5/5.9.1
+    imas/3.21.0/solps                     saxon/HE9-8-0-12J
+    libxml2/2.9.1                         SIP/4.19.13
+    MDSplus/stable_release-7-7-8          solps-gui/1.5
+    mscl/1.1.1                            solps-iter/3.0.7
+
+    module load solps-iter/3.0.7 # Current version
 
