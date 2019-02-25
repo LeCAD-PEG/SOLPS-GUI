@@ -2,6 +2,7 @@
 # Use realpath for the last time to remove trailing slash
 BUILDROOT=$(realpath $(dir $(realpath $(firstword $(MAKEFILE_LIST)))))
 STAGING_DIR ?= ${BUILDROOT}/staging
+MODULE_DIR ?= ${BUILDROOT}/modules
 
 GLI_VERSION=4.5.30
 GR_VERSION=0.0.94
@@ -32,8 +33,8 @@ CMAKE_VERSION=3.10.1
 
 # Get module environment
 #
-MODULE_CMD:=${MODULE_CMD:-module}
 SETUP_FILE="setupenv.sh"
+SOLPS_GUI_MOD=${MODULE_DIR}/solps-gui/1.5
 
 .PHONY: gr gli OpenBLAS mscl ggd python libxml2 saxon blitz cmake mdsplus \
 	imas solps-iter pyqt solps-gui
@@ -238,7 +239,7 @@ ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}:
 
 solps-iter: imas gr gli OpenBLAS mscl ggd python ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}
 
-solps-gui: imas pyqt gnuplot gnuplot-widget setupenv.sh
+solps-gui: imas pyqt gnuplot gnuplot-widget setupenv.sh ${MODULE_DIR}/solps-gui/1.5
 
 setupenv.sh:
 	@echo "Writing environemnt to ${BUILDROOT}/${SETUP_FILE}"
@@ -288,6 +289,38 @@ setupenv.sh:
 	@echo "alias eirene=\"python3 ${BUILDROOT}/src/widgets/eirene.py\"" >> ${SETUP_FILE}
 	@echo "alias b2=\"python3 ${BUILDROOT}/src/widgets/b2.py\"" >> ${SETUP_FILE}
 
+# Solps GUI module file
+${MODULE_DIR}/solps-gui/1.5:
+	@echo "Writing solps-gui module file to ${MODULE_DIR}/solps-gui/1.5"
+	@install -d ${MODULE_DIR}/solps-gui
+	@echo "#%Module1.0###################################################################" > ${SOLPS_GUI_MOD}
+	@echo "##" >> ${SOLPS_GUI_MOD}
+	@echo "## \$$name modulefile" >> ${SOLPS_GUI_MOD}
+	@echo "##" >> ${SOLPS_GUI_MOD}
+	@echo "proc ModulesHelp { } {" >> ${SOLPS_GUI_MOD}
+	@echo "puts stderr "\tThis module sets the environment for $name v$ver"" >> ${SOLPS_GUI_MOD}
+	@echo "}" >> ${SOLPS_GUI_MOD}
+	@echo "conflict $name" >> ${SOLPS_GUI_MOD}
+	@echo "module-whatis "Graphical user interface for interacting with SOLPS-ITER and its output"" >> ${SOLPS_GUI_MOD}
+	@echo "if { ! [ is-loaded imas ] } {" >> ${SOLPS_GUI_MOD}
+	@echo "    module load imas/${IMASDD_VERSION}/solps" >> ${SOLPS_GUI_MOD}
+	@echo "}" >> ${SOLPS_GUI_MOD}
+	@echo "" >> ${SOLPS_GUI_MOD}
+	@echo "if { ![ is-loaded Python/${PYTHON_VERSION} ] } {" >> ${SOLPS_GUI_MOD}
+	@echo "    module load Python/${PYTHON_VERSION}" >> ${SOLPS_GUI_MOD}
+	@echo "}" >> ${SOLPS_GUI_MOD}
+	@echo "" >> ${SOLPS_GUI_MOD}
+	@echo "if { ![ is-loaded PyQt5/${PyQt_Version} ] } {" >> ${SOLPS_GUI_MOD}
+	@echo "    module load PyQt5/${PyQt_Version}" >> ${SOLPS_GUI_MOD}
+	@echo "}" >> ${SOLPS_GUI_MOD}
+	@echo "" >> ${SOLPS_GUI_MOD}
+	@echo "prepend-path PYTHONPATH         ${BUILDROOT}/src/widgets" >> ${SOLPS_GUI_MOD}
+	@echo "prepend-path PYQTDESIGNER       ${BUILDROOT}/src/plugins/designer" >> ${SOLPS_GUI_MOD}
+	@echo "" >> ${SOLPS_GUI_MOD}
+	@echo "set-alias solps {python3 ${BUILDROOT}/src/gui/solps.py $*}" >> ${SOLPS_GUI_MOD}
+	@echo "set-alias solps_doc \"xdg-open ${BUILDROOT}/doc/build/html/index.html\"" >> ${SOLPS_GUI_MOD}
+	@echo "set-alias eirene \"python3 -m eirene $*\"" >> ${SOLPS_GUI_MOD}
+	@echo "set-alias b2 \"python3 -m b2 $*\"" >> ${SOLPS_GUI_MOD}
 
 query-%:
 	@echo $($(*))
