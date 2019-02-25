@@ -100,7 +100,7 @@ make install
 # After-build clean
 make clean
 make distclean
-rm -f moc_* sippy* sipAPI* pyQtGnuplot.*
+rm -f ${SRC_DIR}/moc_* ${SRC_DIR}/sippy* ${SRC_DIR}/sipAPI* ${SRC_DIR}/pyQtGnuplot.*
 rm -rf ${OBJECTS_DIR}
 
 if [ ! -d ${MODULE_DIR}/gnuplot-widget ]; then
