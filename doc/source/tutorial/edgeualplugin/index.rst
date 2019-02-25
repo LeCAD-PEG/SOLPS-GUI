@@ -75,6 +75,16 @@ Additional commands to check available modules::
  module avail IMAS
  module avail imas # listing older IMAS versions
 
+Or if you have installed the packages on a local machine with the help of
+solps-gui make then use the commands::
+
+ cd ~/solps-gui
+ make setupenv
+ source setupenv.sh
+ paraview
+
+The plugin will already be loaded in ParaView.
+
 .. _loading_plugin:
 
 Loading the plugin

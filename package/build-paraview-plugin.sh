@@ -21,29 +21,29 @@ INSTALL_DIR=${STAGING_DIR}/ReadUALEdge-Plugin/${VERSION}
 case $(hostname -f) in
   *.iter.org)
         module purge
-	module load IMAS/3.21.0-3.8.6
+    module load IMAS/3.21.0-3.8.6
         module load OpenSSL/1.0.2g-GCC-4.8.3
-	module unload Python/2.7.14-intel-2018a
-	module load Python/3.6.4-intel-2018a
-	# BUILDING PLUGIN FOR ITER PARAVIEW (available as a module)
-	#module load ParaView/5.4.1-intel-2018a-mpi
-	#export PARAVIEW_PREFIX=${EBROOTPARAVIEW}
-	#export CMAKE_PREFIX_PATH=${EBROOTPARAVIEW}/lib/cmake/paraview-5.4
-	export CC=gcc -E
-	export CXX=g++
-	MAKE_JOBS=${MAKE_JOBS:-4}
-	;;
+    module unload Python/2.7.14-intel-2018a
+    module load Python/3.6.4-intel-2018a
+    # BUILDING PLUGIN FOR ITER PARAVIEW (available as a module)
+    #module load ParaView/5.4.1-intel-2018a-mpi
+    #export PARAVIEW_PREFIX=${EBROOTPARAVIEW}
+    #export CMAKE_PREFIX_PATH=${EBROOTPARAVIEW}/lib/cmake/paraview-5.4
+    export CC=gcc -E
+    export CXX=g++
+    MAKE_JOBS=${MAKE_JOBS:-4}
+    ;;
 
   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
-	. /etc/profile.d.gw/modules.sh
-	module purge
-	module load cineca imasenv/3.20.0 #cmake/3.12.0
-	module switch itm-python/2.7
-	module unload matlab
-	QT_VERSION=4.8.7
-	module load itm-qt/${QT_VERSION}
-	MAKE_JOBS=${MAKE_JOBS:-36}
-	;;
+    . /etc/profile.d.gw/modules.sh
+    module purge
+    module load cineca imasenv/3.20.0 #cmake/3.12.0
+    module switch itm-python/2.7
+    module unload matlab
+    QT_VERSION=4.8.7
+    module load itm-qt/${QT_VERSION}
+    MAKE_JOBS=${MAKE_JOBS:-36}
+    ;;
 
   *)
     PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.1}
@@ -114,7 +114,7 @@ fi
 
 # Generate Modulefile
 if [ ! -d ${MODULE_DIR}/paraview-plugin-edge ]; then
-	install -d ${MODULE_DIR}/paraview-plugin-edge
+    install -d ${MODULE_DIR}/paraview-plugin-edge
 fi
 
 cat << EOF > ${MODULE_DIR}/paraview-plugin-edge/1.5
@@ -130,7 +130,7 @@ module-whatis  "ReadUAL-EDGE plugin for ParaView."
 conflict paraview-plugin
 
 if { ![ is-loaded imas/${IMAS_VERSION}/solps ] } {
- 	module load imas/${IMAS_VERSION}/solps
+    module load imas/${IMAS_VERSION}/solps
 }
 
 if { ![ is-loaded ParaView/${PARAVIEW_VERSION} ] } {

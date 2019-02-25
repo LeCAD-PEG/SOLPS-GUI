@@ -38,7 +38,7 @@ SETUP_FILE="setupenv.sh"
 .PHONY: gr gli OpenBLAS mscl ggd python libxml2 saxon blitz cmake mdsplus \
 	imas solps-iter pyqt solps-gui
 
-all: solps-iter solps-gui setupenv
+all: solps-iter solps-gui
 
 gr:
 	BUILDROOT=${BUILDROOT} GR_VERSION=${GR_VERSION} ./package/build-GR.sh
@@ -189,7 +189,7 @@ solps-iter: imas gr gli OpenBLAS mscl ggd python
 	OPENBLAS_VERSION=${OPENBLAS_VERSION} \
 	./package/build-solps-iter.csh
 
-solps-gui: imas pyqt gnuplot gnuplot-widget
+solps-gui: imas pyqt gnuplot gnuplot-widget setupenv
 
 setupenv:
 	@echo "Writing environemnt to ${BUILDROOT}/${SETUP_FILE}"

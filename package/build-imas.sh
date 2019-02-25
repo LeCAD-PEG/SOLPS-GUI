@@ -159,10 +159,6 @@ if { ![ is-loaded OpenBLAS/${OPENBLAS_VERSION} ] } {
     module load OpenBLAS/${OPENBLAS_VERSION}
 }
 
-if { ![ is-loaded saxon/${SAXON_VERSION} ] } {
-    module load saxon/${SAXON_VERSION}
-}
-
 if { ![ is-loaded libxml2/${LIBXML2_VERSION} ] } {
     module load libxml2/${LIBXML2_VERSION}
 }

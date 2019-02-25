@@ -55,7 +55,7 @@ in :file:`README.md` after ``git clone``. Short instructions for building::
 
     $ git clone ssh://git@git.iter.org/bnd/solps-gui.git
     $ cd solps-gui
-    $ ./build-pyqt.sh # It may take several hours to compile!
+    $ make solps-gui # It may take several hours to compile!
 
 .. note::
 
@@ -67,6 +67,13 @@ Starting the GUI::
 
     $ source setupenv.sh
     $ solps
+
+you may also compile paraview for using ParaView ReadUALEdge plugin::
+
+    $ cd solps-gui
+    $ make paraview-plugin # It may take several hours to compile!
+
+This will compile imas, paraview and the plugin.
 
 Further instructions (optional)::
 
