@@ -35,6 +35,7 @@ CMAKE_VERSION=3.10.1
 #
 SETUP_FILE="setupenv.sh"
 SOLPS_GUI_MOD=${MODULE_DIR}/solps-gui/1.5
+SOLPS_ITER_MOD=${MODULE_DIR}/solps-iter/${SOLPS_VERSION}
 
 .PHONY: gr gli OpenBLAS mscl ggd python libxml2 saxon blitz cmake mdsplus \
 	imas solps-iter pyqt solps-gui
@@ -237,7 +238,7 @@ ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}:
 	OPENBLAS_VERSION=${OPENBLAS_VERSION} \
 	./package/build-solps-iter.csh
 
-solps-iter: imas gr gli OpenBLAS mscl ggd python ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}
+solps-iter: imas gr gli OpenBLAS mscl ggd python ${STAGING_DIR}/solps-iter/${SOLPS_VERSION} ${SOLPS_ITER_MOD}
 
 solps-gui: imas pyqt gnuplot gnuplot-widget setupenv.sh ${MODULE_DIR}/solps-gui/1.5
 
@@ -290,7 +291,7 @@ setupenv.sh:
 	@echo "alias b2=\"python3 ${BUILDROOT}/src/widgets/b2.py\"" >> ${SETUP_FILE}
 
 # Solps GUI module file
-${MODULE_DIR}/solps-gui/1.5:
+${SOLPS_GUI_MOD}:
 	@echo "Writing solps-gui module file to ${MODULE_DIR}/solps-gui/1.5"
 	@install -d ${MODULE_DIR}/solps-gui
 	@echo "#%Module1.0###################################################################" > ${SOLPS_GUI_MOD}
@@ -321,6 +322,127 @@ ${MODULE_DIR}/solps-gui/1.5:
 	@echo "set-alias solps_doc \"xdg-open ${BUILDROOT}/doc/build/html/index.html\"" >> ${SOLPS_GUI_MOD}
 	@echo "set-alias eirene \"python3 -m eirene $*\"" >> ${SOLPS_GUI_MOD}
 	@echo "set-alias b2 \"python3 -m b2 $*\"" >> ${SOLPS_GUI_MOD}
+
+${SOLPS_ITER_MOD}:
+	@echo "Writing solps-iter module file to ${SOLPS_ITER_MOD}"
+	@install -d ${MODULE_DIR}/solps-iter
+	@echo "#%Module1.0###################################################################" 	> ${SOLPS_ITER_MOD}
+	@echo "##" 																				>> ${SOLPS_ITER_MOD}
+	@echo "## \$$name modulefile" 															>> ${SOLPS_ITER_MOD}
+	@echo "##" 																				>> ${SOLPS_ITER_MOD}
+	@echo "if { ![ is-loaded MDSplus/${MDSPLUS_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
+	@echo "    module load MDSplus/${MDSPLUS_VERSION}"  >> ${SOLPS_ITER_MOD}
+	@echo "}"  >> ${SOLPS_ITER_MOD}
+	@echo "if { ![ is-loaded OpenBLAS/${OPENBLAS_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
+	@echo "    module load OpenBLAS/${OPENBLAS_VERSION}"  >> ${SOLPS_ITER_MOD}
+	@echo "}"  >> ${SOLPS_ITER_MOD}
+	@echo "if { ![ is-loaded Python/${PYTHON_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
+	@echo "    module load Python/${PYTHON_VERSION}"  >> ${SOLPS_ITER_MOD}
+	@echo "}"  >> ${SOLPS_ITER_MOD}
+	@echo "if { ![ is-loaded GR/${GR_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
+	@echo "    module load GR/${GR_VERSION}"  >> ${SOLPS_ITER_MOD}
+	@echo "}"  >> ${SOLPS_ITER_MOD}
+	@echo ""  >> ${SOLPS_ITER_MOD}
+	@echo "if { ![ is-loaded GLI/${GLI_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
+	@echo "    module load GLI/${GLI_VERSION}"  >> ${SOLPS_ITER_MOD}
+	@echo "}"  >> ${SOLPS_ITER_MOD}
+	@echo ""  >> ${SOLPS_ITER_MOD}
+	@echo "if { ![ is-loaded GGD/${GGD_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
+	@echo "    module load GGD/${GGD_VERSION}"  >> ${SOLPS_ITER_MOD}
+	@echo "}"  >> ${SOLPS_ITER_MOD}
+	@echo "setenv MAKE make" >> ${SOLPS_ITER_MOD}
+	@echo "setenv SOLPSTOP ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}"	>> ${SOLPS_ITER_MOD}
+	@echo "set SOLPSTOP ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}"	>> ${SOLPS_ITER_MOD}
+	@echo "setenv SOLPSWORK \$$SOLPSTOP/runs"	>> ${SOLPS_ITER_MOD}
+	@echo "setenv HOST_NAME UNKNOWN"	>> ${SOLPS_ITER_MOD}
+	@echo "set HOST_NAME UNKNOWN"	>> ${SOLPS_ITER_MOD}
+	@echo "setenv COMPILER gfortran"	>> ${SOLPS_ITER_MOD}
+	@echo "set COMPILER gfortran"	>> ${SOLPS_ITER_MOD}
+	@echo "setenv DEVICE solps-iter"	>> ${SOLPS_ITER_MOD}
+	@echo "set DEVICE solps-iter"	>> ${SOLPS_ITER_MOD}
+	@echo "set TOOLCHAIN \$$HOST_NAME.\$$COMPILER"	>> ${SOLPS_ITER_MOD}
+	@echo ""	>> ${SOLPS_ITER_MOD}
+	@echo "prepend-path PYTHONPATH \$$SOLPSTOP/lib/python"	>> ${SOLPS_ITER_MOD}
+	@echo "setenv SOLPSLIB \$$SOLPSTOP/lib/\$$HOST_NAME.\$$COMPILER"	>> ${SOLPS_ITER_MOD}
+	@echo ""	>> ${SOLPS_ITER_MOD}
+	@echo "setenv SonnetTopDirectory \\$SOLPSTOP/modules/Sonnet-Light"	>> ${SOLPS_ITER_MOD}
+	@echo "setenv DG \$$SOLPSTOP/modules/DivGeo"	>> ${SOLPS_ITER_MOD}
+	@echo ""	>> ${SOLPS_ITER_MOD}
+	@echo "prepend-path PATH \$$SOLPSTOP/scripts"	>> ${SOLPS_ITER_MOD}
+	@echo "prepend-path PATH \$$SOLPSTOP/modules/Carre/builds/\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
+	@echo "prepend-path PATH \$$SOLPSTOP/modules/DivGeo/builds/\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
+	@echo "prepend-path PATH \$$SOLPSTOP/modules/Eirene/builds/standalone.\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
+	@echo "prepend-path PATH \$$SOLPSTOP/modules/B2.5/builds/standalone.\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
+	@echo "prepend-path PATH \$$SOLPSTOP/modules/B2.5/builds/couple_SOLPS-ITER.\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
+	@echo "prepend-path PATH \$$SOLPSTOP/modules/Uinp/builds/\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
+	@echo "prepend-path PATH \$$SOLPSTOP/modules/Triang/builds/\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
+	@echo "prepend-path PATH \$$SOLPSTOP/modules/amds/builds/\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
+	@echo ""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias sb2  \"cd \$$SOLPSTOP/modules/B2.5\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias sbb  \"cd \$$SOLPSTOP/modules/B2.5\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias sei  \"cd \$$SOLPSTOP/modules/Eirene\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias ssw  \"cd \$$SOLPSTOP/modules/Sonnet-light\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias sst  \"cd \$$SOLPSTOP/modules/Triang\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias ssd  \"cd \$$SOLPSTOP/modules/DivGeo\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias ssc  \"cd \$$SOLPSTOP/modules/Carre\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias ssu  \"cd \$$SOLPSTOP/modules/Uinp\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias slib \"cd \$$SOLPSTOP/lib/${HOST_NAME}.${COMPILER}\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias sbr  \"cd \$$SOLPSTOP/runs\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias scr  \"cd \$$SOLPSTOP/scripts\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias stop \"cd \$$SOLPSTOP\""	>> ${SOLPS_ITER_MOD}
+	@echo ""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias sdg \"cd \$$SOLPSTOP/modules/DivGeo/device/\$$DEVICE\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias ssf \"cd \$$SOLPSTOP/modules/DivGeo/device/\$$DEVICE\""	>> ${SOLPS_ITER_MOD}
+	@echo ""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xyplot \"plot xyplot\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xyplot2 \"plot xyplot2\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xyplot3 \"plot xyplot3\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xyplot4 \"plot xyplot4\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xyplot5 \"plot xyplot5\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xyplot6 \"plot xyplot6\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xyplot7 \"plot xyplot7\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xyplot8 \"plot xyplot8\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xyplot8 \"plot xyplot8\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xyplot9 \"plot xyplot9\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlyplot \"plot xlyplot\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlyplot2 \"plot xlyplot2\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlyplot3 \"plot xlyplot3\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlyplot4 \"plot xlyplot4\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlyplot5 \"plot xlyplot5\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlyplot6 \"plot xlyplot6\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlyplot7 \"plot xlyplot7\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlyplot8 \"plot xlyplot8\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlyplot8 \"plot xlyplot8\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlyplot9 \"plot xlyplot9\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xylplot \"plot xylplot\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xylplot2 \"plot xylplot2\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xylplot3 \"plot xylplot3\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xylplot4 \"plot xylplot4\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xylplot5 \"plot xylplot5\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xylplot6 \"plot xylplot6\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xylplot7 \"plot xylplot7\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xylplot8 \"plot xylplot8\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xylplot8 \"plot xylplot8\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xylplot9 \"plot xylplot9\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlylplot \"plot xlylplot\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlylplot2 \"plot xlylplot2\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlylplot3 \"plot xlylplot3\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlylplot4 \"plot xlylplot4\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlylplot5 \"plot xlylplot5\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlylplot6 \"plot xlylplot6\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlylplot7 \"plot xlylplot7\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlylplot8 \"plot xlylplot8\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlylplot8 \"plot xlylplot8\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias xlylplot9 \"plot xlylplot9\""	>> ${SOLPS_ITER_MOD}
+	@echo ""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias   set_debug  \"source \$$SOLPSTOP/SETUP/debug\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias unset_debug  \"source \$$SOLPSTOP/SETUP/nodebug\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias   set_openmp \"source \$$SOLPSTOP/SETUP/openmp\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias unset_openmp \"source \$$SOLPSTOP/SETUP/noopenmp\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias   set_mpi    \"source \$$SOLPSTOP/SETUP/mpi\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias unset_mpi    \"source \$$SOLPSTOP/SETUP/nompi\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias   set_ig     \"source \$$SOLPSTOP/SETUP/ig\""	>> ${SOLPS_ITER_MOD}
+	@echo "set-alias unset_ig     \"source \$$SOLPSTOP/SETUP/noig\""	>> ${SOLPS_ITER_MOD}
 
 query-%:
 	@echo $($(*))
