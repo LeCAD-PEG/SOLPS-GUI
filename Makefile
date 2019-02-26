@@ -375,8 +375,9 @@ ${SOLPS_ITER_MOD}:
 	@echo "prepend-path PATH \$$SOLPSTOP/modules/Carre/builds/\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
 	@echo "prepend-path PATH \$$SOLPSTOP/modules/DivGeo/builds/\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
 	@echo "prepend-path PATH \$$SOLPSTOP/modules/Eirene/builds/standalone.\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
+	@echo "prepend-path PATH \$$SOLPSTOP/modules/Eirene/builds/coupled_SOLPS-ITER.\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
 	@echo "prepend-path PATH \$$SOLPSTOP/modules/B2.5/builds/standalone.\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
-	@echo "prepend-path PATH \$$SOLPSTOP/modules/B2.5/builds/couple_SOLPS-ITER.\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
+	@echo "prepend-path PATH \$$SOLPSTOP/modules/B2.5/builds/coupled_SOLPS-ITER.\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
 	@echo "prepend-path PATH \$$SOLPSTOP/modules/Uinp/builds/\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
 	@echo "prepend-path PATH \$$SOLPSTOP/modules/Triang/builds/\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
 	@echo "prepend-path PATH \$$SOLPSTOP/modules/amds/builds/\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
