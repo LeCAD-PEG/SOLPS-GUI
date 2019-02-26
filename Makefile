@@ -301,7 +301,7 @@ ${SOLPS_GUI_MOD}:
 	@echo "proc ModulesHelp { } {" >> ${SOLPS_GUI_MOD}
 	@echo "puts stderr "\tThis module sets the environment for $name v$ver"" >> ${SOLPS_GUI_MOD}
 	@echo "}" >> ${SOLPS_GUI_MOD}
-	@echo "conflict $name" >> ${SOLPS_GUI_MOD}
+	@echo "conflict solps-gui" >> ${SOLPS_GUI_MOD}
 	@echo "module-whatis "Graphical user interface for interacting with SOLPS-ITER and its output"" >> ${SOLPS_GUI_MOD}
 	@echo "if { ! [ is-loaded imas ] } {" >> ${SOLPS_GUI_MOD}
 	@echo "    module load imas/${IMASDD_VERSION}/solps" >> ${SOLPS_GUI_MOD}
@@ -313,6 +313,9 @@ ${SOLPS_GUI_MOD}:
 	@echo "" >> ${SOLPS_GUI_MOD}
 	@echo "if { ![ is-loaded PyQt5/${PyQt_Version} ] } {" >> ${SOLPS_GUI_MOD}
 	@echo "    module load PyQt5/${PyQt_Version}" >> ${SOLPS_GUI_MOD}
+	@echo "}" >> ${SOLPS_GUI_MOD}
+	@echo "if { ![ is-loaded gnuplot-widget ] } {" >> ${SOLPS_GUI_MOD}
+	@echo "    module load gnuplot-widget" >> ${SOLPS_GUI_MOD}
 	@echo "}" >> ${SOLPS_GUI_MOD}
 	@echo "" >> ${SOLPS_GUI_MOD}
 	@echo "prepend-path PYTHONPATH         ${BUILDROOT}/src/widgets" >> ${SOLPS_GUI_MOD}

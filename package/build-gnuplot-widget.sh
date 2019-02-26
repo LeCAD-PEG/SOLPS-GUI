@@ -43,6 +43,7 @@ case $(hostname -f) in
         PYTHON_INSTALL_DIR=${STAGING_DIR}/Python/${PYTHON_VERSION}
         PyQt_INSTALL_DIR=${STAGING_DIR}/PyQt5/${PyQT_VERSION}
         SIP_INSTALL_DIR=${STAGING_DIR}/sip/${SIP_VERSION}
+        INSTALL_DIR=${STAGING_DIR}/gnuplot-widget/python-${PYTHON_VERSION}-qt-${QT_VERSION}
 
         export QTDIR
         export PATH="${PYTHON_INSTALL_DIR}/bin:${QTDIR}/bin:${SIP_INSTALL_DIR}/bin:${PATH}"
@@ -130,5 +131,5 @@ if { ![ is-loaded PyQt5/${QT_VERSION} ] } {
     module load PyQt5/${QT_VERSION}
 }
 
-prepend-path PYTHON_PATH        ${INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
+prepend-path PYTHONPATH        ${INSTALL_DIR}
 EOF
