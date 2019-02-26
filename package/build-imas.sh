@@ -170,6 +170,7 @@ if { ![ is-loaded Python/${PYTHON_VERSION} ] } {
 setenv       IMAS_VERSION       ${IMAS_VERSION}
 setenv       UAL_VERSION        ${VERSION}
 setenv       IMAS_PREFIX        ${INSTALL_DIR}
+prepend-path PATH               ${INSTALL_DIR}/bin
 prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
 prepend-path PKG_CONFIG_PATH    ${INSTALL_DIR}/lib/pkgconfig
 prepend-path PYTHONPATH         ${INSTALL_DIR}/python/lib.linux-${B}-${PYTHON_MAINVERSION}

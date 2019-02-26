@@ -65,7 +65,7 @@ if [ ! -d ${MODULE_DIR}/GLI ]; then
     install -d ${MODULE_DIR}/GLI
 fi
 
-cat << EOF > ${MODULE_DIR}/GLI/${GLI_VERSION}
+cat << EOF > ${MODULE_DIR}/GLI/${VERSION}
 #%Module1.0#####################################################################
 ##
 ## \$name modulefile
@@ -88,6 +88,6 @@ module-whatis {Homepage: http://iffwww.iff.kfa-juelich.de/gli/}
 
 conflict GLI
 prepend-path PATH               ${INSTALL_DIR}
-prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
+prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}
 setenv       GLI_HOME ${INSTALL_DIR}
 EOF
