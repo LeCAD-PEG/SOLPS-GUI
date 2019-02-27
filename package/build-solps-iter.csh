@@ -13,7 +13,7 @@ if !($?BUILDROOT) then
 endif
 
 if !($?SOLPS_VERSION) then
-    set SOLPS_VERSION=3.0.7
+    set SOLPS_VERSION=devel
 endif
 
 # Expecting all the other packages are built in the same directory, inside
@@ -128,7 +128,7 @@ endif
 setenv OPENBLAS_ROOT ${STAGING_DIR}/OpenBLAS/${OPENBLAS_VERSION}/lib
 
 if (! -e ${SOLPS_SRC_DIR}/.git) then
-    git clone --branch feature/config-LECAD ${SOLPS_GIT} --single-branch --recursive ${SOLPS_SRC_DIR}
+    git clone --branch feature/config-LECAD ${SOLPS_GIT} --recursive ${SOLPS_SRC_DIR}
     cd ${SOLPS_SRC_DIR}
     git pull
     # git submodule update --init
@@ -141,12 +141,6 @@ make VERSION
 make listobj listobj_debug
 make depend depend_debug
 make tags
-make carre divgeo b25     eirene     b25eirene     uinp     triang amds sonnet-light
-
-# make solps solps_openmp solps_mpi # Problem with manual, maybe because it is being called three times?
-# make carre divgeo uinp triang amds sonnet-light eirene b25
-# make b25eirene
-# make b25eirene_openmp
-# make b25eirene_mpi uinp_mpi amds_mpi
-# make manual # thumbspdf fails, but it is ignored, but not by makefile. So run it again!
-# make manual
+make carre divgeo b25 eirene b25eirene uinp triang amds sonnet-light
+make b25eirene_openmp
+make b25eirene_mpi uinp_mpi amds_mpi
