@@ -38,7 +38,7 @@ install -d ${DOWNLOAD_DIR}
 
 # Download source
 if [ ! -f ${DOWNLOAD_DIR}/${SOURCE} ]; then
-    wget -O ${DOWNLOAD_DIR}/${SOURCE} ${DOWNLOAD}
+    wget -O ${DOWNLOAD_DIR}/${SOURCE} --no-check-certificate ${DOWNLOAD}
 fi
 
 cd ${BUILD_DIR}
