@@ -163,12 +163,15 @@ Ubuntu 9.6 (stretch):
     apt-get install build-essential
 
 CentOS7:
+
+    yum install epel-release
+
     yum install ncl-devel cairo-devel fontconfig-devel libXrender-devel \
     libX11-devel freetype-devel ksh libxslt java-1.8.0-openjdk-devel \
-    readline-devel xsltproc openmpi-dev motif-devel netcdf-devel \
+    readline-devel libxslt openmpi-devel motif-devel netcdf-devel \
     netcdf-fortran-devel ctags-etags texlive texlive-latex \
     texlive-latex-bin-bin texlive-collection-latexrecommended \
-    environment-modules
+    environment-modules openssl-devel
 
     yum groupinstall "Development tools"
 
