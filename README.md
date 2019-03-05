@@ -158,7 +158,8 @@ Ubuntu 9.6 (stretch):
     apt-get install libncarg-dev libcairo2-dev libfontconfig1-dev \
     libxrender-dev libx11-dev libfreetype6-dev ksh libxslt1-dev openjdk-8-jdk \
     libreadline-dev xsltproc libopenmpi-dev libmotif-dev libnetcdf-dev \
-    texlive texlive-latex-recommended texlive-binaries emacs25-bin-common
+    texlive texlive-latex-recommended texlive-binaries emacs25-bin-common \
+    python-dev
 
     apt-get install build-essential
 
@@ -171,7 +172,7 @@ CentOS7:
     readline-devel libxslt openmpi-devel motif-devel netcdf-devel \
     netcdf-fortran-devel ctags-etags texlive texlive-latex \
     texlive-latex-bin-bin texlive-collection-latexrecommended \
-    environment-modules openssl-devel
+    environment-modules openssl-devel python-devel
 
     yum groupinstall "Development tools"
 
