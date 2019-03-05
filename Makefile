@@ -319,7 +319,7 @@ ${SOLPS_GUI_MOD}:
 	@echo "}" >> ${SOLPS_GUI_MOD}
 	@echo "" >> ${SOLPS_GUI_MOD}
 	@echo "prepend-path PYTHONPATH         ${BUILDROOT}/src/widgets" >> ${SOLPS_GUI_MOD}
-	@echo "prepend-path PYQTDESIGNER       ${BUILDROOT}/src/plugins/designer" >> ${SOLPS_GUI_MOD}
+	@echo "prepend-path PYQTDESIGNERPATH   ${BUILDROOT}/src/plugins/designer" >> ${SOLPS_GUI_MOD}
 	@echo "" >> ${SOLPS_GUI_MOD}
 	@echo "set-alias solps {python3 ${BUILDROOT}/src/gui/solps.py $*}" >> ${SOLPS_GUI_MOD}
 	@echo "set-alias solps_doc \"xdg-open ${BUILDROOT}/doc/build/html/index.html\"" >> ${SOLPS_GUI_MOD}
