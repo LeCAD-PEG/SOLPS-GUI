@@ -110,4 +110,6 @@ prepend-path CPATH              ${INSTALL_DIR}/include
 prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
 prepend-path LIBRARY_DIR        ${INSTALL_DIR}/lib
 prepend-path PATH               ${INSTALL_DIR}/bin
+setenv       MDS_PATH           ${INSTALL_DIR}/tdi
+prepend-path IDS_PATH           ${INSTALL_DIR}/idl
 EOF
