@@ -20,16 +20,21 @@ INSTALL_DIR=${STAGING_DIR}/ReadUALEdge-Plugin/${VERSION}
 # Environment dependencies
 case $(hostname -f) in
   *.iter.org)
-        module purge
+    module purge
     module load IMAS/3.21.0-3.8.6
-        module load OpenSSL/1.0.2g-GCC-4.8.3
-    module unload Python/2.7.14-intel-2018a
-    module load Python/3.6.4-intel-2018a
+    INSTALL_DIR=${STAGING_DIR}/ReadUALEdge-Plugin/${IMAS_VERSION}
+    # module load imas/3.19.1/ual/3.8.2
+    module load OpenSSL/1.0.2g-GCC-4.8.3
+    #module unload Python/2.7.14-intel-2018a
+    #module load Python/3.6.4-intel-2018a
     # BUILDING PLUGIN FOR ITER PARAVIEW (available as a module)
-    #module load ParaView/5.4.1-intel-2018a-mpi
-    #export PARAVIEW_PREFIX=${EBROOTPARAVIEW}
-    #export CMAKE_PREFIX_PATH=${EBROOTPARAVIEW}/lib/cmake/paraview-5.4
-    export CC=gcc -E
+    module load ParaView/5.4.1-intel-2018a-mpi
+    module load CMake/3.10.3-GCCcore-6.4.0
+    CMAKE=$(which cmake)
+    #module load paraview/5.4.1
+    export PARAVIEW_PREFIX=${EBROOTPARAVIEW}
+    export CMAKE_PREFIX_PATH=${EBROOTPARAVIEW}/lib/cmake/paraview-5.4
+    export CC=gcc
     export CXX=g++
     MAKE_JOBS=${MAKE_JOBS:-4}
     ;;
