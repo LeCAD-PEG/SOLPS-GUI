@@ -244,7 +244,8 @@ solps-gui: imas pyqt gnuplot gnuplot-widget setupenv.sh ${MODULE_DIR}/solps-gui/
 
 setupenv.sh:
 	@echo "Writing environemnt to ${BUILDROOT}/${SETUP_FILE}"
-	@echo "INSTALL_DIR=${STAGING_DIR}" > ${SETUP_FILE}
+	@echo "ROOT_DIR=\$${PWD}" > ${SETUP_FILE}
+	@echo "INSTALL_DIR=\$${ROOT_DIR}/staging" >> ${SETUP_FILE}
 	@echo "" >> ${SETUP_FILE}
 	@echo "# Setting PATH:" >> ${SETUP_FILE}
 	@echo "PATH=\$${INSTALL_DIR}/Python/${PYTHON_VERSION}/bin:\$${PATH}" >> ${SETUP_FILE}
@@ -263,7 +264,7 @@ setupenv.sh:
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/libxml2/${LIBXML2_VERSION}/solps/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "" >> ${SETUP_FILE}
 	@echo "# Setting PYTHONPATH:" >> ${SETUP_FILE}
-	@echo "PYTHONPATH=${BUILDROOT}/src/widgets:\$${PYTHONPATH}" >> ${SETUP_FILE}
+	@echo "PYTHONPATH=\$${BUILDROOT}/src/widgets:\$${PYTHONPATH}" >> ${SETUP_FILE}
 	@echo "PYTHONPATH=\$${INSTALL_DIR}/imas/${IMASDD_VERSION}/solps/lib.linux-x86_64-${PYTHON_MAINVERSION}:\$${PYTHONPATH}" >> ${SETUP_FILE}
 	@echo "PYTHONPATH=\$${INSTALL_DIR}/PyQt5/${PyQt_Version}/lib/python${PYTHON_MAINVERSION}/site-packages:\$${PYTHONPATH}" >> ${SETUP_FILE}
 	@echo "PYTHONPATH=\$${INSTALL_DIR}/sip/${SIP_VERSION}/lib/python/site-packages:\$${PYTHONPATH}" >> ${SETUP_FILE}
@@ -284,11 +285,11 @@ setupenv.sh:
 	@echo "export PV_PLUGIN_PATH=\$${INSTALL_DIR}/ReadUALEdge-Plugin/1.5.0" >> ${SETUP_FILE}
 	@echo "" >> ${SETUP_FILE}
 	@echo "# Setting aliases" >> ${SETUP_FILE}
-	@echo "alias solps=\"python3 ${BUILDROOT}/src/gui/solps.py\"" >> ${SETUP_FILE}
-	@echo "alias solps_doc=\"xdg-open ${BUILDROOT}/doc/build/html/index.html\"" >> ${SETUP_FILE}
-	@echo "alias solps_help=\"assistant -collectionFile ${BUILDROOT}/doc/build/qthelp/SOLPSGUI.qhc\"" >> ${SETUP_FILE}
-	@echo "alias eirene=\"python3 ${BUILDROOT}/src/widgets/eirene.py\"" >> ${SETUP_FILE}
-	@echo "alias b2=\"python3 ${BUILDROOT}/src/widgets/b2.py\"" >> ${SETUP_FILE}
+	@echo "alias solps=\"python3 \$${ROOT_DIR}/src/gui/solps.py\"" >> ${SETUP_FILE}
+	@echo "alias solps_doc=\"xdg-open \$${ROOT_DIR}/doc/build/html/index.html\"" >> ${SETUP_FILE}
+	@echo "alias solps_help=\"assistant -collectionFile \$${ROOT_DIR}/doc/build/qthelp/SOLPSGUI.qhc\"" >> ${SETUP_FILE}
+	@echo "alias eirene=\"python3 \$${ROOT_DIR}/src/widgets/eirene.py\"" >> ${SETUP_FILE}
+	@echo "alias b2=\"python3 \$${ROOT_DIR}/src/widgets/b2.py\"" >> ${SETUP_FILE}
 
 # Solps GUI module file
 ${SOLPS_GUI_MOD}:

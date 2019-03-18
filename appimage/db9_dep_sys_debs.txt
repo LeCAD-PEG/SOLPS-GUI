@@ -1,0 +1,22 @@
+build-essential
+libncarg-dev
+libcairo2-dev
+libfontconfig1-dev
+libxrender-dev
+libx11-dev
+libfreetype6-dev
+ksh
+libxslt1-dev
+openjdk-8-jdk
+libreadline-dev
+xsltproc
+libopenmpi-dev
+libmotif-dev
+libnetcdf-dev
+texlive
+texlive-latex-recommended
+texlive-binaries
+emacs25-bin-common
+python-dev
+# ParaView. No longer necessary
+libssl1.0-dev
