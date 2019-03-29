@@ -20,15 +20,10 @@ SRC_DIR="${BUILD_DIR}/libxml2-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/libxml2/${VERSION}
 
 # Environment dependencies
-case $(hostname -f) in
-  *)
-        PYTHON_VERSION=${PYTHON_VERSION:-3.6.8}
-        PYTHON_INSTALL_DIR=${STAGING_DIR}/Python/${PYTHON_VERSION}
-        export PATH=${PYTHON_INSTALL_DIR}/bin:${PATH}
-        export PYTHONPATH=${PYTHON_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
-        export LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
-        ;;
-esac
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
+
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}

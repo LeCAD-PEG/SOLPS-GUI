@@ -20,13 +20,10 @@ INSTALL_DIR=${STAGING_DIR}/mdsplus/${VERSION}
 SRC_DIR=${BUILD_DIR}/mdsplus-${VERSION}
 
 # Environment dependencies
-case $(hostname -f) in
-  *)
-        LIBXML2_VERSION=${LIBXML2_VERSION:-2.9.1}
-        LIBXML2_INSTALL_DIR=${STAGING_DIR}/libxml2/${LIBXML2_VERSION}
-        export LD_LIBRARY_PATH=${LIBXML2_INSTALL_DIR}/lib
-        ;;
-esac
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
+
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}

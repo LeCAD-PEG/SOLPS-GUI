@@ -21,13 +21,9 @@ SRC_DIR="${BUILD_DIR}/Python-${VERSION}"
 INSTALL_DIR="${STAGING_DIR}/Python/${VERSION}"
 
 # Environment dependencies
-case $(hostname -f) in
-  *)
-        export LD_LIBRARY_PATH=${INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
-        export PYTHONPATH=${INSTALL_DIR}/lib/python${MAINVERSION}
-        export PATH=${INSTALL_DIR}/bin:${PATH}
-        ;;
-esac
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
 
 
 # Prepare directories for download and building

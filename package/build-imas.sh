@@ -16,55 +16,12 @@ DOWNLOAD_DIR=${BUILDROOT}/download
 VERSION=${VERSION:-3.8.4}
 GIT="ssh://git@git.iter.org/imas/access-layer.git"
 SRC_DIR="${BUILD_DIR}/access-layer-${VERSION}"
-INSTALL_DIR=${STAGING_DIR}/imas/${VERSION}/solps # Use IMASDD version later.
+INSTALL_DIR=${STAGING_DIR}/imas/${IMASDD_VERSION}/solps # Use IMASDD version later.
 
 # Environment dependencies
-case $(hostname -f) in
-    *)
-        PYTHON_VERSION=${PYTHON_VERSION:-3.6.8}
-        PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
-        OPENBLAS_VERSION=${OPENBLAS_VERSION:-0.3.5}
-        NUMPY_VERSION=${NUMPY_VERSION:-1.16.1}
-        SCIPY_VERSION=${SCIPY_VERSION:-1.2.1}
-        MDSPLUS_VERSION=${MDSPLUS_VERSION:-stable_release-7-7-8}
-        BLITZ_VERSION=${BLITZ_VERSION:-1.0.0}
-        LIBXML2_VERSION=${LIBXML2_VERSION:-2.9.1}
-        SAXON_VERSION=${SAXON_VERSION:-HE9-8-0-12J}
-        IMAS_VERSION=${IMAS_VERSION:-3.21.0}  # Data dictionary
-
-        export IMAS_VERSION=${IMASDD_VERSION}
-        INSTALL_DIR=${STAGING_DIR}/imas/${IMAS_VERSION}/solps
-        export UAL_VERSION=${VERSION}
-
-
-        export PATH=${STAGING_DIR}/Python/${PYTHON_VERSION}/bin:${PATH}
-        export PYTHONPATH=${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages
-        export LD_LIBRARY_PATH=${STAGING_DIR}/Python/${PYTHON_VERSION}/lib:${LD_LIBRARY_PATH}
-
-        export CLASSPATH=${STAGING_DIR}/saxon/${SAXON_VERSION}/saxon9he.jar
-
-        export MDSPLUS_DIR=${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
-        export MDS_PATH=${MDSPLUS_DIR}/tdi
-        export LD_LIBRARY_PATH=${MDSPLUS_DIR}/lib:${LD_LIBRARY_PATH}
-        export PATH=${MDSPLUS_DIR}/bin:${PATH}
-
-        export PKG_CONFIG_PATH=${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
-        export PKG_CONFIG_PATH=${STAGING_DIR}/blitz/${BLITZ_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
-        export PKG_CONFIG_PATH=${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
-
-        # A way to find JAVA_HOME
-        # And without /jre part.
-        # java -XshowSettings:properties -version 2>&1 > /dev/null | grep 'java.home'
-        # Print java properties and grep the line with java.home
-        #
-        # tr -d ' ' | sed -e 's|java.home=||' -e 's|/jre||'
-        # Remove spaces and remove the "java.home=" and "/jre" parts.
-        export JAVA_HOME=$(java -XshowSettings:properties -version 2>&1 > /dev/null | grep 'java.home' | tr -d ' ' | sed -e 's|java.home=||' -e 's|/jre||')
-
-        A=$(echo "imas_${IMAS_VERSION}_ual_${VERSION}"|tr . _)
-        B=$(uname -m) # Get system bitness
-        ;;
-esac
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}

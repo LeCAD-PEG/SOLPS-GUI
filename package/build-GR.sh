@@ -20,9 +20,7 @@ INSTALL_DIR=${STAGING_DIR}/GR/${VERSION}
 
 
 # Environment dependencies
-case $(hostname -f) in
-    *)
-esac
+
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}

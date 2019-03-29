@@ -23,54 +23,58 @@ DOWNLOAD="http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-${VERSION}/${SOU
 SRC_DIR="${BUILD_DIR}/PyQt5_gpl-${VERSION}"
 INSTALL_DIR="${STAGING_DIR}/PyQt5/${VERSION}"
 
-# Site specific defaults
-case $(hostname -f) in
-     *.iter.org) # RHEL7
-        module purge
-        # module load GCC/4.8.3 binutils/2.25 python/2.7/11 #gperf
-        # module load imas/3.7.2/ual/3.3.14
-            MAKE_JOBS ?= 14
-        unset CXX CC # Remove ICC to be selected by chance
-            QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:-\
-                            -D GLX_GLXEXT_LEGACY \
-                            -D _X_INLINE=inline \
-                            -D FC_WEIGHT_EXTRABLACK=215 \
-                            -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK}
-        ;;
-    # SLES 11.4 WPCD Gateway (incompatible XCB, Xlib and GL libraries)
-    tok*.bc.rzg.mpg.de) # IPP MPG
-        MAKE_JOBS=${MAKE_JOBS:-16}
-        QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:--no-sql-mysql -no-opengl \
-            -skip qtcanvas3d  -skip qtpurchasing -skip qtvirtualkeyboard}
-        ;;
+# Environment dependencies
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
+# # Site specific defaults
+# case $(hostname -f) in
+#      *.iter.org) # RHEL7
+#         module purge
+#         # module load GCC/4.8.3 binutils/2.25 python/2.7/11 #gperf
+#         # module load imas/3.7.2/ual/3.3.14
+#             MAKE_JOBS ?= 14
+#         unset CXX CC # Remove ICC to be selected by chance
+#             QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:-\
+#                             -D GLX_GLXEXT_LEGACY \
+#                             -D _X_INLINE=inline \
+#                             -D FC_WEIGHT_EXTRABLACK=215 \
+#                             -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK}
+#         ;;
+#     # SLES 11.4 WPCD Gateway (incompatible XCB, Xlib and GL libraries)
+#     tok*.bc.rzg.mpg.de) # IPP MPG
+#         MAKE_JOBS=${MAKE_JOBS:-16}
+#         QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:--no-sql-mysql -no-opengl \
+#             -skip qtcanvas3d  -skip qtpurchasing -skip qtvirtualkeyboard}
+#         ;;
 
-    *.marconi.cineca.it) # EU-IM Gateway CentOS 7 with GCC 6.1
-        MAKE_JOBS=${MAKE_JOBS:-16}
-        #. /etc/profile.d.gw/modules.sh
-        # module unload itm-gcc/6.1.0 itm-python/2.7
-        #module switch itm-python/2.7.13.b1
-        #module unload itm-gcc/6.1.0 gcc/6.1.0
-        module unload matlab
-        module unload paraview
-        export CXXFLAGS="-fpermissive"
-        QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:--no-sql-sqlite}
-        ;;
-    *)
-        PYTHON_VERSION=${PYTHON_VERSION:-3.6.8}
-        PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
-        QT_VERSION=${QT_VERSION:-5.9.1}
-        SIP_VERSION=${SIP_VERSION:-4.19.13}
-        STAGING_QT=${STAGING_QT:-${STAGING_DIR}/qt/${QT_VERSION}}
-        SIP_INSTALL_DIR="${STAGING_DIR}/sip/${SIP_VERSION}"
-        PYTHON_INSTALL_DIR=${STAGING_DIR}/Python/${PYTHON_VERSION}
+#     *.marconi.cineca.it) # EU-IM Gateway CentOS 7 with GCC 6.1
+#         MAKE_JOBS=${MAKE_JOBS:-16}
+#         #. /etc/profile.d.gw/modules.sh
+#         # module unload itm-gcc/6.1.0 itm-python/2.7
+#         #module switch itm-python/2.7.13.b1
+#         #module unload itm-gcc/6.1.0 gcc/6.1.0
+#         module unload matlab
+#         module unload paraview
+#         export CXXFLAGS="-fpermissive"
+#         QT_EXTRA_FLAGS=${QT_EXTRA_FLAGS:--no-sql-sqlite}
+#         ;;
+#     *)
+#         PYTHON_VERSION=${PYTHON_VERSION:-3.6.8}
+#         PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
+#         QT_VERSION=${QT_VERSION:-5.9.1}
+#         SIP_VERSION=${SIP_VERSION:-4.19.13}
+#         STAGING_QT=${STAGING_QT:-${STAGING_DIR}/qt/${QT_VERSION}}
+#         SIP_INSTALL_DIR="${STAGING_DIR}/sip/${SIP_VERSION}"
+#         PYTHON_INSTALL_DIR=${STAGING_DIR}/Python/${PYTHON_VERSION}
 
-        export PATH=${PYTHON_INSTALL_DIR}/bin:${PATH}
-        export LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
-        export LD_LIBRARY_PATH=${SIP_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}:${LD_LIBRARY_PATH}
-        export PYTHONPATH=
+#         export PATH=${PYTHON_INSTALL_DIR}/bin:${PATH}
+#         export LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
+#         export LD_LIBRARY_PATH=${SIP_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}:${LD_LIBRARY_PATH}
+#         export PYTHONPATH=
 
-        ;;
-esac
+#         ;;
+# esac
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}

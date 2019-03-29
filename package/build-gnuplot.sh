@@ -20,38 +20,10 @@ SRC_DIR="${BUILD_DIR}/gnuplot-${VERSION}"
 INSTALL_DIR="${STAGING_DIR}/gnuplot/${VERSION}"
 
 
-
 # Environment dependencies
-case $(hostname -f) in
-    *.iter.org)
-        module purge
-        #module load GCC/4.8.3 binutils/2.25 # libgd
-        # DEPRECATED
-        # module load imas binutils
-        # module unload Anaconda2
-        # qmake --version && sip -V
-        # QT_VERSION=5.6.2 PyQT_VERSION=5.6.2 SIP_VERSION=4.18
-        # STAGING_QT=${EBROOTANACONDA3}/pkgs/qt-5.6.2-3
-        # QT_LIBS=$(pkg-config --libs Qt5Network Qt5Svg Qt5PrintSupport\
-        #           Qt5Widgets Qt5Gui Qt5Core)
-        # QT_LIBS="-Wl,-rpath=${EBROOTANACONDA3}/lib ${QT_LIBS}"
-        # export QT_LIBS="-L${EBROOTANACONDA3}/lib -liconv ${QT_LIBS}"
-        # GNUPLOT_INSTALL_DIR=${GNUPLOT_INSTALL_DIR:-${STAGING_DIR}}
-       MAKE_JOBS=${MAKE_JOBS:-4}
-        ;;
-    *.marconi.cineca.it)
-        module purge
-        module load cineca imasenv
-        module unload matlab
-        QT_VERSION=5.8.0
-        module load itm-qt/${QT_VERSION}
-        ;;
-    *)
-        QT_VERSION=${QT_VERSION:-5.9.1}
-        export LD_LIBRARY_PATH="${STAGING_DIR}/lib:${LD_LIBRARY_PATH}"
-        export PKG_CONFIG_PATH="${STAGING_DIR}/qt/${QT_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}"
-        ;;
-esac
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
 
 
 # Prepare directories for download and building

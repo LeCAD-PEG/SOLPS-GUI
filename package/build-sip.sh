@@ -20,16 +20,9 @@ SRC_DIR=${BUILD_DIR}/sip-${VERSION}
 INSTALL_DIR=${STAGING_DIR}/sip/${VERSION}
 
 # Environment dependencies
-case $(hostname -f) in
-  *)
-        PYTHON_VERSION=${PYTHON_VERSION:-3.6.8}
-        PYTHON_MAINVERSION=${PYTHONPATH:%.*}
-        PYTHON_INSTALL_DIR=${STAGING_DIR}/Python/${PYTHON_VERSION}
-        PYTHON="${PYTHON_INSTALL_DIR}/bin/python3"
-        export LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
-        export PYTHONPATH=
-        ;;
-esac
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}
@@ -53,7 +46,7 @@ cd ${SRC_DIR}
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
     rm -rf ${INSTALL_DIR}
-    ${PYTHON} configure.py --bindir=${INSTALL_DIR}/bin \
+    python3 configure.py --bindir=${INSTALL_DIR}/bin \
         --destdir=${INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
     touch ${SRC_DIR}/.configured
 fi

@@ -18,10 +18,7 @@ GIT="ssh://git@git.iter.org/lib/mscl.git"
 SRC_DIR="${BUILD_DIR}/mscl-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/mscl/${VERSION}
 
-case $(hostname -f) in
-    *)
-        ;;
-esac
+# Environment dependencies
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}

@@ -18,37 +18,10 @@ GIT="ssh://git@git.iter.org/imex/ggd.git"
 SRC_DIR="${BUILD_DIR}/ggd-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/GGD/${VERSION}
 
-
 # Environment dependencies
-case $(hostname -f) in
-    *)
-        IMASDD_VERSION=${IMASDD_VERSION:-3.21.0}
-        IMASUAL_VERSION=${IMASUAL_VERSION:-3.8.4}
-        VERSION=${VERSION:-1.8.3}
-
-        MDSPLUS_VERSION=${MDSPLUS_VERSION:-stable_release-7-7-8}
-        MDSPLUS_INSTALL_DIR=${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
-
-        export IMAS_VERSION=${IMASDD_VERSION}
-        export UAL_VERSION=${IMASUAL_VERSION}
-        IMAS_INSTALL_DIR=${STAGING_DIR}/imas/${IMASDD_VERSION}/solps
-
-        export IMAS_PREFIX=${IMAS_INSTALL_DIR}
-        export PATH=${IMAS_INSTALL_DIR}/bin:${PATH}
-
-        export LD_LIBRARY_PATH=${IMAS_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
-        export LD_LIBRARY_PATH=${MDSPLUS_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
-        export PKG_CONFIG_PATH=${IMAS_INSTALL_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}
-        export PKG_CONFIG_PATH=${MDSPLUS_INSTALL_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}
-
-        export ids_path=${IMAS_INSTALL_DIR}/models/mdsplus
-
-        export imasfortran_LIBS="-L${IMAS_INSTALL_DIR}/lib -limas-gfortran -limas"
-        export imasfortran_CFLAGS="-I${IMAS_INSTALL_DIR}/include/gfortran"
-
-        export FC=gfortran
-        ;;
-esac
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}

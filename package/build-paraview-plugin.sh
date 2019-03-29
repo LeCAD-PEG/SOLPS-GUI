@@ -18,66 +18,9 @@ SRC_DIR="${BUILD_DIR}/Plugins-ReadUALEdge"
 INSTALL_DIR=${STAGING_DIR}/ReadUALEdge-Plugin/${VERSION}
 
 # Environment dependencies
-case $(hostname -f) in
-  *.iter.org)
-    module purge
-    module load IMAS/3.21.0-3.8.6
-    INSTALL_DIR=${STAGING_DIR}/ReadUALEdge-Plugin/${IMAS_VERSION}
-    # module load imas/3.19.1/ual/3.8.2
-    module load OpenSSL/1.0.2g-GCC-4.8.3
-    #module unload Python/2.7.14-intel-2018a
-    #module load Python/3.6.4-intel-2018a
-    # BUILDING PLUGIN FOR ITER PARAVIEW (available as a module)
-    module load ParaView/5.4.1-intel-2018a-mpi
-    module load CMake/3.10.3-GCCcore-6.4.0
-    CMAKE=$(which cmake)
-    #module load paraview/5.4.1
-    export PARAVIEW_PREFIX=${EBROOTPARAVIEW}
-    export CMAKE_PREFIX_PATH=${EBROOTPARAVIEW}/lib/cmake/paraview-5.4
-    export CC=gcc
-    export CXX=g++
-    MAKE_JOBS=${MAKE_JOBS:-4}
-    ;;
-
-  *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
-    . /etc/profile.d.gw/modules.sh
-    module purge
-    module load cineca imasenv/3.20.0 #cmake/3.12.0
-    module switch itm-python/2.7
-    module unload matlab
-    QT_VERSION=4.8.7
-    module load itm-qt/${QT_VERSION}
-    MAKE_JOBS=${MAKE_JOBS:-36}
-    ;;
-
-  *)
-    PARAVIEW_VERSION=${PARAVIEW_VERSION:-5.4.1}
-    PARAVIEW_MAINVERSION=${PARAVIEW_VERSION%.*}
-    QT_VERSION=${QT_VERSION:-4.8.7}
-    IMASUAL_VERSION=${IMASUAL_VERSION:-3.8.4}
-    IMASDD_VERSION=${IMASDD_VERSION:-3.21.0}
-    MDSPLUS_VERSION=${MDSPLUS_VERSION:-stable_release-7-7-8}
-    BLITZ_VERSION=${BLITZ_VERSION:-1.0.0}
-    CMAKE_VERSION=${CMAKE_VERSION:-3.10.1}
-    CMAKE=${STAGING_DIR}/cmake/${CMAKE_VERSION}/bin/cmake
-
-    export IMAS_VERSION=${IMASDD_VERSION}
-
-    export PKG_CONFIG_PATH=${STAGING_DIR}/imas/${IMAS_VERSION}/solps/lib/pkgconfig:${PKG_CONFIG_PATH}
-    export PKG_CONFIG_PATH=${STAGING_DIR}/blitz/${BLITZ_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
-    export PKG_CONFIG_PATH=${STAGING_DIR}/qt/${QT_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
-
-    # export LD_LIBRARY_PATH=${STAGING_DIR}/lib:${LD_LIBRARY_PATH}
-    # export LD_LIBRARY_PATH=${STAGING_DIR}/access-layer/${IMASUAL_VERSION}/lib:${LD_LIBRARY_PATH}
-    # export LD_LIBRARY_PATH=${STAGING_DIR}/qt/${QT_VERSION}/lib:${LD_LIBRARY_PATH}
-    # export LD_LIBRARY_PATH=${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib:${LD_LIBRARY_PATH}
-
-    export PATH=${STAGING_DIR}/paraview/${PARAVIEW_VERSION}/bin:${PATH}
-    export PATH=${STAGING_DIR}/qt/${QT_VERSION}/bin:${PATH}
-
-    export MDSPLUS_DIR=${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
-    ;;
-esac
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}

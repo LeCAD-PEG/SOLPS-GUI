@@ -22,45 +22,49 @@ INSTALL_DIR=${INSTALL_DIR:-${STAGING_DIR}/paraview/${VERSION}}
 
 # Environment dependencies
 FORTRAN_COMPILER_FOR_CATALYST=${FORTRAN_COMPILER_FOR_CATALYST:-ifort}
-case $(hostname -f) in
-  *.iter.org)
-    module purge
-    module load GCCcore/6.4.0 binutils/2.28-GCCcore-6.4.0 intel/2018a GCC/6.4.0-2.28 Blitz++/0.10-GCCcore-6.4.0
-    module load Python/2.7.14-GCCcore-6.4.0-bare
-    # module load OpenSSL/1.0.2g-GCC-4.8.3
-    module load OpenSSL/1.0.2g-goolf-1.5.16
-    export CC=gcc
-    export CXX=g++
-        CMAKE_EXTRA_FLAGS=${CMAKE_EXTRA_FLAGS:-\
-          -DCMAKE_EXE_LINKER_FLAGS:STRING=-L${EBROOTOPENSSL}/lib}
-    #PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-\
-        #          -DPARAVIEW_ENABLE_PYTHON:BOOL=OFF}
-    MAKE_JOBS=${MAKE_JOBS:-8}
-    ;;
-  *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
-    . /etc/profile.d.gw/modules.sh
-    module purge
-    module load cineca imasenv cmake/3.5.2
-    module switch itm-python/2.7
-    module unload matlab
-    QT_VERSION=${QT_VERSION:-4.8.7}
-    module load itm-qt/${QT_VERSION}
-    STAGING_QT=${QTDIR}
-    MAKE_JOBS=${MAKE_JOBS:-36}
-    export CXXFLAGS=-fpermissive
-    PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-\
-                        -DPARAVIEW_USE_MPI:BOOL=ON}
-    ;;
-  *)
-    QT_VERSION=${QT_VERSION:-4.8.7}
-    STAGING_QT=${BUILDROOT}/staging/qt/${QT_VERSION}
-    CMAKE_VERSION=${CMAKE_VERSION:-3.10.1}
-    export PATH=${STAGING_DIR}/cmake/${CMAKE_VERSION}/bin:${PATH}
-    export PATH=${STAGING_QT}/bin:${PATH}
-    export LD_LIBRARY_PATH=${STAGING_DIR}/qt/${QT_VERSION}/lib:${LD_LIBRARY_PATH}
+# Environment dependencies
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
+# case $(hostname -f) in
+#   *.iter.org)
+#     module purge
+#     module load GCCcore/6.4.0 binutils/2.28-GCCcore-6.4.0 intel/2018a GCC/6.4.0-2.28 Blitz++/0.10-GCCcore-6.4.0
+#     module load Python/2.7.14-GCCcore-6.4.0-bare
+#     # module load OpenSSL/1.0.2g-GCC-4.8.3
+#     module load OpenSSL/1.0.2g-goolf-1.5.16
+#     export CC=gcc
+#     export CXX=g++
+#         CMAKE_EXTRA_FLAGS=${CMAKE_EXTRA_FLAGS:-\
+#           -DCMAKE_EXE_LINKER_FLAGS:STRING=-L${EBROOTOPENSSL}/lib}
+#     #PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-\
+#         #          -DPARAVIEW_ENABLE_PYTHON:BOOL=OFF}
+#     MAKE_JOBS=${MAKE_JOBS:-8}
+#     ;;
+#   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
+#     . /etc/profile.d.gw/modules.sh
+#     module purge
+#     module load cineca imasenv cmake/3.5.2
+#     module switch itm-python/2.7
+#     module unload matlab
+#     QT_VERSION=${QT_VERSION:-4.8.7}
+#     module load itm-qt/${QT_VERSION}
+#     STAGING_QT=${QTDIR}
+#     MAKE_JOBS=${MAKE_JOBS:-36}
+#     export CXXFLAGS=-fpermissive
+#     PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-\
+#                         -DPARAVIEW_USE_MPI:BOOL=ON}
+#     ;;
+#   *)
+#     QT_VERSION=${QT_VERSION:-4.8.7}
+#     STAGING_QT=${BUILDROOT}/staging/qt/${QT_VERSION}
+#     CMAKE_VERSION=${CMAKE_VERSION:-3.10.1}
+#     export PATH=${STAGING_DIR}/cmake/${CMAKE_VERSION}/bin:${PATH}
+#     export PATH=${STAGING_QT}/bin:${PATH}
+#     export LD_LIBRARY_PATH=${STAGING_DIR}/qt/${QT_VERSION}/lib:${LD_LIBRARY_PATH}
 
-    ;;
-esac
+#     ;;
+# esac
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}

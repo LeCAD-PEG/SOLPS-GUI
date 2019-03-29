@@ -21,20 +21,9 @@ SRC_DIR="${BUILD_DIR}/cmake-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/cmake/${VERSION}
 
 # Environment dependencies
-case $(hostname -f) in
-    *.iter.org)
-        module purge
-        module load GCC/4.8.3 binutils/2.25
-        module load OpenSSL/1.0.2g-GCC-4.8.3
-        export CC=gcc
-        export CXX=g++
-        CMAKE_EXTRA_FLAGS=${CMAKE_EXTRA_FLAGS:-\
-        -DCMAKE_EXE_LINKER_FLAGS:STRING=-L${EBROOTOPENSSL}/lib}
-        MAKE_JOBS=8
-        ;;
-    *)
-        ;;
-esac
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}

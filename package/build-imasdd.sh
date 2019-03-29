@@ -13,24 +13,15 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-3.20.0}
+VERSION=${VERSION:-3.21.0}
 GIT="ssh://git@git.iter.org/imas/data-dictionary.git"
 SRC_DIR="${BUILD_DIR}/data-dictionary-${VERSION}"
 
-
 # Environment dependencies
-case $(hostname -f) in
-    *)
-        PYTHON_VERSION=${PYTHON_VERSION:-3.6.8}
-        PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
-        SAXON_VERSION=${SAXON_VERSION:-HE9-8-0-12J}
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
 
-        export PATH=${STAGING_DIR}/Python/${PYTHON_VERSION}/bin:${PATH}
-        export PYTHONPATH=${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages
-        export LD_LIBRARY_PATH=${STAGING_DIR}/Python/${PYTHON_VERSION}/lib:${LD_LIBRARY_PATH}
-        export CLASSPATH=${STAGING_DIR}/saxon/${SAXON_VERSION}/saxon9he.jar
-        ;;
-esac
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}

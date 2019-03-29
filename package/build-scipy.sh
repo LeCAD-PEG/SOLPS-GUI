@@ -18,20 +18,11 @@ SOURCE="scipy-${VERSION}.tar.gz"
 DOWNLOAD="https://github.com/scipy/scipy/releases/download/v${VERSION}/scipy-${VERSION}.tar.gz"
 SRC_DIR="${BUILD_DIR}/scipy-${VERSION}"
 
+
 # Environment dependencies
-case $(hostname -f) in
-    *)
-        PYTHON_VERSION=${PYTHON_VERSION:-3.6.8}
-        PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
-        PYTHON_INSTALL_DIR=${STAGING_DIR}/Python/${PYTHON_VERSION}
-        OPENBLAS_VERSION=${OPENBLAS_VERSION:-0.3.5}
-        OPENBLAS_INSTALL_DIR=${STAGING_DIR}/OpenBLAS/${OPENBLAS_VERSION}
-        export PATH=${PYTHON_INSTALL_DIR}/bin:${PATH}
-        export PYTHONPATH=${PYTHON_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
-        export LD_LIBRARY_PATH=${OPENBLAS_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
-        export LD_LIBRARY_PATH=${PYTHON_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
-        ;;
-esac
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}
