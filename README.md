@@ -182,4 +182,5 @@ SOLPS-ITER other packages are compiled, such as IMAS, OpenBLAS.
 To start building the packages, run the following command:
 
     cd solps-gui
+    ./configure
     make solps-iter
