@@ -32,21 +32,6 @@ else()
    link_directories($ENV{MDSPLUS_DIR}/lib)
    link_directories($ENV{BLITZ_DIR}/lib)
 
-#SET(IMASCPP_INCLUDE_DIRS $ENV{IMAS_PREFIX}/include)
-#SET(IMASLL_INCLUDE_DIRS $ENV{IMAS_PREFIX}/include)
-
-
-
-#include_directories(/afs/ipp/itm/switm/ual/4.10a.4_R2.1.0/include)
-#include_directories(/afs/ipp/itm/switm/blitz/0.10/include)
-
-#link_directories(/afs/ipp/itm/switm/ual/4.10a.4_R2.1.0/lib)
-#link_directories(/afs/ipp/itm/switm/mdsplus/5.2_itm_v1/lib64)
-#link_directories(/gw/switm/mdsplus/6.1.84/lib)
-#link_directories($ENV{IMAS_PREFIX}/lib)
-#link_directories(${BLITZ_LIBRARY_DIRS})
-#link_directories(/afs/ipp/itm/switm/lib/hdf5/1.8.10)
-#
 endif()
 
 

@@ -41,12 +41,6 @@ void VTKIDSutilityTemplateClasses::VTK_IDS_Val2UnstrGrid_GenericGridScalar(
     int gridSubset_index,
     int num_gridSubset_el)
 {
-
-    vtkOutputWindowDisplayText(std::string( "Reading quantity array: " +
-        values_array_label + "; grid subset index: " +
-        std::to_string(gridSubset_index) + "; element index: " +
-        std::to_string(num_gridSubset_el) + "\n").c_str());
-
     // Skip if the node structure is empty, otherwise continue
     int quantity_gridSubset_index = loc_quantity.grid_subset_index;
     int num_values = loc_quantity.values.extent(0);
