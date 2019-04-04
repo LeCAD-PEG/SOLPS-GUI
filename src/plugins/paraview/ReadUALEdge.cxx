@@ -452,6 +452,13 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // Object declaration for readPsEdge routines
     readPsEdge pse_obj;
 
+    // Print total number of grid subsets
+    vtkOutputWindowDisplayText(std::string("Total number of grid subsets: " +
+        std::to_string(num_gridSubset) + "\n").c_str());
+
+    // Set a list of grid subset index, to follow which one were already set
+    vector<int> list_gs_indices;
+
     // Loop through all grid subsets and extract data for each
     for(int i = 0; i < num_gridSubset; i++)
     {
@@ -463,10 +470,57 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         gridSubset_index= db._edge_profiles.
             grid_ggd(ggd_slice_index).grid_subset(i).identifier.index;
 
+        // Print grid subset info
+        vtkOutputWindowDisplayText(std::string("-----Grid subset No " +
+            std::to_string(i+1) + " ----- \n").c_str());
+        vtkOutputWindowDisplayText(std::string(" - Index: " +
+            std::to_string(gridSubset_index) + "\n").c_str());
+        vtkOutputWindowDisplayText(std::string(" - Name: " + gridSubset_name +
+            "\n").c_str());
+
+        // Grid subset index check
+        if (std::find(list_gs_indices.begin(),
+            list_gs_indices.end(), gridSubset_index) != list_gs_indices.end())
+        {
+            // If a grid subset with the same grid_subset_index
+            // was already set, skip the 'duplicate' grid subset
+            vtkOutputWindowDisplayWarningText(std::string(
+                "WARNING: A grid subset with the same associated "
+                "grid_subset_index (" + std::to_string(gridSubset_index) +
+                "as the current grid subset was already set. Two grid subsets "
+                "SHOULD NOT share the same grid_subset_index! "
+                "Skipping current grid subset. \n").c_str());
+
+            continue;
+        }
+        else if (gridSubset_index == 0)
+        {
+            vtkOutputWindowDisplayWarningText(
+                "WARNING: A grid subset with index 0 was found. 0 is invalid "
+                "index was found (first index must start with 1). "
+                "Skipping the 'duplicate' grid subset. \n");
+            // exit(0);
+            continue;
+        }
+        else
+        {
+            list_gs_indices.push_back(gridSubset_index);
+        }
+
         // Get size/number of elements forming current grid subset
         int num_gridSubset_el;
         num_gridSubset_el = db._edge_profiles.grid_ggd(ggd_slice_index).
             grid_subset(i).element.extent(0);
+
+        // Check if there are any elements in grid_subset
+        if (num_gridSubset_el == 0)
+        {
+            vtkOutputWindowDisplayWarningText(std::string(
+                "WARNING: Current grid subset does not contain any elements! "
+                "Skipping current grid subset. \n").c_str());
+
+            continue;
+        }
 
         // Get dimension of the objects forming this grid subset
         int gridSubset_obj_cls;
@@ -498,16 +552,11 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 #endif
 
         // Print grid subset info
-        vtkOutputWindowDisplayText(std::string("Grid subset " +
-            std::to_string(gridSubset_index) + ":" + "\n").c_str());
-        vtkOutputWindowDisplayText(std::string(" - Name: " + gridSubset_name +
-            "\n").c_str());
         vtkOutputWindowDisplayText(std::string(" - Class: " +
             std::to_string(gridSubset_obj_cls) + "\n").c_str());
         vtkOutputWindowDisplayText(std::string(" - Dimension: " +
             std::to_string(gridSubset_obj_dim) + "\n").c_str());
-        vtkOutputWindowDisplayText(std::string(
-            " - Number of elements: " +
+        vtkOutputWindowDisplayText(std::string(" - Number of elements: " +
             std::to_string(num_gridSubset_el) + "\n").c_str());
 
         // ------ SET POINTS/NODES -----
@@ -592,6 +641,9 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             fAddBlock2MultiBlock(mainMB, gridSubsetCellsUnstructuredGrid,
                 gridSubset_name );
         }
+
+        vtkOutputWindowDisplayText(std::string("Setting grid subset No " +
+            std::to_string(i+1) + " completed \n").c_str());
     }
 
     output->ShallowCopy(mainMB);

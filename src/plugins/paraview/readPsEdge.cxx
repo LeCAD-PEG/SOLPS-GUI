@@ -323,18 +323,35 @@ void readPsEdge::setUnstructuredGridDataFields(
         // objects (2D cells)
         int num_ion_species = UG_db._edge_profiles
             .ggd(UG_ggd_slice_index).ion.extent(0);
+
+        // Set empty string for holding the ion species label
+        std::string ion_label = "";
+
         for( int k = 0; k < num_ion_species; k++)
         {
-            // Set ion specie label
-            std::string ion_charge= UG_db._edge_profiles
-                .ggd(UG_ggd_slice_index).ion(k).label;
             std::string ion_array_label;
+            // Set ion species label
+            // Search in ion(:).label and ion(:).state(0).label
+            if (UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k).label.empty())
+            {
+                if (UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k).state.extent(0) > 0
+                    && !UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k).state(0).label.empty())
+                {
+                    ion_label = UG_db._edge_profiles
+                        .ggd(UG_ggd_slice_index).ion(k).state(0).label;
+                }
+            }
+            else
+            {
+                ion_label = UG_db._edge_profiles.
+                    ggd(UG_ggd_slice_index).ion(k).label;
+            }
 
             // Assign values found in Ion Temperature array of structures
             // node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Temperature", k, ion_charge );
+                "Temperature", k, ion_label );
             num_IDStarget_gridSubsets = UG_db._edge_profiles
                 .ggd(UG_ggd_slice_index).ion(k).temperature.extent(0);
             for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -342,8 +359,8 @@ void readPsEdge::setUnstructuredGridDataFields(
                 vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
                     ion_array_label,
                     UG,
-                    UG_db._edge_profiles.ggd(UG_ggd_slice_index).ion(k)
-                        .temperature(n),
+                    UG_db._edge_profiles.
+                        ggd(UG_ggd_slice_index).ion(k).temperature(n),
                     UG_gridSubset_index,
                     UG_num_gridSubset_el );
             }
@@ -352,7 +369,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Density", k, ion_charge );
+                "Density", k, ion_label );
             num_IDStarget_gridSubsets = UG_db._edge_profiles
                 .ggd(UG_ggd_slice_index).ion(k).density.extent(0);
             for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -370,7 +387,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Density_Fast", k, ion_charge );
+                "Density_Fast", k, ion_label );
             num_IDStarget_gridSubsets = UG_db._edge_profiles
                 .ggd(UG_ggd_slice_index).ion(k).density_fast.extent(0);
             for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -388,7 +405,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Pressure", k, ion_charge );
+                "Pressure", k, ion_label );
             num_IDStarget_gridSubsets = UG_db._edge_profiles
                 .ggd(UG_ggd_slice_index).ion(k).pressure.extent(0);
             for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -406,7 +423,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // structures node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Pressure - Fast Perpendicular", k, ion_charge );
+                "Pressure - Fast Perpendicular", k, ion_label );
             num_IDStarget_gridSubsets = UG_db._edge_profiles
                 .ggd(UG_ggd_slice_index).ion(k).pressure_fast_perpendicular
                 .extent(0);
@@ -425,7 +442,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // structures node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Pressure - Fast Parallel", k, ion_charge );
+                "Pressure - Fast Parallel", k, ion_label );
             num_IDStarget_gridSubsets = UG_db._edge_profiles
                 .ggd(UG_ggd_slice_index).ion(k).pressure_fast_parallel.extent(0);
             for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -451,7 +468,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // node - Radial simple structure node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Velocity - Radial", k, ion_charge );
+                "Velocity - Radial", k, ion_label );
             for (int n = 0; n < num_IDStarget_gridSubsets; n++)
             {
                 vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
@@ -468,7 +485,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // node - Diamagnetic simple structure node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Velocity - Diamagnetic", k, ion_charge );
+                "Velocity - Diamagnetic", k, ion_label );
             for (int n = 0; n < num_IDStarget_gridSubsets; n++)
             {
                 vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
@@ -485,7 +502,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // node - Parallel simple structure node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Velocity - Parallel", k, ion_charge );
+                "Velocity - Parallel", k, ion_label );
             for (int n = 0; n < num_IDStarget_gridSubsets; n++)
             {
                 vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
@@ -502,7 +519,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // node - Poloidal simple structure node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Velocity - Poloidal", k, ion_charge );
+                "Velocity - Poloidal", k, ion_label );
             for (int n = 0; n < num_IDStarget_gridSubsets; n++)
             {
                 vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
@@ -519,7 +536,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // node - Toroidal simple structure node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Velocity - Toroidal", k, ion_charge );
+                "Velocity - Toroidal", k, ion_label );
             for (int n = 0; n < num_IDStarget_gridSubsets; n++)
             {
                 vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
@@ -537,7 +554,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // structures node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Energy Density Kinetic", k, ion_charge );
+                "Energy Density Kinetic", k, ion_label );
             num_IDStarget_gridSubsets = UG_db._edge_profiles
                 .ggd(UG_ggd_slice_index).ion(k).energy_density_kinetic.extent(0);
             for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -602,7 +619,7 @@ void readPsEdge::setUnstructuredGridDataFields(
         for( int k = 0; k < num_ion_species; k++)
         {
             // Set ion specie label
-            std::string ion_charge= UG_db._edge_sources
+            std::string ion_label= UG_db._edge_sources
                 .source(UG_EdgeSourcesSourceID).ggd(UG_ggd_slice_index)
                 .ion(k).label;
             std::string ion_array_label;
@@ -611,7 +628,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Particles", k, ion_charge );
+                "Particles", k, ion_label );
             num_IDStarget_gridSubsets = UG_db._edge_sources
                 .source(UG_EdgeSourcesSourceID).ggd(UG_ggd_slice_index)
                 .ion(k).particles.extent(0);
@@ -631,7 +648,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Energy", k, ion_charge );
+                "Energy", k, ion_label );
             num_IDStarget_gridSubsets =UG_db._edge_sources
                 .source(UG_EdgeSourcesSourceID).ggd(UG_ggd_slice_index)
                 .ion(k).energy.extent(0);
@@ -795,7 +812,7 @@ void readPsEdge::setUnstructuredGridDataFields(
         for( int k = 0; k < num_ion_species; k++)
         {
             // Set ion specie label
-            std::string ion_charge= UG_db._edge_transport
+            std::string ion_label= UG_db._edge_transport
                 .model(UG_EdgeTransportModelID).ggd(UG_ggd_slice_index)
                 .ion(k).label;
             std::string ion_array_label;
@@ -804,7 +821,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // array of structures node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Particles - Effective Diffusivity", k, ion_charge );
+                "Particles - Effective Diffusivity", k, ion_label );
             num_IDStarget_gridSubsets =
                 UG_db._edge_transport.model(UG_EdgeTransportModelID)
                     .ggd(UG_ggd_slice_index).ion(k).particles.d.extent(0);
@@ -823,7 +840,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // array of structures node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Particles - Effective Convection", k, ion_charge );
+                "Particles - Effective Convection", k, ion_label );
             num_IDStarget_gridSubsets =
                 UG_db._edge_transport.model(UG_EdgeTransportModelID)
                     .ggd(UG_ggd_slice_index).ion(k).particles.v.extent(0);
@@ -843,7 +860,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Particles - Flux", k, ion_charge );
+                "Particles - Flux", k, ion_label );
             num_IDStarget_gridSubsets =
                 UG_db._edge_transport.model(UG_EdgeTransportModelID)
                     .ggd(UG_ggd_slice_index).ion(k).particles.flux.extent(0);
@@ -862,7 +879,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // structures node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Particles - Flux Limiter", k, ion_charge );
+                "Particles - Flux Limiter", k, ion_label );
             num_IDStarget_gridSubsets =
                 UG_db._edge_transport.model(UG_EdgeTransportModelID)
                     .ggd(UG_ggd_slice_index).ion(k).particles.flux_limiter
@@ -882,7 +899,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // array of structures node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Energy - Effective Diffusivity", k, ion_charge );
+                "Energy - Effective Diffusivity", k, ion_label );
             num_IDStarget_gridSubsets =
                 UG_db._edge_transport.model(UG_EdgeTransportModelID)
                     .ggd(UG_ggd_slice_index).ion(k).energy.d.extent(0);
@@ -901,7 +918,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // array of structures node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Energy - Effective Convection", k, ion_charge );
+                "Energy - Effective Convection", k, ion_label );
             num_IDStarget_gridSubsets =
                 UG_db._edge_transport.model(UG_EdgeTransportModelID)
                     .ggd(UG_ggd_slice_index).ion(k).energy.v.extent(0);
@@ -921,7 +938,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Energy - Flux", k, ion_charge );
+                "Energy - Flux", k, ion_label );
             num_IDStarget_gridSubsets =
                 UG_db._edge_transport.model(UG_EdgeTransportModelID)
                     .ggd(UG_ggd_slice_index).ion(k).energy.flux.extent(0);
@@ -940,7 +957,7 @@ void readPsEdge::setUnstructuredGridDataFields(
             // structures node to grid subsets objects
             // Set data field label
             ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-                "Energy - Flux Limiter ", k, ion_charge );
+                "Energy - Flux Limiter ", k, ion_label );
             num_IDStarget_gridSubsets =
                 UG_db._edge_transport.model(UG_EdgeTransportModelID)
                     .ggd(UG_ggd_slice_index).ion(k).energy.flux_limiter
@@ -1195,14 +1212,14 @@ void readPsEdge::setAllDataFields_edge_profiles(
     for( int k = 0; k < num_ion_species; k++)
     {
         // Set ion specie label
-        std::string ion_charge= loc_ggd.ion(k).label;
+        std::string ion_label= loc_ggd.ion(k).label;
         std::string ion_array_label;
 
         // Assign values found in Ion Temperature array of structures
         // node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Temperature", k, ion_charge );
+            "Temperature", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).temperature.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1219,7 +1236,7 @@ void readPsEdge::setAllDataFields_edge_profiles(
         // node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Density", k, ion_charge );
+            "Density", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).density.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1236,7 +1253,7 @@ void readPsEdge::setAllDataFields_edge_profiles(
         // node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Density_Fast", k, ion_charge );
+            "Density_Fast", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).density_fast.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1253,7 +1270,7 @@ void readPsEdge::setAllDataFields_edge_profiles(
         // node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Pressure", k, ion_charge );
+            "Pressure", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).pressure.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1270,7 +1287,7 @@ void readPsEdge::setAllDataFields_edge_profiles(
         // structures node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Pressure - Fast Perpendicular", k, ion_charge );
+            "Pressure - Fast Perpendicular", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).pressure_fast_perpendicular.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1287,7 +1304,7 @@ void readPsEdge::setAllDataFields_edge_profiles(
         // structures node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Pressure - Fast Parallel", k, ion_charge );
+            "Pressure - Fast Parallel", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).pressure_fast_parallel.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1311,7 +1328,7 @@ void readPsEdge::setAllDataFields_edge_profiles(
         // node - Radial simple structure node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Velocity - Radial", k, ion_charge );
+            "Velocity - Radial", k, ion_label );
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
         {
             vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
@@ -1327,7 +1344,7 @@ void readPsEdge::setAllDataFields_edge_profiles(
         // node - Diamagnetic simple structure node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Velocity - Diamagnetic", k, ion_charge );
+            "Velocity - Diamagnetic", k, ion_label );
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
         {
             vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
@@ -1343,7 +1360,7 @@ void readPsEdge::setAllDataFields_edge_profiles(
         // node - Parallel simple structure node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Velocity - Parallel", k, ion_charge );
+            "Velocity - Parallel", k, ion_label );
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
         {
             vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
@@ -1359,7 +1376,7 @@ void readPsEdge::setAllDataFields_edge_profiles(
         // node - Poloidal simple structure node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Velocity - Poloidal", k, ion_charge );
+            "Velocity - Poloidal", k, ion_label );
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
         {
             vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
@@ -1375,7 +1392,7 @@ void readPsEdge::setAllDataFields_edge_profiles(
         // node - Toroidal simple structure node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Velocity - Toroidal", k, ion_charge );
+            "Velocity - Toroidal", k, ion_label );
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
         {
             vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
@@ -1392,7 +1409,7 @@ void readPsEdge::setAllDataFields_edge_profiles(
         // node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Energy Density Kinetic", k, ion_charge );
+            "Energy Density Kinetic", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).energy_density_kinetic.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1463,14 +1480,14 @@ void readPsEdge::setAllDataFields_edge_sources(
     for( int k = 0; k < num_ion_species; k++)
     {
         // Set ion specie label
-        std::string ion_charge= loc_ggd.ion(k).label;
+        std::string ion_label= loc_ggd.ion(k).label;
         std::string ion_array_label;
 
         // Assign values found in Ion Particles array of structures
         // node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Particles", k, ion_charge );
+            "Particles", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).particles.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1488,7 +1505,7 @@ void readPsEdge::setAllDataFields_edge_sources(
         // node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Energy", k, ion_charge );
+            "Energy", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).energy.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1638,14 +1655,14 @@ void readPsEdge::setAllDataFields_edge_transport(
     for( int k = 0; k < num_ion_species; k++)
     {
         // Set ion specie label
-        std::string ion_charge= loc_ggd.ion(k).label;
+        std::string ion_label= loc_ggd.ion(k).label;
         std::string ion_array_label;
 
         // Assign values found in Ion Particles - Effective Diffusivity (d)
         // array of structures node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Particles - Effective Diffusivity", k, ion_charge );
+            "Particles - Effective Diffusivity", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).particles.d.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1662,7 +1679,7 @@ void readPsEdge::setAllDataFields_edge_transport(
         // array of structures node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Particles - Effective Convection", k, ion_charge );
+            "Particles - Effective Convection", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).particles.v.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1680,7 +1697,7 @@ void readPsEdge::setAllDataFields_edge_transport(
         // node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Particles - Flux", k, ion_charge );
+            "Particles - Flux", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).particles.flux.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1697,7 +1714,7 @@ void readPsEdge::setAllDataFields_edge_transport(
         // structures node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Particles - Flux Limiter", k, ion_charge );
+            "Particles - Flux Limiter", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).particles.flux_limiter.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1714,7 +1731,7 @@ void readPsEdge::setAllDataFields_edge_transport(
         // array of structures node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Energy - Effective Diffusivity", k, ion_charge );
+            "Energy - Effective Diffusivity", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).energy.d.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1731,7 +1748,7 @@ void readPsEdge::setAllDataFields_edge_transport(
         // array of structures node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Energy - Effective Convection", k, ion_charge );
+            "Energy - Effective Convection", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).energy.v.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1749,7 +1766,7 @@ void readPsEdge::setAllDataFields_edge_transport(
         // node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Energy - Flux", k, ion_charge );
+            "Energy - Flux", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).energy.flux.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
@@ -1766,7 +1783,7 @@ void readPsEdge::setAllDataFields_edge_transport(
         // node to grid subsets objects
         // Set data field label
         ion_array_label = vtkids_obj_ep.VTK_IDS_SetIonQuantityLabel(
-            "Energy - Flux Limiter ", k, ion_charge );
+            "Energy - Flux Limiter ", k, ion_label );
         num_IDStarget_gridSubsets =
             loc_ggd.ion(k).energy.flux_limiter.extent(0);
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)

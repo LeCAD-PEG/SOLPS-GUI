@@ -55,10 +55,10 @@ std::string VTKIDSutility::VTK_IDS_SetIonQuantityLabel(
     std::string ion_array_label;
     if (is < 9)
     {
-        ion_array_label = "Ion " + quantity_name + " 0" + is_string + ic;
+        ion_array_label = "Ion " + quantity_name + " 0" + is_string + " " + ic;
     } else
     {
-        ion_array_label = "Ion " + quantity_name + " " + is_string + ic;
+        ion_array_label = "Ion " + quantity_name + " " + is_string + " " + ic;
     }
     return ion_array_label;
 }
