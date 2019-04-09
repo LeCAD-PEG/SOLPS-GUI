@@ -319,7 +319,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // (can be specified by the IDSPlasmaDataSource advanced option)
     std::string IDS_plasmaStateSource = "edge_profiles";
 
-    if( std::string(this->IDSPlasmaStateSource) == "Option not set")
+    if( std::string(this->IDSPlasmaStateSource) == "Same as 'Read from IDS'")
     {
         IDS_plasmaStateSource = std::string(this->LoadIDS);
     }
@@ -434,7 +434,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // Set object to readGmtryEdge class
     readGmtryEdge gmtrye_obj;
     //
-    gmtrye_obj.ggdCheck(db, ggd_slice_index);
+    gmtrye_obj.ggdCheck(db, IDS_plasmaStateSource, ggd_slice_index);
 
 
     vtkSmartPointer<vtkMultiBlockDataSet> mainMB =
@@ -1151,7 +1151,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     output->ShallowCopy(mainMB);
     itm.close();
 #endif // IMAS_IDS
-    return 1;
+    //return 1;
 }
 
 void  ReadUALEdge::PrintSelf(ostream& os, vtkIndent indent)

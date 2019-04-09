@@ -15,7 +15,7 @@
                 name="Shot &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
                 command="SetShot"
                 number_of_elements="1"
-                default_values="33"
+                default_values="134000"
                 panel_visibility="default">
                 <IntRangeDomain name="range"/>
                 <Documentation>
@@ -40,7 +40,7 @@
 				label="User"
 				command="SetUser"
 				number_of_elements="1"
-				default_values="penkod"
+				default_values="corrigg"
 				panel_visibility="default"
                 immediate_update="true">
                 <Documentation>
@@ -53,7 +53,7 @@
                 label="Device"
                 command="SetDevice"
                 number_of_elements="1"
-                default_values="test"
+                default_values="iter"
                 panel_visibility="default"
                 immediate_update="true">
                 <Documentation>
@@ -63,7 +63,7 @@
 
             <StringVectorProperty
                 name="LoadIDS"
-                label="Edge IDS"
+                label="Read from IDS"
                 command="SetLoadIDS"
                 number_of_elements="1"
                 default_values="edge_profiles"
@@ -75,32 +75,31 @@
                 </StringListDomain>
                 <Documentation>
                     This property specifies the IDS from which the grid
-                    geometry and plasma state are to be read. Note: If required,
-                    the grid geometry can be read from other IDS by setting the
-                    'Edge IDS grid' option in advanced options.
+                    geometry and plasma state are to be read.
                 </Documentation>
             </StringVectorProperty>
 
             <StringVectorProperty
                 name="IDSPlasmaStateSource"
-                label="Edge IDS plasma state source"
+                label="(optional) Read quantities from"
                 command="SetIDSPlasmaStateSource"
                 number_of_elements="1"
-                default_values="Option not set"
+                default_values="Same as 'Read from IDS'"
                 immediate_update="true"
                 panel_visibility="advanced">
                 <StringListDomain name="IDSGridSourcestringList">
-                    <String value="Option not set"/>
+                    <String value="Same as 'Read from IDS'"/>
                     <String value="edge_profiles"/>
                     <String value="edge_sources"/>
                     <String value="edge_transport"/>
                 </StringListDomain>
                 <Documentation>
                     This property specifies the IDS from which the plasma state
-                    is to be read in the case when the grid geometry of one IDS
-                    corresponds to multiple IDS plasma states. In case
-                    this option is not set, the plasma state is taken from the
-                    IDS specified in the main 'Edge IDS' option.
+                    is to be read in case when the grid geometry in e.g.
+                    edge_profiles IDS corresponds also to quantities in
+                    edge_sources. In case this option is not set, the plasma
+                    state is taken from the IDS specified in the main
+                    'Read from IDS' option.
                 </Documentation>
             </StringVectorProperty>
 

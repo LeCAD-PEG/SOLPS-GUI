@@ -572,6 +572,16 @@ void readPsEdge::setUnstructuredGridDataFields(
     }else if( UG_LoadIDS_string.find( "edge_sources" ) !=
         std::string::npos )
     {
+
+        // Check if the SourceID is fine
+        if ( UG_EdgeSourcesSourceID > UG_db._edge_sources.source.extent(0))
+        {
+
+            vtkOutputWindowDisplayWarningText("Warning! The set Source ID is out"
+                " of bounds. \n");
+            return;
+        }
+
         VTKIDSutility vtkids_obj_ep;
         VTKIDSutilityTemplateClasses vtkids_obj_ep_template;
         // Set default value
@@ -667,6 +677,16 @@ void readPsEdge::setUnstructuredGridDataFields(
     }else if( UG_LoadIDS_string.find( "edge_transport" ) !=
         std::string::npos )
     {
+
+        // Check if the ModelID is fine
+        if ( UG_EdgeTransportModelID > UG_db._edge_transport.model.extent(0))
+        {
+
+            vtkOutputWindowDisplayWarningText("Warning! The set Model ID is out"
+                " of bounds. \n");
+            return;
+        }
+
         VTKIDSutility vtkids_obj_ep;
         VTKIDSutilityTemplateClasses vtkids_obj_ep_template;
 

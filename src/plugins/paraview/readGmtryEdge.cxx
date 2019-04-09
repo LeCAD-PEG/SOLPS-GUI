@@ -28,58 +28,66 @@ using namespace IdsNs;
 template <typename IDS3>
 void readGmtryEdge::ggdCheck(
     IDS3 & GG_db,
+    std::string UG_LoadIDS_string,
     int GG_ggd_slice_index)
 {
-    // For edge_profiles IDS
-    int num_ggd_slices = GG_db._edge_profiles.ggd.extent(0);
-    vtkOutputWindowDisplayText(std::string( "Number of GGD slices:" +
-        std::to_string(num_ggd_slices) + "\n").c_str());
-
-    // Checks regarding GGD slice
-    if (num_ggd_slices == 0)
-    {
-        vtkOutputWindowDisplayWarningText("ERROR! No filled GGD slice found! "
-            "Either selected database doesn't exist or it's empty! \n\n");
-        exit(0);
-    }
-    if (GG_ggd_slice_index > num_ggd_slices - 1)
-    {
-        vtkOutputWindowDisplayWarningText("ERROR! The input GGD structure "
-            "array index does not correspond to any existing GGD structure! "
-            "Reverting the GGD structure array index to 0! \n\n");
-        GG_ggd_slice_index = 0;
-    }
 
     // Set variables to later hold number of elements
     int num_obj_0D = 0; // Node/Point/vertice == 0D object
     int num_obj_1D = 0; // Edge    == 1D object
     int num_obj_2D = 0; // 2D Cell == 2D object
 
+    // For edge_profiles IDS
+    if (UG_LoadIDS_string.find( "edge_profiles" ) != std::string::npos)
+    {
+        int num_ggd_slices = GG_db._edge_profiles.ggd.extent(0);
+        vtkOutputWindowDisplayText(std::string( "Number of GGD slices:" +
+            std::to_string(num_ggd_slices) + "\n").c_str());
+
+        // Checks regarding GGD slice
+        if (GG_ggd_slice_index > num_ggd_slices - 1)
+        {
+            vtkOutputWindowDisplayWarningText("ERROR! The input GGD structure "
+                "array index does not correspond to any existing GGD structure! "
+                "Reverting the GGD structure array index to 0! \n\n");
+            GG_ggd_slice_index = 0;
+        }
+        if (num_ggd_slices == 0)
+        {
+            vtkOutputWindowDisplayWarningText("ERROR! No filled GGD slice found! "
+                "Either selected database doesn't exist or it's empty! \n\n");
+            return;
+        }
+
 #if IMAS_VERSION_DIGIT >= 3151
-    // Check for nodes, edges and cells data in current IDS database and
-    // get number of objects for each dimension
-    // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
-    num_obj_0D = GG_db._edge_profiles.grid_ggd(GG_ggd_slice_index).space(0).
-        objects_per_dimension(0).object.extent(0);
-    // objects_per_dimensions(1) holds every 1D object (edges)
-    num_obj_1D = GG_db._edge_profiles.grid_ggd(GG_ggd_slice_index).space(0).
-        objects_per_dimension(1).object.extent(0);
-    // objects_per_dimensions(2) holds every 2D object (faces/2D cells)
-    num_obj_2D = GG_db._edge_profiles.grid_ggd(GG_ggd_slice_index).space(0).
-        objects_per_dimension(2).object.extent(0);
+        // Check for nodes, edges and cells data in current IDS database and
+        // get number of objects for each dimension
+        // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
+        num_obj_0D = GG_db._edge_profiles.grid_ggd(GG_ggd_slice_index).space(0).
+            objects_per_dimension(0).object.extent(0);
+        // objects_per_dimensions(1) holds every 1D object (edges)
+        num_obj_1D = GG_db._edge_profiles.grid_ggd(GG_ggd_slice_index).space(0).
+            objects_per_dimension(1).object.extent(0);
+        // objects_per_dimensions(2) holds every 2D object (faces/2D cells)
+        num_obj_2D = GG_db._edge_profiles.grid_ggd(GG_ggd_slice_index).space(0).
+            objects_per_dimension(2).object.extent(0);
 #else
-    // Check for nodes, edges and cells data in current IDS database and
-    // get number of objects for each dimension
-    // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
-    num_obj_0D = GG_db._edge_profiles.ggd(GG_ggd_slice_index).grid.space(0).
-        objects_per_dimension(0).object.extent(0);
-    // objects_per_dimensions(1) holds every 1D object (edges)
-    num_obj_1D = GG_db._edge_profiles.ggd(GG_ggd_slice_index).grid.space(0).
-        objects_per_dimension(1).object.extent(0);
-    // objects_per_dimensions(2) holds every 2D object (faces/2D cells)
-    num_obj_2D = GG_db._edge_profiles.ggd(GG_ggd_slice_index).grid.space(0).
-        objects_per_dimension(2).object.extent(0);
+        // Check for nodes, edges and cells data in current IDS database and
+        // get number of objects for each dimension
+        // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
+        num_obj_0D = GG_db._edge_profiles.ggd(GG_ggd_slice_index).grid.space(0).
+            objects_per_dimension(0).object.extent(0);
+        // objects_per_dimensions(1) holds every 1D object (edges)
+        num_obj_1D = GG_db._edge_profiles.ggd(GG_ggd_slice_index).grid.space(0).
+            objects_per_dimension(1).object.extent(0);
+        // objects_per_dimensions(2) holds every 2D object (faces/2D cells)
+        num_obj_2D = GG_db._edge_profiles.ggd(GG_ggd_slice_index).grid.space(0).
+            objects_per_dimension(2).object.extent(0);
 #endif
+
+    }
+
+    // TODO: ggdCheck for edge_sources and edge_transport
 
     vtkOutputWindowDisplayText(std::string("GGD slice: " +
         std::to_string(GG_ggd_slice_index) + "\n").c_str());

@@ -31,6 +31,7 @@ public:
     template <typename IDS3>
     void ggdCheck(
         IDS3 & GG_db,
+        std::string UG_LoadIDS_string,
         int GG_ggd_slice_index);
 
     template <typename IDS4>
