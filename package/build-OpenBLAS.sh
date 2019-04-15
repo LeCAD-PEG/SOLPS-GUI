@@ -47,7 +47,8 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
 fi
 # Build
 if [ ! -e ${SRC_DIR}/.built ]; then
-    make -j${MAKE_JOBS}
+    # Support multiple architectures with dynamic arch.
+    DYNAMIC_ARCH=1 make -j${MAKE_JOBS}
     touch ${SRC_DIR}/.built
 fi
 
