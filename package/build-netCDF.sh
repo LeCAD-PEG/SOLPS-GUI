@@ -103,7 +103,7 @@ if { ![ is-loaded cURL/${CURL_VERSION} ] } {
     module load cURL/${CURL_VERSION}
 }
 
-prepent-path CPATH              ${INSTALL_DIR}/include
+prepend-path CPATH              ${INSTALL_DIR}/include
 prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
 prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib64
 prepend-path LIBRARY_PATH       ${INSTALL_DIR}/lib

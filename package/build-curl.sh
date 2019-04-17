@@ -91,7 +91,7 @@ powerful features.
 module-whatis {Homepage: https://curl.haxx.se/}
 
 conflict cURL
-prepent-path CPATH              ${INSTALL_DIR}/inclue
+prepend-path CPATH              ${INSTALL_DIR}/inclue
 prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
 prepend-path LIBRARY_PATH       ${INSTALL_DIR}/lib
 prepend-path PATH               ${INSTALL_DIR}/bin

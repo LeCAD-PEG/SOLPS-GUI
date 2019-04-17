@@ -100,8 +100,8 @@ advantages for system and software vendors, application developers and
 computer science researchers. }
 module-whatis {Homepage: https://www.open-mpi.org/}
 
-conflict NetCDF
-prepent-path CPATH              ${INSTALL_DIR}/include
+conflict OpenMPI
+prepend-path CPATH              ${INSTALL_DIR}/include
 prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
 prepend-path LIBRARY_PATH       ${INSTALL_DIR}/lib
 prepend-path PATH               ${INSTALL_DIR}/bin

@@ -98,7 +98,7 @@ stored in HDF.
 module-whatis {Homepage: https://www.hdfgroup.org}
 
 conflict hdf5
-prepent-path CPATH              ${INSTALL_DIR}/inclue
+prepend-path CPATH              ${INSTALL_DIR}/inclue
 prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
 prepend-path LIBRARY_PATH       ${INSTALL_DIR}/lib
 prepend-path PATH               ${INSTALL_DIR}/bin
