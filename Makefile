@@ -19,9 +19,9 @@ MDSPLUS_VERSION=stable_release-7-46-1
 BLITZ_VERSION=1.0.1
 LIBXML2_VERSION=2.9.1
 SAXON_VERSION=HE9-8-0-12J
-IMASDD_VERSION=3.21.0
-IMASUAL_VERSION=3.8.4
-GGD_VERSION=1.8.3
+IMASDD_VERSION=3.23.1
+IMASUAL_VERSION=4.0.4
+GGD_VERSION=develop
 SOLPS_VERSION=devel
 MSCL_VERSION=1.1.1
 CURL_VERSION=7.64.1
@@ -223,7 +223,7 @@ ${BUILDROOT}/build/data-dictionary-${IMASDD_VERSION}/.installed:
 imasdd: saxon python ${BUILDROOT}/build/data-dictionary-${IMASDD_VERSION}/.installed
 
 ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps:
-	sed -i -e "/^VERSION/s/:-[^}]*}/:-${IMASDD_VERSION}}/" package/build-imasdd.sh
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${IMASUAL_VERSION}}/" package/build-imas.sh
 
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	MDSPLUS_VERSION=${MDSPLUS_VERSION} \
@@ -363,6 +363,7 @@ setupenv.sh:
 	@echo "" >> ${SETUP_FILE}
 	@echo "# Setting LD_LIBRARY_PATH:" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/Python/${PYTHON_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
+	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/blitz/${BLITZ_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/qt/${QT_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/qt/${QT4_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/PyQt5/${PyQt_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
