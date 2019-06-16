@@ -13,10 +13,11 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-develop}
-GIT="ssh://git@git.iter.org/imex/ggd.git"
-SRC_DIR="${BUILD_DIR}/ggd-${VERSION}"
-INSTALL_DIR=${STAGING_DIR}/GGD/${VERSION}
+VERSION=${VERSION:-2.6.4}
+GIT="https://github.com/westes/flex.git"
+SRC_DIR="${BUILD_DIR}/flex-${VERSION}"
+INSTALL_DIR=${STAGING_DIR}/flex/${VERSION}
+
 
 # Environment dependencies
 if [ -e ${BUILDROOT}/package/setup.sh ]; then
@@ -32,45 +33,47 @@ install -d ${DOWNLOAD_DIR}
 
 # Unpack sources
 if [ ! -d ${SRC_DIR} ]; then
-    git clone --branch ${VERSION} --single-branch ${GIT} ${SRC_DIR}
+    git clone --branch v${VERSION} --single-branch ${GIT} ${SRC_DIR}
 fi
 
 cd ${SRC_DIR}
 
 # Configure
+ln -sf /bin/true makeinfo
+ln -sf /bin/true help2man
+export PATH=${PWD}:${PATH}
 if [ ! -e ${SRC_DIR}/.configured ]; then
     rm -rf ${INSTALL_DIR}
-    ./bootstrap
-    ./configure --prefix=${INSTALL_DIR} --enable-doc --enable-tests \
-                --enable-modulefile \
-                --with-module-prefix=${INSTALL_DIR}/include
+    ./autogen.sh
+    ./configure --prefix=${INSTALL_DIR}
     touch ${SRC_DIR}/.configured
 fi
 
+
 # Build
 if [ ! -e ${SRC_DIR}/.built ]; then
-    make #-j ${MAKE_JOBS}
+    # Texinfo is needed for compiling flex documenttion.
+    # Since there is no way of saying no to compiling docs,
+    # a disable check for job succession was performed.
+    set +e
+    make -j${MAKE_JOBS}
+    # Create dummy doc files
+    touch ${SRC_DIR}/doc/flex.1
+    set -e
     touch ${SRC_DIR}/.built
 fi
 
 # Install
-if [ ! -e ${INSTALL_DIR} ]; then
-    install -d ${INSTALL_DIR}
+if [ ! -d ${INSTALL_DIR} ]; then
     make install
 fi
 
-# Check
-if [ ! -e ${SRC_DIR}/.checked ]; then
-    make check
-    touch ${SRC_DIR}/.checked
-fi
-
 # Generate Modulefile
-if [ ! -d ${MODULE_DIR}/GGD ]; then
-    install -d ${MODULE_DIR}/GGD
+if [ ! -d ${MODULE_DIR}/flex ]; then
+    install -d ${MODULE_DIR}/flex
 fi
 
-cat << EOF > ${MODULE_DIR}/GGD/${VERSION}
+cat << EOF > ${MODULE_DIR}/flex/${VERSION}
 #%Module1.0#####################################################################
 ##
 ## \$name modulefile
@@ -80,26 +83,22 @@ proc ModulesHelp { } {
 
 Description
 ===========
-IMAS GGD Grid Service Library
+Flex is a fast lexical analyser generator. It is a tool for generating programs
+that perform pattern-matching on text. Flex is a free (but non-GNU)
+implementation of the original Unix lex program.
 
 
 More information
 ================
- - Homepage: http://imas.iter.org/
+ - Homepage: Homepage: https://www.gnu.org/software/flex/
     }
 }
 
-module-whatis {Description: IMAS GGD Grid Service Library}
-module-whatis {Homepage: http://imas.iter.org/}
 
-conflict GGD
-
-if { ![ is-loaded imas/${IMAS_VERSION}/solps ] } {
-    module load imas/${IMAS_VERSION}/solps
-}
-
-prepend-path CPATH              ${INSTALL_DIR}/include
+conflict flex
 prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
 prepend-path LIBRARY_PATH       ${INSTALL_DIR}/lib
-prepend-path PKG_CONFIG_PATH    ${INSTALL_DIR}/lib/pkgconfig
+prepend-path CPATH              ${INSTALL_DiR}/include
+prepend-path PATH               ${INSTALL_DiR}/bin
+
 EOF

@@ -69,6 +69,8 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
       -skip qtwebengine \
       -skip qtwebsockets \
       -skip qtwebview \
+      -skip qtdeclarative \
+      -skip qtpurchasing \
       -skip qt3d ${XCB_FLAGS} ${QT_EXTRA_FLAGS} \
       -qt-xkbcommon -xkb-config-root /usr/share/X11/xkb \
       -nomake tests

@@ -135,6 +135,8 @@ if (! -e ${SOLPS_SRC_DIR}/.git) then
 endif
 
 cd ${SOLPS_SRC_DIR}
+# Force setting iamat to UNKNOWN
+mv whereami whereemai_bak
 source ${SOLPS_SRC_DIR}/setup.csh gfortran
 
 make VERSION

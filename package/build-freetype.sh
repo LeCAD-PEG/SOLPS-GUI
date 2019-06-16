@@ -13,10 +13,12 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-develop}
-GIT="ssh://git@git.iter.org/imex/ggd.git"
-SRC_DIR="${BUILD_DIR}/ggd-${VERSION}"
-INSTALL_DIR=${STAGING_DIR}/GGD/${VERSION}
+VERSION=${VERSION:-2.10.0}
+MAIN_VERSION=${VERSION%.*}
+SOURCE="freetype-${VERSION}.tar.gz"
+DOWNLOAD="https://sourceforge.net/projects/freetype/files/freetype2/${VERSION}/freetype-${VERSION}.tar.gz/download"
+SRC_DIR="${BUILD_DIR}/freetype-${VERSION}"
+INSTALL_DIR=${STAGING_DIR}/freetype/${VERSION}
 
 # Environment dependencies
 if [ -e ${BUILDROOT}/package/setup.sh ]; then
@@ -29,10 +31,15 @@ install -d ${STAGING_DIR}
 install -d ${DOWNLOAD_DIR}
 
 # Download source
+if [ ! -f ${DOWNLOAD_DIR}/${SOURCE} ]; then
+    wget -O ${DOWNLOAD_DIR}/${SOURCE} ${DOWNLOAD}
+fi
+
+cd ${BUILD_DIR}
 
 # Unpack sources
 if [ ! -d ${SRC_DIR} ]; then
-    git clone --branch ${VERSION} --single-branch ${GIT} ${SRC_DIR}
+    tar xzf ${DOWNLOAD_DIR}/${SOURCE}
 fi
 
 cd ${SRC_DIR}
@@ -40,66 +47,41 @@ cd ${SRC_DIR}
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
     rm -rf ${INSTALL_DIR}
-    ./bootstrap
-    ./configure --prefix=${INSTALL_DIR} --enable-doc --enable-tests \
-                --enable-modulefile \
-                --with-module-prefix=${INSTALL_DIR}/include
+    ./configure --prefix=${INSTALL_DIR}
     touch ${SRC_DIR}/.configured
 fi
 
 # Build
 if [ ! -e ${SRC_DIR}/.built ]; then
-    make #-j ${MAKE_JOBS}
+    make -j${MAKE_JOBS} VERBOSE=1
     touch ${SRC_DIR}/.built
 fi
 
 # Install
-if [ ! -e ${INSTALL_DIR} ]; then
+if [ ! -d ${INSTALL_DIR} ]; then
     install -d ${INSTALL_DIR}
     make install
 fi
 
-# Check
-if [ ! -e ${SRC_DIR}/.checked ]; then
-    make check
-    touch ${SRC_DIR}/.checked
-fi
 
 # Generate Modulefile
-if [ ! -d ${MODULE_DIR}/GGD ]; then
-    install -d ${MODULE_DIR}/GGD
+if [ ! -d ${MODULE_DIR}/freetype ]; then
+    install -d ${MODULE_DIR}/freetype
 fi
 
-cat << EOF > ${MODULE_DIR}/GGD/${VERSION}
+cat << EOF > ${MODULE_DIR}/freetype/${VERSION}
 #%Module1.0#####################################################################
 ##
 ## \$name modulefile
 ##
 proc ModulesHelp { } {
-    puts stderr {
-
-Description
-===========
-IMAS GGD Grid Service Library
-
-
-More information
-================
- - Homepage: http://imas.iter.org/
-    }
+puts stderr "\tA free, high-quality, and portable font engine"
 }
+module-whatis "A free, high-quality, and portable font engine "
 
-module-whatis {Description: IMAS GGD Grid Service Library}
-module-whatis {Homepage: http://imas.iter.org/}
-
-conflict GGD
-
-if { ![ is-loaded imas/${IMAS_VERSION}/solps ] } {
-    module load imas/${IMAS_VERSION}/solps
-}
-
-prepend-path CPATH              ${INSTALL_DIR}/include
+conflict freetype
 prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
 prepend-path LIBRARY_PATH       ${INSTALL_DIR}/lib
-prepend-path PKG_CONFIG_PATH    ${INSTALL_DIR}/lib/pkgconfig
+prepend-path CPATH              ${INSTALL_DiR}/include
+prepend-path PATH               ${INSTALL_DiR}/bin
 EOF

@@ -14,8 +14,7 @@ DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
 VERSION=${VERSION:-2.9.1}
-SOURCE="libxml2-${VERSION}.tar.gz"
-DOWNLOAD="ftp://xmlsoft.org/libxml2/libxml2-${VERSION}.tar.gz"
+GIT="https://gitlab.gnome.org/GNOME/libxml2.git"
 SRC_DIR="${BUILD_DIR}/libxml2-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/libxml2/${VERSION}
 
@@ -30,16 +29,9 @@ install -d ${BUILD_DIR}
 install -d ${STAGING_DIR}
 install -d ${DOWNLOAD_DIR}
 
-# Download source
-if [ ! -f ${DOWNLOAD_DIR}/${SOURCE} ]; then
-    wget -O ${DOWNLOAD_DIR}/${SOURCE} ${DOWNLOAD}
-fi
-
-cd ${BUILD_DIR}
-
 # Unpack sources
 if [ ! -d ${SRC_DIR} ]; then
-    tar xzf ${DOWNLOAD_DIR}/${SOURCE}
+    git clone --branch v${VERSION} --single-branch ${GIT} ${SRC_DIR}
 fi
 
 cd ${SRC_DIR}
@@ -47,6 +39,7 @@ cd ${SRC_DIR}
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
     rm -rf ${INSTALL_DIR}
+    autoreconf -i
     ./configure --with-python=${PYTHON_INSTALL_DIR} \
                 --prefix=${INSTALL_DIR}
     touch ${SRC_DIR}/.configured

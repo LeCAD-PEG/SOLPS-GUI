@@ -93,5 +93,5 @@ module-whatis {Homepage: https://gr-framework.org/index.html}
 
 conflict GR
 prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
-prepend-path LIBRARY_DIR        ${INSTALL_DIR}/lib
+prepend-path LIBRARY_PATH        ${INSTALL_DIR}/lib
 EOF

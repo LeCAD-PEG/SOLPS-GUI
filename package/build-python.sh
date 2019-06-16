@@ -49,6 +49,11 @@ cd ${SRC_DIR}
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
     rm -rf ${INSTALL_DIR}
+    if pkg-config --exists libssl; then
+        ssl=$(pkg-config --variable=prefix libssl)
+        sed -i -e "s,#SSL=.*,SSL=${ssl}," -e "/^#.*ssl/s/#//" \
+        -e '/ssl/s|-lcrypto |-lcrypto -Wl,-rpath,$(SSL)/lib|' Modules/Setup.dist
+    fi
     ./configure --prefix=${INSTALL_DIR} --enable-shared
     touch ${SRC_DIR}/.configured
 fi

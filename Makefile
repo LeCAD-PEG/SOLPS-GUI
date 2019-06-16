@@ -15,16 +15,24 @@ QT_VERSION=5.9.1
 QT4_VERSION=4.8.7
 PyQt_VERSION=5.9.1
 SIP_VERSION=4.19.13
-MDSPLUS_VERSION=stable_release-7-7-8
-BLITZ_VERSION=1.0.0
+MDSPLUS_VERSION=stable_release-7-46-1
+BLITZ_VERSION=1.0.1
 LIBXML2_VERSION=2.9.1
 SAXON_VERSION=HE9-8-0-12J
-IMASDD_VERSION=3.21.0
-IMASUAL_VERSION=3.8.4
-GGD_VERSION=1.8.3
+IMASDD_VERSION=3.23.1
+IMASUAL_VERSION=4.0.4
+GGD_VERSION=develop
 SOLPS_VERSION=devel
 MSCL_VERSION=1.1.1
-
+CURL_VERSION=7.64.1
+HDF5_VERSION=1.10.5
+NETCDF_VERSION=4.6.0
+NETCDF_FORTRAN_VERSION=4.4.4
+FREETYPE_VERSION=2.10.0
+NCL_VERSION=6.4.0
+MOTIF_VERSION=2.3.8
+OPENMPI_VERSION=2.1.6
+FLEX_VERSION=2.6.4
 #Paraview specific version
 PARAVIEW_VERSION=5.4.1
 CMAKE_VERSION=3.10.1
@@ -36,7 +44,7 @@ SOLPS_GUI_MOD=${MODULE_DIR}/solps-gui/1.5
 SOLPS_ITER_MOD=${MODULE_DIR}/solps-iter/${SOLPS_VERSION}
 
 .PHONY: gr gli OpenBLAS mscl ggd python libxml2 saxon blitz cmake mdsplus \
-	imas solps-iter pyqt solps-gui
+	imas solps-iter pyqt solps-gui curl hdf5 netcdf openmpi motif
 
 all: solps-iter solps-gui
 
@@ -185,7 +193,9 @@ ${STAGING_DIR}/paraview/${PARAVIEW_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${PARAVIEW_VERSION}}/" package/build-paraview.sh
 
 	QT4_VERSION=${QT4_VERSION} \
-	PARAVIEW_VERSION=${PARAVIEW_VERSION} \
+	CMAKE_VERSION=${CMAKE_VERSION} \
+	PYTHON_VERSION=${PYTHON_VERSION} \
+	LIBXML2_VERSION=${LIBXML2_VERSION} \
 	./package/build-paraview.sh
 
 paraview: cmake qt4 ${STAGING_DIR}/paraview/${PARAVIEW_VERSION}
@@ -213,7 +223,7 @@ ${BUILDROOT}/build/data-dictionary-${IMASDD_VERSION}/.installed:
 imasdd: saxon python ${BUILDROOT}/build/data-dictionary-${IMASDD_VERSION}/.installed
 
 ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps:
-	sed -i -e "/^VERSION/s/:-[^}]*}/:-${IMASDD_VERSION}}/" package/build-imasdd.sh
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${IMASUAL_VERSION}}/" package/build-imas.sh
 
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	MDSPLUS_VERSION=${MDSPLUS_VERSION} \
@@ -239,6 +249,81 @@ ${STAGING_DIR}/GGD/${GGD_VERSION}:
 
 ggd: imas ${STAGING_DIR}/GGD/${GGD_VERSION}
 
+
+${STAGING_DIR}/curl/${CURL_VERSION}:
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${CURL_VERSION}}/" package/build-curl.sh
+
+	./package/build-curl.sh
+
+
+curl: ${STAGING_DIR}/curl/${CURL_VERSION}
+
+${STAGING_DIR}/hdf5/${HDF5_VERSION}:
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${HDF5_VERSION}}/" package/build-hdf5.sh
+
+	CMAKE_VERSION=${CMAKE_VERSION} \
+	./package/build-hdf5.sh
+
+hdf5: cmake ${STAGING_DIR}/hdf5/${HDF5_VERSION}
+
+${STAGING_DIR}/netcdf/${NETCDF_VERSION}:
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${NETCDF_VERSION}}/" package/build-netCDF.sh
+
+	VERSION=${NETCDF_VERSION} \
+	HDF5_VERSION=${HDF5_VERSION} \
+	CURL_VERSION=${CURL_VERSION} \
+	CMAKE_VERSION=${CMAKE_VERSION} \
+	./package/build-netCDF.sh
+
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${NETCDF_FORTRAN_VERSION}}/" package/build-netCDF-Fortran.sh
+
+	VERSION=${NETCDF_FORTRAN_VERSION} \
+	NETCDF_VERSION=${NETCDF_VERSION} \
+	CMAKE_VERSION=${CMAKE_VERSION}	\
+	HDF5_VERSION=${HDF5_VERSION} \
+	CURL_VERSION=${CURL_VERSION} \
+	./package/build-netCDF-Fortran.sh
+
+netcdf: hdf5 curl ${STAGING_DIR}/netcdf/${NETCDF_VERSION}
+
+${STAGING_DIR}/freetype/${FREETYPE_VERSION}:
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${FREETYPE_VERSION}}/" package/build-freetype.sh
+
+	./package/build-freetype.sh
+
+freetype: ${STAGING_DIR}/freetype/${FREETYPE_VERSION}
+
+${STAGING_DIR}/ncl/${NCL_VERSION}:
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${NCL_VERSION}}/" package/build-ncl.sh
+
+	FREETYPE_VERSION=${FREETYPE_VERSION} \
+	NETCDF_VERSION=${NETCDF_VERSION} \
+	./package/build-ncl.sh
+
+ncl: freetype ${STAGING_DIR}/ncl/${NCL_VERSION}
+
+${STAGING_DIR}/openmpi/${OPENMPI_VERSION}:
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${OPENMPI_VERSION}}/" package/build-openmpi.sh
+
+	./package/build-openmpi.sh
+
+openmpi: ${STAGING_DIR}/openmpi/${OPENMPI_VERSION}
+
+${STAGING_DIR}/flex/${FLEX_VERSION}:
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${FLEX_VERSION}}/" package/build-flex.sh
+
+	./package/build-flex.sh
+
+flex: ${STAGING_DIR}/flex/${FLEX_VERSION}
+
+${STAGING_DIR}/motif/${MOTIF_VERSION}:
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${MOTIF_VERSION}}/" package/build-motif.sh
+
+	FLEX_VERSION=${FLEX_VERSION} \
+	./package/build-motif.sh
+
+motif: flex ${STAGING_DIR}/motif/${MOTIF_VERSION}
+
 ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}:
 	# Copy imasdb script for setting up IMAS MDSPLUS_TREE environment
 
@@ -251,9 +336,15 @@ ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}:
 	GLI_VERSION=${GLI_VERSION} \
 	MDSPLUS_VERSION=${MDSPLUS_VERSION} \
 	OPENBLAS_VERSION=${OPENBLAS_VERSION} \
+	NCL_VERSION=${NCL_VERSION} \
+	NETCDF_VERSION=${NETCDF_VERSION} \
+	NETCDF_FORTRAN_VERSION=${NETCDF_FORTRAN_VERSION} \
+	OPENMPI_VERSION=${OPENMPI_VERSION} \
+	MOTIF_VERSION=${MOTIF_VERSION} \
+	HDF5_VERSION=${HDF5_VERSION} \
 	./package/build-solps-iter.csh
 
-solps-iter: imas gr gli OpenBLAS mscl ggd python ${STAGING_DIR}/solps-iter/${SOLPS_VERSION} ${SOLPS_ITER_MOD}
+solps-iter: imas gr gli OpenBLAS mscl ggd python netcdf ncl openmpi motif ${STAGING_DIR}/solps-iter/${SOLPS_VERSION} ${SOLPS_ITER_MOD}
 
 solps-gui: imas pyqt gnuplot gnuplot-widget setupenv.sh ${MODULE_DIR}/solps-gui/1.5
 
@@ -268,21 +359,29 @@ setupenv.sh:
 	@echo "PATH=\$${INSTALL_DIR}/qt/${QT_VERSION}/bin:\$${PATH}" >> ${SETUP_FILE}
 	@echo "PATH=\$${INSTALL_DIR}/cmake/${CMAKE_VERSION}/bin:\$${PATH}" >> ${SETUP_FILE}
 	@echo "PATH=\$${INSTALL_DIR}/paraview/${PARAVIEW_VERSION}/bin:\$${PATH}" >> ${SETUP_FILE}
+	@echo "PATH=\$${INSTALL_DIR}/openmpi/${OPENMPI_VERSION}/bin:\$${PATH}" >> ${SETUP_FILE}
 	@echo "" >> ${SETUP_FILE}
 	@echo "# Setting LD_LIBRARY_PATH:" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/Python/${PYTHON_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
+	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/blitz/${BLITZ_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/qt/${QT_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/qt/${QT4_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/PyQt5/${PyQt_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/mdsplus/${MDSPLUS_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/imas/${IMASDD_VERSION}/solps/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/libxml2/${LIBXML2_VERSION}/solps/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
+	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/hdf5/${HDF5_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
+	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/curl/${CURL_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
+	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/openmpi/${OPENMPI_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
+	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/motif/${MOTIF_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
+	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/freetype/${FREETYPE_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
+	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/ncl/${NCL_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "" >> ${SETUP_FILE}
 	@echo "# Setting PYTHONPATH:" >> ${SETUP_FILE}
-	@echo "PYTHONPATH=\$${BUILDROOT}/src/widgets:\$${PYTHONPATH}" >> ${SETUP_FILE}
-	@echo "PYTHONPATH=\$${INSTALL_DIR}/imas/${IMASDD_VERSION}/solps/lib.linux-x86_64-${PYTHON_MAINVERSION}:\$${PYTHONPATH}" >> ${SETUP_FILE}
+	@echo "PYTHONPATH=\$${ROOT_DIR}/src/widgets:\$${PYTHONPATH}" >> ${SETUP_FILE}
+	@echo "PYTHONPATH=\$${INSTALL_DIR}/imas/${IMASDD_VERSION}/solps/python/lib.linux-x86_64-${PYTHON_MAINVERSION}:\$${PYTHONPATH}" >> ${SETUP_FILE}
 	@echo "PYTHONPATH=\$${INSTALL_DIR}/PyQt5/${PyQt_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages:\$${PYTHONPATH}" >> ${SETUP_FILE}
-	@echo "PYTHONPATH=\$${INSTALL_DIR}/sip/${SIP_VERSION}/lib/python/site-packages:\$${PYTHONPATH}" >> ${SETUP_FILE}
+	@echo "PYTHONPATH=\$${INSTALL_DIR}/sip/${SIP_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages:\$${PYTHONPATH}" >> ${SETUP_FILE}
 	@echo "PYTHONPATH=\$${INSTALL_DIR}/gnuplot-widget/python-${PYTHON_VERSION}-qt-${QT_VERSION}:\$${PYTHONPATH}" >> ${SETUP_FILE}
 	@echo "" >> ${SETUP_FILE}
 	@echo "# Exporting variables" >> ${SETUP_FILE}
@@ -346,18 +445,13 @@ ${SOLPS_ITER_MOD}:
 	@echo "Writing solps-iter module file to ${SOLPS_ITER_MOD}"
 	@install -d ${MODULE_DIR}/solps-iter
 	@echo "#%Module1.0###################################################################" 	> ${SOLPS_ITER_MOD}
-	@echo "##" 																				>> ${SOLPS_ITER_MOD}
-	@echo "## \$$name modulefile" 															>> ${SOLPS_ITER_MOD}
-	@echo "##" 																				>> ${SOLPS_ITER_MOD}
-	@echo "if { ![ is-loaded MDSplus/${MDSPLUS_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
-	@echo "    module load MDSplus/${MDSPLUS_VERSION}"  >> ${SOLPS_ITER_MOD}
-	@echo "}"  >> ${SOLPS_ITER_MOD}
-	@echo "if { ![ is-loaded OpenBLAS/${OPENBLAS_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
-	@echo "    module load OpenBLAS/${OPENBLAS_VERSION}"  >> ${SOLPS_ITER_MOD}
-	@echo "}"  >> ${SOLPS_ITER_MOD}
-	@echo "if { ![ is-loaded Python/${PYTHON_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
-	@echo "    module load Python/${PYTHON_VERSION}"  >> ${SOLPS_ITER_MOD}
-	@echo "}"  >> ${SOLPS_ITER_MOD}
+	@echo "##" >> ${SOLPS_ITER_MOD}
+	@echo "## \$$name modulefile" >> ${SOLPS_ITER_MOD}
+	@echo "##" >> ${SOLPS_ITER_MOD}
+	@echo "conflict solps-iter" >> ${SOLPS_ITER_MOD}
+	@echo "if { ! [ is-loaded imas ] } {" >> ${SOLPS_GUI_MOD}
+	@echo "    module load imas/${IMASDD_VERSION}/solps" >> ${SOLPS_GUI_MOD}
+	@echo "}" >> ${SOLPS_GUI_MOD}
 	@echo "if { ![ is-loaded GR/${GR_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
 	@echo "    module load GR/${GR_VERSION}"  >> ${SOLPS_ITER_MOD}
 	@echo "}"  >> ${SOLPS_ITER_MOD}
@@ -368,6 +462,18 @@ ${SOLPS_ITER_MOD}:
 	@echo ""  >> ${SOLPS_ITER_MOD}
 	@echo "if { ![ is-loaded GGD/${GGD_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
 	@echo "    module load GGD/${GGD_VERSION}"  >> ${SOLPS_ITER_MOD}
+	@echo "}"  >> ${SOLPS_ITER_MOD}
+	@echo "if { ![ is-loaded ncl/${NCL_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
+	@echo "    module load ncl/${NCL_VERSION}"  >> ${SOLPS_ITER_MOD}
+	@echo "}"  >> ${SOLPS_ITER_MOD}
+	@echo "if { ![ is-loaded NetCDF/${NETCDF_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
+	@echo "    module load NetCDF/${NETCDF_VERSION}"  >> ${SOLPS_ITER_MOD}
+	@echo "}"  >> ${SOLPS_ITER_MOD}
+	@echo "if { ![ is-loaded OpenMPI/${OPENMPI_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
+	@echo "    module load OpenMPI/${OPENMPI_VERSION}"  >> ${SOLPS_ITER_MOD}
+	@echo "}"  >> ${SOLPS_ITER_MOD}
+	@echo "if { ![ is-loaded motif/${MOTIF_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
+	@echo "    module load motif/${MOTIF_VERSION}"  >> ${SOLPS_ITER_MOD}
 	@echo "}"  >> ${SOLPS_ITER_MOD}
 	@echo "setenv MAKE make" >> ${SOLPS_ITER_MOD}
 	@echo "setenv SOLPSTOP ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}"	>> ${SOLPS_ITER_MOD}

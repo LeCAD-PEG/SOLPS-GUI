@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-stable_release-7-7-8}
+VERSION=${VERSION:-stable_release-7-46-1}
 SOURCE="mdsplus-${VERSION}.tar.gz"
 DOWNLOAD="https://github.com/MDSplus/mdsplus/archive/${VERSION}.tar.gz"
 INSTALL_DIR=${STAGING_DIR}/mdsplus/${VERSION}
@@ -48,6 +48,7 @@ cd ${SRC_DIR}
 if [ ! -e ${SRC_DIR}/.configured ]; then
     rm -rf ${INSTALL_DIR}
     CFLAGS=-I${LIBXML2_INSTALL_DIR}/include/libxml2 \
+    LDFLAGS=-lpthread \
     ./configure --prefix=${INSTALL_DIR} \
                 --enable-shared --disable-doxygen-doc \
                 --disable-xmltest \
