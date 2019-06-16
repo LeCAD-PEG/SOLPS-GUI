@@ -41,8 +41,11 @@ void readGmtryEdge::ggdCheck(
     if (UG_LoadIDS_string.find( "edge_profiles" ) != std::string::npos)
     {
         int num_ggd_slices = GG_db._edge_profiles.ggd.extent(0);
+        int num_grid_ggd_slices = GG_db._edge_profiles.grid_ggd.extent(0);
         vtkOutputWindowDisplayText(std::string( "Number of GGD slices:" +
             std::to_string(num_ggd_slices) + "\n").c_str());
+        vtkOutputWindowDisplayText(std::string( "Number of GRID GGD slices:" +
+            std::to_string(num_grid_ggd_slices) + "\n").c_str());
 
         // Checks regarding GGD slice
         if (GG_ggd_slice_index > num_ggd_slices - 1)
@@ -56,8 +59,14 @@ void readGmtryEdge::ggdCheck(
         {
             vtkOutputWindowDisplayWarningText("ERROR! No filled GGD slice found! "
                 "Either selected database doesn't exist or it's empty! \n\n");
+        }
+        if (num_grid_ggd_slices == 0)
+        {
+            vtkOutputWindowDisplayWarningText("ERROR! No filled GRID GGD slice found! "
+                "Either selected database doesn't exist or it's empty! \n\n");
             return;
         }
+
 
 #if IMAS_VERSION_DIGIT >= 3151
         // Check for nodes, edges and cells data in current IDS database and
@@ -85,6 +94,47 @@ void readGmtryEdge::ggdCheck(
             objects_per_dimension(2).object.extent(0);
 #endif
 
+    // For mhd IDS
+    }else if (UG_LoadIDS_string.find( "mhd" ) != std::string::npos)
+    {
+        int num_ggd_slices = GG_db._mhd.ggd.extent(0);
+        int num_grid_ggd_slices = GG_db._mhd.grid_ggd.extent(0);
+        vtkOutputWindowDisplayText(std::string( "Number of GGD slices:" +
+            std::to_string(num_ggd_slices) + "\n").c_str());
+        vtkOutputWindowDisplayText(std::string( "Number of GRID GGD slices:" +
+            std::to_string(num_grid_ggd_slices) + "\n").c_str());
+
+        // Checks regarding GGD slice
+        if (GG_ggd_slice_index > num_ggd_slices - 1)
+        {
+            vtkOutputWindowDisplayWarningText("ERROR! The input GGD structure "
+                "array index does not correspond to any existing GGD structure! "
+                "Reverting the GGD structure array index to 0! \n\n");
+            GG_ggd_slice_index = 0;
+        }
+        if (num_ggd_slices == 0)
+        {
+            vtkOutputWindowDisplayWarningText("ERROR! No filled GGD slice found! "
+                "Either selected database doesn't exist or it's empty! \n\n");
+        }
+        if (num_grid_ggd_slices == 0)
+        {
+            vtkOutputWindowDisplayWarningText("ERROR! No filled GRID GGD slice found! "
+                "Either selected database doesn't exist or it's empty! \n\n");
+            return;
+        }
+
+        // Check for nodes, edges and cells data in current IDS database and
+        // get number of objects for each dimension
+        // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
+        num_obj_0D = GG_db._mhd.grid_ggd(GG_ggd_slice_index).space(0).
+            objects_per_dimension(0).object.extent(0);
+        // objects_per_dimensions(1) holds every 1D object (edges)
+        num_obj_1D = GG_db._mhd.grid_ggd(GG_ggd_slice_index).space(0).
+            objects_per_dimension(1).object.extent(0);
+        // objects_per_dimensions(2) holds every 2D object (faces/2D cells)
+        num_obj_2D = GG_db._mhd.grid_ggd(GG_ggd_slice_index).space(0).
+            objects_per_dimension(2).object.extent(0);
     }
 
     // TODO: ggdCheck for edge_sources and edge_transport
@@ -373,6 +423,22 @@ vtkSmartPointer<vtkPoints> readGmtryEdge::setVtkPoints(
                     space(0).objects_per_dimension(0).object(i).geometry(1),
                 0.0);
         }
+    // For "mhd" selection in "IDSGridSource" text box
+    }else if( PNT_IDSGridSource_string.find( "mhd" ) != std::string::npos)
+    {
+        // Get number of 0D objects / points
+        num_obj_0D = PNT_db._mhd.grid_ggd(PNT_ggd_slice_index).
+            space(0).objects_per_dimension(0).object.extent(0);
+
+        for(int i = 0; i < num_obj_0D; ++i)
+        {
+            pointsArray->InsertNextPoint(
+                PNT_db._mhd.grid_ggd(PNT_ggd_slice_index).
+                    space(0).objects_per_dimension(0).object(i).geometry(0),
+                PNT_db._mhd.grid_ggd(PNT_ggd_slice_index).
+                    space(0).objects_per_dimension(0).object(i).geometry(1),
+                0.0);
+        }
     }
     return pointsArray;
 }
@@ -459,6 +525,22 @@ vtkSmartPointer<vtkPoints> readGmtryEdge::setVtkPoints(
                     space(0).objects_per_dimension(0).object(i).geometry(0),
                 PNT_db._edge_transport.model(PNT_EdgeTransportModelID).
                     ggd(PNT_ggd_slice_index).grid.
+                    space(0).objects_per_dimension(0).object(i).geometry(1),
+                0.0);
+        }
+    // For "mhd" selection in "IDSGridSource" text box
+    }else if( PNT_IDSGridSource_string.find( "mhd" ) != std::string::npos)
+    {
+        // Get number of 0D objects / points
+        num_obj_0D = PNT_db._mhd.ggd(PNT_ggd_slice_index).grid.
+            space(0).objects_per_dimension(0).object.extent(0);
+
+        for(int i = 0; i < num_obj_0D; ++i)
+        {
+            pointsArray->InsertNextPoint(
+                PNT_db._mhd.ggd(PNT_ggd_slice_index).grid.
+                    space(0).objects_per_dimension(0).object(i).geometry(0),
+                PNT_db._mhd.ggd(PNT_ggd_slice_index).grid.
                     space(0).objects_per_dimension(0).object(i).geometry(1),
                 0.0);
         }

@@ -330,9 +330,9 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
 
     // Get all three IDS databases
-    db._edge_profiles.get();
-    db._edge_sources.get();
-    db._edge_transport.get();
+    // db._edge_profiles.get();
+    // db._edge_sources.get();
+    // db._edge_transport.get();
 
     // Get GGD structure array index to internal variable
     int ggd_slice_index = this->GGDslice;
@@ -352,7 +352,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     if( std::string(this->LoadIDS).find("edge_profiles") != std::string::npos )
     {
         vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
-        // db._edge_profiles.get();
+        db._edge_profiles.get();
         // Get number of grid subsets in the selected IDS
         // (this->LoadIDS selection box)
         num_gridSubset = db._edge_profiles.
@@ -362,7 +362,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         != std::string::npos )
     {
         vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
-        // db._edge_sources.get();
+        db._edge_sources.get();
         // Get number of grid subsets in the selected IDS
         // (this->LoadIDS selection box)
         num_gridSubset = db._edge_sources.grid_ggd(ggd_slice_index).
@@ -372,10 +372,20 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         != std::string::npos )
     {
         vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
-        // db._edge_transport.get();
+        db._edge_transport.get();
         // Get number of grid subsets in the selected IDS
         // (this->LoadIDS selection box)
         num_gridSubset = db._edge_transport.grid_ggd(ggd_slice_index).
+            grid_subset.extent(0);
+    }
+    else if( std::string(this->LoadIDS).find("mhd")
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading mhd IDS. \n");
+        db._mhd.get();
+        // Get number of grid subsets in the selected IDS
+        // (this->LoadIDS selection box)
+        num_gridSubset = db._mhd.grid_ggd(ggd_slice_index).
             grid_subset.extent(0);
     }
 
@@ -424,11 +434,18 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     {
         vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
         // db._edge_sources.get();
-    }else if( std::string(LoadIDS).find( "edge_transport" )
+    }
+    else if( std::string(LoadIDS).find( "edge_transport" )
         != std::string::npos )
     {
         vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
         // db._edge_transport.get();
+    }
+    else if( std::string(LoadIDS).find( "mhd" )
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading mhd IDS. \n");
+        // db._mhd.get();
     }
 
     // Set object to readGmtryEdge class
@@ -464,11 +481,21 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     {
 #if IMAS_VERSION_DIGIT >= 3151
         std::string gridSubset_name;
-        gridSubset_name = db._edge_profiles.
-            grid_ggd(ggd_slice_index).grid_subset(i).identifier.name;
         int gridSubset_index;
-        gridSubset_index= db._edge_profiles.
-            grid_ggd(ggd_slice_index).grid_subset(i).identifier.index;
+        if( std::string(LoadIDS).find("mhd") != std::string::npos )
+        {
+            gridSubset_name = db._mhd.
+                grid_ggd(ggd_slice_index).grid_subset(i).identifier.name;
+            gridSubset_index= db._mhd.
+                grid_ggd(ggd_slice_index).grid_subset(i).identifier.index;
+
+        }else
+        {
+            gridSubset_name = db._edge_profiles.
+                grid_ggd(ggd_slice_index).grid_subset(i).identifier.name;
+            gridSubset_index= db._edge_profiles.
+                grid_ggd(ggd_slice_index).grid_subset(i).identifier.index;
+        }
 
         // Print grid subset info
         vtkOutputWindowDisplayText(std::string("-----Grid subset No " +
@@ -509,8 +536,15 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
         // Get size/number of elements forming current grid subset
         int num_gridSubset_el;
-        num_gridSubset_el = db._edge_profiles.grid_ggd(ggd_slice_index).
-            grid_subset(i).element.extent(0);
+        if( std::string(LoadIDS).find("mhd") != std::string::npos )
+        {
+            num_gridSubset_el = db._mhd.grid_ggd(ggd_slice_index).
+                grid_subset(i).element.extent(0);
+        }else
+        {
+            num_gridSubset_el = db._edge_profiles.grid_ggd(ggd_slice_index).
+                grid_subset(i).element.extent(0);
+        }
 
         // Check if there are any elements in grid_subset
         if (num_gridSubset_el == 0)
@@ -524,13 +558,21 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
         // Get dimension of the objects forming this grid subset
         int gridSubset_obj_cls;
-        gridSubset_obj_cls = db._edge_profiles.grid_ggd(ggd_slice_index).
-            grid_subset(i).element(0).object(0).dimension;
+        if( std::string(LoadIDS).find("mhd") != std::string::npos )
+        {
+            gridSubset_obj_cls = db._mhd.grid_ggd(ggd_slice_index).
+                    grid_subset(i).element(0).object(0).dimension;
+        }else
+        {
+            gridSubset_obj_cls = db._edge_profiles.grid_ggd(ggd_slice_index).
+                grid_subset(i).element(0).object(0).dimension;
+        }
         int gridSubset_obj_dim;
         gridSubset_obj_dim = gridSubset_obj_cls - 1;
 
 #else
-
+        // Note: this old code is for edge_profiles only, there is no mhd IDS
+        // support.
         std::string gridSubset_name;
         gridSubset_name = db._edge_profiles.
             ggd(ggd_slice_index).grid.grid_subset(i).identifier.name;

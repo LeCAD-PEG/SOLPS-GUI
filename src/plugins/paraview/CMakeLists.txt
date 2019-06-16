@@ -42,7 +42,8 @@ if (PARAVIEW_BUILD_QT_GUI)
   qt4_wrap_cpp(moc_srcs
     pqMyPropertyWidgetDecorator.h
     pqMyPropertyWidgetDecorator_EdgeSources.h
-    pqMyPropertyWidgetDecorator_EdgeTransport.h)
+    pqMyPropertyWidgetDecorator_EdgeTransport.h
+    pqMyPropertyWidgetDecorator_mhd.h)
 
   set (outifaces0)
   set (outsrcs0)
@@ -74,6 +75,7 @@ if (PARAVIEW_BUILD_QT_GUI)
                                pqMyPropertyWidgetDecorator.cxx
                                pqMyPropertyWidgetDecorator_EdgeSources.cxx
                                pqMyPropertyWidgetDecorator_EdgeTransport.cxx
+                               pqMyPropertyWidgetDecorator_mhd.cxx
                                readGmtryEdge.cxx
                                readPsEdge.cxx
                                VTKIDSutility.cxx

@@ -72,6 +72,7 @@
                     <String value="edge_profiles"/>
                     <String value="edge_sources"/>
                     <String value="edge_transport"/>
+                    <String value="mhd"/>
                 </StringListDomain>
                 <Documentation>
                     This property specifies the IDS from which the grid
@@ -92,6 +93,7 @@
                     <String value="edge_profiles"/>
                     <String value="edge_sources"/>
                     <String value="edge_transport"/>
+                    <String value="mhd"/>
                 </StringListDomain>
                 <Documentation>
                     This property specifies the IDS from which the plasma state
