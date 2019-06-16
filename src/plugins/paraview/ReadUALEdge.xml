@@ -15,7 +15,7 @@
                 name="Shot &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
                 command="SetShot"
                 number_of_elements="1"
-                default_values="134000"
+                default_values="122264"
                 panel_visibility="default">
                 <IntRangeDomain name="range"/>
                 <Documentation>
@@ -27,7 +27,7 @@
                 name="Run"
                 command="SetRun"
                 number_of_elements="1"
-                default_values="3"
+                default_values="1"
                 panel_visibility="default">
                 <IntRangeDomain name="range"/>
                 <Documentation>
@@ -40,7 +40,7 @@
 				label="User"
 				command="SetUser"
 				number_of_elements="1"
-				default_values="corrigg"
+				default_values="penkod"
 				panel_visibility="default"
                 immediate_update="true">
                 <Documentation>

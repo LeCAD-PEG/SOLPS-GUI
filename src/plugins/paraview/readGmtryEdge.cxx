@@ -510,6 +510,20 @@ vtkSmartPointer<vtkCellArray> readGmtryEdge::setVTKCellArray(
         // Get object index of the object
         int obj_index = loc_gridSubset.element(j).object(0).index;
 
+        // Patch in case of illegal object index 0 (0 in Fortran notation)
+        if (obj_index <= 0)
+        {
+            // Setting illegal object index to 1
+            obj_index = 1;
+            std::string gridSubset_name;
+            gridSubset_name = loc_gridSubset.identifier.name;
+            vtkOutputWindowDisplayWarningText(std::string("WARNING! In "
+                " grid_subset " + gridSubset_name + " an object with illegal "
+                "index was found (ind < 1)! All indices must follow the "
+                "Fortran notation (ind >= 1). Setting object index to 1!. "
+                "\n\n").c_str());
+        }
+
         // Get number of nodes/points forming the object
         int num_obj_nodes = grid.space(obj_space - 1).
             objects_per_dimension(obj_dimension - 1).
