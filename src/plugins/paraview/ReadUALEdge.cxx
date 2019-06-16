@@ -482,6 +482,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 #if IMAS_VERSION_DIGIT >= 3151
         std::string gridSubset_name;
         int gridSubset_index;
+
         if( std::string(LoadIDS).find("mhd") != std::string::npos )
         {
             gridSubset_name = db._mhd.
@@ -611,23 +612,24 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
             // Set grid subset 0D geometry to vtkUnstructuredGrid
             gmtrye_obj.setGridSubset0DGeometry2UnstructuredGrid(
+                std::string(this->LoadIDS),
                 db,
                 gridSubsetPointsUnstructuredGrid,
                 obj_0D_vtkPointsArray,
                 ggd_slice_index,
                 i);
 
-            // Set data fields to vtkunstructuredGrid for selected IDS with the
-            // help of 'setUnstructuredGridDataFields' routine
-            pse_obj.setUnstructuredGridDataFields(
-                gridSubsetPointsUnstructuredGrid,
-                db,
-                gridSubset_index,
-                num_gridSubset_el,
-                IDS_plasmaStateSource,
-                ggd_slice_index,
-                this->EdgeSourcesSourceID,
-                this->EdgeTransportModelID);
+            // // Set data fields to vtkunstructuredGrid for selected IDS with the
+            // // help of 'setUnstructuredGridDataFields' routine
+            // pse_obj.setUnstructuredGridDataFields(
+            //     gridSubsetPointsUnstructuredGrid,
+            //     db,
+            //     gridSubset_index,
+            //     num_gridSubset_el,
+            //     IDS_plasmaStateSource,
+            //     ggd_slice_index,
+            //     this->EdgeSourcesSourceID,
+            //     this->EdgeTransportModelID);
 
             // Add unstructured grid to main block
             fAddBlock2MultiBlock( mainMB, gridSubsetPointsUnstructuredGrid,
@@ -641,6 +643,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
             // Set grid subset 1D geometry to vtkUnstructuredGrid
             gmtrye_obj.setGridSubset1DGeometry2UnstructuredGrid(
+                std::string(this->LoadIDS),
                 db,
                 gridSubsetLinesUnstructuredGrid,
                 obj_0D_vtkPointsArray,
@@ -660,6 +663,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
             // Set grid subset 2D geometry to vtkUnstructuredGrid
             gmtrye_obj.setGridSubset2DGeometry2UnstructuredGrid(
+                std::string(this->LoadIDS),
                 db,
                 gridSubsetCellsUnstructuredGrid,
                 obj_0D_vtkPointsArray,

@@ -36,6 +36,7 @@ public:
 
     template <typename IDS4>
     void setGridSubset0DGeometry2UnstructuredGrid(
+        std::string PNT_IDSGridSource_string,
         IDS4 & GS_db,
         vtkSmartPointer<vtkUnstructuredGrid> unstructuredGrid,
         vtkSmartPointer<vtkPoints> vtk_grid_points,
@@ -44,6 +45,7 @@ public:
 
     template <typename IDS5>
     void setGridSubset1DGeometry2UnstructuredGrid(
+        std::string PNT_IDSGridSource_string,
         IDS5 & GS_db,
         vtkSmartPointer<vtkUnstructuredGrid> unstructuredGrid,
         vtkSmartPointer<vtkPoints> vtk_grid_points,
@@ -52,6 +54,7 @@ public:
 
     template <typename IDS6>
     void setGridSubset2DGeometry2UnstructuredGrid(
+        std::string PNT_IDSGridSource_string,
         IDS6 & GS_db,
         vtkSmartPointer<vtkUnstructuredGrid> unstructuredGrid,
         vtkSmartPointer<vtkPoints> vtk_grid_points,
