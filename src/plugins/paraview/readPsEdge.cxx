@@ -68,6 +68,29 @@
 *                       - v
 *                       - flux
 *                       - flux_limiter
+*           ~ mhd:
+*               - electrons:
+*                   - temperature;
+*               - t_i_average;
+*               - n_i_total;
+*               - zeff;
+*               - b_field_r;
+*               - b_field_z;
+*               - b_field_tor;
+*               - a_field_r;
+*               - a_field_z;
+*               - a_field_tor;
+*               - psi;
+*               - velocity_r;
+*               - velocity_z;
+*               - velocity_tor;
+*               - velocity_parallel;
+*               - phi_potential;
+*               - vorticity;
+*               - j_r;
+*               - j_z;
+*               - j_tor;
+*
 *
 *-------------------------------------------------------------------------------
 */
@@ -993,6 +1016,330 @@ void readPsEdge::setUnstructuredGridDataFields(
                     UG_num_gridSubset_el);
             }
         }
+    // For "mhd" selection in "Load IDS" text box
+    }else if( UG_LoadIDS_string.find( "mhd" ) != std::string::npos)
+    {
+
+        VTKIDSutility vtkids_obj_ep;
+        VTKIDSutilityTemplateClasses vtkids_obj_ep_template;
+        // Set default value
+        int num_IDStarget_gridSubsets = 0;
+
+        // Assigning values - Electrons
+
+        // Assign values found in Electrons Temperature array of structures
+        // node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).electrons.temperature.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electron Temperature",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).electrons.temperature(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+
+        }
+
+        // Assign values found in Ion Temperature (averaged on Ion Species)
+        // array of structures node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).t_i_average.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Ion Temperature (averaged)",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).t_i_average(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+
+        }
+
+        // Assign values found in Total ion density (sum over ion species and
+        // thermal+non-thermal) (averaged on Ion Species)
+        // array of structures node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).n_i_total.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Total Ion Density",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).n_i_total(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+
+        }
+
+        // Assign values found in Effective Charge
+        // array of structures node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).zeff.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Effective Charge",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).zeff(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+
+        }
+
+        // Assign values found in R component of the magnetic field
+        // array of structures node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).b_field_r.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Magnetic Field (component R)",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).b_field_r(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+
+        }
+
+        // Assign values found in Z component of the magnetic field
+        // array of structures node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).b_field_z.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Magnetic Field (component Z)",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).b_field_z(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+
+        }
+
+        // Assign values found in R Toroidal component of the magnetic field
+        // array of structures node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).b_field_tor.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Magnetic Field (component tor)",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).b_field_tor(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+
+        }
+
+        // Assign values found in R component of the magnetic vector potential
+        // array of structures node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).a_field_r.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Magnetic Vector Component (component R)",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).a_field_r(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in Z component of the magnetic vector potential
+        // array of structures node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).a_field_z.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Magnetic Vector Component (component Z)",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).a_field_z(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in Toroidal component of the magnetic vector potential
+        // array of structures node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).a_field_tor.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Magnetic Vector Component (component tor)",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).a_field_tor(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in Poloidal Flux array of structures
+        // node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).psi.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Poloidal Flux",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).psi(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+
+        }
+
+        // Assign values found in R component of the plasma velocity
+        // node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).velocity_r.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Plasma Velocity (component R)",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).velocity_r(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+
+        }
+
+        // Assign values found in Z component of the plasma velocity
+        // node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).velocity_z.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Plasma Velocity (component Z)",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).velocity_z(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+
+        }
+
+        // Assign values found in Toroidal component of the plasma velocity
+        // node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).velocity_tor.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Plasma Velocity (component tor)",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).velocity_tor(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in Parallel (to magnetic field) component of the
+        // plasma velocity node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).velocity_parallel.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Parallel Velocity",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).velocity_parallel(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in Electric Potential
+        // node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).phi_potential.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Electric Potential",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).phi_potential(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in Vorticity
+        // node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).vorticity.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Vorticity",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).vorticity(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+        // Assign values found in R component of the current density
+        // node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).j_r.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Current Density (component R)",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).j_r(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+
+        // Assign values found in Z component of the current density
+        // node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).j_z.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Current Density (component Z)",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).j_z(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
+
+        // Assign values found in Toroidal component of the current density
+        // node to grid subsets objects
+        num_IDStarget_gridSubsets = UG_db._mhd
+            .ggd(UG_ggd_slice_index).j_tor.extent(0);
+        for (int n = 0; n < num_IDStarget_gridSubsets; n++)
+        {
+
+            vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
+                "Current Density (component tor)",
+                UG,
+                UG_db._mhd.ggd(UG_ggd_slice_index).j_tor(n),
+                UG_gridSubset_index,
+                UG_num_gridSubset_el );
+        }
+
     }
 
 #else   // Working for IMAS modules of versions lower than 3.15.1
