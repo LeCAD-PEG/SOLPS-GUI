@@ -54,6 +54,8 @@ class ReadUALEdge : public vtkMultiBlockDataSetAlgorithm
     vtkSetMacro(EdgeSourcesSourceID,int);
     vtkGetMacro(EdgeTransportModelID,int);
     vtkSetMacro(EdgeTransportModelID,int);
+    vtkGetMacro(GridGGDslice,int);
+    vtkSetMacro(GridGGDslice,int);
     vtkGetMacro(GGDslice,int);
     vtkSetMacro(GGDslice,int);
     vtkSetStringMacro(IDSPlasmaStateSource);
@@ -72,6 +74,7 @@ protected:
     int IDSListCheckBox;
     int EdgeSourcesSourceID;
     int EdgeTransportModelID;
+    int GridGGDslice;
     int GGDslice;
     char * User;
     char * Device;

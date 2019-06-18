@@ -29,6 +29,7 @@ template <typename IDS3>
 void readGmtryEdge::ggdCheck(
     IDS3 & GG_db,
     std::string UG_LoadIDS_string,
+    int GG_grid_ggd_slice_index,
     int GG_ggd_slice_index)
 {
 
@@ -72,13 +73,13 @@ void readGmtryEdge::ggdCheck(
         // Check for nodes, edges and cells data in current IDS database and
         // get number of objects for each dimension
         // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
-        num_obj_0D = GG_db._edge_profiles.grid_ggd(GG_ggd_slice_index).space(0).
+        num_obj_0D = GG_db._edge_profiles.grid_ggd(GG_grid_ggd_slice_index).space(0).
             objects_per_dimension(0).object.extent(0);
         // objects_per_dimensions(1) holds every 1D object (edges)
-        num_obj_1D = GG_db._edge_profiles.grid_ggd(GG_ggd_slice_index).space(0).
+        num_obj_1D = GG_db._edge_profiles.grid_ggd(GG_grid_ggd_slice_index).space(0).
             objects_per_dimension(1).object.extent(0);
         // objects_per_dimensions(2) holds every 2D object (faces/2D cells)
-        num_obj_2D = GG_db._edge_profiles.grid_ggd(GG_ggd_slice_index).space(0).
+        num_obj_2D = GG_db._edge_profiles.grid_ggd(GG_grid_ggd_slice_index).space(0).
             objects_per_dimension(2).object.extent(0);
 #else
         // Check for nodes, edges and cells data in current IDS database and
@@ -127,13 +128,13 @@ void readGmtryEdge::ggdCheck(
         // Check for nodes, edges and cells data in current IDS database and
         // get number of objects for each dimension
         // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
-        num_obj_0D = GG_db._mhd.grid_ggd(GG_ggd_slice_index).space(0).
+        num_obj_0D = GG_db._mhd.grid_ggd(GG_grid_ggd_slice_index).space(0).
             objects_per_dimension(0).object.extent(0);
         // objects_per_dimensions(1) holds every 1D object (edges)
-        num_obj_1D = GG_db._mhd.grid_ggd(GG_ggd_slice_index).space(0).
+        num_obj_1D = GG_db._mhd.grid_ggd(GG_grid_ggd_slice_index).space(0).
             objects_per_dimension(1).object.extent(0);
         // objects_per_dimensions(2) holds every 2D object (faces/2D cells)
-        num_obj_2D = GG_db._mhd.grid_ggd(GG_ggd_slice_index).space(0).
+        num_obj_2D = GG_db._mhd.grid_ggd(GG_grid_ggd_slice_index).space(0).
             objects_per_dimension(2).object.extent(0);
     }
 

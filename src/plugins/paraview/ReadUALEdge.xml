@@ -148,6 +148,22 @@
             </IntVectorProperty>
 
             <IntVectorProperty
+                name="GridGGDslice"
+                label=".grid_ggd(#)"
+                command="SetGGDslice"
+                number_of_elements="1"
+                default_values="0"
+                panel_visibility="advanced">
+                <IntRangeDomain name="range"/>
+                <Documentation>
+                    The values of this property sets the Grid GGD time slice.
+                    Python notation (0, 1, 2, ...). Default value = 0. NOTE:
+                    This same value is taken into account for both, grid
+                    geometry and plasma state data.
+                </Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
                 name="GGDslice"
                 label=".ggd(#)"
                 command="SetGGDslice"

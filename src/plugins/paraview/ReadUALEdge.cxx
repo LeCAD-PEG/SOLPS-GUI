@@ -145,6 +145,7 @@ ReadUALEdge::ReadUALEdge()
     this->Version = NULL;
     this->RefRun = 0;
     this->LoadIDS = NULL;
+    this->GridGGDslice = 0;
     this->GGDslice = 0;
     this->EdgeTransportModelID = 0;
     this->EdgeSourcesSourceID = 0;
@@ -334,6 +335,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // db._edge_sources.get();
     // db._edge_transport.get();
 
+    // Get GRID GGD structure array index to internal variable
+    int grid_ggd_slice_index = this->GridGGDslice;
     // Get GGD structure array index to internal variable
     int ggd_slice_index = this->GGDslice;
     // Get edge_sources.source(:) structure array index to internal variable
@@ -358,7 +361,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         // Get number of grid subsets in the selected IDS
         // (this->LoadIDS selection box)
         num_gridSubset = db._edge_profiles.
-            grid_ggd(ggd_slice_index).grid_subset.extent(0);
+            grid_ggd(grid_ggd_slice_index).grid_subset.extent(0);
         // Get number of GGD slices
         num_ggd_slices = db._edge_profiles.ggd.extent(0);
 
@@ -370,7 +373,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         db._edge_sources.get();
         // Get number of grid subsets in the selected IDS
         // (this->LoadIDS selection box)
-        num_gridSubset = db._edge_sources.grid_ggd(ggd_slice_index).
+        num_gridSubset = db._edge_sources.grid_ggd(grid_ggd_slice_index).
             grid_subset.extent(0);
         // Get number of GGD slices
         num_ggd_slices = db._edge_sources.source(source_index).ggd.extent(0);
@@ -382,7 +385,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         db._edge_transport.get();
         // Get number of grid subsets in the selected IDS
         // (this->LoadIDS selection box)
-        num_gridSubset = db._edge_transport.grid_ggd(ggd_slice_index).
+        num_gridSubset = db._edge_transport.grid_ggd(grid_ggd_slice_index).
             grid_subset.extent(0);
         // Get number of GGD slices
         num_ggd_slices = db._edge_transport.model(model_index).ggd.extent(0);
@@ -395,7 +398,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         db._mhd.get();
         // Get number of grid subsets in the selected IDS
         // (this->LoadIDS selection box)
-        num_gridSubset = db._mhd.grid_ggd(ggd_slice_index).
+        num_gridSubset = db._mhd.grid_ggd(grid_ggd_slice_index).
             grid_subset.extent(0);
         // Get number of GGD slices
         num_ggd_slices = db._mhd.ggd.extent(0);
@@ -464,7 +467,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // Set object to readGmtryEdge class
     readGmtryEdge gmtrye_obj;
     //
-    gmtrye_obj.ggdCheck(db, IDS_plasmaStateSource, ggd_slice_index);
+    gmtrye_obj.ggdCheck(db, IDS_plasmaStateSource, grid_ggd_slice_index,
+                        ggd_slice_index);
 
 
     vtkSmartPointer<vtkMultiBlockDataSet> mainMB =
@@ -475,7 +479,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     vtkSmartPointer<vtkPoints> obj_0D_vtkPointsArray = gmtrye_obj.setVtkPoints(
         db,
         std::string(this->LoadIDS),
-        ggd_slice_index,
+        grid_ggd_slice_index,
         this->EdgeSourcesSourceID,
         this->EdgeTransportModelID);
 
@@ -499,16 +503,16 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         if( std::string(LoadIDS).find("mhd") != std::string::npos )
         {
             gridSubset_name = db._mhd.
-                grid_ggd(ggd_slice_index).grid_subset(i).identifier.name;
+                grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.name;
             gridSubset_index= db._mhd.
-                grid_ggd(ggd_slice_index).grid_subset(i).identifier.index;
+                grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.index;
 
         }else
         {
             gridSubset_name = db._edge_profiles.
-                grid_ggd(ggd_slice_index).grid_subset(i).identifier.name;
+                grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.name;
             gridSubset_index= db._edge_profiles.
-                grid_ggd(ggd_slice_index).grid_subset(i).identifier.index;
+                grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.index;
         }
 
         // Print grid subset info
@@ -552,11 +556,11 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         int num_gridSubset_el;
         if( std::string(LoadIDS).find("mhd") != std::string::npos )
         {
-            num_gridSubset_el = db._mhd.grid_ggd(ggd_slice_index).
+            num_gridSubset_el = db._mhd.grid_ggd(grid_ggd_slice_index).
                 grid_subset(i).element.extent(0);
         }else
         {
-            num_gridSubset_el = db._edge_profiles.grid_ggd(ggd_slice_index).
+            num_gridSubset_el = db._edge_profiles.grid_ggd(grid_ggd_slice_index).
                 grid_subset(i).element.extent(0);
         }
 
@@ -574,11 +578,11 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         int gridSubset_obj_cls;
         if( std::string(LoadIDS).find("mhd") != std::string::npos )
         {
-            gridSubset_obj_cls = db._mhd.grid_ggd(ggd_slice_index).
+            gridSubset_obj_cls = db._mhd.grid_ggd(grid_ggd_slice_index).
                     grid_subset(i).element(0).object(0).dimension;
         }else
         {
-            gridSubset_obj_cls = db._edge_profiles.grid_ggd(ggd_slice_index).
+            gridSubset_obj_cls = db._edge_profiles.grid_ggd(grid_ggd_slice_index).
                 grid_subset(i).element(0).object(0).dimension;
         }
         int gridSubset_obj_dim;
@@ -629,7 +633,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 db,
                 gridSubsetPointsUnstructuredGrid,
                 obj_0D_vtkPointsArray,
-                ggd_slice_index,
+                grid_ggd_slice_index,
                 i);
 
             if (num_ggd_slices > 0)
@@ -683,7 +687,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 db,
                 gridSubsetCellsUnstructuredGrid,
                 obj_0D_vtkPointsArray,
-                ggd_slice_index,
+                grid_ggd_slice_index,
                 i,
                 gridSubset_obj_cls);
 
