@@ -345,8 +345,10 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // edge_profiles IDS only!)
     // db._edge_profiles.get();
 
-    // Get number of grid subsets
+    // Set default number of grid subsets
     int num_gridSubset = 0;
+    // Set default number of GGD slices
+    int num_ggd_slices = 0;
 
 #if IMAS_VERSION_DIGIT >= 3151
     if( std::string(this->LoadIDS).find("edge_profiles") != std::string::npos )
@@ -357,6 +359,9 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         // (this->LoadIDS selection box)
         num_gridSubset = db._edge_profiles.
             grid_ggd(ggd_slice_index).grid_subset.extent(0);
+        // Get number of GGD slices
+        num_ggd_slices = db._edge_profiles.ggd.extent(0);
+
     }
     else if( std::string(this->LoadIDS).find("edge_sources")
         != std::string::npos )
@@ -367,6 +372,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         // (this->LoadIDS selection box)
         num_gridSubset = db._edge_sources.grid_ggd(ggd_slice_index).
             grid_subset.extent(0);
+        // Get number of GGD slices
+        num_ggd_slices = db._edge_sources.source(source_index).ggd.extent(0);
     }
     else if( std::string(this->LoadIDS).find("edge_transport")
         != std::string::npos )
@@ -377,6 +384,9 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         // (this->LoadIDS selection box)
         num_gridSubset = db._edge_transport.grid_ggd(ggd_slice_index).
             grid_subset.extent(0);
+        // Get number of GGD slices
+        num_ggd_slices = db._edge_transport.model(model_index).ggd.extent(0);
+
     }
     else if( std::string(this->LoadIDS).find("mhd")
         != std::string::npos )
@@ -387,6 +397,9 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         // (this->LoadIDS selection box)
         num_gridSubset = db._mhd.grid_ggd(ggd_slice_index).
             grid_subset.extent(0);
+        // Get number of GGD slices
+        num_ggd_slices = db._mhd.ggd.extent(0);
+
     }
 
 #else
@@ -619,17 +632,20 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 ggd_slice_index,
                 i);
 
-            // Set data fields to vtkunstructuredGrid for selected IDS with the
-            // help of 'setUnstructuredGridDataFields' routine
-            pse_obj.setUnstructuredGridDataFields(
-                gridSubsetPointsUnstructuredGrid,
-                db,
-                gridSubset_index,
-                num_gridSubset_el,
-                IDS_plasmaStateSource,
-                ggd_slice_index,
-                this->EdgeSourcesSourceID,
-                this->EdgeTransportModelID);
+            if (num_ggd_slices > 0)
+            {
+                // Set data fields to vtkunstructuredGrid for selected IDS with the
+                // help of 'setUnstructuredGridDataFields' routine
+                pse_obj.setUnstructuredGridDataFields(
+                    gridSubsetPointsUnstructuredGrid,
+                    db,
+                    gridSubset_index,
+                    num_gridSubset_el,
+                    IDS_plasmaStateSource,
+                    ggd_slice_index,
+                    this->EdgeSourcesSourceID,
+                    this->EdgeTransportModelID);
+            }
 
             // Add unstructured grid to main block
             fAddBlock2MultiBlock( mainMB, gridSubsetPointsUnstructuredGrid,
@@ -654,7 +670,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             fAddBlock2MultiBlock(mainMB, gridSubsetLinesUnstructuredGrid,
                 gridSubset_name );
         }
-        // ------ SET 2D CELLS -----
+        //------ SET 2D CELLS -----
         else if (gridSubset_obj_cls == 3)
         {
             // Set vtk array for 2D cells
@@ -671,17 +687,22 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                 i,
                 gridSubset_obj_cls);
 
-            // Set data fields to vtkunstructuredGrid for selected IDS with the
-            // help of 'setUnstructuredGridDataFields' routine
-            pse_obj.setUnstructuredGridDataFields(
-                gridSubsetCellsUnstructuredGrid,
-                db,
-                gridSubset_index,
-                num_gridSubset_el,
-                IDS_plasmaStateSource,
-                ggd_slice_index,
-                this->EdgeSourcesSourceID,
-                this->EdgeTransportModelID);
+            if (num_ggd_slices > 0)
+            {
+
+                // Set data fields to vtkunstructuredGrid for selected IDS with the
+                // help of 'setUnstructuredGridDataFields' routine
+                pse_obj.setUnstructuredGridDataFields(
+                    gridSubsetCellsUnstructuredGrid,
+                    db,
+                    gridSubset_index,
+                    num_gridSubset_el,
+                    IDS_plasmaStateSource,
+                    ggd_slice_index,
+                    this->EdgeSourcesSourceID,
+                    this->EdgeTransportModelID);
+
+            }
 
             // Add unstructured grid to main block
             fAddBlock2MultiBlock(mainMB, gridSubsetCellsUnstructuredGrid,
