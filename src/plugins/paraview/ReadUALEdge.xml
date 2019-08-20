@@ -154,7 +154,7 @@
                 number_of_elements="1"
                 default_values="0"
                 panel_visibility="advanced">
-                <IntRangeDomain name="range"/>
+                <IntRangeDomain name="range" min="0"/>
                 <Documentation>
                     The values of this property sets the Grid GGD time slice.
                     Python notation (0, 1, 2, ...). Default value = 0. NOTE:
@@ -170,7 +170,7 @@
                 number_of_elements="1"
                 default_values="0"
                 panel_visibility="advanced">
-                <IntRangeDomain name="range"/>
+                <IntRangeDomain name="range" min="0"/>
                 <Documentation>
                     The values of this property sets the GGD time slice. Python
                     notation (0, 1, 2, ...). Default value = 0. NOTE: This
