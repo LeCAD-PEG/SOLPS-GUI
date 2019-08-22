@@ -39,7 +39,7 @@ FIND_PACKAGE(ParaView REQUIRED)
 INCLUDE(${PARAVIEW_USE_FILE})
 
 if (PARAVIEW_BUILD_QT_GUI)
-  qt4_wrap_cpp(moc_srcs
+  qt5_wrap_cpp(moc_srcs
     pqMyPropertyWidgetDecorator.h
     pqMyPropertyWidgetDecorator_EdgeSources.h
     pqMyPropertyWidgetDecorator_EdgeTransport.h

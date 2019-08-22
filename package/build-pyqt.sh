@@ -17,9 +17,9 @@ DOWNLOAD_DIR=${BUILDROOT}/download
 PATCH_DIR=${BUILDROOT}/src/patches
 
 # Package variables
-VERSION=${VERSION:-5.9.1} # should be the same as Qt
+VERSION=${VERSION:-5.13.0} # should be the same as Qt
 SOURCE="PyQt5_gpl-${VERSION}.tar.gz"
-DOWNLOAD="http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-${VERSION}/${SOURCE}/download"
+DOWNLOAD="https://www.riverbankcomputing.com/static/Downloads/PyQt5/${VERSION}/${SOURCE}"
 SRC_DIR="${BUILD_DIR}/PyQt5_gpl-${VERSION}"
 INSTALL_DIR="${STAGING_DIR}/PyQt5/${VERSION}"
 
@@ -115,6 +115,9 @@ fi
 if [ ! -d ${INSTALL_DIR} ]; then
     install -d ${INSTALL_DIR}
     make install
+    # Link sip.so to PyQt5 directory to avoid "Missing module PyQt5.sip"
+    ln -s ${SIP_INSTALL_DIR}/lib/PyQt5/sip.so \
+          ${INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages/PyQt5
 fi
 
 # Generate Modulefile

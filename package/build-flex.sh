@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-2.6.4}
+VERSION=${VERSION:-flex-2.5.37}
 GIT="https://github.com/westes/flex.git"
 SRC_DIR="${BUILD_DIR}/flex-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/flex/${VERSION}
@@ -33,7 +33,7 @@ install -d ${DOWNLOAD_DIR}
 
 # Unpack sources
 if [ ! -d ${SRC_DIR} ]; then
-    git clone --branch v${VERSION} --single-branch ${GIT} ${SRC_DIR}
+    git clone --branch ${VERSION} --single-branch ${GIT} ${SRC_DIR}
 fi
 
 cd ${SRC_DIR}

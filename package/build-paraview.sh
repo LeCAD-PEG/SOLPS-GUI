@@ -13,8 +13,8 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-5.4.1}
-SOURCE="ParaView-v${VERSION}.tar.gz"
+VERSION=${VERSION:-5.6.1}
+SOURCE="ParaView-v${VERSION}.tar.xz"
 DOWNLOAD="http://www.paraview.org/files/v${VERSION%.*}/${SOURCE}"
 SRC_DIR="${BUILD_DIR}/ParaView-v${VERSION}"
 INSTALL_DIR=${INSTALL_DIR:-${STAGING_DIR}/paraview/${VERSION}}
@@ -80,7 +80,7 @@ cd ${BUILD_DIR}
 
 # Unpack sources
 if [ ! -d ${BUILD_DIR}/${SOURCE%.tar*} ]; then
-    tar xzf ${DOWNLOAD_DIR}/${SOURCE}
+    xzcat ${DOWNLOAD_DIR}/${SOURCE} | tar -xf -
 fi
 
 # Configure
@@ -90,7 +90,6 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
     sed -i -e "/^determine_version/d" ${SRC_DIR}/CMakeLists.txt
     install -d ${BUILD_DIR}/paraview-${VERSION}
     cd ${BUILD_DIR}/paraview-${VERSION}
-
     if [ ${QT_VERSION%%.*} = 5 ]
         then VTK_RENDERING_BACKEND=OpenGL2
         else VTK_RENDERING_BACKEND=OpenGL
@@ -111,6 +110,7 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
     touch ${SRC_DIR}/.configured
 fi
 
+cd ${BUILD_DIR}/paraview-${VERSION}
 
 # Build
 if [ ! -e ${SRC_DIR}/.built ]; then
@@ -129,7 +129,7 @@ DOC_VERSION=${DOC_VERSION:-${VERSION%.*}.0}
 INSTALL_DOC_DIR=${INSTALL_DIR}/share/paraview-${VERSION%.*}/doc
 install -d ${INSTALL_DOC_DIR}
 for file in ParaViewGettingStarted-${DOC_VERSION%-*}.pdf \
-    ParaViewTutorial.pdf  ParaViewGuide-${DOC_VERSION%-*}.pdf \
+    ParaViewTutorial-${DOC_VERSION%-*}.pdf  ParaViewGuide-${DOC_VERSION%-*}.pdf \
     ParaViewCatalystGuide-${DOC_VERSION%-*}.pdf  ; do
     if [ ! -f ${DOWNLOAD_DIR}/${file} ]; then
          wget -O ${DOWNLOAD_DIR}/${file} --no-check-certificate \
@@ -170,8 +170,8 @@ More information
 module-whatis {Description: ParaView is a scientific parallel visualizer.}
 module-whatis {Homepage: http://www.paraview.org}
 
-if { ![ is-loaded Qt4/${QT_VERSION} ] } {
-    module load Qt4/${QT_VERSION}
+if { ![ is-loaded Qt5/${QT_VERSION} ] } {
+    module load Qt5/${QT_VERSION}
 }
 
 conflict ParaView

@@ -45,7 +45,7 @@ fi
 # Build
 if [ ! -e ${SRC_DIR}/.built ]; then
     SOLPS_LIB=${INSTALL_DIR}/lib BLDFLAG="ar cr" RANLIB=echo CFLAGS="-fPIC" \
-    F77=gfortran \
+    F77=gfortran FFLAGS=-std=legacy \
     make libgr.a
     touch ${SRC_DIR}/.built
 fi
@@ -54,7 +54,7 @@ fi
 if [ ! -d ${INSTALL_DIR} ]; then
     install -d ${INSTALL_DIR}/lib
     SOLPS_LIB=${INSTALL_DIR}/lib BLDFLAG="ar cr" RANLIB=echo CFLAGS="-fPIC" \
-    F77=gfortran \
+    F77=gfortran FFLAGS=-std=legacy \
     make install
 fi
 

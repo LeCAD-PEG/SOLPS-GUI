@@ -13,9 +13,9 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package Variables
-VERSION=${VERSION:-4.19.13}
+VERSION=${VERSION:-4.19.18}
 SOURCE="sip-${VERSION}.tar.gz"
-DOWNLOAD="http://sourceforge.net/projects/pyqt/files/sip/sip-${VERSION}/${SOURCE}/download"
+DOWNLOAD="https://www.riverbankcomputing.com/static/Downloads/sip/${VERSION}/${SOURCE}"
 SRC_DIR=${BUILD_DIR}/sip-${VERSION}
 INSTALL_DIR=${STAGING_DIR}/sip/${VERSION}
 
@@ -47,7 +47,8 @@ cd ${SRC_DIR}
 if [ ! -e ${SRC_DIR}/.configured ]; then
     rm -rf ${INSTALL_DIR}
     python3 configure.py --bindir=${INSTALL_DIR}/bin \
-        --destdir=${INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
+        --sip-module=PyQt5.sip \
+        --destdir=${INSTALL_DIR}/lib/
     touch ${SRC_DIR}/.configured
 fi
 
@@ -85,7 +86,7 @@ if { ![ is-loaded Python/${PYTHON_VERSION} ] } {
 conflict SIP
 prepend-path PATH               ${INSTALL_DIR}/bin
 prepend-path CPATH              ${INSTALL_DIR}/include
-prepend-path PYTHONPATH         ${INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages
+prepend-path PYTHONPATH         ${INSTALL_DIR}/lib
 EOF
 
 

@@ -26,13 +26,13 @@ set SOLPS_GIT="ssh://git@git.iter.org/bnd/solps-iter.git"
 set SOLPS_SRC_DIR=${STAGING_DIR}/solps-iter/${SOLPS_VERSION}
 
 if !($?IMASDD_VERSION) then
-    setenv IMAS_VERSION 3.21.0
+    setenv IMAS_VERSION 3.23.2
 else
     setenv IMAS_VERSION "${IMASDD_VERSION}"
 endif
 
 if !($?IMASUAL_VERSION) then
-    setenv UAL_VERSION 3.8.4
+    setenv UAL_VERSION 4.1.2
 else
     setenv UAL_VERSION ${IMASUAL_VERSION}
 endif
@@ -54,13 +54,12 @@ if !($?GLI_VERSION) then
 endif
 
 if !($?MDSPLUS_VERSION) then
-    setenv MDSPLUS_VERSION stable_release-7-7-8
+    setenv MDSPLUS_VERSION stable_release-7-46-1
 endif
 
 if !($?OPENBLAS_VERSION) then
     setenv OPENBLAS_VERSION 0.3.5
 endif
-
 setenv IMAS_PREFIX ${STAGING_DIR}/imas/${IMAS_VERSION}/solps
 if !($?PATH) then
     setenv PATH ${STAGING_DIR}/bin
@@ -144,5 +143,5 @@ make listobj listobj_debug
 make depend depend_debug
 make tags
 make carre divgeo b25 eirene b25eirene uinp triang amds sonnet-light
-make b25eirene_openmp
+# make b25eirene_openmp
 make b25eirene_mpi uinp_mpi amds_mpi

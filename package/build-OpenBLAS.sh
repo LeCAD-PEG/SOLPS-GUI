@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-0.3.5}
+VERSION=${VERSION:-0.3.7}
 SOURCE="OpenBLAS-${VERSION}.tar.gz"
 DOWNLOAD="https://github.com/xianyi/OpenBLAS/archive/v${VERSION}.tar.gz"
 SRC_DIR="${BUILD_DIR}/OpenBLAS-${VERSION}"

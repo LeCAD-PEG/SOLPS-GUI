@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-1.16.1}
+VERSION=${VERSION:-1.17.0}
 SOURCE="numpy-${VERSION}.tar.gz"
 DOWNLOAD="https://github.com/numpy/numpy/releases/download/v${VERSION}/numpy-${VERSION}.tar.gz"
 SRC_DIR="${BUILD_DIR}/numpy-${VERSION}"
@@ -52,6 +52,7 @@ library_dirs = ${OPENBLAS_INSTALL_DIR}/lib
 include_dirs = ${OPENBLAS_INSTALL_DIR}/include
 runtime_library_dirs = ${OPENBLAS_INSTALL_DIR}/lib
 EOF
+    python3 setup.py config
     touch ${SRC_DIR}/.configured
 fi
 

@@ -14,11 +14,11 @@ PATCH_DIR=${BUILDROOT}/src/patches
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-5.9.1}
+VERSION=${VERSION:-5.13.0}
 MAJOR_VERSION=${VERSION%.*}
-SOURCE="qt-everywhere-opensource-src-${VERSION}.tar.xz"
+SOURCE="qt-everywhere-src-${VERSION}.tar.xz"
 DOWNLOAD="http://download.qt.io/official_releases/qt/${MAJOR_VERSION}/${VERSION}/single/${SOURCE}"
-SRC_DIR="${BUILD_DIR}/qt-everywhere-opensource-src-${VERSION}"
+SRC_DIR="${BUILD_DIR}/qt-everywhere-src-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/qt/${VERSION}
 
 # Environment dependencies
@@ -72,8 +72,10 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
       -skip qtdeclarative \
       -skip qtpurchasing \
       -skip qt3d ${XCB_FLAGS} ${QT_EXTRA_FLAGS} \
-      -qt-xkbcommon -xkb-config-root /usr/share/X11/xkb \
-      -nomake tests
+      -nomake tests \
+      -nomake examples \
+      -qt-xcb
+      #-qt-xkbcommon -xkb-config-root /usr/share/X11/xkb \
 
     # Check if INSTALL directory has been already created
     if [ -d ${INSTALL_DIR} ]; then
@@ -93,12 +95,12 @@ fi
 if [ ! -d ${INSTALL_DIR} ]; then
     install -d ${INSTALL_DIR}
     make install
+    # Skip documentation due to Qt (5.13) LLVM (>= 6) requirement
     # Install documentation
-    export PATH=${INSTALL_DIR}/bin:${PATH}
-    make -C qttools/src sub-qdoc
-    make -C qtbase/src html_docs
-    make qmake_all
-    make -j ${MAKE_JOBS} docs install_docs
+    # export PATH=${INSTALL_DIR}/bin:${PATH}
+    # make -C qtbase/src html_docs
+    # make qmake_all
+    # make -j ${MAKE_JOBS} docs install_docs
 fi
 
 # Generate Modulefile

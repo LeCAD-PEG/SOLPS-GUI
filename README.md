@@ -103,12 +103,6 @@ clearing the preferences.
     rm ${HOME}/Library/Preferences/com.iter.solps-gui.plist
     killall -u $USER cfprefsd
 
-## Building on RHEL6 clusters
-Some RHEL6 clusters lack full XCB devel support and for that we recommend the
-following option to building pyqt:
-
-    USE_QT_XCB=YES ./build-pyqt.sh
-
 ## Building Qt (using build-pyqt.sh or build-paraview.sh) on debian stretch (9)
 Older versions of Qt ( < 5.9.0) do not support OpenSSL-1.1.0, which is the
 only available package for debian stretch to get via command:

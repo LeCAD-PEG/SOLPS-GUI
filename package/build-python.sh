@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-3.6.8}
+VERSION=${VERSION:-3.7.4}
 MAINVERSION=${VERSION%.*}
 SOURCE="Python-${VERSION}.tgz"
 DOWNLOAD="https://www.python.org/ftp/python/${VERSION}/${SOURCE}"
@@ -54,7 +54,7 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
         sed -i -e "s,#SSL=.*,SSL=${ssl}," -e "/^#.*ssl/s/#//" \
         -e '/ssl/s|-lcrypto |-lcrypto -Wl,-rpath,$(SSL)/lib|' Modules/Setup.dist
     fi
-    ./configure --prefix=${INSTALL_DIR} --enable-shared
+    ./configure --prefix=${INSTALL_DIR} --enable-shared #--enable-optimizations
     touch ${SRC_DIR}/.configured
 fi
 
