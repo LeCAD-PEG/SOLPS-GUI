@@ -3,35 +3,40 @@ SOLPS-ITER GUI
 
 ## Build environment
 
+First run ./configure
+
+    $ ./configure
+
+
 Prepare Python 3, PyQt and ParaView with GCC 4.8+
 
-    ./build-pyqt.sh
-    ./build-paraview.sh
+    $ ./configure
+    $ make python
+    $ make paraview
 
+One can modify the following environment variables to change the installation
+location:
 
+ - STAGING_DIR installation destination
 
-One can modify the following environment variables to change
-default build procedure:
+    $ # Example
+    $ STAGING_DIR=/path/to/install make
 
- - MAKE_JOBS  number of parallel jobs to make
- - STAGING_PREFIX installation destination
- - USE_QT_XCB for newer distros lacking full XCB support
+Source the setupenv.sh for locally built PyQt with
 
-Source the setupenv.[c]sh for locally built PyQt with
-
+    $ make setupenv.sh
     $ source setupenv.sh
 
-or
+Or use the modules generated after the building of PyQt
 
-    $ source setupenv.csh
+    $ module use modules
+    $ module load ParaView
 
 Optionally after building  PyQt you can build gnuplot 5.2 and embedded gnuplot
 in Qt with the following commands:
 
-    source setupenv.sh
-    ./build-gnuplot.sh
-    cd /src/gnuplot-widget
-    ./build-gnuplot-widget.sh
+    $ make gnuplot
+    $ make gnuplot-widget
 
 ## Running UI
 
@@ -68,10 +73,21 @@ IMAS is not required to build the SOLPS GUI.
 XCB development libraries are required for building Qt5.x
 
     apt-cache search libxcb
-    sudo apt-get install libxcb.*-dev
-    sudo apt-get install libudev-dev libxi-dev
+    sudo apt-get install libxcb.*-dev libxkbcommon-dev
+    sudo apt-get install libudev-dev libxi-dev libffi-dev
 
-## PIP3 packages
+## PIP3 requirements
+
+If for some reason you have a local installation of PIP in
+${HOME}/.local/lib/pythonX.Y then python will not build successfully. To solve
+this, delete the locally installed pip with
+
+    $ pip3 uninstall pip
+
+and then run make python. This problem came with Debian 9 and Ubuntu 19.04
+and higher versions.
+
+For python to be build with the following development packages are required.
 
    apt-get install libssl-dev liblzma-dev
 
@@ -148,14 +164,21 @@ Scripts have been added for compiling SOLPS-ITER and it's prerequisites into
 the same build environment as SOLPS-GUI. Some packages can be installed with
 the use of package managers:
 
-Ubuntu 9.6 (stretch):
-    apt-get install libncarg-dev libcairo2-dev libfontconfig1-dev \
-    libxrender-dev libx11-dev libfreetype6-dev ksh libxslt1-dev openjdk-8-jdk \
-    libreadline-dev xsltproc libopenmpi-dev libmotif-dev libnetcdf-dev \
-    texlive texlive-latex-recommended texlive-binaries emacs25-bin-common \
-    python-dev
+Debian 9.6 (stretch):
+    apt-get install libcairo2-dev libfontconfig1-dev \
+    libxrender-dev libx11-dev libxslt1-dev libxmuu-dev \
+    openjdk-8-jdk \
+    libreadline-dev xsltproc \
+    texlive texlive-latex-recommended texlive-binaries texlive-latex-extra \
+    emacs25-bin-common \
+    python-dev csh ksh tcsh
 
     apt-get install build-essential
+
+Openjdk and emacs packages are different for Debian 10.
+
+Debian 10 (buster):
+    apt-get install openjdk-11-jdk emacs-bin-common
 
 CentOS7:
 

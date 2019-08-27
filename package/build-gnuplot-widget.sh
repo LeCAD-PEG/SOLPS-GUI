@@ -19,7 +19,7 @@ INSTALL_DIR=${STAGING_DIR}/gnuplot-widget/python-${PYTHON_VERSION}-qt-${QT_VERSI
 
 # Environment dependencies
 if [ -e ${BUILDROOT}/package/setup.sh ]; then
-    source ${BUILDROOT}/package/setup.sh
+    . ${BUILDROOT}/package/setup.sh
 fi
 
 

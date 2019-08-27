@@ -289,6 +289,7 @@ ${STAGING_DIR}/ncl/${NCL_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${NCL_VERSION}}/" package/build-ncl.sh
 
 	FREETYPE_VERSION=${FREETYPE_VERSION} \
+	OPENBLAS_VERSION=${OPENBLAS_VERSION} \
 	NETCDF_VERSION=${NETCDF_VERSION} \
 	./package/build-ncl.sh
 
@@ -312,6 +313,7 @@ ${STAGING_DIR}/motif/${MOTIF_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${MOTIF_VERSION}}/" package/build-motif.sh
 
 	FLEX_VERSION=${FLEX_VERSION} \
+	FREETYPE_VERSION=${FREETYPE_VERSION} \
 	./package/build-motif.sh
 
 motif: flex ${STAGING_DIR}/motif/${MOTIF_VERSION}
@@ -440,9 +442,9 @@ ${SOLPS_ITER_MOD}:
 	@echo "## \$$name modulefile" >> ${SOLPS_ITER_MOD}
 	@echo "##" >> ${SOLPS_ITER_MOD}
 	@echo "conflict solps-iter" >> ${SOLPS_ITER_MOD}
-	@echo "if { ! [ is-loaded imas ] } {" >> ${SOLPS_GUI_MOD}
-	@echo "    module load imas/${IMASDD_VERSION}/solps" >> ${SOLPS_GUI_MOD}
-	@echo "}" >> ${SOLPS_GUI_MOD}
+	@echo "if { ! [ is-loaded imas ] } {" >> ${SOLPS_ITER_MOD}
+	@echo "    module load imas/${IMASDD_VERSION}/solps" >> ${SOLPS_ITER_MOD}
+	@echo "}" >> ${SOLPS_ITER_MOD}
 	@echo "if { ![ is-loaded GR/${GR_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
 	@echo "    module load GR/${GR_VERSION}"  >> ${SOLPS_ITER_MOD}
 	@echo "}"  >> ${SOLPS_ITER_MOD}

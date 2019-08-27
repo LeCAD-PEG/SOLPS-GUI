@@ -87,6 +87,9 @@ setenv PKG_CONFIG_PATH ${STAGING_DIR}/GGD/${GGD_VERSION}/lib/pkgconfig:${PKG_CON
 setenv PKG_CONFIG_PATH ${SOLPS_SRC_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}
 
 setenv PKG_CONFIG_PATH ${STAGING_DIR}/mscl/${MSCL_VERSION}/pkgconfig:${PKG_CONFIG_PATH}
+setenv PKG_CONFIG_PATH ${STAGING_DIR}/netcdf/${NETCDF_VERSION}/pkgconfig:${PKG_CONFIG_PATH}
+setenv PKG_CONFIG_PATH ${STAGING_DIR}/netcdf-fortran/${NETCDF_FORTRAN_VERSION}/pkgconfig:${PKG_CONFIG_PATH}
+
 
 if !($?LD_LIBRARY_PATH) then
     setenv LD_LIBRARY_PATH ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib
@@ -103,26 +106,38 @@ setenv LD_LIBRARY_PATH /usr/lib/x86_64-linux-gnu:/usr/lib/gcc/x86_64-linux-gnu/$
 # CentOS
 setenv LD_LIBRARY_PATH /usr/lib64/:/usr/lib/gcc/x86_64-redhat-linux/${GCC_VERSION}:${LD_LIBRARY_PATH}
 
+
 # setenv PKG_CONFIG_PATH ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
 
 setenv CPATH /usr/include:/usr/include/x86_64-linux-gnu:/usr/include/freetype:/usr/include/cairo
+setenv CPATH ${STAGING_DIR}/netcdf-fortran/${NETCDF_FORTRAN_VERSION}:${CPATH}
 
+source ${BUILDROOT}/package/setup.csh
 
 # solps-iter/SETUP/config.*.gfortran packages locations
-setenv NCDIR /usr
+setenv NCDIR ${STAGING_DIR}/netcdf/${NETCDF_VERSION}
 setenv MSCL_ROOT ${STAGING_DIR}/mscl/${MSCL_VERSION}
 setenv GR_ROOT ${STAGING_DIR}/GR/${GR_VERSION}
 setenv GLI_HOME ${STAGING_DIR}/GLI/${GLI_VERSION}
 setenv MDSPLUS_DIR ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
+setenv NCARG_ROOT ${STAGING_DIR}/ncl/${NCL_VERSION}/lib
+setenv H5DIR ${STAGING_DIR}/hdf5/${HDF5_VERSION}
+setenv LIBRARY_PATH ${STAGING_DIR}/hdf5/${HDF5_VERSION}/lib
 
-if ( -f /etc/redhat-release ) then
-    setenv NCARG_ROOT /usr/lib64/ncarg
-    # setenv MPDIR /usr/lib64/openmpi
-    module load mpi/openmpi-x86_64
+setenv CPATH ${STAGING_DIR}/motif/${MOTIF_VERSION}/include:${CPATH}
+setenv LD_LIBRARY_PATH ${STAGING_DIR}/motif/${MOTIF_VERSION}/lib:${LD_LIBRARY_PATH}
+
+if !($?LIBRARY_PATH) then
+    setenv LIBRARY_PATH ${STAGING_DIR}/motif/${MOTIF_VERSION}/lib
 else
-    setenv NCARG_ROOT /usr/lib/x86_64-linux-gnu/ncarg
-    setenv MPDIR /usr/lib/x86_64-linux-gnu/openmpi
+    setenv LIBRARY_PATH ${STAGING_DIR}/motif/${MOTIF_VERSION}/lib:${LD_LIBRARY_PATH}
 endif
+
+setenv PATH ${STAGING_DIR}/motif/${MOTIF_VERSION}/bin:${PATH}
+setenv CPATH ${STAGING_DIR}/openmpi/${OPENMPI_VERSION}/include:${CPATH}
+setenv LD_LIBRARY_PATH ${STAGING_DIR}/openmpi/${OPENMPI_VERSION}/lib:${LD_LIBRARY_PATH}
+setenv LIBRARY_PATH ${STAGING_DIR}/openmpi/${OPENMPI_VERSION}/lib:${LIBRARY_PATH}
+setenv PATH ${STAGING_DIR}/openmpi/${OPENMPI_VERSION}/bin:${PATH}
 
 setenv OPENBLAS_ROOT ${STAGING_DIR}/OpenBLAS/${OPENBLAS_VERSION}/lib
 
@@ -134,8 +149,7 @@ if (! -e ${SOLPS_SRC_DIR}/.git) then
 endif
 
 cd ${SOLPS_SRC_DIR}
-# Force setting iamat to UNKNOWN
-mv whereami whereemai_bak
+setenv HOST_NAME UNKNOWN
 source ${SOLPS_SRC_DIR}/setup.csh gfortran
 
 make VERSION
