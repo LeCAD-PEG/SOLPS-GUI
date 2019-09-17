@@ -465,6 +465,9 @@ ${SOLPS_ITER_MOD}:
 	@echo "if { ![ is-loaded motif/${MOTIF_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
 	@echo "    module load motif/${MOTIF_VERSION}"  >> ${SOLPS_ITER_MOD}
 	@echo "}"  >> ${SOLPS_ITER_MOD}
+	@echo "if { ![ is-loaded OpenBLAS/${OPENBLAS_VERSION} ] } {" >> ${SOLPS_ITER_MOD}
+	@echo "    module load OpenBLAS/${OPENBLAS_VERSION}" >> ${SOLPS_ITER_MOD}
+	@echo "}"  >> ${SOLPS_ITER_MOD}
 	@echo "setenv MAKE make" >> ${SOLPS_ITER_MOD}
 	@echo "setenv SOLPSTOP ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}"	>> ${SOLPS_ITER_MOD}
 	@echo "set SOLPSTOP ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}"	>> ${SOLPS_ITER_MOD}
