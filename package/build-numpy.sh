@@ -67,6 +67,7 @@ set +e
 pip3 show numpy
 if [ $? -ne 0 ]; then
     install -d ${INSTALL_DIR}
+    pip3 uninstall -y numpy
     python3 setup.py build install --prefix=${PYTHON_INSTALL_DIR}
 fi
 # Now install matplotlib.

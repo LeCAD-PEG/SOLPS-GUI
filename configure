@@ -283,6 +283,23 @@ else
     export PATH=\${STAGING_DIR}/freetype/\${FREETYPE_VERSION}/bin:\${PATH}
 fi
 
+if [ -z \${OPENMPI_VERSION+x} ]; then
+    echo "OPENMPI_VERSION is unset, skipping"
+else
+    export CPATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/include:\${CPATH}
+    export LD_LIBRARY_PATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/lib:\${LD_LIBRARY_PATH}
+    export LIBRARY_PATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/lib:\${LIBRARY_PATH}
+    export PATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/bin:\${PATH}
+fi
+
+if [ -z \${GGD_VERSION+x} ]; then
+    echo "GGD_VERSION is unset, skipping"
+else
+    export CPATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/include:\${CPATH}
+    export LD_LIBRARY_PATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/lib:\${LD_LIBRARY_PATH}
+    export LIBRARY_PATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/lib:\${LIBRARY_PATH}
+fi
+
 EOF
 
 echo "Finished writing ${SETUP_FILE} file"
@@ -292,6 +309,13 @@ echo "Preparing ${SETUP_CSH_FILE} file"
 if [ -e ${SETUP_CSH_FILE} ]; then
     rm ${SETUP_CSH_FILE}
 fi
+
+cat << EOF > ${SETUP_CSH_FILE}
+setenv CC gcc
+setenv CXX g++
+setenv FC gfortran
+EOF
+
 
 echo "Writing host specific commands to ${SETUP_CSH_FILE}"
 case ${HOSTNAME} in
@@ -303,16 +327,6 @@ module purge
 # module load OpenSSL/1.0.2g-goolf-1.5.16
 #CMAKE_EXTRA_FLAGS=\${CMAKE_EXTRA_FLAGS:- -DCMAKE_EXE_LINKER_FLAGS:STRING=-L\${EBROOTOPENSSL}/lib}
 #PARAVIEW_EXTRA_FLAGS=\${CMAKE_EXTRA_FLAGS:-- -DCMAKE_EXE_LINKER_FLAGS:STRING=-L\${EBROOTOPENSSL}/lib}
-
-setenv CPATH=\${STAGING_DIR}/motif/\${MOTIF_VERSION}/include:\${CPATH}
-setenv LD_LIBRARY_PATH=\${STAGING_DIR}/motif/\${MOTIF_VERSION}/lib:\${LD_LIBRARY_PATH}
-setenv LIBRARY_PATH=\${STAGING_DIR}/motif/\${MOTIF_VERSION}/lib:\${LIBRARY_PATH}
-setenv PATH=\${STAGING_DIR}/motif/\${MOTIF_VERSION}/bin:\${PATH}
-
-setenv CPATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/include:\${CPATH}
-setenv LD_LIBRARY_PATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/lib:\${LD_LIBRARY_PATH}
-setenv LIBRARY_PATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/lib:\${LIBRARY_PATH}
-setenv PATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/bin:\${PATH}
 
 EOF
         ;;
@@ -362,4 +376,45 @@ EOF
         ;;
 esac
 
+cat << EOF >> ${SETUP_CSH_FILE}
+# Use compiled packages!
+
+setenv CPATH \${STAGING_DIR}/motif/\${MOTIF_VERSION}/include:\${CPATH}
+setenv LD_LIBRARY_PATH \${STAGING_DIR}/motif/\${MOTIF_VERSION}/lib:\${LD_LIBRARY_PATH}
+setenv LIBRARY_PATH \${STAGING_DIR}/motif/\${MOTIF_VERSION}/lib:\${LIBRARY_PATH}
+setenv PATH \${STAGING_DIR}/motif/\${MOTIF_VERSION}/bin:\${PATH}
+
+setenv CPATH \${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/include:\${CPATH}
+setenv LD_LIBRARY_PATH \${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/lib:\${LD_LIBRARY_PATH}
+setenv LIBRARY_PATH \${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/lib:\${LIBRARY_PATH}
+setenv PATH \${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/bin:\${PATH}
+setenv PKG_CONFIG_PATH \${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
+
+setenv IMAS_VERSION \${IMASDD_VERSION}
+setenv LD_LIBRARY_PATH \${STAGING_DIR}/imas/\${IMAS_VERSION}/solps/lib:\${LD_LIBRARY_PATH}
+setenv PKG_CONFIG_PATH \${STAGING_DIR}/imas/\${IMAS_VERSION}/solps/lib/pkgconfig:\${PKG_CONFIG_PATH}
+setenv ids_path \${STAGING_DIR}/imas/\${IMAS_VERSION}/solps/models/mdsplus
+setenv imasfortran_LIBS "-L\${STAGING_DIR}/imas/\${IMAS_VERSION}/solps/lib -limas-gfortran -limas"
+setenv imasfortran_CFLAGS "-I\${STAGING_DIR}/imas/\${IMAS_VERSION}/solps/include/gfortran"
+
+setenv PKG_CONFIG_PATH \${STAGING_DIR}/GGD/\${GGD_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
+setenv CPATH \${STAGING_DIR}/GGD/\${GGD_VERSION}/include:\${CPATH}
+setenv LD_LIBRARY_PATH \${STAGING_DIR}/GGD/\${GGD_VERSION}/lib:\${LD_LIBRARY_PATH}
+setenv LIBRARY_PATH \${STAGING_DIR}/GGD/\${GGD_VERSION}/lib:\${LIBRARY_PATH}
+
+
+setenv PKG_CONFIG_PATH \${STAGING_DIR}/mscl/\${MSCL_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
+
+setenv PKG_CONFIG_PATH \${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
+setenv CPATH \${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/include
+
+setenv LD_LIBRARY_PATH \${STAGING_DIR}/mdsplus/\${MDSPLUS_VERSION}/lib:\${LD_LIBRARY_PATH}
+
+setenv OPENBLAS_ROOT \${STAGING_DIR}/OpenBLAS/\${OPENBLAS_VERSION}/lib
+
+setenv H5DIR \${STAGING_DIR}/hdf5/\${HDF5_VERSION}
+setenv LIBRARY_PATH \${STAGING_DIR}/hdf5/\${HDF5_VERSION}/lib
+
+
+EOF
 echo "Finished writing ${SETUP_CSH_FILE}"

@@ -58,7 +58,7 @@ if !($?MDSPLUS_VERSION) then
 endif
 
 if !($?OPENBLAS_VERSION) then
-    setenv OPENBLAS_VERSION 0.3.5
+    setenv OPENBLAS_VERSION 0.3.7
 endif
 setenv IMAS_PREFIX ${STAGING_DIR}/imas/${IMAS_VERSION}/solps
 if !($?PATH) then
@@ -67,50 +67,40 @@ else
     setenv PATH ${STAGING_DIR}/bin:${PATH}
 endif
 
-setenv PATH ${STAGING_DIR}/imas/${IMAS_VERSION}/solps/bin:${PATH}
-
-if !($?PKG_CONFIG_PATH) then
-    setenv PKG_CONFIG_PATH ${STAGING_DIR}/imas/${IMAS_VERSION}/solps/lib/pkgconfig
-else
-    setenv PKG_CONFIG_PATH ${STAGING_DIR}/imas/${IMAS_VERSION}/solps/lib/pkgconfig:${PKG_CONFIG_PATH}
-endif
-
 # System PKG_CONFIG_PATH
-setenv PKG_CONFIG_PATH /usr/lib/pkgconfig:${PKG_CONFIG_PATH}
+if !($?PKG_CONFIG_PATH) then
+    setenv PKG_CONFIG_PATH /usr/lib/pkgconfig
+else
+    setenv PKG_CONFIG_PATH /usr/lib/pkgconfig:${PKG_CONFIG_PATH}
+endif
 # Debian
 setenv PKG_CONFIG_PATH /usr/lib/x86_64-linux-gnu/pkgconfig:${PKG_CONFIG_PATH}
 # CentOS
 setenv PKG_CONFIG_PATH /usr/lib64/pkgconfig:${PKG_CONFIG_PATH}
 
-setenv PKG_CONFIG_PATH ${STAGING_DIR}/GGD/${GGD_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
-
 setenv PKG_CONFIG_PATH ${SOLPS_SRC_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}
-
-setenv PKG_CONFIG_PATH ${STAGING_DIR}/mscl/${MSCL_VERSION}/pkgconfig:${PKG_CONFIG_PATH}
-setenv PKG_CONFIG_PATH ${STAGING_DIR}/netcdf/${NETCDF_VERSION}/pkgconfig:${PKG_CONFIG_PATH}
-setenv PKG_CONFIG_PATH ${STAGING_DIR}/netcdf-fortran/${NETCDF_FORTRAN_VERSION}/pkgconfig:${PKG_CONFIG_PATH}
-
-
-if !($?LD_LIBRARY_PATH) then
-    setenv LD_LIBRARY_PATH ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib
-else
-    setenv LD_LIBRARY_PATH ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib:${LD_LIBRARY_PATH}
-endif
-
-setenv LD_LIBRARY_PATH ${STAGING_DIR}/lib:${LD_LIBRARY_PATH}
 
 # System LD_LIBRARY_PATH
 set GCC_VERSION="`gcc -dumpversion`"
+
 # Debian
-setenv LD_LIBRARY_PATH /usr/lib/x86_64-linux-gnu:/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION}:${LD_LIBRARY_PATH}
+if !($?LD_LIBRARY_PATH) then
+    setenv LD_LIBRARY_PATH /usr/lib/x86_64-linux-gnu:/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION}
+else
+    setenv LD_LIBRARY_PATH /usr/lib/x86_64-linux-gnu:/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION}:${LD_LIBRARY_PATH}
+endif
 # CentOS
 setenv LD_LIBRARY_PATH /usr/lib64/:/usr/lib/gcc/x86_64-redhat-linux/${GCC_VERSION}:${LD_LIBRARY_PATH}
 
+# Initialize CPATH and LIBRARY_PATH
 
-# setenv PKG_CONFIG_PATH ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}/lib/pkgconfig:${PKG_CONFIG_PATH}
+if !($?CPATH) then
+    setenv CPATH
+endif
 
-setenv CPATH /usr/include:/usr/include/x86_64-linux-gnu:/usr/include/freetype:/usr/include/cairo
-setenv CPATH ${STAGING_DIR}/netcdf-fortran/${NETCDF_FORTRAN_VERSION}:${CPATH}
+if !($?LIBRARY_PATH) then
+    setenv LIBRARY_PATH
+endif
 
 source ${BUILDROOT}/package/setup.csh
 
@@ -121,25 +111,6 @@ setenv GR_ROOT ${STAGING_DIR}/GR/${GR_VERSION}
 setenv GLI_HOME ${STAGING_DIR}/GLI/${GLI_VERSION}
 setenv MDSPLUS_DIR ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
 setenv NCARG_ROOT ${STAGING_DIR}/ncl/${NCL_VERSION}/lib
-setenv H5DIR ${STAGING_DIR}/hdf5/${HDF5_VERSION}
-setenv LIBRARY_PATH ${STAGING_DIR}/hdf5/${HDF5_VERSION}/lib
-
-setenv CPATH ${STAGING_DIR}/motif/${MOTIF_VERSION}/include:${CPATH}
-setenv LD_LIBRARY_PATH ${STAGING_DIR}/motif/${MOTIF_VERSION}/lib:${LD_LIBRARY_PATH}
-
-if !($?LIBRARY_PATH) then
-    setenv LIBRARY_PATH ${STAGING_DIR}/motif/${MOTIF_VERSION}/lib
-else
-    setenv LIBRARY_PATH ${STAGING_DIR}/motif/${MOTIF_VERSION}/lib:${LD_LIBRARY_PATH}
-endif
-
-setenv PATH ${STAGING_DIR}/motif/${MOTIF_VERSION}/bin:${PATH}
-setenv CPATH ${STAGING_DIR}/openmpi/${OPENMPI_VERSION}/include:${CPATH}
-setenv LD_LIBRARY_PATH ${STAGING_DIR}/openmpi/${OPENMPI_VERSION}/lib:${LD_LIBRARY_PATH}
-setenv LIBRARY_PATH ${STAGING_DIR}/openmpi/${OPENMPI_VERSION}/lib:${LIBRARY_PATH}
-setenv PATH ${STAGING_DIR}/openmpi/${OPENMPI_VERSION}/bin:${PATH}
-
-setenv OPENBLAS_ROOT ${STAGING_DIR}/OpenBLAS/${OPENBLAS_VERSION}/lib
 
 if (! -e ${SOLPS_SRC_DIR}/.git) then
     git clone --branch feature/config-LECAD ${SOLPS_GIT} --recursive ${SOLPS_SRC_DIR}

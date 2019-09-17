@@ -19,8 +19,9 @@ BLITZ_VERSION=1.0.1
 LIBXML2_VERSION=2.9.1
 SAXON_VERSION=HE9-8-0-12J
 IMASDD_VERSION=3.23.3
+IMAS_MINOR_VERSION=23
 IMASUAL_VERSION=4.1.5
-GGD_VERSION=develop
+GGD_VERSION=1.8.5
 SOLPS_VERSION=devel
 MSCL_VERSION=1.1.1
 CURL_VERSION=7.64.1
@@ -107,27 +108,21 @@ ${STAGING_DIR}/Python/${PYTHON_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${PYTHON_VERSION}}/" package/build-python.sh
 
 	PYTHON_VERSION=${PYTHON_VERSION} \
+	OPENBLAS_VERSION=${OPENBLAS_VERSION} \
 	./package/build-python.sh
 
-python: ${STAGING_DIR}/Python/${PYTHON_VERSION}
-
-${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages/numpy-${NUMPY_VERSION}-py${PYTHON_MAINVERSION}-linux-x86_64.egg:
+	# Install numpy, matplotib and scipy
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${NUMPY_VERSION}}/" package/build-numpy.sh
-
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	OPENBLAS_VERSION=${OPENBLAS_VERSION} \
 	./package/build-numpy.sh
 
-matplotlib-numpy: python OpenBLAS ${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages/numpy-${NUMPY_VERSION}-py${PYTHON_MAINVERSION}-linux-x86_64.egg
-
-${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages/scipy-${SCIPY_VERSION}-py${PYTHON_MAINVERSION}-linux-x86_64.egg:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${SCIPY_VERSION}}/" package/build-scipy.sh
-
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	OPENBLAS_VERSION=${OPENBLAS_VERSION} \
 	./package/build-scipy.sh
 
-scipy: python OpenBLAS ${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages/scipy-${SCIPY_VERSION}-py${PYTHON_MAINVERSION}-linux-x86_64.egg
+python: OpenBLAS ${STAGING_DIR}/Python/${PYTHON_VERSION}
 
 ${STAGING_DIR}/sip/${SIP_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${SIP_VERSION}}/" package/build-sip.sh
@@ -229,7 +224,7 @@ ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps:
 	./package/build-imas.sh
 	cp ${BUILDROOT}/imasdb ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps/bin
 
-imas: python matplotlib-numpy scipy saxon mdsplus blitz libxml2 imasdd ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps
+imas: python saxon mdsplus blitz libxml2 imasdd ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps
 
 ${STAGING_DIR}/GGD/${GGD_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${GGD_VERSION}}/" package/build-ggd.sh
@@ -254,6 +249,7 @@ ${STAGING_DIR}/hdf5/${HDF5_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${HDF5_VERSION}}/" package/build-hdf5.sh
 
 	CMAKE_VERSION=${CMAKE_VERSION} \
+	OPENMPI_VERSION=${OPENMPI_VERSION} \
 	./package/build-hdf5.sh
 
 hdf5: cmake ${STAGING_DIR}/hdf5/${HDF5_VERSION}
@@ -318,11 +314,12 @@ ${STAGING_DIR}/motif/${MOTIF_VERSION}:
 
 motif: flex ${STAGING_DIR}/motif/${MOTIF_VERSION}
 
-${STAGING_DIR}/solps-iter/${SOLPS_VERSION}:
+${STAGING_DIR}/solps-iter/${SOLPS_VERSION}1:
 	# Copy imasdb script for setting up IMAS MDSPLUS_TREE environment
 
 	SOLPS_VERSION=${SOLPS_VERSION} \
 	IMASUAL_VERSION=${IMASUAL_VERSION} \
+	IMAS_MINOR_VERISON=${IMAS_MINOR_VERSION} \
 	IMASDD_VERSION=${IMASDD_VERSION} \
 	GGD_VERSION=${GGD_VERSION} \
 	MSCL_VERSION=${MSCL_VERSION} \
@@ -338,7 +335,7 @@ ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}:
 	HDF5_VERSION=${HDF5_VERSION} \
 	./package/build-solps-iter.csh
 
-solps-iter: imas gr gli OpenBLAS mscl ggd python netcdf ncl openmpi motif ${STAGING_DIR}/solps-iter/${SOLPS_VERSION} ${SOLPS_ITER_MOD}
+solps-iter: imas gr gli OpenBLAS mscl ggd python netcdf ncl openmpi motif ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}1 ${SOLPS_ITER_MOD}
 
 solps-gui: imas pyqt gnuplot gnuplot-widget setupenv.sh ${MODULE_DIR}/solps-gui/1.5
 
