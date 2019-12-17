@@ -223,58 +223,18 @@
         <property name="spacing">
          <number>0</number>
         </property>
-        <item row="1" column="0">
-         <widget class="QComboBox" name="comboBoxRunFilterType"/>
+        <item row="0" column="6">
+         <widget class="PutIDS" name="put_edge_ids"/>
         </item>
-        <item row="0" column="0">
-         <widget class="QPushButton" name="pushButton_Import">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Imports existing run from elsewhere (with possible conversion) and puts it under selected tree.</string>
-          </property>
+        <item row="1" column="1" colspan="2">
+         <widget class="QCheckBox" name="filterCaseSensitivityCheckBox">
           <property name="text">
-           <string>Import</string>
+           <string>Case sensitive filter</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QPushButton" name="pushButton_Archive">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Moves the selected tree into Archive</string>
-          </property>
-          <property name="text">
-           <string>Archive</string>
-          </property>
-         </widget>
+        <item row="0" column="7">
+         <widget class="GetIDS" name="get_edge_ids"/>
         </item>
         <item row="0" column="2">
          <widget class="QPushButton" name="pushButton_Run">
@@ -298,32 +258,6 @@
           </property>
           <property name="text">
            <string>Run</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3">
-         <widget class="QPushButton" name="pushButton_Stop">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Creates b2mn.exe.dir/.quit that
-should eventually stop the run.</string>
-          </property>
-          <property name="text">
-           <string>Stop</string>
           </property>
          </widget>
         </item>
@@ -375,18 +309,30 @@ and starts the run</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1" colspan="2">
-         <widget class="QCheckBox" name="filterCaseSensitivityCheckBox">
+        <item row="0" column="1">
+         <widget class="QPushButton" name="pushButton_Archive">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Moves the selected tree into Archive</string>
+          </property>
           <property name="text">
-           <string>Case sensitive filter</string>
+           <string>Archive</string>
           </property>
          </widget>
-        </item>
-        <item row="0" column="6">
-         <widget class="PutIDS" name="put_edge_ids"/>
-        </item>
-        <item row="0" column="7">
-         <widget class="GetIDS" name="get_edge_ids"/>
         </item>
         <item row="1" column="3" colspan="4">
          <widget class="QLineEdit" name="lineEditRunFilter">
@@ -411,18 +357,62 @@ and starts the run</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="0" colspan="8">
-         <widget class="QTreeView" name="treeViewRuns">
-          <property name="dragEnabled">
+        <item row="1" column="0">
+         <widget class="QComboBox" name="comboBoxRunFilterType"/>
+        </item>
+        <item row="0" column="0">
+         <widget class="QPushButton" name="pushButton_Import">
+          <property name="enabled">
            <bool>false</bool>
           </property>
-          <property name="alternatingRowColors">
-           <bool>true</bool>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
-          <property name="textElideMode">
-           <enum>Qt::ElideRight</enum>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Imports existing run from elsewhere (with possible conversion) and puts it under selected tree.</string>
+          </property>
+          <property name="text">
+           <string>Import</string>
           </property>
          </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QPushButton" name="pushButton_Stop">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Creates b2mn.exe.dir/.quit that
+should eventually stop the run.</string>
+          </property>
+          <property name="text">
+           <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="8">
+         <widget class="RunDirView" name="treeViewRuns"/>
         </item>
        </layout>
       </widget>
@@ -622,6 +612,16 @@ and starts the run</string>
         <string>Ar&amp;chive</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
+         <widget class="QPushButton" name="pushButton_Restore">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Restore</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="1">
          <spacer name="horizontalSpacer">
           <property name="orientation">
@@ -635,18 +635,8 @@ and starts the run</string>
           </property>
          </spacer>
         </item>
-        <item row="0" column="0">
-         <widget class="QPushButton" name="pushButton_Restore">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Restore</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0" colspan="2">
-         <widget class="QTreeView" name="treeViewArchive"/>
+         <widget class="treeArchiveView" name="treeViewArchive"/>
         </item>
        </layout>
       </widget>
@@ -686,7 +676,7 @@ and starts the run</string>
      <x>0</x>
      <y>0</y>
      <width>662</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -744,6 +734,11 @@ and starts the run</string>
  </widget>
  <customwidgets>
   <customwidget>
+   <class>treeArchiveView</class>
+   <extends>QTreeView</extends>
+   <header>archive_run_dir_view</header>
+  </customwidget>
+  <customwidget>
    <class>Carre</class>
    <extends>QWidget</extends>
    <header>carre</header>
@@ -783,6 +778,11 @@ and starts the run</string>
    <class>PutIDS</class>
    <extends>QWidget</extends>
    <header>put_edge_ids</header>
+  </customwidget>
+  <customwidget>
+   <class>RunDirView</class>
+   <extends>QTreeView</extends>
+   <header>run_dir_view</header>
   </customwidget>
   <customwidget>
    <class>SolpsInput</class>
@@ -836,12 +836,12 @@ and starts the run</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>351</y>
+     <x>53</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
-     <x>278</x>
-     <y>351</y>
+     <x>467</x>
+     <y>423</y>
     </hint>
    </hints>
   </connection>
@@ -852,12 +852,12 @@ and starts the run</string>
    <slot>triggerTextChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>351</y>
+     <x>53</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
-     <x>319</x>
-     <y>323</y>
+     <x>533</x>
+     <y>393</y>
     </hint>
    </hints>
   </connection>
@@ -868,8 +868,8 @@ and starts the run</string>
    <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>351</y>
+     <x>53</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
@@ -900,12 +900,12 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>351</y>
+     <x>53</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
-     <x>72</x>
-     <y>62</y>
+     <x>83</x>
+     <y>118</y>
     </hint>
    </hints>
   </connection>
@@ -916,12 +916,12 @@ and starts the run</string>
    <slot>setTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>324</y>
+     <x>53</x>
+     <y>396</y>
     </hint>
     <hint type="destinationlabel">
-     <x>72</x>
-     <y>62</y>
+     <x>83</x>
+     <y>118</y>
     </hint>
    </hints>
   </connection>
@@ -932,12 +932,12 @@ and starts the run</string>
    <slot>executeTcshCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>249</x>
-     <y>324</y>
+     <x>307</x>
+     <y>396</y>
     </hint>
     <hint type="destinationlabel">
-     <x>72</x>
-     <y>62</y>
+     <x>83</x>
+     <y>118</y>
     </hint>
    </hints>
   </connection>
@@ -948,12 +948,12 @@ and starts the run</string>
    <slot>setSolpsPlotCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>319</x>
-     <y>323</y>
+     <x>533</x>
+     <y>393</y>
     </hint>
     <hint type="destinationlabel">
-     <x>332</x>
-     <y>62</y>
+     <x>579</x>
+     <y>119</y>
     </hint>
    </hints>
   </connection>
@@ -964,12 +964,12 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>319</x>
-     <y>323</y>
+     <x>533</x>
+     <y>393</y>
     </hint>
     <hint type="destinationlabel">
-     <x>332</x>
-     <y>62</y>
+     <x>579</x>
+     <y>119</y>
     </hint>
    </hints>
   </connection>
@@ -980,12 +980,12 @@ and starts the run</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>546</x>
-     <y>323</y>
+     <x>639</x>
+     <y>394</y>
     </hint>
     <hint type="destinationlabel">
-     <x>332</x>
-     <y>62</y>
+     <x>579</x>
+     <y>119</y>
     </hint>
    </hints>
   </connection>
@@ -996,12 +996,12 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>351</y>
+     <x>53</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
-     <x>332</x>
-     <y>62</y>
+     <x>579</x>
+     <y>119</y>
     </hint>
    </hints>
   </connection>
@@ -1012,8 +1012,8 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>351</y>
+     <x>53</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -1028,8 +1028,8 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>351</y>
+     <x>53</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
      <x>530</x>
@@ -1044,8 +1044,8 @@ and starts the run</string>
    <slot>setDirPath(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>351</y>
+     <x>53</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
      <x>610</x>
@@ -1060,8 +1060,8 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>351</y>
+     <x>53</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
      <x>111</x>
@@ -1076,12 +1076,12 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>351</y>
+     <x>53</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
-     <x>330</x>
-     <y>272</y>
+     <x>112</x>
+     <y>87</y>
     </hint>
    </hints>
   </connection>
@@ -1092,12 +1092,12 @@ and starts the run</string>
    <slot>showMessage(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>99</x>
-     <y>367</y>
+     <x>110</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
-     <y>396</y>
+     <y>465</y>
     </hint>
    </hints>
   </connection>
@@ -1108,12 +1108,12 @@ and starts the run</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>31</x>
-     <y>76</y>
+     <x>42</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
-     <x>330</x>
-     <y>231</y>
+     <x>112</x>
+     <y>87</y>
     </hint>
    </hints>
   </connection>
@@ -1130,6 +1130,70 @@ and starts the run</string>
     <hint type="destinationlabel">
      <x>330</x>
      <y>244</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>treeViewRuns</sender>
+   <signal>archiveDirSet(QString)</signal>
+   <receiver>treeViewArchive</receiver>
+   <slot>addToArchiveDirs(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>330</x>
+     <y>267</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>60</x>
+     <y>95</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>treeViewArchive</sender>
+   <signal>archiveDirRemoved(QString)</signal>
+   <receiver>treeViewRuns</receiver>
+   <slot>removeFromArchiveDirs(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>60</x>
+     <y>95</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>330</x>
+     <y>267</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_Restore</sender>
+   <signal>clicked()</signal>
+   <receiver>treeViewArchive</receiver>
+   <slot>removeFromArchiveDirs()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>65</x>
+     <y>77</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>178</x>
+     <y>147</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_Archive</sender>
+   <signal>clicked()</signal>
+   <receiver>treeViewRuns</receiver>
+   <slot>addToArchiveDirs()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>123</x>
+     <y>70</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>187</x>
+     <y>165</y>
     </hint>
    </hints>
   </connection>

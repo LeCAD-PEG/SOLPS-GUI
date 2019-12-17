@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>550</width>
-    <height>306</height>
+    <width>557</width>
+    <height>359</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,29 +19,13 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <widget class="QDialogButtonBox" name="buttonBox">
-   <property name="geometry">
-    <rect>
-     <x>300</x>
-     <y>270</y>
-     <width>231</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-   </property>
-  </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>0</y>
-     <width>291</width>
-     <height>81</height>
+     <x>9</x>
+     <y>9</y>
+     <width>301</width>
+     <height>100</height>
     </rect>
    </property>
    <property name="title">
@@ -177,7 +161,7 @@ Use 127.0.0.1 only for localsubmit.</string>
      <x>320</x>
      <y>0</y>
      <width>231</width>
-     <height>201</height>
+     <height>205</height>
     </rect>
    </property>
    <property name="title">
@@ -403,10 +387,10 @@ Switch -s will be added to the submission script</string>
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>80</y>
-     <width>291</width>
-     <height>181</height>
+     <x>9</x>
+     <y>115</y>
+     <width>301</width>
+     <height>205</height>
     </rect>
    </property>
    <property name="title">
@@ -555,20 +539,30 @@ Switch -s will be added to the submission script</string>
    <property name="geometry">
     <rect>
      <x>320</x>
-     <y>200</y>
-     <width>221</width>
-     <height>61</height>
+     <y>210</y>
+     <width>231</width>
+     <height>111</height>
     </rect>
    </property>
    <property name="title">
     <string>Environment variables</string>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_10">
-      <property name="text">
-       <string>DEVICE</string>
+    <item row="1" column="1">
+     <widget class="QComboBox" name="comboBox_compiler_environment">
+      <property name="editable">
+       <bool>true</bool>
       </property>
+      <item>
+       <property name="text">
+        <string>gfortran</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ifort64</string>
+       </property>
+      </item>
      </widget>
     </item>
     <item row="0" column="1">
@@ -588,7 +582,37 @@ Switch -s will be added to the submission script</string>
       </item>
      </widget>
     </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_11">
+      <property name="text">
+       <string>COMPILER</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_10">
+      <property name="text">
+       <string>DEVICE</string>
+      </property>
+     </widget>
+    </item>
    </layout>
+  </widget>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>330</y>
+     <width>166</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="9"/>

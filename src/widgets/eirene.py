@@ -3928,7 +3928,7 @@ class EireneEdit(QTreeWidget):
         self.getline(['I', 'NSTSI'])
 
         for i in range(self.values['NSTSI']):
-            self.getline(['I', 'TXTSFL', 'ISTS', 'IDIMP', 'INUMP',
+            self.getline(['I', 'TXTTALSFL', 'ISTS', 'IDIMP', 'INUMP',
                                'IRPTA', 'IRPTE', 'IRPTA', 'IRPTA', 'IRPTE'])
             self.getline(['I', 'ILIIN', 'ILSIDE', 'ILSWCH', 'ILEQUI', 'ILCOL',
                                'ILFIT', 'ILCELL', 'ILBOX', 'ILPLG'])

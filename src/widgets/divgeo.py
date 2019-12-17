@@ -17,63 +17,59 @@ class State:
 
 
 class DivGeo(TcshProcess):
-    """
-        Important notice: DivGeo git branch origin/feature/embedxwin
-        required for this to work.
+    """Important notice: DivGeo git branch origin/feature/embedxwin
+    required for this to work.
 
-        DivGeo(QWidget)
+    DivGeo(QWidget)
 
-        Provides a custom widget to embed a DivGeo application as a
-        Qt widget.
+    Provides a custom widget to embed a DivGeo application as a
+    Qt widget.
 
-        With the use of QtGui.QWindow and QWidget.createWindowContainer, DivGeo
-        is embedded inside the QWindow and then we control the drawings with
-        the help of window Container (QWidget.createWindowContainer), which is
-        a QWidget object.
+    With the use of QtGui.QWindow and QWidget.createWindowContainer, DivGeo
+    is embedded inside the QWindow and then we control the drawings with
+    the help of window Container (QWidget.createWindowContainer), which is
+    a QWidget object.
 
-        In Qt5 there is no official x11 support, because it was dropped and
-        so far this is the only way to achieve embedding of external
-        applications.
+    In Qt5 there is no official x11 support, because it was dropped and
+    so far this is the only way to achieve embedding of external
+    applications.
 
-        Furthermore, if we wish to embed an external application we need to get
-        it's Window ID. It is used in the function QWindow.fromWinId(int WinId)
+    Furthermore, if we wish to embed an external application we need to get
+    it's Window ID. It is used in the function QWindow.fromWinId(int WinId)
 
-        .. note::
+    .. note::
 
-           Embedding DivGeo is not always successful. It's hard to figure what
-           is causing problems (Either QProcess or x11 window manager?).
+       Embedding DivGeo is not always successful. It's hard to figure what
+       is causing problems (Either QProcess or x11 window manager?).
 
-        TODO: Run solps-iter/scripts/dg directly to set environment
-              variables such as ``DEVICE, DG_IMPORT_TOPOLOGY_MASK``, ...
-
-
-        Attributes:
-            _embedDivGeo (pyqtSignal): Signal used to run the function for
-                embedding DivGeo.
-            stderrOutput (pyqtSignal): Signal which emits error output from
-                QProcess.
-
-        In :meth:`divgeo.DivGeo.__init__` create an empty layout so that it's
-        created before trying to embed DivGeo, to avoid drawing problems.
-
-        Creating QProcess and connecting the Std. Output and Error to slots.
-        It is important to specify which object should be parent to the
-        QProcess. In this case we provide the parent of DivGeo(QWidget). Reason
-        is, it provides stability when it comes to embedding. Or at least in
-        tests.
-
-        What is important to provide the parent of QWidget DivGeo to the
-        QProcess self.divgeo.
-
-        Attributes:
-            _container : Variable that holds the QWidget window container.
-            _window : Variable that holds the QWindow for embedding DivGeo.
-            Layout (QVBoxLayout): Layout for DivGeo widget.
-            divgeo (QProcess): QProcess that will start DivGeo and then provide
-                the Window ID so QWidget DivGeo can embed it.
+    TODO: Run solps-iter/scripts/dg directly to set environment
+          variables such as ``DEVICE, DG_IMPORT_TOPOLOGY_MASK``, ...
 
 
+    Attributes:
+        _embedDivGeo (pyqtSignal): Signal used to run the function for
+            embedding DivGeo.
+        stderrOutput (pyqtSignal): Signal which emits error output from
+            QProcess.
 
+    In :meth:`divgeo.DivGeo.__init__` create an empty layout so that it's
+    created before trying to embed DivGeo, to avoid drawing problems.
+
+    Creating QProcess and connecting the Std. Output and Error to slots.
+    It is important to specify which object should be parent to the
+    QProcess. In this case we provide the parent of DivGeo(QWidget). Reason
+    is, it provides stability when it comes to embedding. Or at least in
+    tests.
+
+    What is important to provide the parent of QWidget DivGeo to the
+    QProcess self.divgeo.
+
+    Attributes:
+        _container : Variable that holds the QWidget window container.
+        _window : Variable that holds the QWindow for embedding DivGeo.
+        Layout (QVBoxLayout): Layout for DivGeo widget.
+        divgeo (QProcess): QProcess that will start DivGeo and then provide
+            the Window ID so QWidget DivGeo can embed it.
     """
 
     stderrOutput = pyqtSignal(str)
@@ -136,6 +132,7 @@ class DivGeo(TcshProcess):
         the embedding function.
         """
 
+        logging.debug(text)
         for line in text.splitlines():
             if "DivGeo WID: " in line:
                 self.DivGeoWID = int(line.lstrip("DivGeo WID: "))
@@ -147,6 +144,16 @@ class DivGeo(TcshProcess):
             self.labelContainer.setText("DivGeo running.\nClick here to "
                                         "dock DivGeo.")
             self.STATE = State.running
+
+        if 'Error' in text or 'error' in text:
+
+            if 'not found' in text:
+                msg = 'DivGeo executable not found.'
+                self.labelContainer.setText(msg)
+            else:
+                self.labelContainer.setText('Error when running DivGeo.')
+
+            self.STATE = State.notRunning
 
         logging.debug(text)
 

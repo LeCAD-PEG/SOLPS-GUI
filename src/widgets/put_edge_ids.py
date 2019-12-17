@@ -37,9 +37,9 @@ except Exception as e:
 
 ENABLED = True
 # ERROR used for CLI usage.
-ERROR = None # 1 for IMAS module not loaded
-             # 2 for no IMAS module
-             # 3 for corrupted imas module
+ERROR = None  # 1 for IMAS module not loaded
+              # 2 for no IMAS module
+              # 3 for corrupted imas module
 
 if 'IMAS_PREFIX' not in os.environ and 'IMAS_VERSION' not in os.environ:
     ERROR = 1

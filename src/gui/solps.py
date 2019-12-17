@@ -33,28 +33,22 @@ import getopt
 import logging
 import os
 import shutil
-import socket
 import sys
 import time
 
-from PyQt5.QtCore import (QDateTime, pyqtSlot, QModelIndex, Qt, QSettings,
-                          pyqtSignal, QThread, QAbstractItemModel, QVariant,
-                          QSortFilterProxyModel, QRegExp, QRect, QSize,
-                          QProcess)
+from PyQt5.QtCore import (pyqtSlot, QModelIndex, Qt, QSettings, pyqtSignal,
+                          QRegExp, QProcess)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
-                             QFileDialog, QStyle, QStyledItemDelegate,
-                             QLineEdit, QToolButton, QGridLayout, QLabel,
-                             QDialogButtonBox)
-from PyQt5.QtGui import (QFontMetrics, QPen)
+                             QFileDialog, QLineEdit, QToolButton, QGridLayout,
+                             QLabel, QDialogButtonBox)
+from PyQt5.QtNetwork import QHostAddress
 from PyQt5.uic import loadUi
 
 
 from addmenu import AddMenu
 
-REDIRECT_STDOUT_TO_LOG = False
 
-
-class Column:
+class Column(object):
     """Column enumeration for Runs treeview.parent
 
         First column `name` cannot be moved and is short name.
@@ -72,145 +66,9 @@ class Column:
     """
     name, path, date, status, label, comment, device, shot, run, user = \
         range(10)
-
-
-def extract_value(line):
-    if len(line.split()) == 1:
-        return ''
-    else:
-        return line.split()[-1].strip("'")
-
-
-def read_identification_parameters(directory):
-    """ Reads the identification parameters of the experiment.
-    The identification parameters of the experiment are defined inside b2mn.dat
-    under the **b2mndr_*id**. In b2md.dat are the switches for the shot and run
-    parameters.
-
-    This function scans both files and tries to find these parameters. If they
-    are defined inside the b2md.dat or b2mn.dat, these values are then showed
-    in the ``run browser`` in SOLPS-GUI.
-
-    Args:
-        directory (str): The directory of the experiment input files
-
-    Returns:
-        label (str): The string which is labeled as label in b2mn.dat.
-        run (str): The string which is labeled as run in b2mn.dat.
-        shot (str): The string which is labeled as shot in b2mn.dat.
-        user (str): The string which is labeled as user in b2mn.dat
-        device (str): The string which is labeled as device in b2mn.dat
-
-    """
-    path = directory + '/b2mn.dat'
-    label = run = shot = user = device = ''
-
-    if os.path.exists(path):
-        try:
-            with open(path) as file:
-                header = file.read(1024)
-                lines = header.splitlines()
-            for i, line in enumerate(lines):
-                if 'label' in line:
-                    label = lines[i + 1].strip("'")
-                elif 'b2mndr_run_number' in line:
-                    run = extract_value(line)
-                elif 'b2mndr_shot_number' in line:
-                    shot = extract_value(line)
-                elif 'b2mndr_user' in line:
-                    user = extract_value(line)
-                elif 'b2mndr_device' in line:
-                    device = extract_value(line)
-        except OSError as e:
-            label = run = shot = user = device = 'b2mn.dat unreadable'
-        except UnicodeDecodeError as e:
-            logging.error(e)
-            logging.error('File %s contains non-ASCII characters' % path)
-
-    path = directory + '/b2md.dat'
-    if (not shot or not run) and os.path.exists(path):
-        try:
-            with open(path) as file:
-                lines = file.read()
-            for i, line in enumerate(lines):
-                if 'shot' in line:
-                    shot = extract_value(line)
-                elif 'run' in line:
-                    run = extract_value(line)
-        except OSError:
-            shot = 'b2md.dat unreadable' if shot == '' else shot
-            run = 'b2md.dat unreadable' if run == '' else run
-    return label, run, shot, user, device
-
-
-class RunsSortFilterProxyModel(QSortFilterProxyModel):
-    def __init__(self, archive_dirs, parent=None):
-        super(RunsSortFilterProxyModel, self).__init__(parent)
-        self.archive_dirs = archive_dirs
-
-    # Parent of accepted children needs to be accepted too for treeviews. "
-    def has_accepted_children(self, source_index):
-        item = source_index.internalPointer()
-        items = item.childItems.copy()
-        while items:
-            child = items.pop()
-            items.extend(child.childItems)
-            path = child.data(Column.path)
-            if self.filterRegExp().indexIn(path) >= 0 \
-                    and path not in self.archive_dirs:
-                return True
-        return False
-
-    def filterAcceptsRow(self, sourceRow, sourceParent):
-        index = self.sourceModel().index(sourceRow, Column.path, sourceParent)
-        path = self.sourceModel().data(index, Qt.DisplayRole)
-        if path in self.archive_dirs:
-            return False
-        if self.filterRegExp().indexIn(path) >= 0:
-            return True
-        return self.has_accepted_children(index)
-
-
-class ArchiveSortFilterProxyModel(QSortFilterProxyModel):
-    def __init__(self, archive_dirs, style, parent=None):
-        super(ArchiveSortFilterProxyModel, self).__init__(parent)
-        self.archive_dirs = archive_dirs
-        self.style = style
-
-    def data(self, index, role):
-        if role == Qt.DecorationRole:
-            if index.column() == Column.name:
-                index_display = self.index(index.row(),
-                                           Column.path, index.parent())
-                path = self.data(index_display, Qt.DisplayRole)
-                if path in self.archive_dirs:
-                        return self.style.standardIcon(
-                            QStyle.SP_DialogOpenButton)
-                return None
-        return super(ArchiveSortFilterProxyModel, self).data(index, role)
-
-    # Parent of accepted children needs to be accepted too for treeviews.
-
-    def has_accepted_children(self, source_index):
-        item = source_index.internalPointer()
-        items = item.childItems.copy()
-        while items:
-            child = items.pop()
-            items.extend(child.childItems)
-            path = child.data(Column.path)
-            if path in self.archive_dirs:
-                return True
-        return False
-
-    def filterAcceptsRow(self, sourceRow, sourceParent):
-        index = self.sourceModel().index(sourceRow, Column.path, sourceParent)
-        path = self.sourceModel().data(index, Qt.DisplayRole)
-        if path in self.archive_dirs:
-            return True
-        for dir in self.archive_dirs:
-            if path.find(dir) >= 0:
-                return True
-        return self.has_accepted_children(index)
+    headerData = ['Name', 'Path', 'Date', 'Status', 'Label',
+                  'Comment', 'Device', 'Shot', 'Run', 'User']
+    n = 10
 
 
 class MyLineEdit(QLineEdit):
@@ -330,6 +188,7 @@ class Preferences():
         self.compress_log = 0
         self.dry_run = 0
         self.device_environment = 'ITER'
+        self.compiler_environment = 'gfortran'
 
     def read(self):
         """  Reads Preferences from QSettings()
@@ -352,6 +211,7 @@ class Preferences():
         self.compress_log = int(settings.value('compress_log', self.compress_log))
         self.dry_run = int(settings.value('dry_run', self.dry_run))
         self.device_environment = settings.value('device_environment', self.device_environment)
+        self.compiler_environment = settings.value('compiler_environment', self.compiler_environment)
 
     def write(self):
         """ Writes preference to disk
@@ -374,6 +234,7 @@ class Preferences():
         settings.setValue('compress_log', self.compress_log)
         settings.setValue('dry_run', str(self.dry_run))
         settings.setValue('device_environment', str(self.device_environment))
+        settings.setValue('compiler_environment', str(self.compiler_environment))
 
 
 class PreferencesDialog(QDialog):
@@ -404,6 +265,7 @@ class PreferencesDialog(QDialog):
         self.checkBox_compress_log.setCheckState(int(preferences.compress_log))
         self.checkBox_dry_run.setCheckState(int(preferences.dry_run))
         self.comboBox_device_environment.setCurrentText(preferences.device_environment)
+        self.comboBox_compiler_environment.setCurrentText(preferences.compiler_environment)
 
     def setPreferences(self):
         # s = QSettings('ITER', 'solps-gui')
@@ -414,10 +276,6 @@ class PreferencesDialog(QDialog):
         self.preferences.gnuplot_path = self.lineEdit_gnuplot_path.text()
         self.preferences.convert_path = self.lineEdit_convert_path.text()
         self.preferences.log_level = self.comboBox_log_level.currentIndex()
-        log_levels = [logging.DEBUG, logging.INFO, logging.WARNING,
-                      logging.ERROR, logging.CRITICAL]
-        log_level = log_levels[self.comboBox_log_level.currentIndex()]
-        logging.getLogger().setLevel(log_level)
         self.preferences.submit_script = self.comboBox_submit_script.currentText()
         self.preferences.job_name = self.lineEdit_job_name.text()
         self.preferences.standalone = int(self.checkBox_standalone.checkState())
@@ -428,699 +286,7 @@ class PreferencesDialog(QDialog):
         self.preferences.compress_log = int(self.checkBox_compress_log.checkState())
         self.preferences.dry_run = int(self.checkBox_dry_run.checkState())
         self.preferences.device_environment = self.comboBox_device_environment.currentText()
-
-
-class RunsStatusServer(QThread):
-    """ Networking UDP listener for receiving job status updates.
-
-    Receives datagrams in single line and emits decoded one line updates sent
-    by each job to notify the GUI that status changed.
-
-    Attributes:
-        retrieve (Bool) : Gracefully stop the thread on next packet.
-    """
-    retrieve = True
-    jobStatusChanged = pyqtSignal(str)
-    address = None
-    port = None
-
-    def bind(self, address, port):
-        # connect to UDP socket
-        self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # Bind socket to local host and port
-        try:
-            self._sock.bind((address, port))
-            self.address = address
-            self.port = port
-        except socket.error:
-            logging.error('Bind to' + address + ':' + str(port) + ' failed.')
-            return False
-        logging.info('Server listening on ' + address + ':' + str(port))
-        return True
-
-    def run(self):
-        logging.info("RunsStatusServer started.")
-        while self.retrieve:
-            data, addr = self._sock.recvfrom(1024)  # wait for data
-            # print("Message", data.decode('utf-8'), "from", addr[0])
-            msg = data.decode('utf-8').rstrip('\n')
-            if msg[0:4] == 'STOP':
-                break
-            self.jobStatusChanged.emit(msg)
-            # TODO Graceful exit from blocking recvfrom() by setting retrieve
-            # TODO and sending UDP packet to ourselves.
-        logging.info("RunsStatusServer run() finished.")
-        self._sock.close()
-
-    def stop(self):
-        client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        client_sock.sendto(bytes('STOP', 'utf-8'), (self.address, self.port))
-        client_sock.close()
-        self.wait()
-        self.exit(0)
-        logging.info("RunsStatusServer stopped.")
-
-
-class RetrieveRunsFolderInfo(QThread):
-    """ Scans filesystem and retrieves state of each run.
-
-    Several status and LOG files are probed and searched to get the state
-    and other info for Runs table view.
-
-    Args:
-        runs_model (RunsModel): Model that holds Runs
-
-    Attributes:
-        status(pyqtSignal(str)): Emits start/stop notices for status bar.
-        progress(pyqtSignal(str)): Directory that is being processed
-        statusChanged (pyqtSignal(QModelIndex, QModelIndex)) :
-            Changed index range for table view update
-    """
-    status = pyqtSignal(str)
-    progress = pyqtSignal(str)
-    statusChanged = pyqtSignal(QModelIndex, QModelIndex)
-
-    def __init__(self, runs_model, parent=None):
-        super(RetrieveRunsFolderInfo, self).__init__(parent)
-        self.model = runs_model
-
-    def retrieve_folder_state(self, directory):
-        """ Scans directory for existance of status and log files.
-
-        .status and run.log are scanned for status and errors.
-
-        Args:
-            directory (str): Directory to scan
-        Returns:
-            time, state (str, str), static_data : Tuple that is at
-                least directory time and empty string. Otherwise it returns
-                extracted status string and modification time of the file
-                that string was retrieved from and other static data from
-                various files.
-        """
-        # Firstly try to extract label from the beginning of b2mn.dat
-
-        # IF there is no SHOT, RUN in b2mn try b2md
-        static_data = read_identification_parameters(directory)
-
-        # Parse run.log
-        path = directory + '/run.log'
-        if os.path.exists(path):
-            mtime = os.path.getmtime(path)
-            qtime = QDateTime.fromTime_t(mtime)  # Qt formatted datetime
-            try:
-                fsize = os.path.getsize(path)
-                with open(path) as f:
-                    f.seek(max(fsize - 8192, 0), 0)  # Set pos @ last 100 lines
-                    lines = f.read().splitlines()  # Read to end
-                for line in lines:
-                    if 'stopping because' in line \
-                            or 'failed' in line \
-                            or 'ERROR' in line \
-                            or 'UNABLE' in line:
-                        return qtime, line, static_data
-
-                # Is there B2 running directory?
-                b2mn_exe_dir = directory + '/b2mn.exe.dir'
-                if os.path.exists(b2mn_exe_dir):
-                    if time.time() - mtime > 60:  # Is run.log fresh enough?
-                        return qtime, 'CRASHED in b2mn.exe.dir', static_data
-                    else:
-                        return qtime, 'Running', static_data
-                logging.warning("No status found in " + path)
-                return qtime, 'run.log without status', static_data
-            except OSError:
-                return qtime, 'run.log permission denied', static_data
-            except UnicodeDecodeError as e:
-                logging.error(e)
-                logging.error('File %s contains non-ASCII characters' % path)
-
-        # Retrieve last line of .status
-        path = directory + '/.status'
-        if os.path.exists(path):
-            mtime = os.path.getmtime(path)
-            qtime = QDateTime.fromTime_t(mtime)
-            try:
-                with open(path) as file:
-                    lines = file.read().splitlines()
-                if len(lines):
-                    last_status_line = lines[-1]
-                    # detect crashed that 'Started' without run.log present
-                    if time.time() - mtime > 60 and 'Started' in last_status_line:
-                        return qtime, 'CRASHED? ' + last_status_line, static_data
-                    else:
-                        return qtime, last_status_line, static_data
-                else:
-                    return qtime, '.status empty', static_data
-            except OSError:
-                return qtime, '.status permission denied', static_data
-
-        # Try to return at least directory date as last status
-        try:
-            qtime = QDateTime.fromTime_t(os.path.getmtime(directory))
-            return qtime, '', static_data
-        except OSError:
-            return QDateTime().currentDateTime(), 'no access', static_data
-
-    def run(self):
-        """ Thread scans each listed directory of the Runs model.
-
-        In principle this operation should be thread safe when changing model
-        data. However, one should not restart the scan if this thread is
-        not finished yet with scan!
-        """
-        msg = "Updating runs statuses..."
-        logging.info(msg)
-        self.status.emit(msg)
-
-        for path in self.model.column_index:
-            if self.isInterruptionRequested():
-                logging.warning("Status update interrupted!")
-                break
-            (data, date_index, status_index, label_index, device_index,
-             run_index, comment_index, shot_index) = \
-                self.model.column_index[path]
-            data[Column.date], data[Column.status], static_data = \
-                self.retrieve_folder_state(path)
-            data[Column.label], data[Column.run], data[Column.shot], \
-            data[Column.user], data[Column.device] = static_data
-            # data[Column.label] = static_data[0]
-            # Simulate delays with self.msleep(100)
-            # Fill in static data into the columns that follow
-            # Emit the range of columns that changed in the model
-            self.statusChanged.emit(date_index, shot_index)
-            self.progress.emit(path)
-        msg = "Updating run statuses finished. " + \
-              str(len(self.model.column_index)) + " directories scanned."
-        logging.info(msg)
-        self.status.emit(msg)
-
-
-class FileSystemScan(QThread):
-    """ Creates initial list of directory tree hierarchy of all aliased Runs.
-
-    This is quick scan for of all directories to be quickly shown in the
-    tree view and shortly after updated with longer run in separate thread
-    with `RetrieveRunsFolderInfo` operation. Nevertheless, this is done in
-    a thread to give immediate response (GUI) to the user after its start.
-    Tree view is shown empty until this scan finished and model is reset.
-    """
-    status = pyqtSignal(str)
-
-    def __init__(self, runs_model, parent=None):
-        super(FileSystemScan, self).__init__(parent)
-        self.model = runs_model
-
-    def setup_model_data(self, rootdir, alias, parent):
-        if rootdir is '':
-            return
-        self.status.emit("Scanning {0}...".format(alias))
-        indentations = [len(rootdir.split('/'))]
-        parents = [parent]
-
-        for dir, subdirs, files in os.walk(rootdir):
-            if dir == rootdir:  # replace name with alias
-                date = QDateTime().fromTime_t(os.stat(dir).st_mtime)
-                data = [alias, dir, date, None, None, None, None, None, None,
-                        None]  # TODO number of columns
-                parents[0].appendChild(TreeItem(data, parent))
-                continue
-
-            position = len(dir.split('/'))
-
-            if position > indentations[-1]:
-                # The last child of the current parent is now the new
-                # parent unless the current parent has no children.
-
-                if parents[-1].childCount() > 0:
-                    parents.append(
-                        parents[-1].child(parents[-1].childCount() - 1))
-                    indentations.append(position)
-
-            else:
-                while position < indentations[-1] and len(parents) > 0:
-                    parents.pop()
-                    indentations.pop()
-            # Append a new item to the current parent's list of children.
-            date = QDateTime().fromTime_t(os.stat(dir).st_mtime)
-            # TODO Size data to number of columns in use
-            data = [os.path.basename(dir), dir, date, None, None, None, None,
-                    None, None, None]
-            parents[-1].appendChild(TreeItem(data, parents[-1]))
-
-    def run(self):
-        msg = "Filesystem scanning started..."
-        self.status.emit(msg)
-        logging.info(msg)
-        settings = QSettings("ITER", "solps-gui")
-        settings.beginGroup("RunDirectories")
-        rundir1 = settings.value("runDir1", "")
-        alias1 = settings.value("Alias1", "local_1")
-        rundir2 = settings.value("runDir2", "")
-        alias2 = settings.value("Alias2", "local_2")
-        rundir3 = settings.value("runDir3", "")
-        alias3 = settings.value("Alias3", "local_3")
-        rundir4 = settings.value("runDir4", "")
-        alias4 = settings.value("Alias4", "local_4")
-        rundir5 = settings.value("runDir5", "")
-        alias5 = settings.value("Alias5", "local_5")
-        settings.endGroup()
-
-        self.model.rootItem = TreeItem(self.model.headerdata)
-        self.setup_model_data(rundir1, alias1, self.model.rootItem)
-        self.setup_model_data(rundir2, alias2, self.model.rootItem)
-        self.setup_model_data(rundir3, alias3, self.model.rootItem)
-        self.setup_model_data(rundir4, alias4, self.model.rootItem)
-        self.setup_model_data(rundir5, alias5, self.model.rootItem)
-
-        self.model.create_indices_for_columns()
-
-        msg = "Filesystem scanning finished."
-        logging.info(msg)
-        self.status.emit(msg)
-
-
-class TreeItem(object):
-    """ Each item in Runs tree view is itemized into parent, data and childs.
-    Attributes:
-        parentItem (TreeItem) : Pointer to parent.
-        itemData (list) : Column data for tree view. First is always name (str)
-        childItems (list) : Rows of child items references.
-    """
-
-    def __init__(self, data, parent=None):
-        self.parentItem = parent
-        self.itemData = data
-        self.childItems = []
-
-    def removeChildren(self, position, count):
-        if position < 0 or position + count > len(self.childItems):
-            return False
-
-        for row in range(count):
-            self.childItems.pop(position)
-
-        return True
-
-    def appendChild(self, item):
-        self.childItems.append(item)
-
-    def child(self, row):
-        return self.childItems[row]
-
-    def childCount(self):
-        return len(self.childItems)
-
-    def columnCount(self):
-        return len(self.itemData)
-
-    def data(self, column):
-        try:
-            return self.itemData[column]
-        except IndexError:
-            return None
-
-    def parent(self):
-        return self.parentItem
-
-    def row(self):
-        if self.parentItem:
-            return self.parentItem.childItems.index(self)
-        return 0
-
-    def insertChildren(self, position, count, columns):
-        if position < 0 or position > len(self.childItems):
-            return False
-
-        for row in range(count):
-            data = [None for v in range(columns)]
-            item = TreeItem(data, self)
-            self.childItems.insert(position, item)
-
-        return True
-
-    def setData(self, column, value):
-        if column < 0 or column >= len(self.itemData):
-            return False
-
-        self.itemData[column] = value
-
-        return True
-
-
-class TextElideLeftDelegate(QStyledItemDelegate):
-    """ Elide text of the first column to the left (... at start).
-    This allows long folder names to be shown right aligned when they are too
-    long to fit int the column width as usually the folder name changes at the
-    end of the Run name (e.g. with sequence or parameter).
-    """
-
-    def __init__(self, parent=None):
-        super(TextElideLeftDelegate, self).__init__(parent)
-
-    def paint(self, painter, option, index):
-        painter.save()
-        if index.column() == Column.name:  # Elide text on the left
-            painter.setPen(QPen(Qt.black))
-            value = index.data(Qt.DisplayRole)
-            icon = index.data(Qt.DecorationRole)
-            rect_size = QSize(option.rect.width(), option.rect.height())
-            icon_width = icon.actualSize(rect_size).width() + 4  # spacer too
-            text_width = option.rect.width() - icon_width
-            metrics = QFontMetrics(painter.font())
-            elided_text = metrics.elidedText(value, 0, text_width, 0)
-            if isinstance(value, str):
-                icon.paint(painter, option.rect, Qt.AlignLeft)
-                x, y, width, height = option.rect.getCoords()
-                text_rect = QRect(x + icon_width, y,
-                                  width - icon_width, height)
-                painter.drawText(text_rect, Qt.AlignLeft, elided_text)
-        else:
-            QStyledItemDelegate.paint(self, painter, option, index)
-        painter.restore()
-
-
-class RunsModel(QAbstractItemModel):
-    """ Model for the Runs and Archive tree views.
-
-    Data in columns that is presents directories in a hierarchical way.
-
-    Args:
-        style (QStyle) : Widget decoration style used to retrieve builtin
-                         icons.
-
-    Attributes:
-        column_index (path : data, date_index, status_index, label_index) :
-            Dictionary of data pointer and model indexes for cell update
-            with `FileSystemScan` or via network.
-            Keys are paths to "unique" directories.
-    """
-    statusServerThread = None
-    scanFileSystemThread = None
-    column_index = dict()
-
-    def __init__(self, style, parent=None):
-        super(RunsModel, self).__init__(parent)
-        self.style = style
-
-        self.startRunsStatusServer()
-
-        self.headerdata = ['Name', 'Path', 'Date', 'Status', 'Label',
-                           'Comment', 'Device', 'Shot', 'Run', 'User']
-        self.columns = len(self.headerdata)
-        self.rootItem = TreeItem(self.headerdata)
-        self.scanFileSystemThread = FileSystemScan(self)
-        self.scanFileSystemThread.finished.connect(self.modelReset.emit)
-        self.RetrieveRunsFolderInfoThread = RetrieveRunsFolderInfo(self)
-        self.RetrieveRunsFolderInfoThread.statusChanged.connect(
-            self.dataChanged.emit)
-        self.scanFileSystemThread.finished.connect(
-            self.RetrieveRunsFolderInfoThread.start)
-        self.RetrieveRunsFolderInfoThread.finished.connect(self.endResetModel)
-
-    def startThreads(self):
-        self.beginResetModel()
-        self.scanFileSystemThread.start()
-
-    def columnCount(self, parent):
-        if parent.isValid():
-            return parent.internalPointer().columnCount()
-        else:
-            return self.rootItem.columnCount()
-
-    def getItem(self, index):
-        if index.isValid():
-            item = index.internalPointer()
-            if item:
-                return item
-
-        return self.rootItem
-
-    def insertColumns(self, position, columns, parent=QModelIndex()):
-        self.beginInsertColumns(parent, position, position + columns - 1)
-        success = self.rootItem.insertColumns(position, columns)
-        self.endInsertColumns()
-
-        return success
-
-    def insertRows(self, position, rows, parent=QModelIndex()):
-        parentItem = self.getItem(parent)
-        self.beginInsertRows(parent, position, position + rows - 1)
-        columns = self.rootItem.columnCount()
-        success = parentItem.insertChildren(position, rows, columns)
-        self.endInsertRows()
-        return success
-
-    def removeColumns(self, position, columns, parent=QModelIndex()):
-        self.beginRemoveColumns(parent, position, position + columns - 1)
-        success = self.rootItem.removeColumns(position, columns)
-        self.endRemoveColumns()
-
-        if self.rootItem.columnCount() == 0:
-            self.removeRows(0, self.rowCount())
-
-        return success
-
-    def removeRows(self, position, rows, parent=QModelIndex()):
-        parentItem = self.getItem(parent)
-
-        self.beginRemoveRows(parent, position, position + rows - 1)
-        success = parentItem.removeChildren(position, rows)
-        self.endRemoveRows()
-
-        return success
-
-    def setData(self, index, value, role=Qt.EditRole):
-        """This is the overloaded function for QAbstractItemModel. When the
-        user change certain columns in the RunsTreeView, these parameters will
-        be saved to the b2mn.dat file, if able, in the form of identification
-        switches.
-
-        Otherwise, if some columns were to be changed, i.e. the part to the
-        run directories etc... the changes will be rejected.
-        """
-        if role != Qt.EditRole:
-            return False
-
-        column = index.column()
-
-        if column == Column.path or column == Column.date:
-            return False
-
-        # disalow changing 'name' except for aliased names (not saved)
-        if column == Column.name and self.parent(index) != QModelIndex():
-            return False
-
-        item = self.getItem(index)
-        result = item.setData(column, value)
-
-        file = '/b2mn.dat'
-        if column == Column.run:
-            switch_name = 'b2mndr_run_number'
-        elif column == Column.shot:
-            switch_name = 'b2mndr_shot_number'
-        elif column == Column.user:
-            switch_name = 'b2mndr_user'
-        elif column == Column.device:
-            switch_name = 'b2mndr_device'
-        elif column == Column.label:
-            switch_name = 'label'
-        else:
-            switch_name = ''
-
-        # LABEL to b2mn, USER, SHOT, RUN to b2md
-
-        if value:
-            self.dataChanged.emit(index, index)
-            if switch_name:  # set the label in b2mn.dat
-                directory = item.data(Column.path)
-                path = directory + '/b2mn.dat'
-                try:
-                    with open(path) as file:
-                        lines = file.read()  # whole file
-                    if switch_name in lines:
-                        lines = lines.split('\n')
-                        for i, line in enumerate(lines):
-                            if switch_name in line:
-                                if column == Column.label:
-                                    lines[i + 1] = " '" + value + "'"
-                                else:
-                                    value_to_replace =\
-                                        lines[i].split()[-1].strip("'")
-                                    lines[i] = \
-                                    lines[i].replace(value_to_replace, value)
-                                with open(path, 'w') as f:
-                                    f.write('\n'.join(lines))
-                                break
-                    else:
-                        lines = lines.split('\n')
-                        for i, line in enumerate(lines):
-                            if line.startswith('*endphy'):
-                                new_line = "'" + switch_name + \
-                                           "'     '" + value + "'"
-                                lines.insert(i + 1, new_line)
-                                with open(path, 'w') as f:
-                                    f.write('\n'.join(lines))
-
-                except OSError:
-                    QMessageBox.warning(None, "Permission problem",
-                                        "Can't update " + path)
-        return result
-
-    # return self.columns
-    def data(self, index, role):
-        if not index.isValid():
-            return None
-
-        if role == Qt.DecorationRole:
-            if index.column() == 0:
-                if self.parent(index) == QModelIndex():
-                    return self.style.standardIcon(QStyle.SP_DialogOpenButton)
-                else:
-                    return self.style.standardIcon(QStyle.SP_DirHomeIcon)
-
-            if index.column() == 1:
-                return self.style.standardIcon(QStyle.SP_DirIcon)
-
-        if role != Qt.DisplayRole and role != Qt.EditRole:
-            return None
-
-        item = index.internalPointer()
-
-        return item.data(index.column())
-
-    def flags(self, index):
-        if not index.isValid():
-            return Qt.NoItemFlags
-
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-
-    def headerData(self, section, orientation, role=None):
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return QVariant(self.headerdata[section])
-        if role == Qt.TextAlignmentRole:
-            return Qt.AlignHCenter
-        return super(RunsModel, self).headerData(section, orientation, role)
-
-    def index(self, row, column, parent):
-        if not self.hasIndex(row, column, parent):
-            return QModelIndex()
-
-        if not parent.isValid():
-            parentItem = self.rootItem
-        else:
-            parentItem = parent.internalPointer()
-
-        childItem = parentItem.child(row)
-
-        if childItem:
-            return self.createIndex(row, column, childItem)
-        else:
-            return QModelIndex()
-
-    def parent(self, index):
-        if not index.isValid():
-            return QModelIndex()
-
-        childItem = index.internalPointer()
-        parentItem = childItem.parent()
-
-        if parentItem == self.rootItem or parentItem is None:
-            return QModelIndex()
-
-        return self.createIndex(parentItem.row(), 0, parentItem)
-
-    def create_indices_for_columns(self):
-        """Create hashed dictionary for updating columns specified by path.
-        """
-        self.column_index = dict()  # path : (itemData, status, date, label)
-        child_items = [self.rootItem.childItems]
-        while child_items:
-            items = child_items.pop(0)
-            for row, childItem in enumerate(items):
-                date_index = self.createIndex(row, Column.date, childItem)
-                status_index = self.createIndex(row, Column.status, childItem)
-                label_index = self.createIndex(row, Column.label, childItem)
-                device_index = self.createIndex(row, Column.device, childItem)
-                run_index = self.createIndex(row, Column.run, childItem)
-                comment_index = self.createIndex(row, Column.comment,
-                                                 childItem)
-                shot_index = self.createIndex(row, Column.shot, childItem)
-                path = childItem.data(Column.path)
-                self.column_index[path] = (childItem.itemData, date_index,
-                                           status_index, label_index,
-                                           device_index, run_index,
-                                           comment_index, shot_index)
-                if childItem.childItems:
-                    child_items.append(childItem.childItems)
-
-    def rowCount(self, parent):
-        if parent.column() > 0:
-            return 0
-
-        if not parent.isValid():
-            parentItem = self.rootItem
-        else:
-            parentItem = parent.internalPointer()
-
-        return parentItem.childCount()
-
-    def startRunsStatusServer(self):
-        """ Run networking job status server for status updates.
-
-            Status server listens on all (0.0.0.0) or specified network
-            interface. UDP messages should be send in format: name path status
-        """
-        self.statusServerThread = RunsStatusServer()
-        settings = QSettings("ITER", "solps-gui")
-        default_port = 0xCAFE + os.getuid() % 13566
-        # TODO preferences such as:
-        # address = preferences.bind
-        # port = preferences.port
-        try:
-            address = settings.value("SOLPS_GUI_BIND", "0.0.0.0")
-            port = int(settings.value("SOLPS_GUI_PORT", str(default_port)))
-        except:
-            address = "0.0.0.0"
-            port = default_port
-
-        settings.setValue('SOLPS_GUI_BIND', address)
-        settings.setValue('SOLPS_GUI_PORT', str(port))
-
-        status = self.statusServerThread.bind(address, port)
-        if status:
-            self.statusServerThread.start()
-        else:
-            msg = "Failed to bind interface {0} to port {1}. " \
-                  "Job monitoring will not start unless you " \
-                  "setup a free port and restart! " \
-                  "GUI will exit if you press Cancel.".format(address, port)
-            ret = QMessageBox.warning(None, "SOLPS-GUI Status server", msg,
-                                      QMessageBox.Cancel | QMessageBox.Ok)
-            if ret == QMessageBox.Cancel:
-                sys.exit(1)
-        self.statusServerThread.jobStatusChanged.connect(self.jobStatusChanged)
-
-    @pyqtSlot(str)
-    def jobStatusChanged(self, message):
-        try:
-            name, path, status = message.split(maxsplit=2)
-            try:
-                itemData, date_index, status_index, label_index, device_index,\
-                 run_index, comment_index, shot_index = self.column_index[path]
-                itemData[Column.status] = status
-                itemData[Column.date] = QDateTime().currentDateTime()
-                self.dataChanged.emit(date_index, status_index)
-                logging.info("Received job status update: " + message)
-            except KeyError:  # TODO insert non monitored message anyway
-                msg = name + ':' + path + " not monitored "
-                msg += 'Skipping "' + status + '" update.'
-                logging.warning(msg)
-            except ValueError:
-                assert(len(self.column_index[path]) == 4)  # indexing changed
-        except ValueError as e:
-            logging.error(str(e) + " Received essage: '" + message +
-                          "' should be in 'name path status' format.")
+        self.preferences.compiler_environment = self.comboBox_compiler_environment.currentText()
 
 
 class SOLPS_MainWindow(QMainWindow):
@@ -1184,6 +350,8 @@ class SOLPS_MainWindow(QMainWindow):
         self.preferences.read()
 
         self.main_tcsh = QProcess()  # for job submission and scripting
+        self.main_tcsh.setProcessChannelMode(self.main_tcsh.MergedChannels)
+        self.main_tcsh.readyReadStandardOutput.connect(self.read_main_tcsh)
         self.solps_top = None  # Current active ${SOLPSTOP} for tcsh
 
         self.previous_tab_index = None   # For auto saving of Edit tab
@@ -1199,28 +367,6 @@ class SOLPS_MainWindow(QMainWindow):
             self.restoreState(state)
         settings.endGroup()
 
-        settings.beginGroup("TreeViewRuns")
-        treeview = settings.value("ColumnWidth")
-        if treeview:
-            self.treeViewRuns.header().restoreState(treeview)
-        settings.endGroup()
-
-        settings.beginGroup("TreeViewArchive")
-        treeview_archive = settings.value("ColumnWidth")
-        if treeview_archive:
-            self.treeViewArchive.header().restoreState(treeview_archive)
-        settings.endGroup()
-
-        settings.beginGroup("Archive")
-        size = settings.beginReadArray("dirs")
-        self.archive_dirs = set()
-        for i in range(size):
-            settings.setArrayIndex(i)
-            dir = settings.value("dir")
-            self.archive_dirs.add(dir)
-        settings.endArray()
-        settings.endGroup()
-
         self.actionAbout_Qt.triggered.connect(QApplication.instance().aboutQt)
 
         self.comboBoxRunFilterType.addItem("Regular expression",
@@ -1230,44 +376,17 @@ class SOLPS_MainWindow(QMainWindow):
 
         self.filterCaseSensitivityCheckBox.setChecked(True)
 
-        self.model = RunsModel(self.style())
-        self.model.scanFileSystemThread.status.connect(
-            self.statusbar.showMessage)
-        self.model.RetrieveRunsFolderInfoThread.status.connect(
-            self.statusbar.showMessage)
-        self.model.startThreads()
-
-        self.model.RetrieveRunsFolderInfoThread.finished.connect(
-            self.treeViewRuns.update)
-        if True:  # use Filter if True
-            self.proxyModel = RunsSortFilterProxyModel(self.archive_dirs)
-            self.proxyModel.setDynamicSortFilter(True)
-            self.proxyModel.setFilterKeyColumn(Column.path)
-            self.proxyModel.setSourceModel(self.model)
-            self.treeViewRuns.setModel(self.proxyModel)
-        else:
-            self.treeViewRuns.setModel(self.model)
-
-        self.treeViewRuns.setRootIsDecorated(True)
-        self.treeViewRuns.setSortingEnabled(True)
-
-        # Create a delegate for first column to elide text to the left
-        elide_left_delegate = TextElideLeftDelegate(self.treeViewRuns)
-        self.treeViewRuns.setItemDelegate(elide_left_delegate)
-
-        # self.treeViewRuns.setTextElideMode(Qt.ElideLeft)
         self.lineEditRunFilter.returnPressed.connect(self.textFilterChanged)
 
-        # Tree view for archived run directories
 
-        self.archiveProxyModel = \
-            ArchiveSortFilterProxyModel(self.archive_dirs, self.style())
-        self.archiveProxyModel.setDynamicSortFilter(True)
-        self.archiveProxyModel.setFilterKeyColumn(Column.path)
-        self.archiveProxyModel.setSourceModel(self.model)
-        self.treeViewArchive.setModel(self.archiveProxyModel)
-        self.treeViewArchive.setAlternatingRowColors(True)
-        self.treeViewArchive.setSortingEnabled(True)
+        # Tree view for run directories
+        # self.model = self.treeViewRuns.model
+        # self.proxyModel = self.treeViewRuns.proxyModel
+        # Tree view for archived run directories
+        # self.archiveProxyModel = self.treeViewArchive.archiveModel
+
+        # Assign the same source model for the archive treeview.
+        self.treeViewArchive.setArchiveSourceModel(self.treeViewRuns.model().sourceModel())
 
         # Setup input tabs
         self.solpsinput.setup_input_tabs()
@@ -1299,28 +418,47 @@ class SOLPS_MainWindow(QMainWindow):
         self.b2_run_number.connect(self.put_edge_ids.setRun)
         self.b2_shot_number.connect(self.put_edge_ids.setShot)
 
-    @pyqtSlot()
-    def on_pushButton_Archive_clicked(self):
-        """ Selecting directory and pressing Archive will add
-        selected directory to filtered set and will not be shown in Runs.
-        """
-        index = self.treeViewRuns.selectionModel().currentIndex()
-        model = self.proxyModel
-        index_path = model.index(index.row(), Column.path, index.parent())
-        path = model.data(index_path, Qt.DisplayRole)
+    # @pyqtSlot()
+    # def on_pushButton_Archive_clicked(self):
+    #     """ Selecting directory and pressing Archive will add
+    #     selected directory to filtered set and will not be shown in Runs.
+    #     """
+    #     index = self.treeViewRuns.selectionModel().currentIndex()
+    #     model = self.proxyModel
+    #     index_path = model.index(index.row(), Column.path, index.parent())
+    #     path = model.data(index_path, Qt.DisplayRole)
 
-        self.archive_dirs.add(path)
-        self.proxyModel.invalidateFilter()
-        self.archiveProxyModel.invalidateFilter()
+    #     # self.archive_dirs.add(path)
+    #     self.archiveDirs.add(path)
+    #     self.proxyModel.invalidateFilter()
+    #     self.archiveProxyModel.invalidateFilter()
+    #     self.updateArchiveDirSettings()
 
-        settings = QSettings("ITER", "solps-gui")
-        settings.beginGroup("Archive")
-        settings.beginWriteArray("dirs")
-        for i, dir in enumerate(self.archive_dirs):
-            settings.setArrayIndex(i)
-            settings.setValue("dir", dir)
-        settings.endArray()
-        settings.endGroup()
+    # @pyqtSlot()
+    # def on_pushButton_Restore_clicked(self):
+    #     index = self.treeViewArchive.selectionModel().currentIndex()
+    #     arModel = self.archiveProxyModel
+    #     index_path = arModel.index(index.row(), Column.path, index.parent())
+    #     path = arModel.data(index_path, Qt.DisplayRole)
+
+    #     if path in self.proxyModel.archiveDirs:
+    #         self.proxyModel.archiveDirs.remove(path)
+    #         self.proxyModel.invalidateFilter()
+    #         self.archiveProxyModel.invalidateFilter()
+    #         self.updateArchiveDirSettings()
+    #     else:
+    #         msg = "Can only remove archived directories marked with icons!"
+    #         QMessageBox.warning(self, 'Invalid action', msg)
+
+    # def updateArchiveDirSettings(self):
+    #     settings = QSettings("ITER", "solps-gui")
+    #     settings.beginGroup("Archive")
+    #     settings.beginWriteArray("dirs")
+    #     for i, directory in enumerate(self.proxyModel.archiveDirs):
+    #         settings.setArrayIndex(i)
+    #         settings.setValue("dir", directory)
+    #     settings.endArray()
+    #     settings.endGroup()
 
     @pyqtSlot(int)
     def on_tabWidget_currentChanged(self, tab_index):
@@ -1342,7 +480,7 @@ class SOLPS_MainWindow(QMainWindow):
         """
         self.tabWidget.setCurrentIndex(self.input_tab_index)
         index = self.treeViewRuns.selectionModel().currentIndex()
-        model = self.proxyModel
+        model = self.treeViewRuns.model()
         index_path = model.index(index.row(), Column.path, index.parent())
         path = model.data(index_path, Qt.DisplayRole)
         self.statusbar.showMessage('Editing ' + path)
@@ -1350,30 +488,6 @@ class SOLPS_MainWindow(QMainWindow):
         self.solpsinput.read_input_files()
         self.solpsinput.editor_tab_changed(self.solpsinput.currentIndex())
         self.tab_Input.setEnabled(True)
-
-    @pyqtSlot()
-    def on_pushButton_Restore_clicked(self):
-        index = self.treeViewArchive.selectionModel().currentIndex()
-        model = self.archiveProxyModel
-        index_path = model.index(index.row(), Column.path, index.parent())
-        path = model.data(index_path, Qt.DisplayRole)
-
-        if path in self.archive_dirs:
-            self.archive_dirs.remove(path)
-            self.proxyModel.invalidateFilter()
-            self.archiveProxyModel.invalidateFilter()
-
-            settings = QSettings("ITER", "solps-gui")
-            settings.beginGroup("Archive")
-            settings.beginWriteArray("dirs")
-            for i, directory in enumerate(self.archive_dirs):
-                settings.setArrayIndex(i)
-                settings.setValue("dir", directory)
-            settings.endArray()
-            settings.endGroup()
-        else:
-            msg = "Can only remove archived directories marked with icons!"
-            QMessageBox.warning(self, 'Invalid action', msg)
 
     @pyqtSlot()
     def run_selected(self):
@@ -1391,7 +505,7 @@ class SOLPS_MainWindow(QMainWindow):
 
         if valid:
             index = self.treeViewRuns.selectionModel().currentIndex()
-            model = self.proxyModel
+            model = self.treeViewRuns.model()
             index_path = model.index(index.row(), Column.path, index.parent())
             path = model.data(index_path, Qt.DisplayRole)
 
@@ -1419,7 +533,6 @@ class SOLPS_MainWindow(QMainWindow):
             if shot:
                 self.b2_shot_number.emit(shot)
 
-
             self.runSelected.emit(path)
 
     @pyqtSlot()
@@ -1433,23 +546,30 @@ class SOLPS_MainWindow(QMainWindow):
         syntax = QRegExp.PatternSyntax(filter_syntax)
         case_sense = (self.filterCaseSensitivityCheckBox.isChecked() and
                       Qt.CaseSensitive or Qt.CaseInsensitive)
+        text = self.lineEditRunFilter.text()
+        if text == '':
+            # If no filter is provided, then obviously show all.
+            text = '.'
         regExp = QRegExp(self.lineEditRunFilter.text(), case_sense, syntax)
-        self.proxyModel.setFilterRegExp(regExp)
+        self.treeViewRuns.model().setFilterRegExp(regExp)
 
     @pyqtSlot()
     def show_runs_dialog(self):
         dialog = RunsSettings()
         if dialog.exec_():
             dialog.on_close()
-            if self.model.RetrieveRunsFolderInfoThread.isRunning() or \
-                    self.model.scanFileSystemThread.isRunning():
+            model = self.treeViewRuns.model().sourceModel()
+            if model.retRunsFolderInfoThread.isRunning() or \
+                    model.scanDirectoriesThread.isRunning():
                 msg = "Runs layout changed in the middle of the update." \
                     "Directories cannot be changed. Try settings later."
                 QMessageBox.critical(self, "Restart required", msg)
             else:
-                self.model.startThreads()
-            # TODO(kosl) self.model.RetrieveRunsFolderInfoThread.quit()
-            # self.model.scanFileSystemThread.start()
+                model.startThreads()
+                # model.beginResetModel()
+                # model.scanDirectoriesThread.start()
+            # TODO(kosl) self.treeViewRuns.model.retRunsFolderInfoThread.quit()
+            # self.treeViewRuns.model.scanDirectoriesThread.start()
 
     @pyqtSlot()
     def show_preferences_dialog(self):
@@ -1457,10 +577,29 @@ class SOLPS_MainWindow(QMainWindow):
         if dialog.exec_():
             dialog.setPreferences()
             self.preferences.write()
-            self.model.statusServerThread.stop()
-            if self.model.statusServerThread.bind(
-                        self.preferences.bind_address, self.preferences.port):
-                self.model.statusServerThread.start()
+            model = self.treeViewRuns.model().sourceModel()
+            model.statusServerThread.stop()
+
+            address = QHostAddress(self.preferences.bind_address)
+            port = self.preferences.port
+            if model.statusServerThread.state() == \
+               model.statusServerThread.BoundState:
+               model.statusServerThread.close()
+            ok = model.statusServerThread.bind(address, port)
+
+            # Also set the log level for LOG widget
+            log_levels = [logging.DEBUG, logging.INFO, logging.WARNING,
+                          logging.ERROR, logging.CRITICAL]
+            log_level = log_levels[self.preferences.log_level]
+            self.log.logHandler.setLevel(log_level)
+
+
+            if ok:
+                # model.statusServerThread.start()
+                logging.info('statusServerThread bind on port '
+                             f'{self.preferences.port} and on address '
+                             f'{self.preferences.bind_address}')
+                pass
             else:
                 msg = "Failed to bind interface {0} to port {1}. " \
                       "Job monitoring will not start unless you " \
@@ -1496,7 +635,7 @@ class SOLPS_MainWindow(QMainWindow):
         QMainWindow.closeEvent(self, event)
 
     def expanded(self):
-        for column in range(self.model().columnCount(QModelIndex())):
+        for column in range(self.treeViewRuns.model().columnCount(QModelIndex())):
             self.resizeColumnToContents(column)
 
     def change(self, topLeftIndex, bottomRightIndex):
@@ -1514,7 +653,7 @@ class SOLPS_MainWindow(QMainWindow):
         """
 
         index = self.treeViewRuns.selectionModel().currentIndex()
-        model = self.proxyModel
+        model = self.treeViewRuns.model()
         index_path = model.index(index.row(), Column.path, index.parent())
         directory = model.data(index_path, Qt.DisplayRole)
         # Is there B2 running directory?
@@ -1540,10 +679,11 @@ class SOLPS_MainWindow(QMainWindow):
         """ Submits the selected Run
         """
         index = self.treeViewRuns.selectionModel().currentIndex()
-        model = self.proxyModel
+        model = self.treeViewRuns.model()
         index_path = model.index(index.row(), Column.path, index.parent())
         rundir = model.data(index_path, Qt.DisplayRole)
-        self.submit(rundir)  # TODO check b2fstate_OK before you submit
+        # TODO check b2fstate_OK before you submit
+        self.submit(model.mapToSource(index), rundir)
 
     @pyqtSlot()
     def on_pushButton_Continue_clicked(self):
@@ -1552,7 +692,7 @@ class SOLPS_MainWindow(QMainWindow):
         """
         if self.treeViewRuns.selectionModel().currentIndex().isValid():
             index = self.treeViewRuns.selectionModel().currentIndex()
-            model = self.proxyModel
+            model = self.treeViewRuns.model()
             index_path = model.index(index.row(), Column.path, index.parent())
             path = model.data(index_path, Qt.DisplayRole)
             try:
@@ -1582,6 +722,13 @@ class SOLPS_MainWindow(QMainWindow):
             solps_top = solps_top.rsplit('/', 1)[0]
         return None
 
+    @pyqtSlot()
+    def read_main_tcsh(self):
+        data = self.main_tcsh.readAllStandardOutput()
+        text = str(bytearray(data).decode('utf-8'))
+        print(text)
+        logging.debug(text)
+
     def execute_tcsh_command_in_rundir(self, tcsh_command, rundir):
         """" Executes TCSH comand in run directory (e.g. submit)
 
@@ -1605,6 +752,8 @@ class SOLPS_MainWindow(QMainWindow):
         solps_gui_port = settings.value('SOLPS_GUI_PORT', default_port)
         settings.setValue('SOLPS_GUI_PORT', default_port)
 
+        compiler = settings.value('compiler_environment', 'gfortran')
+
         rundir_solps_top = self.find_solps_top(rundir)
 
         if not rundir_solps_top:
@@ -1626,15 +775,16 @@ class SOLPS_MainWindow(QMainWindow):
                 logging.error(self.main_tcsh.program() + " not started")
                 return
             logging.info("MAIN TCSH started in " + self.solps_top)
-            cmd += 'cd ' + self.solps_top + \
-                   '\nsource setup.csh\necho TCSH READY\n'
-        cmd += 'setenv SOLPS_GUI_IP ' + solps_gui_ip + '\n' +\
-               'setenv SOLPS_GUI_PORT ' + solps_gui_port + '\n'
-        cmd += 'cd ' + rundir + '\n'
-        cmd += tcsh_command + '\n'
+            cmd += f'cd {self.solps_top}\nsource setup.csh {compiler}\n'
+            cmd += 'echo TCSH READY\n'
+
+        cmd += f'setenv SOLPS_GUI_IP {solps_gui_ip}\n'
+        cmd += f'setenv SOLPS_GUI_PORT {solps_gui_port}\n'
+        cmd += f'cd {rundir}\n'
+        cmd += f'{tcsh_command}\n'
         self.main_tcsh.write(bytearray(cmd, 'utf8'))  # TODO flush stdout
 
-    def submit(self, rundir):
+    def submit(self, index, rundir):
         """ Submits the job in the rundir under its $SOLPSTOP environment
 
         All ``*.prt`` files are removed befor submission command from
@@ -1646,34 +796,36 @@ class SOLPS_MainWindow(QMainWindow):
         submit_command = self.preferences.submit_script
 
         cmd = ''
+        # Add scripts to path
         opts = ''
+        model = self.treeViewRuns.model().sourceModel()
         if submit_command:
             if self.preferences.submit_script != 'localsubmit' \
                     and len(self.preferences.job_name):
                 if ' ' in self.preferences.job_name:
-                    opts = ' -j "' + self.preferences.job_name + '"'
+                    opts += f' -j "{self.preferences.job_name}"'
                 else:
-                    opts = ' -j ' + self.preferences.job_name
+                    opts += f' -j {self.preferences.job_name}'
             if self.preferences.standalone:
                 opts += ' -s'
             if self.preferences.use_mpi:
-                opts += ' -m "' + self.preferences.mpi_options + '"'
+                opts += f' -m "{self.preferences.mpi_options}"'
             if self.preferences.use_debugger:
-                opts += ' -d "' + self.preferences.debugger + '"'
+                opts += f' -d "{self.preferences.debugger}"'
             if self.preferences.compress_log:
                 opts += ' -z'
             if self.preferences.dry_run:
                 opts += ' -n'
-            cmd += 'rm -f *.prt\n' + submit_command + opts
+            cmd += f'rm -rf *.prt\n{submit_command} {opts}'
             self.execute_tcsh_command_in_rundir(cmd, rundir)
-            msg = 'batch ' + rundir + ' ' + submit_command + opts
+            msg = f'batch {rundir} {submit_command} {opts}'
 
             logging.info(msg)
-            self.model.jobStatusChanged(msg)
+            model.jobStatusChanged(index, msg)
         else:
-            msg = 'batch ' + rundir + ' Not submitted!'
+            msg = f'batch {rundir} Not submitted!'
             msg += "Empty command or no run directory for MAIN TCSH"
-            self.model.jobStatusChanged(msg)
+            model.jobStatusChanged(index, msg)
             logging.warning(msg)
 
     @pyqtSlot()
@@ -1690,7 +842,7 @@ class SOLPS_MainWindow(QMainWindow):
         """
         if self.treeViewRuns.selectionModel().currentIndex().isValid():
             index = self.treeViewRuns.selectionModel().currentIndex()
-            model = self.proxyModel
+            model = self.treeViewRuns.model()
             index_path = model.index(index.row(), Column.path, index.parent())
             destination_dir = model.data(index_path, Qt.DisplayRole)
             selected_dir = QFileDialog.getExistingDirectory(self,
@@ -1723,7 +875,7 @@ class SOLPS_MainWindow(QMainWindow):
                     if os.path.exists(directory + '/b2fstati'):
                         cmd = 'touch b2fstati\n'
                         self.execute_tcsh_command_in_rundir(cmd, directory)
-            self.model.startThreads()  # rescan the model
+            model.startThreads()  # rescan the model
 
     @pyqtSlot()
     def on_actionAbout_triggered(self):
@@ -1735,11 +887,12 @@ class SOLPS_MainWindow(QMainWindow):
         QMessageBox.about(self, 'About SOLPS-ITER GUI', msg)
 
 if __name__ == '__main__':
-    "  Main method "
     app = QApplication(sys.argv)
     # app.setStyle("windows")
     main_window = SOLPS_MainWindow()
     main_window.show()
+
+
     code = app.exec_()
     app.quit()
     sys.exit(code)

@@ -92,14 +92,51 @@ b2mn_menu = {
 				"""),
          ( 'b2news_no_solve', 'integer', '0', """
 					If no_solve.eq.1, then the code is run without actually solving any equations. All secondary and dependent data is computed.
-					The nstg(0:2) array is overwritten to '1's. The simulation time will not be updated. The code will compute fluxes, sources, transport coefficients, etc...
-					'ntim' times but not update the basic plasma quantities. Additionally, if no_solve is set to a negative value, then only some equations are solved (simulation time and nstg arrays will behave normally).
+					The nstg(0:2) array is overwritten to '1's. The simulation time will not be updated. The code will compute fluxes, sources, transport coefficients, etc... 'ntim' times but not update the basic plasma quantities. Additionally, if no_solve is set to a negative value, then only some equations are solved (simulation time and nstg arrays will behave normally).
 					no_solve.eq.-1 will activate the parallel momentum equations only.
-					no_solve.eq.-2 will activate the density equations only. no_solve.eq.-4 will activate the potential equation only. (Active only if poteq.eq.1, otherwise, the behaviour dictated by the poteq setting applies).
+					no_solve.eq.-2 will activate the density equations only.
+					no_solve.eq.-4 will activate the potential equation only. (Active only if poteq.eq.1, otherwise, the behaviour dictated by the poteq setting applies).
 					no_solve.eq.-8 will activate the heat equations only. These can be combined. For example, no_solve.eq.-3 will activate the parallel momentum and particle conservation equations.
 					If the no_solve switch requires an equation not to be solved, the settings in the corresponding solvexx arrays from b2.numerics.parameters are moot.
 					The latter are reserved for fine-tuning numerical diagnostics.
-				"""),
+					If wishing to toggle whether to solve or not to solve each equation separately, one should set, in the b2.numerics.parameters input file, the SOLVEMO, SOLVECO, SOLVEE, SOLVEEI and SOLVEPO arrays, respectively, for each of the parallel momentum equations, the total momentum equation, each density equation, the electron and ion heat equations, and the total energy equation.
+					The table below shows which combination of equations will be solved	depending on the value of switch 'b2news_no_solve'
+					*----------------------------------------------------
+					*        | value |  co  |  mo  |  he  |  hi  |  po  |
+					*----------------------------------------------------
+					*        |   0   |  +   |  +   |  +   |  +   |  +   |
+					*----------------------------------------------------
+					*        |   1   |  -   |  -   |  -   |  -   |  -   |
+					*----------------------------------------------------
+					*        |  -1   |  -   |  +   |  -   |  -   |  -   |
+					*----------------------------------------------------
+					*        |  -2   |  +   |  -   |  -   |  -   |  -   |
+					*----------------------------------------------------
+					*        |  -3   |  +   |  +   |  -   |  -   |  -   |
+					*----------------------------------------------------
+					*        |  -4   |  -   |  -   |  -   |  -   |  +   |
+					*----------------------------------------------------
+					*        |  -5   |  -   |  +   |  -   |  -   |  +   |
+					*----------------------------------------------------
+					*        |  -6   |  +   |  -   |  -   |  -   |  +   |
+					*----------------------------------------------------
+					*        |  -7   |  +   |  +   |  -   |  -   |  +   |
+					*----------------------------------------------------
+					*        |  -8   |  -   |  -   |  +   |  +   |  -   |
+					*----------------------------------------------------
+					*        |  -9   |  -   |  +   |  +   |  +   |  -   |
+					*----------------------------------------------------
+					*        | -10   |  +   |  -   |  +   |  +   |  -   |
+					*----------------------------------------------------
+					*        | -11   |  +   |  +   |  +   |  +   |  -   |
+					*----------------------------------------------------
+					*        | -12   |  -   |  -   |  +   |  +   |  +   |
+					*----------------------------------------------------
+					*        | -13   |  -   |  +   |  +   |  +   |  +   |
+					*----------------------------------------------------
+					*        | -14   |  +   |  -   |  +   |  +   |  +   |
+					*----------------------------------------------------
+        """),
       
          ( 'b2mndr_cpu', 'real', '0.0', """
 					CPU limit. If cpu.eq.0.0, no CPU limit is enforced. Otherwise, the code stops smoothly after it has been running for at least 'cpu' CPU seconds.
@@ -162,7 +199,7 @@ b2mn_menu = {
 				"""),
       ( 'b2srdt_*_namelist', 'switchgroup', [
         
-               ('b2stbc_boundary_namelist', 'integer', '0',''''''), 
+               ('b2stbc_boundary_namelist', 'integer', 'See description',''''''), 
         
                ('b2stbr_neutrals_namelist', 'integer', '0',''''''), 
         
@@ -172,6 +209,7 @@ b2mn_menu = {
         ],
          """
 					Namelist file indicators. If xxx_namelist.eq.1, then the code looks for the file b2.xxx.parameters, in which it expects to find the xxx namelist.
+					In the case of boundary_namelist, defaults to 1 for double-null geometries, 0 otherwise.
 				"""),
          ( 'b2sral_inputfile', '', '0', """
 					Profiles file indicator. If b2sral_inputfile.eq.1, then the code looks for the file b2.sources.profile in which it expects to find the 'profile' namelist.
@@ -184,7 +222,7 @@ b2mn_menu = {
 				"""),
       
          ( 'b2mndr_eirene', 'integer', '0', """
-					Turns on coupling with the Eirene Monte-Carlo neutral code if nonzero.
+					Turns on coupling with the Eirene Monte Carlo neutral code if nonzero.
 					To be used, the code must be compiled with the -DB25_EIRENE option.
 				"""),
       
@@ -284,7 +322,7 @@ b2mn_menu = {
 				"""),
       
          ( 'b2mndr_ntim_save', 'integer', '0', """
-					Another option for plasma state file output. Give the number of B2.5 full interations between succesive write-ups of plasmastate files, in addition to the ones written at regular CPU intervals. Should be used, at the exclusion of other plasmastate write-up frequency settings, in conjunction with the Leuven Monte-Carlo averaging scheme.
+					Another option for plasma state file output. Give the number of B2.5 full interations between succesive write-ups of plasmastate files, in addition to the ones written at regular CPU intervals. Should be used, at the exclusion of other plasmastate write-up frequency settings, in conjunction with the Leuven Monte Carlo averaging scheme.
 				"""),
       
          ( 'b2mndt_av', 'integer', '0', """
@@ -304,7 +342,8 @@ b2mn_menu = {
 				"""),
       
          ( 'b2mndt_av_batch_all', 'integer', '0', """
-					If b2mndt_av_batch_all.gt.0, produces standard output for batch averages.
+					If b2mndt_av_batch_all.ge.0, produces standard output for batch averages.
+					If b2mndt_av_batch_all.eq.1, entire 2D fields of batch averages and variances for ne, te, ... are written. Expert use only, check $SOLPSTOP/doc/SOLPS-ITER_Eirene_averaging.pdf.
 				"""),
       
          ( 'b2mndr_plasmatim', 'real', '0.0', """
@@ -312,10 +351,10 @@ b2mn_menu = {
 				"""),
       
          ( 'b2wdat_iout', 'integer', '0', """
-					If iout.eq.1, a large set of *.dat output files will be produced containing the values of a variety of code quantities.
-					If iout.eq.4, a more select set of output files will be produced, which usually suffices for everyday analysis.
-					For more detailed debugging analysis, one should instead use "procedure_name"_iout.eq.1.
-					The files and their content are fully described in the Output_description.pdf file in the SOLPSTOP/doc directory.
+					If iout.eq.1, a large set of *.dat output files will be produced containing the values of a variety of code quantities, evaluated at the end of the B2.5 iteration.
+					If iout.eq.4, an even larger set of output files will be produced, for the purposes of a full run analysis, evaluated in the individual routines where the quantities are used.
+					For even more detailed debugging analysis, one should instead use "procedure_name"_iout.eq.1.
+					The files and their content are fully described in the Output_description.pdf file in the SOLPSTOP/doc directory and Appendix G of the SOLPS-ITER manual.
 				"""),
       
          ( 'b2wdat_append', 'integer', '0', """
@@ -332,7 +371,7 @@ b2mn_menu = {
 				"""),
       
          ( 'b2mndr_av_read', 'integer', '0', """
-					If ird_aver.gt.0, the averaged solution is read from the b2faveri file and written in the b2favere file at the end of the run.
+					If b2mndr_av_read.gt.0, the initial plasma is the averaged solution read from the b2faveri file. Check $SOLPSTOP/doc/SOLPS-ITER_Eirene_averaging.pdf for details.
 				"""),
       
       ( 'b2mndr_*', 'switchgroup', [
@@ -359,7 +398,7 @@ b2mn_menu = {
 				"""),
       
          ( 'b2mwti_2dwrite', 'integer', '0', """
-					Controls additional output to b2time.nc.  If eq 1 then a few 2d arrays (ne, Te, Ti) are written with each write to b2time.nc. If eq 2 then fluxes, po, kinetic energy, and fluid particle and energy source terms are also included (e.g., rsana, rsahi, rqrad).
+					Controls additional output to b2time.nc.  If eq 1 then a few 2d arrays (ne, Te, Ti) are written with each write to b2time.nc. If eq 2 then fluxes, electric potential, kinetic energy, and fluid particle and energy source terms are also included (e.g., rsana, rsahi, rqrad).
 				"""),
       
          ( 'b2mwti_ismain0', 'integer', '0', """
@@ -384,7 +423,7 @@ b2mn_menu = {
         ],
          """
 					If tallies_netcdf.ne.0, the file 'b2tallies.nc' is created, which contains the regional tallies in CDF format. If b2mndr_stim.lt.0, data from the current run is appended to the existing b2tallies.nc file, otherwise the file is overwritten.
-					If b2wall_netcdf.ne.0, the file 'b2wall.nc' is created, which contains the wall tallies in CDF format [written every b2wall_netcdf 'main calls']. If b2mndr_stim.lt.0, data from the current run is appended to the existing b2wall.nc file, otherwise the file is overwritten.
+					If b2wall_netcdf.ne.0, the file 'b2wall.nc' is created, which contains the wall tallies in CDF format [written every b2wall_netcdf main calls]. If b2mndr_stim.lt.0, data from the current run is appended to the existing b2wall.nc file, otherwise the file is overwritten.
 					If balance_netcdf.ne.0, the file 'balance.nc' is created, which contains all of the arrays required by the balance post-processing routines, in CDF format.
 					If balance_average.ne.0, the balance arrays are averaged over all b2mndr_ntim timesteps.
 				"""),
@@ -432,20 +471,31 @@ b2mn_menu = {
 					Controls level of output in b2srsm. If diagno.ge.2, output will be given on every call. If diagno.eq.1, output will be given on main calls only.
 				"""),
       
-         ( 'b2ux5p_cpu', 'integer', '0', """
+      ( 'b2ux*', 'switchgroup', [
+        
+               ('b2ux5p_cpu', 'integer', '0',''''''), 
+        
+               ('b2ux7p_cpu', 'integer', '0',''''''), 
+        
+               ('b2ux9p_cpu', 'integer', '0',''''''), 
+        
+               ('b2ux11p_cpu', 'integer', '0',''''''), 
+        ],
+         """
 					If cpu.gt.0, prints out the time spent in the matrix solver.
 				"""),
-      
       ( 'b2ux*', 'switchgroup', [
         
                ('b2ux5p_nltrsol', 'integer', '2',''''''), 
         
-               ('b2ux7p_nltrsol', 'integer', '0',''''''), 
+               ('b2ux7p_nltrsol', 'integer', '2',''''''), 
         
-               ('b2ux9p_nltrsol', 'integer', '0',''''''), 
+               ('b2ux9p_nltrsol', 'integer', '2',''''''), 
+        
+               ('b2ux11p_nltrsol', 'integer', '2',''''''), 
         ],
          """
-					Output flag for the iluter matrix solver. Larger numbers mean increasing output level.
+					Output flag for the matrix solvers. Larger numbers mean increasing output level.
 				"""),
          ( 'eirene_mc_output_style', 'integer', '1', """
 					If nonzero, prints sources computed by Eirene. If greater than 1, prints them on every use of the recycling sources, not just when they are computed.
@@ -494,7 +544,7 @@ b2mn_menu = {
 
   'Physics': [ '',
   
-         ( 'b2siav_addvis', 'real', '0.0', """
+         ( 'b2siav_addvis', 'real', '1.0', """
 					Multiplier to heat flux contribution to divergence of viscosity tensor in the momentum equation.
 				"""),
       
@@ -509,16 +559,17 @@ b2mn_menu = {
          ( 'b2npmo_b2sifr_', 'integer', '1', """
 					If b2sigp_style is set to '2', this switch has no effect.
 					When set to '1', the new correct form of the friction force is used, applicable for non-hydrogenic plasmas or hydrogenic mixtures.
-					The value '0' corresponds to the old SOLPS5.0 treatment.
+					The value '0' corresponds to the old SOLPS5.0 treatment. Not recommended unless wanting to recover older 5.0 results.
 				"""),
       
          ( 'b2sihs_istyle_Joule_heating', 'integer', '1', """
+					If b2sigp_style is set to '2', this switch has no effect.
 					When set to '1', there is no radial contribution in Joule heating because there are no physical reasons to take it into account.
 					The value '0' corresponds to the old SOLPS5.0 treatment.
 				"""),
       
          ( 'b2sian_phm0', 'real', '1.0', """
-					Multiplier to the parallel momentum source term associated with the anomalous current. It is recommended '1.0'.
+					Multiplier to the parallel momentum source term associated with the anomalous current. It is recommended '1.0'. Only active if both the ExB and diamagnetic drifts are turned on.
 					The value '0.0' corresponds to the old SOLPS5.0 treatment.
 				"""),
       
@@ -561,6 +612,14 @@ b2mn_menu = {
 					Real parameter which multiplies the convective heat flux due to grad B-drift of guiding centers in non-modified heat fluxes of electrons and ions.
 				"""),
       
+         ( 'b2tfrn_xvecrb', 'real', '1.0', """
+					Real parameter which multiplies the contribution from the ExB drift velocity to the flows passed to Eirene.
+				"""),
+      
+         ( 'b2tfrn_xwdia', 'real', '1.0', """
+					Real parameter which multiplies the contribution from the diamagnetic drift velocity to the flows passed to Eirene.
+				"""),
+      
          ( 'b2tfhe_neutral', 'real', '0.0', """
 					Real parameter which multiplies the ion-neutral current.
 					If b2tfhe_neutral is 0 then the ion-neutral current is switched off otherwise the ion-neutral current is switched on.
@@ -568,7 +627,7 @@ b2mn_menu = {
 				"""),
       
          ( 'b2tinnt_fchin_in_core', 'integer', '0', """
-					Integer switch to turn off or on the ion-neutral current in the core region (applies to coupled runs only). This is recommended in cases where the neutral densities are very low in the core region and the ion-neutral current is likely to vary widely from one iteration to the next as a result of Monte-Carlo noise.
+					Integer switch to turn off or on the ion-neutral current in the core region (applies to coupled runs only). This is recommended in cases where the neutral densities are very low in the core region and the ion-neutral current is likely to vary widely from one iteration to the next as a result of Monte Carlo noise.
 					If fchin_in_core.eq.0 (default), then fchin is set to zero in the core.
 					If fchin_in_core.eq.1, then fchin is unchanged.
 				"""),
@@ -577,7 +636,7 @@ b2mn_menu = {
 					Real parameter which multiplies the Pfirsch-Schlueter electron heat flux and conductivity.
 				"""),
       
-         ( 'b2tfhe_vis_par', 'real', '0.0', """
+         ( 'b2tfhe_vis_par', 'real', '1.0', """
 					Real parameter which multiplies the current driven by parallel viscosity.
 					If b2tfhe_vis_par is 0 then the viscosity-driven current is switched off otherwise the viscosity-driven current is switched on.
 				"""),
@@ -699,6 +758,14 @@ b2mn_menu = {
 					When type16_ref.gt.1, then the position where the core flux tallies are computed moves along with the boundary condition.
 					If type16_kinetic_energy.eq.1, then the parallel kinetic energy flux is included in the ion heat flux component of type 16 and 17 boundary conditions.
 				"""),
+         ( 'b2stbc_bcene_16_style', 'integer', '0', """
+				If bcene_16_style.eq.1, the boundary condition is enforced using the modified fluxes fhe_mdf. Recommended when running cases with drifts.
+			  """),
+      
+         ( 'b2stbc_bceni_16_style', 'integer', '0', """
+				If bceni_16_style.eq.1, the boundary condition is enforced using the modified fluxes fhi_mdf. Recommended when running cases with drifts.
+			  """),
+      
          ( 'b2stbc_secmodel', 'integer', '0', """
 					If secmodel.eq.1, then the secondary electron emission coefficient at the plates is computed locally according to a kinetic model, otherwise the default values of cbsch(7,ireg) and/or gammae are used.
 				"""),
@@ -788,7 +855,7 @@ b2mn_menu = {
 					Turns on the coronal model if coronal.ne.0. I.e., the reaction rates of all reactions are made density-independent, and the value computed at the lowest density (given in b2ar.dat) is used.
 				"""),
       
-         ( 'b2mndr_hz', 'real', '0.0', """
+         ( 'b2mndr_hz', 'real', '1.0', """
 					hz has been introduced into the new form of the parallel momentum balance equation. If fac_hz = 0.0 then hz = 1 and old form of equations is used. If fac_hz = 1.0 then new form of equations is used.
 				"""),
       
@@ -812,8 +879,8 @@ b2mn_menu = {
 					Ycur is a multiplier to the parallel viscosity, perpendicular viscosity, heat viscosity, ion inertial and anomalous current contributions to the ion radial flows (particle and energy).
 				"""),
       
-         ( 'b2tfnb_vis_per', 'real', '0.0', """
-				    vis_per is a multiplier to the perpendicular viscosity current contributions to the ion poloidal flows (particle and energy). Subservient to b2tfnb_xcur and b2tfnb_ycur.
+         ( 'b2tfnb_vis_per', 'real', '1.0', """
+				  vis_per is a multiplier to the perpendicular viscosity current contributions to the ion poloidal flows (particle and energy). Subservient to b2tfnb_xcur and b2tfnb_ycur.
 				"""),
       
          ( 'b2tfnb_vis_q', 'real', '1.0', """
@@ -821,7 +888,7 @@ b2mn_menu = {
 				"""),
       
          ( 'b2tqce_fke_Zhdanov', 'integer', '1', """
-					When set to '1', Zhdanov's expression is used in the electron thermal conductivity. It is recommended to use 'b2tqce_fke_Zhdanov' '1'.
+					When set to '1', the Zhdanov expression is used in the electron thermal conductivity. It is recommended to use 'b2tqce_fke_Zhdanov' '1'.
 					This switch is only active if, simultaneously, one has b2tqce_model.eq.1 and b2tfhe_fch_pTe.eq.1.0.
 				"""),
       
@@ -874,7 +941,7 @@ b2mn_menu = {
                ('b2tqna_min_df0', 'real', '0.0',''''''), 
         ],
          """
-					Upper and lower limits of the diffusivity coefficients df0 computed in b2tqna for each species.
+					Upper and lower limits of the diffusivity coefficients df0 computed in b2tqna for each neutral species.
 				"""),
          ( 'b2tqna_new_df0', 'integer', '0', """
 					When new_df0.eq.1, the neutral diffusivity is computed according to the local charge exchange, ionisation and elastic collision rates, instead of the standard form with constant cross-sections.
@@ -976,7 +1043,7 @@ b2mn_menu = {
 					Parameters for the flux limit to the convective neutral flow.
 					Alpha is a multiplier to the classical flux limit value.
 					The larger α is, the weaker the flux limit is.
-					Γ is the exponent used in the flux-limiting formula.
+					γ is the exponent used in the flux-limiting formula.
 					The smaller γ is, the stronger the flux limit is.
 					If alpha.eq.0, no flux limit is applied.
 					flux_limit_min_ti specifies the minimum ti to be used (in eV).
@@ -990,7 +1057,7 @@ b2mn_menu = {
          """
 					Parameters for the flux limit to dpa0 - pressure driven neutral diffusion.
 					Alpha is a multiplier to the classical flux limit value.
-					Γ is the exponent used in the flux-limiting formula. If alpha.eq.0, no flux limit is applied.
+					γ is the exponent used in the flux-limiting formula. If alpha.eq.0, no flux limit is applied.
 				"""),
       ( 'b2tlh0_*', 'switchgroup', [
         
@@ -1003,7 +1070,7 @@ b2mn_menu = {
          """
 					Parameters for the flux limit to the heat conductivity of the neutrals. Alpha is a multiplier to the classical flux limit value.
 					The larger α is, the weaker the flux limit is.
-					Γ is the exponent used in the flux-limiting formula.
+					γ is the exponent used in the flux-limiting formula.
 					The smaller γ is, the stronger the flux limit is.
 					If alpha.eq.0, no flux limit is applied.
 					flux_limit_min_ti specifies the minimum ti to be used (in eV).
@@ -1077,15 +1144,15 @@ b2mn_menu = {
 					Multiplier to the heat loss rate coefficient.
 				"""),
       
-         ( 'b2stel_phm0', 'real', '0.0', """
-					Multiplier of the recombination contribution to the electron cooling rate (if ADPAK rates are not used because those are already included). Assumes all recombination is three-body.
+         ( 'b2stel_phm0', 'real', '1.0', """
+					Multiplier of the sources due to atomic physics.
 				"""),
       
          ( 'b2tfhe_lim_flux', 'integer', '0', """
 					If '0', flux limit is not applied directly to the electron heat flux but is applied through transport coefficients if 'b2trcl_conductive_limit' is '1'. It is recommended '0'.
 				"""),
       
-         ( 'b2tfhi_lim_flux', 'integer', '1', """
+         ( 'b2tfhi_lim_flux', 'integer', '0', """
 					If '0', flux limit is not applied directly to the ion heat flux but is applied through transport coefficients if 'b2trcl_conductive_limit' is '1'. It is recommended '0'.
 				"""),
       
@@ -1113,8 +1180,16 @@ b2mn_menu = {
 					If '1', use constant density in core region to calculate anomalous conductivity sig0=dfsig*qe*ne(nmdpl,-1), nmdpl - number of midplane cell. If '0', use sig0=dfsig*qe*ne(x,y)
 				"""),
       
+         ( 'b2tral_cvsa_style', 'integer', '1', """
+					If '1', only the parallel ion classical contribution to the viscosity is multiplied by 4/3. If '0', all components (ions and neutrals, parallel and perpendicular) are multiplied by 4/3.
+				"""),
+      
          ( 'b2trno_csig_an_style', 'integer', '1', """
 					If '1', the anomalous contributions in the parallel direction to the electrical conductivity csig and the thermo-electric coefficient calf are zeroed out.
+				"""),
+      
+         ( 'b2tqin_csigin_style', 'integer', '1', """
+					If '1', the ion-neutral conductivity is computed from hydrogen gas diffusivity (SOLPS5.2 treatment). If '0', it is computed from the local CX rate (SOLPS5.0/5.1 treatments).
 				"""),
       
          ( 'b2trno_pol_anom_scale', 'real', '1.0', """
@@ -1140,7 +1215,7 @@ b2mn_menu = {
 				"""),
       
          ( 'eirene_ionising_core', 'integer', '0', """
-					If &lt;&gt; 0 then recycles the neutral flux having crossed the core boundary within Eirene as ions. The recycling is surface-averaged, and neutrals come back as fully-stripped ions.
+					If &lt;&gt; 0 then recycles the neutral flux having crossed the core boundary within Eirene as ions. The recycling is modulated as per the poloidal density distribution of the ions, and neutrals come back as fully-stripped ions.
 					'eirene_ionizing_core' is an alias for this switch.
 					If the value = 1, then the flux is added by direct modification of the sources in the guard cells --- this will only work if a standard flux boundary condition is applied at that boundary.
 					If the value is &lt; 0, then the absolute value specifies which boundary in b2.boundary.parameters is to be used. This will only work for the type 13 boundary condition.
@@ -1177,7 +1252,7 @@ b2mn_menu = {
 					3 --- both banana and PS
 					4 --- all contributions
 					mind that B2 already calculates the classical transport !
-					avoid double transport, 0+4 for cross checks only !
+					avoid double transport, 0+4 for cross-checks only !
 				"""),
       
    ],
@@ -1235,14 +1310,12 @@ b2mn_menu = {
 
   'Geometry': [ '',
   
-         ( 'b2agfs_geometry', '', 'upgrade.geometry', """
-					local_sonnet - character string.
+         ( 'b2agfs_geometry', 'string', 'upgrade.geometry', """
 					local_sonnet is the file name of the geometry file to be read.
-					The file will be looked for in the run directory, in the ../baserun directory and in $SOLPSTOP/data/meshes. To be used in b2ag.dat.
+					The file will be looked for in the run directory, in the ../baserun directory, in $SOLPSTOP/data.local/meshes, in $SOLPSTOP/data/meshes and in $SOLPSTOP/modules/Carre/meshes/$DEVICE. To be used in b2ag.dat.
 				"""),
       
-         ( 'b2mwti_jxa', '', 'See description (integer)', """
-					jxa - integer.
+         ( 'b2mwti_jxa', 'integer', 'See description (integer)', """
 					Cell index, on the basis mesh, of the outer midplane. Default value depends on geometry:
 					Single-null : jxa=rightcut1(1)-(rightcut1(1)-leftcut1(1))/4, i.e. three quarters of the way between the two cuts.
 					Double-null : jxa=(rightcut1(1)+rightcut1(2))/2, i.e. halfway between the two outer cuts. Straight geometry : jxa=3*nx/4
@@ -1254,10 +1327,27 @@ b2mn_menu = {
 					Straight geometry : jxi=nx/4
 				"""),
       
+         ( 'b2mwti_jsep', 'integer', 'See description (integer)', """
+					Cell index, on the basis mesh, of the last poloidal ring before the separatrix. Can only be provided for slab geometries, otherwise calculated from geometry:
+					Single-null : jsep=topcut1(1)-1. Double-null : jsep=min(topcut1(1),topcut1(2))-1.
+					Default for straight geometries : jsep=ny/2
+				"""),
+      
          ( 'b2agmx_pbs_from_basis_mesh', 'integer', '1', """
 					If pbs_from_basis_mesh.eq.0, the pbs array is computed from values on the actual working mesh (old treatment).
 					If pbs_from_basis_mesh.eq.1, the pbs array is computed from values on the (possibly) finer basis mesh from the geometry file and the contributions from each basis cell are added to obtain the value on the working mesh.
 					In both cases, mind the value of 'b2news_area_fix', which should be also declared in b2ag.dat if the non-default behaviour is wanted.
+				"""),
+      
+         ( 'b2agmt_qc_style', 'integer', '1', """
+					When b2agmt_qc_style.eq.1, the cosine of the angle between the left face of cells and the magnetic field direction is computed using information from cells to both the left and right of the face.
+					When b2agmt_qc_style.eq.0, we only use information from the cell at the right of the face. This is the treatment used up to version 3.0.6, inclusively.
+				"""),
+      
+         ( 'b2agdr_redef_qc', 'integer', '0', """
+					When b2agdr_redef_qc.eq.1, the cosine of the angle between the left face of a cell and the magnetic field direction is interpolated from the values at the cell centers.
+					When b2agdr_redef_qc.eq.0, we only use information from the cell at the right of the face. This is the treatment used up to version 3.0.6, inclusively.
+					This switch is superseded by b2agmt_qc_style.
 				"""),
       
          ( 'b2agdr_redef_pbs', 'integer', '1', """
@@ -1269,7 +1359,6 @@ b2mn_menu = {
 				"""),
       
          ( 'b2agfs_periodic_bc', 'integer', '0', """
-					periodic_bc - integer.
 					periodic_bc specifies if this is either an island or limiter geometry.
 					If periodic_bc.eq.1 then island/limiter treatment is turned on. We differentiate between the two case through nncut:
 					nncut.eq.0 = limiter case
@@ -1279,7 +1368,6 @@ b2mn_menu = {
 				"""),
       
          ( 'b2agsi_isymm', 'integer', '1', """
-					isymm - integer.
 					isymm specifies the type of symmetry of the geometry: isymm.eq.0 implies a slab geometry,
 					isymm.eq.1.or.isymm.eq.2 imply rotational symmetry about the crx=0 axis, and isymm.eq.3.or.isymm.eq.4 indicate rotational symmetry about the cry=0 axis.
 					Other values are not allowed.
@@ -1294,7 +1382,7 @@ b2mn_menu = {
                ('b2stbc_coreregn2', 'integer', '4',''''''), 
         ],
          """
-					coreregno, coreregn2 - integers. coreregno is the boundary index of the core boundary in the input files b2ah.dat and b2mn.dat. For a standard single-null case, coreregno is 1. For a straight geometry or limiter case, it is likely that coreregno need be set to 0, depending on the actual geometry details.
+					coreregno is the boundary index of the core boundary in the input files b2ah.dat and b2mn.dat. For a standard single-null case, coreregno is 1. For a straight geometry or limiter case, it is likely that coreregno need be set to 0, depending on the actual geometry details.
 					coreregn2 is the boundary index of the second core boundary in case of a double-null geometry, and is not used otherwise.
 				"""),
       ( 'b2stbc_pfrregno*', 'switchgroup', [
@@ -1304,11 +1392,9 @@ b2mn_menu = {
                ('b2stbc_pfrregno2', 'integer', '2',''''''), 
         ],
          """
-					pfrregno1, pfrregno2 - integers.
 					pfrregno1 is the boundary index of the first half of the private flux region boundary on which feedback is being applied (through b2stbc_ndes or b2stbc_private_flux_puff) in the input files b2ah.dat and b2mn.dat. pfrregno2 is the second half of the same private flux region. For a standard single null, the pair should be (0,2). For a standard double-null, the lower private flux region is labelled with the pair (0,5), and the upper private flux region with the pair (2,3). One can use only one private flux region by setting pfrregno1.eq.pfrregno2.
 				"""),
          ( 'b2stbc_solregno', 'integer', '3', """
-					solregno - integer.
 					solregno is the boundary index of the SOL North boundary in the input files b2ah.dat and b2mn.dat. For a standard single-null case, solregno is 3. For a standard double-null case, solregno for the outer SOL North boundary would be 7.
 				"""),
       
@@ -1326,24 +1412,21 @@ b2mn_menu = {
 				"""),
       
          ( 'b2agfs_Bt_adjust', 'integer', '0', """
-					Bt_adjust - integer.
-					If the mesh is offset (See b2agfs_xoffset, b2agfs_yoffset below) and Bt_adjust.eq.1, then the magnetic field is recomputed, keeping the pitch constant but changing the toroidal field magnitude according to Bt = Bt0/R. To be used in b2ag.dat.
+					If the mesh is offset (See b2agfs_xoffset, b2agfs_yoffset below) and Bt_adjust.eq.1, then the magnetic field is recomputed for toroidal geometries, keeping the pitch constant but changing the toroidal field magnitude according to Bt = Bt0/R. To be used in b2ag.dat.
 				"""),
       
          ( 'b2agfs_Bt_rescale', 'real', '1.0', """
-					Bt_rescale - real*8.
 					The magnetic field will be multiplied by Bt_rescale. All components of the field are scaled together. To be used in b2ag.dat.
 				"""),
       
          ( 'b2agfs_pit_rescale', 'real', '1.0', """
-					pit_rescale - real*8.
 					The magnetic field line pitch will be multiplied by pit_rescale.
 					This means that the poloidal field component is multiplied by pit_rescale, while the toroidal field component is left unchanged. To reverse the plasma current direction, set pit_rescale to -1.0.
 					The sign convention used is that a positive poloidal field points in the direction of increasing &lt;ix&gt;. Be mindful however that, when inverting the sign of the poloidal magnetic field, you are also inverting the direction of the parallel velocity. You will then need to use the 'b2mndr_inverse_ua' switch to correct for that. To be used in b2ag.dat.
 				"""),
       
          ( 'b2agfs_Bt_reversal', 'integer', '0', """
-					Bt_reversal - integer. If Bt_reversal.eq.1, then the sign of the toroidal field component only is reversed. The sign convention used is that a positive toroidal field leads to a Bx(grad(B)) direction pointing down, so B is out of the page when looking at the usual view of the poloidal plane with the center line on the left. To be used in b2ag.dat.
+					If Bt_reversal.eq.1, then the sign of the toroidal field component only is reversed. The sign convention used is that a positive toroidal field leads to a Bx(grad(B)) direction pointing down, so B is out of the page when looking at the usual view of the poloidal plane with the center line on the left. To be used in b2ag.dat.
 				"""),
       
          ( 'b2agfs_min_pitch', 'real', '1.0', """
@@ -1357,7 +1440,6 @@ b2mn_menu = {
                ('b2agfs_yoffset', 'real', '0.0',''''''), 
         ],
          """
-					xoffset, yoffset - real*8.
 					xoffset and yoffset are offsets of the basis mesh in the x- and y-direction respectively. The mesh will be translated by (xoffset,yoffset) if any of the two is non-zero from its position given in the local_sonnet (See 'b2agfs_geometry' above) file.
 					To be used in b2ag.dat.
 				"""),
@@ -1368,7 +1450,6 @@ b2mn_menu = {
                ('b2agfs_yrescale', 'real', '1.0',''''''), 
         ],
          """
-					yrescale - real*8.
 					Rescaling factors of the x- and y- coordinates of the basis mesh.
 					To be used in b2ag.dat.
 				"""),
@@ -1488,7 +1569,7 @@ b2mn_menu = {
          ( 'label', 'None', 'None', """a label"""),
       
          ( 'specs', 'None', 'None', """
-					atomic charge, nuclear charge, atomic mass and atomic charge squared for each charge stateminimum atomic charge of the stage, maximum atomic charge of the stage, nuclear charge, and atomic mass; this data should match that given in b2ah.dat
+					atomic charge, nuclear charge, atomic mass and atomic charge squared for each charge state, minimum atomic charge of the stage, maximum atomic charge of the stage, nuclear charge, and atomic mass; this data should match that given in b2ah.dat
 				"""),
       
          ( 'naini', 'None', 'None', """
@@ -1589,7 +1670,7 @@ b2mn_menu = {
 				"""),
       
          ( 'RCPOS', 'integer array of length (NSTRAT)', '-2', """
-					Position in the B2 grid of the of strata. Similar use as BCPOS from /BOUNDARY/ namelist.
+					Position in the B2 grid of the strata. Similar use as BCPOS from /BOUNDARY/ namelist.
 				"""),
       
          ( 'RCSTART', 'integer array of length (NSTRAT)', '-2', """
@@ -1789,7 +1870,7 @@ b2mn_menu = {
 					Maximum number by which Eirene neutral sources may be scaled in either direction within the ank-mods scheme. See explaining text in $SOLPSTOP/doc/Source_Scaling_in_B2.pdf for details.
 				"""),
       
-         ( 'TRACK_INDEX', 'integer array of size (0:NS-1)', '1 for species spud_dst, 0 for other', """
+         ( 'TRACK_INDEX', 'integer array of size (0:NS-1)', '1 for species sput_dst, 0 for all others', """
 					Specifies the mixed material species index related to B2 species (is).
 				"""),
       
@@ -1897,11 +1978,11 @@ b2mn_menu = {
 				"""),
       
          ( 'CHEMICAL_SPUTTER_YIELD', 'real*8 array of size (0:NLIM+NSTS)', '0.0', """
-					Passed to Eirene. Chemical sputter yield of wall surface (ilim).
+					Passed to Eirene. Chemical sputter yield of wall surface (ilim). Element 0 corresponds to the default setting for all surfaces.
 				"""),
       
          ( 'FCHAR_CHEMICAL', 'real*8', '0', """
-					Nuclear charge of atomic species causing the sputtering. Default means no chemical sputtering.
+					Nuclear charge of atomic species causing the sputtering. If set to its default value of 0, then the chemical sputtering switches from this block are not used and the settings from the Eirene input file are used.
 				"""),
       
          ( 'IGASS_CHEMICAL', 'integer', '0', """
@@ -2040,8 +2121,9 @@ b2mn_menu = {
 					Contains the atomic numbers Z of the various elements present within the surface layer of wall element (iwall). Defaults to 6 for the first value, 0 otherwise.
 				"""),
       
-         ( 'LAYER_NRELCONSTITUENTS', 'real*8 array of size (NWALL,6+NTRACK)', '', """
+         ( 'LAYER_RELCONSTITUENTS', 'real*8 array of size (NWALL,6+NTRACK)', '', """
 					Contains the relative atomic abundances of the various elements present within the surface layer of wall element (iwall). Defaults to 1.0 for the first value, 0.0 otherwise.
+					Replaces LAYER_NRELCONSTITUENTS.
 				"""),
       
    ],
@@ -2165,19 +2247,19 @@ b2mn_menu = {
 							CONPAR(,,2) is the strength of the feedback,
 							CONPAR(,,3), when running with Eirene and the 'ionising core' switch is used, is set internally to match the re-entering flux of ionised neutrals that crossed the core boundary (one must then have 'ionising_core'.eq.-IB where IB is the boundary index).
 							The feedback scheme can be further tweaked with the switches 'b2stbc_type13_norm' and 'b2stbc_type13_fac'. See code for details.
-						14 : sound speed velocity flux, CONPAR(,,1) is a multiplier to the outgoing sound speed C<sub>s</sub>.
+						14 : sound speed velocity flux, CONPAR(,,1) is a multiplier to the outgoing sound speed C<sub>s</sub> . To be used in conjunction with BCENE/I=15, BCPOT=11, and BCMOM=13. recommended for cases with drifts.
 						15 : prescribe a radial leakage velocity, CONPAR(,,1) specifies the leakage velocity in units of the local thermal velocity.
 						16 : particle density to achieve specified total flux, used with ASTRA coupling. The total desired flux is summed over all BCCON=16 core boundaries. CONPAR(,,1) specifies the desired particle flux in s<sup>-1</sup> .
 						18 : prescribe total main ion particle flux, used with ASTRA coupling.
 						19 : particle flux feedback boundary condition, flux is summed over neutrals and ions, for coupling with ASTRA. The total desired flux is summed over all BCCON=19 core boundaries. This boundary condition type is applied to ions in their highest ionisation stage. CONPAR(,,1) specifies the desired particle flux in s<sup>-1</sup> .
 						20 : constant density feedback condition, CONPAR(,,1) specifies the desired density in m<sup>-3</sup> .
 						21 : prescribe the value of the density and add a density perturbation to get a solution which is as close as possible to neoclassical theory. It is recommended to use this boundary condition together with corresponding condition on ion temperature (BCENI=24). The total desired density is summed over all BCCON=21 core boundaries. CONPAR(,,1) specifies the desired density in m<sup>-3</sup>.
-						22 : Feedback boundary condition: given total particle flux with constant average density. The poloidal density variation is added to make the solution as close as possible to the neoclassical value derived for pure H/D/T plasma. It is recommended to use this boundary condition with corresponding boundary condition on ion temperature (BCENI=23,24). The total desired flux is summed over all BCCON=22 core boundaries. CONPAR(,,1) specifies the desired particle flux in s<sup>-1</sup> .
-						23 : Feedback boundary condition: given sum of integrated neutrals and main ion particle fluxes with constant average density. The poloidal density variation is added to make the solution as close as possible to the neoclassical value derived for pure H/D/T plasma. It is recommended to use this boundary condition with corresponding boundary condition on ion temperature (BCENI=23,24). The total desired flux is summed over all BCCON=23 core boundaries. CONPAR(,,1) specifies the desired particle flux in s<sup>-1</sup> .
+						22 : feedback boundary condition: given total particle flux with constant average density. The poloidal density variation is added to make the solution as close as possible to the neoclassical value derived for pure H/D/T plasma. It is recommended to use this boundary condition with corresponding boundary condition on ion temperature (BCENI=23,24). The total desired flux is summed over all BCCON=22 core boundaries. CONPAR(,,1) specifies the desired particle flux in s<sup>-1</sup> .
+						23 : feedback boundary condition: given sum of integrated neutrals and main ion particle fluxes with constant average density. The poloidal density variation is added to make the solution as close as possible to the neoclassical value derived for pure H/D/T plasma. It is recommended to use this boundary condition with corresponding boundary condition on ion temperature (BCENI=23,24). The total desired flux is summed over all BCCON=23 core boundaries. CONPAR(,,1) specifies the desired particle flux in s<sup>-1</sup> .
 						24 : constant density feedback scaled by density on the ring 'bc_type21_ref' away. CONPAR(,,1) specifies the desired density in m<sup>-3</sup> . CONPAR(,,2) is the strength of the feedback
-						25 : Feedback boundary condition: prescribe the average value of the density and add a density perturbation from neighbouring radial cell. This boundary condition is suitable for any species of a multi-species plasma (i.e. in the case when the condition used in BCCON=21 fails). It is recommended to use this boundary condition together with the corresponding condition on ion temperature (BCENI=26,27). CONPAR(,,1) specifies the desired average density in m<sup>-3</sup> .
-						26 : Feedback boundary condition: prescribe the total ion flux and find the average density. A density perturbation is taken from the neighbouring radial cell. This boundary condition is suitable for any species of a multi-species plasma (i.e. in the case when the condition used in BCCON=22 fails). It is recommended to use this boundary condition together with a corresponding condition on the ion temperature (BCENI=26,27). The total desired flux is summed over all BCCON=26 core boundaries. CONPAR(,,1) specifies the desired particle flux in s<sup>-1</sup> .
-						27 : Feedback boundary condition: prescribe the particle flux sum for all neutrals and ions belonging to a given isonuclear sequence and find the average density of the highest ionization stage. A density perturbation is taken from the neighbouring radial cell. It is recommended to use this boundary condition together with corresponding condition on ion temperature (BCENI=25,26). The total desired flux is summed over all BCCON=27 core boundaries. CONPAR(,,1) specifies the desired particle flux in s<sup>-1</sup> .
+						25 : feedback boundary condition: prescribe the average value of the density and add a density perturbation from neighbouring radial cell. This boundary condition is suitable for any species of a multi-species plasma (i.e. in the case when the condition used in BCCON=21 fails). It is recommended to use this boundary condition together with the corresponding condition on ion temperature (BCENI=26,27). CONPAR(,,1) specifies the desired average density in m<sup>-3</sup> .
+						26 : feedback boundary condition: prescribe the total ion flux and find the average density. A density perturbation is taken from the neighbouring radial cell. This boundary condition is suitable for any species of a multi-species plasma (i.e. in the case when the condition used in BCCON=22 fails). It is recommended to use this boundary condition together with a corresponding condition on the ion temperature (BCENI=26,27). The total desired flux is summed over all BCCON=26 core boundaries. CONPAR(,,1) specifies the desired particle flux in s<sup>-1</sup> .
+						27 : feedback boundary condition: prescribe the particle flux sum for all neutrals and ions belonging to a given isonuclear sequence and find the average density of the highest ionization stage. A density perturbation is taken from the neighbouring radial cell. It is recommended to use this boundary condition together with corresponding condition on ion temperature (BCENI=25,26). The total desired flux is summed over all BCCON=27 core boundaries. CONPAR(,,1) specifies the desired particle flux in s<sup>-1</sup> .
 				"""),
       
          ( 'BCMOM', 'integer array, length NS * NBC', '', """
@@ -2196,11 +2278,11 @@ b2mn_menu = {
 						 9 : prescribe the total parallel momentum flux with constant flux density, MOMPAR(,,1) specifies the parallel momentum flux in N
 						10 : prescribe the decay length for the parallel momentum, MOMPAR(,,1) specifies the decay length in m
 						11 : Rozhansky viscosity condition for the parallel momentum, MOMPAR(,,1) is not used
-						12 : Condition from b2stbc_spb for the parallel momentum
-						13 : sheath boundary condition from b2stbc_spb for the parallel momentum
-						14 : Condition from b2stbc_spb for the parallel momentum
-						15 : Prescribe the value of the parallel velocity, scaled with B_average/B_local
-						16 : Prescribe the average value of the parallel velocity MOMPAR(,,1) specifies the parallel velocity in m.s -1
+						12 : condition from b2stbc_spb for the parallel momentum
+						13 : sheath boundary condition from b2stbc_spb for the parallel momentum. To be used in conjunction with BCENE/I=15, BCPOT=11, and BCCON=14. Recommended for cases with drifts.
+						14 : condition from b2stbc_spb for the parallel momentum
+						15 : prescribe the value of the parallel velocity, scaled with B_average/B_local
+						16 : prescribe the average value of the parallel velocity MOMPAR(,,1) specifies the parallel velocity in m.s<sup>-1</sup>
 						17 : leakage option for parallel momentum, MOMPAR(,,1) specifies the leakage factor, α in Γ<sub>loss</sub> = α C<sub>s,a</sub> m<sub>a</sub> n<sub>a</sub> u<sub>a</sub>
 				"""),
       
@@ -2221,12 +2303,12 @@ b2mn_menu = {
 						 12 : sheath conditions, electron energy transmission coefficient, ENEPAR(,1) specifies an energy transmission factor, delta<sub>e</sub> in Q<sub>e</sub> = delta<sub>e</sub> Γ<sub>e</sub> T<sub>e</sub>
 						 13 : prescribe the electron energy flux per unit area proportional to temperature, ENEPAR(,1) specifies the energy flux density per temperature in W.m<sup>-2</sup>.J<sup>-1</sup> (the temperature here in J)
 						 14 : leakage option for electron energy, ENEPAR(,1) specifies the leakage factor, α in Γ<sub>loss</sub> = α C<sub>s</sub>, collective n<sub>e</sub> T<sub>e</sub>
-						 15 : sheath boundary condition, from b2stbc_spb, recommended when using drifts (see Section C.6.4 of manual for details). Linked to using BCCON=14 for all ion species.
-						 16 : Feedback boundary condition with constant temperature, ENEPAR(,1) specifies the power flux in W across the flux surface with index 'b2stbc_type16_ref' (default=-1), ENEPAR(,2) should be something like 0.1 and specifies the strength of the feedback. Also see type [17] below. Available if bcene_16_style=0 (default). If bcene_16_style=1, integrated electron heat flux with constant electron temperature, summed over all core boundaries with BCENE=16.
-						 17 : Feedback boundary condition with constant shared temperature for both electrons and ions, with ENEPAR(,1) + ENIPAR(,1) giving the total power flux in W across the flux surface with index 'b2stbc_type16_ref' (default=-1), ENEPAR(,2) should be something like 0.1 and specifies the strength of the feedback. Replaces [16] for high densities and large values of 'b2stbc_type16_ref'.
-						 18 : Fractional drop condition. Not yet working.
+						 15 : sheath boundary condition, from b2stbc_spb, recommended when using drifts (see Section C.7.4 of manual for details). Linked to using BCCON=14 and BCMOM=13 for all ion species, BCENI=15, and BCPOT=11.
+						 16 : feedback boundary condition with constant temperature, ENEPAR(,1) specifies the power flux in W across the flux surface with index 'b2stbc_type16_ref' (default=-1), ENEPAR(,2) should be something like 0.1 and specifies the strength of the feedback. Also see type [17] below. Available if bcene_16_style=0 (default). If bcene_16_style=1, integrated electron heat flux with constant electron temperature, summed over all core boundaries with BCENE=16.
+						 17 : feedback boundary condition with constant shared temperature for both electrons and ions, with ENEPAR(,1) + ENIPAR(,1) giving the total power flux in W across the flux surface with index 'b2stbc_type16_ref' (default=-1), ENEPAR(,2) should be something like 0.1 and specifies the strength of the feedback. Replaces [16] for high densities and large values of 'b2stbc_type16_ref'.
+						 18 : fractional drop condition. Not yet working.
 						 19 : same as [9] but to be used when simultaneously setting BCCON=1 on the same boundary.
-						 20 : Feedback boundary condition with constant temperature, as per type [16] but with 'type20_' switches and a different feedback scheme.
+						 20 : feedback boundary condition with constant temperature, as per type [16] but with 'type20_' switches and a different feedback scheme.
 						 21 : constant temperature feedback scaled by temperature on the ring bc_type21_ref away
 						  	ENEPAR(,1) specifies the desired electron temperature in eV.
 						    ENEPAR(,2) is the strength of the feedback
@@ -2250,20 +2332,20 @@ b2mn_menu = {
 						12 : sheath conditions, ion energy transmission coefficient, ENIPAR(,1) specifies an energy transmission factor, delta<sub>i</sub> in Q<sub>i</sub> = delta<sub>i</sub> T<sub>i</sub> sum<sub>a</sub> Γ<sub>a</sub>
 						13 : prescribe the ion energy flux per unit area proportional to temperature, ENIPAR(,1) specifies the energy flux density per temperature in W.m<sup>-2</sup>.J<sup>-1</sup> (the temperature here in J)
 						14 : leakage option for ion energy, ENIPAR(,1) specifies the leakage factor, α in Γ<sub>loss</sub> = α C<sub>s</sub>T<sub>i</sub>
-						15 : sheath boundary condition, from b2stbc_spb, recommended when using drifts (see Section C.6.5 of manual for details). Linked to using BCCON=14 for all ion species.
-						16 : Feedback boundary condition with constant temperature, ENIPAR(,1) specifies the power flux in W across the flux surface with index 'b2stbc_type16_ref' (default=-1), ENIPAR(,2) should be something like 0.1 and specifies the strength of the feedback. Also see type [17] below. Available if bceni_16_style=0 (default). If bceni_16_style=1, integrated ion heat flux with constant ion temperature, summed over all core boundaries with BCENI=16.
+						15 : sheath boundary condition, from b2stbc_spb, recommended when using drifts (see Section C.7.5 of manual for details). Linked to using BCCON=14 and BCMOM=13 for all ion species, along with BCENE=15 and BCPOT=11.
+						16 : feedback boundary condition with constant temperature, ENIPAR(,1) specifies the power flux in W across the flux surface with index 'b2stbc_type16_ref' (default=-1), ENIPAR(,2) should be something like 0.1 and specifies the strength of the feedback. Also see type [17] below. Available if bceni_16_style=0 (default). If bceni_16_style=1, integrated ion heat flux with constant ion temperature, summed over all core boundaries with BCENI=16.
 							ENIPAR(,1) specifies the power flux in W
-						17 : Feedback boundary condition with constant shared temperature for both electrons and ions, see BCENE=17 above for description.
-						18 : Fractional drop condition. Not yet working.
+						17 : feedback boundary condition with constant shared temperature for both electrons and ions, see BCENE=17 above for description.
+						18 : fractional drop condition. Not yet working.
 						19 : same as [9] but to be used when simultaneously setting BCCON=1 on the same boundary.
-						20 : Feedback boundary condition with constant temperature, as per type [16] but with 'type20_' switches and a different feedback scheme.
+						20 : feedback boundary condition with constant temperature, as per type [16] but with 'type20_' switches and a different feedback scheme.
 						21 : from b2stbc_spb
-						22 : Radial leakage condition for the ion temperature. ENIPAR(,1) specifies the leakage velocity in units of the collective ion thermal velocity. A temperature gradient such that the diffusive flux is set to match this leakage is imposed.
-						23 : Prescribe the poloidally averaged value of the ion temperature and introduce a poloidal variation as close as possible to neoclassical solution. It is recommended to use this boundary condition together with corresponding condition on ion density (BCCON=21,22,23). The average is taken over all core boundaries with BCENI=23. ENIPAR(,1) specifies the temperature in eV
-						24 : Feedback boundary condition with prescribed total ion flux, constant poloidally averaged ion temperature and a poloidal variation as close as possible to neoclassical solution. It is recommended to use this boundary condition together with corresponding condition on ion density (BCCON=21,22,23). The flux is summed over all core boundaries with BCENI=24. ENIPAR(,1) specifies the energy flux in W
-						25 : Constant temperature feedback scaled by temperature on the ring bc_type21_ref away. ENIPAR(,1) specifies the desired ion temperature in eV. ENIPAR(,2) is the strength of the feedback
-						26 : Prescribe the poloidally averaged value of the ion temperature and introduce a poloidal variation in a simplified manner. This boundary condition is suitable for any plasma composition (i.e. when BCENI=23 fails). It is recommended to use this boundary condition together with corresponding condition on ion density (BCCON = 25,26,27). The average is taken over all core boundaries with BCENI=26. ENIPAR(,1) specifies the temperature in eV
-						27 : Feedback boundary condition with prescribed total ion heat flux, constant poloidally averaged ion temperature and a poloidal variation in a simplified manner. This boundary condition is suitable for any plasma composition (i.e. when BCENI=24 fails). It is recommended to use this boundary condition together with corresponding condition on ion density (BCCON = 25,26,27). The flux is summed over all core boundaries with BCENI=27. ENIPAR(,1) specifies the energy flux in W
+						22 : radial leakage condition for the ion temperature. ENIPAR(,1) specifies the leakage velocity in units of the collective ion thermal velocity. A temperature gradient such that the diffusive flux is set to match this leakage is imposed.
+						23 : prescribe the poloidally averaged value of the ion temperature and introduce a poloidal variation as close as possible to neoclassical solution. It is recommended to use this boundary condition together with corresponding condition on ion density (BCCON=21,22,23). The average is taken over all core boundaries with BCENI=23. ENIPAR(,1) specifies the temperature in eV
+						24 : feedback boundary condition with prescribed total ion flux, constant poloidally averaged ion temperature and a poloidal variation as close as possible to neoclassical solution. It is recommended to use this boundary condition together with corresponding condition on ion density (BCCON=21,22,23). The flux is summed over all core boundaries with BCENI=24. ENIPAR(,1) specifies the energy flux in W
+						25 : constant temperature feedback scaled by temperature on the ring bc_type21_ref away. ENIPAR(,1) specifies the desired ion temperature in eV. ENIPAR(,2) is the strength of the feedback
+						26 : prescribe the poloidally averaged value of the ion temperature and introduce a poloidal variation in a simplified manner. This boundary condition is suitable for any plasma composition (i.e. when BCENI=23 fails). It is recommended to use this boundary condition together with corresponding condition on ion density (BCCON = 25,26,27). The average is taken over all core boundaries with BCENI=26. ENIPAR(,1) specifies the temperature in eV
+						27 : feedback boundary condition with prescribed total ion heat flux, constant poloidally averaged ion temperature and a poloidal variation in a simplified manner. This boundary condition is suitable for any plasma composition (i.e. when BCENI=24 fails). It is recommended to use this boundary condition together with corresponding condition on ion density (BCCON = 25,26,27). The flux is summed over all core boundaries with BCENI=27. ENIPAR(,1) specifies the energy flux in W
 				"""),
       
          ( 'BCPOT', 'integer array, length NBC', '', """
@@ -2280,7 +2362,7 @@ b2mn_menu = {
 						 8 : prescribe the total electric current with constant flux density, POTPAR(,1) specifies the electric current in A
 						 9 : prescribe the decay length for the potential, POTPAR(,1) specifies the decay length in m
 						10 : feedback option for core [not yet tested!!!!!!!!!] (based on using cbsch(0,coreregno))
-						11 : sheath conditions, electron energy transmission from b2stbc_spb, POTPAR(,2) specifies the bias potential in V
+						11 : sheath conditions, electron energy transmission from b2stbc_spb, POTPAR(,2) specifies the bias potential in V. Recommended for use in cases with drifts, along with BCENE/I=15, BCCON=14, and BCMOM=13.
 						12 : Imposes the currents due to drifts for the South core boundary. Must be used in conjunction with istyle_cur_contr_on_S_and_N.eq.2
 						13 : Imposes the currents due to drifts for the South private flux and North boundaries. Must be used in conjunction with istyle_cur_contr_on_S_and_N.eq.2
 						16 : Constant electric potential feedback on imposed total current. The current prescribed is given by the sum of the POTPAR(IB,1) (in A) over all the BCPOT=16 boundaries.
@@ -2299,7 +2381,7 @@ b2mn_menu = {
 				"""),
       
          ( 'LBNDUSR', 'logical', '.false.', """
-					If .true. will also call Bas' boundary condition routine after the end of the physics boundary condition routine (governed by the data from b2ah.dat and b2mn.dat).
+					If .true. will also call b2stbc_bas boundary condition routine after the end of the physics boundary condition routine (governed by the data from b2ah.dat and b2mn.dat).
 				"""),
       
          ( 'LFEEDBACK', 'logical', '.false.', """
@@ -2395,6 +2477,10 @@ b2mn_menu = {
 					Last value used for the radial particle flux feedback in the SOL. Corresponds to 'isfeedback' B2 species.
 				"""),
       
+         ( 'SAVED_NA_FEEDBACK_ACTUATOR', 'real*8 array of size (NSPECIES)', '0.0', """
+					Last value used for the feedback control actuator for each isonuclear sequence.
+				"""),
+      
    ],
 
   'b2.feedback_control.parameters': [ 'namelist',
@@ -2436,7 +2522,7 @@ b2mn_menu = {
 				"""),
       
          ( 'NA_FEEDBACK_TARGET', 'Real*8 array of size (0:NSPECIES-1)', '0.0', """
-					Sets the target density of species (ISPECIES) for the feedback scheme.
+					Sets the target value of the quantity associated with species (ISPECIES) for the feedback scheme defined by NA_FEEDBACK_CHOICE(ISPECIES).
 				"""),
       
          ( 'NA_FEEDBACK_TIME', 'Real*8 array of size (0:NSPECIES-1)', '0.0', """
@@ -2449,10 +2535,11 @@ b2mn_menu = {
 						1: local species density (averaged over the rectangle of cells[IX1:IX2,IY1:IY2]). Summed over all charge states of that species.
 						2: local electron density (averaged over the rectangle of cells[IX1:IX2,IY1:IY2]).
 						3: outer midplane separatrix electron density.
-						4: total particle content for that species.
-						5: total ion content for that species (not including neutrals).
+						4: total particle content for that species summed over the rectangle of cells[IX1:IX2,IY1:IY2].
+						5: total ion content for that species (not including neutrals) summed over the rectangle of cells[IX1:IX2,IY1:IY2].
 						6: neutral particle flux through the core boundary.
 						7: relative average concentration of this species at the separatrix.
+                                                8: relative average concentration of this species averaged over the rectangle of cells[IX1:IX2,IY1:IY2].
 				"""),
       
          ( 'NA_FEEDBACK_OPTION', 'Integer array of size (0:NSPECIES-1)', '0', """
@@ -2480,7 +2567,7 @@ b2mn_menu = {
       
          ( 'NA_FEEDBACK_ALPHA', 'Real*8 array of size (0:NSPECIES-1)', '0.001', """
 					Factor by which the rescaling is slowed. Rescaling factor is :
-					Option 1: (1 + α*target/current) / (1 + alpha)
+					Option 1: (1 + alpha*target/current) / (1 + alpha)
 					Option 3: 2**(tanh(log(x)/beta)*log(alpha)/log(2))
 					Options 4 and 5: Corresponds to parameter F
 				"""),
@@ -2495,19 +2582,19 @@ b2mn_menu = {
 				"""),
       
          ( 'NA_FEEDBACK_IX1', 'Integer array of size (0:NSPECIES-1)', '-2', """
-					Lower poloidal bound for the region of which the density is being averaged.
+					Lower poloidal bound for the region over which the quantity used for the feedback of species (ISPECIES) is computed, if applicable.
 				"""),
       
          ( 'NA_FEEDBACK_IX2', 'Integer array of size (0:NSPECIES-1)', '-2', """
-					Upper poloidal bound for the region of which the density is being averaged.
+					Upper poloidal bound for the region over which the quantity used for the feedback of species (ISPECIES) is computed, if applicable.
 				"""),
       
          ( 'NA_FEEDBACK_IY1', 'Integer array of size (0:NSPECIES-1)', '-2', """
-					Lower radial bound for the region of which the density is being averaged.
+					Lower radial bound for the region over which the quantity used for the feedback of species (ISPECIES) is computed, if applicable.
 				"""),
       
          ( 'NA_FEEDBACK_IY2', 'Integer array of size (0:NSPECIES-1)', '-2', """
-					Upper poloidal bound for the region of which the density is being averaged.
+					Upper poloidal bound for the region over which the quantity used for the feedback of species (ISPECIES) is computed, if applicable.
 				"""),
       
          ( 'NA_FEEDBACK_IB', 'Integer array of size (0:NSPECIES-1)', '-1', """
@@ -2682,8 +2769,8 @@ b2mn_menu = {
 				"""),
       
          ( 'CORR_CORE_DN', 'real*8 array of size (0:NS-1)', '1.0', """
-				Pressure correction speed-up parameter α_a, acting on the density contribution from species a.
-					See Pressure_correction_speed-up.pdf in $SOLPSTOP/doc for a full description. Should be roughly equal to corr_core_dt below.
+				  Pressure correction speed-up parameter α_a, acting on the density contribution from species a.
+				  See Pressure_correction_speed-up.pdf in $SOLPSTOP/doc for a full description. Should be roughly equal to corr_core_dt below. Does not apply to neutral species.
 				"""),
       
          ( 'CORR_CORE_DT', 'real*8', '1.0', """
@@ -2707,6 +2794,10 @@ b2mn_menu = {
 					If .true. (default), writes the content of the namelist to stdout after it has been read.
 				"""),
       
+         ( 'ADD_TE_CORR_TO_PO', 'logical array of size (0:NREG)', '.true.', """
+					If .true. (default), adds dte(ix,iy)/qe to the potential correction after the internal energy balance equations are solved, where dte(ix,iy) is the electron temperature correction on the time step. Individually set for each region index.
+				"""),
+      
    ],
 
   'b2.transport_models_save.parameters': [ 'namelist',
@@ -2725,7 +2816,7 @@ b2mn_menu = {
 				"""),
       
          ( 'RCPOS', 'integer array of length (NSTRAT)', '-2', """
-					Position in the B2 grid of the of strata. Similar use as BCPOS from /BOUNDARY/ namelist.
+					Position in the B2 grid of the strata. Similar use as BCPOS from /BOUNDARY/ namelist.
 				"""),
       
          ( 'RCSTART', 'integer array of length (NSTRAT)', '-2', """
@@ -2925,7 +3016,7 @@ b2mn_menu = {
 					Maximum number by which Eirene neutral sources may be scaled in either direction within the ank-mods scheme. See explaining text in $SOLPSTOP/doc/Source_Scaling_in_B2.pdf for details.
 				"""),
       
-         ( 'TRACK_INDEX', 'integer array of size (0:NS-1)', '1 for species spud_dst, 0 for other', """
+         ( 'TRACK_INDEX', 'integer array of size (0:NS-1)', '1 for species sput_dst, 0 for all others', """
 					Specifies the mixed material species index related to B2 species (is).
 				"""),
       
@@ -3033,11 +3124,11 @@ b2mn_menu = {
 				"""),
       
          ( 'CHEMICAL_SPUTTER_YIELD', 'real*8 array of size (0:NLIM+NSTS)', '0.0', """
-					Passed to Eirene. Chemical sputter yield of wall surface (ilim).
+					Passed to Eirene. Chemical sputter yield of wall surface (ilim). Element 0 corresponds to the default setting for all surfaces.
 				"""),
       
          ( 'FCHAR_CHEMICAL', 'real*8', '0', """
-					Nuclear charge of atomic species causing the sputtering. Default means no chemical sputtering.
+					Nuclear charge of atomic species causing the sputtering. If set to its default value of 0, then the chemical sputtering switches from this block are not used and the settings from the Eirene input file are used.
 				"""),
       
          ( 'IGASS_CHEMICAL', 'integer', '0', """

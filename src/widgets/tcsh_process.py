@@ -69,22 +69,22 @@ class Tcsh(QProcess):
 
     @pyqtSlot()
     def processStarted(self):
-        msg = "Process " + self.program() + " started."
+        msg = f'Process {self.program()} started.'
         logging.info(msg)
         self.prcStarted.emit(msg)
 
     @pyqtSlot(QProcess.ProcessState)
     def processStateChanged(self, newState):
         states = ['Not Running', 'Starting', 'Running']
-        msg = 'Process ' + self.program() + ' state changed: ' + \
-            states[newState]
+
+        msg = f'Process {self.program()} state changed: {states[newState]}'
         logging.info(msg)
         self.prcStateChanged.emit(msg)
 
     @pyqtSlot(int, QProcess.ExitStatus)
     def finishedProcess(self, exitCode, exitStatus):
-        exits = ["Normal exit", "Crashed exit"]
-        msg = 'Process ' + self.program() + ' exited: ' + exits[exitStatus]
+        exits = ['Normal exit', 'Crashed exit']
+        msg = f'Process {self.program()} exited: {exits[exitStatus]}'
         self.prcFinished.emit(msg)
 
     @pyqtSlot(QProcess.ProcessError)
@@ -94,13 +94,13 @@ class Tcsh(QProcess):
         """
         errors = ['Failed to Start', 'Crashed', 'Timed out', 'WriteError',
                   'ReadError', 'UnknownError']
-        msg = 'ProcessError: ' + errors[error] + '\n' + self.errorString()
+        msg = f'ProcessError: {errors[error]}\n{self.errorString()}'
         logging.error(msg)
         self.prcError.emit(msg)
 
     def write(self, command):
         if self.state() == QProcess.NotRunning:
-            msg = 'Process ' + self.program() + ' is not running!'
+            msg = f'Process {self.program()} is not running!'
             logging.warning(msg)
             return
 
@@ -110,7 +110,7 @@ class Tcsh(QProcess):
     def start(self):
         runDirSolpsTop = self.findSolpsTop(self.runDir)
         if not runDirSolpsTop:
-            msg = "Could not find readable SOLPSTOP for run."
+            msg = 'Could not find readable SOLPSTOP for run.'
             logging.error(msg)
             return
 
@@ -120,22 +120,24 @@ class Tcsh(QProcess):
             self.solpsTop = runDirSolpsTop
 
         if self.state() != QProcess.NotRunning:
-            logging.info(self.program() + " is already running!")
+            logging.info(f'{self.program()} is already running!')
             return
 
         self.setProgram(self.tcshPath)
+        self.setWorkingDirectory(self.solpsTop)
         self.setArguments(['-l'])
         super(Tcsh, self).start()
 
         if not self.waitForStarted():
-            logging.error(self.program() + "not started.")
+            logging.error(f'{self.program()} not started.')
             return
 
-        logging.info("TCSH started in " + self.solpsTop + ".")
+        logging.info(f'TCSH started in {self.solpsTop}.')
         env = QSettings('ITER', 'solps-gui')
         device = env.value('device_environment', 'iter')
-        cmd = 'setenv DEVICE %s\n' % device
-        cmd += 'cd %s\nsource setup.csh\necho TCSH READY\n' % self.solpsTop
+        compiler = env.value('compiler_environment', 'ifort64')
+        cmd = f'setenv DEVICE {device}\n'
+        cmd += f'source setup.csh {compiler}\necho TCSH READY\n'
         self.cwd = self.solpsTop
         self.write(cmd)
 
@@ -150,16 +152,16 @@ class Tcsh(QProcess):
         """
         solpsTop = directory
         while(solpsTop):
-            path = solpsTop + '/setup.csh'
+            path = os.path.join(solpsTop, 'setup.csh')
             if os.path.exists(path) and os.access(path, os.R_OK):
                 return solpsTop
-            path = solpsTop + '/SOLPSTOP'
+            path = os.path.join(solpsTop, 'SOLPSTOP')
             if os.path.exists(path) and os.access(path, os.R_OK):
                 with open(path) as file:
                     return file.readline()
             solpsTop = solpsTop.rsplit('/', 1)[0]
-        logging.error('No SOLPSTOP found. Are you sure that the run is inside'
-                      ' of a solps-iter?')
+        logging.error(f'No SOLPSTOP found from {directory}. Are you sure that'
+                      ' the run is inside of a solps-iter?')
         return None
 
 
@@ -186,6 +188,7 @@ class TcshProcess(QWidget):
         self.tcshCwd = ''
         self.tcsh = Tcsh(self)
         self.destroyed.connect(self.tcsh.close)
+        self.activateDebugging()
 
     def activateDebugging(self):
         """Function that activates printing of all the output from the
@@ -201,19 +204,19 @@ class TcshProcess(QWidget):
     def debugError(self, message):
         """Prints std error message. Used for debugging.
         """
-        print('Error: ' + message)
+        logging.info('Error: ' + message)
 
     @pyqtSlot(str)
     def debugState(self, message):
         """Prints QProcess state. Used for debugging.
         """
-        print('Changed State: ' + message)
+        logging.info('Changed State: ' + message)
 
     @pyqtSlot(str)
     def debugStd(self, message):
         """Prints std output message. Used for debugging.
         """
-        print('STD: ' + message)
+        logging.info('STD: ' + message)
 
     @pyqtSlot(str)
     def setRunDir(self, newVal):

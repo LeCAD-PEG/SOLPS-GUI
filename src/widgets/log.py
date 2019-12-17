@@ -3,7 +3,7 @@ from PyQt5.QtCore import QThread, QObject, pyqtSignal, pyqtSlot, QSettings
 import queue
 import logging
 
-REDIRECT_STDOUT_TO_LOG = False # For debugging debugging
+REDIRECT_STDOUT_TO_LOG = False  # For debugging debugging
 
 
 class LoggingHandler(logging.Handler):
@@ -95,12 +95,15 @@ class Log(QPlainTextEdit):
         logFormat = "%(asctime)s %(levelname)s: %(message)s"
         logHandler.setFormatter(logging.Formatter(logFormat))
 
-        logging.getLogger().addHandler(logHandler)
+        logger = logging.getLogger()
+        # Somehow the output is still logged to terminal
+        logger.handlers = []
+        logger.addHandler(logHandler)
+        self.logHandler = logHandler
 
         settings = QSettings("ITER", "solps-gui")
         logLevels = [logging.DEBUG, logging.INFO, logging.WARNING,
                      logging.ERROR, logging.CRITICAL]
-
         logLevel = logLevels[int(settings.value('log_level', '1'))]
         logging.getLogger().setLevel(logLevel)
 
@@ -115,6 +118,7 @@ class Log(QPlainTextEdit):
             self.stdOutReceiver.moveToThread(self.stdOutThread)
             self.stdOutThread.started.connect(self.stdOutReceiver.run)
             self.stdOutThread.start()
+
 
 if __name__ == "__main__":
     from PyQt5.QtWidgets import QApplication, QMainWindow

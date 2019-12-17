@@ -14,17 +14,18 @@ import os
 import tempfile
 
 try:
-    from pyQtGnuplot import gnuplotWidget
+    from QtGnuplot import QtGnuplotInstance, QtGnuplotWidget, QtGnuplotBar
     GNUPLOT_WIDGET = True
 except ImportError as e:
     GNUPLOT_WIDGET = False
+
+from QtGnuplot import QtGnuplotWidget
 
 
 def cleanTempFiles(*files):
     for file in files:
         if file and os.path.exists(file):
             os.unlink(file)
-
 
 class Gnuplot(TcshProcess):
     """Gnuplot(QWidget)
@@ -50,7 +51,7 @@ class Gnuplot(TcshProcess):
         super(Gnuplot, self).__init__(parent)
         settings = QSettings('ITER', 'solps-gui')
         self.tcsh_path = settings.value('tcsh_path', '/bin/tcsh')
-        self.gnuplot_path = settings.value('gnuplot_path', '/usr/bin/gnuplot')
+        self.gnuplot_path = settings.value('gnuplot_path', 'gnuplot')
         self.solps_plot_command = None
         self.gnuplot_cmdfile = None
         self.gnuplot_datafile = None
@@ -66,12 +67,14 @@ class Gnuplot(TcshProcess):
         layout.setContentsMargins(1, 1, 1, 1)
 
         if GNUPLOT_WIDGET:
-            self.gnuplot = gnuplotWidget(self)
-            self.gnuplot.layout().setSpacing(0)
-            self.gnuplot.layout().setContentsMargins(0, 0, 0, 0)
-            self.send_command.connect(self.gnuplot.cmd)
+            self.gp = QtGnuplotInstance()
+            self.gnuplot = QtGnuplotWidget(self)
+            self.gp.setWidget(self.gnuplot)
+            self.gnuplotBar = QtGnuplotBar(self, m_widget=self.gnuplot)
+            # self.send_command.connect(self.gnuplot.cmd)
             self.gnuplot.plotDone.connect(self.showPlot)
             layout.addWidget(self.gnuplot, 0, 0)
+            layout.addWidget(self.gnuplotBar, 1, 0)
         else:
 
             self.gnuplot = QProcess()
@@ -108,8 +111,9 @@ class Gnuplot(TcshProcess):
             + str(self.width()) + ', ' + str(self.height()) + '\n' \
 
         if GNUPLOT_WIDGET:
-            self.gnuplot_cmd += plot_command.split('#', 1)[0]
-            self.send_command.emit(self.gnuplot_cmd)
+            self.gnuplot_cmd = plot_command.split('#', 1)[0]
+            # self.send_command.emit(self.gnuplot_cmd)
+            self.gp << self.gnuplot_cmd + '\n'
         else:
             self.gnuplot_cmd += 'plot ' + plot_command.split('#', 1)[0]
             self.gnuplot_cmd += '\nquit\n'
@@ -191,12 +195,11 @@ class Gnuplot(TcshProcess):
     @pyqtSlot(str)
     def readTcshStdOut(self, text):
         if 'PLOT FINISHED' in text:
-            self.gnuplot_cmd = 'cd "' + self.runDir + '"\n' \
-                'set terminal ' + self.TERMINAL + ' size ' \
-                + str(self.width()) + ', ' + str(self.height()) + '\n' \
-                + 'load "' + self.gnuplot_cmdfile
+            self.gnuplot_cmd = f'cd "{self.runDir}"\n'
+            self.gnuplot_cmd += f'load "{self.gnuplot_cmdfile}"\n'
             if GNUPLOT_WIDGET:
-                self.send_command.emit(self.gnuplot_cmd)
+                # self.send_command.emit(self.gnuplot_cmd)
+                self.gp << self.gnuplot_cmd
             else:
                 self.gnuplot_cmd += '\nquit\n'
                 self.gnuplot.start(self.gnuplot_path)
@@ -227,14 +230,17 @@ class Gnuplot(TcshProcess):
                                                          suffix='.dat',
                                                       dir=self.temp_dir.path())
             os.close(fd)
-            cmd = 'cd ' + self.runDir + '\n'
+            cmd = f'cd {self.runDir}\n'
             cmd_file = self.gnuplot_cmdfile.split('/')[-1]
             dat_file = self.gnuplot_datafile.split('/')[-1]
-            cmd += 'setenv GNUPLOT_CMD ' + cmd_file + '\n'
-            cmd += 'setenv GNUPLOT_DATA ' + dat_file + '\n'
-            cmd += 'setenv GNUPLOT_TMP ' + self.temp_dir.path() + '\n'
-            cmd += self.solps_plot_command + '\n'
+            cmd += f'setenv GNUPLOT_CMD {cmd_file}\n'
+            cmd += f'setenv GNUPLOT_DATA {dat_file}\n'
+            cmd += f'setenv GNUPLOT_TMP {self.temp_dir.path()}\n'
+            cmd += f'{self.solps_plot_command}\n'
             cmd += 'echo PLOT FINISHED\n'
+
+            logging.info(f'Running command:')
+            [logging.info(_) for _ in cmd.split('\n')]
             self.tcsh.write(cmd)
         else:
             logging.warning("No plot command or run directory")
@@ -288,7 +294,7 @@ if __name__ == "__main__":
 
         output = Output()
         layout.addWidget(output)
-        window.gnuplot.gnuplotOutput.connect(output.updateLog)
+        # window.gnuplot.gnuplotOutput.connect(output.updateLog)
         window.gnuplot.plotDone.connect(output.updateLog)
     widget.setLayout(layout)
     main.setCentralWidget(widget)
