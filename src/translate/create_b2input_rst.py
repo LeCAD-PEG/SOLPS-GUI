@@ -4,9 +4,11 @@ import xml.etree.ElementTree as etree
 from xml.etree.ElementTree import tostring
 import textwrap
 from itertools import chain
+import re
+import sys
 
 greek_pattern = r"\&([A-z]+)\;"
-import re
+
 
 def body(string, c, with_outline=False):
     global reST_text
@@ -15,6 +17,7 @@ def body(string, c, with_outline=False):
     reST_text += string + '\n'
     reST_text += len(string) * c + '\n'
 
+
 def dedent(description):
     trim_start = 0  # Remove any leading newlines that affects dedent
     while trim_start < len(description) and description[trim_start] == '\n':
@@ -22,10 +25,11 @@ def dedent(description):
     description = textwrap.dedent(description[trim_start:])
     return description
 
+
 def get_default_and_type(node):
     second_line = ''
     switch_type = node.findtext('type')
-    if switch_type: 
+    if switch_type:
         second_line = '    type: ``' + switch_type + '``'
 
     default = node.findtext('default')
@@ -34,21 +38,34 @@ def get_default_and_type(node):
 
     return second_line
 
+
 def stringify_children(node):
-    if node != None:
+    if node is not None:
+        # node.getchildren() will be deprecated
+        # using list(node)
+
+        # middlePart = []
+        # children = list(node)
+        # for child in children:
+        #    if child:
+        #        middlePart.append()
+
+        middlePart = list(chain(*([tostring(c).split()[0], c.tail] for c in list(node))))
         parts = ([node.text] +
-                list(chain(*([tostring(c).split()[0], c.tail] for c in node.getchildren()))) +
+                list(chain(*([tostring(c).split()[0], c.tail] for c in list(node)))) +
                 [node.tail])
         # filter removes possible Nones in texts and tails
         return ''.join([i.decode() if type(i) == bytes else i for i in filter(None, parts)])
     else:
         return ''
 
+
 def extract(string, start, end):
     output = []
     for el in string.split(start)[1:]:
         output.append(el.split(end)[0])
     return output
+
 
 def get_description(node):
     description = stringify_children(node.find('description'))
@@ -81,6 +98,7 @@ def get_description(node):
 
     return dedent(description)
 
+
 def add_description(node, prefix=''):
     global reST_text
 
@@ -92,40 +110,38 @@ def add_description(node, prefix=''):
             if start:
                 reST_text += '\n'
                 start = 0
-            reST_text += '    |' + line + '\n' 
+            reST_text += '    |' + line + '\n'
         else:
             if start == 0:
                 reST_text += '\n'
                 start = 1
-            reST_text += '    ' + line.lstrip() + '\n' 
+            reST_text += '    ' + line.lstrip() + '\n'
+
 
 def add_switch(node, prefix='', name_prefix='``', index=True):
     global reST_text
 
+    name = node.findtext('name')
 
-    name = node.findtext('name')    
-    
     if index:
-        reST_text += ".. index:: "   + name + "\n\n"
+        reST_text += ".. index:: " + name + "\n\n"
 
     reST_text += prefix + name_prefix + name + name_prefix
 
 
     reST_text += prefix + get_default_and_type(node) + '\n'
 
-    if node.find("description") != None:
+    if node.find("description") is not None:
         add_description(node, prefix)
 
 
 def add_switchgroup(node):
     global reST_text
 
-    name = node.findtext('name') 
+    name = node.findtext('name')
     sub_names = [e.findtext("name") for e in node.findall('switch')]
 
-
-
-    reST_text += ".. index:: "+ name + '\n\n'
+    reST_text += ".. index:: " + name + '\n\n'
     reST_text += ".. index:: " + ", ".join(sub_names) + "\n.. c\n\n"
     reST_text += "``" + name + "``\n\n"
 
@@ -137,21 +153,18 @@ def add_switchgroup(node):
 
     add_description(node)
 
-
     reST_text += ".. index::\n"
     for sub_name in sub_names:
         reST_text += "   single: " + name + "; " + sub_name + '\n'
     reST_text += '\n\n'
 
 
-
-
-import sys
-
 try:
     xml_name = sys.argv[1]
     dtd_name = sys.argv[2]
+    out_name = sys.argv[3]
 except Exception as e:
+    print(e)
     sys.exit()
 
 xml_entities = '<!ENTITY % symbols SYSTEM "xhtml-symbol.ent" > %symbols;'
@@ -171,8 +184,6 @@ tree = etree.ElementTree(etree.fromstring(text_to_process))
 
 root = tree.getroot()
 
-
-
 head = 'B2.5 input'
 reST_text = """.. _b2input:
 
@@ -187,8 +198,8 @@ reST_text += """
 
 
 .. note::
-	
-	This is a generated reST file from b2input.xml. 
+
+	This is a generated reST file from b2input.xml.
 	It covers switches and parameters.
 
 .. role:: latex(raw)
@@ -199,18 +210,17 @@ for module in root:
 
     for category in module.findall('category'):
 
-
         reST_text += ".. index:: " + category.attrib['name'] + "\n\n"
         reST_text
         body(category.attrib['name'], '=')
         names = []
         for element in category:
-            
+
             if element.tag == "switch":
                 names.append(element.findtext('name'))
                 add_switch(element)
                 if reST_text[-2] != '\n':
-                    reST_text+='\n'
+                    reST_text += '\n'
             elif element.tag == "switchgroup":
                 names.append(element.findtext('name'))
                 add_switchgroup(element)
@@ -223,4 +233,5 @@ for module in root:
         reST_text += "\n"
 
 
-print(reST_text)
+with open(out_name, 'w') as f:
+    f.write(reST_text)

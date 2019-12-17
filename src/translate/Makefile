@@ -1,5 +1,5 @@
-B2INPUT = ${HOME}/solps-iter/modules/B2.5/src/documentation/b2input.xml
-B2DTD = $(HOME)/solps-iter/modules/B2.5/src/documentation/xhtml-symbol.ent
+B2INPUT = ../../staging/solps-iter/develop/modules/B2.5/src/documentation/b2input.xml
+B2DTD = ../../staging/solps-iter/develop/modules/B2.5/src/documentation/xhtml-symbol.ent
 
 all : ../widgets/b2_tooltips.py ../widgets/b2menu.py \
 	../../doc/source/code/b2input.rst
@@ -11,4 +11,4 @@ all : ../widgets/b2_tooltips.py ../widgets/b2menu.py \
 	xsltproc --nonet create-addmenu.xslt $(B2INPUT) > $@
 
 ../../doc/source/code/b2input.rst : $(B2INPUT) create_b2input_rst.py
-	python3 create_b2input_rst.py $(B2INPUT) $(B2DTD)> $@
+	python3 create_b2input_rst.py $(B2INPUT) $(B2DTD) $@
