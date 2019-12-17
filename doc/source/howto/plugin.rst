@@ -172,7 +172,7 @@ Building the widget
      this->setText("Hello, SOLPS");
    }
 
-.. code-block:: guess
+.. code-block:: c++
    :caption: sip/hello.sip
 
    // Define the SIP wrapper to the hello library.
@@ -194,7 +194,7 @@ Building the widget
        Hello(const Hello &);
    };
 
-.. code-block:: guess
+.. code-block:: c++
    :caption: features/hello.prf
 
    greaterThan(QT_MAJOR_VERSION, 4) {
