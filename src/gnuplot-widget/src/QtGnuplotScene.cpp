@@ -163,6 +163,8 @@ void QtGnuplotScene::flushCurrentPointsItem()
 void QtGnuplotScene::update_key_box(const QRectF rect)
 {
 	if (m_currentPlotNumber > m_key_boxes.count()) {
+		// DEBUG Feb 2018 should no longer trigger
+		// because m_key_box insertion is done in layer code for GEAfterPlot
 		m_key_boxes.insert(m_currentPlotNumber, QtGnuplotKeybox(rect));
 	} else if (m_key_boxes[m_currentPlotNumber-1].isEmpty()) {
 		// Retain the visible/hidden flag when re-initializing the Keybox
@@ -268,7 +270,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		{
 			// Distinguish between opaque and transparent pattern fill
 			if (m_currentFillStyle ==  FS_PATTERN)
-				m_currentPointsItem->addFilledPolygon(clipPolygon(polygon, false), 
+				m_currentPointsItem->addFilledPolygon(clipPolygon(polygon, false),
 					QBrush(m_widget->backgroundColor()));
 
 			m_currentPointsItem->addFilledPolygon(clipPolygon(polygon, false), m_currentBrush);
@@ -345,10 +347,10 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		positionText(textItem, point);
 
 		QRectF rect = textItem->boundingRect();
-		if (m_textAlignment == Qt::AlignCenter) {
+		if (m_textAlignment & Qt::AlignCenter) {
 			rect.moveCenter(point);
 			rect.moveBottom(point.y());
-		} else if (m_textAlignment == Qt::AlignRight)
+		} else if (m_textAlignment & Qt::AlignRight)
 			rect.moveBottomRight(point);
 		else
 			rect.moveBottomLeft(point);
@@ -380,7 +382,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		QString text    ; in >> text;
 		if (m_enhanced == 0)
 			m_enhanced = new QtGnuplotEnhanced();
-		m_enhanced->addText(fontName, fontSize, 
+		m_enhanced->addText(fontName, fontSize,
 				    (QFont::Style)fontStyle, (QFont::Weight)fontWeight,
 				    base, widthFlag, showFlag,
 		                    overprint, text, m_currentPen.color());
@@ -394,14 +396,14 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		addItem(m_enhanced);
 
 		QRectF rect = m_enhanced->boundingRect();
-		if (m_textAlignment == Qt::AlignCenter) {
+		if (m_textAlignment & Qt::AlignCenter) {
 			rect.moveCenter(point);
 			rect.moveBottom(point.y());
-		} else if (m_textAlignment == Qt::AlignRight)
+		} else if (m_textAlignment & Qt::AlignRight)
 			rect.moveBottomRight(point);
 		else
 			rect.moveBottomLeft(point);
-		rect.adjust(-m_currentPen.width()*2, rect.height()/2, 
+		rect.adjust(-m_currentPen.width()*2, rect.height()/2,
 			    m_currentPen.width()*2, rect.height()/2);
 
 		if (m_inKeySample)
@@ -484,7 +486,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			in >> m_axisValid[i] >> m_axisMin[i] >> m_axisLower[i] >> m_axisScale[i] >> m_axisLog[i];
 		in >> m_axisValid[4];
 	}
-	else if (type == GEAfterPlot) 
+	else if (type == GEAfterPlot)
 	{
 		flushCurrentPointsItem();
 		if (m_currentPlotNumber >= m_plot_group.count()) {
@@ -497,17 +499,24 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 				newgroup->setVisible( !(m_key_boxes[m_currentPlotNumber-1].ishidden()) );
 			// Store it in an ordered list so we can toggle it by index
 			m_plot_group.insert(m_currentPlotNumber, newgroup);
-		} 
+		}
+
+		if (m_currentPlotNumber >= m_key_boxes.count()) {
+			QRectF empty( QPointF(0,0), QPointF(0,0));
+			m_key_boxes.insert(m_currentPlotNumber,  empty);
+			m_key_boxes[m_currentPlotNumber-1].resetStatus();
+		}
+
 		m_currentPlotNumber = 0;
 	}
-	else if (type == GEPlotNumber) 
+	else if (type == GEPlotNumber)
 	{
 		flushCurrentPointsItem();
 		int newPlotNumber;  in >> newPlotNumber;
 		if (newPlotNumber >= m_plot_group.count()) {
 			// Initialize list of elements for next group
 			m_currentGroup.clear();
-		} 
+		}
 		// Otherwise we are making a second pass through the same plots
 		// (currently used only to draw key samples on an opaque key box)
 		m_currentPlotNumber = newPlotNumber;
@@ -522,7 +531,6 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		enum QtGnuplotModPlots ops = (enum QtGnuplotModPlots) ops_i;
 
 		/* FIXME: This shouldn't happen, but it does. */
-		/* Failure to reset lists after multiplot??   */
 		if (i > m_plot_group.count())
 		    i = m_plot_group.count();
 
@@ -739,11 +747,11 @@ void QtGnuplotScene::positionText(QGraphicsItem* item, const QPoint& point)
 
 	double cx = 0.;
 	double cy = (item->boundingRect().bottom() + item->boundingRect().top())/2.;
-	if (m_textAlignment == Qt::AlignLeft)
+	if (m_textAlignment & Qt::AlignLeft)
 		cx = item->boundingRect().left();
-	else if (m_textAlignment == Qt::AlignRight)
+	else if (m_textAlignment & Qt::AlignRight)
 		cx = item->boundingRect().right();
-	else if (m_textAlignment == Qt::AlignCenter)
+	else if (m_textAlignment & Qt::AlignCenter)
 		cx = (item->boundingRect().right() + item->boundingRect().left())/2.;
 
 	item->setTransformOriginPoint(cx, cy);
@@ -798,8 +806,8 @@ void QtGnuplotScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	else if (event->button()== Qt::MidButton)   button = 2;
 	else if (event->button()== Qt::RightButton) button = 3;
 
-	m_eventHandler->postTermEvent(GE_buttonpress, 
-			int(event->scenePos().x()), int(event->scenePos().y()), 
+	m_eventHandler->postTermEvent(GE_buttonpress,
+			int(event->scenePos().x()), int(event->scenePos().y()),
 			button, 0, m_widget);
 	QGraphicsScene::mousePressEvent(event);
 }
@@ -846,7 +854,7 @@ void QtGnuplotScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 	int i = m_hypertextList.count();
 	bool hit = false;
 	while (i-- > 1) {
-		if (!hit && ((m_hypertextList[i]->pos() - m_textOffset) 
+		if (!hit && ((m_hypertextList[i]->pos() - m_textOffset)
 				- m_lastMousePos).manhattanLength() <= 5) {
 			hit = true;
 			m_hypertextList[i]->setVisible(true);
@@ -854,7 +862,7 @@ void QtGnuplotScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 			m_hypertextList[0]->setPos(m_hypertextList[i]->pos());
 			m_hypertextList[0]->setZValue(m_hypertextList[i]->zValue()-1);
 
-			// Special hypertext "image{(xsize,ysize)}:filename" 
+			// Special hypertext "image{(xsize,ysize)}:filename"
 			QString current_text = ((QGraphicsTextItem *)(m_hypertextList[i]))->toPlainText();
 			if (current_text.startsWith("image")) {
 				int sep = current_text.indexOf(":");
@@ -922,14 +930,14 @@ void QtGnuplotScene::wheelEvent(QGraphicsSceneWheelEvent* event)
 	if (event->orientation() == Qt::Horizontal) {
 		// 6 = scroll left, 7 = scroll right
 		m_eventHandler->postTermEvent(GE_buttonpress,
-			int(event->scenePos().x()), int(event->scenePos().y()), 
+			int(event->scenePos().x()), int(event->scenePos().y()),
 			event->delta() > 0 ? 6 : 7, 0, m_widget);
 	} else { /* if (event->orientation() == Qt::Vertical) */
 		// 4 = scroll up, 5 = scroll down
 		m_eventHandler->postTermEvent(GE_buttonpress,
-			int(event->scenePos().x()), int(event->scenePos().y()), 
+			int(event->scenePos().x()), int(event->scenePos().y()),
 			event->delta() > 0 ? 4 : 5, 0, m_widget);
-	} 
+	}
 }
 
 void QtGnuplotScene::keyPressEvent(QKeyEvent* event)
@@ -1026,13 +1034,17 @@ void QtGnuplotScene::keyPressEvent(QKeyEvent* event)
 			case Qt::Key_F12        : key = GP_F12        ; break;
 		}
 
+	// The <tab> key is special.  We will catch it on keyRelease.
+	if (key == GP_Tab)
+		key = 0;
+
 	if (key >= 0)
 		live = m_eventHandler->postTermEvent(GE_keypress,
 			int(m_lastMousePos.x()), int(m_lastMousePos.y()), key, 0, m_widget);
 	else
 		live = true;
 
-	// Key handling in persist mode 
+	// Key handling in persist mode
 	// !live means (I think!) that we are in persist mode
 	if (!live) {
 		switch (key) {
@@ -1054,6 +1066,22 @@ void QtGnuplotScene::keyPressEvent(QKeyEvent* event)
 	}
 
 	QGraphicsScene::keyPressEvent(event);
+}
+
+/*
+ * Qt swallows the keyPress events from <tab> because it is used to
+ * cycle focus among a set of widgets. The documented methods for bypassing
+ * this focus-related theft are beyond my comprehension.  So instead we
+ * catch the key release event (for <tab> only) and pretend it was a press.
+ */
+void QtGnuplotScene::keyReleaseEvent(QKeyEvent* event)
+{
+	if (Qt::Key_Tab == event->key())
+		m_eventHandler->postTermEvent(GE_keypress,
+			int(m_lastMousePos.x()), int(m_lastMousePos.y()),
+			GP_Tab, 0, m_widget);
+
+	QGraphicsScene::keyReleaseEvent(event);
 }
 
 double QtGnuplotScene::sceneToGraph(int axis, double coord) const

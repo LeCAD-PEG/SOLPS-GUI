@@ -1,4 +1,4 @@
-This created the python module pyQtGnuplot, which contains embedded gnuplot
+This creates the python module pyQtGnuplot, which contains embedded gnuplot
 in PyQt.
 
 To build it run:
@@ -31,6 +31,6 @@ To do it by hand:
 The installation folder is in $(HOME)/solps-gui/staging/lib/site-packages/. To
 change settings edit the configure.py file.
 
-To import and use the module right away, either sorce setupenv.sh from solps-gui
-root dir or append the path to ~/solps-gui/staging/lib/site-packages to
-variable PYTHONPATH.
+To import and use the module right away, either source setupenv.sh from
+solps-gui root dir or append the path to ~/solps-gui/staging/lib/site-packages
+to variable PYTHONPATH.

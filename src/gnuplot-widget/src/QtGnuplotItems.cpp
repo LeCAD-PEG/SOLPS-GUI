@@ -1,3 +1,5 @@
+
+
 /* GNUPLOT - QtGnuplotItems.cpp */
 
 /*[
@@ -48,7 +50,7 @@
 /////////////////////////////
 // QtGnuplotEnhanced
 
-void QtGnuplotEnhanced::addText(const QString& fontName, double fontSize, 
+void QtGnuplotEnhanced::addText(const QString& fontName, double fontSize,
 				QFont::Style fontStyle, QFont::Weight fontWeight,
 				double base, bool widthFlag,
                                 bool showFlag, int overprint, const QString& text, QColor color)
