@@ -1,0 +1,279 @@
+diff --git a/SETUP/config.UNKNOWN.gfortran b/SETUP/config.UNKNOWN.gfortran
+new file mode 100644
+index 00000000..dbc723ab
+--- /dev/null
++++ b/SETUP/config.UNKNOWN.gfortran
+@@ -0,0 +1,140 @@
++#
++# Specify paths to root-directories of following libraries on your system
++#
++# Special notes:
++#
++# If you have NCAR version 3 on your system:
++# Remove -DNCAR4 from SOLPS_CPP
++#
++# If you do not have NAG on your system:
++# Use LD_NAG to link to the BLASLAPACK library instead
++# Add -DNO_NAG to SOLPS_CPP
++#
++# If you have NAG Mark 17 or greater on your system:
++# Add -DNO_F01AAF to SOLPS_CPP
++#
++# If you have NAG Mark 22 or greater on your system:
++# Add -DNAG22 to SOLPS_CPP
++#
++
++        NCDIR ?= ${SOLPSLIB}
++    MSCL_ROOT ?= ${SOLPSLIB}
++        H5DIR ?= ${SOLPSLIB}
++      GR_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++     GLI_HOME ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++OPENBLAS_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++  MDSPLUS_DIR ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++
++# The library path when installing NCARG on Debian9 is
++# /usr/lib/x86_64-linux-gnu/ncarg
++# But on CentOS7, it's
++# /usr/lib64/ncarg
++# The same goes for OpenMP, so the best way is to provide the PKG_CONFIG_PATH,
++# or run the SOLPS-GUI build script.
++
++   NCARG_ROOT ?= ${SOLPSLIB}
++        MPDIR ?= ${SOLPSLIB}
++
++        NAGDIR ?= ${SOLPSLIB}
++#
++# Variables of linking, using pkg-config
++#
++# LD_INTEL_LIBS= -lirc -lirc_s -liomp5 -lifcoremt_pic -lsvml -lifport -limf -lm -lifcore_pic -lpthread
++
++LD_NETCDF  = -L${H5DIR}/lib -L${NCDIR}/lib -lnetcdf -lnetcdff -lhdf5 -lhdf5_hl
++LD_MSCL    = -L${MSCL_ROOT}/lib -lmscl
++LD_GR      = -L${GR_ROOT}/lib -lgr
++LD_GKS     = -L${GLI_HOME} -lgks -lgfortran -lX11 -lXt
++LD_NCARG   = -L${NCARG_ROOT} -lncarg -lncarg_gks -lncarg_c -lgfortran -lfreetype -lfontconfig -lpthread -lXrender -lX11 -lm -lcairo
++LD_NAG     = -L${OPENBLAS_ROOT} -lopenblas
++LD_MDSPLUS = -L${MDSPLUS_DIR}/lib -lMdsLib_client -lMdsIpShr -lMdsShr
++LD_SONNET  = -L${SOLPSLIB}/lib -lsonnet -lstdc++
++LD_MPI     = -L${MPDIR}/lib -L/usr/lib/x86_64-linux-gnu -lmpi
++
++#
++# Preprocessor options
++#
++
++SOLPS_CPP      = -DNO_NAG -DGFORTRAN
++B25_DEFINES    =
++EIRENE_DEFINES =
++MPI_CPP        = -I${MPDIR}/include
++
++# Autodetected optional features...
++
++# Build with NetCDF tools if available
++ifdef LD_NETCDF
++  SOLPS_CPP   += -DCDF_MOVIE
++else
++  SOLPS_CPP   += -DNO_CDF
++endif
++
++# Build with MDSplus tools if MDSplus is present
++ifdef LD_MDSPLUS
++  SOLPS_CPP   += -DMDSPLUS
++endif
++
++# Build with Catalyst if ParaView is in PATH
++ifdef LD_CATALYST
++  SOLPS_CPP   += -DCATALYST
++endif
++
++# Build with IMAS if imas module is loaded
++ifdef IMAS_VERSION
++  LD_UAL   = `pkg-config imas-gfortran ggd --libs` -Wl,-rpath,${IMAS_PREFIX}/lib
++  UAL_MAJOR_VERSION = $(shell echo ${UAL_VERSION} | cut -d '.' -f1 )
++  GGD_MINOR_VERSION = $(shell echo ${EBVERSIONGGD} | cut -d '.' -f2 )
++  IMAS_MAJOR_VERSION = $(shell echo ${IMAS_VERSION} | cut -d '.' -f1 )
++  IMAS_MINOR_VERSION = $(shell echo ${IMAS_VERSION} | cut -d '.' -f2 )
++  SOLPS_CPP += -DIMAS -DUAL_MAJOR_VERSION=${UAL_MAJOR_VERSION} -DIMAS_MINOR_VERSION=${IMAS_MINOR_VERSION} -DGGD_MINOR_VERSION=${GGD_MINOR_VERSION}
++  export LD_UAL
++else
++  UAL_MAJOR_VERSION = 0
++  GGD_MINOR_VERSION = 0
++  IMAS_MAJOR_VERSION = 0
++  IMAS_MINOR_VERSION = 0
++endif
++export UAL_MAJOR_VERSION
++export GGD_MINOR_VERSION
++export IMAS_MAJOR_VERSION
++export IMAS_MINOR_VERSION
++
++# Build with OpenMP if requested
++#ifdef SOLPS_OPENMP
++#  B25_DEFINES += -D_OPENMP
++#endif
++
++#
++# Export for use in sub-makefiles
++#
++
++export NCDIR
++export MSCL_ROOT
++export H5DIR
++export GR_ROOT
++export GLI_HOME
++export NCARG_ROOT
++export NAGDIR
++export MDSPLUS_DIR
++
++export LD_NETCDF
++export LD_MSCL
++export LD_GR
++export LD_GKS
++export LD_NCARG
++export LD_NAG
++export LD_MDSPLUS
++export LD_SONNET
++export LD_MPI
++export LD_UAL
++
++export NODENAME
++export SOLPS_CPP
++export B25_DEFINES
++export EIRENE_DEFINES
++export MPI_CPP
++
++#!!!Local Variables:
++#!!! mode: Makefile
++#!!! End:
++
+diff --git a/SETUP/setup.csh.UNKNOWN.gfortran b/SETUP/setup.csh.UNKNOWN.gfortran
+new file mode 100644
+index 00000000..4221e7c1
+--- /dev/null
++++ b/SETUP/setup.csh.UNKNOWN.gfortran
+@@ -0,0 +1,10 @@
++if (`where paraview-config` == "") then
++  echo "Warning: paraview-config not found. ParaView with Catalyst will not be compiled-in!"
++else
++  # See ParaViewCatalystUsersGuide_v2.pdf Sec 3.7.2 Linking with Python ...
++  set PARAVIEW_LIB=`paraview-config --libs --python | sed s/-L//`
++  setenv LD_LIBRARY_PATH "${PARAVIEW_LIB}:${LD_LIBRARY_PATH}"
++  setenv PYTHONPATH "${PARAVIEW_LIB}/site-packages/vtk:${PYTHONPATH}"
++  setenv PYTHONPATH "${PARAVIEW_LIB}/site-packages:${PYTHONPATH}"
++  setenv LD_CATALYST `paraview-config --libs vtkPVPythonCatalyst`
++endif
+diff --git a/modules/Triang/config/config.UNKNOWN.gfortran b/modules/Triang/config/config.UNKNOWN.gfortran
+new file mode 100644
+index 00000000..802a228f
+--- /dev/null
++++ b/modules/Triang/config/config.UNKNOWN.gfortran
+@@ -0,0 +1,41 @@
++#  VERSION : 16.12.2004 23:58
++
++# The version relying on Fujitsu Fortran installed on AFS
++
++# Test whether necessary variables are defined
++ifndef LD_GR
++  $(error LD_GR not defined)
++endif
++ifndef LD_GKS
++  $(error LD_GKS not defined)
++endif
++ifndef LD_NAG
++  $(error LD_NAG not defined)
++endif
++
++#DEFINES  = ${SOLPS_CPP} ${EIRENE_DEFINES} -DRECL_UNITS_PER_DOUBLE=8 -DNO_FORT10 -DNO_SHORT_CYCLE -DNO_F01AAF
++#DEFINES  = ${SOLPS_CPP} ${EIRENE_DEFINES} -DTRIANG -DRECL_UNITS_PER_DOUBLE=8 -DNO_FORT10 -DNO_SHORT_CYCLE -DNO_F01AAF
++
++CPP       = /lib/cpp -traditional -ffreestanding
++CPPOPTS   = -P -I${srcdir} ${EQUIVS}
++SED       =
++LINK_MOD  =
++
++FC        = gfortran
++
++ifdef SOLPS_DEBUG
++FCOPTS    = -g -fcheck=all -fbacktrace -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
++DEFINES  += -DDBG
++else
++FCOPTS    = -O3
++endif
++
++GKS       = ${LD_GR} ${LD_GKS} -lX11 -lXt -lXmu
++
++INCMOD    = -I
++MOD       = mod
++OBJDEST   = -J${OBJDIR} -o ${OBJDIR}/$*.o
++
++BLD       = ar rcv
++
++LD         = gfortran
+\ No newline at end of file
+diff --git a/modules/Uinp/config/config.UNKNOWN.gfortran b/modules/Uinp/config/config.UNKNOWN.gfortran
+new file mode 100644
+index 00000000..5a411132
+--- /dev/null
++++ b/modules/Uinp/config/config.UNKNOWN.gfortran
+@@ -0,0 +1,36 @@
++#  VERSION : 28.07.99 20:34
++
++# File compiler.macro for Fujitsu frt
++
++LD_MSCL ?= `pkg-config mscl --libs`
++
++ifdef USE_MPI
++FC       = mpif90
++else
++FC       = gfortran
++endif
++FC_VERSION = $(shell echo `gfortran --version | head -1 | awk '{printf "%s ",$$3,"\n"}'`)
++
++ifdef SOLPS_DEBUG
++FFLAGS   = -g -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
++else
++FFLAGS   =
++endif
++ifeq (${FC_VERSION},6.4.0})
++FFLAGS  += -fuse-ld=bfd
++endif
++INCLUDE  = -I${SRCDIR} ${EIRINC} ${B2INC}
++COMPILE  = ${FC} -c ${FFLAGS}
++CPP      = /lib/cpp -traditional
++
++MOD      = mod
++LDLIBS   = ${LD_MSCL}
++LDEXTRA  =
++ifdef USE_MPI
++LDLIBS  += ${LD_MPI}
++endif
++
++#!!!Local Variables:
++#!!! mode: Makefile
++#!!! End:
++
+diff --git a/modules/amds/config/config.UNKNOWN.gfortran b/modules/amds/config/config.UNKNOWN.gfortran
+new file mode 100644
+index 00000000..7c233dff
+--- /dev/null
++++ b/modules/amds/config/config.UNKNOWN.gfortran
+@@ -0,0 +1,8 @@
++CC = cc
++CFLAGS = -g
++LIBS = -lXm -lXt -lX11 -lXext -lXmuu -lpthread -lm
++
++#!!!Local Variables:
++#!!! mode: Makefile
++#!!! End:
++
+diff --git a/runs/Makefile b/runs/Makefile
+index efa3c2a2..e4129199 100644
+--- a/runs/Makefile
++++ b/runs/Makefile
+@@ -4,7 +4,7 @@
+ #-----------------------------------------------------------------------
+ # Variables.
+
+-SHELL = /usr/bin/env sh
++SHELL = /bin/tcsh
+ TIME = time
+ RUN_OPTIONS =
+ BLANK =

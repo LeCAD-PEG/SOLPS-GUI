@@ -1,0 +1,57 @@
+diff --git a/config/config.UNKNOWN.gfortran b/config/config.UNKNOWN.gfortran
+new file mode 100644
+index 00000000..ed1a2672
+--- /dev/null
++++ b/config/config.UNKNOWN.gfortran
+@@ -0,0 +1,51 @@
++# Test whether necessary variables are set
++ifndef LD_GR
++  $(error LD_GR not defined)
++endif
++ifndef LD_GKS
++  $(error LD_GKS not defined)
++endif
++ifndef LD_NAG
++  $(error LD_NAG not defined)
++endif
++ifndef GLI_HOME
++  $(error GLI_HOME not defined)
++endif
++ifndef SOLPS_CPP
++DEFINES += -DGFORTRAN
++endif
++
++CPP       = -/lib/cpp -C -traditional -ffreestanding
++ifdef SOLPS_MPI
++FC        = mpif90
++else
++FC        = gfortran
++endif
++CC        = /usr/bin/gcc
++
++ifdef SOLPS_DEBUG
++FCOPTS    = -g -fcheck=all -fPIC -fno-second-underscore -DDECLARE_MPI_WTIME -fbacktrace -frecursive -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
++CFLAGS    = -g
++else
++FCOPTS    = -O2 -fPIC -fno-second-underscore -DDECLARE_MPI_WTIME
++CFLAGS    = -O2
++endif
++
++# NAG     = ${LD_NAG}
++GKS       = ${LD_GR} ${LD_GKS} -lX11 -lXt
++
++LDLIBS    = -L/usr/local/lib -L/usr/lib/x86_64-linux-gnu
++LDEXTRA   =
++
++# new
++
++INCMOD    = -I
++MOD       = mod
++OBJDEST   = -J${OBJDIR} -o $@
++
++COMPILE   = ${FC} -c ${FCOPTS} ${INCMOD}${OBJDIR}
++
++#!!!Local Variables:
++#!!! mode: Makefile
++#!!! End:
++
