@@ -44,6 +44,7 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
     IMAS_VERSION_DIGIT=$(echo "$IMAS_VERSION" | sed "s/\.//g") \
     ${CMAKE} -DCMAKE_BUILD_TYPE:STRING=Debug \
     -DParaView_DIR:PATH=${STAGING_DIR}/ParaView/${PARAVIEW_VERSION} \
+    -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
     ${BUILDROOT}/src/plugins/paraview
     touch ${SRC_DIR}/.configured
 fi
@@ -56,8 +57,9 @@ fi
 
 # Install
 if [ ! -d ${INSTALL_DIR} ]; then
-    install -d ${INSTALL_DIR}
-    install ${SRC_DIR}/libReadUALEdge.so ${INSTALL_DIR}
+    make install
+    # install -d ${INSTALL_DIR}
+    # install ${SRC_DIR}/libReadUALEdge.so ${INSTALL_DIR}
 fi
 
 # Generate Modulefile

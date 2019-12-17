@@ -195,7 +195,8 @@ if  [ -z \${OPENBLAS_VERSION+x} ]; then
     echo "OPENBLAS_VERSION is unset, skipping"
 else
     export OPENBLAS_INSTALL_DIR=\${STAGING_DIR}/OpenBLAS/\${OPENBLAS_VERSION}
-    export LD_LIBRARY_PATH=\${OPENBLAS_INSTALL_DIR}\lib:\${LD_LIBRARY_PATH}
+    export LD_LIBRARY_PATH=\${OPENBLAS_INSTALL_DIR}/lib:\${LD_LIBRARY_PATH}
+    export OPENBLAS_ROOT=\${OPENBLAS_INSTALL_DIR}/lib
 fi
 
 if [ -z \${BLITZ_VERSION+x} ]; then
@@ -245,7 +246,6 @@ else
     export NCDIR=\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}
 fi
 
-
 if [ -z \${NETCDF_FORTRAN_VERSION+x} ]; then
     echo "NETCDF_FORTRAN_VERSION is unset, skiping"
 else
@@ -290,6 +290,7 @@ else
     export LD_LIBRARY_PATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/lib:\${LD_LIBRARY_PATH}
     export LIBRARY_PATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/lib:\${LIBRARY_PATH}
     export PATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/bin:\${PATH}
+    export PKG_CONFIG_PATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
 fi
 
 if [ -z \${GGD_VERSION+x} ]; then
@@ -298,6 +299,25 @@ else
     export CPATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/include:\${CPATH}
     export LD_LIBRARY_PATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/lib:\${LD_LIBRARY_PATH}
     export LIBRARY_PATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/lib:\${LIBRARY_PATH}
+    export PKG_CONFIG_PATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
+fi
+
+if [ -z \${MSCL_VERSION+x} ]; then
+    echo "MSCL_VERSION is unset, skipping"
+else
+    export PKG_CONFIG_PATH=\${STAGING_DIR}/mscl/\${MSCL_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
+fi
+
+if [ -z \${GLI_VERSION}+x ]; then
+    echo "GLI_VERSION is unset, skipping"
+else
+    export GLI_HOME=\${STAGING_DIR}/GLI/${GLI_VERSION}
+fi
+
+if [ -z \${NCL_VERSION}+x ]; then
+    echo "NCL_VERSION is unset, skipping"
+else
+    export NCARG_ROOT=\${STAGING_DIR}/ncl/\${NCL_VERSION}
 fi
 
 EOF

@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-4.1.5}
+VERSION=${VERSION:-4.2.0}
 GIT="ssh://git@git.iter.org/imas/access-layer.git"
 SRC_DIR="${BUILD_DIR}/access-layer-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/imas/${IMASDD_VERSION}/solps # Use IMASDD version later.
@@ -52,8 +52,9 @@ if [ ! -e ${SRC_DIR}/.built ]; then
 
     IMAS_IFORT='no' IMAS_PYTHON3='yes' IMAS_PYTHON2='no' IMAS_CPP='yes' IMAS_FORTRAN='yes' \
     IMAS_PYTHON='yes' IMAS_JAVA='no' IMAS_MATLAB='no' IMAS_MDSPLUS='yes' IMAS_UDA='no' \
+    IMAS_MEX='no' \
     IMAS_PREFIX=${INSTALL_DIR} \
-    make #-j ${MAKE_JOBS}
+    make -j ${MAKE_JOBS}
     touch ${SRC_DIR}/.built
 fi
 
@@ -62,7 +63,7 @@ if [ ! -d ${INSTALL_DIR} ]; then
     install -d ${INSTALL_DIR}
     IMAS_IFORT='no' IMAS_PYTHON3='yes' IMAS_PYTHON2='no' IMAS_CPP='yes' IMAS_FORTRAN='yes' \
     IMAS_PYTHON='yes' IMAS_JAVA='no' IMAS_MATLAB='no' IMAS_MDSPLUS='yes' \
-    IMAS_PREFIX=${INSTALL_DIR} IMAS_UDA='no' \
+    IMAS_PREFIX=${INSTALL_DIR} IMAS_UDA='no' IMAS_MEX='no' \
     make install IMAS_INSTALL_DIR=${INSTALL_DIR}
 
     # Post installation

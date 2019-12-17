@@ -44,7 +44,8 @@ cd ${SRC_DIR}
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
     rm -rf ${INSTALL_DIR}
-    CXX=g++ ./configure --prefix=${INSTALL_DIR} --with-pic --enable-shared
+    autoreconf -fiv
+    CXX=g++ ./configure --prefix=${INSTALL_DIR} --with-pic --enable-shared=yes
     touch ${SRC_DIR}/.configured
 fi
 

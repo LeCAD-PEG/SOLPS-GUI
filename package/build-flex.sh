@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-flex-2.5.37}
+VERSION=${VERSION:-v2.6.3}
 GIT="https://github.com/westes/flex.git"
 SRC_DIR="${BUILD_DIR}/flex-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/flex/${VERSION}

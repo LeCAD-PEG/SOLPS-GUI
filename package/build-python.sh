@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-3.7.4}
+VERSION=${VERSION:-3.6.9}
 MAINVERSION=${VERSION%.*}
 SOURCE="Python-${VERSION}.tgz"
 DOWNLOAD="https://www.python.org/ftp/python/${VERSION}/${SOURCE}"
@@ -54,7 +54,7 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
         sed -i -e "s,#SSL=.*,SSL=${ssl}," -e "/^#.*ssl/s/#//" \
         -e '/ssl/s|-lcrypto |-lcrypto -Wl,-rpath,$(SSL)/lib|' Modules/Setup.dist
     fi
-    ./configure --prefix=${INSTALL_DIR} --enable-shared #--enable-optimizations
+    ./configure --prefix=${INSTALL_DIR} --enable-shared # --enable-optimizations
     touch ${SRC_DIR}/.configured
 fi
 
@@ -71,14 +71,14 @@ if [ ! -d ${INSTALL_DIR} ]; then
 
     ln -sf python3 ${INSTALL_DIR}/bin/python
     pip3 --trusted-host pypi.python.org install --upgrade \
-        pip sphinx sphinx_rtd_theme mock nose
+        pip sphinx sphinx_rtd_theme mock nose Cython wheel setuptools
 
     # The following Python modules are preferred by IMAS
 
-    pip3 --trusted-host pypi.python.org install --upgrade \
-        Cython luigi tornado deap decorator liac-arff ecdsa \
-        netaddr paramiko virtualenv setuptools \
-        wheel pyvtk
+    # pip3 --trusted-host pypi.python.org install --upgrade \
+    #     Cython luigi tornado deap decorator liac-arff ecdsa \
+    #     netaddr paramiko virtualenv setuptools \
+    #     wheel pyvtk
 fi
 
 MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}

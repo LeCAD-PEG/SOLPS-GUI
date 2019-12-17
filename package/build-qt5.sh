@@ -62,6 +62,7 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
     #                   qtgraphicaleffects/tests/tests.pro
     ./configure -v --prefix=${INSTALL_DIR} -opensource -confirm-license \
       -shared \
+      -qt-xcb \
       -skip qtmultimedia \
       -skip qtwayland \
       -skip qtgamepad \
@@ -73,8 +74,7 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
       -skip qtpurchasing \
       -skip qt3d ${XCB_FLAGS} ${QT_EXTRA_FLAGS} \
       -nomake tests \
-      -nomake examples \
-      -qt-xcb
+      -nomake examples
       #-qt-xkbcommon -xkb-config-root /usr/share/X11/xkb \
 
     # Check if INSTALL directory has been already created
@@ -100,7 +100,7 @@ if [ ! -d ${INSTALL_DIR} ]; then
     # export PATH=${INSTALL_DIR}/bin:${PATH}
     # make -C qtbase/src html_docs
     # make qmake_all
-    # make -j ${MAKE_JOBS} docs install_docs
+    make -j ${MAKE_JOBS} html_docs
 fi
 
 # Generate Modulefile

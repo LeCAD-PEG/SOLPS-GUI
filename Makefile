@@ -3,50 +3,64 @@
 BUILDROOT:=$(realpath $(dir $(realpath $(firstword $(MAKEFILE_LIST)))))
 STAGING_DIR ?= ${BUILDROOT}/staging
 MODULE_DIR ?= ${BUILDROOT}/modules
-GLI_VERSION=4.5.30
-GR_VERSION=0.0.94
+
+# SOLPS-GUI
+SOLPS_GUI_VERSION=1.5.0
+
 OPENBLAS_VERSION=0.3.7
-PYTHON_VERSION=3.7.4
-PYTHON_MAINVERSION=3.7
-NUMPY_VERSION=1.17.0
+PYTHON_VERSION=3.6.9
+PYTHON_MAINVERSION=3.6
+NUMPY_VERSION=1.17.3
 SCIPY_VERSION=1.3.1
-GNUPLOT_VERSION=5.2.2
+GNUPLOT_VERSION=5.2.7
 QT_VERSION=5.13.0
 PyQt_VERSION=5.13.0
 SIP_VERSION=4.19.18
-MDSPLUS_VERSION=stable_release-7-46-1
+# ParaView specific version
+PARAVIEW_VERSION=5.6.2
+CMAKE_VERSION=3.15.4
+
+# IMAS
 BLITZ_VERSION=1.0.1
+MDSPLUS_VERSION=stable_release-7-84-8
 LIBXML2_VERSION=2.9.1
 SAXON_VERSION=HE9-8-0-12J
-IMASDD_VERSION=3.23.3
-IMAS_MINOR_VERSION=23
-IMASUAL_VERSION=4.1.5
-GGD_VERSION=1.8.5
-SOLPS_VERSION=devel
+IMASUAL_VERSION=4.2.0
+IMASDD_VERSION=3.24.0
+# Minor version is used for compatibility compiling.
+IMAS_MINOR_VERSION=24
+
+# SOLPS-ITER
+GLI_VERSION=4.5.30
+GR_VERSION=0.0.94
+GGD_VERSION=1.9.1
+SOLPS_VERSION=develop
 MSCL_VERSION=1.1.1
 CURL_VERSION=7.64.1
 HDF5_VERSION=1.10.5
 NETCDF_VERSION=4.6.0
 NETCDF_FORTRAN_VERSION=4.4.4
 FREETYPE_VERSION=2.10.0
-NCL_VERSION=6.4.0
+NCL_VERSION=6.5.0
 MOTIF_VERSION=2.3.8
-OPENMPI_VERSION=2.1.6
-FLEX_VERSION=flex-2.5.37
-#Paraview specific version
-PARAVIEW_VERSION=5.6.1
-CMAKE_VERSION=3.10.1
+OPENMPI_VERSION=4.0.0
+FLEX_VERSION=v2.6.3
 
-# Get module environment
-#
 SETUP_FILE="setupenv.sh"
 SOLPS_GUI_MOD=${MODULE_DIR}/solps-gui/1.5
 SOLPS_ITER_MOD=${MODULE_DIR}/solps-iter/${SOLPS_VERSION}
 
 .PHONY: gr gli OpenBLAS mscl ggd python libxml2 saxon blitz cmake mdsplus \
-	imas solps-iter pyqt solps-gui curl hdf5 netcdf openmpi motif
+	imas solps-iter pyqt solps-gui curl hdf5 netcdf openmpi motif \
+	solps-gui-mod
 
 all: solps-iter solps-gui
+
+package/setup.sh: configure
+	./configure
+
+config: package/setup.sh
+
 
 ${STAGING_DIR}/GR/${GR_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${GR_VERSION}}/" package/build-GR.sh
@@ -88,7 +102,7 @@ ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}:
 	LIBXML2_VERSION=${LIBXML2_VERSION} \
 	./package/build-mdsplus.sh
 
-mdsplus: libxml2 ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
+mdsplus: config libxml2 ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
 
 ${STAGING_DIR}/OpenBLAS/${OPENBLAS_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${OPENBLAS_VERSION}}/" package/build-OpenBLAS.sh
@@ -122,7 +136,7 @@ ${STAGING_DIR}/Python/${PYTHON_VERSION}:
 	OPENBLAS_VERSION=${OPENBLAS_VERSION} \
 	./package/build-scipy.sh
 
-python: OpenBLAS ${STAGING_DIR}/Python/${PYTHON_VERSION}
+python: config OpenBLAS ${STAGING_DIR}/Python/${PYTHON_VERSION}
 
 ${STAGING_DIR}/sip/${SIP_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${SIP_VERSION}}/" package/build-sip.sh
@@ -130,14 +144,15 @@ ${STAGING_DIR}/sip/${SIP_VERSION}:
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	./package/build-sip.sh
 
-sip: python ${STAGING_DIR}/sip/${SIP_VERSION}
+sip: config python ${STAGING_DIR}/sip/${SIP_VERSION}
 
 ${STAGING_DIR}/qt/${QT_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${QT_VERSION}}/" package/build-qt5.sh
 
+	PYTHON_VERSION=${PYTHON_VERSION} \
 	./package/build-qt5.sh
 
-qt5: ${STAGING_DIR}/qt/${QT_VERSION}
+qt5: config ${STAGING_DIR}/qt/${QT_VERSION}
 
 ${STAGING_DIR}/PyQt5/${PyQt_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${PyQt_VERSION}}/" package/build-pyqt.sh
@@ -147,7 +162,7 @@ ${STAGING_DIR}/PyQt5/${PyQt_VERSION}:
 	SIP_VERSION=${SIP_VERSION} \
 	./package/build-pyqt.sh
 
-pyqt: python qt5 sip ${STAGING_DIR}/PyQt5/${PyQt_VERSION}
+pyqt: config python qt5 sip ${STAGING_DIR}/PyQt5/${PyQt_VERSION}
 
 ${STAGING_DIR}/gnuplot/${GNUPLOT_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${GNUPLOT_VERSION}}/" package/build-gnuplot.sh
@@ -155,7 +170,7 @@ ${STAGING_DIR}/gnuplot/${GNUPLOT_VERSION}:
 	QT_VERSION=${QT_VERSION} \
 	./package/build-gnuplot.sh
 
-gnuplot: pyqt ${STAGING_DIR}/gnuplot/${GNUPLOT_VERSION}
+gnuplot: config pyqt ${STAGING_DIR}/gnuplot/${GNUPLOT_VERSION}
 
 ${STAGING_DIR}/gnuplot-widget/python-${PYTHON_VERSION}-qt-${QT_VERSION}:
 
@@ -166,7 +181,7 @@ ${STAGING_DIR}/gnuplot-widget/python-${PYTHON_VERSION}-qt-${QT_VERSION}:
 	GNUPLOT_VERSION=${GNUPLOT_VERSION} \
 	./package/build-gnuplot-widget.sh
 
-gnuplot-widget: gnuplot pyqt ${STAGING_DIR}/gnuplot-widget/python-${PYTHON_VERSION}-qt-${QT_VERSION}
+gnuplot-widget: config gnuplot pyqt ${STAGING_DIR}/gnuplot-widget/python-${PYTHON_VERSION}-qt-${QT_VERSION}
 
 ${STAGING_DIR}/libxml2/${LIBXML2_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${LIBXML2_VERSION}}/" package/build-libxml2.sh
@@ -174,7 +189,7 @@ ${STAGING_DIR}/libxml2/${LIBXML2_VERSION}:
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	./package/build-libxml2.sh
 
-libxml2: python ${STAGING_DIR}/libxml2/${LIBXML2_VERSION}
+libxml2: config python ${STAGING_DIR}/libxml2/${LIBXML2_VERSION}
 
 ${STAGING_DIR}/paraview/${PARAVIEW_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${PARAVIEW_VERSION}}/" package/build-paraview.sh
@@ -185,7 +200,7 @@ ${STAGING_DIR}/paraview/${PARAVIEW_VERSION}:
 	LIBXML2_VERSION=${LIBXML2_VERSION} \
 	./package/build-paraview.sh
 
-paraview: cmake qt5 ${STAGING_DIR}/paraview/${PARAVIEW_VERSION}
+paraview: config cmake qt5 ${STAGING_DIR}/paraview/${PARAVIEW_VERSION}
 
 ${STAGING_DIR}/ReadUALEdge-Plugin/1.5.0:
 	QT_VERSION=${QT_VERSION} \
@@ -197,7 +212,7 @@ ${STAGING_DIR}/ReadUALEdge-Plugin/1.5.0:
 	MDSPLUS_VERSION=${MDSPLUS_VERSION} \
 	./package/build-paraview-plugin.sh
 
-paraview-plugin: imas cmake paraview blitz ${STAGING_DIR}/ReadUALEdge-Plugin/1.5.0
+paraview-plugin: config imas cmake paraview blitz ${STAGING_DIR}/ReadUALEdge-Plugin/1.5.0
 
 ${BUILDROOT}/build/data-dictionary-${IMASDD_VERSION}/.installed:
 	@echo ${BUILDROOT}/data-dictionary-${IMASDD_VERSION}/.installed
@@ -207,7 +222,7 @@ ${BUILDROOT}/build/data-dictionary-${IMASDD_VERSION}/.installed:
 	SAXON_VERSION=${SAXON_VERSION} \
 	./package/build-imasdd.sh
 
-imasdd: saxon python ${BUILDROOT}/build/data-dictionary-${IMASDD_VERSION}/.installed
+imasdd: config saxon python ${BUILDROOT}/build/data-dictionary-${IMASDD_VERSION}/.installed
 
 ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${IMASUAL_VERSION}}/" package/build-imas.sh
@@ -224,7 +239,7 @@ ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps:
 	./package/build-imas.sh
 	cp ${BUILDROOT}/imasdb ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps/bin
 
-imas: python saxon mdsplus blitz libxml2 imasdd ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps
+imas: config python saxon mdsplus blitz libxml2 imasdd ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps
 
 ${STAGING_DIR}/GGD/${GGD_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${GGD_VERSION}}/" package/build-ggd.sh
@@ -234,7 +249,7 @@ ${STAGING_DIR}/GGD/${GGD_VERSION}:
 	MDSPLUS_VERSION=${MDSPLUS_VERSION} \
 	./package/build-ggd.sh
 
-ggd: imas ${STAGING_DIR}/GGD/${GGD_VERSION}
+ggd: config imas ${STAGING_DIR}/GGD/${GGD_VERSION}
 
 
 ${STAGING_DIR}/curl/${CURL_VERSION}:
@@ -243,7 +258,7 @@ ${STAGING_DIR}/curl/${CURL_VERSION}:
 	./package/build-curl.sh
 
 
-curl: ${STAGING_DIR}/curl/${CURL_VERSION}
+curl: config ${STAGING_DIR}/curl/${CURL_VERSION}
 
 ${STAGING_DIR}/hdf5/${HDF5_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${HDF5_VERSION}}/" package/build-hdf5.sh
@@ -252,7 +267,7 @@ ${STAGING_DIR}/hdf5/${HDF5_VERSION}:
 	OPENMPI_VERSION=${OPENMPI_VERSION} \
 	./package/build-hdf5.sh
 
-hdf5: cmake ${STAGING_DIR}/hdf5/${HDF5_VERSION}
+hdf5: config cmake ${STAGING_DIR}/hdf5/${HDF5_VERSION}
 
 ${STAGING_DIR}/netcdf/${NETCDF_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${NETCDF_VERSION}}/" package/build-netCDF.sh
@@ -272,7 +287,7 @@ ${STAGING_DIR}/netcdf/${NETCDF_VERSION}:
 	CURL_VERSION=${CURL_VERSION} \
 	./package/build-netCDF-Fortran.sh
 
-netcdf: hdf5 curl ${STAGING_DIR}/netcdf/${NETCDF_VERSION}
+netcdf: config hdf5 curl ${STAGING_DIR}/netcdf/${NETCDF_VERSION}
 
 ${STAGING_DIR}/freetype/${FREETYPE_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${FREETYPE_VERSION}}/" package/build-freetype.sh
@@ -289,7 +304,7 @@ ${STAGING_DIR}/ncl/${NCL_VERSION}:
 	NETCDF_VERSION=${NETCDF_VERSION} \
 	./package/build-ncl.sh
 
-ncl: freetype ${STAGING_DIR}/ncl/${NCL_VERSION}
+ncl: config freetype ${STAGING_DIR}/ncl/${NCL_VERSION}
 
 ${STAGING_DIR}/openmpi/${OPENMPI_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${OPENMPI_VERSION}}/" package/build-openmpi.sh
@@ -312,7 +327,7 @@ ${STAGING_DIR}/motif/${MOTIF_VERSION}:
 	FREETYPE_VERSION=${FREETYPE_VERSION} \
 	./package/build-motif.sh
 
-motif: flex ${STAGING_DIR}/motif/${MOTIF_VERSION}
+motif: config flex ${STAGING_DIR}/motif/${MOTIF_VERSION}
 
 ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}1:
 	# Copy imasdb script for setting up IMAS MDSPLUS_TREE environment
@@ -333,11 +348,22 @@ ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}1:
 	OPENMPI_VERSION=${OPENMPI_VERSION} \
 	MOTIF_VERSION=${MOTIF_VERSION} \
 	HDF5_VERSION=${HDF5_VERSION} \
-	./package/build-solps-iter.csh
+	./package/build-solps-iter.sh
 
-solps-iter: imas gr gli OpenBLAS mscl ggd python netcdf ncl openmpi motif ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}1 ${SOLPS_ITER_MOD}
+solps-iter: config imas gr gli OpenBLAS mscl ggd python netcdf ncl openmpi motif ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}1
 
-solps-gui: imas pyqt gnuplot gnuplot-widget setupenv.sh ${MODULE_DIR}/solps-gui/1.5
+solps-gui-mod:
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${SOLPS_GUI_VERSION}}/" package/build-solps-gui.sh
+	VERSION=${SOLPS_GUI_VERSION} \
+	IMASDD_VERSION=${IMASDD_VERSION} \
+	PYTHON_VERSION=${PYTHON_VERSION} \
+	QT_VERSION=${QT_VERSION} \
+	PyQt_VERSION=${PyQt_VERSION} \
+	GNUPLOT_VERSION=${GNUPLOT_VERSION} \
+	./package/build-solps-gui.sh
+
+
+solps-gui: config imas pyqt gnuplot gnuplot-widget setupenv.sh solps-gui-mod
 
 setupenv.sh:
 	@echo "Writing environemnt to ${BUILDROOT}/${SETUP_FILE}"
@@ -430,138 +456,6 @@ ${SOLPS_GUI_MOD}:
 	@echo "set-alias solps_doc \"xdg-open ${BUILDROOT}/doc/build/html/index.html\"" >> ${SOLPS_GUI_MOD}
 	@echo "set-alias eirene \"python3 -m eirene $*\"" >> ${SOLPS_GUI_MOD}
 	@echo "set-alias b2 \"python3 -m b2 $*\"" >> ${SOLPS_GUI_MOD}
-
-${SOLPS_ITER_MOD}:
-	@echo "Writing solps-iter module file to ${SOLPS_ITER_MOD}"
-	@install -d ${MODULE_DIR}/solps-iter
-	@echo "#%Module1.0###################################################################" 	> ${SOLPS_ITER_MOD}
-	@echo "##" >> ${SOLPS_ITER_MOD}
-	@echo "## \$$name modulefile" >> ${SOLPS_ITER_MOD}
-	@echo "##" >> ${SOLPS_ITER_MOD}
-	@echo "conflict solps-iter" >> ${SOLPS_ITER_MOD}
-	@echo "if { ! [ is-loaded imas ] } {" >> ${SOLPS_ITER_MOD}
-	@echo "    module load imas/${IMASDD_VERSION}/solps" >> ${SOLPS_ITER_MOD}
-	@echo "}" >> ${SOLPS_ITER_MOD}
-	@echo "if { ![ is-loaded GR/${GR_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
-	@echo "    module load GR/${GR_VERSION}"  >> ${SOLPS_ITER_MOD}
-	@echo "}"  >> ${SOLPS_ITER_MOD}
-	@echo ""  >> ${SOLPS_ITER_MOD}
-	@echo "if { ![ is-loaded GLI/${GLI_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
-	@echo "    module load GLI/${GLI_VERSION}"  >> ${SOLPS_ITER_MOD}
-	@echo "}"  >> ${SOLPS_ITER_MOD}
-	@echo ""  >> ${SOLPS_ITER_MOD}
-	@echo "if { ![ is-loaded GGD/${GGD_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
-	@echo "    module load GGD/${GGD_VERSION}"  >> ${SOLPS_ITER_MOD}
-	@echo "}"  >> ${SOLPS_ITER_MOD}
-	@echo "if { ![ is-loaded ncl/${NCL_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
-	@echo "    module load ncl/${NCL_VERSION}"  >> ${SOLPS_ITER_MOD}
-	@echo "}"  >> ${SOLPS_ITER_MOD}
-	@echo "if { ![ is-loaded NetCDF/${NETCDF_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
-	@echo "    module load NetCDF/${NETCDF_VERSION}"  >> ${SOLPS_ITER_MOD}
-	@echo "}"  >> ${SOLPS_ITER_MOD}
-	@echo "if { ![ is-loaded OpenMPI/${OPENMPI_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
-	@echo "    module load OpenMPI/${OPENMPI_VERSION}"  >> ${SOLPS_ITER_MOD}
-	@echo "}"  >> ${SOLPS_ITER_MOD}
-	@echo "if { ![ is-loaded motif/${MOTIF_VERSION} ] } {"  >> ${SOLPS_ITER_MOD}
-	@echo "    module load motif/${MOTIF_VERSION}"  >> ${SOLPS_ITER_MOD}
-	@echo "}"  >> ${SOLPS_ITER_MOD}
-	@echo "if { ![ is-loaded OpenBLAS/${OPENBLAS_VERSION} ] } {" >> ${SOLPS_ITER_MOD}
-	@echo "    module load OpenBLAS/${OPENBLAS_VERSION}" >> ${SOLPS_ITER_MOD}
-	@echo "}"  >> ${SOLPS_ITER_MOD}
-	@echo "setenv MAKE make" >> ${SOLPS_ITER_MOD}
-	@echo "setenv SOLPSTOP ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}"	>> ${SOLPS_ITER_MOD}
-	@echo "set SOLPSTOP ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}"	>> ${SOLPS_ITER_MOD}
-	@echo "setenv SOLPSWORK \$$SOLPSTOP/runs"	>> ${SOLPS_ITER_MOD}
-	@echo "setenv HOST_NAME UNKNOWN"	>> ${SOLPS_ITER_MOD}
-	@echo "set HOST_NAME UNKNOWN"	>> ${SOLPS_ITER_MOD}
-	@echo "setenv COMPILER gfortran"	>> ${SOLPS_ITER_MOD}
-	@echo "set COMPILER gfortran"	>> ${SOLPS_ITER_MOD}
-	@echo "setenv DEVICE solps-iter"	>> ${SOLPS_ITER_MOD}
-	@echo "set DEVICE solps-iter"	>> ${SOLPS_ITER_MOD}
-	@echo "set TOOLCHAIN \$$HOST_NAME.\$$COMPILER"	>> ${SOLPS_ITER_MOD}
-	@echo ""	>> ${SOLPS_ITER_MOD}
-	@echo "prepend-path PYTHONPATH \$$SOLPSTOP/lib/python"	>> ${SOLPS_ITER_MOD}
-	@echo "setenv SOLPSLIB \$$SOLPSTOP/lib/\$$HOST_NAME.\$$COMPILER"	>> ${SOLPS_ITER_MOD}
-	@echo ""	>> ${SOLPS_ITER_MOD}
-	@echo "setenv SonnetTopDirectory \\$SOLPSTOP/modules/Sonnet-Light"	>> ${SOLPS_ITER_MOD}
-	@echo "setenv DG \$$SOLPSTOP/modules/DivGeo"	>> ${SOLPS_ITER_MOD}
-	@echo ""	>> ${SOLPS_ITER_MOD}
-	@echo "prepend-path PATH \$$SOLPSTOP/scripts"	>> ${SOLPS_ITER_MOD}
-	@echo "prepend-path PATH \$$SOLPSTOP/modules/Carre/builds/\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
-	@echo "prepend-path PATH \$$SOLPSTOP/modules/DivGeo/builds/\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
-	@echo "prepend-path PATH \$$SOLPSTOP/modules/Eirene/builds/standalone.\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
-	@echo "prepend-path PATH \$$SOLPSTOP/modules/Eirene/builds/coupled_SOLPS-ITER.\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
-	@echo "prepend-path PATH \$$SOLPSTOP/modules/B2.5/builds/standalone.\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
-	@echo "prepend-path PATH \$$SOLPSTOP/modules/B2.5/builds/coupled_SOLPS-ITER.\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
-	@echo "prepend-path PATH \$$SOLPSTOP/modules/Uinp/builds/\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
-	@echo "prepend-path PATH \$$SOLPSTOP/modules/Triang/builds/\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
-	@echo "prepend-path PATH \$$SOLPSTOP/modules/amds/builds/\$$TOOLCHAIN"	>> ${SOLPS_ITER_MOD}
-	@echo ""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias sb2  \"cd \$$SOLPSTOP/modules/B2.5\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias sbb  \"cd \$$SOLPSTOP/modules/B2.5\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias sei  \"cd \$$SOLPSTOP/modules/Eirene\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias ssw  \"cd \$$SOLPSTOP/modules/Sonnet-light\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias sst  \"cd \$$SOLPSTOP/modules/Triang\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias ssd  \"cd \$$SOLPSTOP/modules/DivGeo\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias ssc  \"cd \$$SOLPSTOP/modules/Carre\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias ssu  \"cd \$$SOLPSTOP/modules/Uinp\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias slib \"cd \$$SOLPSTOP/lib/${HOST_NAME}.${COMPILER}\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias sbr  \"cd \$$SOLPSTOP/runs\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias scr  \"cd \$$SOLPSTOP/scripts\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias stop \"cd \$$SOLPSTOP\""	>> ${SOLPS_ITER_MOD}
-	@echo ""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias sdg \"cd \$$SOLPSTOP/modules/DivGeo/device/\$$DEVICE\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias ssf \"cd \$$SOLPSTOP/modules/DivGeo/device/\$$DEVICE\""	>> ${SOLPS_ITER_MOD}
-	@echo ""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xyplot \"plot xyplot\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xyplot2 \"plot xyplot2\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xyplot3 \"plot xyplot3\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xyplot4 \"plot xyplot4\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xyplot5 \"plot xyplot5\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xyplot6 \"plot xyplot6\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xyplot7 \"plot xyplot7\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xyplot8 \"plot xyplot8\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xyplot8 \"plot xyplot8\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xyplot9 \"plot xyplot9\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlyplot \"plot xlyplot\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlyplot2 \"plot xlyplot2\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlyplot3 \"plot xlyplot3\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlyplot4 \"plot xlyplot4\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlyplot5 \"plot xlyplot5\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlyplot6 \"plot xlyplot6\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlyplot7 \"plot xlyplot7\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlyplot8 \"plot xlyplot8\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlyplot8 \"plot xlyplot8\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlyplot9 \"plot xlyplot9\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xylplot \"plot xylplot\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xylplot2 \"plot xylplot2\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xylplot3 \"plot xylplot3\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xylplot4 \"plot xylplot4\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xylplot5 \"plot xylplot5\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xylplot6 \"plot xylplot6\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xylplot7 \"plot xylplot7\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xylplot8 \"plot xylplot8\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xylplot8 \"plot xylplot8\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xylplot9 \"plot xylplot9\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlylplot \"plot xlylplot\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlylplot2 \"plot xlylplot2\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlylplot3 \"plot xlylplot3\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlylplot4 \"plot xlylplot4\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlylplot5 \"plot xlylplot5\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlylplot6 \"plot xlylplot6\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlylplot7 \"plot xlylplot7\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlylplot8 \"plot xlylplot8\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlylplot8 \"plot xlylplot8\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias xlylplot9 \"plot xlylplot9\""	>> ${SOLPS_ITER_MOD}
-	@echo ""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias   set_debug  \"source \$$SOLPSTOP/SETUP/debug\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias unset_debug  \"source \$$SOLPSTOP/SETUP/nodebug\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias   set_openmp \"source \$$SOLPSTOP/SETUP/openmp\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias unset_openmp \"source \$$SOLPSTOP/SETUP/noopenmp\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias   set_mpi    \"source \$$SOLPSTOP/SETUP/mpi\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias unset_mpi    \"source \$$SOLPSTOP/SETUP/nompi\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias   set_ig     \"source \$$SOLPSTOP/SETUP/ig\""	>> ${SOLPS_ITER_MOD}
-	@echo "set-alias unset_ig     \"source \$$SOLPSTOP/SETUP/noig\""	>> ${SOLPS_ITER_MOD}
 
 query-%:
 	@echo $($(*))

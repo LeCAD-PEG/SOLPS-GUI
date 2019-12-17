@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-3.10.1}
+VERSION=${VERSION:-3.15.4}
 MAIN_VERSION=${VERSION%.*}
 SOURCE="cmake-${VERSION}.tar.gz"
 DOWNLOAD="https://cmake.org/files/v${MAIN_VERSION}/cmake-${VERSION}.tar.gz"

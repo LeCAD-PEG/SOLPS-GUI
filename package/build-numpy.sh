@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-1.17.0}
+VERSION=${VERSION:-1.17.3}
 SOURCE="numpy-${VERSION}.tar.gz"
 DOWNLOAD="https://github.com/numpy/numpy/releases/download/v${VERSION}/numpy-${VERSION}.tar.gz"
 SRC_DIR="${BUILD_DIR}/numpy-${VERSION}"
@@ -41,6 +41,8 @@ if [ ! -d ${SRC_DIR} ]; then
     tar xzf ${DOWNLOAD_DIR}/${SOURCE}
 fi
 
+PYTHON=python${PYTHON_MAINVERSION}
+PIP=pip${PYTHON_MAINVERSION}
 cd ${SRC_DIR}
 
 # Configure
@@ -52,28 +54,25 @@ library_dirs = ${OPENBLAS_INSTALL_DIR}/lib
 include_dirs = ${OPENBLAS_INSTALL_DIR}/include
 runtime_library_dirs = ${OPENBLAS_INSTALL_DIR}/lib
 EOF
-    python3 setup.py config
+    ${PYTHON} setup.py config
     touch ${SRC_DIR}/.configured
 fi
 
 # Build
 if [ ! -e ${SRC_DIR}/.built ]; then
-    python3 setup.py build
+    ${PYTHON} setup.py build
     touch ${SRC_DIR}/.built
 fi
 
 # Install
 set +e
-pip3 show numpy
-if [ $? -ne 0 ]; then
-    install -d ${INSTALL_DIR}
-    pip3 uninstall -y numpy
-    python3 setup.py build install --prefix=${PYTHON_INSTALL_DIR}
-fi
+${PIP} uninstall -y numpy
+${PYTHON} setup.py build install --prefix=${PYTHON_INSTALL_DIR}
+
 # Now install matplotlib.
-pip3 show matplotlib
+${PIP} show matplotlib
 if [ $? -ne 0 ]; then
-    pip3 --trusted-host pypi.python.org install --upgrade matplotlib
+    ${PIP} --trusted-host pypi.python.org install --upgrade matplotlib
 fi
 
 set -e

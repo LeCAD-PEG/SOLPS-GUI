@@ -26,19 +26,19 @@ set SOLPS_GIT="ssh://git@git.iter.org/bnd/solps-iter.git"
 set SOLPS_SRC_DIR=${STAGING_DIR}/solps-iter/${SOLPS_VERSION}
 
 if !($?IMASDD_VERSION) then
-    setenv IMAS_VERSION 3.23.2
+    setenv IMAS_VERSION 3.24.0
 else
     setenv IMAS_VERSION "${IMASDD_VERSION}"
 endif
 
 if !($?IMASUAL_VERSION) then
-    setenv UAL_VERSION 4.1.2
+    setenv UAL_VERSION 4.2.0
 else
     setenv UAL_VERSION ${IMASUAL_VERSION}
 endif
 
 if !($?GGD_VERSION) then
-    setenv GGD_VERSION 1.8.3
+    setenv GGD_VERSION 1.8.5
 endif
 
 if !($?MSCL_VERSION) then
@@ -54,7 +54,7 @@ if !($?GLI_VERSION) then
 endif
 
 if !($?MDSPLUS_VERSION) then
-    setenv MDSPLUS_VERSION stable_release-7-46-1
+    setenv MDSPLUS_VERSION stable_release-7-84-8
 endif
 
 if !($?OPENBLAS_VERSION) then
@@ -112,17 +112,11 @@ setenv GLI_HOME ${STAGING_DIR}/GLI/${GLI_VERSION}
 setenv MDSPLUS_DIR ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
 setenv NCARG_ROOT ${STAGING_DIR}/ncl/${NCL_VERSION}/lib
 
-if (! -e ${SOLPS_SRC_DIR}/.git) then
-    git clone --branch feature/config-LECAD ${SOLPS_GIT} --recursive ${SOLPS_SRC_DIR}
-    cd ${SOLPS_SRC_DIR}
-    git pull
-    # git submodule update --init
-endif
-
 cd ${SOLPS_SRC_DIR}
 setenv HOST_NAME UNKNOWN
 source ${SOLPS_SRC_DIR}/setup.csh gfortran
 
+rehash
 make VERSION
 make listobj listobj_debug
 make depend depend_debug

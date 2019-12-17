@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-2.1.6}
+VERSION=${VERSION:-4.0.0}
 GIT="https://github.com/open-mpi/ompi.git"
 SRC_DIR="${BUILD_DIR}/openmpi-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/openmpi/${VERSION}

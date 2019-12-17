@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-6.4.0}
+VERSION=${VERSION:-6.5.0}
 GIT="https://github.com/NCAR/ncl.git"
 SRC_DIR="${BUILD_DIR}/ncl-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/ncl/${VERSION}

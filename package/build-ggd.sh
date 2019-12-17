@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-1.8.5}
+VERSION=${VERSION:-1.9.1}
 GIT="ssh://git@git.iter.org/imex/ggd.git"
 SRC_DIR="${BUILD_DIR}/ggd-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/GGD/${VERSION}
