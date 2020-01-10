@@ -442,25 +442,26 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     if( std::string(LoadIDS).find("edge_profiles")
         != std::string::npos )
     {
-        vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
+        vtkOutputWindowDisplayText("GGD check: edge_profiles IDS. \n");
         // db._edge_profiles.get();
     }
     else if( std::string(LoadIDS).find( "edge_sources" )
         != std::string::npos )
     {
-        vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
+        vtkOutputWindowDisplayText("GGD check: edge_sources IDS. \n");
         // db._edge_sources.get();
     }
     else if( std::string(LoadIDS).find( "edge_transport" )
         != std::string::npos )
     {
-        vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
+        vtkOutputWindowDisplayText(std::string("GGD check: edge_transport IDS "
+            "(not yet implemented). \n").c_str());
         // db._edge_transport.get();
     }
     else if( std::string(LoadIDS).find( "mhd" )
         != std::string::npos )
     {
-        vtkOutputWindowDisplayText("Reading mhd IDS. \n");
+        vtkOutputWindowDisplayText("GGD check: mhd IDS. \n");
         // db._mhd.get();
     }
 
@@ -500,6 +501,10 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         std::string gridSubset_name;
         int gridSubset_index;
 
+        // Current grid subset index
+        vtkOutputWindowDisplayText(std::string("-----Grid subset No " +
+            std::to_string(i+1) + " ----- \n").c_str());
+
         if( std::string(LoadIDS).find("mhd") != std::string::npos )
         {
             gridSubset_name = db._mhd.
@@ -507,6 +512,12 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             gridSubset_index= db._mhd.
                 grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.index;
 
+        }else if( std::string(LoadIDS).find("edge_sources") != std::string::npos )
+        {
+            gridSubset_name = db._edge_sources.
+                grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.name;
+            gridSubset_index= db._edge_sources.
+                grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.index;
         }else
         {
             gridSubset_name = db._edge_profiles.
@@ -516,8 +527,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         }
 
         // Print grid subset info
-        vtkOutputWindowDisplayText(std::string("-----Grid subset No " +
-            std::to_string(i+1) + " ----- \n").c_str());
         vtkOutputWindowDisplayText(std::string(" - Index: " +
             std::to_string(gridSubset_index) + "\n").c_str());
         vtkOutputWindowDisplayText(std::string(" - Name: " + gridSubset_name +
@@ -558,6 +567,10 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         {
             num_gridSubset_el = db._mhd.grid_ggd(grid_ggd_slice_index).
                 grid_subset(i).element.extent(0);
+        }else if( std::string(LoadIDS).find("edge_sources") != std::string::npos )
+        {
+            num_gridSubset_el = db._edge_sources.grid_ggd(grid_ggd_slice_index).
+                grid_subset(i).element.extent(0);
         }else
         {
             num_gridSubset_el = db._edge_profiles.grid_ggd(grid_ggd_slice_index).
@@ -580,6 +593,11 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         {
             gridSubset_obj_cls = db._mhd.grid_ggd(grid_ggd_slice_index).
                     grid_subset(i).element(0).object(0).dimension;
+        }
+        else if( std::string(LoadIDS).find("edge_sources") != std::string::npos )
+        {
+            gridSubset_obj_cls = db._edge_sources.grid_ggd(grid_ggd_slice_index).
+                    grid_subset(i).element(0).object(0).dimension;
         }else
         {
             gridSubset_obj_cls = db._edge_profiles.grid_ggd(grid_ggd_slice_index).
@@ -590,7 +608,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
 #else
         // Note: this old code is for edge_profiles only, there is no mhd IDS
-        // support.
+        // and edge_sources support.
         std::string gridSubset_name;
         gridSubset_name = db._edge_profiles.
             ggd(ggd_slice_index).grid.grid_subset(i).identifier.name;

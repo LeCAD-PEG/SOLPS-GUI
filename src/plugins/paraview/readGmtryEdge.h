@@ -35,6 +35,14 @@ public:
         int GG_grid_ggd_slice_index,
         int GG_ggd_slice_index);
 
+    template <typename IDS7>
+    void ggdCheck_edge_sources(
+        IDS7 & GG_db,
+        std::string UG_LoadIDS_string,
+        int GG_grid_ggd_slice_index,
+        int GG_ggd_slice_index,
+        int SourceID);
+
     template <typename IDS4>
     void setGridSubset0DGeometry2UnstructuredGrid(
         std::string PNT_IDSGridSource_string,

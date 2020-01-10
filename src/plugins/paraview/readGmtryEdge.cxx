@@ -190,6 +190,13 @@ void readGmtryEdge::setGridSubset0DGeometry2UnstructuredGrid(
             GS_db._mhd.grid_ggd(GS_ggd_slice_index).
                 grid_subset(GS_gridSubset_index),
             GS_db._mhd.grid_ggd(GS_ggd_slice_index));
+    }
+    else if( PNT_IDSGridSource_string.find( "edge_sources" ) != std::string::npos)
+    {
+        gridSubsetVertices = setVTKCellArray(gridSubsetVertex,
+            GS_db._edge_sources.grid_ggd(GS_ggd_slice_index).
+                grid_subset(GS_gridSubset_index),
+            GS_db._edge_sources.grid_ggd(GS_ggd_slice_index));
     }else
     {
         gridSubsetVertices = setVTKCellArray(gridSubsetVertex,
@@ -248,6 +255,14 @@ void readGmtryEdge::setGridSubset1DGeometry2UnstructuredGrid(
             GS_db._mhd.grid_ggd(GS_ggd_slice_index).
                 grid_subset(GS_gridSubset_index),
             GS_db._mhd.grid_ggd(GS_ggd_slice_index));
+    }
+    else if( PNT_IDSGridSource_string.find( "edge_sources" ) != std::string::npos)
+    {
+        gridSubsetLinesArray = setVTKCellArray(gridSubsetLine,
+            GS_db._edge_sources.grid_ggd(GS_ggd_slice_index).
+                grid_subset(GS_gridSubset_index),
+            GS_db._edge_sources.grid_ggd(GS_ggd_slice_index));
+
     }else
     {
         gridSubsetLinesArray = setVTKCellArray(gridSubsetLine,
@@ -331,6 +346,37 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
                 GS_db._mhd.grid_ggd(GS_ggd_slice_index).
                     grid_subset(GS_gridSubset_index),
                 GS_db._mhd.grid_ggd(GS_ggd_slice_index));
+
+            // Assign vtkCellArray to vtkUnstructuredGrid
+            unstructuredGrid->SetPoints(vtk_grid_points);
+            unstructuredGrid->SetCells(VTK_QUAD, gridSubsetCellArray);
+        }
+    }else if( PNT_IDSGridSource_string.find( "edge_sources" ) != std::string::npos)
+    {
+
+        int num_obj_nodes_first = GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
+            space(0).objects_per_dimension(GS_gridSubset_obj_cls - 1).object(0).
+            nodes.extent(0);
+
+        // Cells-Triangles
+        if (num_obj_nodes_first == 3)
+        {
+            gridSubsetCellArray = setVTKCellArray(gridSubsetTriangle,
+                GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
+                    grid_subset(GS_gridSubset_index),
+                GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index));
+
+            // Assign vtkCellArray to vtkUnstructuredGrid
+            unstructuredGrid->SetPoints(vtk_grid_points);
+            unstructuredGrid->SetCells(VTK_TRIANGLE, gridSubsetCellArray);
+        }
+        // Cells-Quad
+        else if (num_obj_nodes_first == 4)
+        {
+            gridSubsetCellArray = setVTKCellArray(gridSubsetQuad,
+                GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
+                    grid_subset(GS_gridSubset_index),
+                GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index));
 
             // Assign vtkCellArray to vtkUnstructuredGrid
             unstructuredGrid->SetPoints(vtk_grid_points);
