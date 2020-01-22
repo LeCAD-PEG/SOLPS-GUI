@@ -53,6 +53,9 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
         echo "Patching solps-iter root"
         patch -p1 < ${PATCH_DIR}/solps-iter.patch
 
+        echo "Patching solps-iter scripts ( -X -> -x in check executables conditions)"
+        patch -p1 < ${PATCH_DIR}/solps-iter-scripts-executable-check.patch
+
         echo "Patching solps-iter B2.5"
         cd ${SRC_DIR}/modules/B2.5
         patch -p1 < ${PATCH_DIR}/solps-iter-B2.5.patch
