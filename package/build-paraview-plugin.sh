@@ -14,7 +14,7 @@ DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
 VERSION=${VERSION:-1.5.0}
-SRC_DIR="${BUILD_DIR}/Plugins-ReadUALEdge"
+SRC_DIR="${BUILD_DIR}/ReadUALEdge-Plugin"
 INSTALL_DIR=${STAGING_DIR}/ReadUALEdge-Plugin/${VERSION}
 
 # Environment dependencies
