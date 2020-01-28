@@ -742,6 +742,118 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     }else if( std::string(GridForm).find("Single grid") != std::string::npos){
         vtkOutputWindowDisplayText("Representation as a 'Single grid' selected.");
 
+        // Get dimension of the grid (up to 3D)
+        // Note: Looking only in the first space (grid_ggd(:).space(0))
+        int dim = 0;
+        int num_0D_obj = 0;
+        int num_1D_obj = 0;
+        int num_2D_obj = 0;
+        int num_3D_obj = 0;
+        // TODO: Create a function for the below if statements (only the IDS
+        //       is different, everything else is the same)
+        if( std::string(LoadIDS).find("mhd") != std::string::npos )
+        {
+            dim = db._mhd.grid_ggd(grid_ggd_slice_index).space(0).
+                objects_per_dimension.extent(0);
+            if (dim == 0)
+            {
+                vtkOutputWindowDisplayWarningText(std::string(
+                    "WARNING: Grid (space(0)) is empty!").c_str());
+            }
+            if (dim >= 1)
+            {
+                num_0D_obj = db._mhd.grid_ggd(grid_ggd_slice_index).
+                space(0).objects_per_dimension(0).object.extent(0);
+            }
+            if (dim >= 2)
+            {
+                num_1D_obj = db._mhd.grid_ggd(grid_ggd_slice_index).
+                space(0).objects_per_dimension(1).object.extent(0);
+            }
+            if (dim >= 3)
+            {
+                num_2D_obj = db._mhd.grid_ggd(grid_ggd_slice_index).
+                space(0).objects_per_dimension(2).object.extent(0);
+            }
+            if (dim >= 4)
+            {
+                num_3D_obj = db._mhd.grid_ggd(grid_ggd_slice_index).
+                space(0).objects_per_dimension(3).object.extent(0);
+            }
+        }else if( std::string(LoadIDS).find("edge_sources") != std::string::npos )
+        {
+            dim = db._edge_sources.grid_ggd(grid_ggd_slice_index).
+                space(0).objects_per_dimension.extent(0);
+            if (dim == 0)
+            {
+                vtkOutputWindowDisplayWarningText(std::string(
+                    "WARNING: Grid (space(0)) is empty!").c_str());
+            }
+            if (dim >= 1)
+            {
+                num_0D_obj = db._edge_sources.grid_ggd(grid_ggd_slice_index).
+                space(0).objects_per_dimension(0).object.extent(0);
+            }
+            if (dim >= 2)
+            {
+                num_1D_obj = db._edge_sources.grid_ggd(grid_ggd_slice_index).
+                space(0).objects_per_dimension(1).object.extent(0);
+            }
+            if (dim >= 3)
+            {
+                num_2D_obj = db._edge_sources.grid_ggd(grid_ggd_slice_index).
+                space(0).objects_per_dimension(2).object.extent(0);
+            }
+            if (dim >= 4)
+            {
+                num_3D_obj = db._edge_sources.grid_ggd(grid_ggd_slice_index).
+                space(0).objects_per_dimension(3).object.extent(0);
+            }
+        }else if( std::string(LoadIDS).find("edge_profiles") != std::string::npos )
+        {
+            dim = db._edge_profiles.grid_ggd(grid_ggd_slice_index).
+                space(0).objects_per_dimension.extent(0);
+            if (dim == 0)
+            {
+                vtkOutputWindowDisplayWarningText(std::string(
+                    "WARNING: Grid (space(0)) is empty!").c_str());
+            }
+            if (dim >= 1)
+            {
+                num_0D_obj = db._edge_profiles.grid_ggd(grid_ggd_slice_index).
+                space(0).objects_per_dimension(0).object.extent(0);
+            }
+            if (dim >= 2)
+            {
+                num_1D_obj = db._edge_profiles.grid_ggd(grid_ggd_slice_index).
+                space(0).objects_per_dimension(1).object.extent(0);
+            }
+            if (dim >= 3)
+            {
+                num_2D_obj = db._edge_profiles.grid_ggd(grid_ggd_slice_index).
+                space(0).objects_per_dimension(2).object.extent(0);
+            }
+            if (dim >= 4)
+            {
+                num_3D_obj = db._edge_profiles.grid_ggd(grid_ggd_slice_index).
+                space(0).objects_per_dimension(3).object.extent(0);
+            }
+        }else{
+            vtkOutputWindowDisplayWarningText(std::string(
+                "WARNING: Unknown IDS provided.").c_str());
+        }
+
+        vtkOutputWindowDisplayText(std::string(" - Dimension: "
+            + std::to_string(dim-1) + "D\n").c_str());
+        vtkOutputWindowDisplayText(std::string(" - Number of 0D objects: "
+            + std::to_string(num_0D_obj) + "\n").c_str());
+        vtkOutputWindowDisplayText(std::string(" - Number of 1D objects: "
+            + std::to_string(num_1D_obj) + "\n").c_str());
+        vtkOutputWindowDisplayText(std::string(" - Number of 2D objects: "
+            + std::to_string(num_2D_obj) + "\n").c_str());
+        vtkOutputWindowDisplayText(std::string(" - Number of 3D objects: "
+            + std::to_string(num_3D_obj) + "\n").c_str());
+
     }else{
         vtkOutputWindowDisplayText("Neither grid representation as grid subsets"
             " or as a single unstructured grid was initiated. NOTHING WAS "
