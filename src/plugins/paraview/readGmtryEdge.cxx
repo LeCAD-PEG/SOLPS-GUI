@@ -350,11 +350,17 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
             // Assign vtkCellArray to vtkUnstructuredGrid
             unstructuredGrid->SetPoints(vtk_grid_points);
             unstructuredGrid->SetCells(VTK_QUAD, gridSubsetCellArray);
+        }else
+        {
+            vtkOutputWindowDisplayWarningText(std::string("WARNING!"
+                "Number of nodes per element does not follow the template!"
+                "Number of nodes per element: " + std::to_string(num_obj_nodes_first)
+                + "\n\n").c_str());
         }
     }else if( PNT_IDSGridSource_string.find( "edge_sources" ) != std::string::npos)
     {
 
-        int num_obj_nodes_first = GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
+        int num_obj_nodes_first = GS_db._edge_sources.grid_ggd(GS_ggd_slice_index).
             space(0).objects_per_dimension(GS_gridSubset_obj_cls - 1).object(0).
             nodes.extent(0);
 
@@ -362,9 +368,9 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
         if (num_obj_nodes_first == 3)
         {
             gridSubsetCellArray = setVTKCellArray(gridSubsetTriangle,
-                GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
+                GS_db._edge_sources.grid_ggd(GS_ggd_slice_index).
                     grid_subset(GS_gridSubset_index),
-                GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index));
+                GS_db._edge_sources.grid_ggd(GS_ggd_slice_index));
 
             // Assign vtkCellArray to vtkUnstructuredGrid
             unstructuredGrid->SetPoints(vtk_grid_points);
@@ -374,13 +380,19 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
         else if (num_obj_nodes_first == 4)
         {
             gridSubsetCellArray = setVTKCellArray(gridSubsetQuad,
-                GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
+                GS_db._edge_sources.grid_ggd(GS_ggd_slice_index).
                     grid_subset(GS_gridSubset_index),
-                GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index));
+                GS_db._edge_sources.grid_ggd(GS_ggd_slice_index));
 
             // Assign vtkCellArray to vtkUnstructuredGrid
             unstructuredGrid->SetPoints(vtk_grid_points);
             unstructuredGrid->SetCells(VTK_QUAD, gridSubsetCellArray);
+        }else
+        {
+            vtkOutputWindowDisplayWarningText(std::string("WARNING!"
+                "Number of nodes per element does not follow the template!"
+                "Number of nodes per element: " + std::to_string(num_obj_nodes_first)
+                + "\n\n").c_str());
         }
     }else
     {
@@ -412,6 +424,12 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
             // Assign vtkCellArray to vtkUnstructuredGrid
             unstructuredGrid->SetPoints(vtk_grid_points);
             unstructuredGrid->SetCells(VTK_QUAD, gridSubsetCellArray);
+        }else
+        {
+            vtkOutputWindowDisplayWarningText(std::string("WARNING!"
+                "Number of nodes per element does not follow the template!"
+                "Number of nodes per element: " + std::to_string(num_obj_nodes_first)
+                + "\n\n").c_str());
         }
     }
 }
