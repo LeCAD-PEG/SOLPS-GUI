@@ -60,7 +60,8 @@ class ReadUALEdge : public vtkMultiBlockDataSetAlgorithm
     vtkSetMacro(GGDslice,int);
     vtkSetStringMacro(IDSPlasmaStateSource);
     vtkGetStringMacro(IDSPlasmaStateSource);
-
+    vtkSetStringMacro(GridForm);
+    vtkGetStringMacro(GridForm);
 
 protected:
     ReadUALEdge();
@@ -76,11 +77,12 @@ protected:
     int EdgeTransportModelID;
     int GridGGDslice;
     int GGDslice;
-    char * User;
-    char * Device;
-    char * Version;
-    char * LoadIDS;
-    char * IDSPlasmaStateSource;
+    char* User;
+    char* Device;
+    char* Version;
+    char* LoadIDS;
+    char* IDSPlasmaStateSource;
+    char* GridForm;
     vtkSmartPointer<vtkStringArray> stringArray;
 
     int RequestData(vtkInformation *, vtkInformationVector **,

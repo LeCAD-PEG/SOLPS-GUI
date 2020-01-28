@@ -70,6 +70,8 @@
 *                       - v
 *                       - flux
 *                       - flux_limiter
+*           ~ mdh:
+*               - TODO
 *
 *-------------------------------------------------------------------------------
 */
@@ -114,7 +116,9 @@
 #define IMAS_IDS
 #define PLUGIN_IMAS_VERSION_DIGIT IMAS_VERSION_DIGIT
 
-// From ggd/f90/src/service/ids_grid_common.f90
+// From $IMAS_PREFIX/include/cpp/coordinate_identifier.h
+// TODO: do not define coordtypes again. Use those from coordinate_identifier
+//       now that they're available from there
 // First cartesian coordinate in the horizontal plane [m]
 #define COORDTYPE_X              1
 // Second cartesian coordinate in the horizontal plane [m]
@@ -150,6 +154,7 @@ ReadUALEdge::ReadUALEdge()
     this->EdgeTransportModelID = 0;
     this->EdgeSourcesSourceID = 0;
     this->IDSPlasmaStateSource = NULL;
+    this->GridForm = NULL;
     this->SetNumberOfInputPorts(0);
     this->SetNumberOfOutputPorts(1);
     this->DebugOff();
@@ -215,9 +220,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 {
     // Get the info object
     vtkInformation *outInfo = outputVector->GetInformationObject(0);
-    // Get the output
-    vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
-        outInfo->Get(vtkMultiBlockDataSet::DATA_OBJECT()));
 
     // If PromptUser is set to true then each time a line of text is displayed,
     // the user is asked if they want to keep getting messages.
@@ -329,12 +331,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         IDS_plasmaStateSource = std::string(this->IDSPlasmaStateSource);
     }
 
-
-    // Get all three IDS databases
-    // db._edge_profiles.get();
-    // db._edge_sources.get();
-    // db._edge_transport.get();
-
     // Get GRID GGD structure array index to internal variable
     int grid_ggd_slice_index = this->GridGGDslice;
     // Get GGD structure array index to internal variable
@@ -344,10 +340,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // Get edge_transport.model(:) structure array index to internal variable
     int model_index = this->EdgeTransportModelID;
 
-    // Get grid geometry from one of the IDSs (currently ready from
-    // edge_profiles IDS only!)
-    // db._edge_profiles.get();
-
+    // Set default number of GRID_GGD slices
+    int num_gridggd_slices = 0;
     // Set default number of grid subsets
     int num_gridSubset = 0;
     // Set default number of GGD slices
@@ -358,8 +352,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     {
         vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
         db._edge_profiles.get();
+        num_gridggd_slices = db._edge_profiles.grid_ggd.extent(0);
         // Get number of grid subsets in the selected IDS
-        // (this->LoadIDS selection box)
         num_gridSubset = db._edge_profiles.
             grid_ggd(grid_ggd_slice_index).grid_subset.extent(0);
         // Get number of GGD slices
@@ -371,8 +365,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     {
         vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
         db._edge_sources.get();
+        num_gridggd_slices = db._edge_sources.grid_ggd.extent(0);
         // Get number of grid subsets in the selected IDS
-        // (this->LoadIDS selection box)
         num_gridSubset = db._edge_sources.grid_ggd(grid_ggd_slice_index).
             grid_subset.extent(0);
         // Get number of GGD slices
@@ -383,8 +377,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     {
         vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
         db._edge_transport.get();
+        num_gridggd_slices = db._edge_transport.grid_ggd.extent(0);
         // Get number of grid subsets in the selected IDS
-        // (this->LoadIDS selection box)
         num_gridSubset = db._edge_transport.grid_ggd(grid_ggd_slice_index).
             grid_subset.extent(0);
         // Get number of GGD slices
@@ -396,8 +390,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     {
         vtkOutputWindowDisplayText("Reading mhd IDS. \n");
         db._mhd.get();
+        num_gridggd_slices = db._mhd.grid_ggd.extent(0);
         // Get number of grid subsets in the selected IDS
-        // (this->LoadIDS selection box)
         num_gridSubset = db._mhd.grid_ggd(grid_ggd_slice_index).
             grid_subset.extent(0);
         // Get number of GGD slices
@@ -471,10 +465,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     gmtrye_obj.ggdCheck(db, IDS_plasmaStateSource, grid_ggd_slice_index,
                         ggd_slice_index);
 
-
-    vtkSmartPointer<vtkMultiBlockDataSet> mainMB =
-        vtkSmartPointer<vtkMultiBlockDataSet>::New();
-
     // Get the geometry/coordinates of all nodes/points N[R, Z]
     // forming this grid using routine 'setVtkPoints'
     vtkSmartPointer<vtkPoints> obj_0D_vtkPointsArray = gmtrye_obj.setVtkPoints(
@@ -487,255 +477,277 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // Object declaration for readPsEdge routines
     readPsEdge pse_obj;
 
-    // Print total number of grid subsets
-    vtkOutputWindowDisplayText(std::string("Total number of grid subsets: " +
-        std::to_string(num_gridSubset) + "\n").c_str());
-
-    // Set a list of grid subset index, to follow which one were already set
-    vector<int> list_gs_indices;
-
-    // Loop through all grid subsets and extract data for each
-    for(int i = 0; i < num_gridSubset; i++)
+    // Represent grid as grid subsets or as a single unstructured grid
+    if( std::string(GridForm).find("Grid subsets") != std::string::npos)
     {
+        vtkOutputWindowDisplayText("Representation as 'Grid subsets' selected.");
+
+        vtkSmartPointer<vtkMultiBlockDataSet> mainMB =
+            vtkSmartPointer<vtkMultiBlockDataSet>::New();
+
+        // Print total number of grid subsets
+        vtkOutputWindowDisplayText(std::string("Total number of grid subsets: " +
+            std::to_string(num_gridSubset) + "\n").c_str());
+
+        // Set a list of grid subset index, to follow which one were already set
+        vector<int> list_gs_indices;
+
+        // Loop through all grid subsets and extract data for each
+        for(int i = 0; i < num_gridSubset; i++)
+        {
 #if IMAS_VERSION_DIGIT >= 3151
-        std::string gridSubset_name;
-        int gridSubset_index;
+            std::string gridSubset_name;
+            int gridSubset_index;
 
-        // Current grid subset index
-        vtkOutputWindowDisplayText(std::string("-----Grid subset No " +
-            std::to_string(i+1) + " ----- \n").c_str());
+            // Current grid subset index
+            vtkOutputWindowDisplayText(std::string("-----Grid subset No " +
+                std::to_string(i+1) + " ----- \n").c_str());
 
-        if( std::string(LoadIDS).find("mhd") != std::string::npos )
-        {
-            gridSubset_name = db._mhd.
-                grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.name;
-            gridSubset_index= db._mhd.
-                grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.index;
+            if( std::string(LoadIDS).find("mhd") != std::string::npos )
+            {
+                gridSubset_name = db._mhd.
+                    grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.name;
+                gridSubset_index= db._mhd.
+                    grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.index;
 
-        }else if( std::string(LoadIDS).find("edge_sources") != std::string::npos )
-        {
-            gridSubset_name = db._edge_sources.
-                grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.name;
-            gridSubset_index= db._edge_sources.
-                grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.index;
-        }else
-        {
-            gridSubset_name = db._edge_profiles.
-                grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.name;
-            gridSubset_index= db._edge_profiles.
-                grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.index;
-        }
+            }else if( std::string(LoadIDS).find("edge_sources") != std::string::npos )
+            {
+                gridSubset_name = db._edge_sources.
+                    grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.name;
+                gridSubset_index= db._edge_sources.
+                    grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.index;
+            }else
+            {
+                gridSubset_name = db._edge_profiles.
+                    grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.name;
+                gridSubset_index= db._edge_profiles.
+                    grid_ggd(grid_ggd_slice_index).grid_subset(i).identifier.index;
+            }
 
-        // Print grid subset info
-        vtkOutputWindowDisplayText(std::string(" - Index: " +
-            std::to_string(gridSubset_index) + "\n").c_str());
-        vtkOutputWindowDisplayText(std::string(" - Name: " + gridSubset_name +
-            "\n").c_str());
+            // Print grid subset info
+            vtkOutputWindowDisplayText(std::string(" - Index: " +
+                std::to_string(gridSubset_index) + "\n").c_str());
+            vtkOutputWindowDisplayText(std::string(" - Name: " + gridSubset_name +
+                "\n").c_str());
 
-        // Grid subset index check
-        if (std::find(list_gs_indices.begin(),
-            list_gs_indices.end(), gridSubset_index) != list_gs_indices.end())
-        {
-            // If a grid subset with the same grid_subset_index
-            // was already set, skip the 'duplicate' grid subset
-            vtkOutputWindowDisplayWarningText(std::string(
-                "WARNING: A grid subset with the same associated "
-                "grid_subset_index (" + std::to_string(gridSubset_index) +
-                "as the current grid subset was already set. Two grid subsets "
-                "SHOULD NOT share the same grid_subset_index! "
-                "Skipping current grid subset. \n").c_str());
+            // Grid subset index check
+            if (std::find(list_gs_indices.begin(),
+                list_gs_indices.end(), gridSubset_index) != list_gs_indices.end())
+            {
+                // If a grid subset with the same grid_subset_index
+                // was already set, skip the 'duplicate' grid subset
+                vtkOutputWindowDisplayWarningText(std::string(
+                    "WARNING: A grid subset with the same associated "
+                    "grid_subset_index (" + std::to_string(gridSubset_index) +
+                    "as the current grid subset was already set. Two grid subsets "
+                    "SHOULD NOT share the same grid_subset_index! "
+                    "Skipping current grid subset. \n").c_str());
 
-            continue;
-        }
-        else if (gridSubset_index == 0)
-        {
-            vtkOutputWindowDisplayWarningText(
-                "WARNING: A grid subset with index 0 was found. 0 is invalid "
-                "index was found (first index must start with 1). "
-                "Skipping the 'duplicate' grid subset. \n");
-            // exit(0);
-            continue;
-        }
-        else
-        {
-            list_gs_indices.push_back(gridSubset_index);
-        }
+                continue;
+            }
+            else if (gridSubset_index == 0)
+            {
+                vtkOutputWindowDisplayWarningText(
+                    "WARNING: A grid subset with index 0 was found. 0 is invalid "
+                    "index was found (first index must start with 1). "
+                    "Skipping the 'duplicate' grid subset. \n");
+                // exit(0);
+                continue;
+            }
+            else
+            {
+                list_gs_indices.push_back(gridSubset_index);
+            }
 
-        // Get size/number of elements forming current grid subset
-        int num_gridSubset_el;
-        if( std::string(LoadIDS).find("mhd") != std::string::npos )
-        {
-            num_gridSubset_el = db._mhd.grid_ggd(grid_ggd_slice_index).
-                grid_subset(i).element.extent(0);
-        }else if( std::string(LoadIDS).find("edge_sources") != std::string::npos )
-        {
-            num_gridSubset_el = db._edge_sources.grid_ggd(grid_ggd_slice_index).
-                grid_subset(i).element.extent(0);
-        }else
-        {
-            num_gridSubset_el = db._edge_profiles.grid_ggd(grid_ggd_slice_index).
-                grid_subset(i).element.extent(0);
-        }
+            // Get size/number of elements forming current grid subset
+            int num_gridSubset_el;
+            if( std::string(LoadIDS).find("mhd") != std::string::npos )
+            {
+                num_gridSubset_el = db._mhd.grid_ggd(grid_ggd_slice_index).
+                    grid_subset(i).element.extent(0);
+            }else if( std::string(LoadIDS).find("edge_sources") != std::string::npos )
+            {
+                num_gridSubset_el = db._edge_sources.grid_ggd(grid_ggd_slice_index).
+                    grid_subset(i).element.extent(0);
+            }else
+            {
+                num_gridSubset_el = db._edge_profiles.grid_ggd(grid_ggd_slice_index).
+                    grid_subset(i).element.extent(0);
+            }
 
-        // Check if there are any elements in grid_subset
-        if (num_gridSubset_el == 0)
-        {
-            vtkOutputWindowDisplayWarningText(std::string(
-                "WARNING: Current grid subset does not contain any elements! "
-                "Skipping current grid subset. \n").c_str());
+            // Check if there are any elements in grid_subset
+            if (num_gridSubset_el == 0)
+            {
+                vtkOutputWindowDisplayWarningText(std::string(
+                    "WARNING: Current grid subset does not contain any elements! "
+                    "Skipping current grid subset. \n").c_str());
 
-            continue;
-        }
+                continue;
+            }
 
-        // Get dimension of the objects forming this grid subset
-        int gridSubset_obj_cls;
-        if( std::string(LoadIDS).find("mhd") != std::string::npos )
-        {
-            gridSubset_obj_cls = db._mhd.grid_ggd(grid_ggd_slice_index).
+            // Get dimension of the objects forming this grid subset
+            int gridSubset_obj_cls;
+            if( std::string(LoadIDS).find("mhd") != std::string::npos )
+            {
+                gridSubset_obj_cls = db._mhd.grid_ggd(grid_ggd_slice_index).
+                        grid_subset(i).element(0).object(0).dimension;
+            }
+            else if( std::string(LoadIDS).find("edge_sources") != std::string::npos )
+            {
+                gridSubset_obj_cls = db._edge_sources.grid_ggd(grid_ggd_slice_index).
+                        grid_subset(i).element(0).object(0).dimension;
+            }else
+            {
+                gridSubset_obj_cls = db._edge_profiles.grid_ggd(grid_ggd_slice_index).
                     grid_subset(i).element(0).object(0).dimension;
-        }
-        else if( std::string(LoadIDS).find("edge_sources") != std::string::npos )
-        {
-            gridSubset_obj_cls = db._edge_sources.grid_ggd(grid_ggd_slice_index).
-                    grid_subset(i).element(0).object(0).dimension;
-        }else
-        {
-            gridSubset_obj_cls = db._edge_profiles.grid_ggd(grid_ggd_slice_index).
-                grid_subset(i).element(0).object(0).dimension;
-        }
-        int gridSubset_obj_dim;
-        gridSubset_obj_dim = gridSubset_obj_cls - 1;
+            }
+            int gridSubset_obj_dim;
+            gridSubset_obj_dim = gridSubset_obj_cls - 1;
 
 #else
-        // Note: this old code is for edge_profiles only, there is no mhd IDS
-        // and edge_sources support.
-        std::string gridSubset_name;
-        gridSubset_name = db._edge_profiles.
-            ggd(ggd_slice_index).grid.grid_subset(i).identifier.name;
-        int gridSubset_index;
-        gridSubset_index= db._edge_profiles.
-            ggd(ggd_slice_index).grid.grid_subset(i).identifier.index;
+            // Note: this old code is for edge_profiles only, there is no mhd IDS
+            // and edge_sources support.
+            std::string gridSubset_name;
+            gridSubset_name = db._edge_profiles.
+                ggd(ggd_slice_index).grid.grid_subset(i).identifier.name;
+            int gridSubset_index;
+            gridSubset_index= db._edge_profiles.
+                ggd(ggd_slice_index).grid.grid_subset(i).identifier.index;
 
-        // Get size/number of elements forming current grid subset
-        int num_gridSubset_el;
-        num_gridSubset_el = db._edge_profiles.ggd(ggd_slice_index).grid.
-            grid_subset(i).element.extent(0);
+            // Get size/number of elements forming current grid subset
+            int num_gridSubset_el;
+            num_gridSubset_el = db._edge_profiles.ggd(ggd_slice_index).grid.
+                grid_subset(i).element.extent(0);
 
-        // Get dimension of the objects forming this grid subset
-        int gridSubset_obj_cls;
-        gridSubset_obj_cls = db._edge_profiles.ggd(ggd_slice_index).grid.
-            grid_subset(i).element(0).object(0).dimension;
-        int gridSubset_obj_dim;
-        gridSubset_obj_dim = gridSubset_obj_cls - 1;
+            // Get dimension of the objects forming this grid subset
+            int gridSubset_obj_cls;
+            gridSubset_obj_cls = db._edge_profiles.ggd(ggd_slice_index).grid.
+                grid_subset(i).element(0).object(0).dimension;
+            int gridSubset_obj_dim;
+            gridSubset_obj_dim = gridSubset_obj_cls - 1;
 #endif
 
-        // Print grid subset info
-        vtkOutputWindowDisplayText(std::string(" - Class: " +
-            std::to_string(gridSubset_obj_cls) + "\n").c_str());
-        vtkOutputWindowDisplayText(std::string(" - Dimension: " +
-            std::to_string(gridSubset_obj_dim) + "\n").c_str());
-        vtkOutputWindowDisplayText(std::string(" - Number of elements: " +
-            std::to_string(num_gridSubset_el) + "\n").c_str());
+            // Print grid subset info
+            vtkOutputWindowDisplayText(std::string(" - Class: " +
+                std::to_string(gridSubset_obj_cls) + "\n").c_str());
+            vtkOutputWindowDisplayText(std::string(" - Dimension: " +
+                std::to_string(gridSubset_obj_dim) + "\n").c_str());
+            vtkOutputWindowDisplayText(std::string(" - Number of elements: " +
+                std::to_string(num_gridSubset_el) + "\n").c_str());
 
-        // ------ SET POINTS/NODES -----
-        if (gridSubset_obj_cls == 1)
-        {
-            // Set vtkUnstructuredGrid dataset for grid subset, containing
-            // only 0D objects
-            vtkSmartPointer<vtkUnstructuredGrid> gridSubsetPointsUnstructuredGrid =
-                vtkSmartPointer<vtkUnstructuredGrid>::New();
-
-            // Set grid subset 0D geometry to vtkUnstructuredGrid
-            gmtrye_obj.setGridSubset0DGeometry2UnstructuredGrid(
-                std::string(this->LoadIDS),
-                db,
-                gridSubsetPointsUnstructuredGrid,
-                obj_0D_vtkPointsArray,
-                grid_ggd_slice_index,
-                i);
-
-            if (num_ggd_slices > 0)
+            // ------ SET POINTS/NODES -----
+            if (gridSubset_obj_cls == 1)
             {
-                // Set data fields to vtkunstructuredGrid for selected IDS with the
-                // help of 'setUnstructuredGridDataFields' routine
-                pse_obj.setUnstructuredGridDataFields(
+                // Set vtkUnstructuredGrid dataset for grid subset, containing
+                // only 0D objects
+                vtkSmartPointer<vtkUnstructuredGrid> gridSubsetPointsUnstructuredGrid =
+                    vtkSmartPointer<vtkUnstructuredGrid>::New();
+
+                // Set grid subset 0D geometry to vtkUnstructuredGrid
+                gmtrye_obj.setGridSubset0DGeometry2UnstructuredGrid(
+                    std::string(this->LoadIDS),
+                    db,
                     gridSubsetPointsUnstructuredGrid,
-                    db,
-                    gridSubset_index,
-                    num_gridSubset_el,
-                    IDS_plasmaStateSource,
-                    ggd_slice_index,
-                    this->EdgeSourcesSourceID,
-                    this->EdgeTransportModelID);
+                    obj_0D_vtkPointsArray,
+                    grid_ggd_slice_index,
+                    i);
+
+                if (num_ggd_slices > 0)
+                {
+                    // Set data fields to vtkunstructuredGrid for selected IDS with the
+                    // help of 'setUnstructuredGridDataFields' routine
+                    pse_obj.setUnstructuredGridDataFields(
+                        gridSubsetPointsUnstructuredGrid,
+                        db,
+                        gridSubset_index,
+                        num_gridSubset_el,
+                        IDS_plasmaStateSource,
+                        ggd_slice_index,
+                        this->EdgeSourcesSourceID,
+                        this->EdgeTransportModelID);
+                }
+
+                // Add unstructured grid to main block
+                fAddBlock2MultiBlock( mainMB, gridSubsetPointsUnstructuredGrid,
+                    gridSubset_name );
             }
-
-            // Add unstructured grid to main block
-            fAddBlock2MultiBlock( mainMB, gridSubsetPointsUnstructuredGrid,
-                gridSubset_name );
-        }
-        // ------ SET LINES -----
-        else if (gridSubset_obj_cls == 2)
-        {
-            vtkSmartPointer<vtkUnstructuredGrid> gridSubsetLinesUnstructuredGrid =
-                vtkSmartPointer<vtkUnstructuredGrid>::New();
-
-            // Set grid subset 1D geometry to vtkUnstructuredGrid
-            gmtrye_obj.setGridSubset1DGeometry2UnstructuredGrid(
-                std::string(this->LoadIDS),
-                db,
-                gridSubsetLinesUnstructuredGrid,
-                obj_0D_vtkPointsArray,
-                ggd_slice_index,
-                i);
-
-            // Add unstructured grid to main block
-            fAddBlock2MultiBlock(mainMB, gridSubsetLinesUnstructuredGrid,
-                gridSubset_name );
-        }
-        //------ SET 2D CELLS -----
-        else if (gridSubset_obj_cls == 3)
-        {
-            // Set vtk array for 2D cells
-            vtkSmartPointer<vtkUnstructuredGrid> gridSubsetCellsUnstructuredGrid =
-                vtkSmartPointer<vtkUnstructuredGrid>::New();
-
-            // Set grid subset 2D geometry to vtkUnstructuredGrid
-            gmtrye_obj.setGridSubset2DGeometry2UnstructuredGrid(
-                std::string(this->LoadIDS),
-                db,
-                gridSubsetCellsUnstructuredGrid,
-                obj_0D_vtkPointsArray,
-                grid_ggd_slice_index,
-                i,
-                gridSubset_obj_cls);
-
-            if (num_ggd_slices > 0)
+            // ------ SET LINES -----
+            else if (gridSubset_obj_cls == 2)
             {
+                vtkSmartPointer<vtkUnstructuredGrid> gridSubsetLinesUnstructuredGrid =
+                    vtkSmartPointer<vtkUnstructuredGrid>::New();
 
-                // Set data fields to vtkunstructuredGrid for selected IDS with the
-                // help of 'setUnstructuredGridDataFields' routine
-                pse_obj.setUnstructuredGridDataFields(
-                    gridSubsetCellsUnstructuredGrid,
+                // Set grid subset 1D geometry to vtkUnstructuredGrid
+                gmtrye_obj.setGridSubset1DGeometry2UnstructuredGrid(
+                    std::string(this->LoadIDS),
                     db,
-                    gridSubset_index,
-                    num_gridSubset_el,
-                    IDS_plasmaStateSource,
+                    gridSubsetLinesUnstructuredGrid,
+                    obj_0D_vtkPointsArray,
                     ggd_slice_index,
-                    this->EdgeSourcesSourceID,
-                    this->EdgeTransportModelID);
+                    i);
 
+                // Add unstructured grid to main block
+                fAddBlock2MultiBlock(mainMB, gridSubsetLinesUnstructuredGrid,
+                    gridSubset_name );
+            }
+            //------ SET 2D CELLS -----
+            else if (gridSubset_obj_cls == 3)
+            {
+                // Set vtk array for 2D cells
+                vtkSmartPointer<vtkUnstructuredGrid> gridSubsetCellsUnstructuredGrid =
+                    vtkSmartPointer<vtkUnstructuredGrid>::New();
+
+                // Set grid subset 2D geometry to vtkUnstructuredGrid
+                gmtrye_obj.setGridSubset2DGeometry2UnstructuredGrid(
+                    std::string(this->LoadIDS),
+                    db,
+                    gridSubsetCellsUnstructuredGrid,
+                    obj_0D_vtkPointsArray,
+                    grid_ggd_slice_index,
+                    i,
+                    gridSubset_obj_cls);
+
+                if (num_ggd_slices > 0)
+                {
+
+                    // Set data fields to vtkunstructuredGrid for selected IDS with the
+                    // help of 'setUnstructuredGridDataFields' routine
+                    pse_obj.setUnstructuredGridDataFields(
+                        gridSubsetCellsUnstructuredGrid,
+                        db,
+                        gridSubset_index,
+                        num_gridSubset_el,
+                        IDS_plasmaStateSource,
+                        ggd_slice_index,
+                        this->EdgeSourcesSourceID,
+                        this->EdgeTransportModelID);
+
+                }
+
+                // Add unstructured grid to main block
+                fAddBlock2MultiBlock(mainMB, gridSubsetCellsUnstructuredGrid,
+                    gridSubset_name );
             }
 
-            // Add unstructured grid to main block
-            fAddBlock2MultiBlock(mainMB, gridSubsetCellsUnstructuredGrid,
-                gridSubset_name );
+            vtkOutputWindowDisplayText(std::string("Setting grid subset No " +
+                std::to_string(i+1) + " completed \n").c_str());
         }
 
-        vtkOutputWindowDisplayText(std::string("Setting grid subset No " +
-            std::to_string(i+1) + " completed \n").c_str());
+        // Set the output format
+        vtkMultiBlockDataSet *outputMB = vtkMultiBlockDataSet::SafeDownCast(
+            outInfo->Get(vtkMultiBlockDataSet::DATA_OBJECT()));
+        // Make shallow copy of the output (passes it to ParaView)
+        outputMB->ShallowCopy(mainMB);
+
+    }else if( std::string(GridForm).find("Single grid") != std::string::npos){
+        vtkOutputWindowDisplayText("Representation as a 'Single grid' selected.");
+
+    }else{
+        vtkOutputWindowDisplayText("Neither grid representation as grid subsets"
+            " or as a single unstructured grid was initiated. NOTHING WAS "
+            " PASSED TO PARAVIEW!");
     }
 
-    output->ShallowCopy(mainMB);
     db.close();
 
 #else  // CPO

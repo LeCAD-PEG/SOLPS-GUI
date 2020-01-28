@@ -19,7 +19,7 @@
                 panel_visibility="default">
                 <IntRangeDomain name="range"/>
                 <Documentation>
-                    The values of this property sets the case Shot number.
+                    The values of this property sets the case **Shot** number.
                 </Documentation>
             </IntVectorProperty>
 
@@ -31,7 +31,7 @@
                 panel_visibility="default">
                 <IntRangeDomain name="range"/>
                 <Documentation>
-                    The values of this property sets the case Run number.
+                    The values of this property sets the case **Run** number.
                 </Documentation>
             </IntVectorProperty>
 
@@ -44,7 +44,7 @@
 				panel_visibility="default"
                 immediate_update="true">
                 <Documentation>
-                    This property specifies the user for the UAL Database.
+                    This property specifies the **User** for the UAL Database.
                 </Documentation>
             </StringVectorProperty>
 
@@ -57,7 +57,7 @@
                 panel_visibility="default"
                 immediate_update="true">
                 <Documentation>
-                    This property specifies the Device for the UAL Database.
+                    This property specifies the **Device** for the UAL Database.
                 </Documentation>
             </StringVectorProperty>
 
@@ -96,8 +96,9 @@
                     <String value="mhd"/>
                 </StringListDomain>
                 <Documentation>
-                    This property specifies the IDS from which the plasma state
-                    is to be read in case when the grid geometry in e.g.
+                    This property specifies the IDS from which the
+                    **plasma state quantities**
+                    are to be read in case when the grid geometry in e.g.
                     edge_profiles IDS corresponds also to quantities in
                     edge_sources. In case this option is not set, the plasma
                     state is taken from the IDS specified in the main
@@ -114,8 +115,8 @@
                 panel_visibility="advanced">
                 <IntRangeDomain name="range"/>
                 <Documentation>
-                    This property specifies the edge_sources.source(:) IDS
-                    structure array index. Python notation (0, 1, 2, ...).
+                    This property specifies the **edge_sources.source(:)** IDS
+                    **structure array index**. Python notation (0, 1, 2, ...).
                     Default value = 0. NOTE: This same value is taken into
                     account for both, grid geometry and plasma state data.
                 </Documentation>
@@ -135,10 +136,10 @@
                 panel_visibility="advanced">
                 <IntRangeDomain name="range"/>
                 <Documentation>
-                    This property specifies the edge_transport.model(:) IDS
-                    structure array index. Python notation (0, 1, 2, ...).
+                    This property specifies the **edge_transport.model(:)** IDS
+                    structure **array index**. Python notation (0, 1, 2, ...).
                     Default value = 0. NOTE: This same value is taken into
-                    account for both, grid geometry and plasma state data.
+                    account for both, **grid geometry** and **plasma state**.
                 </Documentation>
                 <Hints>
                    <WidgetHeight number_of_rows="1"/>
@@ -156,10 +157,10 @@
                 panel_visibility="advanced">
                 <IntRangeDomain name="range" min="0"/>
                 <Documentation>
-                    The values of this property sets the Grid GGD time slice.
-                    Python notation (0, 1, 2, ...). Default value = 0. NOTE:
-                    This same value is taken into account for both, grid
-                    geometry and plasma state data.
+                    The values of this property sets the **Grid GGD time slice**
+                    to point to the wanted **grid geometry data** for specific
+                    time slice.
+                    Python notation (0, 1, 2, ...). Default value = 0.
                 </Documentation>
             </IntVectorProperty>
 
@@ -172,12 +173,55 @@
                 panel_visibility="advanced">
                 <IntRangeDomain name="range" min="0"/>
                 <Documentation>
-                    The values of this property sets the GGD time slice. Python
-                    notation (0, 1, 2, ...). Default value = 0. NOTE: This
-                    same value is taken into account for both, grid geometry and
-                    plasma state data.
+                    The values of this property sets the **GGD time slice**
+                    to point to the wanted **plasma state quantities** for
+                    specific time slice.
+                    Python notation (0, 1, 2, ...). Default value = 0.
                 </Documentation>
             </IntVectorProperty>
+
+            <StringVectorProperty
+                name="GridForm"
+                label="Represent grid as"
+                command="SetGridForm"
+                number_of_elements="1"
+                default_values="Grid subsets"
+                immediate_update="true"
+                panel_visibility="advanced">
+                <StringListDomain name="GridFormstringList">
+                    <String value="Grid subsets"/>
+                    <String value="Single grid"/>
+                </StringListDomain>
+                <Documentation>
+                    This property specifies the form in which the data is
+                    represented.
+
+                    - **Grid subsets**:
+                    the representation of the geometry and quantities as
+                    **grid subsets** (in IDS the **ggd_grid(:).grid_subset**
+                    node must contain appropriate data). This one constructs a
+                    set of blocks, each block containing
+                    **single grid subset** (collection of n-dimensional elements
+                    of a single type e.g. vertices, quads etc.) as
+                    **Unstructured Grid**.
+                    SOLPS-ITER and JINTRAC are one of such codes that use
+                    this feature.
+
+                    - **Single grid**:
+                    representation of the geometry and plasma state quantities
+                    as a **single Unstructured Grid**, combining grid elements
+                    (found in
+                    **ggd_grid(:).space(:).objects_per_dimension(:)...**)
+                    into a single **vtkUnstructuredGrid object**. This feature
+                    is intended for grid descriptions which is **NOT** divided
+                    into grid subsets (NOTE: it can still
+                    be used also with IDSs which contain grid subsets. In this
+                    case the major grid subsets 'nodes', 'edges' and 'cells'
+                    will be combined into a single vtkUnstructuredGrid). A good
+                    example for such cases are IDSs which contain meshes with
+                    corresponding values.
+                </Documentation>
+            </StringVectorProperty>
 
             <Property
                 name="Refresh"
