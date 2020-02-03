@@ -396,7 +396,6 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
         }
     }else
     {
-
         int num_obj_nodes_first = GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
             space(0).objects_per_dimension(GS_gridSubset_obj_cls - 1).object(0).
             nodes.extent(0);
@@ -755,34 +754,37 @@ vtkSmartPointer<vtkCellArray> readGmtryEdge::setVTKCellArrayGS(
 
 #if IMAS_VERSION_DIGIT >= 3151
 /**
-*   Function used to fill predefined (size, label...) vtkCellArray using grid
-*   directly from spaces.
-*   @param  dim             Dimension of the cell element. For 0 the vtkVertex
+*   Function used to add/insert VTK cells of specific type/dimension, based on
+*   objects taken directly from GGD GRID space(:), unstructured grid.
+*   @param  dim             Dimension of the cell element. 0 for vtkVertex
 *                           must be passes as 'vtk_cell_type', for 1 vtkLine,
 *                           for 2 vtkTriangle or vtkQuad etc.)
 *   @param  vtk_cell_type   VTK data type (vtkVertex etc.)
 *   @param  grid            Type of edge_profiles IDS data structure, designed
 *                           for handling full grid data
+*   @param UG               vtkUnstructuredGrid to which the data (e.g. cells)
+*                           is to be set
 */
-template <typename V4, typename V5>
-vtkSmartPointer<vtkCellArray> readGmtryEdge::setVTKCellArray(
+template <typename V4, typename V5, typename V6>
+void readGmtryEdge::insertVTKCells2UnstructuredGrid(
     int dim,
     V4 const& vtk_cell_type,
-    V5& grid)
+    V5& grid,
+    V6& UG)
 {
-    vtkSmartPointer<vtkCellArray> newCellArray =
-        vtkSmartPointer<vtkCellArray>::New();
 
+    // Get number of objects of specific dimension
     int num_obj = grid.space(0).objects_per_dimension(dim).object.extent(0);
+    // Allocate space for known number of cells of certain type (faster)
+    UG->Allocate(vtk_cell_type->GetCellType(), num_obj);
 
     if(dim > 3)
     {
     vtkOutputWindowDisplayWarningText(std::string("WARNING! Improper "
-        "dimension provided. setVTKCellArray routine performs only with "
+        "dimension provided. insertVTKCells2UnstructuredGrid routine performs only with "
         "dimension up to 3D"
-        "\n\n").c_str());
+        "\n").c_str());
     }
-
 
     for ( int i = 0; i < num_obj; i++)
     {
@@ -794,14 +796,22 @@ vtkSmartPointer<vtkCellArray> readGmtryEdge::setVTKCellArray(
         {
             int node_ind = grid.space(0).objects_per_dimension(dim).
                 object(i).nodes(j);
+            // Skip illegal nodes with index 0
+            if( node_ind < 1)
+            {
+                vtkOutputWindowDisplayWarningText(std::string(
+                    "Illegal node index 0 or lower found in the list of nodes"
+                    "\n").c_str());
+                return;
+            }
             vtk_cell_type->GetPointIds()->SetId(j, node_ind - 1);
         }
-        // Assign the <vtk_cell_type> list of data types to vtkCellArray
-        newCellArray->InsertNextCell(vtk_cell_type);
+        // Assign the <vtk_cell_type> vtkUnstructuredGrid UG
+        UG->InsertNextCell(vtk_cell_type->GetCellType(), vtk_cell_type->GetPointIds());
     }
-        vtkOutputWindowDisplayText(std::string("setVTKCellArray: GetNumberOfCells(): "
-            + std::to_string(newCellArray->GetNumberOfCells())).c_str());
-    return newCellArray;
+        vtkOutputWindowDisplayText(std::string(
+            "insertVTKCells2UnstructuredGrid: GetNumberOfCells(): "
+            + std::to_string(UG->GetNumberOfCells())+ "\n").c_str());
 }
 
 #endif

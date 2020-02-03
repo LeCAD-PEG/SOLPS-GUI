@@ -866,23 +866,59 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         vtkSmartPointer<vtkUnstructuredGrid> UG =
              vtkSmartPointer<vtkUnstructuredGrid>::New();
 
+
         if (max_dim > 0)
         {
             int dim = 0;
             // Set vtkVertex vtk data type
             vtkSmartPointer<vtkVertex> vertex =
                 vtkSmartPointer<vtkVertex>::New();
-            // Set vtkCellArray for nodes/points
-            vtkSmartPointer<vtkCellArray> vertices =
-                vtkSmartPointer<vtkCellArray>::New();
 
-            vertices = gmtrye_obj.setVTKCellArray(dim, vertex,
-                db._edge_profiles.grid_ggd(grid_ggd_slice_index));
+            // Set points
             UG->SetPoints(obj_0D_vtkPointsArray);
-            UG->SetCells(VTK_VERTEX, vertices);
+
+            gmtrye_obj.insertVTKCells2UnstructuredGrid(dim, vertex,
+                db._edge_profiles.grid_ggd(grid_ggd_slice_index), UG);
             // UG->GetCellData()->AddArray(electronDensityArray);
 
         }
+        if (max_dim > 1)
+        {
+            int dim = 1;
+            // Set vtkVertex vtk data type
+            vtkSmartPointer<vtkLine> line =
+                vtkSmartPointer<vtkLine>::New();
+            gmtrye_obj.insertVTKCells2UnstructuredGrid(dim, line,
+                db._edge_profiles.grid_ggd(grid_ggd_slice_index), UG);
+
+        }
+        if (max_dim > 2)
+        {
+            int dim = 2;
+            // Get number of nodes per object (to determine to use either
+            // vtkTriangle (3 nodes) or vtkQuad (4 nodes))
+            int num_obj_nodes =
+                db._edge_profiles.grid_ggd(grid_ggd_slice_index).space(0).
+                objects_per_dimension(dim).object(0).nodes.extent(0);
+
+            if (num_obj_nodes == 3)
+            {
+            // Set vtkTriangle vtk data type
+            vtkSmartPointer<vtkTriangle> triangle =
+                vtkSmartPointer<vtkTriangle>::New();
+            gmtrye_obj.insertVTKCells2UnstructuredGrid(dim, triangle,
+                db._edge_profiles.grid_ggd(grid_ggd_slice_index), UG);
+
+            }else if (num_obj_nodes == 4)
+            {
+            // Set vtkQuad vtk data type
+            vtkSmartPointer<vtkQuad> quad =
+                vtkSmartPointer<vtkQuad>::New();
+            gmtrye_obj.insertVTKCells2UnstructuredGrid(dim, quad,
+                db._edge_profiles.grid_ggd(grid_ggd_slice_index), UG);
+            }
+        }
+
         // Add unstructured grid to main block
         fAddBlock2MultiBlock(mainMB, UG, "Full Unstructured Grid" );
 
@@ -1402,7 +1438,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     output->ShallowCopy(mainMB);
     itm.close();
 #endif // IMAS_IDS
-    //return 1;
+    // return 1;
 }
 
 void  ReadUALEdge::PrintSelf(ostream& os, vtkIndent indent)

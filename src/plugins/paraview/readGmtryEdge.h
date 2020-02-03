@@ -85,11 +85,12 @@ public:
         V2& loc_gridSubset,
         V3& grid);
 
-    template <typename V4, typename V5>
-    vtkSmartPointer<vtkCellArray> setVTKCellArray(
+    template <typename V4, typename V5, typename V6>
+    void insertVTKCells2UnstructuredGrid(
         int dim,
         V4 const& vtk_cell_type,
-        V5& grid);
+        V5& grid,
+        V6& UG);
 };
 
 #endif
