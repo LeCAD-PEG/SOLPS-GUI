@@ -80,10 +80,16 @@ public:
         int PNT_EdgeTransportModelID);
 
     template <typename V1, typename V2, typename V3>
-    vtkSmartPointer<vtkCellArray> setVTKCellArray(
+    vtkSmartPointer<vtkCellArray> setVTKCellArrayGS(
         V1 const& el_data_type,
         V2& loc_gridSubset,
         V3& grid);
+
+    template <typename V4, typename V5>
+    vtkSmartPointer<vtkCellArray> setVTKCellArray(
+        int dim,
+        V4 const& vtk_cell_type,
+        V5& grid);
 };
 
 #endif

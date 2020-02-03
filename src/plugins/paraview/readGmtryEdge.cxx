@@ -72,25 +72,25 @@ void readGmtryEdge::ggdCheck(
 #if IMAS_VERSION_DIGIT >= 3151
         // Check for nodes, edges and cells data in current IDS database and
         // get number of objects for each dimension
-        // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
+        // objects_per_dimension(0) holds every 0D object (nodes/vertices)
         num_obj_0D = GG_db._edge_profiles.grid_ggd(GG_grid_ggd_slice_index).space(0).
             objects_per_dimension(0).object.extent(0);
-        // objects_per_dimensions(1) holds every 1D object (edges)
+        // objects_per_dimension(1) holds every 1D object (edges)
         num_obj_1D = GG_db._edge_profiles.grid_ggd(GG_grid_ggd_slice_index).space(0).
             objects_per_dimension(1).object.extent(0);
-        // objects_per_dimensions(2) holds every 2D object (faces/2D cells)
+        // objects_per_dimension(2) holds every 2D object (faces/2D cells)
         num_obj_2D = GG_db._edge_profiles.grid_ggd(GG_grid_ggd_slice_index).space(0).
             objects_per_dimension(2).object.extent(0);
 #else
         // Check for nodes, edges and cells data in current IDS database and
         // get number of objects for each dimension
-        // objects_per_dimensions(0) holds every 0D object (nodes/vertices)
+        // objects_per_dimension(0) holds every 0D object (nodes/vertices)
         num_obj_0D = GG_db._edge_profiles.ggd(GG_ggd_slice_index).grid.space(0).
             objects_per_dimension(0).object.extent(0);
-        // objects_per_dimensions(1) holds every 1D object (edges)
+        // objects_per_dimension(1) holds every 1D object (edges)
         num_obj_1D = GG_db._edge_profiles.ggd(GG_ggd_slice_index).grid.space(0).
             objects_per_dimension(1).object.extent(0);
-        // objects_per_dimensions(2) holds every 2D object (faces/2D cells)
+        // objects_per_dimension(2) holds every 2D object (faces/2D cells)
         num_obj_2D = GG_db._edge_profiles.ggd(GG_ggd_slice_index).grid.space(0).
             objects_per_dimension(2).object.extent(0);
 #endif
@@ -186,26 +186,26 @@ void readGmtryEdge::setGridSubset0DGeometry2UnstructuredGrid(
     // For "mhd" selection in "IDSGridSource" text box
     if( PNT_IDSGridSource_string.find( "mhd" ) != std::string::npos)
     {
-        gridSubsetVertices = setVTKCellArray(gridSubsetVertex,
+        gridSubsetVertices = setVTKCellArrayGS(gridSubsetVertex,
             GS_db._mhd.grid_ggd(GS_ggd_slice_index).
                 grid_subset(GS_gridSubset_index),
             GS_db._mhd.grid_ggd(GS_ggd_slice_index));
     }
     else if( PNT_IDSGridSource_string.find( "edge_sources" ) != std::string::npos)
     {
-        gridSubsetVertices = setVTKCellArray(gridSubsetVertex,
+        gridSubsetVertices = setVTKCellArrayGS(gridSubsetVertex,
             GS_db._edge_sources.grid_ggd(GS_ggd_slice_index).
                 grid_subset(GS_gridSubset_index),
             GS_db._edge_sources.grid_ggd(GS_ggd_slice_index));
     }else
     {
-        gridSubsetVertices = setVTKCellArray(gridSubsetVertex,
+        gridSubsetVertices = setVTKCellArrayGS(gridSubsetVertex,
             GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
                 grid_subset(GS_gridSubset_index),
             GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index));
     }
 #else
-    gridSubsetVertices = setVTKCellArray(gridSubsetVertex,
+    gridSubsetVertices = setVTKCellArrayGS(gridSubsetVertex,
         GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
             grid_subset(GS_gridSubset_index),
         GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
@@ -251,27 +251,27 @@ void readGmtryEdge::setGridSubset1DGeometry2UnstructuredGrid(
     // For "mhd" selection in "IDSGridSource" text box
     if( PNT_IDSGridSource_string.find( "mhd" ) != std::string::npos)
     {
-        gridSubsetLinesArray = setVTKCellArray(gridSubsetLine,
+        gridSubsetLinesArray = setVTKCellArrayGS(gridSubsetLine,
             GS_db._mhd.grid_ggd(GS_ggd_slice_index).
                 grid_subset(GS_gridSubset_index),
             GS_db._mhd.grid_ggd(GS_ggd_slice_index));
     }
     else if( PNT_IDSGridSource_string.find( "edge_sources" ) != std::string::npos)
     {
-        gridSubsetLinesArray = setVTKCellArray(gridSubsetLine,
+        gridSubsetLinesArray = setVTKCellArrayGS(gridSubsetLine,
             GS_db._edge_sources.grid_ggd(GS_ggd_slice_index).
                 grid_subset(GS_gridSubset_index),
             GS_db._edge_sources.grid_ggd(GS_ggd_slice_index));
 
     }else
     {
-        gridSubsetLinesArray = setVTKCellArray(gridSubsetLine,
+        gridSubsetLinesArray = setVTKCellArrayGS(gridSubsetLine,
             GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
                 grid_subset(GS_gridSubset_index),
             GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index));
     }
 #else
-    gridSubsetLinesArray = setVTKCellArray(gridSubsetLine,
+    gridSubsetLinesArray = setVTKCellArrayGS(gridSubsetLine,
         GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
             grid_subset(GS_gridSubset_index),
         GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
@@ -330,7 +330,7 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
         // Cells-Triangles
         if (num_obj_nodes_first == 3)
         {
-            gridSubsetCellArray = setVTKCellArray(gridSubsetTriangle,
+            gridSubsetCellArray = setVTKCellArrayGS(gridSubsetTriangle,
                 GS_db._mhd.grid_ggd(GS_ggd_slice_index).
                     grid_subset(GS_gridSubset_index),
                 GS_db._mhd.grid_ggd(GS_ggd_slice_index));
@@ -342,7 +342,7 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
         // Cells-Quad
         else if (num_obj_nodes_first == 4)
         {
-            gridSubsetCellArray = setVTKCellArray(gridSubsetQuad,
+            gridSubsetCellArray = setVTKCellArrayGS(gridSubsetQuad,
                 GS_db._mhd.grid_ggd(GS_ggd_slice_index).
                     grid_subset(GS_gridSubset_index),
                 GS_db._mhd.grid_ggd(GS_ggd_slice_index));
@@ -367,7 +367,7 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
         // Cells-Triangles
         if (num_obj_nodes_first == 3)
         {
-            gridSubsetCellArray = setVTKCellArray(gridSubsetTriangle,
+            gridSubsetCellArray = setVTKCellArrayGS(gridSubsetTriangle,
                 GS_db._edge_sources.grid_ggd(GS_ggd_slice_index).
                     grid_subset(GS_gridSubset_index),
                 GS_db._edge_sources.grid_ggd(GS_ggd_slice_index));
@@ -379,7 +379,7 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
         // Cells-Quad
         else if (num_obj_nodes_first == 4)
         {
-            gridSubsetCellArray = setVTKCellArray(gridSubsetQuad,
+            gridSubsetCellArray = setVTKCellArrayGS(gridSubsetQuad,
                 GS_db._edge_sources.grid_ggd(GS_ggd_slice_index).
                     grid_subset(GS_gridSubset_index),
                 GS_db._edge_sources.grid_ggd(GS_ggd_slice_index));
@@ -404,7 +404,7 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
         // Cells-Triangles
         if (num_obj_nodes_first == 3)
         {
-            gridSubsetCellArray = setVTKCellArray(gridSubsetTriangle,
+            gridSubsetCellArray = setVTKCellArrayGS(gridSubsetTriangle,
                 GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
                     grid_subset(GS_gridSubset_index),
                 GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index));
@@ -416,7 +416,7 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
         // Cells-Quad
         else if (num_obj_nodes_first == 4)
         {
-            gridSubsetCellArray = setVTKCellArray(gridSubsetQuad,
+            gridSubsetCellArray = setVTKCellArrayGS(gridSubsetQuad,
                 GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index).
                     grid_subset(GS_gridSubset_index),
                 GS_db._edge_profiles.grid_ggd(GS_ggd_slice_index));
@@ -446,7 +446,7 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
     // Cells-Triangles
     if (num_obj_nodes_first == 3)
     {
-        gridSubsetCellArray = setVTKCellArray(gridSubsetTriangle,
+        gridSubsetCellArray = setVTKCellArrayGS(gridSubsetTriangle,
             GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
                 grid_subset(GS_gridSubset_index),
             GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
@@ -457,7 +457,7 @@ void readGmtryEdge::setGridSubset2DGeometry2UnstructuredGrid(
     // Cells-Quad
     else if (num_obj_nodes_first == 4)
     {
-        gridSubsetCellArray = setVTKCellArray(gridSubsetQuad,
+        gridSubsetCellArray = setVTKCellArrayGS(gridSubsetQuad,
             GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid.
                 grid_subset(GS_gridSubset_index),
             GS_db._edge_profiles.ggd(GS_ggd_slice_index).grid);
@@ -675,7 +675,8 @@ vtkSmartPointer<vtkPoints> readGmtryEdge::setVtkPoints(
 #endif
 
 /**
-*   Function used to fill predefined (size, label...) vtkCellArray.
+*   Function used to fill predefined (size, label...) vtkCellArray using grid
+*   subsets.
 *   @param  el_data_type    VTK data type (vtkVertex etc.)
 *   @param  loc_gridSubset  Type of edge_profiles IDS data structure, designed
 *                           for handling grid subset data
@@ -683,7 +684,7 @@ vtkSmartPointer<vtkPoints> readGmtryEdge::setVtkPoints(
 *                           for handling full grid data
 */
 template <typename V1, typename V2, typename V3>
-vtkSmartPointer<vtkCellArray> readGmtryEdge::setVTKCellArray(
+vtkSmartPointer<vtkCellArray> readGmtryEdge::setVTKCellArrayGS(
     V1 const& el_data_type,
     V2& loc_gridSubset,
     V3& grid)
@@ -751,3 +752,56 @@ vtkSmartPointer<vtkCellArray> readGmtryEdge::setVTKCellArray(
     }
     return newCellArray;
 }
+
+#if IMAS_VERSION_DIGIT >= 3151
+/**
+*   Function used to fill predefined (size, label...) vtkCellArray using grid
+*   directly from spaces.
+*   @param  dim             Dimension of the cell element. For 0 the vtkVertex
+*                           must be passes as 'vtk_cell_type', for 1 vtkLine,
+*                           for 2 vtkTriangle or vtkQuad etc.)
+*   @param  vtk_cell_type   VTK data type (vtkVertex etc.)
+*   @param  grid            Type of edge_profiles IDS data structure, designed
+*                           for handling full grid data
+*/
+template <typename V4, typename V5>
+vtkSmartPointer<vtkCellArray> readGmtryEdge::setVTKCellArray(
+    int dim,
+    V4 const& vtk_cell_type,
+    V5& grid)
+{
+    vtkSmartPointer<vtkCellArray> newCellArray =
+        vtkSmartPointer<vtkCellArray>::New();
+
+    int num_obj = grid.space(0).objects_per_dimension(dim).object.extent(0);
+
+    if(dim > 3)
+    {
+    vtkOutputWindowDisplayWarningText(std::string("WARNING! Improper "
+        "dimension provided. setVTKCellArray routine performs only with "
+        "dimension up to 3D"
+        "\n\n").c_str());
+    }
+
+
+    for ( int i = 0; i < num_obj; i++)
+    {
+        int num_obj_nodes = grid.space(0).objects_per_dimension(dim).
+            object(i).nodes.extent(0);
+        // Fill the vtk_cell_type (it must be either vtkVertex,
+        // vtkLine, vtkTriangle or vtkQuad data type)
+        for(int j = 0; j < num_obj_nodes; j++)
+        {
+            int node_ind = grid.space(0).objects_per_dimension(dim).
+                object(i).nodes(j);
+            vtk_cell_type->GetPointIds()->SetId(j, node_ind - 1);
+        }
+        // Assign the <vtk_cell_type> list of data types to vtkCellArray
+        newCellArray->InsertNextCell(vtk_cell_type);
+    }
+        vtkOutputWindowDisplayText(std::string("setVTKCellArray: GetNumberOfCells(): "
+            + std::to_string(newCellArray->GetNumberOfCells())).c_str());
+    return newCellArray;
+}
+
+#endif
