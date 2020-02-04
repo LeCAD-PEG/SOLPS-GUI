@@ -762,22 +762,22 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             if (max_dim >= 1)
             {
                 num_0D_obj = db._mhd.grid_ggd(grid_ggd_slice_index).
-                space(0).objects_per_dimension(0).object.extent(0);
+                    space(0).objects_per_dimension(0).object.extent(0);
             }
             if (max_dim >= 2)
             {
                 num_1D_obj = db._mhd.grid_ggd(grid_ggd_slice_index).
-                space(0).objects_per_dimension(1).object.extent(0);
+                    space(0).objects_per_dimension(1).object.extent(0);
             }
             if (max_dim >= 3)
             {
                 num_2D_obj = db._mhd.grid_ggd(grid_ggd_slice_index).
-                space(0).objects_per_dimension(2).object.extent(0);
+                    space(0).objects_per_dimension(2).object.extent(0);
             }
             if (max_dim >= 4)
             {
                 num_3D_obj = db._mhd.grid_ggd(grid_ggd_slice_index).
-                space(0).objects_per_dimension(3).object.extent(0);
+                    space(0).objects_per_dimension(3).object.extent(0);
             }
         }else if( std::string(LoadIDS).find("edge_sources") != std::string::npos )
         {
@@ -866,7 +866,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         vtkSmartPointer<vtkUnstructuredGrid> UG =
              vtkSmartPointer<vtkUnstructuredGrid>::New();
 
-
+        // Points are mandatory. Set points (but not vertices) and PointData
         if (max_dim > 0)
         {
             int dim = 0;
@@ -877,77 +877,112 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             // Set points
             UG->SetPoints(obj_0D_vtkPointsArray);
 
-            gmtrye_obj.insertVTKCells2UnstructuredGrid(dim, vertex,
-                db._edge_profiles.grid_ggd(grid_ggd_slice_index), UG);
-            // UG->GetCellData()->AddArray(electronDensityArray);
+            // gmtrye_obj.insertVTKCells2UnstructuredGrid(dim, vertex,
+            //     db._edge_profiles.grid_ggd(grid_ggd_slice_index), UG);
 
-        }
-        if (max_dim > 1)
-        {
-            int dim = 1;
-            // Set vtkVertex vtk data type
-            vtkSmartPointer<vtkLine> line =
-                vtkSmartPointer<vtkLine>::New();
-            gmtrye_obj.insertVTKCells2UnstructuredGrid(dim, line,
-                db._edge_profiles.grid_ggd(grid_ggd_slice_index), UG);
-
-        }
-        if (max_dim > 2)
-        {
-            int dim = 2;
-            // Get number of nodes per object (to determine to use either
-            // vtkTriangle (3 nodes) or vtkQuad (4 nodes))
-            int num_obj_nodes =
-                db._edge_profiles.grid_ggd(grid_ggd_slice_index).space(0).
-                objects_per_dimension(dim).object(0).nodes.extent(0);
-
-            if (num_obj_nodes == 3)
+            if (num_ggd_slices > 0)
             {
-            // Set vtkTriangle vtk data type
-            vtkSmartPointer<vtkTriangle> triangle =
-                vtkSmartPointer<vtkTriangle>::New();
-            gmtrye_obj.insertVTKCells2UnstructuredGrid(dim, triangle,
-                db._edge_profiles.grid_ggd(grid_ggd_slice_index), UG);
 
-            }else if (num_obj_nodes == 4)
-            {
-            // Set vtkQuad vtk data type
-            vtkSmartPointer<vtkQuad> quad =
-                vtkSmartPointer<vtkQuad>::New();
-            gmtrye_obj.insertVTKCells2UnstructuredGrid(dim, quad,
-                db._edge_profiles.grid_ggd(grid_ggd_slice_index), UG);
+                // Set data fields to vtkunstructuredGrid for selected IDS with
+                // the help of 'setUnstructuredGridDataFields' routine
+                // NOTE: grid_subsetIndex = 0 is being used to use this routine
+                //       in an alternative way - not checking grid subsets, but
+                //       the grid_ggd(:).space(:).objects_per_dimension(:)...
+                //       directly (intended for meshes that don't use/have
+                //       grid subsets)
+                pse_obj.setUnstructuredGridDataFields(
+                    UG,
+                    db,
+                    0,
+                    num_0D_obj,
+                    IDS_plasmaStateSource,
+                    ggd_slice_index,
+                    this->EdgeSourcesSourceID,
+                    this->EdgeTransportModelID);
             }
         }
 
-        // TODO: Setting PointData together for, for example, quad elements
+        if( std::string(LoadIDS).find("edge_profiles") != std::string::npos )
+        {
 
-        // // Setup fields/quantities
-        // // NOTE: TEST!
-        // vtkSmartPointer<vtkDoubleArray> cellArrayData =
-        //     vtkSmartPointer<vtkDoubleArray>::New();
+            if (max_dim-1 == 1)
+            {
+                int dim = 1;
+                // Set vtkLine vtk data type
+                vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
+                gmtrye_obj.insertVTKCells2UnstructuredGrid(dim, line,
+                    db._edge_profiles.grid_ggd(grid_ggd_slice_index), UG);
 
-        // // int num_all_cells = num_0D_obj+num_1D_obj+num_2D_obj;
-        // int num_all_cells = UG->GetNumberOfCells();
-        // cellArrayData->SetNumberOfValues(num_all_cells);
-        // cellArrayData->SetName("cellArrayData");
+            }
+            if (max_dim-1 >= 2)
+            {
+                // NOTE: Max 2D supported!
+                int dim = 2;
+                // Get number of nodes per object (to determine to use either
+                // vtkTriangle (3 nodes) or vtkQuad (4 nodes))
+                int num_obj_nodes =
+                    db._edge_profiles.grid_ggd(grid_ggd_slice_index).space(0).
+                    objects_per_dimension(dim).object(0).nodes.extent(0);
 
-        // for (int i = 0; i < num_all_cells; i++)
-        // {
-        //     cellArrayData->SetComponent(i, 0, 1.9);
-        // }
-        // UG->GetCellData()->AddArray(cellArrayData);
+                if (num_obj_nodes == 3)
+                {
+                // Set vtkTriangle vtk data type
+                vtkSmartPointer<vtkTriangle> triangle =
+                    vtkSmartPointer<vtkTriangle>::New();
+                gmtrye_obj.insertVTKCells2UnstructuredGrid(dim, triangle,
+                    db._edge_profiles.grid_ggd(grid_ggd_slice_index), UG);
 
-        // vtkSmartPointer<vtkDoubleArray> pointArrayData =
-        //     vtkSmartPointer<vtkDoubleArray>::New();
-        // pointArrayData->SetNumberOfValues(num_0D_obj);
-        // pointArrayData->SetName("pointArrayData");
-        // for (int i = 0; i < num_0D_obj; i++)
-        // {
-        //     pointArrayData->SetComponent(i, 0, 11.9);
-        // }
-        // NOTE: PointData values get interpolated to 2D elements such as quad
-        //       (in case there are no quad values present)
-        // UG->GetPointData()->AddArray(pointArrayData);
+                }else if (num_obj_nodes == 4)
+                {
+                // Set vtkQuad vtk data type
+                vtkSmartPointer<vtkQuad> quad = vtkSmartPointer<vtkQuad>::New();
+                gmtrye_obj.insertVTKCells2UnstructuredGrid(dim, quad,
+                    db._edge_profiles.grid_ggd(grid_ggd_slice_index), UG);
+                }
+            }
+        }else if( std::string(LoadIDS).find("mhd") != std::string::npos )
+        {
+
+            if (max_dim-1 == 1)
+            {
+                int dim = 1;
+                // Set vtkLine vtk data type
+                vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
+                gmtrye_obj.insertVTKCells2UnstructuredGrid(dim, line,
+                    db._mhd.grid_ggd(grid_ggd_slice_index), UG);
+
+            }
+            if (max_dim-1 >= 2)
+            {
+                // NOTE: Max 2D supported!
+                int dim = 2;
+                // Get number of nodes per object (to determine to use either
+                // vtkTriangle (3 nodes) or vtkQuad (4 nodes))
+                int num_obj_nodes =
+                    db._mhd.grid_ggd(grid_ggd_slice_index).space(0).
+                    objects_per_dimension(dim).object(0).nodes.extent(0);
+
+                if (num_obj_nodes == 3)
+                {
+                // Set vtkTriangle vtk data type
+                vtkSmartPointer<vtkTriangle> triangle =
+                    vtkSmartPointer<vtkTriangle>::New();
+                gmtrye_obj.insertVTKCells2UnstructuredGrid(dim, triangle,
+                    db._mhd.grid_ggd(grid_ggd_slice_index), UG);
+
+                }else if (num_obj_nodes == 4)
+                {
+                // Set vtkQuad vtk data type
+                vtkSmartPointer<vtkQuad> quad = vtkSmartPointer<vtkQuad>::New();
+                gmtrye_obj.insertVTKCells2UnstructuredGrid(dim, quad,
+                    db._mhd.grid_ggd(grid_ggd_slice_index), UG);
+                }
+            }
+        }else{
+            vtkOutputWindowDisplayWarningText(std::string(
+                "WARNING: Trying to read IDS with empty/unsupported GRID_GGD."
+                ).c_str());
+        }
 
         // Add unstructured grid to main block
         fAddBlock2MultiBlock(mainMB, UG, "Full Unstructured Grid" );

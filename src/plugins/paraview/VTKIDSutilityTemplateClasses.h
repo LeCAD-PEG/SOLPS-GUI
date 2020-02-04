@@ -25,15 +25,16 @@ using namespace std;
 class VTKIDSutilityTemplateClasses
 {
 public:
-    template< typename LQ2>
+
+    template <typename LQ2>
     void VTK_IDS_Val2UnstrGrid_GenericGridScalar(
         std::string values_array_label,
         vtkSmartPointer<vtkUnstructuredGrid> inputVtkUnstructuredGrid,
         LQ2 & loc_quantity,
         int gridSubset_index,
-        int num_gridSubset_el);
+        int num_el);
 
-    template< typename LQ3>
+    template <typename LQ3>
     void VTK_IDS_Val2UnstrGrid_GenericGridVectorComponents(
         std::string values_array_label,
         vtkSmartPointer<vtkUnstructuredGrid> inputVtkUnstructuredGrid,

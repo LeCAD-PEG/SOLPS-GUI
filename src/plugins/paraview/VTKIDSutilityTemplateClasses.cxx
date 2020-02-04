@@ -32,7 +32,11 @@ using namespace IdsNs;
 *   and assign it to vtkUnstructuredGrid.
 *   (after each full vtkDoubleArray definition process is required
 *   to assign it to vtkUnstructuredGrid)
-*   @param loc_quantity     \b grid_generic_scalar IDS data structure
+*   @param values_array_label           \b Quantity label (string)
+*   @param inputVtkUnstructuredGrid     \b vtkUnstrucuredGrid object
+*   @param loc_quantity                 \b grid_generic_scalar IDS data structure
+*   @param gridSubset_index             \b Grid subset index (integer)
+*   @param num_el                       \b Number of elements (in GS)
 */
 template <typename LQ2>
 void VTKIDSutilityTemplateClasses::VTK_IDS_Val2UnstrGrid_GenericGridScalar(
@@ -40,24 +44,25 @@ void VTKIDSutilityTemplateClasses::VTK_IDS_Val2UnstrGrid_GenericGridScalar(
     vtkSmartPointer<vtkUnstructuredGrid> inputVtkUnstructuredGrid,
     LQ2 & loc_quantity,
     int gridSubset_index,
-    int num_gridSubset_el)
+    int num_el)
 {
+
     // Skip if the node structure is empty, otherwise continue
     int quantity_gridSubset_index = loc_quantity.grid_subset_index;
     int num_values = loc_quantity.values.extent(0);
     if (gridSubset_index == quantity_gridSubset_index &&
-        num_gridSubset_el == num_values)
+        num_el == num_values)
     {
         VTKIDSutility util_obj;
 
         // Define vtkDoubleArray and set its label and size
         vtkSmartPointer<vtkDoubleArray> newVtkDoubleArray =
-            util_obj.VTK_IDS_setValuesArrayBase( num_gridSubset_el, values_array_label);
+            util_obj.VTK_IDS_setValuesArrayBase( num_el, values_array_label);
         // In correctly written IDS the number of grid subset
         // objects and grid subset values (scalars) is equal
         newVtkDoubleArray->
-            SetNumberOfValues(num_gridSubset_el);
-        for (int j = 0; j < num_gridSubset_el; j++)
+            SetNumberOfValues(num_el);
+        for (int j = 0; j < num_el; j++)
         {
             newVtkDoubleArray->SetComponent(
                 j,0, loc_quantity.values(j));
@@ -71,7 +76,41 @@ void VTKIDSutilityTemplateClasses::VTK_IDS_Val2UnstrGrid_GenericGridScalar(
         // are currently dealing with points) in
         // vtkUnstructuredGrid, set new vtkDoubleArray, containing data field,
         // to vtkUnstructuredGrid points
-        if(num_gridSubset_el == inputVtkUnstructuredGrid->GetNumberOfPoints())
+        if(num_el == inputVtkUnstructuredGrid->GetNumberOfPoints())
+        {
+            inputVtkUnstructuredGrid->GetPointData()->AddArray(newVtkDoubleArray);
+        }
+        return;
+    }else if (gridSubset_index == 0 && num_el == num_values)
+    {
+        // A template when allocating quantities directly to grid (grid
+        // subsets are empty).
+
+        VTKIDSutility util_obj;
+
+        // Define vtkDoubleArray and set its label and size
+        vtkSmartPointer<vtkDoubleArray> newVtkDoubleArray =
+            util_obj.VTK_IDS_setValuesArrayBase( num_el, values_array_label);
+        // In correctly written IDS the number of grid subset
+        // objects and grid subset values (scalars) is equal
+        newVtkDoubleArray->
+            SetNumberOfValues(num_el);
+        for (int j = 0; j < num_el; j++)
+        {
+            newVtkDoubleArray->SetComponent(j,0, loc_quantity.values(j));
+        }
+
+        // NOTE: skipping all other cells, because we want only points
+        // Set new vtkDoubleArray, containing data field,
+        // to vtkUnstructuredGrid
+        // inputVtkUnstructuredGrid->GetCellData()->AddArray(
+        //     newVtkDoubleArray);
+
+        // If the number of elements match the number of points (meaning we
+        // are currently dealing with points) in
+        // vtkUnstructuredGrid, set new vtkDoubleArray, containing data field,
+        // to vtkUnstructuredGrid points
+        if(num_el == inputVtkUnstructuredGrid->GetNumberOfPoints())
         {
             inputVtkUnstructuredGrid->GetPointData()->AddArray(newVtkDoubleArray);
         }

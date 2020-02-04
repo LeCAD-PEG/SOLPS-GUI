@@ -157,8 +157,18 @@ void readPsEdge::setUnstructuredGridDataFields(
     if( UG_LoadIDS_string.find( "edge_profiles" ) != std::string::npos)
     {
 
+        // NOTE: Other method than setting whole path:
+        // UG_db._edge_profiles.ggd(UG_ggd_slice_index).electrons
+        //            .temperature(n)
+        class IdsNs::IDS::edge_profiles & e_p = UG_db._edge_profiles;
+        class IdsNs::IDS::edge_profiles::ggd & GGD =
+            UG_db._edge_profiles.ggd(UG_ggd_slice_index);
+        class IdsNs::IDS::edge_profiles::ggd::electrons & e = GGD.electrons;
+        // class IdsNs::IDS::edge_profiles::ggd::electrons::temperature & te_n = e.temperature(n);
+
         VTKIDSutility vtkids_obj_ep;
         VTKIDSutilityTemplateClasses vtkids_obj_ep_template;
+
         // Set default value
         int num_IDStarget_gridSubsets = 0;
 
