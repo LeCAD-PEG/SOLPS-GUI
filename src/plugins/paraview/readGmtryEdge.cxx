@@ -25,6 +25,34 @@
 using namespace std;
 using namespace IdsNs;
 
+template <typename IDS8>
+int (*readGmtryEdge::getNumberOfNDimObjects(IDS8 & GRID_GGD))[4]{
+
+    // {num_obj_0D, num_obj_1D, num_obj_2D, num_obj_3D}
+    static int num_obj_array[]={0,0,0,0};
+
+    int max_dim = GRID_GGD.space(0).objects_per_dimension.extent(0);
+
+    if (max_dim > 0)
+    {
+        num_obj_array[0] = GRID_GGD.space(0).objects_per_dimension(0).object.extent(0);
+    }
+    if (max_dim > 1)
+    {
+        num_obj_array[1] = GRID_GGD.space(0).objects_per_dimension(1).object.extent(0);
+    }
+    if (max_dim > 2)
+    {
+        num_obj_array[2] = GRID_GGD.space(0).objects_per_dimension(2).object.extent(0);
+    }
+    if (max_dim > 3)
+    {
+        num_obj_array[3] = GRID_GGD.space(0).objects_per_dimension(3).object.extent(0);
+    }
+    return &num_obj_array;
+};
+
+
 template <typename IDS3>
 void readGmtryEdge::ggdCheck(
     IDS3 & GG_db,

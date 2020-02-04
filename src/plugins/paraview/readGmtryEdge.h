@@ -28,6 +28,10 @@ class readGmtryEdge
 {
 public:
 
+    template <typename IDS9>
+    int (*getNumberOfNDimObjects(
+        IDS9 & GRID_GGD))[4];
+
     template <typename IDS3>
     void ggdCheck(
         IDS3 & GG_db,
