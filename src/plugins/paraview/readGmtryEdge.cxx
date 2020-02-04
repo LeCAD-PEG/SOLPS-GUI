@@ -25,11 +25,12 @@
 using namespace std;
 using namespace IdsNs;
 
-template <typename IDS8>
-int (*readGmtryEdge::getNumberOfNDimObjects(IDS8 & GRID_GGD))[4]{
+template <typename GRID_GGD1>
+void readGmtryEdge::getNumberOfNDimObjects(GRID_GGD1 & GRID_GGD, int num_obj_array[4])
+{
 
     // {num_obj_0D, num_obj_1D, num_obj_2D, num_obj_3D}
-    static int num_obj_array[]={0,0,0,0};
+    // int num_obj_array[4]={0,0,0,0};
 
     int max_dim = GRID_GGD.space(0).objects_per_dimension.extent(0);
 
@@ -49,9 +50,7 @@ int (*readGmtryEdge::getNumberOfNDimObjects(IDS8 & GRID_GGD))[4]{
     {
         num_obj_array[3] = GRID_GGD.space(0).objects_per_dimension(3).object.extent(0);
     }
-    return &num_obj_array;
-};
-
+}
 
 template <typename IDS3>
 void readGmtryEdge::ggdCheck(
