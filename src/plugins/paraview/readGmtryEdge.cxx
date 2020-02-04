@@ -776,7 +776,9 @@ void readGmtryEdge::insertVTKCells2UnstructuredGrid(
     // Get number of objects of specific dimension
     int num_obj = grid.space(0).objects_per_dimension(dim).object.extent(0);
     // Allocate space for known number of cells of certain type (faster)
-    UG->Allocate(vtk_cell_type->GetCellType(), num_obj);
+    // NOTE: this allocation DELETES all previous allocationS, even though the
+    //       allocations were made for other vtkCellType!
+    // UG->Allocate(vtk_cell_type->GetCellType(), num_obj);
 
     if(dim > 3)
     {
@@ -812,6 +814,56 @@ void readGmtryEdge::insertVTKCells2UnstructuredGrid(
         vtkOutputWindowDisplayText(std::string(
             "insertVTKCells2UnstructuredGrid: GetNumberOfCells(): "
             + std::to_string(UG->GetNumberOfCells())+ "\n").c_str());
+}
+
+/**
+*   Function used to fill predefined (size, label...) vtkCellArray using grid
+*   directly from spaces.
+*   @param  dim             Dimension of the cell element. For 0 the vtkVertex
+*                           must be passes as 'vtk_cell_type', for 1 vtkLine,
+*                           for 2 vtkTriangle or vtkQuad etc.)
+*   @param  vtk_cell_type   VTK data type (vtkVertex etc.)
+*   @param  grid            Type of edge_profiles IDS data structure, designed
+*                           for handling full grid data
+*/
+template <typename V7, typename V8>
+vtkSmartPointer<vtkCellArray> readGmtryEdge::setVTKCellArray(
+    int dim,
+    V7 const& vtk_cell_type,
+    V8& grid)
+{
+    vtkSmartPointer<vtkCellArray> newCellArray =
+        vtkSmartPointer<vtkCellArray>::New();
+
+    int num_obj = grid.space(0).objects_per_dimension(dim).object.extent(0);
+
+    if(dim > 3)
+    {
+    vtkOutputWindowDisplayWarningText(std::string("WARNING! Improper "
+        "dimension provided. setVTKCellArray routine performs only with "
+        "dimension up to 3D"
+        "\n").c_str());
+    }
+
+    for ( int i = 0; i < num_obj; i++)
+    {
+        int num_obj_nodes = grid.space(0).objects_per_dimension(dim).
+            object(i).nodes.extent(0);
+        // Fill the vtk_cell_type (it must be either vtkVertex,
+        // vtkLine, vtkTriangle or vtkQuad data type)
+        for(int j = 0; j < num_obj_nodes; j++)
+        {
+            int node_ind = grid.space(0).objects_per_dimension(dim).
+                object(i).nodes(j);
+            vtk_cell_type->GetPointIds()->SetId(j, node_ind - 1);
+        }
+        // Assign the <vtk_cell_type> list of data types to vtkCellArray
+        newCellArray->InsertNextCell(vtk_cell_type);
+    }
+        vtkOutputWindowDisplayText(std::string("setVTKCellArray: GetNumberOfCells(): "
+            + std::to_string(newCellArray->GetNumberOfCells())+ "\n").c_str());
+
+    return newCellArray;
 }
 
 #endif

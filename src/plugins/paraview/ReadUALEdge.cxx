@@ -919,6 +919,36 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             }
         }
 
+        // TODO: Setting PointData together for, for example, quad elements
+
+        // // Setup fields/quantities
+        // // NOTE: TEST!
+        // vtkSmartPointer<vtkDoubleArray> cellArrayData =
+        //     vtkSmartPointer<vtkDoubleArray>::New();
+
+        // // int num_all_cells = num_0D_obj+num_1D_obj+num_2D_obj;
+        // int num_all_cells = UG->GetNumberOfCells();
+        // cellArrayData->SetNumberOfValues(num_all_cells);
+        // cellArrayData->SetName("cellArrayData");
+
+        // for (int i = 0; i < num_all_cells; i++)
+        // {
+        //     cellArrayData->SetComponent(i, 0, 1.9);
+        // }
+        // UG->GetCellData()->AddArray(cellArrayData);
+
+        // vtkSmartPointer<vtkDoubleArray> pointArrayData =
+        //     vtkSmartPointer<vtkDoubleArray>::New();
+        // pointArrayData->SetNumberOfValues(num_0D_obj);
+        // pointArrayData->SetName("pointArrayData");
+        // for (int i = 0; i < num_0D_obj; i++)
+        // {
+        //     pointArrayData->SetComponent(i, 0, 11.9);
+        // }
+        // NOTE: PointData values get interpolated to 2D elements such as quad
+        //       (in case there are no quad values present)
+        // UG->GetPointData()->AddArray(pointArrayData);
+
         // Add unstructured grid to main block
         fAddBlock2MultiBlock(mainMB, UG, "Full Unstructured Grid" );
 
@@ -1438,7 +1468,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     output->ShallowCopy(mainMB);
     itm.close();
 #endif // IMAS_IDS
-    // return 1;
+    return 1;
 }
 
 void  ReadUALEdge::PrintSelf(ostream& os, vtkIndent indent)

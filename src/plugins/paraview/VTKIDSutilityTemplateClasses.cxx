@@ -13,6 +13,7 @@
 #include "VTKIDSutility.h"
 #include <UALClasses.h>
 #include <vtkCellData.h>
+#include <vtkPointData.h>
 #include <vtkDoubleArray.h>
 #include <vtkSmartPointer.h>
 #include <dirent.h>
@@ -65,6 +66,15 @@ void VTKIDSutilityTemplateClasses::VTK_IDS_Val2UnstrGrid_GenericGridScalar(
         // to vtkUnstructuredGrid
         inputVtkUnstructuredGrid->GetCellData()->AddArray(
             newVtkDoubleArray);
+
+        // If the number of elements match the number of points (meaning we
+        // are currently dealing with points) in
+        // vtkUnstructuredGrid, set new vtkDoubleArray, containing data field,
+        // to vtkUnstructuredGrid points
+        if(num_gridSubset_el == inputVtkUnstructuredGrid->GetNumberOfPoints())
+        {
+            inputVtkUnstructuredGrid->GetPointData()->AddArray(newVtkDoubleArray);
+        }
         return;
     }
 }
@@ -124,6 +134,16 @@ void VTKIDSutilityTemplateClasses::VTK_IDS_Val2UnstrGrid_GenericGridVectorCompon
                 // to vtkUnstructuredGrid
                 inputVtkUnstructuredGrid->GetCellData()->AddArray(
                     newVtkDoubleArray);
+                // If the number of elements match the number of points
+                // (meaning we are currently dealing with points) in
+                // vtkUnstructuredGrid, set new vtkDoubleArray, containing
+                // data field, to vtkUnstructuredGrid points
+                if(num_gridSubset_el == inputVtkUnstructuredGrid->
+                    GetNumberOfPoints())
+                {
+                    inputVtkUnstructuredGrid->GetPointData()->
+                        AddArray(newVtkDoubleArray);
+                }
                 return;
             }
         }
@@ -150,6 +170,16 @@ void VTKIDSutilityTemplateClasses::VTK_IDS_Val2UnstrGrid_GenericGridVectorCompon
                 // to vtkUnstructuredGrid
                 inputVtkUnstructuredGrid->GetCellData()->AddArray(
                     newVtkDoubleArray);
+                // If the number of elements match the number of points
+                // (meaning we are currently dealing with points) in
+                // vtkUnstructuredGrid, set new vtkDoubleArray, containing
+                // data field, to vtkUnstructuredGrid points
+                if(num_gridSubset_el == inputVtkUnstructuredGrid->
+                    GetNumberOfPoints())
+                {
+                    inputVtkUnstructuredGrid->GetPointData()->
+                        AddArray(newVtkDoubleArray);
+                }
                 return;
             }
         }
@@ -176,6 +206,16 @@ void VTKIDSutilityTemplateClasses::VTK_IDS_Val2UnstrGrid_GenericGridVectorCompon
                 // to vtkUnstructuredGrid
                 inputVtkUnstructuredGrid->GetCellData()->AddArray(
                     newVtkDoubleArray);
+                // If the number of elements match the number of points
+                // (meaning we are currently dealing with points) in
+                // vtkUnstructuredGrid, set new vtkDoubleArray, containing
+                // data field, to vtkUnstructuredGrid points
+                if(num_gridSubset_el == inputVtkUnstructuredGrid->
+                    GetNumberOfPoints())
+                {
+                    inputVtkUnstructuredGrid->GetPointData()->
+                        AddArray(newVtkDoubleArray);
+                }
                 return;
             }
         }
@@ -202,6 +242,16 @@ void VTKIDSutilityTemplateClasses::VTK_IDS_Val2UnstrGrid_GenericGridVectorCompon
                 // to vtkUnstructuredGrid
                 inputVtkUnstructuredGrid->GetCellData()->AddArray(
                     newVtkDoubleArray);
+                // If the number of elements match the number of points
+                // (meaning we are currently dealing with points) in
+                // vtkUnstructuredGrid, set new vtkDoubleArray, containing
+                // data field, to vtkUnstructuredGrid points
+                if(num_gridSubset_el == inputVtkUnstructuredGrid->
+                    GetNumberOfPoints())
+                {
+                    inputVtkUnstructuredGrid->GetPointData()->
+                        AddArray(newVtkDoubleArray);
+                }
                 return;
             }
         }
@@ -228,6 +278,16 @@ void VTKIDSutilityTemplateClasses::VTK_IDS_Val2UnstrGrid_GenericGridVectorCompon
                 // to vtkUnstructuredGrid
                 inputVtkUnstructuredGrid->GetCellData()->AddArray(
                     newVtkDoubleArray);
+                // If the number of elements match the number of points
+                // (meaning we are currently dealing with points) in
+                // vtkUnstructuredGrid, set new vtkDoubleArray, containing
+                // data field, to vtkUnstructuredGrid points
+                if(num_gridSubset_el == inputVtkUnstructuredGrid->
+                    GetNumberOfPoints())
+                {
+                    inputVtkUnstructuredGrid->GetPointData()->
+                        AddArray(newVtkDoubleArray);
+                }
                 return;
             }
         }

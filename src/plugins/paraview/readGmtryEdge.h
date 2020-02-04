@@ -91,6 +91,12 @@ public:
         V4 const& vtk_cell_type,
         V5& grid,
         V6& UG);
+
+    template <typename V7, typename V8>
+    vtkSmartPointer<vtkCellArray> setVTKCellArray(
+        int dim,
+        V7 const& vtk_cell_type,
+        V8& grid);
 };
 
 #endif
