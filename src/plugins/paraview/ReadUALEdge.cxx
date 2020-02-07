@@ -231,6 +231,14 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 #ifdef IMAS_IDS
     using namespace IdsNs;
 
+#if IMAS_VERSION_DIGIT <= 3151
+    msgToOutputWindow("This plugin was compiled using ancient version of IMAS "
+        "which shouldn't be used anymore (3.15.0 or older)! Due for this reason"
+        "this plugin does not support those versions of IMAS (and DD) anymore",
+        "warning" );
+#endif
+
+
     // Check IMAS and UAL version
     std::string load_IV = getenv("IMAS_VERSION");
     std::string load_UV = getenv("UAL_VERSION");
@@ -259,8 +267,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     }
     // Latest IMAS version, for which it is confirmed the ReadUALEdgeplugin is
     // compatible with ( in single integer form )
-    std::string IV_latest_string = "3.15.0";
-    int IV_latest_DIGIT = 3150;
+    std::string IV_latest_string = "3.26.0";
+    int IV_latest_DIGIT = 3260;
 
     // Display IMAS and UAL versions
     vtkOutputWindowDisplayText(std::string("LOADED IMAS VERSION: " + load_IV +
@@ -277,8 +285,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             "consequently Data Dictionary) is outdated! ReadUALEdge plugin "
             "might not be fully compatible with the currently loaded Data "
             "Dictionary! The latest IMAS module, confirmed to be compatible "
-            "with the ReadUALEdge plugin, is imas/3.17.0/ual/3.8.0 while the "
-            "oldest is imas/3.8.0/ual/3.5.0. Using the last confirmed "
+            "with the ReadUALEdge plugin, is IMAS/3.26.0/UAL/4.4.0 while the "
+            "oldest is IMAS/3.17.0/UAL/3.8.0. Using the last confirmed "
             "compatible IMAS version is recommended. \n\n");
     }
     if( load_IV_DIGIT != PLUGIN_IMAS_VERSION_DIGIT )
@@ -293,8 +301,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         vtkOutputWindowDisplayWarningText("WARNING! The IMAS version (and "
             "consequently Data Dictionary), used to compile the ReadUALEdge "
             "plugin, is outdated! The latest IMAS module, confirmed to be "
-            "compatible with the ReadUALEdge, is imas/3.17.0/ual/3.8.0 while "
-            "the oldest is imas/3.8.0/ual/3.5.0. Using the last confirmed "
+            "compatible with the ReadUALEdge, is IMAS/3.26.0/UAL/4.4.0 while "
+            "the oldest is IMAS/3.17.0/UAL/3.8.0. Using the last confirmed "
             "compatible IMAS version is recommended.\n\n");
     }
 
@@ -347,7 +355,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // Set default number of GGD slices
     int num_ggd_slices = 0;
 
-#if IMAS_VERSION_DIGIT >= 3151
     if( std::string(this->LoadIDS).find("edge_profiles") != std::string::npos )
     {
         vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
@@ -396,41 +403,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             grid_subset.extent(0);
         // Get number of GGD slices
         num_ggd_slices = db._mhd.ggd.extent(0);
-
     }
-
-#else
-
-    if( std::string(this->LoadIDS).find("edge_profiles") != std::string::npos )
-    {
-        vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
-        // db._edge_profiles.get();
-        // Get number of grid subsets in the selected IDS
-        // (this->LoadIDS selection box)
-        num_gridSubset = db._edge_profiles.
-            ggd(ggd_slice_index).grid.grid_subset.extent(0);
-    }
-    else if( std::string(this->LoadIDS).find("edge_sources")
-        != std::string::npos )
-    {
-        vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
-        // db._edge_sources.get();
-        // Get number of grid subsets in the selected IDS
-        // (this->LoadIDS selection box)
-        num_gridSubset = db._edge_sources.source(source_index).
-            ggd(ggd_slice_index).grid.grid_subset.extent(0);
-    }
-    else if( std::string(this->LoadIDS).find("edge_transport")
-        != std::string::npos )
-    {
-        vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
-        // db._edge_transport.get();
-        // Get number of grid subsets in the selected IDS
-        // (this->LoadIDS selection box)
-        num_gridSubset = db._edge_transport.model(model_index).
-            ggd(ggd_slice_index).grid.grid_subset.extent(0);
-    }
-#endif
 
     // Get plasma state from one of the IDSs
     if( std::string(LoadIDS).find("edge_profiles")
@@ -495,7 +468,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         // Loop through all grid subsets and extract data for each
         for(int i = 0; i < num_gridSubset; i++)
         {
-#if IMAS_VERSION_DIGIT >= 3151
             std::string gridSubset_name;
             int gridSubset_index;
 
@@ -603,29 +575,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             }
             int gridSubset_obj_dim;
             gridSubset_obj_dim = gridSubset_obj_cls - 1;
-
-#else
-            // Note: this old code is for edge_profiles only, there is no mhd IDS
-            // and edge_sources support.
-            std::string gridSubset_name;
-            gridSubset_name = db._edge_profiles.
-                ggd(ggd_slice_index).grid.grid_subset(i).identifier.name;
-            int gridSubset_index;
-            gridSubset_index= db._edge_profiles.
-                ggd(ggd_slice_index).grid.grid_subset(i).identifier.index;
-
-            // Get size/number of elements forming current grid subset
-            int num_gridSubset_el;
-            num_gridSubset_el = db._edge_profiles.ggd(ggd_slice_index).grid.
-                grid_subset(i).element.extent(0);
-
-            // Get dimension of the objects forming this grid subset
-            int gridSubset_obj_cls;
-            gridSubset_obj_cls = db._edge_profiles.ggd(ggd_slice_index).grid.
-                grid_subset(i).element(0).object(0).dimension;
-            int gridSubset_obj_dim;
-            gridSubset_obj_dim = gridSubset_obj_cls - 1;
-#endif
 
             // Print grid subset info
             vtkOutputWindowDisplayText(std::string(" - Class: " +
@@ -935,509 +884,13 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
             " PASSED TO PARAVIEW!");
     }
 
+    // Close IMAS database
     db.close();
 
-#else  // CPO
-       // Note: The development is focused on IDSs. Following that the
-       //       plugin support for the CPO is not being developed at the time.
-    ItmNs::Itm itm(this->Shot,this->Run,this->Shot,this->RefRun);
+#else
+    msgToOutputWindow("This plugin supports only IMAS and IDSs. There is no "
+        "CPO support.", "warning" );
 
-    if (!this->Version)
-        this->Version = strdup("4.10a");
-    itm.openEnv(this->User, this->Device, this->Version); //Open the database
-    std::clog << "User: "<<this->User<<" Device:"<<this->Device<< std::endl;
-
-    itm._edgeArray.get();
-
-    int num_slices = itm._edgeArray.extent(0);
-    if (num_slices == 0)
-    {
-        std::clog << "ERROR! Either selected database doesn't exist"
-            "or it's empty!" << std::endl;
-        return 0;
-    }
-
-    class ItmNs::Itm::edge & edge = itm._edgeArray[0];
-    class ItmNs::Itm::edge::grid & grid = edge.grid;
-    class ItmNs::Itm::edge::grid::spaces & space = grid.spaces(0);
-    class ItmNs::Itm::edge::grid::spaces::objects & nodes = space.objects(0);
-    class ItmNs::Itm::edge::grid::spaces::objects & edges = space.objects(1);
-    class ItmNs::Itm::edge::grid::spaces::objects & cells = space.objects(2);
-
-    std::clog << "grid id: " << grid.id << std::endl;
-
-    int num_spaces = grid.spaces.extent(0);
-    std::clog << "num_spaces: " << num_spaces << std::endl;
-    grid.spaces.extent(0);
-
-    int num_coordtypes =  space.coordtype.extent(0);
-
-    if (num_spaces != 1 && num_coordtypes != 2)
-    {
-        std::clog << "Unhandled space configuration!" << std::endl;
-        return 0;
-    }
-
-    // Assure we are reading SOLPS grid
-    assert(space.coordtype(0,0) == COORDTYPE_R);
-    assert(space.coordtype(1,0) == COORDTYPE_Z);
-    // assert(space.objects.extent(0) == 1);
-
-    int num_objects = space.objects.extent(0);
-    std::clog << "num_objects: " << num_objects << std::endl;
-
-    int num_nodes = nodes.geo.extent(0);
-    std::clog << "num_nodes: " << num_nodes << std::endl;
-
-    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-
-    for(int i=0; i < num_nodes; ++i)
-    {
-        points->InsertNextPoint(nodes.geo(i, 0), nodes.geo(i, 1), 0.0);
-    }
-
-    // 2D cells in GGD are defined by edges. Edges have indices to nodes.
-
-    int num_edges = edges.boundary.extent(0);
-    int num_cells = cells.boundary.extent(0);
-
-    std::clog << "num_cells :" << num_cells << std::endl;
-
-    vtkSmartPointer<vtkQuad> subgridQuad =  vtkSmartPointer<vtkQuad>::New();
-    vtkSmartPointer<vtkCellArray> cellArray =
-        vtkSmartPointer<vtkCellArray>::New();
-    vtkSmartPointer<vtkMultiBlockDataSet> mainMB =
-        vtkSmartPointer<vtkMultiBlockDataSet>::New();
-
-    double all_cells[num_cells][4];
-    for (int i = 0; i < num_cells; ++i)
-    {
-        int node_idx[4];    // Resulting node indices for a cell
-        int free_edge[3];   // list of edges that are free to search for node
-        int last_idx;       // last node index
-        int edge_idx = cells.boundary(i, 0) - 1;
-        free_edge[0] = cells.boundary(i, 1) - 1;
-        free_edge[1] = cells.boundary(i, 2) - 1;
-        free_edge[2] = cells.boundary(i, 3) - 1;
-        node_idx[0] = edges.boundary(edge_idx, 0) - 1;
-        node_idx[last_idx=1] = edges.boundary(edge_idx, 1) - 1;
-        for(int loop_count = 0; last_idx < 3 && loop_count < 4; ++loop_count)
-        {
-            for(int j = 0; j < 3 ; ++j)
-            {
-                // free_edge
-                edge_idx = free_edge[j];
-                if(edge_idx < 0)
-                continue;
-                int node1 =  edges.boundary(edge_idx, 0) - 1;
-                int node2 =  edges.boundary(edge_idx, 1) - 1;
-                if (node_idx[last_idx] == node1)
-                {
-                    free_edge[j] = -1;
-                    node_idx[++last_idx] = node2;
-                    break;
-                }
-                if (node_idx[last_idx] == node2)
-                {
-                    free_edge[j] = -1;
-                    node_idx[++last_idx] = node1;
-                    break;
-                }
-            }
-            assert(loop_count < 3);
-        }
-        all_cells[i][0] = node_idx[0];
-        all_cells[i][1] = node_idx[1];
-        all_cells[i][2] = node_idx[2];
-        all_cells[i][3] = node_idx[3];
-    }
-
-    // Check contents under po (electric potential)
-    class ItmNs::Itm::edge::fluid::po & po = edge.fluid.po;
-    std::clog << std::left << setw(35) << "po.value(0).extent(0): _______" <<
-        edge.fluid.po.value.extent(0) << std::endl;
-    std::clog << std::left << setw(35) << "po.value(0).scalar.extent(0): ___" <<
-        edge.fluid.po.value(0).scalar.extent(0) << std::endl;
-
-    int num_ni_species = edge.fluid.ni.extent(0);
-    std::clog << "Number of Ion Density species:" << num_ni_species <<
-        std::endl;
-    int num_ti_species = edge.fluid.ti.extent(0);
-    std::clog << "Number of Ion Temperature species:" << num_ti_species <<
-        std::endl;
-
-    int num_subgrids = grid.subgrids.extent(0);
-    std:: subgridName[num_subgrids];
-    std::clog << "num_subgrids: "<< num_subgrids << std::endl;
-    std::clog << "Setting scalars" << std::endl;
-    for(int i = 0; i < num_subgrids; i++)
-    {
-        int subgrid_class = grid.subgrids(i).list(0).cls(0);
-        int ind_num = grid.subgrids(i).list(0).ind.extent(0);
-        subgridName[i] = grid.subgrids(i).id;
-        int indset_found = grid.subgrids(i).list(0).indset.extent(0);
-        // grid.subgrids(i).list(0).indset contains range for certain subgrid.
-        // If indset is not found then also there is no range for that subgrid.
-        std::clog << std::left << "Subgrid id number: " << setw(2) << i+1 <<
-        " Subgrid name: " << setw(18) << subgridName[i] << " Subgrid class: " <<
-        setw(1) << subgrid_class << " ";
-        int range0 = 0;
-        int range1 = 0;
-        int range_found;
-        int start_index;
-        int end_index;
-        int jIndex = 0;
-        int array_size;
-        if(indset_found > 0)
-        {
-            int range_size = grid.subgrids(i).list(0).indset(0).range.extent(0);
-            if(range_size > 1)
-            {
-                range_found = 1;
-                range0 = grid.subgrids(i).list(0).indset(0).range(0) - 1;
-                range1 = grid.subgrids(i).list(0).indset(0).range(1);
-                start_index = range0;
-                end_index = range1;
-                std::clog << std::left << " range: " << setw(4) << range0+1 <<
-                " - " << setw(4) << range1;
-                array_size = end_index - start_index;
-            } else
-            {
-                std::clog << "Range is either EMPTY or it doesn't exist" <<
-                std::endl;
-            }
-        } else
-        {
-            range_found = 0;
-            start_index = grid.subgrids(i).list(0).ind(0,0) - 1;
-            end_index = grid.subgrids(i).list(0).ind(ind_num-1,0) - 1;
-            std::clog << std::left << setw(19) << "range: not found";
-            array_size = ind_num;
-        }
-        int index_array[array_size];
-        std::clog << "  index_Array size: " <<
-            sizeof(index_array)/sizeof(*index_array) << std::endl;
-        if(range_found == 1)
-        {
-            for(int j = start_index; j < end_index; j++)
-            {
-                index_array[j-start_index] = j;
-            }
-        } else
-        {
-            for(int j = 0; j < ind_num; j++)
-            {
-                jIndex = grid.subgrids(i).list(0).ind(j,0) - 1;
-                index_array[j] = jIndex;
-            }
-        }
-
-        int size = (sizeof(index_array)/sizeof(*index_array));
-
-        vtkSmartPointer<vtkCellArray> subgridCellArray =
-            vtkSmartPointer<vtkCellArray>::New();
-
-        // ELECTRON TEMPERATURE creating array
-        vtkSmartPointer<vtkDoubleArray> electronTemperatureArray =
-            fSetValuesArrayBase(size, "Electron Temperature");
-
-        // ELECTRON DENSITY creating array
-        vtkSmartPointer<vtkDoubleArray> electronDensityArray =
-            fSetValuesArrayBase(size, "Electron Density");
-
-        // ELECTRIC POTENTIAL creating array
-        vtkSmartPointer<vtkDoubleArray> electricPotentialArray =
-            fSetValuesArrayBase(size, "Electric Potential");
-
-        if(subgrid_class == 0)
-        {
-            // POINTS/NODES
-            vtkSmartPointer<vtkUnstructuredGrid> subgridPointsUnstructuredGrid =
-                 vtkSmartPointer<vtkUnstructuredGrid>::New();
-            // Getting vertex colored by reading scalars from electron density
-            // subgrids (nodes)
-            int ne_subgrid_num = edge.fluid.ne.value.extent(0);
-            for(int n = 0; n < ne_subgrid_num; n++)
-            {
-                int ne_subgrid_ind = edge.fluid.ne.value(n).subgrid;
-                if(i+1 == edge.fluid.ne.value(n).subgrid)
-                // +1 because in CPO index starts with 1 and not with 0
-                // as in C++
-                {
-                    vtkSmartPointer<vtkCellArray> subgridVertices =
-                        vtkSmartPointer<vtkCellArray>::New();
-                    vtkSmartPointer<vtkVertex> subgridVertex =
-                        vtkSmartPointer<vtkVertex>::New();
-
-                    electronDensityArray->SetNumberOfValues(size);
-                    for(int j = 0; j < size; j++)
-                    {
-                        points->InsertNextPoint(nodes.geo(index_array[j], 0),
-                            nodes.geo(index_array[j], 1), 0.0);
-                        subgridVertex->GetPointIds()->SetId(0, j);
-                        subgridVertices->InsertNextCell(subgridVertex);
-                        electronDensityArray->SetComponent(j, 0,
-                            edge.fluid.ne.value(n).scalar(j));
-                    }
-                    // To add new array Electron Density (Cells) as unstructuredGrid
-                    subgridPointsUnstructuredGrid->SetPoints(points);
-                    subgridPointsUnstructuredGrid->SetCells(
-                        VTK_VERTEX, subgridVertices);
-                    subgridPointsUnstructuredGrid->GetCellData()->AddArray(
-                        electronDensityArray);
-                }
-            }
-
-            // Getting vertex colored by reading scalars from electron
-            // temperature subgrids (nodes)
-            int te_subgrid_num = edge.fluid.te.value.extent(0);
-            for(int n = 0; n < te_subgrid_num; n++)
-            {
-                int te_subgrid_ind = edge.fluid.te.value(n).subgrid;
-                if(i+1 == edge.fluid.te.value(n).subgrid)
-                // +1 because in CPO index starts with 1 and not with 0
-                // as in C++
-                {
-                    vtkSmartPointer<vtkCellArray> subgridVertices =
-                        vtkSmartPointer<vtkCellArray>::New();
-                    vtkSmartPointer<vtkVertex> subgridVertex =
-                        vtkSmartPointer<vtkVertex>::New();
-                    electronTemperatureArray->SetNumberOfValues(size);
-                    for(int j = 0; j < size; j++)
-                    {
-                        points->InsertNextPoint(nodes.geo(index_array[j], 0),
-                            nodes.geo(index_array[j], 1), 0.0);
-                        subgridVertex->GetPointIds()->SetId(0, j);
-                        subgridVertices->InsertNextCell(subgridVertex);
-                        electronTemperatureArray->SetComponent(j, 0,
-                            edge.fluid.te.value(n).scalar(j));
-                    }
-
-                    // To add new array Electron Temperature (Cells) as
-                    // unstructuredGrid
-                    subgridPointsUnstructuredGrid->SetPoints(points);
-                    subgridPointsUnstructuredGrid->SetCells(
-                        VTK_VERTEX, subgridVertices);
-                    subgridPointsUnstructuredGrid->GetCellData()->AddArray(
-                        electronTemperatureArray);
-                }
-            }
-            // Getting vertex colored by reading scalars from ion density
-            // subgrids (nodes)
-            for(int k = 0; k < num_ni_species; k++)
-            {
-                std::string ion_charge = edge.species(k).label;
-                stringstream ni_species_num2str;
-                ni_species_num2str << k+1;
-                string ni_species_num_str = ni_species_num2str.str();
-                std::string ni_array_label;
-                if (k < 9)
-                {
-                    ni_array_label = "Ion Density 0" + ni_species_num_str +
-                        ion_charge;
-                } else
-                {
-                    ni_array_label = "Ion Density " + ni_species_num_str +
-                        ion_charge;
-                }
-                vtkSmartPointer<vtkDoubleArray> ionDensityArray =
-                    fSetValuesArrayBase(size, ni_array_label);
-                int ni_subgrid_num = edge.fluid.ni(k).value.extent(0);
-                for(int n = 0; n < ni_subgrid_num; n++)
-                {
-                    int ni_subgrid_ind = edge.fluid.ni(k).value(n).subgrid;
-                    if(i+1 == edge.fluid.ni(k).value(n).subgrid)
-                    // +1 because in CPO index starts with 1 and not with 0
-                    // as in C++
-                    {
-                        vtkSmartPointer<vtkCellArray> subgridVertices =
-                            vtkSmartPointer<vtkCellArray>::New();
-                        vtkSmartPointer<vtkVertex> subgridVertex =
-                            vtkSmartPointer<vtkVertex>::New();
-                        ionDensityArray->SetNumberOfValues(size);
-                        for(int j = 0; j < size; j++)
-                        {
-                            points->InsertNextPoint(nodes.geo(index_array[j], 0),
-                                nodes.geo(index_array[j], 1), 0.0);
-                            subgridVertex->GetPointIds()->SetId(0, j);
-                            subgridVertices->InsertNextCell(subgridVertex);
-                            ionDensityArray->SetComponent(j, 0, edge.fluid.
-                                ni(k).value(n).scalar(j));
-                        }
-
-                        // To add new array Electron Density (Cells) as unstructuredGrid
-                        subgridPointsUnstructuredGrid->SetPoints(points);
-                        subgridPointsUnstructuredGrid->SetCells(
-                            VTK_VERTEX, subgridVertices);
-                        subgridPointsUnstructuredGrid->GetCellData()->AddArray(
-                            ionDensityArray);
-                    }
-                }
-            }
-
-            // Getting vertex colored by reading scalars from ion Temperature
-            // subgrids (nodes)
-            for(int k = 0; k < num_ti_species; k++)
-            {
-                vtkSmartPointer<vtkDoubleArray> ionTemperatureArray =
-                    fSetValuesArrayBase(size, "Ion Temperature");
-                int ti_subgrid_num = edge.fluid.ti(k).value.extent(0);
-                for(int n = 0; n < ti_subgrid_num; n++)
-                {
-                    int ti_subgrid_ind = edge.fluid.ti(k).value(n).subgrid;
-                    if(i+1 == edge.fluid.ti(k).value(n).subgrid)
-                    // +1 because in CPO index starts with 1 and not with 0
-                    // as in C++
-                    {
-                        vtkSmartPointer<vtkCellArray> subgridVertices =
-                            vtkSmartPointer<vtkCellArray>::New();
-                        vtkSmartPointer<vtkVertex> subgridVertex =
-                            vtkSmartPointer<vtkVertex>::New();
-                        ionTemperatureArray->SetNumberOfValues(size);
-                        for(int j = 0; j < size; j++)
-                        {
-                            points->InsertNextPoint(
-                                nodes.geo(index_array[j], 0),
-                                nodes.geo(index_array[j], 1), 0.0);
-                            subgridVertex->GetPointIds()->SetId(0, j);
-                            subgridVertices->InsertNextCell(subgridVertex);
-                            ionTemperatureArray->SetComponent(j, 0,
-                                edge.fluid.ti(k).value(n).scalar(j));
-                        }
-
-                        // To add new array Electron Temperature (Cells)
-                        // as unstructuredGrid
-                        subgridPointsUnstructuredGrid->SetPoints(points);
-                        subgridPointsUnstructuredGrid->SetCells(
-                            VTK_VERTEX, subgridVertices);
-                        subgridPointsUnstructuredGrid->GetCellData()->AddArray(
-                            ionTemperatureArray);
-                    }
-                }
-            }
-
-            // Getting vertex colored by reading scalars from electric potential
-            // subgrids (nodes): There is no data for electric potential nodes.
-            int num_blocks = mainMB->GetNumberOfBlocks();
-            mainMB->SetBlock(num_blocks, subgridPointsUnstructuredGrid);
-            mainMB->GetMetaData((unsigned int) num_blocks)->Set(
-                vtkCompositeDataSet::NAME(), subgridName[i].c_str());
-        }
-        else if(subgrid_class == 1) //LINES
-        {
-            vtkSmartPointer<vtkUnstructuredGrid> subgridLinesUnstructuredGrid =
-                vtkSmartPointer<vtkUnstructuredGrid>::New();
-            vtkSmartPointer<vtkCellArray> subgridLinesArray =
-                vtkSmartPointer<vtkCellArray>::New();
-            for(int j = 0; j < size; j++)
-            {
-                vtkSmartPointer<vtkLine> subgridLine =
-                    vtkSmartPointer<vtkLine>::New();
-
-                int line_ind_0 = edges.boundary(index_array[j],0) -1;
-                int line_ind_1 = edges.boundary(index_array[j],1) -1;
-
-                subgridLine ->GetPointIds()->SetId(0, line_ind_0);
-                subgridLine ->GetPointIds()->SetId(1, line_ind_1);
-                subgridLinesArray->InsertNextCell(subgridLine);
-            }
-            subgridLinesUnstructuredGrid->SetPoints(points);
-            subgridLinesUnstructuredGrid->SetCells(VTK_LINE, subgridLinesArray);
-
-            // Getting all subgrids to main block
-            int num_blocks = mainMB->GetNumberOfBlocks();
-            mainMB->SetBlock(num_blocks, subgridLinesUnstructuredGrid);
-            mainMB->GetMetaData((unsigned int) num_blocks)->
-                Set(vtkCompositeDataSet::NAME(), subgridName[i].c_str());
-        }
-        else if(subgrid_class == 2) //CELLS
-        {
-            for(int j = 0; j < size; j++)
-            {
-                subgridQuad->GetPointIds()->
-                    SetId(0,all_cells[index_array[j]][0]);
-                subgridQuad->GetPointIds()->
-                    SetId(1,all_cells[index_array[j]][1]);
-                subgridQuad->GetPointIds()->
-                    SetId(2,all_cells[index_array[j]][2]);
-                subgridQuad->GetPointIds()->
-                    SetId(3,all_cells[index_array[j]][3]);
-                subgridCellArray->InsertNextCell(subgridQuad);
-
-                // ELECTRON DENSITY and ELECTRON TEMPERATURE
-                electronDensityArray->SetComponent(j, 0,
-                    edge.fluid.ne.value(0).scalar(index_array[j]));
-                electronTemperatureArray->SetComponent(j, 0,
-                    edge.fluid.te.value(0).scalar(index_array[j]));
-                electricPotentialArray->SetComponent(j, 0,
-                    edge.fluid.po.value(0).scalar(index_array[j]));
-            }
-            vtkSmartPointer<vtkUnstructuredGrid> subgridCellsUnstructuredGrid =
-                vtkSmartPointer<vtkUnstructuredGrid>::New();
-
-            subgridCellsUnstructuredGrid->SetPoints(points);
-            subgridCellsUnstructuredGrid->SetCells(VTK_QUAD, subgridCellArray);
-
-            // Setting Electron Density and Electron Temperature to
-            // UnstructuredGrid
-            subgridCellsUnstructuredGrid->GetCellData()->AddArray(
-                electronTemperatureArray);
-            subgridCellsUnstructuredGrid->GetCellData()->AddArray(
-                electronDensityArray);
-            subgridCellsUnstructuredGrid->GetCellData()->AddArray(
-                electricPotentialArray);
-
-            // ION DENSITY
-            for(int k = 0; k < num_ni_species; k++)
-            {
-                std::string ion_charge = edge.species(k).label;
-                stringstream ni_species_num2str;
-                ni_species_num2str << k+1;
-                string ni_species_num_str = ni_species_num2str.str();
-                std::string ni_array_label;
-                if (k < 9)
-                {
-                    ni_array_label = "Ion Density 0" + ni_species_num_str +
-                        ion_charge;
-                } else
-                {
-                    ni_array_label = "Ion Density " + ni_species_num_str +
-                        ion_charge;
-                }
-                vtkSmartPointer<vtkDoubleArray> ionDensityArray =
-                    fSetValuesArrayBase(size, ni_array_label);
-                for(int j =0; j < size; j++)
-                {
-                    ionDensityArray->SetComponent(j, 0,
-                        edge.fluid.ni(k).value(0).scalar(index_array[j]));
-                }
-                    subgridCellsUnstructuredGrid->GetCellData()->AddArray(
-                        ionDensityArray);
-            }
-
-            // ION TEMPERATURE
-            for(int k = 0; k < num_ti_species; k++)
-            {
-                vtkSmartPointer<vtkDoubleArray> ionTemperatureArray =
-                    fSetValuesArrayBase(size, "Ion Temperature");
-                for(int j =0; j < size; j++)
-                {
-                    ionTemperatureArray->SetComponent(j, 0,
-                        edge.fluid.ti(k).value(0).scalar(index_array[j]));
-                }
-                subgridCellsUnstructuredGrid->GetCellData()->AddArray(
-                    ionTemperatureArray);
-            }
-
-            // Getting all subgrids to main multiblockdataset block
-            int num_blocks = mainMB->GetNumberOfBlocks();
-            mainMB->SetBlock(num_blocks, subgridCellsUnstructuredGrid);
-            mainMB->GetMetaData((unsigned int) num_blocks)->Set(
-                vtkCompositeDataSet::NAME(), subgridName[i].c_str());
-        }
-    }
-    output->ShallowCopy(mainMB);
-    itm.close();
 #endif // IMAS_IDS
     return 1;
 }

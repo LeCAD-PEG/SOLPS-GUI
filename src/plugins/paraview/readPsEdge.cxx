@@ -143,16 +143,6 @@ void readPsEdge::setUnstructuredGridDataFields(
     int UG_EdgeSourcesSourceID,
     int UG_EdgeTransportModelID)
 {
-//   @note   Below  is a variant of 'setUnstructuredGridDataFields_IMAS' routine,
-//           made specifically for IMAS 3.15.1 due many issues with IMAS 3.15.1
-//           ( while with IMAS 3.15.0 it works great).
-//           It includes also full code of 'setAllDataFields_edge_profiles',
-//           'setAllDataFields_edge_sources' and 'setAllDataFields_edge_profiles'
-//           routines. For some strange reason those routines doesn't work with
-//           IMAS 3.15.1 (the plugin freezes etc.).
-#if IMAS_VERSION_DIGIT >= 3151
-    // Object declaration for readPsEdge routines
-
     // For "edge_profiles" selection in "Load IDS" text box
     if( UG_LoadIDS_string.find( "edge_profiles" ) != std::string::npos)
     {
@@ -263,10 +253,9 @@ void readPsEdge::setUnstructuredGridDataFields(
                 UG_num_gridSubset_el );
         }
 
-        // In IMAS 3.15.0 and older versions the .velocity IDS data structure is
-        // simple structure node, while in 3.15.1 it was changed to array
-        // of structures node
-    #if IMAS_VERSION_DIGIT >= 3170
+        // Note: In IMAS 3.15.0 and older versions the .velocity IDS data
+        // structure is simple structure node, while in 3.15.1 it was changed
+        // to array of structures node
         // Reading Electron velocity ( GenericGridVectorComponents data structure
         // type )
         num_IDStarget_gridSubsets = UG_db._edge_profiles.ggd(UG_ggd_slice_index)
@@ -335,7 +324,6 @@ void readPsEdge::setUnstructuredGridDataFields(
                 UG_gridSubset_index,
                 UG_num_gridSubset_el );
         }
-    #endif
 
         // Assign values found in Electrons Distribution Function array of
         // structures node to grid subsets objects
@@ -489,10 +477,9 @@ void readPsEdge::setUnstructuredGridDataFields(
                     UG_num_gridSubset_el );
             }
 
-        // In IMAS 3.15.0 and older versions the .velocity IDS data structure is
-        // simple structure node, while in 3.6.4 it was changed to array
-        // of structures node
-    #if IMAS_VERSION_DIGIT >= 3170
+            // NOTE: In IMAS 3.15.0 and older versions the .velocity IDS data
+            // structure is simple structure node, while in 3.6.4 it was changed
+            // to array of structures node
             // Reading Ion velocity ( GenericGridVectorComponents data structure
             // type )
             num_IDStarget_gridSubsets = UG_db._edge_profiles
@@ -581,7 +568,6 @@ void readPsEdge::setUnstructuredGridDataFields(
                     UG_gridSubset_index,
                     UG_num_gridSubset_el );
             }
-    #endif
 
             // Assign values found in Ion Energy Density Kinetic array of
             // structures node to grid subsets objects
@@ -823,7 +809,6 @@ void readPsEdge::setUnstructuredGridDataFields(
                 UG_gridSubset_index,
                 UG_num_gridSubset_el);
         }
-
 
         // Assign values found in Electrons Energy - Flux array of structures
         // node to grid subsets objects
@@ -1351,46 +1336,7 @@ void readPsEdge::setUnstructuredGridDataFields(
         }
 
     }
-
-#else   // Working for IMAS modules of versions lower than 3.15.1
-
-    // For "edge_profiles" selection in "Load IDS" text box
-    if( UG_LoadIDS_string.find( "edge_profiles" ) != std::string::npos)
-    {
-        // Using readPsEdge function
-        setAllDataFields_edge_profiles(
-            UG,
-            UG_db._edge_profiles.ggd(UG_ggd_slice_index),
-            UG_gridSubset_index,
-            UG_num_gridSubset_el);
-    // For "edge_sources" selection in "Load IDS" text box
-    }else if( UG_LoadIDS_string.find( "edge_sources" ) !=
-        std::string::npos )
-    {
-        // Assigning values (2D cells)
-        // Using readPsEdge function
-        setAllDataFields_edge_sources(
-            UG,
-            UG_db._edge_sources.source(UG_EdgeSourcesSourceID).
-                ggd(UG_ggd_slice_index),
-            UG_gridSubset_index,
-            UG_num_gridSubset_el);
-    // For "edge_transport" selection in "Load IDS" text box
-    }else if( UG_LoadIDS_string.find( "edge_transport" ) !=
-        std::string::npos )
-    {
-        // Assigning values (2D cells)
-        // Using readPsEdge function
-        setAllDataFields_edge_transport(
-            UG,
-            UG_db._edge_transport.model(UG_EdgeTransportModelID).
-                ggd(UG_ggd_slice_index),
-            UG_gridSubset_index,
-            UG_num_gridSubset_el);
-    }
-#endif
 }
-
 
 /* Main function used to fully read plasma state from the edge_profiles IDS
 * and set the data properly to specified vtkUnstructuredGrid
@@ -1496,10 +1442,6 @@ void readPsEdge::setAllDataFields_edge_profiles(
             num_gridSubset_el );
     }
 
-    // In IMAS 3.15.0 and older versions the .velocity IDS data structure is
-    // simple structure node, while in 3.6.4 it was changed to array
-    // of structures node
-#if IMAS_VERSION_DIGIT >= 3150
     // Reading Electron velocity ( GenericGridVectorComponents data structure
     // type )
     num_IDStarget_gridSubsets = loc_ggd.electrons.velocity.extent(0);
@@ -1567,7 +1509,6 @@ void readPsEdge::setAllDataFields_edge_profiles(
             gridSubset_index,
             num_gridSubset_el );
     }
-#endif
 
     // Assign values found in Electrons Distribution Function array of structures
     // node to grid subsets objects
@@ -1694,10 +1635,6 @@ void readPsEdge::setAllDataFields_edge_profiles(
                 num_gridSubset_el );
         }
 
-    // In IMAS 3.15.0 and older versions the .velocity IDS data structure is
-    // simple structure node, while in 3.6.4 it was changed to array
-    // of structures node
-#if IMAS_VERSION_DIGIT >= 3150
         // Reading Ion velocity ( GenericGridVectorComponents data structure
         // type )
         num_IDStarget_gridSubsets = loc_ggd.ion(k).velocity.extent(0);
@@ -1780,7 +1717,6 @@ void readPsEdge::setAllDataFields_edge_profiles(
                 gridSubset_index,
                 num_gridSubset_el );
         }
-#endif
 
         // Assign values found in Ion Energy Density Kinetic array of structures
         // node to grid subsets objects
