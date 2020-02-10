@@ -150,10 +150,10 @@ void readPsEdge::setUnstructuredGridDataFields(
         // NOTE: Other method than setting whole path:
         // UG_db._edge_profiles.ggd(UG_ggd_slice_index).electrons
         //            .temperature(n)
-        class IdsNs::IDS::edge_profiles & e_p = UG_db._edge_profiles;
-        class IdsNs::IDS::edge_profiles::ggd & GGD =
-            UG_db._edge_profiles.ggd(UG_ggd_slice_index);
-        class IdsNs::IDS::edge_profiles::ggd::electrons & e = GGD.electrons;
+        // class IdsNs::IDS::edge_profiles & e_p = UG_db._edge_profiles;
+        // class IdsNs::IDS::edge_profiles::ggd & GGD =
+        //     UG_db._edge_profiles.ggd(UG_ggd_slice_index);
+        // class IdsNs::IDS::edge_profiles::ggd::electrons & e = GGD.electrons;
         // class IdsNs::IDS::edge_profiles::ggd::electrons::temperature & te_n = e.temperature(n);
 
         VTKIDSutility vtkids_obj_ep;
@@ -168,9 +168,9 @@ void readPsEdge::setUnstructuredGridDataFields(
         // node to grid subsets objects
         num_IDStarget_gridSubsets = UG_db._edge_profiles
             .ggd(UG_ggd_slice_index).electrons.temperature.extent(0);
+
         for (int n = 0; n < num_IDStarget_gridSubsets; n++)
         {
-
             vtkids_obj_ep_template.VTK_IDS_Val2UnstrGrid_GenericGridScalar(
                 "Electron Temperature",
                 UG,

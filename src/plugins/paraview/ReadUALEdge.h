@@ -48,8 +48,6 @@ class ReadUALEdge : public vtkMultiBlockDataSetAlgorithm
     vtkGetStringMacro(Device);
     vtkSetStringMacro(LoadIDS);
     vtkGetStringMacro(LoadIDS);
-    vtkGetMacro(IDSListCheckBox,int);
-    vtkSetMacro(IDSListCheckBox,int);
     vtkGetMacro(EdgeSourcesSourceID,int);
     vtkSetMacro(EdgeSourcesSourceID,int);
     vtkGetMacro(EdgeTransportModelID,int);
@@ -62,6 +60,10 @@ class ReadUALEdge : public vtkMultiBlockDataSetAlgorithm
     vtkGetStringMacro(IDSPlasmaStateSource);
     vtkSetStringMacro(GridForm);
     vtkGetStringMacro(GridForm);
+    vtkGetMacro(ReadAllTimeSlicesCheckBox,int);
+    vtkSetMacro(ReadAllTimeSlicesCheckBox,int);
+    vtkGetMacro(IDSListCheckBox,int);
+    vtkSetMacro(IDSListCheckBox,int);
 
 protected:
     ReadUALEdge();
@@ -72,7 +74,6 @@ protected:
     int Shot;
     int Run;
     int RefRun;
-    int IDSListCheckBox;
     int EdgeSourcesSourceID;
     int EdgeTransportModelID;
     int GridGGDslice;
@@ -83,6 +84,8 @@ protected:
     char* LoadIDS;
     char* IDSPlasmaStateSource;
     char* GridForm;
+    int ReadAllTimeSlicesCheckBox;
+    int IDSListCheckBox;
     vtkSmartPointer<vtkStringArray> stringArray;
 
     int RequestData(vtkInformation *, vtkInformationVector **,
