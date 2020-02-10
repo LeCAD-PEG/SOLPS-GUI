@@ -560,7 +560,7 @@ vtkSmartPointer<vtkCellArray> readGmtryEdge::setVTKCellArrayGS(
     //         the first object forming the grid subset.
     int obj_dimension = loc_gridSubset.element(0).object(0).dimension;
 
-    for (int j = 0; j < num_gridSubset_el; j++)
+    for (int j = 0; j < num_gridSubset_el; ++j)
     {
         // Get objects space index, dimension and index
         // Note that in IDS indices are written in Fortran notation
@@ -594,7 +594,7 @@ vtkSmartPointer<vtkCellArray> readGmtryEdge::setVTKCellArrayGS(
 
         // Fill the el_data_type (it must be either vtkVertex,
         // vtkLine, vtkTriangle or vtkQuad data type)
-        for(int k = 0; k < num_obj_nodes; k++)
+        for(int k = 0; k < num_obj_nodes; ++k)
         {
             int node_ind = grid.space(obj_space - 1).
                 objects_per_dimension(obj_dimension - 1).
@@ -643,13 +643,13 @@ void readGmtryEdge::insertVTKCells2UnstructuredGrid(
         "\n").c_str());
     }
 
-    for ( int i = 0; i < num_obj; i++)
+    for ( int i = 0; i < num_obj; ++i)
     {
         int num_obj_nodes = grid.space(0).objects_per_dimension(dim).
             object(i).nodes.extent(0);
         // Fill the vtk_cell_type (it must be either vtkVertex,
         // vtkLine, vtkTriangle or vtkQuad data type)
-        for(int j = 0; j < num_obj_nodes; j++)
+        for(int j = 0; j < num_obj_nodes; ++j)
         {
             int node_ind = grid.space(0).objects_per_dimension(dim).
                 object(i).nodes(j);
@@ -700,13 +700,13 @@ vtkSmartPointer<vtkCellArray> readGmtryEdge::setVTKCellArray(
         "\n").c_str());
     }
 
-    for ( int i = 0; i < num_obj; i++)
+    for ( int i = 0; i < num_obj; ++i)
     {
         int num_obj_nodes = grid.space(0).objects_per_dimension(dim).
             object(i).nodes.extent(0);
         // Fill the vtk_cell_type (it must be either vtkVertex,
         // vtkLine, vtkTriangle or vtkQuad data type)
-        for(int j = 0; j < num_obj_nodes; j++)
+        for(int j = 0; j < num_obj_nodes; ++j)
         {
             int node_ind = grid.space(0).objects_per_dimension(dim).
                 object(i).nodes(j);

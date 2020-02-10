@@ -237,7 +237,7 @@
                     created
                     NOTE: due to non-trivial and limited solutions for plugins,
                     the VTM files get written to **/tmp** directory and then
-                    are read to ParaView by the plugin.
+                    must be manually opened in ParaView.
                 </Documentation>
             </IntVectorProperty>
 

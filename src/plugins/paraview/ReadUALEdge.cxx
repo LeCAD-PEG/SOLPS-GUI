@@ -169,7 +169,8 @@ ReadUALEdge::ReadUALEdge()
 * @param msg        Message text to display
 * @param ms_type    message type (info/error/warning)
 */
-void msgToOutputWindow( std::stringstream& msg, std::string msg_type = "info" )
+void msgToOutputWindow(std::stringstream& msg,
+                       std::string const& msg_type = "info" )
 {
     const std::string msg_str = msg.str();
     const char* msg_cstr = msg_str.c_str();
@@ -1010,18 +1011,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     gmtrye_obj.ggdCheck(db, IDS_plasmaStateSource, grid_ggd_slice_index,
                         ggd_slice_index);
 
-    // Get the geometry/coordinates of all nodes/points N[R, Z]
-    // forming this grid using routine 'setVtkPoints'
-    vtkSmartPointer<vtkPoints> obj_0D_vtkPointsArray = gmtrye_obj.setVtkPoints(
-        db,
-        std::string(this->LoadIDS),
-        grid_ggd_slice_index,
-        this->EdgeSourcesSourceID,
-        this->EdgeTransportModelID);
-
-    // Object declaration for readPsEdge routines
-    readPsEdge pse_obj;
-
     // MultiBlock object, to hold all VTUs
     vtkSmartPointer<vtkMultiBlockDataSet> mainMB =
         vtkSmartPointer<vtkMultiBlockDataSet>::New();
@@ -1033,7 +1022,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
         if (this->ReadAllTimeSlicesCheckBox)
         {
-            for(int s; s < num_ggd_slices; s++)
+            for(int s; s < num_ggd_slices; ++s)
             {
                 if (s > 1)
                 {
@@ -1041,6 +1030,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                     // one block must remain)
                     mainMB->RemoveBlock(0);
                 }
+                // Create a multiblock holding multiple blocks -> Unstructured
+                // Grids
                 fTimeSlice2MultiBlockGS(db,
                                         std::string(this->LoadIDS),
                                         std::string(IDS_plasmaStateSource),
@@ -1063,6 +1054,8 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
         }else
         {
+            // Create a multiblock holding multiple blocks -> Unstructured
+            // Grids
             fTimeSlice2MultiBlockGS(db,
                                     std::string(this->LoadIDS),
                                     std::string(IDS_plasmaStateSource),
@@ -1094,6 +1087,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
                     // one block must remain)
                     mainMB->RemoveBlock(0);
                 }
+                // Create a multiblock holding single block -> Unstructured Grid
                 fTimeSlice2MultiBlockSingleUG(db,
                                               std::string(this->LoadIDS),
                                               std::string(IDS_plasmaStateSource),
@@ -1116,6 +1110,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
 
         }else
         {
+            // Create a multiblock holding single block -> Unstructured Grid
             fTimeSlice2MultiBlockSingleUG(db,
                                           std::string(this->LoadIDS),
                                           std::string(IDS_plasmaStateSource),
