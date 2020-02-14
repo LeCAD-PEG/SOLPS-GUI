@@ -299,12 +299,13 @@ freetype: ${STAGING_DIR}/freetype/${FREETYPE_VERSION}
 ${STAGING_DIR}/ncl/${NCL_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${NCL_VERSION}}/" package/build-ncl.sh
 
+	FLEX_VERSION=${FLEX_VERSION} \
 	FREETYPE_VERSION=${FREETYPE_VERSION} \
 	OPENBLAS_VERSION=${OPENBLAS_VERSION} \
 	NETCDF_VERSION=${NETCDF_VERSION} \
 	./package/build-ncl.sh
 
-ncl: config freetype ${STAGING_DIR}/ncl/${NCL_VERSION}
+ncl: config flex freetype ${STAGING_DIR}/ncl/${NCL_VERSION}
 
 ${STAGING_DIR}/openmpi/${OPENMPI_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${OPENMPI_VERSION}}/" package/build-openmpi.sh
