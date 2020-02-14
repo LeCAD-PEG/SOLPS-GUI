@@ -308,13 +308,13 @@ else
     export PKG_CONFIG_PATH=\${STAGING_DIR}/mscl/\${MSCL_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
 fi
 
-if [ -z \${GLI_VERSION}+x ]; then
+if [ -z \${GLI_VERSION+x} ]; then
     echo "GLI_VERSION is unset, skipping"
 else
-    export GLI_HOME=\${STAGING_DIR}/GLI/${GLI_VERSION}
+    export GLI_HOME=\${STAGING_DIR}/GLI/\${GLI_VERSION}
 fi
 
-if [ -z \${NCL_VERSION}+x ]; then
+if [ -z \${NCL_VERSION+x} ]; then
     echo "NCL_VERSION is unset, skipping"
 else
     export NCARG_ROOT=\${STAGING_DIR}/ncl/\${NCL_VERSION}
