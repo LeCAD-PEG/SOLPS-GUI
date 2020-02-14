@@ -247,6 +247,7 @@
                 panel_widget="command_button"
                 width="5"/>
 
+
             <IntVectorProperty
                 name="IDSListCheckBox"
                 label="Show list of available IDS Shot/Run cases"
@@ -277,6 +278,16 @@
 			 	   <PropertyWidgetDecorator type="my_decorator"/>
 		 	    </Hints>
             </StringVectorProperty>
+
+            <DoubleVectorProperty
+                name="TimestepValues"
+                information_only="1">
+                <TimeStepsInformationHelper/>
+                <Documentation>
+                    Available timestep values.
+                </Documentation>
+            </DoubleVectorProperty>
+
             <Hints>
                 <ShowInMenu category="IMAS"/>
             </Hints>

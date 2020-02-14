@@ -23,6 +23,7 @@
 #include "vtkDataArraySelection.h"
 // #include "vtkUnstructuredGridAlgorithm.h"
 #include <vtkMultiBlockDataSetAlgorithm.h>
+#include <vtkMultiBlockDataSet.h>
 
 using namespace std;
 
@@ -65,6 +66,19 @@ class ReadUALEdge : public vtkMultiBlockDataSetAlgorithm
     vtkGetMacro(IDSListCheckBox,int);
     vtkSetMacro(IDSListCheckBox,int);
 
+    // Which TimeStep to read.
+    vtkSetMacro(TimeStep, int);
+    vtkGetMacro(TimeStep, int);
+    vtkGetMacro(NumberOfTimeSteps, int);
+    // Which TimeStepRange to read
+    vtkGetVector2Macro(TimeStepRange, int);
+    vtkSetVector2Macro(TimeStepRange, int);
+    vtkSetMacro(CurrentTimeStep, int);
+    vtkGetMacro(CurrentTimeStep, int);
+
+    vtkSetMacro(ReadDataFlag, int);
+    vtkGetMacro(ReadDataFlag, int);
+
 protected:
     ReadUALEdge();
     ~ReadUALEdge(){}
@@ -88,8 +102,29 @@ protected:
     int IDSListCheckBox;
     vtkSmartPointer<vtkStringArray> stringArray;
 
-    int RequestData(vtkInformation *, vtkInformationVector **,
+    // The timestep currently being read.
+    int TimeStep;
+    // int CurrentTimeStep;
+    int NumberOfTimeSteps;
+    // Store the range of time steps
+    int TimeStepRange[2];
+    double* TimeSteps;
+    int CurrentTimeStep;
+    vtkSmartPointer<vtkMultiBlockDataSet> outputMB;
+
+    int ReadDataFlag;
+
+    virtual int RequestData(vtkInformation *, vtkInformationVector **,
                     vtkInformationVector *);
+    virtual int RequestInformation(vtkInformation *request,
+                           vtkInformationVector **inputVector,
+                           vtkInformationVector *outputVector);
+
+    // Setup the output's information.
+    virtual void SetupOutputInformation(vtkInformation *vtkNotUsed(outInfo)) {}
+
+    // Whether there was an error reading the file in RequestInformation.
+    int InformationError;
 
 private:
     ReadUALEdge(const ReadUALEdge&);  // Not implemented.
