@@ -100,7 +100,7 @@ if [ ! -d ${INSTALL_DIR} ]; then
     # export PATH=${INSTALL_DIR}/bin:${PATH}
     # make -C qtbase/src html_docs
     # make qmake_all
-    make -j ${MAKE_JOBS} html_docs
+    # make -j ${MAKE_JOBS} html_docs
 fi
 
 # Generate Modulefile
