@@ -3,7 +3,7 @@ new file mode 100644
 index 00000000..dbc723ab
 --- /dev/null
 +++ b/SETUP/config.UNKNOWN.gfortran
-@@ -0,0 +1,140 @@
+@@ -0,0 +1,141 @@
 +#
 +# Specify paths to root-directories of following libraries on your system
 +#
@@ -23,6 +23,7 @@ index 00000000..dbc723ab
 +# Add -DNAG22 to SOLPS_CPP
 +#
 +
++    NODENAME ?= $(shell echo `hostname`)
 +        NCDIR ?= ${SOLPSLIB}
 +    MSCL_ROOT ?= ${SOLPSLIB}
 +        H5DIR ?= ${SOLPSLIB}
@@ -50,21 +51,21 @@ index 00000000..dbc723ab
 +LD_NETCDF  = -L${H5DIR}/lib -L${NCDIR}/lib -lnetcdf -lnetcdff -lhdf5 -lhdf5_hl
 +LD_MSCL    = -L${MSCL_ROOT}/lib -lmscl
 +LD_GR      = -L${GR_ROOT}/lib -lgr
-+LD_GKS     = -L${GLI_HOME} -lgks -lgfortran -lX11 -lXt
-+LD_NCARG   = -L${NCARG_ROOT} -lncarg -lncarg_gks -lncarg_c -lgfortran -lfreetype -lfontconfig -lpthread -lXrender -lX11 -lm -lcairo
++LD_GKS     = -L${GLI_HOME} -lgks -lXmu -lX11 -lXt -ldl
++LD_NCARG   = -L${NCARG_ROOT} -lncarg -lncarg_gks -lncarg_c -lX11 -lXext -lcairo -lfontconfig -lfreetype -lpng -lz -lXrender -lbz2 -ldl # For NCARG v6.x.x
 +LD_NAG     = -L${OPENBLAS_ROOT} -lopenblas
 +LD_MDSPLUS = -L${MDSPLUS_DIR}/lib -lMdsLib_client -lMdsIpShr -lMdsShr
 +LD_SONNET  = -L${SOLPSLIB}/lib -lsonnet -lstdc++
-+LD_MPI     = -L${MPDIR}/lib -L/usr/lib/x86_64-linux-gnu -lmpi
++LD_MPI     = -L${MPDIR}/lib -lmpi
 +
 +#
 +# Preprocessor options
 +#
 +
-+SOLPS_CPP      = -DNO_NAG -DGFORTRAN
++SOLPS_CPP      = -DNCAR4 -DNO_NAG -DGFORTRAN -I${NCDFIR}/include
 +B25_DEFINES    =
 +EIRENE_DEFINES =
-+MPI_CPP        = -I${MPDIR}/include
++#MPI_CPP        = -I${MPDIR}/include
 +
 +# Autodetected optional features...
 +
@@ -165,26 +166,22 @@ new file mode 100644
 index 00000000..802a228f
 --- /dev/null
 +++ b/modules/Triang/config/config.UNKNOWN.gfortran
-@@ -0,0 +1,41 @@
+@@ -0,0 +1,46 @@
 +#  VERSION : 16.12.2004 23:58
 +
 +# The version relying on Fujitsu Fortran installed on AFS
 +
-+# Test whether necessary variables are defined
-+ifndef LD_GR
-+  $(error LD_GR not defined)
-+endif
-+ifndef LD_GKS
-+  $(error LD_GKS not defined)
-+endif
-+ifndef LD_NAG
-+  $(error LD_NAG not defined)
-+endif
++ LD_GR    ?= -L${GR_ROOT}/lib -lgr
++ LD_GKS   ?= -L${GLI_HOME} -lgks -lgfortran -lX11 -lXt -lXmu
++ LD_NAG   ?= `pkg-config nag --libs`
++ GLI_HOME ?= /work/imas/opt/gks/4.4.74/lib
 +
 +#DEFINES  = ${SOLPS_CPP} ${EIRENE_DEFINES} -DRECL_UNITS_PER_DOUBLE=8 -DNO_FORT10 -DNO_SHORT_CYCLE -DNO_F01AAF
 +#DEFINES  = ${SOLPS_CPP} ${EIRENE_DEFINES} -DTRIANG -DRECL_UNITS_PER_DOUBLE=8 -DNO_FORT10 -DNO_SHORT_CYCLE -DNO_F01AAF
++DEFINES   =
++EQUIVS    =
 +
-+CPP       = /lib/cpp -traditional -ffreestanding
++CPP       = /lib/cpp -traditional
 +CPPOPTS   = -P -I${srcdir} ${EQUIVS}
 +SED       =
 +LINK_MOD  =
@@ -198,7 +195,16 @@ index 00000000..802a228f
 +FCOPTS    = -O3
 +endif
 +
++#COMPILE  = ${FC} -c ${FFLAGS}
++
++NAG       = ${LD_NAG}
 +GKS       = ${LD_GR} ${LD_GKS} -lX11 -lXt -lXmu
++
++#LDLIBS   = ${LD_MSCL}-L/usr/local/lib -L/usr/X11R6/lib64
++LDLIBS    =
++LDEXTRA   =
++
++ # new
 +
 +INCMOD    = -I
 +MOD       = mod
@@ -242,9 +248,9 @@ index 00000000..5a411132
 +MOD      = mod
 +LDLIBS   = ${LD_MSCL}
 +LDEXTRA  =
-+ifdef USE_MPI
-+LDLIBS  += ${LD_MPI}
-+endif
++#ifdef USE_MPI
++#LDLIBS  += ${LD_MPI}
++#endif
 +
 +#!!!Local Variables:
 +#!!! mode: Makefile

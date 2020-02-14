@@ -3,25 +3,18 @@ new file mode 100644
 index 00000000..ed1a2672
 --- /dev/null
 +++ b/config/config.UNKNOWN.gfortran
-@@ -0,0 +1,51 @@
+@@ -0,0 +1,44 @@
 +# Test whether necessary variables are set
-+ifndef LD_GR
-+  $(error LD_GR not defined)
-+endif
-+ifndef LD_GKS
-+  $(error LD_GKS not defined)
-+endif
-+ifndef LD_NAG
-+  $(error LD_NAG not defined)
-+endif
-+ifndef GLI_HOME
-+  $(error GLI_HOME not defined)
-+endif
++GLI_HOME ?= ${EBROOTGLI}
++LD_GR    ?= -L${EBROOTGR}/lib -lgr
++LD_GKS   ?= -L${GLI_HOME} -lgks -lXmu -lX11 -lXt -ldl
++
++# DEFINES  += -DRECL_UNITS_PER_DOUBLE=8 -DNO_SAVE
 +ifndef SOLPS_CPP
-+DEFINES += -DGFORTRAN
++DEFINES  += -DGFORTRAN
 +endif
 +
-+CPP       = -/lib/cpp -C -traditional -ffreestanding
++CPP       = -/lib/cpp -traditional
 +ifdef SOLPS_MPI
 +FC        = mpif90
 +else
@@ -38,7 +31,7 @@ index 00000000..ed1a2672
 +endif
 +
 +# NAG     = ${LD_NAG}
-+GKS       = ${LD_GR} ${LD_GKS} -lX11 -lXt
++GKS       = ${LD_GR} ${LD_GKS}
 +
 +LDLIBS    = -L/usr/local/lib -L/usr/lib/x86_64-linux-gnu
 +LDEXTRA   =
