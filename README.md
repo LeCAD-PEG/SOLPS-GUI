@@ -171,7 +171,8 @@ Debian 9.6 (stretch):
     libreadline-dev xsltproc \
     texlive texlive-latex-recommended texlive-binaries texlive-latex-extra \
     emacs25-bin-common \
-    python-dev csh ksh tcsh
+    python-dev csh ksh tcsh \
+    xutils-dev # Makedepend
 
     apt-get install build-essential
 

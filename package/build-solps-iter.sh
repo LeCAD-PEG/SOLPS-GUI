@@ -76,7 +76,9 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
 
         ;;
     esac
+    touch ${SRC_DIR}/.configured
     cd ${SRC_DIR}
+
 fi
 
 # Build
@@ -108,16 +110,15 @@ if [ ! -e ${SRC_DIR}/.built ]; then
     command=${command}$(cat <<-EOL
         cd ${SRC_DIR}
         source ${SRC_DIR}/setup.csh gfortran
-
         rehash
         make listobj listobj_debug
         make depend depend_debug
         make tags
         make carre divgeo b25 eirene b25eirene uinp triang amds sonnet-light
-        # make b25eirene_openmp
         make b25eirene_mpi uinp_mpi amds_mpi
 EOL
 )
+        # make b25eirene_openmp
 
     EBVERSIONGGD=${GGD_VERSION} \
     LD_LIBRARY_PATH=${LD_LIBRARY_PATH} \
@@ -129,6 +130,7 @@ EOL
     MDSPLUS_ROOT=${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION} \
     NCARG_ROOT=${STAGING_DIR}/ncl/${NCL_VERSION}/lib \
     SOLPS_SRC_DIR=${SRC_DIR} \
+    MPDIR=${STAGING_DIR}/openmpi/${OPENMPI_VERSION} \
     tcsh -c "${command}"
     touch ${SRC_DIR}/.built
 fi
