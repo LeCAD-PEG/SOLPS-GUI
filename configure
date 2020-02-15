@@ -58,6 +58,17 @@ module load itm-qt/\${QT_VERSION}
 unset QT_VERSION
 EOF
         ;;
+    viz.hpc.fs.uni-lj.si)
+    cat << EOF >> ${SETUP_FILE}
+module purge
+module load GCC/8.3.0
+module load X11/20190717-GCCcore-8.3.0
+module load Automake/1.16.1-GCCcore-8.3.0
+module load libtool/2.4.6-GCCcore-8.3.0
+module load texlive
+module list
+EOF
+	;;
     *)
         ;;
 esac
@@ -380,6 +391,13 @@ if (\$X =~ *"iter.org") then
     setenv CPATH "\${STAGING_DIR}/netcdf-fortran/\${NETCDF_FORTRAN_VERSION}/include:\${CPATH}"
     setenv LIBRARY_PATH "/usr/lib:/usr/lib64:\${LIBRARY_PATH}"
     setenv CPATH "/usr/include:\${CPATH}"
+else if (\$X =~ *"viz.hpc.fs.uni-lj.si") then
+    module purge
+    module load GCC/8.3.0
+    module load X11/20190717-GCCcore-8.3.0
+    module load Automake/1.16.1-GCCcore-8.3.0
+    module load libtool/2.4.6-GCCcore-8.3.0
+    module load texlive
 else
     setenv NCARG_ROOT "/usr/lib64/ncarg"
     module load mpi/openmpi-x86_64
@@ -398,7 +416,7 @@ esac
 
 cat << EOF >> ${SETUP_CSH_FILE}
 # Use compiled packages!
-
+setenv STAGING_DIR ${STAGING_DIR}
 setenv CPATH \${STAGING_DIR}/motif/\${MOTIF_VERSION}/include:\${CPATH}
 setenv LD_LIBRARY_PATH \${STAGING_DIR}/motif/\${MOTIF_VERSION}/lib:\${LD_LIBRARY_PATH}
 setenv LIBRARY_PATH \${STAGING_DIR}/motif/\${MOTIF_VERSION}/lib:\${LIBRARY_PATH}
@@ -434,6 +452,18 @@ setenv OPENBLAS_ROOT \${STAGING_DIR}/OpenBLAS/\${OPENBLAS_VERSION}/lib
 
 setenv H5DIR \${STAGING_DIR}/hdf5/\${HDF5_VERSION}
 setenv LIBRARY_PATH \${STAGING_DIR}/hdf5/\${HDF5_VERSION}/lib
+setenv NCARG_ROOT "\${STAGING_DIR}/ncl/\${NCL_VERSION}/lib"
+setenv EBVERSIONGGD \${GGD_VERSION}
+setenv LD_LIBRARY_PATH \${LD_LIBRARY_PATH}
+setenv PKG_CONFIG_PATH \${PKG_CONFIG_PATH}
+setenv NCDIR \${STAGING_DIR}/netcdf/\${NETCDF_VERSION}
+setenv MSCL_ROOT \${STAGING_DIR}/mscl/\${MSCL_VERSION}
+setenv GR_ROOT \${STAGING_DIR}/GR/\${GR_VERSION}
+setenv GLI_HOME \${STAGING_DIR}/GLI/\${GLI_VERSION}
+setenv MDSPLUS_ROOT \${STAGING_DIR}/mdsplus/\${MDSPLUS_VERSION}
+setenv NCARG_ROOT \${STAGING_DIR}/ncl/\${NCL_VERSION}/lib
+setenv SOLPS_SRC_DIR \${SRC_DIR}
+setenv MPDIR \${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}
 
 
 EOF
