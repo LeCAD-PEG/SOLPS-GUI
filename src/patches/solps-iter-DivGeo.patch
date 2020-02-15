@@ -29,7 +29,7 @@ index 0000000..3eb5734
 +endif
 +
 +COMPILE = ${FC} -c ${FFLAGS}
-+CPP     = /lib/cpp -traditional
++CPP     = cpp -traditional
 +
 +LDLIBS  = ${LD_MSCL} -lstdc++
 +LDEXTRA =
@@ -54,7 +54,7 @@ index 0000000..a138542
 +FFLAGS   = -O
 +endif
 +COMPILE  = ${FC} -c ${FFLAGS}
-+CPP      = /lib/cpp -traditional
++CPP      = cpp -traditional
 +
 +ifdef SOLPS_CPP
 +DEFINES  = ${SOLPS_CPP}

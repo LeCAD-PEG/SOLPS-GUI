@@ -14,7 +14,7 @@ index 0000000..30c62f7
 +endif
 +
 +FC        = gfortran
-+CPP       = /lib/cpp -traditional
++CPP       = cpp -traditional
 +
 +ifdef SOLPS_DEBUG
 +FFLAGS    = -g -gdwarf-2 -fcheck=all -fbacktrace -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans

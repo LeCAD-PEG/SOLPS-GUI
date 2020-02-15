@@ -16,7 +16,7 @@ index 00000000..b128dff6
 +EQUIVS += -DGFORTRAN
 +endif
 +
-+CPP = /lib/cpp -traditional -DNO_IEEE
++CPP = cpp -traditional -DNO_IEEE
 +CPPOPTS = -P -I${srcdir} ${EQUIVS}
 +SED = sed s:\#PREC\#:d:g
 +SED =

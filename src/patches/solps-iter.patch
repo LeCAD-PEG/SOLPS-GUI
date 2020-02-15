@@ -181,7 +181,7 @@ index 00000000..802a228f
 +DEFINES   =
 +EQUIVS    =
 +
-+CPP       = /lib/cpp -traditional
++CPP       = cpp -traditional
 +CPPOPTS   = -P -I${srcdir} ${EQUIVS}
 +SED       =
 +LINK_MOD  =
@@ -243,7 +243,7 @@ index 00000000..5a411132
 +endif
 +INCLUDE  = -I${SRCDIR} ${EIRINC} ${B2INC}
 +COMPILE  = ${FC} -c ${FFLAGS}
-+CPP      = /lib/cpp -traditional
++CPP      = cpp -traditional
 +
 +MOD      = mod
 +LDLIBS   = ${LD_MSCL}

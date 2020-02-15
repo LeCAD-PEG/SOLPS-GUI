@@ -14,7 +14,7 @@ index 00000000..ed1a2672
 +DEFINES  += -DGFORTRAN
 +endif
 +
-+CPP       = -/lib/cpp -traditional
++CPP       = -cpp -traditional
 +ifdef SOLPS_MPI
 +FC        = mpif90
 +else
