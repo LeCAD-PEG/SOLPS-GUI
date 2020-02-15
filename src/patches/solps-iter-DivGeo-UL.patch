@@ -1,0 +1,86 @@
+diff --git a/config/config.UL.gfortran b/config/config.UL.gfortran
+new file mode 100644
+index 0000000..e0fc301
+--- /dev/null
++++ b/config/config.UL.gfortran
+@@ -0,0 +1,8 @@
++LIBS = -lXm -lXt -lX11 -lXext -lXmu -lXft -lpthread -lm -L/usr/lib -L/usr/lib/x86_64-linux-gnu
++CFLAGS = -g
++CC = cc
++
++#!!!Local Variables:
++#!!! mode: Makefile
++#!!! End:
++
+diff --git a/convert/config/config.UL.gfortran b/convert/config/config.UL.gfortran
+new file mode 100644
+index 0000000..c80a815
+--- /dev/null
++++ b/convert/config/config.UL.gfortran
+@@ -0,0 +1,20 @@
++# check if necessary variables are correctly defined
++LD_MSCL ?= `pkg-config mscl --libs`
++
++FC      = gfortran
++ifdef SOLPS_DEBUG
++FFLAGS  = -g -fcheck=all -fbacktrace -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
++else
++FFLAGS  = -O3
++endif
++
++COMPILE = ${FC} -c ${FFLAGS}
++CPP     = cpp -traditional
++
++LDLIBS  = ${LD_MSCL} -lstdc++
++LDEXTRA =
++
++#!!!Local Variables:
++#!!! mode: Makefile
++#!!! End:
++
+diff --git a/equtrn/config/config.UL.gfortran b/equtrn/config/config.UL.gfortran
+new file mode 100644
+index 0000000..4bf50e1
+--- /dev/null
++++ b/equtrn/config/config.UL.gfortran
+@@ -0,0 +1,40 @@
++# check if necessary variables are correctly defined
++LD_MSCL ?= `pkg-config mscl --libs`
++
++FC       = gfortran
++ifdef SOLPS_DEBUG
++FFLAGS   = -g -fcheck=all -fbacktrace -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
++else
++FFLAGS   = -O
++endif
++COMPILE  = ${FC} -c ${FFLAGS}
++CPP      = cpp -traditional
++
++ifdef SOLPS_CPP
++DEFINES  = ${SOLPS_CPP}
++else
++DEFINES += -DGFORTRAN
++endif
++LDLIBS   = ${LD_MSCL}
++LDFLAGS  =
++
++ifdef IMAS_VERSION
++UAL_MAJOR_VERSION ?= $(shell echo ${UAL_VERSION} | cut -d '.' -f1 )
++GGD_MINOR_VERSION ?= $(shell echo ${EBVERSIONGGD} | cut -d '.' -f2 )
++IMAS_MAJOR_VERSION ?= $(shell echo ${IMAS_VERSION} | cut -d '.' -f1 )
++IMAS_MINOR_VERSION ?= $(shell echo ${IMAS_VERSION} | cut -d '.' -f2 )
++ifndef SOLPS_CPP
++EQUIVS  += -DIMAS -DUAL_MAJOR_VERSION=${UAL_MAJOR_VERSION} -DIMAS_MINOR_VERSION=${IMAS_MINOR_VERSION} -DGGD_MINOR_VERSION=${GGD_MINOR_VERSION}
++endif
++LD_UAL  ?= `pkg-config imas-gfortran ggd --libs`
++INCMODS  = `pkg-config imas-gfortran ggd --cflags`
++endif
++
++#LDWOS   = -L/usr/ads/lib/ -lKK -lwoss -lddww -lpplotXt -R/usr/ads/lib/:/opt/SUNWspro/lib/ -lsocket
++#LDWOS   = -L/afs/ipp/aug/ads/lib64/@sys -lKK -lwoss -lddww -lpplotXt -lsocket
++#LDWOS   = -L/afs/ipp/aug-ads/@sys/lib64 -Wl,-R/afs/ipp/aug-ads/@sys/lib64 -lkk -lddww
++
++#!!!Local Variables:
++#!!! mode: Makefile
++#!!! End:
++

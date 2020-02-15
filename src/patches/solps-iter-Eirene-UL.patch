@@ -1,0 +1,50 @@
+diff --git a/config/config.UL.gfortran b/config/config.UL.gfortran
+new file mode 100644
+index 0000000..7e11968
+--- /dev/null
++++ b/config/config.UL.gfortran
+@@ -0,0 +1,44 @@
++# Test whether necessary variables are set
++GLI_HOME ?= ${EBROOTGLI}
++LD_GR    ?= -L${EBROOTGR}/lib -lgr
++LD_GKS   ?= -L${GLI_HOME} -lgks -lXmu -lX11 -lXt -ldl
++
++# DEFINES  += -DRECL_UNITS_PER_DOUBLE=8 -DNO_SAVE
++ifndef SOLPS_CPP
++DEFINES  += -DGFORTRAN
++endif
++
++CPP       = -cpp -traditional
++ifdef SOLPS_MPI
++FC        = mpif90
++else
++FC        = gfortran
++endif
++CC        = /usr/bin/gcc
++
++ifdef SOLPS_DEBUG
++FCOPTS    = -g -fcheck=all -fPIC -fno-second-underscore -DDECLARE_MPI_WTIME -fbacktrace -frecursive -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
++CFLAGS    = -g
++else
++FCOPTS    = -O2 -fPIC -fno-second-underscore -DDECLARE_MPI_WTIME
++CFLAGS    = -O2
++endif
++
++# NAG     = ${LD_NAG}
++GKS       = ${LD_GR} ${LD_GKS}
++
++LDLIBS    = -L/usr/local/lib -L/usr/lib/x86_64-linux-gnu
++LDEXTRA   =
++
++# new
++
++INCMOD    = -I
++MOD       = mod
++OBJDEST   = -J${OBJDIR} -o $@
++
++COMPILE   = ${FC} -c ${FCOPTS} ${INCMOD}${OBJDIR}
++
++#!!!Local Variables:
++#!!! mode: Makefile
++#!!! End:
++
