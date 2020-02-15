@@ -330,7 +330,7 @@ ${STAGING_DIR}/motif/${MOTIF_VERSION}:
 
 motif: config flex ${STAGING_DIR}/motif/${MOTIF_VERSION}
 
-${STAGING_DIR}/solps-iter/${SOLPS_VERSION}:
+${STAGING_DIR}/solps-iter/${SOLPS_VERSION}/.installed:
 	# Copy imasdb script for setting up IMAS MDSPLUS_TREE environment
 
 	SOLPS_VERSION=${SOLPS_VERSION} \
@@ -351,7 +351,7 @@ ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}:
 	HDF5_VERSION=${HDF5_VERSION} \
 	./package/build-solps-iter.sh
 
-solps-iter :config imas gr gli OpenBLAS mscl ggd python netcdf ncl openmpi motif ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}
+solps-iter :config imas gr gli OpenBLAS mscl ggd python netcdf ncl openmpi motif ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}/.installed
 
 solps-gui-mod:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${SOLPS_GUI_VERSION}}/" package/build-solps-gui.sh

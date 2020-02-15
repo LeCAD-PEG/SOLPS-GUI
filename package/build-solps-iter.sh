@@ -277,3 +277,5 @@ set-alias unset_mpi    "source \$SOLPSTOP/SETUP/nompi"
 set-alias   set_ig     "source \$SOLPSTOP/SETUP/ig"
 set-alias unset_ig     "source \$SOLPSTOP/SETUP/noig"
 EOF
+
+touch ${SRC_DIR}/.installed

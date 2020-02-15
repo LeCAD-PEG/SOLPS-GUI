@@ -20,6 +20,9 @@ SRC_DIR="${BUILD_DIR}/OpenBLAS-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/OpenBLAS/${VERSION}
 
 # Environment dependencies
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}

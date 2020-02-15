@@ -19,6 +19,9 @@ SRC_DIR="${BUILD_DIR}/mscl-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/mscl/${VERSION}
 
 # Environment dependencies
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}
