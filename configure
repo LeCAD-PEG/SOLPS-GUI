@@ -67,6 +67,7 @@ module load Automake/1.16.1-GCCcore-8.3.0
 module load libtool/2.4.6-GCCcore-8.3.0
 module load texlive
 module list
+export HOST_NAME="UL"
 EOF
 	;;
     *)
@@ -311,12 +312,14 @@ else
     export LD_LIBRARY_PATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/lib:\${LD_LIBRARY_PATH}
     export LIBRARY_PATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/lib:\${LIBRARY_PATH}
     export PKG_CONFIG_PATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
+    export EBVERSIONGGD=\${GGD_VERSION}
 fi
 
 if [ -z \${MSCL_VERSION+x} ]; then
     echo "MSCL_VERSION is unset, skipping"
 else
     export PKG_CONFIG_PATH=\${STAGING_DIR}/mscl/\${MSCL_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
+    export MSCL_ROOT=\${STAGING_DIR}/mscl/\${MSCL_VERSION}
 fi
 
 if [ -z \${GLI_VERSION+x} ]; then
@@ -328,7 +331,13 @@ fi
 if [ -z \${NCL_VERSION+x} ]; then
     echo "NCL_VERSION is unset, skipping"
 else
-    export NCARG_ROOT=\${STAGING_DIR}/ncl/\${NCL_VERSION}
+    export NCARG_ROOT=\${STAGING_DIR}/ncl/\${NCL_VERSION}/lib
+fi
+
+if [ -z \${GR_VERSION+x} ]; then
+    echo "GR_VERSION is unset, skipping"
+else
+    export GR_ROOT=\${STAGING_DIR}/GR/\${GR_VERSION}
 fi
 
 EOF
