@@ -151,10 +151,10 @@ index 0000000..32d1362
 --- /dev/null
 +++ b/SETUP/setup.csh.UL.gfortran
 @@ -0,0 +1,19 @@
-+module load GCC/8.3.0
-+module load X11/20190717-GCCcore-8.3.0
-+module load Automake/1.16.1-GCCcore-8.3.0
-+module load libtool/2.4.6-GCCcore-8.3.0
++module load GCC/6.4.0-2.28
++module load X11/20171023-GCCcore-6.4.0
++module load Automake/1.15.1-GCCcore-6.4.0
++module load libtool/2.4.6-GCCcore-6.4.0
 +module load tcsh/6.22.02
 +module load texlive
 +
@@ -176,12 +176,12 @@ index 0000000..0101b07
 --- /dev/null
 +++ b/SETUP/setup.sh.UL.gfortran
 @@ -0,0 +1,19 @@
-+module load GCC/8.3.0
-+module load X11/20190717-GCCcore-8.3.0
-+module load Automake/1.16.1-GCCcore-8.3.0
-+module load libtool/2.4.6-GCCcore-8.3.0
++module load GCC/6.4.0-2.28
++module load X11/20171023-GCCcore-6.4.0
++module load Automake/1.15.1-GCCcore-6.4.0
++module load libtool/2.4.6-GCCcore-6.4.0
++module load tcsh/6.22.02
 +module load texlive
-+
 +
 +if [ -x "$(paraview-config)" ]; then
 +  # See ParaViewCatalystUsersGuide_v2.pdf Sec 3.7.2 Linking with Python ...
