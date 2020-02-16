@@ -1,3 +1,19 @@
+diff --git a/SETUP/setup.sh.UNKNOWN.gfortran b/SETUP/setup.sh.UNKNOWN.gfortran
+new file mode 100644
+index 00000000..9659b9df
+--- /dev/null
++++ b/SETUP/setup.sh.UNKNOWN.gfortran
+@@ -0,0 +1,10 @@
++if [ -x "$(which paraview-config)" ]; then
++  # See ParaViewCatalystUsersGuide_v2.pdf Sec 3.7.2 Linking with Python ...
++  PARAVIEW_LIB=$(paraview-config --libs --python | sed s/-L//)
++  export LD_LIBRARY_PATH="${PARAVIEW_LIB}:${LD_LIBRARY_PATH}"
++  export PYTHONPATH="${PARAVIEW_LIB}/site-packages/vtk:${PYTHONPATH}"
++  export PYTHONPATH="${PARAVIEW_LIB}/site-packages:${PYTHONPATH}"
++  export LD_CATALYST=$(paraview-config --libs vtkPVPythonCatalyst)
++else
++  echo "Warning: paraview-config not found. ParaView with Catalyst will not be compiled-in!"
++fi
 diff --git a/SETUP/config.UNKNOWN.gfortran b/SETUP/config.UNKNOWN.gfortran
 new file mode 100644
 index 00000000..dbc723ab

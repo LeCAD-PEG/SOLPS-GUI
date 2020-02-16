@@ -183,7 +183,7 @@ index 0000000..0101b07
 +module load tcsh/6.22.02
 +module load texlive
 +
-+if [ -x "$(paraview-config)" ]; then
++if [ -x "$(which paraview-config)" ]; then
 +  # See ParaViewCatalystUsersGuide_v2.pdf Sec 3.7.2 Linking with Python ...
 +  PARAVIEW_LIB=$(paraview-config --libs --python | sed s/-L//)
 +  export LD_LIBRARY_PATH="${PARAVIEW_LIB}:${LD_LIBRARY_PATH}"
