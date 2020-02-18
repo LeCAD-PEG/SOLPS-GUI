@@ -10,7 +10,7 @@
 *   The focus of plugin development is on data stored in 'edge_profiles',
 *   'edge_sources' and 'edge_transport' IDSs.
 *
-*   Currently the included data fields are:
+*   Currently the included (GGD) data fields are:
 *       - grid geometry from any of the above IDSs;
 *       - plasma state:
 *           ~ edge_profiles:
@@ -71,7 +71,27 @@
 *                       - flux
 *                       - flux_limiter
 *           ~ mdh:
-*               - TODO
+*               - electrons:
+*                   - temperature
+*               - t_i_average
+*               - n_i_total
+*               - zeff
+*               - b_field_r
+*               - b_field_z
+*               - b_field_tor
+*               - a_field_r
+*               - a_field_z
+*               - a_field_tor
+*               - psi
+*               - velocity_r
+*               - velocity_z
+*               - velocity_tor
+*               - velocity_parallel
+*               - phi_potential
+*               - vorticity
+*               - j_r
+*               - j_z
+*               - j_tor
 *
 *-------------------------------------------------------------------------------
 */
@@ -115,6 +135,10 @@
 #include <vector>
 #include <vtkStreamingDemandDrivenPipeline.h>
 
+#include <QWidget>
+#include <QFileDialog>
+#include <QDialog>
+
 #define IMAS_IDS
 #define PLUGIN_IMAS_VERSION_DIGIT IMAS_VERSION_DIGIT
 
@@ -157,23 +181,11 @@ ReadUALEdge::ReadUALEdge()
     this->EdgeSourcesSourceID = 0;
     this->IDSPlasmaStateSource = NULL;
     this->GridForm = NULL;
-    this->ReadAllTimeSlicesCheckBox = 0;
     this->IDSListCheckBox = 0;
     this->SetNumberOfInputPorts(0);
     this->SetNumberOfOutputPorts(1);
     this->DebugOff();
     this->stringArray=vtkSmartPointer<vtkStringArray>::New();
-
-    this->InformationError = 0;
-    this->ReadDataFlag = 1;
-
-    // Time support:
-    this->TimeStep = 0; // By default the file does not have timestep
-    this->TimeStepRange[0] = 0;
-    this->TimeStepRange[1] = 0;
-    this->NumberOfTimeSteps = 0;
-    this->TimeSteps = NULL;
-    this->CurrentTimeStep = 0;
 
     this->outputMB = vtkSmartPointer<vtkMultiBlockDataSet>::New();
 }
@@ -789,77 +801,6 @@ void fTimeSlice2MultiBlockSingleUG(IDS100 & db,
     fAddBlock2MultiBlock(MB, UG, "Full Unstructured Grid" );
 }
 
-int ReadUALEdge::RequestInformation(vtkInformation *request,
-                                    vtkInformationVector **vtkNotUsed(inputVector),
-                                    vtkInformationVector *outputVector)
-{
-    // Runs before pressing Apply button
-    std::clog << "Executing ReadUALEdge::RequestInformation" << std::endl;
-    // Let the subclasses read the information they want.
-    int outputPort =
-      request->Get( vtkDemandDrivenPipeline::FROM_OUTPUT_PORT() );
-    outputPort = outputPort >= 0 ? outputPort : 0;
-    vtkInformation* outInfo = outputVector->GetInformationObject(0);
-
-    this->SetupOutputInformation(outInfo);
-    outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
-
-    if (!outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
-    {
-        vtkOutputWindowDisplayText("RequestInformation: setting time steps");
-
-        // The number of time steps and range can be set only in
-        // RequestInformation, it cannot be re-set in RequestData, meaning that
-        // we must know how many time steps are there even before opening an IDS
-        // Temporal solution: set 100 dummy time steps.
-        // TODO: figure out how to determine/find number of time steps
-        this->NumberOfTimeSteps = 78; // HARDCODED!!
-        this->TimeSteps = new double[this->NumberOfTimeSteps];
-
-        for (int step = 0; step < this->NumberOfTimeSteps; step++)
-            this->TimeSteps[step] = (double)step;
-        double tRange[2];
-        tRange[0] = this->TimeSteps[0];
-        tRange[1] = this->TimeSteps[this->NumberOfTimeSteps - 1];
-        // int numTimesteps = this->GetNumberOfTimeSteps();
-        this->TimeStepRange[0] = tRange[0];
-        // this->TimeStepRange[1] = (numTimesteps > 0 ? numTimesteps-1 : 0);
-        this->TimeStepRange[1] = tRange[1];
-        outInfo->Set(
-            vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
-            this->TimeSteps,
-            this->NumberOfTimeSteps);
-        outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
-                     tRange, 2);
-
-    //     std::clog << "this->TimeSteps[0]: " << this->TimeSteps[0] << std::endl;
-    //     std::clog << "this->TimeSteps[this->NumberOfTimeSteps-1]: " << this->TimeSteps[this->NumberOfTimeSteps-1] << std::endl;
-
-    //     std::clog << "RequestInformation outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS())[0] " <<
-    //     outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS())[0] << std::endl;
-
-    //     std::clog << "RequestInformation outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS())[this->NumberOfTimeSteps-1] " <<
-    //     outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS())[this->NumberOfTimeSteps-1] << std::endl;
-
-    //     std::clog << "RequestInformation outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE())[0] " <<
-    //     outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE())[0] << std::endl;
-
-    //     std::clog << "RequestInformation outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE())[1] " <<
-    //     outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE())[1] << std::endl;
-
-    //     int utime = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-    //     std::clog << "*F RequestInformation utime: " << utime << std::endl;
-    }
-    else
-    {
-      this->InformationError = 1;
-    }
-
-    // return !this->InformationError;
-    return 1;
-}
-
 /**
 *   Main ReadUALEdge function. It reads grid geometry, grid subset and plasma
 *   state data out of the IDSs and combines this data into display ready
@@ -873,15 +814,6 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // Get the info object
     vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
-    // std::clog << "RequestData outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS())[0] " <<
-    // outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS())[0] << std::endl;
-
-    // std::clog << "RequestData outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS())[this->NumberOfTimeSteps-1] " <<
-    // outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS())[this->NumberOfTimeSteps-1] << std::endl;
-
-    // vtkInformationDoubleKey* timeKey =
-    //     static_cast<vtkInformationDoubleKey*>(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-
     // Set the output format
     vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
         outInfo->Get(vtkMultiBlockDataSet::DATA_OBJECT()));
@@ -893,389 +825,266 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     // ParaView 'Output messages' window
     std::stringstream msg;
 
-    if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()) && this->NumberOfTimeSteps > 0
-       && this->ReadDataFlag == 0)
+#ifdef IMAS_IDS
+    using namespace IdsNs;
+
+#if IMAS_VERSION_DIGIT <= 3151
+    msgToOutputWindow("This plugin was compiled using ancient version of IMAS "
+        "which shouldn't be used anymore (3.15.0 or older)! Due for this reason"
+        "this plugin does not support those versions of IMAS (and DD) anymore",
+        "warning" );
+#endif
+
+    // Check IMAS and UAL version
+    std::string load_IV = getenv("IMAS_VERSION");
+    std::string load_UV = getenv("UAL_VERSION");
+
+    // Get IMAS version digit, used to compile the plugin, as a string
+    // (e.g. 3150 -> 3.15.0)
+    std::string plugin_IV = std::to_string(PLUGIN_IMAS_VERSION_DIGIT);
+    int load_IV_DIGIT = 0;
+    std::string load_IV_str;
+    if( plugin_IV.length() == 3 )
     {
-        double requestedTimeValue = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-        int nSteps = outInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-        double* steps = outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+        plugin_IV = std::string() + plugin_IV[0] + "." + plugin_IV[1] + "." +
+            plugin_IV[2];
+        // Get currently loaded IMAS version as an integer (e.g. 3.5.0 -> 350)
+        load_IV_str = std::string() + load_IV[0] + load_IV[2] + load_IV [4];
+        load_IV_DIGIT = std::stoi( load_IV_str );
+    }
+    else if( plugin_IV.length() == 4 )
+    {
+        plugin_IV = std::string() + plugin_IV[0] + "." + plugin_IV[1] +
+            plugin_IV [2] + "." + plugin_IV[3];
+        // Get currently loaded IMAS version as an integer (e.g. 3.15.0 -> 3150)
+        load_IV_str = std::string() + load_IV[0] + load_IV[2] + load_IV[3]
+            + load_IV[5];
+        load_IV_DIGIT = std::stoi( load_IV_str );
+    }
+    // Latest IMAS version, for which it is confirmed the ReadUALEdgeplugin is
+    // compatible with ( in single integer form )
+    std::string IV_latest_string = "3.26.0";
+    int IV_latest_DIGIT = 3260;
 
-        // Note: Assuming time value == time step!!!
-        int requestedTimeStep = (int) requestedTimeValue;
+    // Display IMAS and UAL versions
+    vtkOutputWindowDisplayText(std::string("LOADED IMAS VERSION: " + load_IV +
+        "\n").c_str());
+    vtkOutputWindowDisplayText(std::string("LOADED UAL VERSION: " + load_UV +
+        "\n").c_str());
+    vtkOutputWindowDisplayText(std::string("PLUGIN IMAS VERSION: " + plugin_IV +
+        "\n\n").c_str());
 
-        // std::clog << "requestedTimeValue: " << requestedTimeValue << std::endl;
-        std::clog << "requestedTimeStep: " << requestedTimeStep << std::endl;
-        // std::clog << "nSteps: " << nSteps << std::endl;
-        // std::clog << "steps: " << steps << std::endl;
-        // std::clog << "steps[0]: " << steps[0] << std::endl;
-        // std::clog << "steps[this->NumberOfTimeSteps-1]: " << steps[this->NumberOfTimeSteps-1] << std::endl;
-        // // output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), steps[this->NumberOfTimeSteps-1] );
-        std::clog << "Setting block: " << requestedTimeStep << std::endl;
-        output->ShallowCopy(this->outputMB->GetBlock(requestedTimeStep));
-        output->GetInformation()->Set(vtkMultiBlockDataSet::DATA_TIME_STEP(), steps[this->NumberOfTimeSteps-1] );
+    // IMAS version checks
+    if( load_IV_DIGIT < IV_latest_DIGIT )
+    {
+        vtkOutputWindowDisplayWarningText("Note: A more recent version of IMAS "
+            "(and consequently Data Dictionary) supported by the plugin exists. "
+            "Using the last confirmed compatible IMAS version is recommended. "
+            "\n\n");
+    }
+    if( load_IV_DIGIT != PLUGIN_IMAS_VERSION_DIGIT )
+    {
+        vtkOutputWindowDisplayWarningText("WARNING! For best practice it is "
+            "recommended that the same IMAS/DD version is used for writing "
+            "the IDSs, compiling the ReadUALEdge plugin and then for loading "
+            "the plugin within the ParaView application. \n\n");
+    }
+    if( PLUGIN_IMAS_VERSION_DIGIT < IV_latest_DIGIT)
+    {
+        vtkOutputWindowDisplayWarningText("WARNING! The IMAS version (and "
+            "consequently Data Dictionary), used to compile the ReadUALEdge "
+            "plugin, is outdated! The latest IMAS module, confirmed to be "
+            "compatible with the ReadUALEdge, is IMAS/3.26.0/UAL/4.4.0 while "
+            "the oldest is IMAS/3.17.0/UAL/3.8.0. Using the last confirmed "
+            "compatible IMAS version is recommended.\n\n");
+    }
+
+    vtkOutputWindowDisplayText("Reading IDS \n");
+
+    // Set IDSs shot and run
+    IDS db(this->Shot, this->Run, this->Shot, this->RefRun);
+    if (!this->Version)
+        this->Version = strdup("3");
+    // Open IDS
+    db.openEnv(this->User, this->Device, this->Version);
+
+    // Print IDS info
+    msg  << "IDS parameters:" << "\n" <<
+        " - Loaded IDS: " << this->LoadIDS << "\n" <<
+        " - Shot:       " << this->Shot    << "\n" <<
+        " - Run:        " << this->Run     << "\n" <<
+        " - RefRun:     " << this->RefRun  << "\n" <<
+        " - User:       " << this->User    << "\n" <<
+        " - Device:     " << this->Device  << "\n" <<
+        " - Version:    " << this->Version << "\n\n";
+    msgToOutputWindow( msg );
+
+    // Set default variable to hold the IDS source for plasma state data fields
+    // (can be specified by the IDSPlasmaDataSource advanced option)
+    std::string IDS_plasmaStateSource = "edge_profiles";
+
+    // if( std::string(this->IDSPlasmaStateSource).find("Same as 'Read from IDS'")
+    //     != std::string::npos)
+    if( std::string(this->IDSPlasmaStateSource) == "Same as 'Read from IDS'")
+    {
+        IDS_plasmaStateSource = std::string(this->LoadIDS);
     }
     else
     {
-
-#ifdef IMAS_IDS
-        using namespace IdsNs;
-
-#if IMAS_VERSION_DIGIT <= 3151
-        msgToOutputWindow("This plugin was compiled using ancient version of IMAS "
-            "which shouldn't be used anymore (3.15.0 or older)! Due for this reason"
-            "this plugin does not support those versions of IMAS (and DD) anymore",
-            "warning" );
-#endif
-
-        // Check IMAS and UAL version
-        std::string load_IV = getenv("IMAS_VERSION");
-        std::string load_UV = getenv("UAL_VERSION");
-
-        // Get IMAS version digit, used to compile the plugin, as a string
-        // (e.g. 3150 -> 3.15.0)
-        std::string plugin_IV = std::to_string(PLUGIN_IMAS_VERSION_DIGIT);
-        int load_IV_DIGIT = 0;
-        std::string load_IV_str;
-        if( plugin_IV.length() == 3 )
-        {
-            plugin_IV = std::string() + plugin_IV[0] + "." + plugin_IV[1] + "." +
-                plugin_IV[2];
-            // Get currently loaded IMAS version as an integer (e.g. 3.5.0 -> 350)
-            load_IV_str = std::string() + load_IV[0] + load_IV[2] + load_IV [4];
-            load_IV_DIGIT = std::stoi( load_IV_str );
-        }
-        else if( plugin_IV.length() == 4 )
-        {
-            plugin_IV = std::string() + plugin_IV[0] + "." + plugin_IV[1] +
-                plugin_IV [2] + "." + plugin_IV[3];
-            // Get currently loaded IMAS version as an integer (e.g. 3.15.0 -> 3150)
-            load_IV_str = std::string() + load_IV[0] + load_IV[2] + load_IV[3]
-                + load_IV[5];
-            load_IV_DIGIT = std::stoi( load_IV_str );
-        }
-        // Latest IMAS version, for which it is confirmed the ReadUALEdgeplugin is
-        // compatible with ( in single integer form )
-        std::string IV_latest_string = "3.26.0";
-        int IV_latest_DIGIT = 3260;
-
-        // Display IMAS and UAL versions
-        vtkOutputWindowDisplayText(std::string("LOADED IMAS VERSION: " + load_IV +
-            "\n").c_str());
-        vtkOutputWindowDisplayText(std::string("LOADED UAL VERSION: " + load_UV +
-            "\n").c_str());
-        vtkOutputWindowDisplayText(std::string("PLUGIN IMAS VERSION: " + plugin_IV +
-            "\n\n").c_str());
-
-        // IMAS version checks
-        if( load_IV_DIGIT < IV_latest_DIGIT )
-        {
-            vtkOutputWindowDisplayWarningText("WARNING! This IMAS (and "
-                "consequently Data Dictionary) is outdated! ReadUALEdge plugin "
-                "might not be fully compatible with the currently loaded Data "
-                "Dictionary! The latest IMAS module, confirmed to be compatible "
-                "with the ReadUALEdge plugin, is IMAS/3.26.0/UAL/4.4.0 while the "
-                "oldest is IMAS/3.17.0/UAL/3.8.0. Using the last confirmed "
-                "compatible IMAS version is recommended. \n\n");
-        }
-        if( load_IV_DIGIT != PLUGIN_IMAS_VERSION_DIGIT )
-        {
-            vtkOutputWindowDisplayWarningText("WARNING! For best practice it is "
-                "recommended that the same IMAS/DD version is used for writing "
-                "the IDSs, compiling the ReadUALEdge plugin and then for loading "
-                "the plugin within the ParaView application. \n\n");
-        }
-        if( PLUGIN_IMAS_VERSION_DIGIT < IV_latest_DIGIT)
-        {
-            vtkOutputWindowDisplayWarningText("WARNING! The IMAS version (and "
-                "consequently Data Dictionary), used to compile the ReadUALEdge "
-                "plugin, is outdated! The latest IMAS module, confirmed to be "
-                "compatible with the ReadUALEdge, is IMAS/3.26.0/UAL/4.4.0 while "
-                "the oldest is IMAS/3.17.0/UAL/3.8.0. Using the last confirmed "
-                "compatible IMAS version is recommended.\n\n");
-        }
-
-        vtkOutputWindowDisplayText("Reading IDS \n");
-
-        // Set IDSs shot and run
-        IDS db(this->Shot, this->Run, this->Shot, this->RefRun);
-        if (!this->Version)
-            this->Version = strdup("3");
-        // Open IDS
-        db.openEnv(this->User, this->Device, this->Version);
-
-        // Print IDS info
-        msg  << "IDS parameters:" << "\n" <<
-            " - Loaded IDS: " << this->LoadIDS << "\n" <<
-            " - Shot:       " << this->Shot    << "\n" <<
-            " - Run:        " << this->Run     << "\n" <<
-            " - RefRun:     " << this->RefRun  << "\n" <<
-            " - User:       " << this->User    << "\n" <<
-            " - Device:     " << this->Device  << "\n" <<
-            " - Version:    " << this->Version << "\n\n";
-        msgToOutputWindow( msg );
-
-        // Set default variable to hold the IDS source for plasma state data fields
-        // (can be specified by the IDSPlasmaDataSource advanced option)
-        std::string IDS_plasmaStateSource = "edge_profiles";
-
-        // if( std::string(this->IDSPlasmaStateSource).find("Same as 'Read from IDS'")
-        //     != std::string::npos)
-        if( std::string(this->IDSPlasmaStateSource) == "Same as 'Read from IDS'")
-        {
-            IDS_plasmaStateSource = std::string(this->LoadIDS);
-        }
-        else
-        {
-            IDS_plasmaStateSource = std::string(this->IDSPlasmaStateSource);
-        }
-
-        // Get GRID GGD structure array index to internal variable
-        int grid_ggd_slice_index = this->GridGGDslice;
-        // Get GGD structure array index to internal variable
-        int ggd_slice_index = this->GGDslice;
-        // Get edge_sources.source(:) structure array index to internal variable
-        int source_index = this->EdgeSourcesSourceID;
-        // Get edge_transport.model(:) structure array index to internal variable
-        int model_index = this->EdgeTransportModelID;
-
-        // Set default number of GRID_GGD slices
-        int num_gridggd_slices = 0;
-        // Set default number of grid subsets
-        int num_gridSubset = 0;
-        // Set default number of GGD slices
-        int num_ggd_slices = 0;
-
-        if( std::string(this->LoadIDS).find("edge_profiles") != std::string::npos )
-        {
-            vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
-            db._edge_profiles.get();
-            num_gridggd_slices = db._edge_profiles.grid_ggd.extent(0);
-            // Get number of grid subsets in the selected IDS
-            num_gridSubset = db._edge_profiles.
-                grid_ggd(grid_ggd_slice_index).grid_subset.extent(0);
-            // Get number of GGD slices
-            num_ggd_slices = db._edge_profiles.ggd.extent(0);
-
-        }
-        else if( std::string(this->LoadIDS).find("edge_sources")
-            != std::string::npos )
-        {
-            vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
-            db._edge_sources.get();
-            num_gridggd_slices = db._edge_sources.grid_ggd.extent(0);
-            // Get number of grid subsets in the selected IDS
-            num_gridSubset = db._edge_sources.grid_ggd(grid_ggd_slice_index).
-                grid_subset.extent(0);
-            // Get number of GGD slices
-            num_ggd_slices = db._edge_sources.source(source_index).ggd.extent(0);
-        }
-        else if( std::string(this->LoadIDS).find("edge_transport")
-            != std::string::npos )
-        {
-            vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
-            db._edge_transport.get();
-            num_gridggd_slices = db._edge_transport.grid_ggd.extent(0);
-            // Get number of grid subsets in the selected IDS
-            num_gridSubset = db._edge_transport.grid_ggd(grid_ggd_slice_index).
-                grid_subset.extent(0);
-            // Get number of GGD slices
-            num_ggd_slices = db._edge_transport.model(model_index).ggd.extent(0);
-
-        }
-        else if( std::string(this->LoadIDS).find("mhd")
-            != std::string::npos )
-        {
-            vtkOutputWindowDisplayText("Reading mhd IDS. \n");
-            db._mhd.get();
-            num_gridggd_slices = db._mhd.grid_ggd.extent(0);
-            // Get number of grid subsets in the selected IDS
-            num_gridSubset = db._mhd.grid_ggd(grid_ggd_slice_index).
-                grid_subset.extent(0);
-            // Get number of GGD slices
-            num_ggd_slices = db._mhd.ggd.extent(0);
-        }
-
-        // Get plasma state from one of the IDSs
-        if( std::string(LoadIDS).find("edge_profiles")
-            != std::string::npos )
-        {
-            vtkOutputWindowDisplayText("GGD check: edge_profiles IDS. \n");
-            // db._edge_profiles.get();
-        }
-        else if( std::string(LoadIDS).find( "edge_sources" )
-            != std::string::npos )
-        {
-            vtkOutputWindowDisplayText("GGD check: edge_sources IDS. \n");
-            // db._edge_sources.get();
-        }
-        else if( std::string(LoadIDS).find( "edge_transport" )
-            != std::string::npos )
-        {
-            vtkOutputWindowDisplayText(std::string("GGD check: edge_transport IDS "
-                "(not yet implemented). \n").c_str());
-            // db._edge_transport.get();
-        }
-        else if( std::string(LoadIDS).find( "mhd" )
-            != std::string::npos )
-        {
-            vtkOutputWindowDisplayText("GGD check: mhd IDS. \n");
-            // db._mhd.get();
-        }
-
-        // Set object to readGmtryEdge class
-        readGmtryEdge gmtrye_obj;
-        //
-        gmtrye_obj.ggdCheck(db, IDS_plasmaStateSource, grid_ggd_slice_index,
-                            ggd_slice_index);
-
-        // Represent grid as grid subsets or as a single unstructured grid
-        if( std::string(GridForm).find("Grid subsets") != std::string::npos)
-        {
-            vtkOutputWindowDisplayText("Representation as 'Grid subsets' selected.");
-
-            if (this->ReadAllTimeSlicesCheckBox)
-            {
-                for(int s; s < num_ggd_slices; ++s)
-                {
-
-                    // MultiBlock object, to hold all VTUs
-                    vtkSmartPointer<vtkMultiBlockDataSet> singe_time_sliceMB =
-                        vtkSmartPointer<vtkMultiBlockDataSet>::New();
-
-                    // Create a multiblock holding multiple blocks -> Unstructured
-                    // Grids
-                    fTimeSlice2MultiBlockGS(db,
-                                            std::string(this->LoadIDS),
-                                            std::string(IDS_plasmaStateSource),
-                                            singe_time_sliceMB,
-                                            grid_ggd_slice_index,
-                                            s,
-                                            this->EdgeSourcesSourceID,
-                                            this->EdgeTransportModelID);
-                    // // Writing a MultiBlock dataset
-                    // // NOTE: the written files MUST BE LOADED TO PARAVIEW MANUALLY!!
-                    // // (just passing the data to output->... doesn't work )
-                    // // TODO: figure out how to properly create temporary folder
-                    // // (QTemporaryDir could be of use)
-                    // vtkXMLMultiBlockDataWriter* mbw = vtkXMLMultiBlockDataWriter::New();
-                    // std::string fileName = "/tmp/output" + std::to_string(s) + ".vtm";
-                    // mbw->SetFileName((fileName).c_str());
-                    // mbw->SetInputData(outputMB);
-                    // mbw->Write();
-
-
-                    // vtkDebugMacro(<< "Current Number of blocks" <<
-                    //     this->outputMB->GetNumberOfBlocks() << std::endl);
-                    vtkOutputWindowDisplayText(std::string(
-                        "Setting time slice block: " + std::to_string(s) + "\n").c_str());
-                    this->outputMB->SetBlock(s, singe_time_sliceMB);
-                }
-
-            }else
-            {
-                // Create a multiblock holding multiple blocks -> Unstructured
-                // Grids
-                fTimeSlice2MultiBlockGS(db,
-                                        std::string(this->LoadIDS),
-                                        std::string(IDS_plasmaStateSource),
-                                        this->outputMB,
-                                        grid_ggd_slice_index,
-                                        ggd_slice_index,
-                                        this->EdgeSourcesSourceID,
-                                        this->EdgeTransportModelID);
-            }
-
-        }else if( std::string(GridForm).find("Single grid") != std::string::npos)
-        {
-            // NOTE: UnstructuredGrid cannot be set as the output, as in the
-            //       C++ header file the vtkMultiBlockDataSetAlgorithm is being set
-            //       (plugin CANNOT USE both vtkMultiBlockDataSetAlgorithm and
-            //       vtkUnstructuredGridAlgorithm AT THE SAME TIME!)
-            //       Due to that a single full unstructured grid will be passed as
-            //       a block to multiblock dataset.
-
-            vtkOutputWindowDisplayText("Representation as a 'Single grid' selected.");
-
-            if (this->ReadAllTimeSlicesCheckBox)
-            {
-
-                for(int s; s < num_ggd_slices; s++)
-                {
-
-                    // MultiBlock object, to hold all VTUs
-                    vtkSmartPointer<vtkMultiBlockDataSet> singe_time_sliceMB =
-                        vtkSmartPointer<vtkMultiBlockDataSet>::New();
-
-                    // Create a multiblock holding single block -> Unstructured Grid
-                    fTimeSlice2MultiBlockSingleUG(db,
-                                                  std::string(this->LoadIDS),
-                                                  std::string(IDS_plasmaStateSource),
-                                                  singe_time_sliceMB,
-                                                  grid_ggd_slice_index,
-                                                  s,
-                                                  this->EdgeSourcesSourceID,
-                                                  this->EdgeTransportModelID);
-                    // // Writing a MultiBlock dataset
-                    // // NOTE: the written files MUST BE LOADED TO PARAVIEW MANUALLY!!
-                    // // (just passing the data to output->... doesn't work )
-                    // // TODO: figure out how to properly create temporary folder
-                    // // (QTemporaryDir could be of use)
-                    // vtkXMLMultiBlockDataWriter* mbw = vtkXMLMultiBlockDataWriter::New();
-                    // std::string fileName = "/tmp/output" + std::to_string(s) + ".vtm";
-                    // mbw->SetFileName((fileName).c_str());
-                    // mbw->SetInputData(singe_time_sliceMB);
-                    // mbw->Write();
-
-                    // vtkDebugMacro(<< "Current Number of blocks" <<
-                    //     this->outputMB->GetNumberOfBlocks() << std::endl);
-                    vtkOutputWindowDisplayText(std::string(
-                        "Setting time slice block: " + std::to_string(s) + "\n").c_str());
-                    this->outputMB->SetBlock(s, singe_time_sliceMB);
-                }
-
-            }else
-            {
-                // Create a multiblock holding single block -> Unstructured Grid
-                fTimeSlice2MultiBlockSingleUG(db,
-                                              std::string(this->LoadIDS),
-                                              std::string(IDS_plasmaStateSource),
-                                              this->outputMB,
-                                              grid_ggd_slice_index,
-                                              ggd_slice_index,
-                                              this->EdgeSourcesSourceID,
-                                              this->EdgeTransportModelID);
-            }
-        }else
-        {
-            vtkOutputWindowDisplayText("Neither grid representation as grid subsets"
-                " or as a single unstructured grid was initiated. NOTHING WAS "
-                " PASSED TO PARAVIEW!");
-        }
-
-
-        // Make shallow copy of the output (passes it to ParaView)
-        // output->ShallowCopy(this->outputMB->GetBlock(0));
-        if (this->ReadAllTimeSlicesCheckBox)
-        {
-            output->ShallowCopy(this->outputMB->GetBlock(0));
-        }
-        else
-        {
-            output->ShallowCopy(this->outputMB);
-        }
-
-        // Close IMAS database
-        db.close();
-
-        // Set ReadDataFlag to 0, so that the data won't be re-read on next
-        // RequestData (when using frame commands)
-        this->ReadDataFlag = 0;
+        IDS_plasmaStateSource = std::string(this->IDSPlasmaStateSource);
     }
+
+    // Get GRID GGD structure array index to internal variable
+    int grid_ggd_slice_index = this->GridGGDslice;
+    // Get GGD structure array index to internal variable
+    int ggd_slice_index = this->GGDslice;
+    // Get edge_sources.source(:) structure array index to internal variable
+    int source_index = this->EdgeSourcesSourceID;
+    // Get edge_transport.model(:) structure array index to internal variable
+    int model_index = this->EdgeTransportModelID;
+
+    // Set default number of GRID_GGD slices
+    int num_gridggd_slices = 0;
+    // Set default number of grid subsets
+    int num_gridSubset = 0;
+    // Set default number of GGD slices
+    int num_ggd_slices = 0;
+
+    if( std::string(this->LoadIDS).find("edge_profiles") != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
+        db._edge_profiles.get();
+        num_gridggd_slices = db._edge_profiles.grid_ggd.extent(0);
+        // Get number of grid subsets in the selected IDS
+        num_gridSubset = db._edge_profiles.
+            grid_ggd(grid_ggd_slice_index).grid_subset.extent(0);
+        // Get number of GGD slices
+        num_ggd_slices = db._edge_profiles.ggd.extent(0);
+
+    }
+    else if( std::string(this->LoadIDS).find("edge_sources")
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
+        db._edge_sources.get();
+        num_gridggd_slices = db._edge_sources.grid_ggd.extent(0);
+        // Get number of grid subsets in the selected IDS
+        num_gridSubset = db._edge_sources.grid_ggd(grid_ggd_slice_index).
+            grid_subset.extent(0);
+        // Get number of GGD slices
+        num_ggd_slices = db._edge_sources.source(source_index).ggd.extent(0);
+    }
+    else if( std::string(this->LoadIDS).find("edge_transport")
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
+        db._edge_transport.get();
+        num_gridggd_slices = db._edge_transport.grid_ggd.extent(0);
+        // Get number of grid subsets in the selected IDS
+        num_gridSubset = db._edge_transport.grid_ggd(grid_ggd_slice_index).
+            grid_subset.extent(0);
+        // Get number of GGD slices
+        num_ggd_slices = db._edge_transport.model(model_index).ggd.extent(0);
+
+    }
+    else if( std::string(this->LoadIDS).find("mhd")
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading mhd IDS. \n");
+        db._mhd.get();
+        num_gridggd_slices = db._mhd.grid_ggd.extent(0);
+        // Get number of grid subsets in the selected IDS
+        num_gridSubset = db._mhd.grid_ggd(grid_ggd_slice_index).
+            grid_subset.extent(0);
+        // Get number of GGD slices
+        num_ggd_slices = db._mhd.ggd.extent(0);
+    }
+
+    // Get plasma state from one of the IDSs
+    if( std::string(LoadIDS).find("edge_profiles")
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("GGD check: edge_profiles IDS. \n");
+        // db._edge_profiles.get();
+    }
+    else if( std::string(LoadIDS).find( "edge_sources" )
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("GGD check: edge_sources IDS. \n");
+        // db._edge_sources.get();
+    }
+    else if( std::string(LoadIDS).find( "edge_transport" )
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText(std::string("GGD check: edge_transport IDS "
+            "(not yet implemented). \n").c_str());
+        // db._edge_transport.get();
+    }
+    else if( std::string(LoadIDS).find( "mhd" )
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("GGD check: mhd IDS. \n");
+        // db._mhd.get();
+    }
+
+    // Set object to readGmtryEdge class
+    readGmtryEdge gmtrye_obj;
+    //
+    gmtrye_obj.ggdCheck(db, IDS_plasmaStateSource, grid_ggd_slice_index,
+                        ggd_slice_index);
+
+    // Represent grid as grid subsets or as a single unstructured grid
+    if( std::string(GridForm).find("Grid subsets") != std::string::npos)
+    {
+        vtkOutputWindowDisplayText("Representation as 'Grid subsets' selected.");
+
+        // Create a multiblock holding multiple blocks -> Unstructured
+        // Grids
+        fTimeSlice2MultiBlockGS(db,
+                                std::string(this->LoadIDS),
+                                std::string(IDS_plasmaStateSource),
+                                this->outputMB,
+                                grid_ggd_slice_index,
+                                ggd_slice_index,
+                                this->EdgeSourcesSourceID,
+                                this->EdgeTransportModelID);
+
+    }else if( std::string(GridForm).find("Single grid") != std::string::npos)
+    {
+        // NOTE: UnstructuredGrid cannot be set as the output, as in the
+        //       C++ header file the vtkMultiBlockDataSetAlgorithm is being set
+        //       (plugin CANNOT USE both vtkMultiBlockDataSetAlgorithm and
+        //       vtkUnstructuredGridAlgorithm AT THE SAME TIME!)
+        //       Due to that a single full unstructured grid will be passed as
+        //       a block to multiblock dataset.
+
+        vtkOutputWindowDisplayText("Representation as a 'Single grid' selected.");
+
+        // Create a multiblock holding single block -> Unstructured Grid
+        fTimeSlice2MultiBlockSingleUG(db,
+                                      std::string(this->LoadIDS),
+                                      std::string(IDS_plasmaStateSource),
+                                      this->outputMB,
+                                      grid_ggd_slice_index,
+                                      ggd_slice_index,
+                                      this->EdgeSourcesSourceID,
+                                      this->EdgeTransportModelID);
+    }else
+    {
+        vtkOutputWindowDisplayText("Neither grid representation as grid subsets"
+            " or as a single unstructured grid was initiated. NOTHING WAS "
+            " PASSED TO PARAVIEW!");
+    }
+
+    // Make shallow copy of the output (passes it to ParaView)
+    output->ShallowCopy(this->outputMB);
+
+    // Close IMAS database
+    db.close();
 
 #else
     msgToOutputWindow("This plugin supports only IMAS and IDSs. There is no "
         "CPO support.", "warning" );
-
 
 #endif // IMAS_IDS
     return 1;

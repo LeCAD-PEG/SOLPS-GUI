@@ -223,30 +223,11 @@
                 </Documentation>
             </StringVectorProperty>
 
-            <IntVectorProperty
-                name="ReadAllTimeSlicesCheckBox"
-                label="Read all time slices "
-                command="SetReadAllTimeSlicesCheckBox"
-                number_of_elements="1"
-                default_values="0"
-                panel_visibility="default">
-                <BooleanDomain name="bool"/>
-                <Documentation>
-                    When activated, on the press of the **Apply** button
-                    vtkMultiBlocks for all available (GGD) time slices will be
-                    created
-                    NOTE: due to non-trivial and limited solutions for plugins,
-                    the VTM files get written to **/tmp** directory and then
-                    must be manually opened in ParaView.
-                </Documentation>
-            </IntVectorProperty>
-
             <Property
                 name="Refresh"
                 command="Modified"
                 panel_widget="command_button"
                 width="5"/>
-
 
             <IntVectorProperty
                 name="IDSListCheckBox"

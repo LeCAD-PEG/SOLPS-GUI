@@ -61,23 +61,8 @@ class ReadUALEdge : public vtkMultiBlockDataSetAlgorithm
     vtkGetStringMacro(IDSPlasmaStateSource);
     vtkSetStringMacro(GridForm);
     vtkGetStringMacro(GridForm);
-    vtkGetMacro(ReadAllTimeSlicesCheckBox,int);
-    vtkSetMacro(ReadAllTimeSlicesCheckBox,int);
     vtkGetMacro(IDSListCheckBox,int);
     vtkSetMacro(IDSListCheckBox,int);
-
-    // Which TimeStep to read.
-    vtkSetMacro(TimeStep, int);
-    vtkGetMacro(TimeStep, int);
-    vtkGetMacro(NumberOfTimeSteps, int);
-    // Which TimeStepRange to read
-    vtkGetVector2Macro(TimeStepRange, int);
-    vtkSetVector2Macro(TimeStepRange, int);
-    vtkSetMacro(CurrentTimeStep, int);
-    vtkGetMacro(CurrentTimeStep, int);
-
-    vtkSetMacro(ReadDataFlag, int);
-    vtkGetMacro(ReadDataFlag, int);
 
 protected:
     ReadUALEdge();
@@ -98,33 +83,13 @@ protected:
     char* LoadIDS;
     char* IDSPlasmaStateSource;
     char* GridForm;
-    int ReadAllTimeSlicesCheckBox;
     int IDSListCheckBox;
     vtkSmartPointer<vtkStringArray> stringArray;
 
-    // The timestep currently being read.
-    int TimeStep;
-    // int CurrentTimeStep;
-    int NumberOfTimeSteps;
-    // Store the range of time steps
-    int TimeStepRange[2];
-    double* TimeSteps;
-    int CurrentTimeStep;
     vtkSmartPointer<vtkMultiBlockDataSet> outputMB;
-
-    int ReadDataFlag;
 
     virtual int RequestData(vtkInformation *, vtkInformationVector **,
                     vtkInformationVector *);
-    virtual int RequestInformation(vtkInformation *request,
-                           vtkInformationVector **inputVector,
-                           vtkInformationVector *outputVector);
-
-    // Setup the output's information.
-    virtual void SetupOutputInformation(vtkInformation *vtkNotUsed(outInfo)) {}
-
-    // Whether there was an error reading the file in RequestInformation.
-    int InformationError;
 
 private:
     ReadUALEdge(const ReadUALEdge&);  // Not implemented.
