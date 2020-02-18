@@ -1,8 +1,8 @@
-diff --git a/config/config.UNKNOWN.gfortran b/config/config.UNKNOWN.gfortran
+diff --git a/config/config.UL.gfortran b/config/config.UL.gfortran
 new file mode 100644
 index 0000000..e0fc301
 --- /dev/null
-+++ b/config/config.UNKNOWN.gfortran
++++ b/config/config.UL.gfortran
 @@ -0,0 +1,8 @@
 +LIBS = -lXm -lXt -lX11 -lXext -lXmu -lXft -lpthread -lm -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 +CFLAGS = -g
@@ -12,11 +12,11 @@ index 0000000..e0fc301
 +#!!! mode: Makefile
 +#!!! End:
 +
-diff --git a/convert/config/config.UNKNOWN.gfortran b/convert/config/config.UNKNOWN.gfortran
+diff --git a/convert/config/config.UL.gfortran b/convert/config/config.UL.gfortran
 new file mode 100644
-index 0000000..3eb5734
+index 0000000..c80a815
 --- /dev/null
-+++ b/convert/config/config.UNKNOWN.gfortran
++++ b/convert/config/config.UL.gfortran
 @@ -0,0 +1,20 @@
 +# check if necessary variables are correctly defined
 +LD_MSCL ?= `pkg-config mscl --libs`
@@ -38,11 +38,11 @@ index 0000000..3eb5734
 +#!!! mode: Makefile
 +#!!! End:
 +
-diff --git a/equtrn/config/config.UNKNOWN.gfortran b/equtrn/config/config.UNKNOWN.gfortran
+diff --git a/equtrn/config/config.UL.gfortran b/equtrn/config/config.UL.gfortran
 new file mode 100644
-index 0000000..a138542
+index 0000000..4bf50e1
 --- /dev/null
-+++ b/equtrn/config/config.UNKNOWN.gfortran
++++ b/equtrn/config/config.UL.gfortran
 @@ -0,0 +1,40 @@
 +# check if necessary variables are correctly defined
 +LD_MSCL ?= `pkg-config mscl --libs`

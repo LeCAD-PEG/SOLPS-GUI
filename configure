@@ -58,6 +58,19 @@ module load itm-qt/\${QT_VERSION}
 unset QT_VERSION
 EOF
         ;;
+    viz.hpc.fs.uni-lj.si)
+    cat << EOF >> ${SETUP_FILE}
+module purge
+module load GCC/6.4.0-2.28
+module load X11/20171023-GCCcore-6.4.0
+module load Automake/1.15.1-GCCcore-6.4.0
+module load libtool/2.4.6-GCCcore-6.4.0
+module load texlive
+module unload freetype
+module list
+export HOST_NAME="UL"
+EOF
+	;;
     *)
         ;;
 esac
@@ -300,24 +313,32 @@ else
     export LD_LIBRARY_PATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/lib:\${LD_LIBRARY_PATH}
     export LIBRARY_PATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/lib:\${LIBRARY_PATH}
     export PKG_CONFIG_PATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
+    export EBVERSIONGGD=\${GGD_VERSION}
 fi
 
 if [ -z \${MSCL_VERSION+x} ]; then
     echo "MSCL_VERSION is unset, skipping"
 else
     export PKG_CONFIG_PATH=\${STAGING_DIR}/mscl/\${MSCL_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
+    export MSCL_ROOT=\${STAGING_DIR}/mscl/\${MSCL_VERSION}
 fi
 
-if [ -z \${GLI_VERSION}+x ]; then
+if [ -z \${GLI_VERSION+x} ]; then
     echo "GLI_VERSION is unset, skipping"
 else
-    export GLI_HOME=\${STAGING_DIR}/GLI/${GLI_VERSION}
+    export GLI_HOME=\${STAGING_DIR}/GLI/\${GLI_VERSION}
 fi
 
-if [ -z \${NCL_VERSION}+x ]; then
+if [ -z \${NCL_VERSION+x} ]; then
     echo "NCL_VERSION is unset, skipping"
 else
-    export NCARG_ROOT=\${STAGING_DIR}/ncl/\${NCL_VERSION}
+    export NCARG_ROOT=\${STAGING_DIR}/ncl/\${NCL_VERSION}/lib
+fi
+
+if [ -z \${GR_VERSION+x} ]; then
+    echo "GR_VERSION is unset, skipping"
+else
+    export GR_ROOT=\${STAGING_DIR}/GR/\${GR_VERSION}
 fi
 
 EOF
@@ -380,6 +401,13 @@ if (\$X =~ *"iter.org") then
     setenv CPATH "\${STAGING_DIR}/netcdf-fortran/\${NETCDF_FORTRAN_VERSION}/include:\${CPATH}"
     setenv LIBRARY_PATH "/usr/lib:/usr/lib64:\${LIBRARY_PATH}"
     setenv CPATH "/usr/include:\${CPATH}"
+else if (\$X =~ *"viz.hpc.fs.uni-lj.si") then
+    module purge
+    module load GCC/8.3.0
+    module load X11/20190717-GCCcore-8.3.0
+    module load Automake/1.16.1-GCCcore-8.3.0
+    module load libtool/2.4.6-GCCcore-8.3.0
+    module load texlive
 else
     setenv NCARG_ROOT "/usr/lib64/ncarg"
     module load mpi/openmpi-x86_64
@@ -398,7 +426,7 @@ esac
 
 cat << EOF >> ${SETUP_CSH_FILE}
 # Use compiled packages!
-
+setenv STAGING_DIR ${STAGING_DIR}
 setenv CPATH \${STAGING_DIR}/motif/\${MOTIF_VERSION}/include:\${CPATH}
 setenv LD_LIBRARY_PATH \${STAGING_DIR}/motif/\${MOTIF_VERSION}/lib:\${LD_LIBRARY_PATH}
 setenv LIBRARY_PATH \${STAGING_DIR}/motif/\${MOTIF_VERSION}/lib:\${LIBRARY_PATH}
@@ -434,6 +462,18 @@ setenv OPENBLAS_ROOT \${STAGING_DIR}/OpenBLAS/\${OPENBLAS_VERSION}/lib
 
 setenv H5DIR \${STAGING_DIR}/hdf5/\${HDF5_VERSION}
 setenv LIBRARY_PATH \${STAGING_DIR}/hdf5/\${HDF5_VERSION}/lib
+setenv NCARG_ROOT "\${STAGING_DIR}/ncl/\${NCL_VERSION}/lib"
+setenv EBVERSIONGGD \${GGD_VERSION}
+setenv LD_LIBRARY_PATH \${LD_LIBRARY_PATH}
+setenv PKG_CONFIG_PATH \${PKG_CONFIG_PATH}
+setenv NCDIR \${STAGING_DIR}/netcdf/\${NETCDF_VERSION}
+setenv MSCL_ROOT \${STAGING_DIR}/mscl/\${MSCL_VERSION}
+setenv GR_ROOT \${STAGING_DIR}/GR/\${GR_VERSION}
+setenv GLI_HOME \${STAGING_DIR}/GLI/\${GLI_VERSION}
+setenv MDSPLUS_ROOT \${STAGING_DIR}/mdsplus/\${MDSPLUS_VERSION}
+setenv NCARG_ROOT \${STAGING_DIR}/ncl/\${NCL_VERSION}/lib
+setenv SOLPS_SRC_DIR \${SRC_DIR}
+setenv MPDIR \${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}
 
 
 EOF

@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash -x
 set -e
 
 
@@ -53,27 +53,47 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
         echo "Patching solps-iter root"
         patch -p1 < ${PATCH_DIR}/solps-iter.patch
 
+        echo "Patch: Add bash setup.sh"
+        patch -p1 < ${PATCH_DIR}/solps-iter-bash-setup.patch
+
+        echo "Patch: Add UL to whereami"
+        patch -p1 < ${PATCH_DIR}/solps-iter-whereami-UL.patch
+
+        echo "Patch: Add UL configs"
+        patch -p1 < ${PATCH_DIR}/solps-iter-UL-configs.patch
+
+        echo "Patching solps-iter scripts ( -X -> -x in check executables conditions)"
+        patch -p1 < ${PATCH_DIR}/solps-iter-scripts-executable-check.patch
+
         echo "Patching solps-iter B2.5"
         cd ${SRC_DIR}/modules/B2.5
         patch -p1 < ${PATCH_DIR}/solps-iter-B2.5.patch
+        echo "Adding UL configs to B2.5"
+        patch -p1 < ${PATCH_DIR}/solps-iter-B2.5-UL.patch
 
         echo "Patching solps-iter Carre"
         cd ${SRC_DIR}/modules/Carre
         patch -p1 < ${PATCH_DIR}/solps-iter-Carre.patch
+        echo "Adding UL configs to Carre"
+        patch -p1 < ${PATCH_DIR}/solps-iter-Carre-UL.patch
 
         echo "Patching solps-iter DivGeo"
         cd ${SRC_DIR}/modules/DivGeo
         patch -p1 < ${PATCH_DIR}/solps-iter-DivGeo.patch
+        echo "Adding UL configs to DivGeo"
+        patch -p1 < ${PATCH_DIR}/solps-iter-DivGeo-UL.patch
 
         echo "Patching solps-iter Eirene"
         cd ${SRC_DIR}/modules/Eirene
         patch -p1 < ${PATCH_DIR}/solps-iter-Eirene.patch
-
-        HOST_NAME=UNKNOWN
+        echo "Adding UL configs to Eirene"
+        patch -p1 < ${PATCH_DIR}/solps-iter-Eirene-UL.patch
 
         ;;
     esac
+    touch ${SRC_DIR}/.configured
     cd ${SRC_DIR}
+
 fi
 
 # Build
@@ -83,50 +103,40 @@ if [ ! -e ${SRC_DIR}/.built ]; then
 
     # Setup LD_LIBRARY_PATH
     # Debian
-    LD_LIBRARY_PATH=usr/lib/x86_64-linux-gnu:/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION}:${LD_LIBRARY_PATH}
+    LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/lib/x86_64-linux-gnu:/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION}
     # CentOS
-    LD_LIBRARY_PATH=/usr/lib64/:/usr/lib/gcc/x86_64-redhat-linux/${GCC_VERSION}:${LD_LIBRARY_PATH}
+    LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/lib64/:/usr/lib/gcc/x86_64-redhat-linux/${GCC_VERSION}
 
     # Setup PKG_CONFIG_PATH
-    PKG_CONFIG_PATH=/usr/lib/pkgconfig:${PKG_CONFIG_PATH}
+    PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib/pkgconfig
     # Debian
-    PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:${PKG_CONFIG_PATH}
+    PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib/x86_64-linux-gnu/pkgconfig
     # CentOS
-    PKG_CONFIG_PATH=/usr/lib64/pkgconfig:${PKG_CONFIG_PATH}
-    # SolpsITER
-    PKG_CONFIG_PATH=${SRC_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}
+    PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib64/pkgconfig
+
 
     # Package PKG_CONFIG_PATH
 
-    if [ -z ${HOST_NAME+x} ]; then
-        command="setenv HOST_NAME ${HOST_NAME}\n"
-    fi
+    cd ${SRC_DIR}
+    source ${SRC_DIR}/setup.sh gfortran
+    hash -r
+    make listobj listobj_debug
+    make depend depend_debug
+    make tags
+    make carre
+    make divgeo
+    make b25
+    make eirene
+    make b25eirene
+    #make uinp
+    make triang
+    make amds
+    make sonnet-light
+    make carre divgeo b25 eirene b25eirene uinp triang amds sonnet-light
+    make b25eirene_mpi amds_mpi
+    #make uinp_mpi
+    # make b25eirene_openmp
 
-    command=${command}$(cat <<-EOL
-        cd ${SRC_DIR}
-        source ${SRC_DIR}/setup.csh gfortran
-
-        rehash
-        make listobj listobj_debug
-        make depend depend_debug
-        make tags
-        make carre divgeo b25 eirene b25eirene uinp triang amds sonnet-light
-        # make b25eirene_openmp
-        make b25eirene_mpi uinp_mpi amds_mpi
-EOL
-)
-
-    EBVERSIONGGD=${GGD_VERSION} \
-    LD_LIBRARY_PATH=${LD_LIBRARY_PATH} \
-    PKG_CONFIG_PATH=${PKG_CONFIG_PATH} \
-    NCDIR=${STAGING_DIR}/netcdf/${NETCDF_VERSION} \
-    MSCL_ROOT=${STAGING_DIR}/mscl/${MSCL_VERSION} \
-    GR_ROOT=${STAGING_DIR}/GR/${GR_VERSION} \
-    GLI_HOME=${STAGING_DIR}/GLI/${GLI_VERSION} \
-    MDSPLUS_ROOT=${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION} \
-    NCARG_ROOT=${STAGING_DIR}/ncl/${NCL_VERSION}/lib \
-    SOLPS_SRC_DIR=${SRC_DIR} \
-    tcsh -c "${command}"
     touch ${SRC_DIR}/.built
 fi
 
@@ -181,8 +191,8 @@ setenv MAKE make
 setenv SOLPSTOP ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}
 set SOLPSTOP ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}
 setenv SOLPSWORK \$SOLPSTOP/runs
-setenv HOST_NAME UNKNOWN
-set HOST_NAME UNKNOWN
+setenv HOST_NAME ${HOST_NAME}
+set HOST_NAME ${HOST_NAME}
 setenv COMPILER gfortran
 set COMPILER gfortran
 setenv DEVICE solps-iter
@@ -272,3 +282,5 @@ set-alias unset_mpi    "source \$SOLPSTOP/SETUP/nompi"
 set-alias   set_ig     "source \$SOLPSTOP/SETUP/ig"
 set-alias unset_ig     "source \$SOLPSTOP/SETUP/noig"
 EOF
+
+touch ${SRC_DIR}/.installed

@@ -45,7 +45,7 @@ cat << EOF > ${MODULE_DIR}/solps-gui/${VERSION}
 ##
 ## \$name modulefile
 ##
-conflict solps-iter
+conflict solps-gui
 if { ! [ is-loaded imas/${IMASDD_VERSION}/solps ] } {
     module load imas/${IMASDD_VERSION}/solps
 }

@@ -119,7 +119,7 @@ cd ${BUILD_DIR}/paraview-${VERSION}
 
 # Build
 if [ ! -e ${SRC_DIR}/.built ]; then
-    make -j${MAKE_JOBS} VERBOSE=0
+    make -j${MAKE_JOBS} --silent
     touch ${SRC_DIR}/.built
 fi
 

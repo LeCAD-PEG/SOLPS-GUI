@@ -1,8 +1,8 @@
-diff --git a/config/config.UNKNOWN.gfortran b/config/config.UNKNOWN.gfortran
+diff --git a/config/config.UL.gfortran b/config/config.UL.gfortran
 new file mode 100644
-index 00000000..b128dff6
+index 0000000..5ba40a7
 --- /dev/null
-+++ b/config/config.UNKNOWN.gfortran
++++ b/config/config.UL.gfortran
 @@ -0,0 +1,87 @@
 +# Test whether necessary variables are set
 +LD_MSCL   ?= `pkg-config mscl --libs`

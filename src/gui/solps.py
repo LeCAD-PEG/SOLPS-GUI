@@ -801,6 +801,7 @@ class SOLPS_MainWindow(QMainWindow):
         model = self.treeViewRuns.model().sourceModel()
         if submit_command:
             if self.preferences.submit_script != 'localsubmit' \
+               and self.preferences.submit_script != 'local run' \
                     and len(self.preferences.job_name):
                 if ' ' in self.preferences.job_name:
                     opts += f' -j "{self.preferences.job_name}"'
@@ -816,6 +817,9 @@ class SOLPS_MainWindow(QMainWindow):
                 opts += ' -z'
             if self.preferences.dry_run:
                 opts += ' -n'
+
+            if submit_command == 'local run':
+                submit_command = 'b2run b2mn'
             cmd += f'rm -rf *.prt\n{submit_command} {opts}'
             self.execute_tcsh_command_in_rundir(cmd, rundir)
             msg = f'batch {rundir} {submit_command} {opts}'

@@ -1,0 +1,14 @@
+diff --git a/whereami b/whereami
+index 83d7492..8d60aeb 100755
+--- a/whereami
++++ b/whereami
+@@ -111,6 +111,9 @@ case "PLASMATHEORY08":
+ case "*.mephi.ru":
+   echo MEPHI
+   breaksw
++case "viz.hpc.fs.uni-lj.si":
++  echo UL
++  breaksw
+ case "*.cn":
+ case "*.hk":
+ case "*.mo":

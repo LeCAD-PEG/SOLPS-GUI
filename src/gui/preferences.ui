@@ -237,6 +237,11 @@ Use 127.0.0.1 only for localsubmit.</string>
     </item>
     <item>
      <property name="text">
+      <string>local run</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string/>
      </property>
     </item>

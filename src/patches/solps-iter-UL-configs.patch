@@ -1,24 +1,8 @@
-diff --git a/SETUP/setup.sh.UNKNOWN.gfortran b/SETUP/setup.sh.UNKNOWN.gfortran
+diff --git a/SETUP/config.UL.gfortran b/SETUP/config.UL.gfortran
 new file mode 100644
-index 00000000..9659b9df
+index 0000000..40dd826
 --- /dev/null
-+++ b/SETUP/setup.sh.UNKNOWN.gfortran
-@@ -0,0 +1,10 @@
-+if [ -x "$(which paraview-config)" ]; then
-+  # See ParaViewCatalystUsersGuide_v2.pdf Sec 3.7.2 Linking with Python ...
-+  PARAVIEW_LIB=$(paraview-config --libs --python | sed s/-L//)
-+  export LD_LIBRARY_PATH="${PARAVIEW_LIB}:${LD_LIBRARY_PATH}"
-+  export PYTHONPATH="${PARAVIEW_LIB}/site-packages/vtk:${PYTHONPATH}"
-+  export PYTHONPATH="${PARAVIEW_LIB}/site-packages:${PYTHONPATH}"
-+  export LD_CATALYST=$(paraview-config --libs vtkPVPythonCatalyst)
-+else
-+  echo "Warning: paraview-config not found. ParaView with Catalyst will not be compiled-in!"
-+fi
-diff --git a/SETUP/config.UNKNOWN.gfortran b/SETUP/config.UNKNOWN.gfortran
-new file mode 100644
-index 00000000..dbc723ab
---- /dev/null
-+++ b/SETUP/config.UNKNOWN.gfortran
++++ b/SETUP/config.UL.gfortran
 @@ -0,0 +1,141 @@
 +#
 +# Specify paths to root-directories of following libraries on your system
@@ -161,12 +145,19 @@ index 00000000..dbc723ab
 +#!!! mode: Makefile
 +#!!! End:
 +
-diff --git a/SETUP/setup.csh.UNKNOWN.gfortran b/SETUP/setup.csh.UNKNOWN.gfortran
+diff --git a/SETUP/setup.csh.UL.gfortran b/SETUP/setup.csh.UL.gfortran
 new file mode 100644
-index 00000000..4221e7c1
+index 0000000..32d1362
 --- /dev/null
-+++ b/SETUP/setup.csh.UNKNOWN.gfortran
-@@ -0,0 +1,10 @@
++++ b/SETUP/setup.csh.UL.gfortran
+@@ -0,0 +1,19 @@
++module load GCC/6.4.0-2.28
++module load X11/20171023-GCCcore-6.4.0
++module load Automake/1.15.1-GCCcore-6.4.0
++module load libtool/2.4.6-GCCcore-6.4.0
++module load tcsh/6.22.02
++module load texlive
++module unload freetype
 +if (`where paraview-config` == "") then
 +  echo "Warning: paraview-config not found. ParaView with Catalyst will not be compiled-in!"
 +else
@@ -177,11 +168,38 @@ index 00000000..4221e7c1
 +  setenv PYTHONPATH "${PARAVIEW_LIB}/site-packages:${PYTHONPATH}"
 +  setenv LD_CATALYST `paraview-config --libs vtkPVPythonCatalyst`
 +endif
-diff --git a/modules/Triang/config/config.UNKNOWN.gfortran b/modules/Triang/config/config.UNKNOWN.gfortran
++
++
+diff --git a/SETUP/setup.sh.UL.gfortran b/SETUP/setup.sh.UL.gfortran
 new file mode 100644
-index 00000000..802a228f
+index 0000000..0101b07
 --- /dev/null
-+++ b/modules/Triang/config/config.UNKNOWN.gfortran
++++ b/SETUP/setup.sh.UL.gfortran
+@@ -0,0 +1,19 @@
++module load GCC/6.4.0-2.28
++module load X11/20171023-GCCcore-6.4.0
++module load Automake/1.15.1-GCCcore-6.4.0
++module load libtool/2.4.6-GCCcore-6.4.0
++module load tcsh/6.22.02
++module load texlive
++module unload freetype
++if [ -x "$(which paraview-config)" ]; then
++  # See ParaViewCatalystUsersGuide_v2.pdf Sec 3.7.2 Linking with Python ...
++  PARAVIEW_LIB=$(paraview-config --libs --python | sed s/-L//)
++  export LD_LIBRARY_PATH="${PARAVIEW_LIB}:${LD_LIBRARY_PATH}"
++  export PYTHONPATH="${PARAVIEW_LIB}/site-packages/vtk:${PYTHONPATH}"
++  export PYTHONPATH="${PARAVIEW_LIB}/site-packages:${PYTHONPATH}"
++  export LD_CATALYST=$(paraview-config --libs vtkPVPythonCatalyst)
++else
++  echo "Warning: paraview-config not found. ParaView with Catalyst will not be compiled-in!"
++fi
++
++module list
+diff --git a/modules/Triang/config/config.UL.gfortran b/modules/Triang/config/config.UL.gfortran
+new file mode 100644
+index 0000000..cf46c22
+--- /dev/null
++++ b/modules/Triang/config/config.UL.gfortran
 @@ -0,0 +1,46 @@
 +#  VERSION : 16.12.2004 23:58
 +
@@ -230,11 +248,11 @@ index 00000000..802a228f
 +
 +LD         = gfortran
 \ No newline at end of file
-diff --git a/modules/Uinp/config/config.UNKNOWN.gfortran b/modules/Uinp/config/config.UNKNOWN.gfortran
+diff --git a/modules/Uinp/config/config.UL.gfortran b/modules/Uinp/config/config.UL.gfortran
 new file mode 100644
-index 00000000..5a411132
+index 0000000..7b8e57e
 --- /dev/null
-+++ b/modules/Uinp/config/config.UNKNOWN.gfortran
++++ b/modules/Uinp/config/config.UL.gfortran
 @@ -0,0 +1,36 @@
 +#  VERSION : 28.07.99 20:34
 +
@@ -272,11 +290,11 @@ index 00000000..5a411132
 +#!!! mode: Makefile
 +#!!! End:
 +
-diff --git a/modules/amds/config/config.UNKNOWN.gfortran b/modules/amds/config/config.UNKNOWN.gfortran
+diff --git a/modules/amds/config/config.UL.gfortran b/modules/amds/config/config.UL.gfortran
 new file mode 100644
-index 00000000..7c233dff
+index 0000000..7c233df
 --- /dev/null
-+++ b/modules/amds/config/config.UNKNOWN.gfortran
++++ b/modules/amds/config/config.UL.gfortran
 @@ -0,0 +1,8 @@
 +CC = cc
 +CFLAGS = -g
@@ -286,16 +304,3 @@ index 00000000..7c233dff
 +#!!! mode: Makefile
 +#!!! End:
 +
-diff --git a/runs/Makefile b/runs/Makefile
-index efa3c2a2..e4129199 100644
---- a/runs/Makefile
-+++ b/runs/Makefile
-@@ -4,7 +4,7 @@
- #-----------------------------------------------------------------------
- # Variables.
-
--SHELL = /usr/bin/env sh
-+SHELL = /bin/tcsh
- TIME = time
- RUN_OPTIONS =
- BLANK =

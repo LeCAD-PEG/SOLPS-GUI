@@ -1,0 +1,224 @@
+diff --git a/setup.sh b/setup.sh
+new file mode 100644
+index 0000000..5813c1d
+--- /dev/null
++++ b/setup.sh
+@@ -0,0 +1,218 @@
++#!/bin/bash
++
++
++# Function that checks if variable is defined, otherwise sets the value
++# provided
++setIfUndefined() {
++    # Do nothing if less than 2 arguments exist
++    if [ $# -lt 2 ]; then
++        return
++    fi
++    # If the first argument does not exist as an environmental value,
++    # set the second argument as value and export it.
++    if [ -z ${!1+x} ]; then
++        export $1="$2"
++    fi
++}
++
++echo "Welcome to SOLPS-ITER!"
++echo "Documentation can be found at:"
++echo "https://portal.iter.org/departments/POP/CM/IMAS/SOLPS-ITER"
++echo "and"
++echo "https://user.iter.org/\?uid=Q92BAQ"
++echo "(both require a valid ITER IDM account)"
++echo "The full SOLPS-ITER manual can be found in \$SOLPSTOP/doc/solps/solps.pdf"
++echo "The Eirene manual is located at http://www.eirene.de/"
++
++export SOLPSTOP=${PWD}
++export SOLPSWORK=${SOLPSTOP}/runs
++
++if [ -s whereami ]; then
++    iamat=$(./whereami | tail -1)
++    echo "Running at ${iamat}"
++else
++    iamat="UNKNOWN"
++fi
++
++LOCAL_SETUP_FILE=${SOLPSTOP}/SETUP/setup.sh.HOST_NAME.local
++if [ -f ${LOCAL_SETUP_FILE} ] ; then
++    echo "Loading ${LOCAL_SETUP_FILE}"
++    export HOST_NAME=$(cat ${LOCAL_SETUP_FILE})
++else
++    case "${iamat}" in
++        *UNKNOWN)
++            export HOST_NAME="UNKNOWN"
++            ;;
++        *)
++            export HOST_NAME=${iamat}
++            ;;
++    esac
++fi
++
++if [ "$1" == "" ]; then
++    if [ -s default_compiler ]; then
++        export COMPILER=$(./default_compiler|tail -1)
++        echo "Using compiler ${COMPILER}"
++    else
++        export COMPILER="ifort64"
++        echo "Assuming default compiler ifort64"
++    fi
++else
++    export COMPILER=$1
++    echo "Using specified compiler $1"
++fi
++
++if [ -z ${COMPILER+x} ]; then
++    echo "Compiler not defined!"
++fi
++
++if [ -x "$(which gmake)" ]; then
++    export MAKE=$(which gmake)
++else
++    export MAKE=$(which make)
++fi
++
++
++export PYTHONPATH=${PYTHONPATH}:${SOLPSTOP}/lib/python
++
++# setup files for combination of HOST_NAME and COMPILER, + local modifications if present
++SETUP_FILE="SETUP/setup.sh.${HOST_NAME}.${COMPILER}"
++if [ -s ${SETUP_FILE} ]; then
++    echo "Loading ${SETUP_FILE}."
++    source ${SETUP_FILE}
++else
++    echo "File ${SETUP_FILE} not found!"
++fi
++
++LOCAL_SETUP_FILE=SETUP/setup.sh.${HOST_NAME}.${COMPILER}.local
++if [ -s ${LOCAL_SETUP_FILE} ]; then
++    echo "Loading ${LOCAL_SETUP_FILE}."
++    source ${LOCAL_SETUP_FILE}
++fi
++
++# limit stacksize unlimited
++ulimit -s unlimited
++
++setIfUndefined "GRAPHCAP" "X11"
++setIfUndefined "B2PLOT_DEV" "x11 ps"
++setIfUndefined "GRSOFT_DEVICE" "211 62"
++export SonnetTopDirectory=${SOLPSTOP}/modules/Sonnet-light
++export EscapeSonnet=$(echo ${SonnetTopDirectory} | sed 's:\/:\\\/:g')
++
++export DG=${SOLPSTOP}/modules/DivGeo
++#export CARRE_STOREDIR ${SOLPSTOP}/modules/Carre/meshes
++
++# Set path to scripts and executables
++#------------------------------------
++
++if [ -z ${SOLPS_PATH} ]; then
++    export PATH=$(echo ${PATH} | sed "s|${SOLPS_PATH}:||")
++fi
++
++TOOLCHAIN=${HOST_NAME}.${COMPILER}
++CARRE_PATH=${SOLPSTOP}/modules/Carre/builds/${TOOLCHAIN}
++DIVGEO_PATH=${SOLPSTOP}/modules/DivGeo/builds/${TOOLCHAIN}:${SOLPSTOP}/modules/DivGeo/equtrn/builds/${TOOLCHAIN}:${SOLPSTOP}/modules/DivGeo/convert/builds/${TOOLCHAIN}
++EIRENE_PATH=${SOLPSTOP}/modules/Eirene/builds/standalone.${TOOLCHAIN}
++B25_PATH=${SOLPSTOP}/modules/B2.5/builds/standalone.${TOOLCHAIN}
++B25EIRENE_PATH=${SOLPSTOP}/modules/B2.5/builds/couple_SOLPS-ITER.${TOOLCHAIN}
++UINP_PATH=${SOLPSTOP}/modules/Uinp/builds/${TOOLCHAIN}
++TRIANG_PATH=${SOLPSTOP}/modules/Triang/builds/${TOOLCHAIN}
++SCRIPTS_PATH=${SOLPSTOP}/scripts.local:${SOLPSTOP}/scripts:${SOLPSTOP}/scripts/${TOOLCHAIN}:${SOLPSTOP}/modules/Eirene/scripts
++AMDS_PATH=${SOLPSTOP}/modules/amds/builds/${TOOLCHAIN}
++S45_PATH=${SOLPSTOP}/modules/solps4-5/builds/${TOOLCHAIN}
++
++# Note: in case of name-clash between script and executable, script will be found first
++export SOLPS_PATH=${SCRIPTS_PATH}:${CARRE_PATH}:${DIVGEO_PATH}:${B25EIRENE_PATH}:${EIRENE_PATH}:${B25_PATH}:${UINP_PATH}:${TRIANG_PATH}:${AMDS_PATH}:${S45_PATH}
++export OLD_PATH=${PATH}
++export PATH=${SOLPS_PATH}:${PATH}
++export LD_LIBRARY_PATH=${SOLPSLIB}:${LD_LIBRARY_PATH}
++
++unset TOOLCHAIN SCRIPTS_PATH CARRE_PATH DIVGEO_PATH EIRENE_PATH B25_PATH B25EIRENE_PATH UINP_PATH TRIANG_PATH AMDS_PATH S45_PATH
++
++# Check whether SOLPS_DEBUG and SOLPS_MPI had been set already by the user
++if [ -z ${SOLPS_DEBUG+x} ]; then
++    :
++else
++    source ${SOLPSTOP}/SETUP/debug
++fi
++if [ -z ${SOLPS_MPI+x} ]; then
++    :
++else
++    source ${SOLPSTOP}/SETUP/mpi
++fi
++
++# Set path to manuals
++#--------------------
++
++export MANPATH=${MANPATH}:${SonnetTopDirectory}/man:${DG}/equtrn/doxygen/man
++
++# Remove double entries from some environment variables, if there are any
++export PATH=$(echo ${PATH} | awk -v RS=: -v ORS= '!a[$0]++ {if (NR>1) printf(":"); printf("%s",$0) }')
++export LD_LIBRARY_PATH=$(echo ${LD_LIBRARY_PATH} | awk -v RS=: -v ORS= '!a[$0]++ {if (NR>1) printf(":"); printf("%s",$0) }')
++export MANPATH=$(echo ${MANPATH} | awk -v RS=: -v ORS= '!a[$0]++ {if (NR>1) printf(":"); printf("%s",$0) }')
++export PYTHONPATH=$(echo ${PYTHONPATH} | awk -v RS=: -v ORS= '!a[$0]++ {if (NR>1) printf(":"); printf("%s",$0) }')
++export OLD_PATH=$(echo ${OLD_PATH} | awk -v RS=: -v ORS= '!a[$0]++ {if (NR>1) printf(":"); printf("%s",$0) }')
++
++alias sb2="cd ${SOLPSTOP}/modules/B2.5"
++alias sbb="cd ${SOLPSTOP}/modules/B2.5"
++alias sei="cd ${SOLPSTOP}/modules/Eirene"
++alias ssw="cd ${SOLPSTOP}/modules/Sonnet-light"
++alias sst="cd ${SOLPSTOP}/modules/Triang"
++alias ssd="cd ${SOLPSTOP}/modules/DivGeo"
++alias ssc="cd ${SOLPSTOP}/modules/Carre"
++alias ssu="cd ${SOLPSTOP}/modules/Uinp"
++alias slib="cd ${SOLPSTOP}/lib/${HOST_NAME}.${COMPILER}"
++alias sbr="cd ${SOLPSTOP}/runs"
++alias scr="cd ${SOLPSTOP}/scripts"
++alias stop="cd ${SOLPSTOP}"
++
++alias sdg="cd ${SOLPSTOP}/modules/DivGeo/device/${DEVICE}"
++alias ssf="cd ${SOLPSTOP}/modules/DivGeo/device/${DEVICE}"
++
++alias xyplot="plot xyplot"
++alias xyplot2="plot xyplot2"
++alias xyplot3="plot xyplot3"
++alias xyplot4="plot xyplot4"
++alias xyplot5="plot xyplot5"
++alias xyplot6="plot xyplot6"
++alias xyplot7="plot xyplot7"
++alias xyplot8="plot xyplot8"
++alias xyplot8="plot xyplot8"
++alias xyplot9="plot xyplot9"
++alias xlyplot="plot xlyplot"
++alias xlyplot2="plot xlyplot2"
++alias xlyplot3="plot xlyplot3"
++alias xlyplot4="plot xlyplot4"
++alias xlyplot5="plot xlyplot5"
++alias xlyplot6="plot xlyplot6"
++alias xlyplot7="plot xlyplot7"
++alias xlyplot8="plot xlyplot8"
++alias xlyplot8="plot xlyplot8"
++alias xlyplot9="plot xlyplot9"
++alias xylplot="plot xylplot"
++alias xylplot2="plot xylplot2"
++alias xylplot3="plot xylplot3"
++alias xylplot4="plot xylplot4"
++alias xylplot5="plot xylplot5"
++alias xylplot6="plot xylplot6"
++alias xylplot7="plot xylplot7"
++alias xylplot8="plot xylplot8"
++alias xylplot8="plot xylplot8"
++alias xylplot9="plot xylplot9"
++alias xlylplot="plot xlylplot"
++alias xlylplot2="plot xlylplot2"
++alias xlylplot3="plot xlylplot3"
++alias xlylplot4="plot xlylplot4"
++alias xlylplot5="plot xlylplot5"
++alias xlylplot6="plot xlylplot6"
++alias xlylplot7="plot xlylplot7"
++alias xlylplot8="plot xlylplot8"
++alias xlylplot8="plot xlylplot8"
++alias xlylplot9="plot xlylplot9"
++
++alias set_debug="source $SOLPSTOP/SETUP/debug"
++alias unset_debug="source $SOLPSTOP/SETUP/nodebug"
++alias set_mpi="source $SOLPSTOP/SETUP/mpi"
++alias unset_mpi="source $SOLPSTOP/SETUP/nompi"
++alias set_ig="source $SOLPSTOP/SETUP/ig"
++alias unset_ig="source $SOLPSTOP/SETUP/noig"

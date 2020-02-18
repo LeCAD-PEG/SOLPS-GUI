@@ -1,0 +1,329 @@
+diff --git a/scripts/awk.plot_mesh b/scripts/awk.plot_mesh
+index f98e3010..1ba20e82 100755
+--- a/scripts/awk.plot_mesh
++++ b/scripts/awk.plot_mesh
+@@ -15,7 +15,7 @@ else
+   echo Cannot find $1
+   exit
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/last10 b/scripts/last10
+index a5775f4e..5efc3dbe 100755
+--- a/scripts/last10
++++ b/scripts/last10
+@@ -2,7 +2,7 @@
+ if (-s run.log) then
+   tail -100000 run.log >! tmp.run.log
+ else
+-  if (-X zcat) then
++  if (-x zcat) then
+     set ZCAT="zcat --force"
+   else
+     set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/pipe_run.log b/scripts/pipe_run.log
+index 77439306..970d04bd 100755
+--- a/scripts/pipe_run.log
++++ b/scripts/pipe_run.log
+@@ -8,7 +8,7 @@ else
+     set FILE=run.log
+   endif
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/plot_mesh b/scripts/plot_mesh
+index 776db7b6..1ca4bbae 100755
+--- a/scripts/plot_mesh
++++ b/scripts/plot_mesh
+@@ -44,7 +44,7 @@ setenv GNUPLOT_EXTRA /tmp/tmp.$USER.$$.gnuplot.extra
+ echo 'set xlabel "R (m)"' >! $GNUPLOT_EXTRA
+ echo 'set ylabel "Z (m)"' >> $GNUPLOT_EXTRA
+ 
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/print_species b/scripts/print_species
+index e8c1fa46..56cd3142 100755
+--- a/scripts/print_species
++++ b/scripts/print_species
+@@ -1,5 +1,5 @@
+ #! /bin/tcsh
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/res_D+C b/scripts/res_D+C
+index 256685a2..443666d1 100755
+--- a/scripts/res_D+C
++++ b/scripts/res_D+C
+@@ -4,7 +4,7 @@ if (-s b2mn.exe.dir/b2ftrace) then
+ else
+   set FILE=b2ftrace
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/res_D+C+Ar+Ne+He b/scripts/res_D+C+Ar+Ne+He
+index 13e4e3f3..9959e2ef 100755
+--- a/scripts/res_D+C+Ar+Ne+He
++++ b/scripts/res_D+C+Ar+Ne+He
+@@ -4,7 +4,7 @@ if (-s b2mn.exe.dir/b2ftrace) then
+ else
+   set FILE=b2ftrace
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/res_D+C+He b/scripts/res_D+C+He
+index 7630d560..ae12e630 100755
+--- a/scripts/res_D+C+He
++++ b/scripts/res_D+C+He
+@@ -4,7 +4,7 @@ if (-s b2mn.exe.dir/b2ftrace) then
+ else
+   set FILE=b2ftrace
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/res_D+O b/scripts/res_D+O
+index 46560cfe..10e00878 100755
+--- a/scripts/res_D+O
++++ b/scripts/res_D+O
+@@ -4,7 +4,7 @@ if (-s b2mn.exe.dir) then
+ else
+   set FILE=b2ftrace
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/resall_D b/scripts/resall_D
+index 41eb1426..eaa30913 100755
+--- a/scripts/resall_D
++++ b/scripts/resall_D
+@@ -4,7 +4,8 @@ if (-s b2mn.exe.dir/b2ftrace) then
+ else
+   set FILE=b2ftrace
+ endif
+-if (-X zcat) then
++echo "test"
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/resall_D+D b/scripts/resall_D+D
+index b9a8af60..a06c585c 100755
+--- a/scripts/resall_D+D
++++ b/scripts/resall_D+D
+@@ -4,7 +4,7 @@ if (-s b2mn.exe.dir/b2ftrace) then
+ else
+   set FILE=b2ftrace
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/resall_D+T b/scripts/resall_D+T
+index 370e4d0f..8c6017b9 100755
+--- a/scripts/resall_D+T
++++ b/scripts/resall_D+T
+@@ -4,7 +4,7 @@ if (-s b2mn.exe.dir/b2ftrace) then
+ else
+   set FILE=b2ftrace
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/resall_D+_only b/scripts/resall_D+_only
+index 49286f86..53d275d5 100755
+--- a/scripts/resall_D+_only
++++ b/scripts/resall_D+_only
+@@ -4,7 +4,7 @@ if (-s b2mn.exe.dir/b2ftrace) then
+ else
+   set FILE=b2ftrace
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/resall_H b/scripts/resall_H
+index 8ccf3821..093caa22 100755
+--- a/scripts/resall_H
++++ b/scripts/resall_H
+@@ -4,7 +4,7 @@ if (-s b2mn.exe.dir/b2ftrace) then
+ else
+   set FILE=b2ftrace
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/resco b/scripts/resco
+index 33967366..3a2981be 100755
+--- a/scripts/resco
++++ b/scripts/resco
+@@ -14,7 +14,7 @@ else
+ endif
+ set n=`echo $SOLPS_FLUIDS | wc -w`
+ echo $n
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/resco_D+C b/scripts/resco_D+C
+index b2a42a3d..8b9a5674 100755
+--- a/scripts/resco_D+C
++++ b/scripts/resco_D+C
+@@ -4,7 +4,7 @@ if (-s b2mn.exe.dir/b2ftrace) then
+ else
+   set FILE=b2ftrace
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/resco_D+C+He b/scripts/resco_D+C+He
+index f7d03b57..b3ceb315 100755
+--- a/scripts/resco_D+C+He
++++ b/scripts/resco_D+C+He
+@@ -4,7 +4,7 @@ if (-s b2mn.exe.dir/b2ftrace) then
+ else
+   set FILE=b2ftrace
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/resco_D+O b/scripts/resco_D+O
+index 229251a7..9a708e2d 100755
+--- a/scripts/resco_D+O
++++ b/scripts/resco_D+O
+@@ -4,7 +4,7 @@ if (-s b2mn.exe.dir) then
+ else
+   set FILE=b2ftrace
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/resmo b/scripts/resmo
+index 66143740..855c8559 100755
+--- a/scripts/resmo
++++ b/scripts/resmo
+@@ -14,7 +14,7 @@ else
+ endif
+ set n=`echo $SOLPS_FLUIDS | wc -w`
+ echo $n
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/resmo_D+C b/scripts/resmo_D+C
+index cfa40c33..4d58d7be 100755
+--- a/scripts/resmo_D+C
++++ b/scripts/resmo_D+C
+@@ -4,7 +4,7 @@ if (-s b2mn.exe.dir/b2ftrace) then
+ else
+   set FILE=b2ftrace
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/resmo_D+C+He b/scripts/resmo_D+C+He
+index d93edb53..417839c9 100755
+--- a/scripts/resmo_D+C+He
++++ b/scripts/resmo_D+C+He
+@@ -4,7 +4,7 @@ if (-s b2mn.exe.dir/b2ftrace) then
+ else
+   set FILE=b2ftrace
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/resmo_D+O b/scripts/resmo_D+O
+index 15129979..346f4888 100755
+--- a/scripts/resmo_D+O
++++ b/scripts/resmo_D+O
+@@ -4,7 +4,7 @@ if (-s b2mn.exe.dir) then
+ else
+   set FILE=b2ftrace
+ endif
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/resrest b/scripts/resrest
+index 6568173e..106f92b8 100755
+--- a/scripts/resrest
++++ b/scripts/resrest
+@@ -14,7 +14,7 @@ else
+ endif
+ set n=`echo $SOLPS_FLUIDS | wc -w`
+ echo $n
+-if (-X zcat) then
++if (-x zcat) then
+   set ZCAT="zcat --force"
+ else
+   set ZCAT="gzip --decompress --force --stdout"
+diff --git a/scripts/which_latex b/scripts/which_latex
+index 92317734..2e806664 100755
+--- a/scripts/which_latex
++++ b/scripts/which_latex
+@@ -1,9 +1,9 @@
+ #! /bin/csh -f
+ 
+-if (-X xelatex) then
++if (-x xelatex) then
+   echo 'xelatex'
+ else
+-  if (-X pdflatex) then
++  if (-x pdflatex) then
+     echo 'pdflatex'
+   else
+     echo 'latex'
+diff --git a/scripts/which_pdftops b/scripts/which_pdftops
+index e8750a67..c7324747 100755
+--- a/scripts/which_pdftops
++++ b/scripts/which_pdftops
+@@ -1,8 +1,8 @@
+ #! /bin/tcsh -f
+ 
+-if (-X pdftops) then
++if (-x pdftops) then
+   echo 'pdftops'
+-else if (-X pdf2ps) then
++else if (-x pdf2ps) then
+   echo 'pdf2ps'
+ else
+   echo 'convert' 

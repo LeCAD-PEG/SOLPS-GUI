@@ -13,13 +13,16 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-0.3.7}
+VERSION=${VERSION:-0.3.8}
 SOURCE="OpenBLAS-${VERSION}.tar.gz"
 DOWNLOAD="https://github.com/xianyi/OpenBLAS/archive/v${VERSION}.tar.gz"
 SRC_DIR="${BUILD_DIR}/OpenBLAS-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/OpenBLAS/${VERSION}
 
 # Environment dependencies
+if [ -e ${BUILDROOT}/package/setup.sh ]; then
+    . ${BUILDROOT}/package/setup.sh
+fi
 
 # Prepare directories for download and building
 install -d ${BUILD_DIR}

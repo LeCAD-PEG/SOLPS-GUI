@@ -7,7 +7,7 @@ MODULE_DIR ?= ${BUILDROOT}/modules
 # SOLPS-GUI
 SOLPS_GUI_VERSION=1.5.0
 
-OPENBLAS_VERSION=0.3.7
+OPENBLAS_VERSION=0.3.8
 PYTHON_VERSION=3.6.9
 PYTHON_MAINVERSION=3.6
 NUMPY_VERSION=1.17.3
@@ -299,12 +299,13 @@ freetype: ${STAGING_DIR}/freetype/${FREETYPE_VERSION}
 ${STAGING_DIR}/ncl/${NCL_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${NCL_VERSION}}/" package/build-ncl.sh
 
+	FLEX_VERSION=${FLEX_VERSION} \
 	FREETYPE_VERSION=${FREETYPE_VERSION} \
 	OPENBLAS_VERSION=${OPENBLAS_VERSION} \
 	NETCDF_VERSION=${NETCDF_VERSION} \
 	./package/build-ncl.sh
 
-ncl: config freetype ${STAGING_DIR}/ncl/${NCL_VERSION}
+ncl: config flex freetype ${STAGING_DIR}/ncl/${NCL_VERSION}
 
 ${STAGING_DIR}/openmpi/${OPENMPI_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${OPENMPI_VERSION}}/" package/build-openmpi.sh
@@ -329,7 +330,7 @@ ${STAGING_DIR}/motif/${MOTIF_VERSION}:
 
 motif: config flex ${STAGING_DIR}/motif/${MOTIF_VERSION}
 
-${STAGING_DIR}/solps-iter/${SOLPS_VERSION}1:
+${STAGING_DIR}/solps-iter/${SOLPS_VERSION}/.installed:
 	# Copy imasdb script for setting up IMAS MDSPLUS_TREE environment
 
 	SOLPS_VERSION=${SOLPS_VERSION} \
@@ -348,9 +349,13 @@ ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}1:
 	OPENMPI_VERSION=${OPENMPI_VERSION} \
 	MOTIF_VERSION=${MOTIF_VERSION} \
 	HDF5_VERSION=${HDF5_VERSION} \
+	CURL_VERSION=${CURL_VERSION} \
+	FLEX_VERSION=${FLEX_VERSION} \
+	FREETYPE_VERSION=${FREETYPE_VERSION} \
+	PYTHON=${PYTHON_VERSION} \
 	./package/build-solps-iter.sh
 
-solps-iter: config imas gr gli OpenBLAS mscl ggd python netcdf ncl openmpi motif ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}1
+solps-iter: config imas gr gli OpenBLAS mscl ggd python netcdf ncl openmpi motif ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}/.installed
 
 solps-gui-mod:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${SOLPS_GUI_VERSION}}/" package/build-solps-gui.sh
