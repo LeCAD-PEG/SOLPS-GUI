@@ -164,6 +164,16 @@ Scripts have been added for compiling SOLPS-ITER and it's prerequisites into
 the same build environment as SOLPS-GUI. Some packages can be installed with
 the use of package managers:
 
+Ubuntu 19.04:
+    apt-get install libcairo2-dev libfontconfig1-dev \
+    libxrender-dev libx11-dev libxslt1-dev libxmuu-dev \
+    openjdk-8-jdk \
+    libreadline-dev xsltproc \
+    texlive texlive-latex-recommended texlive-binaries texlive-latex-extra \
+    emacs-bin-common \
+    python-dev csh ksh tcsh \
+    xutils-dev # Makedepend
+
 Debian 9.6 (stretch):
     apt-get install libcairo2-dev libfontconfig1-dev \
     libxrender-dev libx11-dev libxslt1-dev libxmuu-dev \

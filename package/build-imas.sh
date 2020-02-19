@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-4.2.0}
+VERSION=${VERSION:-4.5.0}
 GIT="ssh://git@git.iter.org/imas/access-layer.git"
 SRC_DIR="${BUILD_DIR}/access-layer-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/imas/${IMASDD_VERSION}/solps # Use IMASDD version later.
