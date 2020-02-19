@@ -25,10 +25,10 @@ BLITZ_VERSION=1.0.1
 MDSPLUS_VERSION=stable_release-7-84-8
 LIBXML2_VERSION=2.9.1
 SAXON_VERSION=HE9-8-0-12J
-IMASUAL_VERSION=4.2.0
-IMASDD_VERSION=3.24.0
+IMASUAL_VERSION=4.5.0
+IMASDD_VERSION=3.26.0
 # Minor version is used for compatibility compiling.
-IMAS_MINOR_VERSION=24
+IMAS_MINOR_VERSION=26
 
 # SOLPS-ITER
 GLI_VERSION=4.5.30
@@ -100,9 +100,11 @@ cmake: ${STAGING_DIR}/cmake/${CMAKE_VERSION}
 ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${MDSPLUS_VERSION}}/" package/build-mdsplus.sh
 	LIBXML2_VERSION=${LIBXML2_VERSION} \
+	FLEX_VERSION=${FLEX_VERSION} \
+	MOTIF_VERSION=${MOTIF_VERSION} \
 	./package/build-mdsplus.sh
 
-mdsplus: config libxml2 ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
+mdsplus: config motif libxml2 ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
 
 ${STAGING_DIR}/OpenBLAS/${OPENBLAS_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${OPENBLAS_VERSION}}/" package/build-OpenBLAS.sh
