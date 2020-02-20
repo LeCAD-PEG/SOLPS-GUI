@@ -52,7 +52,7 @@ SOLPS_ITER_MOD=${MODULE_DIR}/solps-iter/${SOLPS_VERSION}
 
 .PHONY: gr gli OpenBLAS mscl ggd python libxml2 saxon blitz cmake mdsplus \
 	imas solps-iter pyqt solps-gui curl hdf5 netcdf openmpi motif \
-	solps-gui-mod
+	solps-gui-mod paraview-plugin-iter
 
 all: solps-iter solps-gui
 
@@ -215,6 +215,11 @@ ${STAGING_DIR}/ReadUALEdge-Plugin/1.5.0:
 	./package/build-paraview-plugin.sh
 
 paraview-plugin: config imas cmake paraview blitz ${STAGING_DIR}/ReadUALEdge-Plugin/1.5.0
+
+${STAGING_DIR}/ReadUALEdge-Plugin/1.5.0-iter:
+	./package/build-paraview-plugin-iter.sh
+
+paraview-plugin-iter: ${STAGING_DIR}/ReadUALEdge-Plugin/1.5.0-iter
 
 ${BUILDROOT}/build/data-dictionary-${IMASDD_VERSION}/.installed:
 	@echo ${BUILDROOT}/data-dictionary-${IMASDD_VERSION}/.installed
