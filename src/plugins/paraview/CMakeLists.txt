@@ -81,7 +81,7 @@ if (PARAVIEW_BUILD_QT_GUI)
   target_include_directories(ReadUALEdge PUBLIC ${IMASCPP_INCLUDE_DIRS})
   target_include_directories(ReadUALEdge PUBLIC ${BLITZ_INCLUDE_DIRS})
   #target_include_directories(ReadUALEdge PUBLIC ${MDSPLUS_INCLUDE_DIRS})
-  target_link_libraries(ReadUALEdge  imas-cpp imas TreeShr TdiShr MdsShr MdsIpShr XTreeShr blitz)
+  target_link_libraries(ReadUALEdge LINK_PRIVATE imas-cpp imas TreeShr TdiShr MdsShr MdsIpShr XTreeShr blitz)
   install(TARGETS ReadUALEdge DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 endif()
