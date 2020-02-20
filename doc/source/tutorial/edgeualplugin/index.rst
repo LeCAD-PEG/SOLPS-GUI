@@ -11,86 +11,103 @@ Using ParaView ReadUALEdge plugin
 
 This tutorial covers the basic instructions about running and using
 ParaView application [1]_ and how to run and use ReadUALEdge
-ParaView plugin on ITER hpc-login02.iter.org login node.
+ParaView plugin on **ITER hpc-login02.iter.org login node**.
 
 Introduction to ParaView
 -------------------------
 
 ParaView is an open-source, multi-platform application used to visualize
-data sets. Here we won't cover the installation process as the all needed
-informations including setup guide, tutorials etc. can be found on ParaView
-wiki page http://www.paraview.org/Wiki/ParaView and in ParaView Guide
-found on http://www.paraview.org/paraview-guide/.
+data sets. More on ParaView is available on
+`ParaView wiki page <http://www.paraview.org/Wiki/ParaView/>`_ and
+`ParaView Guide <http://www.paraview.org/paraview-guide/>`_. By default,
+SOLPS-GUI comes with its own ParaView installation procedure however the plugin
+can be used also with other installations of ParaView.
 
-The use of some useful ParaView tools will be covered in ReadUALEdge
-plugin chapter.
-
+In this section also a few convenient ParaView tools will be covered.
 
 ParaView ReadUALEdge plugin
 ---------------------------
 
-ParaView ReadUALEdge plugin is a tool used to visualize and analyze data,
-obtained by fusion simulations (electron temperature/density, ion
-temperature/density) stored in the IMAS database - edge_profiles, edge_transport
-and edge_sources IDSs.
+**ParaView ReadUALEdge plugin** is a tool used to visualize and analyze plasma
+state, obtained by fusion simulation codes such as SOLPS-ITER and JINTRAC
+(also JOREK is supported) and stored to Interface Data Structures, a data
+hierarchy structure format and a successor to CPOs, used by IMAS. The list of
+currently supported IDSs:
 
-Here we'll demonstrate how to launch and use the ReadUALEdge plugin using
-IDS case with parameters shot: ``122264; run: 1; user: 'public';
-device/database: 'iterdb'``
+- Edge Profiles
+- Edge Transport
+- Edge Sources
+- MHD
 
-.. [1] During the time of writing this  tutorial ParaView version 5.4.1 was used.
+In this tutorial an example of the ReadUALEdge plugin usage will be demonstrated
+using IDS (available on ITER HPC) with the next parameters:
 
-Using ParaView and plugin on ITER cluster
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- shot: **122264**
+- run: **1**
+- user: **public**
+- device: **iter**
 
-Precompiled ParaView 5.4.1 is available on ITER cluster as a module. To set the
-environment use the following commands::
+.. [1] During the time of writing this tutorial the next ParaView versions were
+       used: **ParaView version 5.5.2** on ITER HPC and
+       **ParaView version 5.6.2** (local installation).
 
- module purge
- module load IMAS/3.21.0-3.8.6
- module load ParaView/5.4.1-intel-2018a-mpi
- paraview
+Using ParaView and plugin on ITER HPC cluster
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A ParaView opening window will appear. How to load and use the plugin is
-described in section :ref:`loading_plugin`.
+**ParaView 5.5.2** is already available on **ITER HPC cluster** as a module and
+it can be used for loading the plugin.
+To set the environment use the following commands:
+
+.. code-block:: console
+
+   module purge
+   module load IMAS/3.26.0-4.5.0
+   module load ParaView/5.5.2-intel-2018a-Python-3.6.4-mpi
+   paraview
+
+or use, while in SOLPS-GUI root directory:
+
+.. code-block:: console
+
+   ./run-paraview.sh
+
+.. Note::
+
+   This modules were last checked on 20.2.2020. With time new modules might be
+   introduced and the old ones **removed** (!).
+
+Additional commands to check available modules:
+
+.. code-block:: console
+
+   module avail IMAS
+   module avail imas # listing older IMAS versions
+
+A ParaView opening window will appear. For instructions on how to load and use
+the plugin continue to subsection :ref:`loading_plugin`
 
 Development use of ParaView
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For *standalone* use on cluster when having compiled your own ParaView provided
-by SOLPS-GUI then use the commands::
+by SOLPS-GUI then use the commands:
 
- cd ~/solps-gui
- ./run-paraview.sh
+.. code-block:: console
 
+   # source setupenv.sh
+   module use ~/solps-gui/modules
+   module load paraview-plugin-edge/1.5
+   paraview
 
-Command ``run-paraview.sh`` command provides the following module and
-environments ::
-
- module load IMAS/3.21.0-3.8.6 binutils/2.28-GCCcore-6.4.0 Blitz++/0.10-GCCcore-6.4.0
- imasdb solps-iter
-
-Additional commands to check available modules::
-
- module avail IMAS
- module avail imas # listing older IMAS versions
-
-Or if you have installed the packages on a local machine with the help of
-solps-gui make then use the commands::
-
- cd ~/solps-gui
- make setupenv
- source setupenv.sh
- paraview
-
-The plugin will already be loaded in ParaView.
+The plugin then should be already loaded in ParaView, otherwise it can be
+loaded manually.
 
 .. _loading_plugin:
 
 Loading the plugin
 ------------------
 
-After launching the ParaView application the start window appears.
+When launching the ParaView application first the startup window should appear.
 
 The main parts are:
 
@@ -98,17 +115,19 @@ The main parts are:
  2. Toolbar
  3. Pipeline Browser
  4. View Browser
+ 5. Output messages
 
 .. figure:: images/1_start_window_marked.png
    :align: center
    :alt: ParaView start window
 
-   ParaView start window.
+   ParaView startup window. Note: the `R` and `Z` marks are not provided
+   default by ParaView. They have to be manually set in settings.
 
 Loading and running the ReadUALEdge plugin is done in the next few steps:
 
-1. Open the *Plugin Manager* by navigating from Menu Bar to
-   :menuselection:`Tools --> Manage Plugins`
+1. Open the *Plugin Manager* by navigating from :guilabel:`Menu Bar` to
+   :guilabel:`Tools` -> :guilabel:`Manage Plugins`.
 
    .. figure:: images/2_manage_plugins.png
       :align: center
@@ -124,7 +143,8 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
      Plugin Manager window
 
 3. Navigate to and select the plugin library file ``libReadUALEdge.so``
-   available in ``/home/ITER/penkod/public/ParaView-plugin-ReadUALEdge/imas/3.21.0``
+   available in
+   ``/home/ITER/penkod/public/ParaView-plugin-ReadUALEdge/imas/3.26.0``
    directory. Press :guilabel:`OK` button.
 
   .. figure:: images/4_plugin_manager2.png
@@ -143,13 +163,13 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
 
      Loading the ReadUALEdge plugin
 
-5. Run the plugin by navigating from Menu Bar to
-   :menuselection:`Sources --> IMAS --> UAL Edge IDS` (see
+5. Run the plugin by navigating from :guilabel:`Menu Bar` to
+   :guilabel:`Sources` -> :guilabel:`IMAS` -> :guilabel:`UAL Edge IDS` (see
    :numref:`pv-run-plugin-1`). The Pipeline Browser will change and
    after choosing the desired database parameters press button
    :guilabel:`Apply` (see :numref:`pv-run-plugin-2`). The database
    will be loaded and visualized on the View Browser as seen in
-   :numref:`pv-run-plugin-3` for ITER tokamak.
+   :numref:`pv-run-plugin-3` for ITER tokamak device.
 
   .. _pv-run-plugin-1:
   .. figure:: images/6_running_plugin.png
@@ -159,16 +179,17 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
 
   .. _pv-run-plugin-2:
   .. figure:: images/7_plugin_run1.png
-     :alt: Applying the ReadUALEdge plugin database parameters
+     :width: 100%
+     :alt: Applying the ReadUALEdge plugin IDS database parameters
 
      Applying the ReadUALEdge plugin database parameters
 
   .. _pv-run-plugin-3:
   .. figure:: images/8_plugin_run2.png
-     :width: 60%
-     :alt: Example of visualized data gathered from public ``iterdb`` database
+     :width: 100%
+     :alt: Example of visualized data gathered from public ``iter`` database
 
-     Example of visualized data gathered from public ``iterdb``  database
+     Example of visualized data gathered from public ``iter``  database
 
 .. note::
    Sometimes after opening Iter tokamak database **no** visual
