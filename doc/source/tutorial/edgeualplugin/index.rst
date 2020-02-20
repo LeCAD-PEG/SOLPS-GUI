@@ -172,12 +172,14 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
    :numref:`pv-run-plugin-3` for ITER tokamak device.
 
   .. _pv-run-plugin-1:
+
   .. figure:: images/6_running_plugin.png
      :alt: Running the ReadUALEdge plugin
 
      Running the ReadUALEdge plugin
 
   .. _pv-run-plugin-2:
+
   .. figure:: images/7_plugin_run1.png
      :width: 100%
      :alt: Applying the ReadUALEdge plugin IDS database parameters
@@ -185,41 +187,46 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
      Applying the ReadUALEdge plugin database parameters
 
   .. _pv-run-plugin-3:
+
   .. figure:: images/8_plugin_run2.png
      :width: 100%
      :alt: Example of visualized data gathered from public ``iter`` database
 
      Example of visualized data gathered from public ``iter``  database
 
-.. note::
-   Sometimes after opening Iter tokamak database **no** visual
-   change in the ``View`` ``Browser`` can be seen, because of the
-   default zoom. To solve that press twice the :guilabel:`Reset`
+.. Note::
+
+   Sometimes after pressing the :guilabel:`Apply` button there might be
+   **no** visual change in the ``View`` ``Browser`` due to the
+   default zoom settings. To solve that press twice the :guilabel:`Reset`
    button found in :guilabel:`Toolbar`.
 
 Data analysis
 -------------
 
-In previous chapter we can notice that we have loaded data, but no
-useful information could be seen, just the geometry of the tokamak displaying
-a lot of colored grid elements. In this tutorial we'll first explain what
-those multiple colors represent and then how to display full information we want.
+In the previous section it could be noticed that the contents of the IDS were
+loaded, but a mix-up of different colors could be seen
+(as in Figure :numref:`pv-run-plugin-3`), displaying only the the geometry of
+the tokamak. Here it will be explained what those multiple colors represent and
+then how to display only the wanted segment of the full available data.
 
 Grid subsets and Multi-Block Inspector
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Briefly said, grid subset is “a part” of the full grid geometry. In our case,
-the **Multi-Block Inspector** uses the grid subsets as blocks of data,
-displaying them in different colors with one color per block of data
+Briefly said, **grid subset** is a segment of the full **grid geometry**
+description which occur in codes such as **SOLPS-ITER** and **JINTRAC EDGE2D**.
+In our case,
+the **Multi-Block Inspector** uses the grid subsets as **blocks of data**,
+displaying them in **different colors** with one color per block of data
 as seen in Figure :numref:`pv-run-plugin-3`, and it
-is used to select and display only the wanted blocks of data.
+is used to select and display only a selection of the available blocks.
 
-To load the Multi-Block Inspector, go to Menu bar
-:menuselection:`View` and check the :menuselection:`Multi-Block
-Inspector` selection, as seen in :numref:`pv-loading-mbinsp`. Then
+To load the :guilabel:`Multi-Block Inspector`, go to :guilabel:`Menu bar`
+-> :guilabel:`View` and check the :guilabel:`Multi-Block Inspector`
+selection, as seen in :numref:`pv-loading-mbinsp`. Then
 you should have already noticed that a new interface called
-*Multi-Block Inspector* opened at the bottom of the Pipeline Browser,
-as seen in :numref:`pv-mbinsp`.
+**Multi-Block Inspector** tab opened at the bottom of the
+:guilabel:`Pipeline Browser`, as seen in :numref:`pv-mbinsp`.
 
 .. _pv-loading-mbinsp:
 .. figure:: images/11_loading_mbinsp.png
@@ -231,8 +238,9 @@ as seen in :numref:`pv-mbinsp`.
 
    Multi-Block Inspector
 
-Here we can select the wanted blocks we want to be seen in the *View
-Browser*. An example is shown in :numref:`pv-mbinscp-cells`, where
+Here any blocks can be selected or deselected and instant block selection change
+can be observed in the :guilabel:`View Browser`.
+An example is shown in :numref:`pv-mbinscp-cells`, where
 only the ``Cells`` block was selected, and in
 :numref:`pv-mbinscp-nodes`, where only the ``Nodes`` block was
 selected. We can also choose multiple blocks at once, as shown in
@@ -242,72 +250,80 @@ selected. We can also choose multiple blocks at once, as shown in
 .. _pv-mbinscp-cells:
 .. figure:: images/13_mbinsp_cells.png
    :alt: Displaying Cells block using Multi-Block Inspector
-   :width: 60%
+   :width: 80%
 
    Displaying Cells block using Multi-Block Inspector
 
 .. _pv-mbinscp-nodes:
 .. figure:: images/14_mbinsp_nodes.png
    :alt: Displaying Nodes block using Multi-Block Inspector
-   :width: 60%
+   :width: 80%
 
    Displaying Nodes block using Multi-Block Inspector
 
 .. _pv-mbinspc-sol-odivertor:
 .. figure:: images/15_mbinsp_sol-odivertor.png
    :alt: Displaying SOL and Outer Divertor blocks using Multi-Block Inspector
-   :width: 60%
+   :width: 80%
 
    Displaying SOL and Outer Divertor blocks using Multi-Block Inspector
 
 Data arrays
 ~~~~~~~~~~~
 
-Data arrays are holding data such as *electron density/temperature* and
-*ion density/temperature* values, which are used to color the blocks.
-When running the ReadUALedge plugin with the *Multi-Block Inspector* the
-*vtkBlockColors* layer is automatically selected, coloring the blocks
-with their specific block color. To select the wanted data layer
-navigate through **List of Data Arrays** found in Toolbar, as seen in
-:numref:`pv-data-arrays-list`. Examples are shown in Figures
+Data arrays are representing **plasma state quantities**
+such as *electron density/temperature* and
+*ion density/temperature* values, which are used to allocate values to the
+block elements (nodes, 2D cells etc.).
+When running the **ReadUALedge plugin** the so-called
+**vtkBlockColors** layer is automatically selected, coloring the blocks
+with their specific block color. Selection of the wanted data layer can be done
+by navigate through the **List of Data Arrays** found in :guilabel:`Toolbar`,
+as seen in :numref:`pv-data-arrays-list`. Examples are shown in Figures
 :numref:`pv-data-arrays-list-ne`, :numref:`pv-data-arrays-list-te` and
 :numref:`pv-data-arrays-list-te-core-sol`.
 
 .. _pv-data-arrays-list:
 .. figure:: images/16_data_arrays_list.png
-   :alt: List of data arrays
+   :alt: List of available quantity arrays.
 
-   List of data arrays
+   List of quantity arrays
 
 .. _pv-data-arrays-list-ne:
 
 .. figure:: images/17_data_arrays_ne_full.png
-   :width: 60%
-   :alt: Data layer Electron Density using Cell block
+   :width: 80%
+   :alt: **Cells** grid subset (block) selection with corresponding
+         **Electron Density** values.
 
-   Data layer Electron Density using Cell block
+   **Cells** grid subset (block) selection with corresponding
+   **Electron Density** values.
 
 .. _pv-data-arrays-list-te:
 
 .. figure:: images/18_data_arrays_te.png
    :width: 45%
-   :alt: Data layer Electron Temperature using Cell block
+   :alt: **Cells** grid subset (block) selection with corresponding
+         **Electron Temperature** values.
 
-   Data layer Electron Temperature using Cell block
+   **Cells** grid subset (block) selection with corresponding
+   **Electron Temperature** values.
 
 .. _pv-data-arrays-list-te-core-sol:
 
 .. figure:: images/19_data_arrays_te_core_sol.png
    :width: 45%
-   :alt: Data layer Electron Temperature using Core and SOL block
+   :alt: Core and SOL grid subset (block) selection with corresponding
+         **Electron Temperature** values.
 
-   Data layer Electron Temperature using Core and SOL block
+   **Core** and **SOL** grid subset (block) selection with corresponding
+   **Electron Temperature** values.
 
 Other useful ParaView tools
 ---------------------------
 
 .. note::
-   The tutorial below was made with ParaView 5.2.0.
+   The tutorial below was made with ParaView 5.1.0 and might be outdated.
 
 .. _paraview-python-filter:
 
