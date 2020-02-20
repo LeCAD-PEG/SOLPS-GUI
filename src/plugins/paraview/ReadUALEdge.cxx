@@ -294,49 +294,70 @@ void fTimeSlice2MultiBlockGS(IDS100 & db,
     int num_ggd_slices = 0;
     if( std::string(LoadIDS).find("edge_profiles") != std::string::npos )
     {
-        vtkOutputWindowDisplayText("Reading edge_profiles IDS. \n");
-        db._edge_profiles.get();
+        vtkOutputWindowDisplayText("Reading edge_profiles IDS ggd_grid. \n");
         num_gridggd_slices = db._edge_profiles.grid_ggd.extent(0);
         // Get number of grid subsets in the selected IDS
         num_gridSubset = db._edge_profiles.
             grid_ggd(grid_ggd_slice_index).grid_subset.extent(0);
-        // Get number of GGD slices
-        num_ggd_slices = db._edge_profiles.ggd.extent(0);
     }
     else if( std::string(LoadIDS).find("edge_sources")
         != std::string::npos )
     {
-        vtkOutputWindowDisplayText("Reading edge_sources IDS. \n");
-        db._edge_sources.get();
+        vtkOutputWindowDisplayText("Reading edge_sources IDS ggd_grid. \n");
         num_gridggd_slices = db._edge_sources.grid_ggd.extent(0);
         // Get number of grid subsets in the selected IDS
         num_gridSubset = db._edge_sources.grid_ggd(grid_ggd_slice_index).
             grid_subset.extent(0);
-        // Get number of GGD slices
-        num_ggd_slices = db._edge_sources.source(source_index).ggd.extent(0);
     }
     else if( std::string(LoadIDS).find("edge_transport")
         != std::string::npos )
     {
-        vtkOutputWindowDisplayText("Reading edge_transport IDS. \n");
-        db._edge_transport.get();
+        vtkOutputWindowDisplayText("Reading edge_transport IDS ggd_grid. \n");
         num_gridggd_slices = db._edge_transport.grid_ggd.extent(0);
         // Get number of grid subsets in the selected IDS
         num_gridSubset = db._edge_transport.grid_ggd(grid_ggd_slice_index).
             grid_subset.extent(0);
-        // Get number of GGD slices
-        num_ggd_slices = db._edge_transport.model(model_index).ggd.extent(0);
 
     }
     else if( std::string(LoadIDS).find("mhd")
         != std::string::npos )
     {
-        vtkOutputWindowDisplayText("Reading mhd IDS. \n");
-        db._mhd.get();
+        vtkOutputWindowDisplayText("Reading mhd IDS ggd_grid. \n");
         num_gridggd_slices = db._mhd.grid_ggd.extent(0);
         // Get number of grid subsets in the selected IDS
         num_gridSubset = db._mhd.grid_ggd(grid_ggd_slice_index).
             grid_subset.extent(0);
+    }
+
+    if( std::string(IDS_plasmaStateSource).find("edge_profiles") != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading edge_profiles IDS GGD. \n");
+        db._edge_profiles.get();
+        // Get number of GGD slices
+        num_ggd_slices = db._edge_profiles.ggd.extent(0);
+    }
+    else if( std::string(IDS_plasmaStateSource).find("edge_sources")
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading edge_sources IDS GGD. \n");
+        db._edge_sources.get();
+        // Get number of GGD slices
+        num_ggd_slices = db._edge_sources.source(source_index).ggd.extent(0);
+    }
+    else if( std::string(IDS_plasmaStateSource).find("edge_transport")
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading edge_transport IDS GGD. \n");
+        db._edge_transport.get();
+        // Get number of GGD slices
+        num_ggd_slices = db._edge_transport.model(model_index).ggd.extent(0);
+
+    }
+    else if( std::string(IDS_plasmaStateSource).find("mhd")
+        != std::string::npos )
+    {
+        vtkOutputWindowDisplayText("Reading mhd IDS GGD. \n");
+        db._mhd.get();
         // Get number of GGD slices
         num_ggd_slices = db._mhd.ggd.extent(0);
     }
