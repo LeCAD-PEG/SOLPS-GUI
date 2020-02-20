@@ -818,6 +818,9 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
         outInfo->Get(vtkMultiBlockDataSet::DATA_OBJECT()));
 
+    // Clear outputMB instance
+    this->outputMB = vtkSmartPointer<vtkMultiBlockDataSet>::New();
+
     // If PromptUser is set to true then each time a line of text is displayed,
     // the user is asked if they want to keep getting messages.
     vtkOutputWindow::GetInstance()->PromptUserOff();
