@@ -39,7 +39,7 @@ currently supported IDSs:
 - Edge Sources
 - MHD
 
-In this tutorial an example of the ReadUALEdge plugin usage will be demonstrated
+In this tutorial, an example of the ReadUALEdge plugin usage will be demonstrated
 using IDS (available on ITER HPC) with the next parameters:
 
 - shot: **122264**
@@ -73,7 +73,7 @@ or use, while in SOLPS-GUI root directory:
 
 .. Note::
 
-   This modules were last checked on 20.2.2020. With time new modules might be
+   These modules were last checked on 20.2.2020. With time, new modules might be
    introduced and the old ones **removed** (!).
 
 Additional commands to check available modules:
@@ -89,8 +89,8 @@ the plugin continue to subsection :ref:`loading_plugin`
 Development use of ParaView
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For *standalone* use on cluster when having compiled your own ParaView provided
-by SOLPS-GUI then use the commands:
+For *standalone* use on the ITER HPC cluster when having compiled your own
+ParaView provided by SOLPS-GUI then use the commands:
 
 .. code-block:: console
 
@@ -99,7 +99,7 @@ by SOLPS-GUI then use the commands:
    module load paraview-plugin-edge/1.5
    paraview
 
-The plugin then should be already loaded in ParaView, otherwise it can be
+The plugin then should be already loaded in ParaView, otherwise, it can be
 loaded manually.
 
 .. _loading_plugin:
@@ -121,7 +121,7 @@ The main parts are:
    :align: center
    :alt: ParaView start window
 
-   ParaView startup window. Note: the `R` and `Z` marks are not provided
+   ParaView startup window. Note: the `R` and `Z` marks are not set by
    default by ParaView. They have to be manually set in settings.
 
 Loading and running the ReadUALEdge plugin is done in the next few steps:
@@ -210,9 +210,9 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
 Data analysis
 -------------
 
-In the previous section it could be noticed that the contents of the IDS were
+In the previous section, it could be noticed that the contents of the IDS were
 loaded, but a mix-up of different colors could be seen
-(as in Figure :numref:`pv-run-plugin-3`), displaying only the the geometry of
+(as in Figure :numref:`pv-run-plugin-3`), displaying only the geometry of
 the tokamak. Here it will be explained what those multiple colors represent and
 then how to display only the wanted segment of the full available data.
 
@@ -280,7 +280,7 @@ Data arrays
 Data arrays are representing **plasma state quantities**
 such as *electron density/temperature* and
 *ion density/temperature* values, which are used to allocate values to the
-block elements (nodes, 2D cells etc.).
+block elements (nodes, 2D cells, etc.).
 When running the **ReadUALedge plugin** the so-called
 **vtkBlockColors** layer is automatically selected, coloring the blocks
 with their specific block color. Selection of the wanted data layer can be done
@@ -328,7 +328,7 @@ as seen in :numref:`pv-data-arrays-list`. Examples are shown in Figures
 Advanced options
 ~~~~~~~~~~~~~~~~
 
-With further ReadUALEdge plugin development a few advanced options were
+With further ReadUALEdge plugin development, a few advanced options were
 introduced, intended for reading data from different Edge IDS or from different
 time slice (time slice index 0 is the default value).
 The advanced options can be toggled by clicking the gear icon in
@@ -338,7 +338,7 @@ to the search box**.
 An additional set of value boxes will be shown.
 
 .. figure:: images/40_advanced_options_gear.png
-   :width: 60%
+   :width: 40%
 
    Toggle advanced plugin options.
 
@@ -360,7 +360,7 @@ The options shown are:
   - :guilabel:`a single grid` (intended for **JOREK** where grid subsets are
     not being used). For this option note that:
 
-    - Reads only **quantites** corresponding to **points** (0D elements),
+    - Reads only **quantities** corresponding to **points** (0D elements),
     - If the data in the IDS is well written it can be used also for cases
       that use grid subsets (as shown in Figure :numref:`SOLPS-ITER-single-grid`).
 
@@ -378,8 +378,8 @@ When selecting **edge_transport** IDS a next option will be shown:
 .. Note:: More information on the available options is available by **hovering**
           over the widgets with the mouse cursor.
 
-In below Figure :numref:`JINRAC-EDGE2D-example` an example using a combination
-of advanced settings is being demonstrated.
+In Figure :numref:`JINRAC-EDGE2D-example` an example using a combination
+of advanced settings is being shown.
 
 .. _JINRAC-EDGE2D-example:
 
@@ -402,9 +402,6 @@ of advanced settings is being demonstrated.
    with (IMAS 3.26.0) **Shot: 122264**; **Run: 1**; **User: public**;
    **Device: iter** (on ITER HPC).
 
-
-
-
 Other useful ParaView tools
 ---------------------------
 
@@ -425,11 +422,13 @@ Alphabetical -->` ``Python Calculator`` as seen in
 
 .. _pv-python-calculator1:
 .. figure:: images/20_python_calculator1.png
+   :width: 60%
 
    Selecting Filters Alphabetical
 
 .. _pv-python-calculator2:
 .. figure:: images/21_python_calculator2.png
+   :width: 60%
 
    Python calculator filter
 
@@ -438,6 +437,7 @@ Pipeline Browser as seen in :numref:`pv-python-calculator3`.
 
 .. _pv-python-calculator3:
 .. figure:: images/22_python_calculator3.png
+   :width: 40%
    :alt: Python Calculator start in Pipeline Browser
 
    Python Calculator start in Pipeline Browser
