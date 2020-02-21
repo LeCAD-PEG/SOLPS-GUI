@@ -186,6 +186,7 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
 
      Applying the ReadUALEdge plugin database parameters
 
+
   .. _pv-run-plugin-3:
 
   .. figure:: images/8_plugin_run2.png
@@ -193,6 +194,11 @@ Loading and running the ReadUALEdge plugin is done in the next few steps:
      :alt: Example of visualized data gathered from public ``iter`` database
 
      Example of visualized data gathered from public ``iter``  database
+
+.. Note::
+   One plugin instance should be run only once. If another IDS is to be read
+   re-run / open a new instance of the plugin. Using the same plugin instance
+   all the time might result in a plugin failure.
 
 .. Note::
 
@@ -318,6 +324,86 @@ as seen in :numref:`pv-data-arrays-list`. Examples are shown in Figures
 
    **Core** and **SOL** grid subset (block) selection with corresponding
    **Electron Temperature** values.
+
+Advanced options
+~~~~~~~~~~~~~~~~
+
+With further ReadUALEdge plugin development a few advanced options were
+introduced, intended for reading data from different Edge IDS or from different
+time slice (time slice index 0 is the default value).
+The advanced options can be toggled by clicking the gear icon in
+:guilabel:`Pipeline Browser` -> :guilabel:`Properties` tab -> **gear icon next
+to the search box**.
+
+An additional set of value boxes will be shown.
+
+.. figure:: images/40_advanced_options_gear.png
+   :width: 60%
+
+   Toggle advanced plugin options.
+
+The options shown are:
+
+- :guilabel:`Read from IDS`: A dropdown list of supported IDSs from which
+  the **grid geometry** will be read.
+- :guilabel:`(Optional) Read quantities from`: A dropdown list of supported
+  IDSs from which the **plasma state quantities** will be read. Usually the
+  same "IDS grid geometry source" is being used also for getting the
+  corresponding quantities.
+- :guilabel:`.grid_ggd(#)`: Represent a **GGD grid** geometry time slice index
+  to be read.
+- :guilabel:`.ggd(#)`: Represent a **GGD** time slice index to be read.
+- :guilabel:`Represent grid as`: Option to represent grid as a set of:
+
+  - :guilabel:`grid subsets` (intended for **SOLPS-ITER**; **JINTRAC EDGE2D**
+    etc.), or
+  - :guilabel:`a single grid` (intended for **JOREK** where grid subsets are
+    not being used). For this option note that:
+
+    - Reads only **quantites** corresponding to **points** (0D elements),
+    - If the data in the IDS is well written it can be used also for cases
+      that use grid subsets (as shown in Figure :numref:`SOLPS-ITER-single-grid`).
+
+When selecting **edge_sources** IDS a next option will be shown:
+
+ - :guilabel:`.source(#)`: **Edge Sources** source index.
+
+When selecting **edge_transport** IDS a next option will be shown:
+
+ - :guilabel:`.model(#)`: **Edge Transport** model index.
+
+.. Note:: When selecting different combinations make sure that the data was
+   stored properly following the IMAS **Data Dictionary** structure description!
+
+.. Note:: More information on the available options is available by **hovering**
+          over the widgets with the mouse cursor.
+
+In below Figure :numref:`JINRAC-EDGE2D-example` an example using a combination
+of advanced settings is being demonstrated.
+
+.. _JINRAC-EDGE2D-example:
+
+.. figure:: images/41_advanced_options_JINRAC_EDGE2D_example.png
+   :width: 100%
+
+   Example of using advanced options with (IMAS 3.26.0)
+   **Shot: 134000**; **Run: 50**;
+   **User: public**; **Device: iter** (on ITER HPC). **Edge Profiles IDS** is
+   being used as a source for the **grid geometry description** while the
+   quantities are taken from **Edge Sources IDS - Source 14**
+   (in Python notation).
+
+.. _SOLPS-ITER-single-grid:
+
+.. figure:: images/42_SOLPS-ITER_single_grid.png
+   :width: 100%
+
+   Example of using :guilabel:`Represent grid as` -> :guilabel:`single grid`
+   with (IMAS 3.26.0) **Shot: 122264**; **Run: 1**; **User: public**;
+   **Device: iter** (on ITER HPC).
+
+
+
 
 Other useful ParaView tools
 ---------------------------
