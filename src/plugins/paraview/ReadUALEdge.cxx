@@ -8,7 +8,7 @@
 *   ParaView ReadUALEdge plugin is a tool used to visualize and analyze data,
 *   obtained by fusion simulations stored IDS database.
 *   The focus of plugin development is on data stored in 'edge_profiles',
-*   'edge_sources' and 'edge_transport' IDSs.
+*   'edge_sources', 'edge_transport' and 'mhd' IDSs.
 *
 *   Currently the included (GGD) data fields are:
 *       - grid geometry from any of the above IDSs;
@@ -20,7 +20,7 @@
 *                   - density_fast;
 *                   - pressure;
 *                   - pressure_fast_perpendicular;
-*                   - velocity:     @note: only for IMAS version <= 3.15.0
+*                   - velocity:
 *                       - radial;
 *                       - diamagnetic;
 *                       - parallel;
@@ -33,7 +33,7 @@
 *                   - density_fast;
 *                   - pressure;
 *                   - pressure_fast_perpendicular;
-*                   - velocity:     @note: only for IMAS version <= 3.15.0
+*                   - velocity:
 *                       - radial;
 *                       - diamagnetic;
 *                       - parallel;
@@ -853,7 +853,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     using namespace IdsNs;
 
 #if IMAS_VERSION_DIGIT <= 3151
-    msgToOutputWindow("This plugin was compiled using ancient version of IMAS "
+    msgToOutputWindow("This plugin was compiled using 'ancient' version of IMAS "
         "which shouldn't be used anymore (3.15.0 or older)! Due for this reason"
         "this plugin does not support those versions of IMAS (and DD) anymore",
         "warning" );
