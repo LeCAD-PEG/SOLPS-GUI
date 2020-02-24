@@ -377,7 +377,7 @@ solps-gui-mod:
 
 solps-gui: config imas pyqt gnuplot gnuplot-widget setupenv.sh solps-gui-mod
 
-setupenv.sh:
+setupenv.sh: Makefile
 	@echo "Writing environemnt to ${BUILDROOT}/${SETUP_FILE}"
 	@echo "ROOT_DIR=\$${PWD}" > ${SETUP_FILE}
 	@echo "INSTALL_DIR=\$${ROOT_DIR}/staging" >> ${SETUP_FILE}
@@ -418,7 +418,7 @@ setupenv.sh:
 	@echo "export PYTHONPATH" >> ${SETUP_FILE}
 	@echo "export QTDIR=${BUILDROOT}/staging/qt/5.9.1" >> ${SETUP_FILE}
 	@echo "export QT_QPA_FONTDIR=/usr/share/fonts/dejavu" >> ${SETUP_FILE}
-	@echo "export QT_QPA_PLATFORM_PLUGIN_PATH=$${QTDIR}/plugins" >> ${SETUP_FILE}
+	@echo "export QT_QPA_PLATFORM_PLUGIN_PATH=\$${QTDIR}/plugins" >> ${SETUP_FILE}
 	@echo "export PARAVIEW_PREFIX=${BUILDROOT}/staging/paraview/5.4.1" >> ${SETUP_FILE}
 	@echo "export ids_path=\$${INSTALL_DIR}/imas/${IMASDD_VERSION}/solps/models/mdsplus" >> ${SETUP_FILE}
 	@echo "export SOLPSGUI=${BUILDROOT}/src/gui" >> ${SETUP_FILE}
