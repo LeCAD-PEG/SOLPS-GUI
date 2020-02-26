@@ -379,7 +379,8 @@ solps-gui: config imas pyqt gnuplot gnuplot-widget setupenv.sh solps-gui-mod
 
 setupenv.sh: Makefile
 	@echo "Writing environemnt to ${BUILDROOT}/${SETUP_FILE}"
-	@echo "ROOT_DIR=\$${PWD}" > ${SETUP_FILE}
+	@echo "ROOT_DIR=${BUILDROOT}" > ${SETUP_FILE}
+	@echo "source \$${ROOT_DIR}/package/setup.sh" >> ${SETUP_FILE}
 	@echo "INSTALL_DIR=\$${ROOT_DIR}/staging" >> ${SETUP_FILE}
 	@echo "" >> ${SETUP_FILE}
 	@echo "# Setting PATH:" >> ${SETUP_FILE}
@@ -404,6 +405,8 @@ setupenv.sh: Makefile
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/motif/${MOTIF_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/freetype/${FREETYPE_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/ncl/${NCL_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
+	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/netcdf/${NETCDF_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
+	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/netcdf/${NETCDF_VERSION}/lib64:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "" >> ${SETUP_FILE}
 	@echo "# Setting PYTHONPATH:" >> ${SETUP_FILE}
 	@echo "PYTHONPATH=\$${ROOT_DIR}/src/widgets:\$${PYTHONPATH}" >> ${SETUP_FILE}

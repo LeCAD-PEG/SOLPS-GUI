@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 set -e
 
 
@@ -43,9 +43,6 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
     HOSTNAME=$(hostname)
 
     case ${HOSTNAME} in
-        *.iter.org)
-        # Do nothing
-        ;;
         *)
         # Local machine or basically an UNKNOWN machine, so patch is required
         # to setup the configuration files for UNKNOWN.gfortran
@@ -61,6 +58,9 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
 
         echo "Patch: Add UL configs"
         patch -p1 < ${PATCH_DIR}/solps-iter-UL-configs.patch
+
+        echo "Patch: Add SETUP sh ITER"
+        patch -p1 < ${PATCH_DIR}/solps-iter-ITER-SETUP-sh.patch
 
         echo "Patching solps-iter scripts ( -X -> -x in check executables conditions)"
         patch -p1 < ${PATCH_DIR}/solps-iter-scripts-executable-check.patch
@@ -89,6 +89,14 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
         echo "Adding UL configs to Eirene"
         patch -p1 < ${PATCH_DIR}/solps-iter-Eirene-UL.patch
 
+        ;;
+    esac
+    # Force UNKNOWN host on ITER.
+    case ${HOSTNAME} in
+        *.iter.org)
+        if [ -f ${SRC_DIR}/whereami ]; then
+            mv ${SRC_DIR}/whereami ${SRC_DIR}/whereami_bak
+        fi
         ;;
     esac
     touch ${SRC_DIR}/.configured

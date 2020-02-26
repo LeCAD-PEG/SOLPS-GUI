@@ -1,0 +1,57 @@
+diff --git a/SETUP/setup.sh.ITER.gfortran b/SETUP/setup.sh.ITER.gfortran
+new file mode 100644
+index 00000000..cbdcb2f7
+--- /dev/null
++++ b/SETUP/setup.sh.ITER.gfortran
+@@ -0,0 +1,51 @@
++# Modules needed by SOLPS-ITER
++set nodename=`hostname`
++module load GCCcore/6.4.0 binutils/2.28-GCCcore-6.4.0 intel/2018a GCC/6.4.0-2.28 Blitz++/0.10-GCCcore-6.4.0
++module load Python/2.7.14-GCCcore-6.4.0-bare
++module load OpenSSL/1.0.2g-goolf-1.5.16
++module load Autotools/20170619-GCCcore-6.4.0
++module load libtool/2.4.6-GCCcore-6.4.0
++module load gettext/0.19.8.1-GCCcore-6.4.0
++module load X11/20180131-GCCcore-6.4.0
++
++module load Doxygen/1.8.13-GCCcore-6.4.0
++module load Ghostscript/9.23-GCCcore-6.4.0
++module unload LibTIFF/4.0.9-GCCcore-6.4.0
++
++module load texlive
++
++# Debugger (set environment variable DBX)
++module load TotalView/2017.1.21_linux_x86-64
++export DBX=totalview
++
++# Compilers
++export CC=gcc
++export FC=gfortran
++export CXX=g++
++
++if [ -x "$(which paraview-config)" ]; then
++  # See ParaViewCatalystUsersGuide_v2.pdf Sec 3.7.2 Linking with Python ...
++  PARAVIEW_LIB=$(paraview-config --libs --python | sed s/-L//)
++  export LD_LIBRARY_PATH="${PARAVIEW_LIB}:${LD_LIBRARY_PATH}"
++  export PYTHONPATH="${PARAVIEW_LIB}/site-packages/vtk:${PYTHONPATH}"
++  export PYTHONPATH="${PARAVIEW_LIB}/site-packages:${PYTHONPATH}"
++  export LD_CATALYST=$(paraview-config --libs vtkPVPythonCatalyst)
++  export LD_CATALYST="${LD_CATALYST} -lstdc++"
++else
++  echo "Warning: paraview-config not found. ParaView with Catalyst will not be compiled-in!"
++fi
++
++# Other environment variables
++# module load solps-gui
++# setenv LD_PRELOAD /usr/lib64/libfontconfig.so.1 # needed by solps-gui
++#setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/usr/lib64
++#setenv PYTHONPATH "/work/imas/opt/SOLPS-GUI/1.5/src/widgets:${PYTHONPATH}"
++#setenv PYQTDESIGNERPATH "/work/imas/opt/SOLPS-GUI/1.5/src/plugins/designer"
++#setenv SOLPSGUI "/work/imas/opt/SOLPS-GUI/1.5/src/gui"
++#setenv SOLPSWORK /work/projects/solps-iter/$USER
++#alias solps 'python3 /work/imas/opt/SOLPS-GUI/1.5/src/gui/solps.py'
++#alias solps_doc 'xdg-open /work/imas/opt/SOLPS-GUI/1.5/doc/build/html/index.html'
++#alias solps_help 'assistant -collectionFile /work/imas/opt/SOLPS-GUI/1.5/doc/build/qthelp/SOLPSGUI.qhc'
++#alias eirene 'python3 /work/imas/opt/SOLPS-GUI/1.5/src/widgets/eirene.py'
++#alias b2 'python3 /work/imas/opt/SOLPS-GUI/1.5/src/widgets/b2.py'
++

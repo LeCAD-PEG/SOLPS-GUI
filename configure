@@ -16,7 +16,7 @@ OS=$(lsb_release -is)
 if [ $? != 0 ]; then
     echo "This system does not contain lsb_release for printing \
           distribution specific information"
-    exit 1
+    return
 fi
 echo "Detected OS: ${OS}"
 
@@ -34,9 +34,14 @@ case ${HOSTNAME} in
     *.iter.org)
     cat << EOF >> ${SETUP_FILE}
 module purge
-#module load GCCcore/6.4.0 binutils/2.28-GCCcore-6.4.0 intel/2018a GCC/6.4.0-2.28 Blitz++/0.10-GCCcore-6.4.0
-#module load Python/2.7.14-GCCcore-6.4.0-bare
+module load GCCcore/6.4.0 binutils/2.28-GCCcore-6.4.0 intel/2018a GCC/6.4.0-2.28
+module load Python/2.7.14-GCCcore-6.4.0-bare
 #module load OpenSSL/1.0.2g-goolf-1.5.16
+module load Autotools/20170619-GCCcore-6.4.0
+module load libtool/2.4.6-GCCcore-6.4.0
+module load gettext/0.19.8.1-GCCcore-6.4.0
+module load X11/20180131-GCCcore-6.4.0
+module list
 # Additional library path for OpenSSL
 SSL=$(pkg-config --variable=prefix libssl)
 export LIBRARY_PATH=\${SSL}/lib:\${LIBRARY_PATH}
@@ -93,13 +98,17 @@ export CXX=g++
 export FC=gfortran
 
 if [ -z \${BUILDROOT+x} ]; then
-    echo "No buildroot is set! Exiting"
-    exit 1
+    echo "No buildroot is set! Stopping"
+    return
+else
+    echo "Buildroot set to \${BUILDROOT}"
 fi
 
 if [ -z \${STAGING_DIR+x} ]; then
-    echo "No staging dir is set! Exiting"
-    exit 1
+    echo "No staging dir is set! Stopping"
+    return
+else
+    echo "Buildroot set to \${STAGING_DIR}
 fi
 
 if [ -z \${IMASDD_VERSION+x} ]; then
@@ -250,6 +259,7 @@ if [ -z \${NETCDF_VERSION+x} ]; then
     echo "NETCDF_VERSION is unset, skiping"
 else
     export PKG_CONFIG_PATH=\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
+    export PKG_CONFIG_PATH=\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/lib64/pkgconfig:\${PKG_CONFIG_PATH}
     export CPATH=\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/include:\${CPATH}
     export LD_LIBRARY_PATH=\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/lib:\${LD_LIBRARY_PATH}
     export LIBRARY_PATH=\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/lib:\${LIBRARY_PATH}
