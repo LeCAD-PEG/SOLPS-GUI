@@ -666,6 +666,8 @@ void fTimeSlice2MultiBlockSingleUG(IDS100 & db,
         class IdsNs::IDS::edge_sources::grid_ggd & GRID_GGD =
             db._edge_sources.grid_ggd(grid_ggd_slice_index);
         gmtrye_obj.getNumberOfNDimObjects(GRID_GGD, num_nD_obj);
+        // Get number of GGD slices
+        num_ggd_slices = db._edge_sources.source(source_index).ggd.extent(0);
     }
     else if( std::string(LoadIDS).find("edge_transport") != std::string::npos )
     {
@@ -677,8 +679,6 @@ void fTimeSlice2MultiBlockSingleUG(IDS100 & db,
     }else{
         vtkOutputWindowDisplayWarningText(std::string(
             "WARNING: Unknown IDS provided.").c_str());
-        // Get number of GGD slices
-        num_ggd_slices = db._edge_sources.source(source_index).ggd.extent(0);
     }
 
     num_0D_obj = num_nD_obj[0];
