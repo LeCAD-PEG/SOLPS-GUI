@@ -108,7 +108,7 @@ if [ -z \${STAGING_DIR+x} ]; then
     echo "No staging dir is set! Stopping"
     return
 else
-    echo "Buildroot set to \${STAGING_DIR}
+    echo "Buildroot set to \${STAGING_DIR}"
 fi
 
 if [ -z \${IMASDD_VERSION+x} ]; then
