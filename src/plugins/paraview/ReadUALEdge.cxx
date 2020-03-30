@@ -171,7 +171,7 @@ ReadUALEdge::ReadUALEdge()
     this->Shot = 0;
     this->Run = 0;
     this->User = NULL;
-    this->Device = NULL;
+    this->Database = NULL;
     this->Version = NULL;
     this->RefRun = 0;
     this->LoadIDS = NULL;
@@ -930,7 +930,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
     if (!this->Version)
         this->Version = strdup("3");
     // Open IDS
-    db.openEnv(this->User, this->Device, this->Version);
+    db.openEnv(this->User, this->Database, this->Version);
 
     // Print IDS info
     msg  << "IDS parameters:" << "\n" <<
@@ -939,7 +939,7 @@ int ReadUALEdge::RequestData(   vtkInformation *vtkNotUsed(request),
         " - Run:        " << this->Run     << "\n" <<
         " - RefRun:     " << this->RefRun  << "\n" <<
         " - User:       " << this->User    << "\n" <<
-        " - Device:     " << this->Device  << "\n" <<
+        " - Database:     " << this->Database  << "\n" <<
         " - Version:    " << this->Version << "\n\n";
     msgToOutputWindow( msg );
 

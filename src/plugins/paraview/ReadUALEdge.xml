@@ -49,15 +49,15 @@
             </StringVectorProperty>
 
             <StringVectorProperty
-                name="Device"
-                label="Device"
-                command="SetDevice"
+                name="Database"
+                label="Database"
+                command="SetDatabase"
                 number_of_elements="1"
                 default_values="iter"
                 panel_visibility="default"
                 immediate_update="true">
                 <Documentation>
-                    This property specifies the **Device** for the UAL Database.
+                    This property specifies the **Database** for the UAL Database.
                 </Documentation>
             </StringVectorProperty>
 

@@ -73,9 +73,9 @@ pqMyPropertyWidgetDecorator::pqMyPropertyWidgetDecorator(
         prop_user, vtkCommand::UncheckedPropertyModifiedEvent,
         this, SIGNAL(visibilityChanged()));
 
-    vtkSMProperty* prop_device = proxy? proxy->GetProperty("Device") : NULL;
+    vtkSMProperty* prop_database = proxy? proxy->GetProperty("Database") : NULL;
     this->ObserverId = pqCoreUtilities::connect(
-        prop_device, vtkCommand::UncheckedPropertyModifiedEvent,
+        prop_database, vtkCommand::UncheckedPropertyModifiedEvent,
         this, SIGNAL(visibilityChanged()));
 }
 
@@ -157,23 +157,23 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
     // Object declaration for readPsEdge routines
     VTKIDSutility uvi_obj;
 
-    /// Setting imasdb directory using the Device textbox on Apply
+    /// Setting imasdb directory using the Database textbox on Apply
     // Default database directory
     std::string userIMASShotRunDir = homedir + "/public/imasdb/solps-iter/3/0";
     // Get changed value
-    vtkSMProperty* prop_device = proxy? proxy->GetProperty("Device") : NULL;
+    vtkSMProperty* prop_database = proxy? proxy->GetProperty("Database") : NULL;
     vtkSMStringVectorProperty* prop_device_strVec =
-        dynamic_cast<vtkSMStringVectorProperty*>(proxy->GetProperty("Device"));
+        dynamic_cast<vtkSMStringVectorProperty*>(proxy->GetProperty("Database"));
     std::string db_dir;
-    if(prop_device)
+    if(prop_database)
     {
         // Getting text currently in"User" checkbox to string on Apply
-        // std::clog << "---prop_device Printself---: " << std::endl;
-        // prop_device->PrintSelf(std::clog, vtkIndent());
-        // std::clog << prop_device->GetXMLName() << std::endl;
-        // Get Device GUI text box string and set this value to db_dir
+        // std::clog << "---prop_database Printself---: " << std::endl;
+        // prop_database->PrintSelf(std::clog, vtkIndent());
+        // std::clog << prop_database->GetXMLName() << std::endl;
+        // Get Database GUI text box string and set this value to db_dir
         // (short for database directory)
-        db_dir = vtkSMUncheckedPropertyHelper(prop_device).GetAsString();
+        db_dir = vtkSMUncheckedPropertyHelper(prop_database).GetAsString();
         userIMASShotRunDir = homedir + "/public/imasdb/" + db_dir + "/3/0";
         // userIMASShotRunDir.erase(std::remove(userIMASShotRunDir.begin(),
         //     userIMASShotRunDir.end(), '\n'), userIMASShotRunDir.end());

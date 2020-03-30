@@ -69,10 +69,10 @@ std::string VTKIDSutility::VTK_IDS_SetIonQuantityLabel(
 *   @param userIMASShotRunDir   IMAS database directory (imasdb), containing
 *                               IDS cases
 *   @param user                 Owner of the IDS cases
-*   @param device               IDS case device
+*   @param database             IDS case database
 */
 std::vector<std::string> VTKIDSutility::findShotRun(
-    std::string userIMASShotRunDir, std::string user, std::string device)
+    std::string userIMASShotRunDir, std::string user, std::string database)
 {
     DIR *pDIR = NULL;
     struct dirent *entry = NULL;
@@ -93,7 +93,7 @@ std::vector<std::string> VTKIDSutility::findShotRun(
     if (stat(dirPath.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))
     {
         vtkOutputWindowDisplayText(std::string("IDS imasdb directory '" +
-            device + "' from user '" + user + "' found: '" +
+            database + "' from user '" + user + "' found: '" +
             userIMASShotRunDir + "' Reading available IDS shot/runs." +
             "\n\n").c_str());
 
