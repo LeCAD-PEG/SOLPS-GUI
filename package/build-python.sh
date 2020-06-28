@@ -58,7 +58,13 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
         sed -i -e "s,#SSL=.*,SSL=${ssl}," -e "/^#.*ssl/s/#//" \
         -e '/ssl/s|-lcrypto |-lcrypto -Wl,-rpath,$(SSL)/lib|' ${MODULES_FILE}
     fi
-    ./configure --prefix=${INSTALL_DIR} --enable-shared --enable-optimizations
+    
+    # Add a temporal fix for custom libffi location!
+    if [ -z "${Py_FFI_LDFLAGS+x}" ]; then
+      ./configure --prefix=${INSTALL_DIR} --enable-shared #--enable-optimizations
+    else
+      LDFLAGS="${Py_FFI_LDFLAGS}" ./configure --prefix=${INSTALL_DIR} --enable-shared #--enable-optimizations
+    fi
     touch ${SRC_DIR}/.configured
 fi
 

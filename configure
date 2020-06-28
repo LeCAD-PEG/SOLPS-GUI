@@ -41,9 +41,16 @@ module load Autotools/20170619-GCCcore-6.4.0
 module load libtool/2.4.6-GCCcore-6.4.0
 module load gettext/0.19.8.1-GCCcore-6.4.0
 module load X11/20180131-GCCcore-6.4.0
+module load libffi/3.2.1-GCCcore-6.4.0
+# From Python/3.7 the code of libffi is not included into source code anymore.
+# With system installed ffi, it works without a problem, but with custom
+# compiled and installed ffi then this becomes a trouble since currently it hasn't
+# been solved:: https://bugs.python.org/issue34823
+export Py_FFI_LDFLAGS=\$(pkg-config --libs-only-L libffi)
+
 module list
 # Additional library path for OpenSSL
-SSL=$(pkg-config --variable=prefix libssl)
+SSL=\$(pkg-config --variable=prefix libssl)
 export LIBRARY_PATH=\${SSL}/lib:\${LIBRARY_PATH}
 CMAKE_EXTRA_FLAGS=\${CMAKE_EXTRA_FLAGS:--DCMAKE_EXE_LINKER_FLAGS:STRING=-L\${SSL}/lib}
 export PARAVIEW_EXTRA_FLAGS=\${PARAVIEW_EXTRA_FLAGS:- -DCMAKE_EXE_LINKER_FLAGS:STRING=-L\${SSL}/lib -DPARAVIEW_ENABLE_PYTHON:BOOL=OFF}
