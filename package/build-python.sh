@@ -61,9 +61,9 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
     
     # Add a temporal fix for custom libffi location!
     if [ -z "${Py_FFI_LDFLAGS+x}" ]; then
-      ./configure --prefix=${INSTALL_DIR} --enable-shared #--enable-optimizations
+      ./configure --prefix=${INSTALL_DIR} --enable-shared --enable-optimizations
     else
-      LDFLAGS="${Py_FFI_LDFLAGS}" ./configure --prefix=${INSTALL_DIR} --enable-shared #--enable-optimizations
+      LDFLAGS="${Py_FFI_LDFLAGS}" ./configure --prefix=${INSTALL_DIR} --enable-shared --enable-optimizations
     fi
     touch ${SRC_DIR}/.configured
 fi
