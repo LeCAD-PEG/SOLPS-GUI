@@ -14,7 +14,7 @@ PATCH_DIR=${BUILDROOT}/src/patches
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-5.13.0}
+VERSION=${VERSION:-5.14.2}
 MAJOR_VERSION=${VERSION%.*}
 SOURCE="qt-everywhere-src-${VERSION}.tar.xz"
 DOWNLOAD="http://download.qt.io/official_releases/qt/${MAJOR_VERSION}/${VERSION}/single/${SOURCE}"

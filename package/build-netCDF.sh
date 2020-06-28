@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-4.6.0}
+VERSION=${VERSION:-4.7.4}
 GIT="https://github.com/Unidata/netcdf-c"
 SRC_DIR="${BUILD_DIR}/netcdf-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/netcdf/${VERSION}

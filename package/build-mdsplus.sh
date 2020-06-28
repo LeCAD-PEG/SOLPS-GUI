@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-stable_release-7-84-8}
+VERSION=${VERSION:-stable_release-7-96-8}
 SOURCE="mdsplus-${VERSION}.tar.gz"
 DOWNLOAD="https://github.com/MDSplus/mdsplus/archive/${VERSION}.tar.gz"
 INSTALL_DIR=${STAGING_DIR}/mdsplus/${VERSION}

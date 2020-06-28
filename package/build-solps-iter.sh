@@ -128,6 +128,7 @@ if [ ! -e ${SRC_DIR}/.built ]; then
     cd ${SRC_DIR}
     source ${SRC_DIR}/setup.sh gfortran
     hash -r
+    make clean
     make listobj listobj_debug
     make depend depend_debug
     make tags
@@ -136,14 +137,14 @@ if [ ! -e ${SRC_DIR}/.built ]; then
     make b25
     make eirene
     make b25eirene
-    #make uinp
+    make uinp
     make triang
     make amds
     make sonnet-light
     make carre divgeo b25 eirene b25eirene uinp triang amds sonnet-light
     make b25eirene_mpi amds_mpi
-    #make uinp_mpi
-    # make b25eirene_openmp
+    make uinp_mpi
+    make b25eirene_openmp
 
     touch ${SRC_DIR}/.built
 fi

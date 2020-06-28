@@ -1,9 +1,9 @@
 diff --git a/SETUP/config.UL.gfortran b/SETUP/config.UL.gfortran
 new file mode 100644
-index 0000000..40dd826
+index 00000000..b4925797
 --- /dev/null
 +++ b/SETUP/config.UL.gfortran
-@@ -0,0 +1,141 @@
+@@ -0,0 +1,153 @@
 +#
 +# Specify paths to root-directories of following libraries on your system
 +#
@@ -24,9 +24,9 @@ index 0000000..40dd826
 +#
 +
 +    NODENAME ?= $(shell echo `hostname`)
-+        NCDIR ?= ${SOLPSLIB}
-+    MSCL_ROOT ?= ${SOLPSLIB}
-+        H5DIR ?= ${SOLPSLIB}
++        NCDIR ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++    MSCL_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++        H5DIR ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
 +      GR_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
 +     GLI_HOME ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
 +OPENBLAS_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
@@ -39,8 +39,8 @@ index 0000000..40dd826
 +# The same goes for OpenMP, so the best way is to provide the PKG_CONFIG_PATH,
 +# or run the SOLPS-GUI build script.
 +
-+   NCARG_ROOT ?= ${SOLPSLIB}
-+        MPDIR ?= ${SOLPSLIB}
++   NCARG_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++        MPDIR ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
 +
 +        NAGDIR ?= ${SOLPSLIB}
 +#
@@ -48,8 +48,8 @@ index 0000000..40dd826
 +#
 +# LD_INTEL_LIBS= -lirc -lirc_s -liomp5 -lifcoremt_pic -lsvml -lifport -limf -lm -lifcore_pic -lpthread
 +
-+LD_NETCDF  = -L${H5DIR}/lib -L${NCDIR}/lib -lnetcdf -lnetcdff -lhdf5 -lhdf5_hl
-+LD_MSCL    = -L${MSCL_ROOT}/lib -lmscl
++LD_NETCDF  = `nf-config --flibs` # from staging/netcdf/<version>/bin
++LD_MSCL    = `pkg-config mscl --libs` -lgfortran # from staging/mscl/<version>/lib/pkgconfig
 +LD_GR      = -L${GR_ROOT}/lib -lgr
 +LD_GKS     = -L${GLI_HOME} -lgks -lXmu -lX11 -lXt -ldl
 +LD_NCARG   = -L${NCARG_ROOT} -lncarg -lncarg_gks -lncarg_c -lX11 -lXext -lcairo -lfontconfig -lfreetype -lpng -lz -lXrender -lbz2 -ldl # For NCARG v6.x.x
@@ -62,10 +62,10 @@ index 0000000..40dd826
 +# Preprocessor options
 +#
 +
-+SOLPS_CPP      = -DNCAR4 -DNO_NAG -DGFORTRAN -I${NCDFIR}/include
++SOLPS_CPP      = -DNCAR4 -DNO_NAG -DGFORTRAN `pkg-config netcdf-fortran --cflags`
 +B25_DEFINES    =
 +EIRENE_DEFINES =
-+#MPI_CPP        = -I${MPDIR}/include
++FFLAGSEXTRA    =
 +
 +# Autodetected optional features...
 +
@@ -88,11 +88,21 @@ index 0000000..40dd826
 +
 +# Build with IMAS if imas module is loaded
 +ifdef IMAS_VERSION
-+  LD_UAL   = `pkg-config imas-gfortran ggd --libs` -Wl,-rpath,${IMAS_PREFIX}/lib
 +  UAL_MAJOR_VERSION = $(shell echo ${UAL_VERSION} | cut -d '.' -f1 )
-+  GGD_MINOR_VERSION = $(shell echo ${EBVERSIONGGD} | cut -d '.' -f2 )
 +  IMAS_MAJOR_VERSION = $(shell echo ${IMAS_VERSION} | cut -d '.' -f1 )
 +  IMAS_MINOR_VERSION = $(shell echo ${IMAS_VERSION} | cut -d '.' -f2 )
++  ifeq ($(shell test ${IMAS_MINOR_VERSION} -ge 17; echo $$?),0)
++    GGD_MINOR_VERSION = $(shell echo ${GGD_VERSION} | cut -d '.' -f2 )
++    LD_UAL = `pkg-config imas-gfortran ggd --libs`
++  else
++    ifeq ($(shell test ${IMAS_MINOR_VERSION} -ge 12; echo $$?),0)
++      GGD_MINOR_VERSION = $(shell echo ${GGD_VERSION} | cut -d '.' -f2 )
++      LD_UAL = `pkg-config imas-gfortran --libs` -lggd-gfortran
++    else
++      GGD_MINOR_VERSION = 0
++      LD_UAL = `pkg-config imas-lowlevel imas-gfortran --libs`
++    endif
++  endif
 +  SOLPS_CPP += -DIMAS -DUAL_MAJOR_VERSION=${UAL_MAJOR_VERSION} -DIMAS_MINOR_VERSION=${IMAS_MINOR_VERSION} -DGGD_MINOR_VERSION=${GGD_MINOR_VERSION}
 +  export LD_UAL
 +else
@@ -107,9 +117,9 @@ index 0000000..40dd826
 +export IMAS_MINOR_VERSION
 +
 +# Build with OpenMP if requested
-+#ifdef SOLPS_OPENMP
-+#  B25_DEFINES += -D_OPENMP
-+#endif
++ifdef SOLPS_OPENMP
++  B25_DEFINES += -D_OPENMP
++endif
 +
 +#
 +# Export for use in sub-makefiles
@@ -137,7 +147,9 @@ index 0000000..40dd826
 +
 +export NODENAME
 +export SOLPS_CPP
++export FFLAGSEXTRA
 +export B25_DEFINES
++export CARRE_DEFINES
 +export EIRENE_DEFINES
 +export MPI_CPP
 +
@@ -147,7 +159,7 @@ index 0000000..40dd826
 +
 diff --git a/SETUP/setup.csh.UL.gfortran b/SETUP/setup.csh.UL.gfortran
 new file mode 100644
-index 0000000..32d1362
+index 00000000..ecbcfd57
 --- /dev/null
 +++ b/SETUP/setup.csh.UL.gfortran
 @@ -0,0 +1,19 @@
@@ -172,7 +184,7 @@ index 0000000..32d1362
 +
 diff --git a/SETUP/setup.sh.UL.gfortran b/SETUP/setup.sh.UL.gfortran
 new file mode 100644
-index 0000000..0101b07
+index 00000000..e95ed92e
 --- /dev/null
 +++ b/SETUP/setup.sh.UL.gfortran
 @@ -0,0 +1,19 @@
@@ -197,7 +209,7 @@ index 0000000..0101b07
 +module list
 diff --git a/modules/Triang/config/config.UL.gfortran b/modules/Triang/config/config.UL.gfortran
 new file mode 100644
-index 0000000..cf46c22
+index 00000000..fa9304e5
 --- /dev/null
 +++ b/modules/Triang/config/config.UL.gfortran
 @@ -0,0 +1,46 @@
@@ -205,10 +217,10 @@ index 0000000..cf46c22
 +
 +# The version relying on Fujitsu Fortran installed on AFS
 +
-+ LD_GR    ?= -L${GR_ROOT}/lib -lgr
-+ LD_GKS   ?= -L${GLI_HOME} -lgks -lgfortran -lX11 -lXt -lXmu
-+ LD_NAG   ?= `pkg-config nag --libs`
-+ GLI_HOME ?= /work/imas/opt/gks/4.4.74/lib
++LD_GR    ?= -L${GR_ROOT}/lib -lgr
++LD_GKS   ?= -L${GLI_HOME} -lgks -lgfortran -lX11 -lXt -lXmu
++LD_NAG   ?= `pkg-config nag --libs`
++GLI_HOME ?= /work/imas/opt/gks/4.4.74/lib
 +
 +#DEFINES  = ${SOLPS_CPP} ${EIRENE_DEFINES} -DRECL_UNITS_PER_DOUBLE=8 -DNO_FORT10 -DNO_SHORT_CYCLE -DNO_F01AAF
 +#DEFINES  = ${SOLPS_CPP} ${EIRENE_DEFINES} -DTRIANG -DRECL_UNITS_PER_DOUBLE=8 -DNO_FORT10 -DNO_SHORT_CYCLE -DNO_F01AAF
@@ -250,7 +262,7 @@ index 0000000..cf46c22
 \ No newline at end of file
 diff --git a/modules/Uinp/config/config.UL.gfortran b/modules/Uinp/config/config.UL.gfortran
 new file mode 100644
-index 0000000..7b8e57e
+index 00000000..ea53c707
 --- /dev/null
 +++ b/modules/Uinp/config/config.UL.gfortran
 @@ -0,0 +1,36 @@
@@ -272,6 +284,9 @@ index 0000000..7b8e57e
 +else
 +FFLAGS   =
 +endif
++ifdef USE_OPENMP
++FFLAGS += -fopenmp
++endif
 +ifeq (${FC_VERSION},6.4.0})
 +FFLAGS  += -fuse-ld=bfd
 +endif
@@ -282,9 +297,6 @@ index 0000000..7b8e57e
 +MOD      = mod
 +LDLIBS   = ${LD_MSCL}
 +LDEXTRA  =
-+#ifdef USE_MPI
-+#LDLIBS  += ${LD_MPI}
-+#endif
 +
 +#!!!Local Variables:
 +#!!! mode: Makefile
@@ -292,7 +304,7 @@ index 0000000..7b8e57e
 +
 diff --git a/modules/amds/config/config.UL.gfortran b/modules/amds/config/config.UL.gfortran
 new file mode 100644
-index 0000000..7c233df
+index 00000000..7c233dff
 --- /dev/null
 +++ b/modules/amds/config/config.UL.gfortran
 @@ -0,0 +1,8 @@

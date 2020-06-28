@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-4.4.4}
+VERSION=${VERSION:-4.5.3}
 GIT="https://github.com/Unidata/netcdf-fortran.git"
 SRC_DIR="${BUILD_DIR}/netcdf-fortran-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/netcdf/${VERSION}

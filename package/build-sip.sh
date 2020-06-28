@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package Variables
-VERSION=${VERSION:-4.19.18}
+VERSION=${VERSION:-4.19.22}
 SOURCE="sip-${VERSION}.tar.gz"
 DOWNLOAD="https://www.riverbankcomputing.com/static/Downloads/sip/${VERSION}/${SOURCE}"
 SRC_DIR=${BUILD_DIR}/sip-${VERSION}

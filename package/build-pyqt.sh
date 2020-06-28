@@ -17,10 +17,10 @@ DOWNLOAD_DIR=${BUILDROOT}/download
 PATCH_DIR=${BUILDROOT}/src/patches
 
 # Package variables
-VERSION=${VERSION:-5.13.0} # should be the same as Qt
-SOURCE="PyQt5_gpl-${VERSION}.tar.gz"
+VERSION=${VERSION:-5.13.2} # should be the same as Qt
+SOURCE="PyQt5-${VERSION}.tar.gz"
 DOWNLOAD="https://www.riverbankcomputing.com/static/Downloads/PyQt5/${VERSION}/${SOURCE}"
-SRC_DIR="${BUILD_DIR}/PyQt5_gpl-${VERSION}"
+SRC_DIR="${BUILD_DIR}/PyQt5-${VERSION}"
 INSTALL_DIR="${STAGING_DIR}/PyQt5/${VERSION}"
 
 # Environment dependencies

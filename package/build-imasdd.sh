@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-3.26.0}
+VERSION=${VERSION:-3.28.1}
 GIT="ssh://git@git.iter.org/imas/data-dictionary.git"
 SRC_DIR="${BUILD_DIR}/data-dictionary-${VERSION}"
 

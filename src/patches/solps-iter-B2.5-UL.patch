@@ -1,12 +1,14 @@
 diff --git a/config/config.UL.gfortran b/config/config.UL.gfortran
 new file mode 100644
-index 0000000..5ba40a7
+index 00000000..ef753ef6
 --- /dev/null
 +++ b/config/config.UL.gfortran
-@@ -0,0 +1,87 @@
+@@ -0,0 +1,107 @@
 +# Test whether necessary variables are set
 +LD_MSCL   ?= `pkg-config mscl --libs`
++ifdef NCARG_ROOT
 +LD_NCARG  ?= -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -lm  -lX11 -lXext `pkg-config cairo --libs` -lfontconfig -lfreetype -lpng -lz -lpthread -lXrender -lbz2 -lgfortran
++endif
 +LD_NAG    ?= `pkg-config nag --libs`
 +NCDIR     ?= /work/imas/opt/netcdf-fortran/4.2-GCC-4.1.2
 +LD_NETCDF ?= `nf-config --flibs`
@@ -48,6 +50,11 @@ index 0000000..5ba40a7
 +FCOPTS += ${MPI_CPP}
 +endif
 +
++ifdef USE_OPENMP
++FCOPTS += -fopenmp
++LDOPTS += -fopenmp
++endif
++
 +DBLFC = ${FC}
 +DDBLOPTION =
 +DBLSED = sed -e s:\#PREC\#:d:g
@@ -67,15 +74,28 @@ index 0000000..5ba40a7
 +endif
 +
 +ifdef IMAS_VERSION
++GGD_VERSION ?= ${EBVERSIONGGD}
 +UAL_MAJOR_VERSION ?= $(shell echo ${UAL_VERSION} | cut -d '.' -f1 )
-+GGD_MINOR_VERSION ?= $(shell echo ${EBVERSIONGGD} | cut -d '.' -f2 )
 +IMAS_MAJOR_VERSION ?= $(shell echo ${IMAS_VERSION} | cut -d '.' -f1 )
 +IMAS_MINOR_VERSION ?= $(shell echo ${IMAS_VERSION} | cut -d '.' -f2 )
-+ifndef SOLPS_CPP
-+EQUIVS  += -DIMAS -DUAL_MAJOR_VERSION=${UAL_MAJOR_VERSION} -DIMAS_MINOR_VERSION=${IMAS_MINOR_VERSION} -DGGD_MINOR_VERSION=${GGD_MINOR_VERSION}
-+endif
++ifeq ($(shell test ${IMAS_MINOR_VERSION} -ge 17; echo $$?),0)
++GGD_MINOR_VERSION ?= $(shell echo ${GGD_VERSION} | cut -d '.' -f2 )
 +LD_UAL  ?= `pkg-config imas-gfortran ggd --libs`
 +INCMODS  = `pkg-config imas-gfortran ggd --cflags`
++else
++ifeq ($(shell test ${IMAS_MINOR_VERSION} -ge 12; echo $$?),0)
++GGD_MINOR_VERSION ?= $(shell echo ${GGD_VERSION} | cut -d '.' -f2 )
++LD_UAL  ?= `pkg-config imas-gfortran --libs` -lggd-gfortran
++INCMODS  = `pkg-config imas-gfortran --cflags`
++else
++GGD_MINOR_VERSION ?= 0
++LD_UAL  ?= `pkg-config imas-lowlevel imas-gfortran --libs`
++INCMODS  = `pkg-config imas-lowlevel imas-gfortran --cflags`
++endif
++endif
++ifndef SOLPS_CPP
++DEFINES += -DIMAS -DUAL_MAJOR_VERSION=${UAL_MAJOR_VERSION} -DIMAS_MINOR_VERSION=${IMAS_MINOR_VERSION} -DGGD_MINOR_VERSION=${GGD_MINOR_VERSION}
++endif
 +IMASLIBS = ${LD_UAL}
 +endif
 +

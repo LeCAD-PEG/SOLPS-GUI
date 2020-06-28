@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-3.6.9}
+VERSION=${VERSION:-3.8.3}
 MAINVERSION=${VERSION%.*}
 SOURCE="Python-${VERSION}.tgz"
 DOWNLOAD="https://www.python.org/ftp/python/${VERSION}/${SOURCE}"
@@ -51,10 +51,14 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
     rm -rf ${INSTALL_DIR}
     if pkg-config --exists libssl; then
         ssl=$(pkg-config --variable=prefix libssl)
+
+        # Modules/Setup checkup.
+        MODULES_FILE=Modules/Setup.dist
+        [ ! -e "Modules/Setup.dist" ] && MODULES_FILE=Modules/Setup
         sed -i -e "s,#SSL=.*,SSL=${ssl}," -e "/^#.*ssl/s/#//" \
-        -e '/ssl/s|-lcrypto |-lcrypto -Wl,-rpath,$(SSL)/lib|' Modules/Setup.dist
+        -e '/ssl/s|-lcrypto |-lcrypto -Wl,-rpath,$(SSL)/lib|' ${MODULES_FILE}
     fi
-    ./configure --prefix=${INSTALL_DIR} --enable-shared # --enable-optimizations
+    ./configure --prefix=${INSTALL_DIR} --enable-shared --enable-optimizations
     touch ${SRC_DIR}/.configured
 fi
 

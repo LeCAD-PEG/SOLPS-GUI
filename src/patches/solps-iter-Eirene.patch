@@ -1,9 +1,9 @@
 diff --git a/config/config.UNKNOWN.gfortran b/config/config.UNKNOWN.gfortran
 new file mode 100644
-index 00000000..ed1a2672
+index 00000000..a6ca420b
 --- /dev/null
 +++ b/config/config.UNKNOWN.gfortran
-@@ -0,0 +1,44 @@
+@@ -0,0 +1,49 @@
 +# Test whether necessary variables are set
 +GLI_HOME ?= ${EBROOTGLI}
 +LD_GR    ?= -L${EBROOTGR}/lib -lgr
@@ -22,11 +22,16 @@ index 00000000..ed1a2672
 +endif
 +CC        = /usr/bin/gcc
 +
++GFORTRAN_MAJOR_VERSION = $(shell ${FC} --version | head -1 | awk '{printf "%s ",$$NF,"\n"}' | cut -d '.' -f 1 )
++GFORTRAN_MINOR_VERSION = $(shell ${FC} --version | head -1 | awk '{printf "%s ",$$NF,"\n"}' | cut -d '.' -f 2 )
++DEFINES  += -DCOMPILER_MAJOR_VERSION=${GFORTRAN_MAJOR_VERSION} -DCOMPILER_MINOR_VERSION=${GFORTRAN_MINOR_VERSION}
++
++FCOPTS    = -fPIC -fno-second-underscore
 +ifdef SOLPS_DEBUG
-+FCOPTS    = -g -fcheck=all -fPIC -fno-second-underscore -DDECLARE_MPI_WTIME -fbacktrace -frecursive -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
++FCOPTS   += -g -fcheck=all -fbacktrace -frecursive -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
 +CFLAGS    = -g
 +else
-+FCOPTS    = -O2 -fPIC -fno-second-underscore -DDECLARE_MPI_WTIME
++FCOPTS   += -O2
 +CFLAGS    = -O2
 +endif
 +
@@ -38,7 +43,7 @@ index 00000000..ed1a2672
 +
 +# new
 +
-+INCMOD    = -I
++INCMOD    = -B
 +MOD       = mod
 +OBJDEST   = -J${OBJDIR} -o $@
 +

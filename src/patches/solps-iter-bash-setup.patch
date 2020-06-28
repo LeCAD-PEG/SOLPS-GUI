@@ -1,9 +1,9 @@
 diff --git a/setup.sh b/setup.sh
 new file mode 100644
-index 0000000..5813c1d
+index 00000000..9d9aa8fc
 --- /dev/null
 +++ b/setup.sh
-@@ -0,0 +1,218 @@
+@@ -0,0 +1,265 @@
 +#!/bin/bash
 +
 +
@@ -30,21 +30,26 @@ index 0000000..5813c1d
 +echo "The full SOLPS-ITER manual can be found in \$SOLPSTOP/doc/solps/solps.pdf"
 +echo "The Eirene manual is located at http://www.eirene.de/"
 +
++export SETUP_FILE=$(echo $_ | cut -d " " -f 2)
++export REAL_FILE=$(eval echo ${SETUP_FILE})
++export SETUP_PATH=$(dirname ${REAL_FILE})
 +export SOLPSTOP=${PWD}
 +export SOLPSWORK=${SOLPSTOP}/runs
 +
-+if [ -s whereami ]; then
-+    iamat=$(./whereami | tail -1)
-+    echo "Running at ${iamat}"
-+else
-+    iamat="UNKNOWN"
-+fi
++# Set HOST_NAME and COMPILER, which will determine setup files to be used
++#------------------------------------------------------------------------
 +
 +LOCAL_SETUP_FILE=${SOLPSTOP}/SETUP/setup.sh.HOST_NAME.local
 +if [ -f ${LOCAL_SETUP_FILE} ] ; then
 +    echo "Loading ${LOCAL_SETUP_FILE}"
 +    export HOST_NAME=$(cat ${LOCAL_SETUP_FILE})
 +else
++    if [ -s whereami ]; then
++        iamat=$(./whereami | tail -1)
++        echo "Running at ${iamat}"
++    else
++        iamat="UNKNOWN"
++    fi
 +    case "${iamat}" in
 +        *UNKNOWN)
 +            export HOST_NAME="UNKNOWN"
@@ -55,6 +60,7 @@ index 0000000..5813c1d
 +    esac
 +fi
 +
++# COMPILER can also be the argument to setup.sh call
 +if [ "$1" == "" ]; then
 +    if [ -s default_compiler ]; then
 +        export COMPILER=$(./default_compiler|tail -1)
@@ -80,6 +86,7 @@ index 0000000..5813c1d
 +
 +
 +export PYTHONPATH=${PYTHONPATH}:${SOLPSTOP}/lib/python
++export SOLPSLIB=${SOLPSTOP}/lib/${HOST_NAME}.${COMPILER}
 +
 +# setup files for combination of HOST_NAME and COMPILER, + local modifications if present
 +SETUP_FILE="SETUP/setup.sh.${HOST_NAME}.${COMPILER}"
@@ -111,6 +118,8 @@ index 0000000..5813c1d
 +# Set path to scripts and executables
 +#------------------------------------
 +
++# First, remove the old path to SOLPS if already set
++# (avoid too long paths)
 +if [ -z ${SOLPS_PATH} ]; then
 +    export PATH=$(echo ${PATH} | sed "s|${SOLPS_PATH}:||")
 +fi
@@ -127,6 +136,22 @@ index 0000000..5813c1d
 +AMDS_PATH=${SOLPSTOP}/modules/amds/builds/${TOOLCHAIN}
 +S45_PATH=${SOLPSTOP}/modules/solps4-5/builds/${TOOLCHAIN}
 +
++# Create mirror scripts directories
++if [ -d ${SOLPSTOP}/scripts/${TOOLCHAIN}.mpi ]; then rm -Rf ${SOLPSTOP}/scripts/${TOOLCHAIN}.mpi; fi
++if [ -d ${SOLPSTOP}/scripts/${TOOLCHAIN}.openmp ]; then rm -Rf ${SOLPSTOP}/scripts/${TOOLCHAIN}.openmp; fi
++if [ -d ${SOLPSTOP}/scripts/${TOOLCHAIN}.openmp.mpi ]; then rm -Rf ${SOLPSTOP}/scripts/${TOOLCHAIN}.openmp.mpi; fi
++if [ -d ${SOLPSTOP}/scripts/${TOOLCHAIN}.debug ]; then rm -Rf ${SOLPSTOP}/scripts/${TOOLCHAIN}.debug; fi
++if [ -d ${SOLPSTOP}/scripts/${TOOLCHAIN}.mpi.debug ]; then rm -Rf ${SOLPSTOP}/scripts/${TOOLCHAIN}.mpi.debug; fi
++if [ -d ${SOLPSTOP}/scripts/${TOOLCHAIN}.openmp.debug ]; then rm -Rf ${SOLPSTOP}/scripts/${TOOLCHAIN}.openmp.debug; fi
++if [ -d ${SOLPSTOP}/scripts/${TOOLCHAIN}.openmp.mpi.debug ]; then rm -Rf ${SOLPSTOP}/scripts/${TOOLCHAIN}.openmp.mpi.debug; fi
++ln -sf ${SOLPSTOP}/scripts/${TOOLCHAIN} ${SOLPSTOP}/scripts/${TOOLCHAIN}.mpi
++ln -sf ${SOLPSTOP}/scripts/${TOOLCHAIN} ${SOLPSTOP}/scripts/${TOOLCHAIN}.openmp
++ln -sf ${SOLPSTOP}/scripts/${TOOLCHAIN} ${SOLPSTOP}/scripts/${TOOLCHAIN}.openmp.mpi
++ln -sf ${SOLPSTOP}/scripts/${TOOLCHAIN} ${SOLPSTOP}/scripts/${TOOLCHAIN}.debug
++ln -sf ${SOLPSTOP}/scripts/${TOOLCHAIN} ${SOLPSTOP}/scripts/${TOOLCHAIN}.mpi.debug
++ln -sf ${SOLPSTOP}/scripts/${TOOLCHAIN} ${SOLPSTOP}/scripts/${TOOLCHAIN}.openmp.debug
++ln -sf ${SOLPSTOP}/scripts/${TOOLCHAIN} ${SOLPSTOP}/scripts/${TOOLCHAIN}.openmp.mpi.debug
++
 +# Note: in case of name-clash between script and executable, script will be found first
 +export SOLPS_PATH=${SCRIPTS_PATH}:${CARRE_PATH}:${DIVGEO_PATH}:${B25EIRENE_PATH}:${EIRENE_PATH}:${B25_PATH}:${UINP_PATH}:${TRIANG_PATH}:${AMDS_PATH}:${S45_PATH}
 +export OLD_PATH=${PATH}
@@ -136,6 +161,11 @@ index 0000000..5813c1d
 +unset TOOLCHAIN SCRIPTS_PATH CARRE_PATH DIVGEO_PATH EIRENE_PATH B25_PATH B25EIRENE_PATH UINP_PATH TRIANG_PATH AMDS_PATH S45_PATH
 +
 +# Check whether SOLPS_DEBUG and SOLPS_MPI had been set already by the user
++if [ -z ${SOLPS_OPENMP+x} ]; then
++    :
++else
++    source ${SOLPSTOP}/SETUP/openmp
++fi
 +if [ -z ${SOLPS_DEBUG+x} ]; then
 +    :
 +else
@@ -218,7 +248,24 @@ index 0000000..5813c1d
 +
 +alias set_debug="source $SOLPSTOP/SETUP/debug"
 +alias unset_debug="source $SOLPSTOP/SETUP/nodebug"
++alias set_openmp="source $SOLPSTOP/SETUP/openmp"
++alias unset_openmp="source $SOLPSTOP/SETUP/noopenmp"
 +alias set_mpi="source $SOLPSTOP/SETUP/mpi"
 +alias unset_mpi="source $SOLPSTOP/SETUP/nompi"
 +alias set_ig="source $SOLPSTOP/SETUP/ig"
 +alias unset_ig="source $SOLPSTOP/SETUP/noig"
++
++# Check for Motif library
++if [ ! -e $(which mwm) ]; then
++    export NO_MOTIF=1
++fi
++
++# Add any local settings if present
++if [ -s ${SOLPSTOP}/SETUP/setup.sh.local]; then
++  echo "Loading SETUP/setup.sh.local."
++  source ${SOLPSTOP}/SETUP/setup.sh.local
++fi
++
++# List loaded modules
++
++module list

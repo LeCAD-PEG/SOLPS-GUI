@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-1.17.3}
+VERSION=${VERSION:-1.18.2}
 SOURCE="numpy-${VERSION}.tar.gz"
 DOWNLOAD="https://github.com/numpy/numpy/releases/download/v${VERSION}/numpy-${VERSION}.tar.gz"
 SRC_DIR="${BUILD_DIR}/numpy-${VERSION}"

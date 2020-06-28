@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-5.2.7}
+VERSION=${VERSION:-5.2.8}
 SOURCE="gnuplot-${VERSION}.tar.gz"
 DOWNLOAD="http://sourceforge.net/projects/gnuplot/files/gnuplot/${VERSION}/${SOURCE}/download"
 SRC_DIR="${BUILD_DIR}/gnuplot-${VERSION}"

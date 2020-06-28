@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-5.6.2}
+VERSION=${VERSION:-5.8.0}
 SOURCE="ParaView-v${VERSION}.tar.xz"
 DOWNLOAD="http://www.paraview.org/files/v${VERSION%.*}/${SOURCE}"
 SRC_DIR="${BUILD_DIR}/ParaView-v${VERSION}"

@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-1.10.5}
+VERSION=${VERSION:-1.10.6}
 GIT="https://bitbucket.hdfgroup.org/scm/hdffv/hdf5.git"
 DOWNLOAD="${BUILD_DIR}/hdf5"
 SRC_DIR="${BUILD_DIR}/hdf5-${VERSION}"
@@ -43,7 +43,8 @@ cd ${SRC_DIR}
 # Configure
 if [ ! -e ${SRC_DIR}/.configured ]; then
     rm -rf ${INSTALL_DIR}
-    cmake -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} ${DOWNLOAD}
+    cmake -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} ${DOWNLOAD} \
+    -DHDF5_ENABLE_Z_LIB_SUPPORT=ON
     touch ${SRC_DIR}/.configured
 fi
 

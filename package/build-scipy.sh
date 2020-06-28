@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-1.3.1}
+VERSION=${VERSION:-1.4.1}
 SOURCE="scipy-${VERSION}.tar.gz"
 DOWNLOAD="https://github.com/scipy/scipy/releases/download/v${VERSION}/scipy-${VERSION}.tar.gz"
 SRC_DIR="${BUILD_DIR}/scipy-${VERSION}"

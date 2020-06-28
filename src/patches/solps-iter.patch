@@ -1,25 +1,9 @@
-diff --git a/SETUP/setup.sh.UNKNOWN.gfortran b/SETUP/setup.sh.UNKNOWN.gfortran
-new file mode 100644
-index 00000000..9659b9df
---- /dev/null
-+++ b/SETUP/setup.sh.UNKNOWN.gfortran
-@@ -0,0 +1,10 @@
-+if [ -x "$(which paraview-config)" ]; then
-+  # See ParaViewCatalystUsersGuide_v2.pdf Sec 3.7.2 Linking with Python ...
-+  PARAVIEW_LIB=$(paraview-config --libs --python | sed s/-L//)
-+  export LD_LIBRARY_PATH="${PARAVIEW_LIB}:${LD_LIBRARY_PATH}"
-+  export PYTHONPATH="${PARAVIEW_LIB}/site-packages/vtk:${PYTHONPATH}"
-+  export PYTHONPATH="${PARAVIEW_LIB}/site-packages:${PYTHONPATH}"
-+  export LD_CATALYST=$(paraview-config --libs vtkPVPythonCatalyst)
-+else
-+  echo "Warning: paraview-config not found. ParaView with Catalyst will not be compiled-in!"
-+fi
 diff --git a/SETUP/config.UNKNOWN.gfortran b/SETUP/config.UNKNOWN.gfortran
 new file mode 100644
-index 00000000..dbc723ab
+index 00000000..b4925797
 --- /dev/null
 +++ b/SETUP/config.UNKNOWN.gfortran
-@@ -0,0 +1,141 @@
+@@ -0,0 +1,153 @@
 +#
 +# Specify paths to root-directories of following libraries on your system
 +#
@@ -40,9 +24,9 @@ index 00000000..dbc723ab
 +#
 +
 +    NODENAME ?= $(shell echo `hostname`)
-+        NCDIR ?= ${SOLPSLIB}
-+    MSCL_ROOT ?= ${SOLPSLIB}
-+        H5DIR ?= ${SOLPSLIB}
++        NCDIR ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++    MSCL_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++        H5DIR ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
 +      GR_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
 +     GLI_HOME ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
 +OPENBLAS_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
@@ -55,8 +39,8 @@ index 00000000..dbc723ab
 +# The same goes for OpenMP, so the best way is to provide the PKG_CONFIG_PATH,
 +# or run the SOLPS-GUI build script.
 +
-+   NCARG_ROOT ?= ${SOLPSLIB}
-+        MPDIR ?= ${SOLPSLIB}
++   NCARG_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++        MPDIR ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
 +
 +        NAGDIR ?= ${SOLPSLIB}
 +#
@@ -64,8 +48,8 @@ index 00000000..dbc723ab
 +#
 +# LD_INTEL_LIBS= -lirc -lirc_s -liomp5 -lifcoremt_pic -lsvml -lifport -limf -lm -lifcore_pic -lpthread
 +
-+LD_NETCDF  = -L${H5DIR}/lib -L${NCDIR}/lib -lnetcdf -lnetcdff -lhdf5 -lhdf5_hl
-+LD_MSCL    = -L${MSCL_ROOT}/lib -lmscl
++LD_NETCDF  = `nf-config --flibs` # from staging/netcdf/<version>/bin
++LD_MSCL    = `pkg-config mscl --libs` -lgfortran # from staging/mscl/<version>/lib/pkgconfig
 +LD_GR      = -L${GR_ROOT}/lib -lgr
 +LD_GKS     = -L${GLI_HOME} -lgks -lXmu -lX11 -lXt -ldl
 +LD_NCARG   = -L${NCARG_ROOT} -lncarg -lncarg_gks -lncarg_c -lX11 -lXext -lcairo -lfontconfig -lfreetype -lpng -lz -lXrender -lbz2 -ldl # For NCARG v6.x.x
@@ -78,10 +62,10 @@ index 00000000..dbc723ab
 +# Preprocessor options
 +#
 +
-+SOLPS_CPP      = -DNCAR4 -DNO_NAG -DGFORTRAN -I${NCDFIR}/include
++SOLPS_CPP      = -DNCAR4 -DNO_NAG -DGFORTRAN `pkg-config netcdf-fortran --cflags`
 +B25_DEFINES    =
 +EIRENE_DEFINES =
-+#MPI_CPP        = -I${MPDIR}/include
++FFLAGSEXTRA    =
 +
 +# Autodetected optional features...
 +
@@ -104,11 +88,21 @@ index 00000000..dbc723ab
 +
 +# Build with IMAS if imas module is loaded
 +ifdef IMAS_VERSION
-+  LD_UAL   = `pkg-config imas-gfortran ggd --libs` -Wl,-rpath,${IMAS_PREFIX}/lib
 +  UAL_MAJOR_VERSION = $(shell echo ${UAL_VERSION} | cut -d '.' -f1 )
-+  GGD_MINOR_VERSION = $(shell echo ${EBVERSIONGGD} | cut -d '.' -f2 )
 +  IMAS_MAJOR_VERSION = $(shell echo ${IMAS_VERSION} | cut -d '.' -f1 )
 +  IMAS_MINOR_VERSION = $(shell echo ${IMAS_VERSION} | cut -d '.' -f2 )
++  ifeq ($(shell test ${IMAS_MINOR_VERSION} -ge 17; echo $$?),0)
++    GGD_MINOR_VERSION = $(shell echo ${GGD_VERSION} | cut -d '.' -f2 )
++    LD_UAL = `pkg-config imas-gfortran ggd --libs`
++  else
++    ifeq ($(shell test ${IMAS_MINOR_VERSION} -ge 12; echo $$?),0)
++      GGD_MINOR_VERSION = $(shell echo ${GGD_VERSION} | cut -d '.' -f2 )
++      LD_UAL = `pkg-config imas-gfortran --libs` -lggd-gfortran
++    else
++      GGD_MINOR_VERSION = 0
++      LD_UAL = `pkg-config imas-lowlevel imas-gfortran --libs`
++    endif
++  endif
 +  SOLPS_CPP += -DIMAS -DUAL_MAJOR_VERSION=${UAL_MAJOR_VERSION} -DIMAS_MINOR_VERSION=${IMAS_MINOR_VERSION} -DGGD_MINOR_VERSION=${GGD_MINOR_VERSION}
 +  export LD_UAL
 +else
@@ -123,9 +117,9 @@ index 00000000..dbc723ab
 +export IMAS_MINOR_VERSION
 +
 +# Build with OpenMP if requested
-+#ifdef SOLPS_OPENMP
-+#  B25_DEFINES += -D_OPENMP
-+#endif
++ifdef SOLPS_OPENMP
++  B25_DEFINES += -D_OPENMP
++endif
 +
 +#
 +# Export for use in sub-makefiles
@@ -153,7 +147,9 @@ index 00000000..dbc723ab
 +
 +export NODENAME
 +export SOLPS_CPP
++export FFLAGSEXTRA
 +export B25_DEFINES
++export CARRE_DEFINES
 +export EIRENE_DEFINES
 +export MPI_CPP
 +
@@ -177,9 +173,25 @@ index 00000000..4221e7c1
 +  setenv PYTHONPATH "${PARAVIEW_LIB}/site-packages:${PYTHONPATH}"
 +  setenv LD_CATALYST `paraview-config --libs vtkPVPythonCatalyst`
 +endif
+diff --git a/SETUP/setup.sh.UNKNOWN.gfortran b/SETUP/setup.sh.UNKNOWN.gfortran
+new file mode 100644
+index 00000000..001898ad
+--- /dev/null
++++ b/SETUP/setup.sh.UNKNOWN.gfortran
+@@ -0,0 +1,10 @@
++if [ -x "$(which paraview-config)" ]; then
++  # See ParaViewCatalystUsersGuide_v2.pdf Sec 3.7.2 Linking with Python ...
++  PARAVIEW_LIB=$(paraview-config --libs --python | sed s/-L//)
++  export LD_LIBRARY_PATH="${PARAVIEW_LIB}:${LD_LIBRARY_PATH}"
++  export PYTHONPATH="${PARAVIEW_LIB}/site-packages/vtk:${PYTHONPATH}"
++  export PYTHONPATH="${PARAVIEW_LIB}/site-packages:${PYTHONPATH}"
++  export LD_CATALYST=$(paraview-config --libs vtkPVPythonCatalyst)
++else
++  echo "Warning: paraview-config not found. ParaView with Catalyst will not be compiled-in!"
++fi
 diff --git a/modules/Triang/config/config.UNKNOWN.gfortran b/modules/Triang/config/config.UNKNOWN.gfortran
 new file mode 100644
-index 00000000..802a228f
+index 00000000..fa9304e5
 --- /dev/null
 +++ b/modules/Triang/config/config.UNKNOWN.gfortran
 @@ -0,0 +1,46 @@
@@ -187,10 +199,10 @@ index 00000000..802a228f
 +
 +# The version relying on Fujitsu Fortran installed on AFS
 +
-+ LD_GR    ?= -L${GR_ROOT}/lib -lgr
-+ LD_GKS   ?= -L${GLI_HOME} -lgks -lgfortran -lX11 -lXt -lXmu
-+ LD_NAG   ?= `pkg-config nag --libs`
-+ GLI_HOME ?= /work/imas/opt/gks/4.4.74/lib
++LD_GR    ?= -L${GR_ROOT}/lib -lgr
++LD_GKS   ?= -L${GLI_HOME} -lgks -lgfortran -lX11 -lXt -lXmu
++LD_NAG   ?= `pkg-config nag --libs`
++GLI_HOME ?= /work/imas/opt/gks/4.4.74/lib
 +
 +#DEFINES  = ${SOLPS_CPP} ${EIRENE_DEFINES} -DRECL_UNITS_PER_DOUBLE=8 -DNO_FORT10 -DNO_SHORT_CYCLE -DNO_F01AAF
 +#DEFINES  = ${SOLPS_CPP} ${EIRENE_DEFINES} -DTRIANG -DRECL_UNITS_PER_DOUBLE=8 -DNO_FORT10 -DNO_SHORT_CYCLE -DNO_F01AAF
@@ -232,7 +244,7 @@ index 00000000..802a228f
 \ No newline at end of file
 diff --git a/modules/Uinp/config/config.UNKNOWN.gfortran b/modules/Uinp/config/config.UNKNOWN.gfortran
 new file mode 100644
-index 00000000..5a411132
+index 00000000..ea53c707
 --- /dev/null
 +++ b/modules/Uinp/config/config.UNKNOWN.gfortran
 @@ -0,0 +1,36 @@
@@ -254,6 +266,9 @@ index 00000000..5a411132
 +else
 +FFLAGS   =
 +endif
++ifdef USE_OPENMP
++FFLAGS += -fopenmp
++endif
 +ifeq (${FC_VERSION},6.4.0})
 +FFLAGS  += -fuse-ld=bfd
 +endif
@@ -264,9 +279,6 @@ index 00000000..5a411132
 +MOD      = mod
 +LDLIBS   = ${LD_MSCL}
 +LDEXTRA  =
-+#ifdef USE_MPI
-+#LDLIBS  += ${LD_MPI}
-+#endif
 +
 +#!!!Local Variables:
 +#!!! mode: Makefile
@@ -287,7 +299,7 @@ index 00000000..7c233dff
 +#!!! End:
 +
 diff --git a/runs/Makefile b/runs/Makefile
-index efa3c2a2..e4129199 100644
+index f4674e03..c5df5d62 100644
 --- a/runs/Makefile
 +++ b/runs/Makefile
 @@ -4,7 +4,7 @@
