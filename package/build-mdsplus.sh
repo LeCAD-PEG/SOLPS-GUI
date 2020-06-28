@@ -54,6 +54,10 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
                 --disable-xmltest \
                 --with-xml-prefix=${LIBXML2_INSTALL_DIR} \
                 --without-labview
+    # apply patch
+    cd mitdevices
+    patch -p0 < ${BUILDROOT}/src/patches/mdsplus-mitdevices-do-NOT-clear-LD_LIBRARY_PATH.patch
+    cd ..
     touch ${SRC_DIR}/.configured
 fi
 

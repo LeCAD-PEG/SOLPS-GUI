@@ -1,0 +1,11 @@
+--- Makefile.old	2020-06-28 21:58:14.322252000 +0200
++++ Makefile	2020-06-28 21:58:47.171341000 +0200
+@@ -24,7 +24,7 @@
+ MATH_LIBS=-L$(top_builddir)/lib64/ -lMdsMath
+ LIBDC1394_LIBS=-ldc1394 -lraw1394 $(THREAD)
+ LIBDC1394_INCS=-I$(top_srcdir)/include -I/usr/include/dc1394 -I/usr/include/libraw1394a $(THREAD)
+-export LD_LIBRARY_PATH=$(top_builddir)/lib64/
++export LD_LIBRARY_PATH:=$(top_builddir)/lib64:${LD_LIBRARY_PATH}
+ DTACQ_FILESYSTEM := $(shell  find ${srcdir}/acq_root_filesystem -print)
+ DC := $(shell date)
+ 
