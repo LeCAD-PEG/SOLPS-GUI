@@ -63,9 +63,15 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
     # sed -i -e '/auto/d' qtdeclarative/tests/tests.pro \
     #                   qtmultimedia/tests/tests.pro \
     #                   qtgraphicaleffects/tests/tests.pro
+    if [ -z "${USE_SYSTEM_XCB+x}" ]; then
+      XCB_FLAG=-qt-xcb
+    else
+      XCB_FLAG=-system-xcb
+    fi
+    
     ./configure -v --prefix=${INSTALL_DIR} -opensource -confirm-license \
       -shared \
-      -qt-xcb \
+      ${XCB_FLAG} \
       -skip qtmultimedia \
       -skip qtwayland \
       -skip qtgamepad \
@@ -75,6 +81,7 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
       -skip qtwebview \
       -skip qtdeclarative \
       -skip qtpurchasing \
+      -no-feature-accessibility \
       -skip qt3d ${XCB_FLAGS} ${QT_EXTRA_FLAGS} \
       -nomake tests \
       -nomake examples

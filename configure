@@ -48,6 +48,12 @@ module load libffi/3.2.1-GCCcore-6.4.0
 # been solved:: https://bugs.python.org/issue34823
 export Py_FFI_LDFLAGS=\$(pkg-config --libs-only-L libffi)
 
+# Qt5 tries
+module load GLib/2.54.3-GCCcore-6.4.0
+module load DBus/1.13.6-GCCcore-6.4.0
+module load libGLU/9.0.0-foss-2018a
+export USE_SYSTEM_XCB=1
+
 module list
 # Additional library path for OpenSSL
 SSL=\$(pkg-config --variable=prefix libssl)
