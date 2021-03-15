@@ -1,72 +1,26 @@
-#!/bin/sh -x
+#!/bin/sh
 set -e
-
-
-# Variables
-BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
-MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
-
-# Buildroot directories
-MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
-BUILD_DIR=${BUILDROOT}/build
-STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
-DOWNLOAD_DIR=${BUILDROOT}/download
-
-#Package variables
+BUILDROOT=${BUILDROOT:-$( cd "$( dirname "${BASH_SOURCE[0]:-$0}" )" &> /dev/null && echo ${PWD%/package} )}
+PACKAGE="saxon"
 VERSION=${VERSION:-HE9-8-0-12J}
-SOURCE="Saxon${VERSION}.zip"
-DOWNLOAD="https://sourceforge.net/projects/saxon/files/Saxon-HE/9.8/Saxon${VERSION}.zip/download"
-INSTALL_DIR=${STAGING_DIR}/saxon/${VERSION}
+MAJOR_VERSION=${VERSION%.*}
+DOWNLOAD_LINK="https://sourceforge.net/projects/saxon/files/Saxon-HE/9.8/Saxon${VERSION}.zip/download"
+FILENAME="${PACKAGE}-${VERSION}.zip"
 
-# Environment dependencies
-if [ -e ${BUILDROOT}/package/setup.sh ]; then
-    . ${BUILDROOT}/package/setup.sh
+if  [ -e ${BUILDROOT}/package/solps_gui_utils.sh ]; then
+    source ${BUILDROOT}/package/solps_gui_utils.sh
 fi
-
-# Prepare directories for download and building
-install -d ${BUILD_DIR}
-install -d ${STAGING_DIR}
-install -d ${DOWNLOAD_DIR}
-
+if  [ -e ${BUILDROOT}/package/setup.sh ]; then
+    source ${BUILDROOT}/package/setup.sh
+fi
 
 # Download source
-if [ ! -f ${DOWNLOAD_DIR}/${SOURCE} ]; then
-    wget --no-check-certificate -O ${DOWNLOAD_DIR}/${SOURCE} \
-        ${DOWNLOAD}
+if [ ! -f ${DOWNLOAD_DIR}/${FILENAME} ]; then
+    wget --no-check-certificate -O ${DOWNLOAD_DIR}/${FILENAME} \
+        ${DOWNLOAD_LINK}
 fi
-
-cd ${BUILD_DIR}
-
-# Unpack sources
-
-# Configure
-
-# Build
-
 # Install
-if [ ! -d ${INSTALL_DIR} ]; then
-    install -d ${INSTALL_DIR}
-    unzip ${DOWNLOAD_DIR}/${SOURCE} -d ${INSTALL_DIR}
+if [ ! -d ${PACKAGE_INSTALL_DIR} ]; then
+    install -d ${PACKAGE_INSTALL_DIR}
+    unzip ${DOWNLOAD_DIR}/${FILENAME} -d ${PACKAGE_INSTALL_DIR}
 fi
-
-if [ ! -d ${MODULE_DIR}/saxon ]; then
-    install -d ${MODULE_DIR}/saxon
-fi
-
-cat << EOF > ${MODULE_DIR}/saxon/${VERSION}
-#%Module1.0#####################################################################
-##
-## \$name modulefile
-##
-proc ModulesHelp { } {
-    puts stderr { Open Source SAXON XSLT processor developed by Saxonica Limited. - Homepage: http://saxon.sourceforge.net
-    }
-}
-
-module-whatis {Description: Open Source SAXON XSLT processor developed by Saxonica Limited. - Homepage: http://saxon.sourceforge.net}
-
-conflict saxon
-prepend-path    CLASSPATH               ${INSTALL_DIR}/saxon9-test.jar
-prepend-path    CLASSPATH               ${INSTALL_DIR}/saxon9-xqj.jar
-prepend-path    CLASSPATH               ${INSTALL_DIR}/saxon9he.jar
-EOF

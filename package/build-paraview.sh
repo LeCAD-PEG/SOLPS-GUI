@@ -1,137 +1,44 @@
-#!/bin/sh -x
+#!/bin/sh
 set -e
+BUILDROOT=${BUILDROOT:-$( cd "$( dirname "${BASH_SOURCE[0]:-$0}" )" &> /dev/null && echo ${PWD%/package} )}
+PACKAGE="paraview"
+VERSION=${VERSION:-5.8.1}
+MAJOR_VERSION=${VERSION%.*}
+DOWNLOAD_LINK="http://www.paraview.org/files/v${VERSION%.*}/ParaView-v${VERSION}.tar.xz"
+FILENAME="${PACKAGE}-${VERSION}.tar.xz"
 
+if  [ -e ${BUILDROOT}/package/solps_gui_utils.sh ]; then
+    source ${BUILDROOT}/package/solps_gui_utils.sh
+fi
+if  [ -e ${BUILDROOT}/package/setup.sh ]; then
+    source ${BUILDROOT}/package/setup.sh
+fi
 
-# Variables
-BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
-MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
+_downloadFileAndUnpack ${DOWNLOAD_LINK} ${FILENAME}
 
-# Buildroot directories
-MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
-BUILD_DIR=${BUILDROOT}/build
-STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
-DOWNLOAD_DIR=${BUILDROOT}/download
-
-# Package variables
-VERSION=${VERSION:-5.8.0}
-SOURCE="ParaView-v${VERSION}.tar.xz"
-DOWNLOAD="http://www.paraview.org/files/v${VERSION%.*}/${SOURCE}"
-SRC_DIR="${BUILD_DIR}/ParaView-v${VERSION}"
-INSTALL_DIR=${INSTALL_DIR:-${STAGING_DIR}/paraview/${VERSION}}
-
-
-# Environment dependencies
+PYTHON3_PATH=$(which python3)
 FORTRAN_COMPILER_FOR_CATALYST=${FORTRAN_COMPILER_FOR_CATALYST:-ifort}
-# Environment dependencies
-if [ -e ${BUILDROOT}/package/setup.sh ]; then
-    . ${BUILDROOT}/package/setup.sh
-fi
-# case $(hostname -f) in
-#   *.iter.org)
-#     module purge
-#     module load GCCcore/6.4.0 binutils/2.28-GCCcore-6.4.0 intel/2018a GCC/6.4.0-2.28 Blitz++/0.10-GCCcore-6.4.0
-#     module load Python/2.7.14-GCCcore-6.4.0-bare
-#     # module load OpenSSL/1.0.2g-GCC-4.8.3
-#     module load OpenSSL/1.0.2g-goolf-1.5.16
-#     export CC=gcc
-#     export CXX=g++
-#         CMAKE_EXTRA_FLAGS=${CMAKE_EXTRA_FLAGS:-\
-#           -DCMAKE_EXE_LINKER_FLAGS:STRING=-L${EBROOTOPENSSL}/lib}
-#     #PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-\
-#         #          -DPARAVIEW_ENABLE_PYTHON:BOOL=OFF}
-#     MAKE_JOBS=${MAKE_JOBS:-8}
-#     ;;
-#   *.marconi.cineca.it) # EU-IM Gateway with CentOS7.2
-#     . /etc/profile.d.gw/modules.sh
-#     module purge
-#     module load cineca imasenv cmake/3.5.2
-#     module switch itm-python/2.7
-#     module unload matlab
-#     QT_VERSION=${QT_VERSION:-4.8.7}
-#     module load itm-qt/${QT_VERSION}
-#     STAGING_QT=${QTDIR}
-#     MAKE_JOBS=${MAKE_JOBS:-36}
-#     export CXXFLAGS=-fpermissive
-#     PARAVIEW_EXTRA_FLAGS=${PARAVIEW_EXTRA_FLAGS:-\
-#                         -DPARAVIEW_USE_MPI:BOOL=ON}
-#     ;;
-#   *)
-#     QT_VERSION=${QT_VERSION:-4.8.7}
-#     STAGING_QT=${BUILDROOT}/staging/qt/${QT_VERSION}
-#     CMAKE_VERSION=${CMAKE_VERSION:-3.10.1}
-#     export PATH=${STAGING_DIR}/cmake/${CMAKE_VERSION}/bin:${PATH}
-#     export PATH=${STAGING_QT}/bin:${PATH}
-#     export LD_LIBRARY_PATH=${STAGING_DIR}/qt/${QT_VERSION}/lib:${LD_LIBRARY_PATH}
 
-#     ;;
-# esac
+CMAKE_FLAGS="-DCMAKE_BUILD_TYPE:STRING=Release"
+CMAKE_FLAGS="${CMAKE_FLAGS} -DPARAVIEW_BUILD_SHARED_LIBS:BOOL=ON"
+CMAKE_FLAGS="${CMAKE_FLAGS} -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON"
+CMAKE_FLAGS="${CMAKE_FLAGS} -DBUILD_TESTING:BOOL=OFF"
+CMAKE_FLAGS="${CMAKE_FLAGS} -DUSE_SYSTEM_PYTHON:BOOL=OFF"
+CMAKE_FLAGS="${CMAKE_FLAGS} -DPARAVIEW_ENABLE_PYTHON:BOOL=ON"
+CMAKE_FLAGS="${CMAKE_FLAGS} -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON3_PATH}"
+CMAKE_FLAGS="${CMAKE_FLAGS} -DPARAVIEW_PYTHON_LIBRARY:FILEPATH=${STAGING_DIR}/python/${PYTHON_VERSION}/lib/libpython3.so"
+CMAKE_FLAGS="${CMAKE_FLAGS} -DCMAKE_Fortran_COMPILER:STRING=${FORTRAN_COMPILER_FOR_CATALYST}"
+CMAKE_FLAGS="${CMAKE_FLAGS} -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_DIR}/qt/${QT_VERSION}/bin/qmake"
+CMAKE_FLAGS="${CMAKE_FLAGS} -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF"
+CMAKE_FLAGS="${CMAKE_FLAGS} ${PARAVIEW_EXTRA_FLAGS}"
 
-# Prepare directories for download and building
-install -d ${BUILD_DIR}
-install -d ${STAGING_DIR}
-install -d ${DOWNLOAD_DIR}
-
-# Download source
-if [ ! -f ${DOWNLOAD_DIR}/${SOURCE} ]; then
-    wget -O ${DOWNLOAD_DIR}/${SOURCE} --no-check-certificate ${DOWNLOAD}
-fi
-
-cd ${BUILD_DIR}
-
-# Unpack sources
-if [ ! -d ${BUILD_DIR}/${SOURCE%.tar*} ]; then
-    xzcat ${DOWNLOAD_DIR}/${SOURCE} | tar -xf -
-fi
-
-# Configure
-if [ ! -e ${SRC_DIR}/.configured ]; then
-    rm -rf ${INSTALL_DIR}
-    # Ignore git describe tags as we are building ParaView from tar.gz
-    sed -i -e "/^determine_version/d" ${SRC_DIR}/CMakeLists.txt
-    install -d ${BUILD_DIR}/paraview-${VERSION}
-    cd ${BUILD_DIR}/paraview-${VERSION}
-    if [ ${QT_VERSION%%.*} = 5 ]
-        then VTK_RENDERING_BACKEND=OpenGL2
-        else VTK_RENDERING_BACKEND=OpenGL
-    fi
-
-    cmake -DCMAKE_BUILD_TYPE:STRING=Release \
-    -DVTK_RENDERING_BACKEND:STRING=${VTK_RENDERING_BACKEND} \
-    -DPARAVIEW_QT_VERSION:STRING=${QT_VERSION%%.*} \
-    -DVTK_QT_VERSION:STRING=${QT_VERSION%%.*} \
-        -DPARAVIEW_BUILD_SHARED_LIBS:BOOL=ON  \
-        -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON \
-        -DBUILD_TESTING:BOOL=OFF \
-        -DUSE_SYSTEM_PYTHON:BOOL=OFF \
-        -DPARAVIEW_ENABLE_PYTHON:BOOL=ON \
-        -DPYTHON_EXECUTABLE:FILEPATH=${STAGING_DIR}/Python/${PYTHON_VERSION}/bin/python3 \
-        -DPARAVIEW_INCLUDE_DIR:PATH=${STAGING_DIR}/Python/${PYTHON_VERSION}/include \
-        -DPARAVIEW_PYTHON_LIBRARY:FILEPATH=${STAGING_DIR}/Python/${PYTHON_VERSION}/lib/libpython3.so \
-        -DCMAKE_Fortran_COMPILER:STRING=${FORTRAN_COMPILER_FOR_CATALYST} \
-        -DQT_QMAKE_EXECUTABLE:FILEPATH=${STAGING_DIR}/qt/${QT_VERSION}/bin/qmake \
-        -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_DIR} \
-        -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF \
-    ${PARAVIEW_EXTRA_FLAGS} ${SRC_DIR}
-    touch ${SRC_DIR}/.configured
-fi
-
-cd ${BUILD_DIR}/paraview-${VERSION}
-
-# Build
-if [ ! -e ${SRC_DIR}/.built ]; then
-    make -j${MAKE_JOBS} --silent
-    touch ${SRC_DIR}/.built
-fi
-
-# Install
-if [ ! -d ${INSTALL_DIR} ]; then
-    install -d ${INSTALL_DIR}
-    make install
-fi
+_cmake "${CMAKE_FLAGS}"
+_make "-j${MAKE_JOBS} --silent"
+_install
 
 # Post Installation
 DOC_VERSION=${DOC_VERSION:-${VERSION%.*}.0}
-INSTALL_DOC_DIR=${INSTALL_DIR}/share/paraview-${VERSION%.*}/doc
+INSTALL_DOC_DIR=${PACKAGE_INSTALL_DIR}/share/paraview-${VERSION%.*}/doc
 install -d ${INSTALL_DOC_DIR}
 for file in ParaViewGettingStarted-${DOC_VERSION%-*}.pdf \
     ParaViewTutorial-${DOC_VERSION%-*}.pdf  ParaViewGuide-${DOC_VERSION%-*}.pdf \
@@ -146,43 +53,3 @@ for file in ParaViewGettingStarted-${DOC_VERSION%-*}.pdf \
     target=${noPdf}.pdf
     install -m 444 ${DOWNLOAD_DIR}/${file} ${INSTALL_DOC_DIR}/${target}
 done
-
-
-# Generate Modulefile
-if [ ! -d ${MODULE_DIR}/ParaView ]; then
-    install -d ${MODULE_DIR}/ParaView
-fi
-
-cat << EOF > ${MODULE_DIR}/ParaView/${VERSION}
-#%Module1.0#####################################################################
-##
-## \$name modulefile
-##
-proc ModulesHelp { } {
-    puts stderr {
-
-Description
-===========
-ParaView is a scientific parallel visualizer.
-
-
-More information
-================
- - Homepage: http://www.paraview.org
-    }
-}
-
-module-whatis {Description: ParaView is a scientific parallel visualizer.}
-module-whatis {Homepage: http://www.paraview.org}
-
-if { ![ is-loaded Qt5/${QT_VERSION} ] } {
-    module load Qt5/${QT_VERSION}
-}
-
-conflict ParaView
-prepend-path CPATH              ${INSTALL_DIR}/include
-prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
-prepend-path LIBRARY_DIR        ${INSTALL_DIR}/lib
-prepend-path PKG_CONFIG_PATH    ${INSTALL_DIR}/lib/pkgconfig
-prepend-path PATH               ${INSTALL_DIR}/bin
-EOF

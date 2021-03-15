@@ -1,136 +1,48 @@
-#!/bin/sh -x
+#!/bin/sh
 set -e
+BUILDROOT=${BUILDROOT:-$( cd "$( dirname "${BASH_SOURCE[0]:-$0}" )" &> /dev/null && echo ${PWD%/package} )}
+PACKAGE="python"
+VERSION=${VERSION:-3.9.2}
+DOWNLOAD_LINK="https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tgz"
+FILENAME="${PACKAGE}-${VERSION}.tar.gz"
 
-
-# Variables
-BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
-MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
-
-# Buildroot directories
-MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
-BUILD_DIR=${BUILDROOT}/build
-STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
-DOWNLOAD_DIR=${BUILDROOT}/download
-
-# Package variables
-VERSION=${VERSION:-3.8.3}
-MAINVERSION=${VERSION%.*}
-SOURCE="Python-${VERSION}.tgz"
-DOWNLOAD="https://www.python.org/ftp/python/${VERSION}/${SOURCE}"
-SRC_DIR="${BUILD_DIR}/Python-${VERSION}"
-INSTALL_DIR="${STAGING_DIR}/Python/${VERSION}"
-
-# Environment dependencies
-if [ -e ${BUILDROOT}/package/setup.sh ]; then
-    . ${BUILDROOT}/package/setup.sh
+if  [ -e ${BUILDROOT}/package/solps_gui_utils.sh ]; then
+    source ${BUILDROOT}/package/solps_gui_utils.sh
+fi
+if  [ -e ${BUILDROOT}/package/setup.sh ]; then
+    source ${BUILDROOT}/package/setup.sh
 fi
 
+_downloadFileAndUnpack ${DOWNLOAD_LINK} ${FILENAME}
 
-# Prepare directories for download and building
-install -d ${BUILD_DIR}
-install -d ${STAGING_DIR}
-install -d ${DOWNLOAD_DIR}
-## Install Python3
+cd ${PACKAGE_SOURCE_DIR}
 
-# Download source
-if [ ! -f ${DOWNLOAD_DIR}/${SOURCE} ]; then
-    wget -O ${DOWNLOAD_DIR}/${SOURCE} ${DOWNLOAD}
+# Before calling configure we have to fix the SSL linking
+if pkg-config --exists libssl; then
+    ssl=$(pkg-config --variable=prefix libssl)
+
+    # Modules/Setup checkup.
+    MODULES_FILE=Modules/Setup.dist
+    [ ! -e "Modules/Setup.dist" ] && MODULES_FILE=Modules/Setup
+    sed -i -e "s,#SSL=.*,SSL=${ssl}," -e "/^#.*ssl/s/#//" \
+    -e '/ssl/s|-lcrypto |-lcrypto -Wl,-rpath,$(SSL)/lib|' ${MODULES_FILE}
 fi
 
-cd ${BUILD_DIR}
+# FFI library is no longer bundled together so it is required to have
+# development and runtime packages of FFI installed on the system.
 
-# Unpack sources
-if [ ! -d ${SRC_DIR} ]; then
-    tar xzf ${DOWNLOAD_DIR}/${SOURCE}
-fi
+_configure "--enable-shared --enable-optimizations --with-system-ffi"
+_make "-j${MAKE_JOBS}"
+_install
 
-cd ${SRC_DIR}
+# Post install things
+ln -sf python3 ${PACKAGE_INSTALL_DIR}/bin/python
 
-# Configure
-if [ ! -e ${SRC_DIR}/.configured ]; then
-    rm -rf ${INSTALL_DIR}
-    if pkg-config --exists libssl; then
-        ssl=$(pkg-config --variable=prefix libssl)
+# Pip packages to install
 
-        # Modules/Setup checkup.
-        MODULES_FILE=Modules/Setup.dist
-        [ ! -e "Modules/Setup.dist" ] && MODULES_FILE=Modules/Setup
-        sed -i -e "s,#SSL=.*,SSL=${ssl}," -e "/^#.*ssl/s/#//" \
-        -e '/ssl/s|-lcrypto |-lcrypto -Wl,-rpath,$(SSL)/lib|' ${MODULES_FILE}
-    fi
-    
-    # Add a temporal fix for custom libffi location!
-    if [ -z "${Py_FFI_LDFLAGS+x}" ]; then
-      ./configure --prefix=${INSTALL_DIR} --enable-shared --enable-optimizations
-    else
-      LDFLAGS="${Py_FFI_LDFLAGS}" ./configure --prefix=${INSTALL_DIR} --enable-shared --enable-optimizations
-    fi
-    touch ${SRC_DIR}/.configured
-fi
-
-# Build
-if [ ! -e ${SRC_DIR}/.built ]; then
-    make -j${MAKE_JOBS}
-    touch ${SRC_DIR}/.built
-fi
-
-# Install
-if [ ! -d ${INSTALL_DIR} ]; then
-    install -d ${INSTALL_DIR}
-    make install
-
-    ln -sf python3 ${INSTALL_DIR}/bin/python
-    pip3 --trusted-host pypi.python.org install --upgrade \
-        pip sphinx sphinx_rtd_theme mock nose Cython wheel setuptools
-
-    # The following Python modules are preferred by IMAS
-
-    # pip3 --trusted-host pypi.python.org install --upgrade \
-    #     Cython luigi tornado deap decorator liac-arff ecdsa \
-    #     netaddr paramiko virtualenv setuptools \
-    #     wheel pyvtk
-fi
-
-MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
-if [ ! -d ${MODULE_DIR}/Python ]; then
-	install -d ${MODULE_DIR}/Python
-fi
-
-cat << EOF > ${MODULE_DIR}/Python/${VERSION}
-#%Module1.0#####################################################################
-##
-## \$name modulefile
-##
-proc ModulesHelp { } {
-    puts stderr {
-
-Description
-===========
-Python is a programming language that lets you work more quickly and integrate your systems
- more effectively.
-
-
-More information
-================
- - Homepage: http://python.org/
-
-
-    }
-}
-
-if { ![ is-loaded OpenBLAS/${OPENBLAS_VERSION} ] } {
-    module load OpenBLAS/${OPENBLAS_VERSION}
-}
-
-module-whatis {Description: Python is a programming language that lets you work more quickly and integrate your systems
- more effectively.}
-module-whatis {Homepage: http://python.org/}
-
-conflict Python
-prepend-path CPATH              ${INSTALL_DIR}/include
-prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
-prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib/python${MAINVERSION}/site-packages
-prepend-path LIBRARY_DIR        ${INSTALL_DIR}/lib
-prepend-path PKG_CONFIG_PATH    ${INSTALL_DIR}/lib/pkgconfig
-prepend-path PATH               ${INSTALL_DIR}/bin
-EOF
+export PATH=${PACKAGE_INSTALL_DIR}/bin:${PATH}
+export LD_LIBRARY_PATH=${PACKAGE_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
+echo "Installing packages via pip. Check ${PACKAGE_LOG_DIR}/pip_installs"
+pip3 --trusted-host pypi.python.org install --upgrade \
+    pip Cython sphinx sphinx_rtd_theme mock nose wheel setuptools \
+    &> ${PACKAGE_LOG_DIR}/pip_installs

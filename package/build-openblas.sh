@@ -1,10 +1,9 @@
 #!/bin/sh
 set -e
 BUILDROOT=${BUILDROOT:-$( cd "$( dirname "${BASH_SOURCE[0]:-$0}" )" &> /dev/null && echo ${PWD%/package} )}
-PACKAGE="blitz"
-VERSION=${VERSION:-1.0.2}
-MAJOR_VERSION=${VERSION%.*}
-DOWNLOAD_LINK="https://github.com/blitzpp/blitz/archive/${VERSION}.tar.gz"
+PACKAGE="openblas"
+VERSION=${VERSION:-0.3.13}
+DOWNLOAD_LINK="https://github.com/xianyi/OpenBLAS/archive/v${VERSION}.tar.gz"
 FILENAME="${PACKAGE}-${VERSION}.tar.gz"
 
 if  [ -e ${BUILDROOT}/package/solps_gui_utils.sh ]; then
@@ -16,6 +15,8 @@ fi
 
 _downloadFileAndUnpack ${DOWNLOAD_LINK} ${FILENAME}
 
-_cmake
-_make "-j${MAKE_JOBS}"
-_install
+cd ${PACKAGE_SOURCE_DIR}
+# Since OpenBLAS make has no configure and CMake is still not as stable
+# we have to manually go into the source directory and compile it.
+_make "" "DYNAMIC_ARCH=1"
+_install "PREFIX=${PACKAGE_INSTALL_DIR}"

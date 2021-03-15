@@ -1,138 +1,45 @@
-#!/bin/sh -x
+#!/bin/sh
 set -e
-
-
-# Variables
-BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
-MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
-
-# Buildroot directories
-MODULE_DIR=${MODULE_DIR:-${BUILDROOT}/modules}
-BUILD_DIR=${BUILDROOT}/build
-STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
-PATCH_DIR=${BUILDROOT}/src/patches
-DOWNLOAD_DIR=${BUILDROOT}/download
-
-# Package variables
-VERSION=${VERSION:-5.14.2}
+BUILDROOT=${BUILDROOT:-$( cd "$( dirname "${BASH_SOURCE[0]:-$0}" )" &> /dev/null && echo ${PWD%/package} )}
+PACKAGE="qt5"
+VERSION=${VERSION:-5.15.2}
 MAJOR_VERSION=${VERSION%.*}
-SOURCE="qt-everywhere-src-${VERSION}.tar.xz"
-DOWNLOAD="http://download.qt.io/official_releases/qt/${MAJOR_VERSION}/${VERSION}/single/${SOURCE}"
-SRC_DIR="${BUILD_DIR}/qt-everywhere-src-${VERSION}"
-INSTALL_DIR=${STAGING_DIR}/qt/${VERSION}
+DOWNLOAD_LINK="https://download.qt.io/official_releases/qt/${MAJOR_VERSION}/${VERSION}/single/qt-everywhere-opensource-src-${VERSION}.tar.xz"
+FILENAME="qt-everywhere-src-${VERSION}.tar.xz"
 
-# Environment dependencies
-if [ -e ${BUILDROOT}/package/setup.sh ]; then
-    . ${BUILDROOT}/package/setup.sh
+if  [ -e ${BUILDROOT}/package/solps_gui_utils.sh ]; then
+    source ${BUILDROOT}/package/solps_gui_utils.sh
+fi
+if  [ -e ${BUILDROOT}/package/setup.sh ]; then
+    source ${BUILDROOT}/package/setup.sh
 fi
 
-# Prepare directories for download and building
-install -d ${BUILD_DIR}
-install -d ${STAGING_DIR}
-install -d ${DOWNLOAD_DIR}
+_downloadFileAndUnpack ${DOWNLOAD_LINK} ${FILENAME}
 
-# Download source
-if [ ! -f ${DOWNLOAD_DIR}/${SOURCE} ]; then
-    wget -O ${DOWNLOAD_DIR}/${SOURCE} ${DOWNLOAD}
-fi
+CONFIGURE_FLAG="-v -release -opensource -confirm-license"
+CONFIGURE_FLAG="${CONFIGURE_FLAG} -nomake tests -nomake examples"
+CONFIGURE_FLAG="${CONFIGURE_FLAG} -no-rpath"
+CONFIGURE_FLAG="${CONFIGURE_FLAG} -no-separate-debug-info"
+CONFIGURE_FLAG="${CONFIGURE_FLAG} -xcb"
+CONFIGURE_FLAG="${CONFIGURE_FLAG} -qt-libpng -no-eglfs -dbus-runtime"
+CONFIGURE_FLAG="${CONFIGURE_FLAG} -skip qtwebengine"
 
-cd ${BUILD_DIR}
+CONFIGURE_FLAG="${CONFIGURE_FLAG} -skip qtwayland"
+CONFIGURE_FLAG="${CONFIGURE_FLAG} -skip qtgamepad"
+CONFIGURE_FLAG="${CONFIGURE_FLAG} -skip qtwebchannel"
+CONFIGURE_FLAG="${CONFIGURE_FLAG} -skip qtwebsockets"
+CONFIGURE_FLAG="${CONFIGURE_FLAG} -skip qtwebview"
+CONFIGURE_FLAG="${CONFIGURE_FLAG} -skip qtdeclarative"
+CONFIGURE_FLAG="${CONFIGURE_FLAG} -skip qtpurchasing"
 
-# Unpack sources
-if [ ! -d ${SRC_DIR} ]; then
-    xzcat ${DOWNLOAD_DIR}/${SOURCE} | tar -xf -
-fi
+CONFIGURE_FLAG="${CONFIGURE_FLAG} -qt-harfbuzz"
+CONFIGURE_FLAG="${CONFIGURE_FLAG} -no-openssl"
+# qmake fails if the following variables are set... https://bugreports.qt.io/browse/QTBUG-78729
+unset CPLUS_INCLUDE_PATH
+unset CPATH
 
-cd ${SRC_DIR}
+_configure "${CONFIGURE_FLAG}"
+_make "-j${MAKE_JOBS}"
+_install
 
-# Configure
-if [ ! -e ${SRC_DIR}/.configured ]; then
-    rm -rf ${INSTALL_DIR}
-    # sed -i.orig -e 's/-Wno-error=return-type//' \
-    #     qtlocation/src/3rdparty/poly2tri/poly2tri.pro
-    #patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-openssl.patch
-    # patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-no-offscreen.patch
-    # #patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-qfbvthandler.patch
-    # patch -p 1 -d ${SRC_DIR}<${PATCH_DIR}/qglxintegration-glx-context.patch
-    # #patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-qxcbconnection.patch
-    # patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-qbenchmarkperfevents.patch
-    # #patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qsimd.cpp-gcc4.2.patch
-    # patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-qdbusinternalfilters.patch
-    # patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-invoke-static.patch
-    # #patch -p 1 -d ${SRC_DIR} < ${PATCH_DIR}/qt5-qtbase-platformsupport-fbconveniance-qfbvthandler.patch
-    # sed -i -e '/auto/d' qtdeclarative/tests/tests.pro \
-    #                   qtmultimedia/tests/tests.pro \
-    #                   qtgraphicaleffects/tests/tests.pro
-    if [ -z "${USE_SYSTEM_XCB+x}" ]; then
-      XCB_FLAG=-qt-xcb
-    else
-      XCB_FLAG=-system-xcb
-    fi
-    
-    ./configure -v --prefix=${INSTALL_DIR} -opensource -confirm-license \
-      -shared \
-      ${XCB_FLAG} \
-      -skip qtmultimedia \
-      -skip qtwayland \
-      -skip qtgamepad \
-      -skip qtwebchannel \
-      -skip qtwebengine \
-      -skip qtwebsockets \
-      -skip qtwebview \
-      -skip qtdeclarative \
-      -skip qtpurchasing \
-      -no-feature-accessibility \
-      -skip qt3d ${XCB_FLAGS} ${QT_EXTRA_FLAGS} \
-      -nomake tests \
-      -nomake examples
-      #-qt-xkbcommon -xkb-config-root /usr/share/X11/xkb \
-
-    # Check if INSTALL directory has been already created
-    if [ -d ${INSTALL_DIR} ]; then
-    	rm -r ${INSTALL_DIR}
-    fi
-
-    touch ${SRC_DIR}/.configured
-fi
-
-# Build
-if [ ! -e ${SRC_DIR}/.built ]; then
-    make -j${MAKE_JOBS}
-    touch ${SRC_DIR}/.built
-fi
-
-# Install
-if [ ! -d ${INSTALL_DIR} ]; then
-    install -d ${INSTALL_DIR}
-    make install
-    # Skip documentation due to Qt (5.13) LLVM (>= 6) requirement
-    # Install documentation
-    # export PATH=${INSTALL_DIR}/bin:${PATH}
-    # make -C qtbase/src html_docs
-    # make qmake_all
-    # make -j ${MAKE_JOBS} html_docs
-fi
-
-# Generate Modulefile
-if [ ! -d ${MODULE_DIR}/Qt5 ]; then
-    install -d ${MODULE_DIR}/Qt5
-fi
-
-cat << EOF > ${MODULE_DIR}/Qt5/${VERSION}
-#%Module1.0#####################################################################
-##
-## \$name modulefile
-##
-proc ModulesHelp { } {
-    puts stderr { Qt is a comprehensive cross-platform C++ application framework. - Homepage: http://qt.io/
-    }
-}
-
-module-whatis {Description: Qt is a comprehensive cross-platform C++ application framework. - Homepage: http://qt.io/}
-conflict Qt5
-prepend-path CPATH              ${INSTALL_DIR}/include
-prepend-path LD_LIBRARY_PATH    ${INSTALL_DIR}/lib
-prepend-path LIBRARY_DIR        ${INSTALL_DIR}/lib
-prepend-path PKG_CONFIG_PATH    ${INSTALL_DIR}/lib/pkgconfig
-prepend-path PATH               ${INSTALL_DIR}/bin
-EOF
+# TODO: also install documentation, but that requires LLVM...

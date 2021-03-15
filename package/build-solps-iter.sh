@@ -45,7 +45,15 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
     case ${HOSTNAME} in
         *)
         # Local machine or basically an UNKNOWN machine, so patch is required
-        # to setup the configuration files for UNKNOWN.gfortran
+        # to setup the configuration files for UNKNOWN.gfortra
+
+        # Set of commands to ultimately reset repo.
+        # git clean -xfd
+        # git submodule foreach --recursive git clean -xfd
+        # git reset --hard
+        # git submodule foreach --recursive git reset --hard
+        # git submodule update --init --recursive
+
         PATCH_DIR=${BUILDROOT}/src/patches
         echo "Patching solps-iter root"
         patch -p1 < ${PATCH_DIR}/solps-iter.patch
@@ -113,7 +121,8 @@ if [ ! -e ${SRC_DIR}/.built ]; then
     # Debian
     LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/lib/x86_64-linux-gnu:/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION}
     # CentOS
-    LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/lib64/:/usr/lib/gcc/x86_64-redhat-linux/${GCC_VERSION}
+    LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/lib64:/usr/lib/gcc/x86_64-redhat-linux/${GCC_VERSION}
+
 
     # Setup PKG_CONFIG_PATH
     PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib/pkgconfig
@@ -122,29 +131,32 @@ if [ ! -e ${SRC_DIR}/.built ]; then
     # CentOS
     PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib64/pkgconfig
 
-
     # Package PKG_CONFIG_PATH
 
     cd ${SRC_DIR}
     source ${SRC_DIR}/setup.sh gfortran
     hash -r
-    make clean
+    # make clean
     make listobj listobj_debug
     make depend depend_debug
     make tags
-    make carre
-    make divgeo
-    make b25
-    make eirene
-    make b25eirene
-    make uinp
-    make triang
-    make amds
-    make sonnet-light
-    make carre divgeo b25 eirene b25eirene uinp triang amds sonnet-light
-    make b25eirene_mpi amds_mpi
-    make uinp_mpi
-    make b25eirene_openmp
+    make solps
+    make solps_mpi
+    make solps_openmp
+    make solps_openmp_mpi
+    # make carre
+    # make divgeo
+    # make b25
+    # make eirene
+    # make b25eirene
+    # make uinp
+    # make triang
+    # make amds
+    # make sonnet-light
+    # make carre divgeo b25 eirene b25eirene uinp triang amds sonnet-light
+    # make b25eirene_mpi amds_mpi
+    # make uinp_mpi
+    # make b25eirene_openmp
 
     touch ${SRC_DIR}/.built
 fi
