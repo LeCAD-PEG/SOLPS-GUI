@@ -4,9 +4,8 @@ BUILDROOT=${BUILDROOT:-$( cd "$( dirname "${BASH_SOURCE[0]:-$0}" )" &> /dev/null
 PACKAGE="qt5"
 VERSION=${VERSION:-5.15.2}
 MAJOR_VERSION=${VERSION%.*}
-DOWNLOAD_LINK="https://download.qt.io/official_releases/qt/${MAJOR_VERSION}/${VERSION}/single/qt-everywhere-opensource-src-${VERSION}.tar.xz"
+DOWNLOAD_LINK="https://download.qt.io/official_releases/qt/${MAJOR_VERSION}/${VERSION}/single/qt-everywhere-src-${VERSION}.tar.xz"
 FILENAME="qt-everywhere-src-${VERSION}.tar.xz"
-
 if  [ -e ${BUILDROOT}/package/solps_gui_utils.sh ]; then
     source ${BUILDROOT}/package/solps_gui_utils.sh
 fi
