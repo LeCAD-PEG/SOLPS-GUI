@@ -167,13 +167,13 @@ ${STAGING_DIR}/sip/${SIP_VERSION}:
 
 sip: config python ${STAGING_DIR}/sip/${SIP_VERSION}
 
-${STAGING_DIR}/qt/${QT_VERSION}:
+${STAGING_DIR}/qt5/${QT_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${QT_VERSION}}/" package/build-qt5.sh
 
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	./package/build-qt5.sh
 
-qt5: config ${STAGING_DIR}/qt/${QT_VERSION}
+qt5: config ${STAGING_DIR}/qt5/${QT_VERSION}
 
 ${STAGING_DIR}/pyside2/${PYSIDE2_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${PYSIDE2_VERSION}}/" package/build-pyside2.sh
@@ -253,15 +253,15 @@ ${STAGING_DIR}/ReadUALEdge-Plugin/1.5.0-iter:
 
 paraview-plugin-iter: ${STAGING_DIR}/ReadUALEdge-Plugin/1.5.0-iter
 
-${BUILDROOT}/build/data-dictionary-${IMASDD_VERSION}/.installed:
-	@echo ${BUILDROOT}/data-dictionary-${IMASDD_VERSION}/.installed
+${BUILDROOT}/3rd_packages/source/imasdd-${IMASDD_VERSION}/.installed:
+	@echo ${BUILDROOT}/3rd_packages/sources/imasdd-${IMASDD_VERSION}/.installed
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${IMASDD_VERSION}}/" package/build-imasdd.sh
 
 	PYTHON_VERSION=${PYTHON_VERSION} \
 	SAXON_VERSION=${SAXON_VERSION} \
 	./package/build-imasdd.sh
 
-imasdd: config saxon python ${BUILDROOT}/build/data-dictionary-${IMASDD_VERSION}/.installed
+imasdd: config saxon python ${BUILDROOT}/3rd_packages/source/imasdd-${IMASDD_VERSION}/.installed
 
 ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${IMASUAL_VERSION}}/" package/build-imas.sh

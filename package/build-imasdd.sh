@@ -15,3 +15,4 @@ fi
 _gitCloneSingleBranch ${GIT_LINK} ${VERSION}
 cd ${PACKAGE_SOURCE_DIR}
 _install
+touch ${PACKAGE_SOURCE_DIR}/.installed
