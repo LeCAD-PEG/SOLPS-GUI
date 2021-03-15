@@ -58,7 +58,7 @@ SOLPS_ITER_MOD=${MODULE_DIR}/solps-iter/${SOLPS_VERSION}
 	imas solps-iter pyqt solps-gui curl hdf5 netcdf openmpi motif \
 	llvm paraview-plugin-iter
 
-all: solps-iter solps-gui
+all: solps-gui
 
 package/setup.sh: configure
 	./configure
