@@ -1,5 +1,5 @@
---- Makefile.old	2020-06-28 21:58:14.322252000 +0200
-+++ Makefile	2020-06-28 21:58:47.171341000 +0200
+--- a/mitdevices/Makefile.old	2020-06-28 21:58:14.322252000 +0200
++++ b/mitdevices/Makefile	2020-06-28 21:58:47.171341000 +0200
 @@ -24,7 +24,7 @@
  MATH_LIBS=-L$(top_builddir)/lib64/ -lMdsMath
  LIBDC1394_LIBS=-ldc1394 -lraw1394 $(THREAD)
