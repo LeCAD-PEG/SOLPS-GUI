@@ -16,6 +16,9 @@ fi
 
 _downloadFileAndUnpack ${DOWNLOAD_LINK} ${FILENAME}
 
-_configure "" "CFLAGS=-DUSE_INTERP_RESULT"
-_make "gli gligksm  cgmview libgks.so libgus.so"
-_make "dist DESTDIR=${PACKAGE_INSTALL_DIR}"
+cd ${PACKAGE_SOURCE_DIR}/src
+export CFLAGS="-I/usr/include/tirpc:${CFLAGS}"
+PRE_FLAGS="F77=gfortran CFLAGS=-DUSE_INTERP_RESULT LDFLAGS=-ltirpc"
+_configure_custom "${PACKAGE_SOURCE_DIR}/src/configure" "" "${PRE_FLAGS}"
+_make
+_install "DESTDIR=${PACKAGE_INSTALL_DIR}"

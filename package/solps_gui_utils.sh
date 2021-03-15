@@ -150,6 +150,23 @@ function _configure {
     fi
 }
 
+function _configure_custom {
+    # Same as _configure, except when the configure script is located somewhere
+    # else in the sources. Also runs in the ${PWD} directory so you have change to
+    # the directory you wish to call configure.
+    # Arguments:
+    # 1 - Path to configure
+    # 2 - Configure options
+    # 3 - Additional flags before configure
+    _log "Configuring ${PACKAGE}. Log file: ${PACKAGE_LOG_DIR}/configure"
+    _log "$3 ${1} --prefix=${PACKAGE_INSTALL_DIR} $2"
+
+    if [ ! -e ${PWD}/.configured ]; then
+        env -v ${3} ${1} --prefix=${PACKAGE_INSTALL_DIR} ${2} &> ${PACKAGE_LOG_DIR}/configure
+        touch ${PWD}/.configured
+    fi
+}
+
 function _python_configure {
     # Calls python setup.py configure.
     # Arguments:
