@@ -31,6 +31,37 @@ echo "export OS=${OS}" >> ${SETUP_FILE}
 
 echo "Writing host specific commands to ${SETUP_FILE}"
 case ${HOSTNAME} in
+    sdcc*.iter.org)
+cat << EOF >> ${SETUP_FILE}
+# module load Autotools/20180311-GCCcore-9.3.0
+# module load libtool/2.4.6-GCCcore-9.3.0
+# module load gettext/0.20.1-GCCcore-9.3.0
+# module load X11/20200222-GCCcore-9.3.0
+# module load libffi/3.3-GCCcore-9.3.0
+# module load GLib/2.64.1-GCCcore-9.3.0
+# module load DBus/1.13.12-GCCcore-9.3.0
+# module load libGLU/9.0.1-GCCcore-9.3.0
+# module load texlive/2015
+# module load Doxygen/1.8.17-GCCcore-9.3.0
+# module load LLVM/9.0.1-GCCcore-9.3.0
+
+
+# Problems with OpenSSL
+
+export QT_NO_SSL
+
+export USE_SYSTEM_XCB=1
+SSL=\$(pkg-config --variable=prefix libssl)
+export LIBRARY_PATH=\${SSL}/lib:\${LIBRARY_PATH}
+CMAKE_EXTRA_FLAGS=\${CMAKE_EXTRA_FLAGS:--DCMAKE_EXE_LINKER_FLAGS:STRING=-L\${SSL}/lib}
+export PARAVIEW_EXTRA_FLAGS=\${PARAVIEW_EXTRA_FLAGS:- -DCMAKE_EXE_LINKER_FLAGS:STRING=-L\${SSL}/lib -DPARAVIEW_ENABLE_PYTHON:BOOL=OFF}
+
+# RPC exposure
+export CPATH=/usr/include/tirpc:\${CPATH}
+
+EOF
+    ;;
+
     *.iter.org)
     cat << EOF >> ${SETUP_FILE}
 module purge
@@ -111,21 +142,53 @@ export CXX=g++
 export FC=gfortran
 
 if [ -z \${BUILDROOT+x} ]; then
-    echo "No buildroot is set! Stopping"
+    echo "BUILDROOT is not set! Stopping"
     return
 else
-    echo "Buildroot set to \${BUILDROOT}"
+    echo "BUILDROOT set to \${BUILDROOT}"
 fi
 
 if [ -z \${STAGING_DIR+x} ]; then
-    echo "No staging dir is set! Stopping"
-    return
+    echo "STAGING_DIR is not set! Using BUILDROOT to set it ti \${BUILDROOT}/staging"
+    STAGING_DIR=\${BUILDROOT}/staging
 else
-    echo "Buildroot set to \${STAGING_DIR}"
+    echo "STAGING_DIR set to \${STAGING_DIR}"
 fi
 
+if [ -z \${FFI_VERSION+x} ]; then
+    :
+else
+    export PKG_CONFIG_PATH=\${STAGING_DIR}/libffi/\${FFI_VERSION}/lib/pkgconfig
+    export LD_LIBRARY_PATH=\${STAGING_DIR}/libffi/\${FFI_VERSION}/lib:\${LD_LIBRARY_PATH}
+    export LD_LIBRARY_PATH=\${STAGING_DIR}/libffi/\${FFI_VERSION}/lib64:\${LD_LIBRARY_PATH}
+    export CPATH=\${STAGING_DIR}/libffi/\${FFI_VERSION}/include
+    # From Python/3.7 the code of libffi is not included into source code anymore.
+    # With system installed ffi, it works without a problem, but with custom
+    # compiled and installed ffi then this becomes a trouble since currently it hasn't
+    # been solved:: https://bugs.python.org/issue34823
+    export Py_FFI_LDFLAGS=\$(pkg-config --libs-only-L libffi)
+
+    # export Py_FFI_CFLAGS=\${pkg-config --cflags-only-I libffi} # Returns empty string?
+    # Possibly due to duplication in CPATH... Have to manually provide it.
+    # It is not enough to set LDFLAGS, CPPFLAGS must be also included
+    export Py_FFI_CPPFLAGS=-I\${STAGING_DIR}/libffi/\${FFI_VERSION}/include
+    echo "Environment for FFI_VERSION=\${FFI_VERSION} set"
+fi
+
+if [ -z \${LLVM_VERSION+x} ]; then
+    :
+else
+    export PATH=\${STAGING_DIR}/llvm/\${LLVM_VERSION}/bin:\${PATH}
+    export PKG_CONFIG_PATH=\${STAGING_DIR}/llvm/\${LLVM_VERSION}/lib/pkgconfig
+    export LD_LIBRARY_PATH=\${STAGING_DIR}/llvm/\${LLVM_VERSION}/lib:\${LD_LIBRARY_PATH}
+    export CPATH=\${STAGING_DIR}/llvm/\${LLVM_VERSION}/include
+    export LLVM_INSTALL_DIR=\${STAGING_DIR}/llvm/\${LLVM_VERSION}
+    echo "Environment for LLVM_VERSION=\${LLVM_VERSION} set"
+fi
+
+
 if [ -z \${IMASDD_VERSION+x} ]; then
-    echo "IMASDD_VERSION is unset, skipping settings"
+    :
 else
     export IMAS_VERSION=\${IMASDD_VERSION}
     export LD_LIBRARY_PATH=\${STAGING_DIR}/imas/\${IMAS_VERSION}/solps/lib:\${LD_LIBRARY_PATH}
@@ -133,35 +196,38 @@ else
     export ids_path=\${STAGING_DIR}/imas/\${IMAS_VERSION}/solps/models/mdsplus
     export imasfortran_LIBS="-L\${STAGING_DIR}/imas/\${IMAS_VERSION}/solps/lib -limas-gfortran -limas"
     export imasfortran_CFLAGS="-I\${STAGING_DIR}/imas/\${IMAS_VERSION}/solps/include/gfortran"
-    echo "Environment for IMASDD_VERSION set"
+    echo "Environment for IMAS_VERSION=\${IMAS_VERSION} set"
+
 fi
 
 if [ -z \${IMASUAL_VERSION+x} ]; then
-    echo "IMASUAL_VERSION is unset, skipping settings"
+    :
 else
     export UAL_VERSION=\${IMASUAL_VERSION}
+    echo "Environment for IMASUAL_VERSION=\${IMASUAL_VERSION} set"
 fi
 
 if [ -z \${MDSPLUS_VERSION+x} ]; then
-    echo "MDSPLUS_VERSION is unset, skipping settings"
+    :
 else
     export LD_LIBRARY_PATH=\${STAGING_DIR}/mdsplus/\${MDSPLUS_VERSION}/lib:\${LD_LIBRARY_PATH}
     export PKG_CONFIG_PATH=\${STAGING_DIR}/mdsplus/lib/pkgconfig:\${PKG_CONFIG_PATH}
     export MDSPLUS_DIR=\${STAGING_DIR}/mdsplus/\${MDSPLUS_VERSION}
-    echo "Environment for MDSPLUS_VERSION set"
+    echo "Environment for MDSPLUS_VERSION=\${MDSPLUS_VERSION} set"
 fi
 
 if [ -z \${QT_VERSION+x} ]; then
-    echo "QT_VERSION is unset, skipping settings"
+    :
 else
-    export QTDIR=\${STAGING_DIR}/qt/\${QT_VERSION}
+    export QTDIR=\${STAGING_DIR}/qt5/\${QT_VERSION}
     export PATH=\${QTDIR}/bin:\${PATH}
     export LD_LIBRARY_PATH=\${QTDIR}/lib:\${LD_LIBRARY_PATH}
-    export PKG_CONFIG_PATH=\${STAGING_DIR}/qt/\${QT_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
+    export PKG_CONFIG_PATH=\${STAGING_DIR}/qt5/\${QT_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
+    echo "Environment for QT_VERSION=\${QT_VERSION} set"
 fi
 
 if [ -z \${QT4_VERSION+x} ]; then
-    echo "QT_VERSION is unset, skipping settings"
+    :
 else
     export QT_VERSION=\${QT4_VERSION}
     export QTDIR=\${STAGING_DIR}/qt/\${QT_VERSION}
@@ -171,80 +237,90 @@ else
 fi
 
 if [ -z \${CMAKE_VERSION+x} ]; then
-    echo "CMAKE_VERSION is unset, skipping settings"
+    :
 else
     export PATH=\${STAGING_DIR}/cmake/\${CMAKE_VERSION}/bin:\${PATH}
     export CMAKE=cmake
+    echo "Environment for CMAKE_VERSION=\${CMAKE_VERSION} set"
 fi
 
 if [ -z \${PARAVIEW_VERSION} ]; then
-    echo "PARAVIEW_VERSION is unset, skipping settings"
+    :
 else
     export PATH=\${STAGING_DIR}/paraview/\${PARAVIEW_VERSION}/bin:\${PATH}
+    echo "Environment for PARAVIEW_VERSION=\${PARAVIEW_VERSION} set"
 fi
 
 if [ -z \${PYTHON_VERSION+x} ]; then
-    echo "PYTHON_VERSION is unset, skipping settings"
+    :
 else
     PYTHON_MAINVERSION=\${PYTHON_VERSION%.*}
-    export PYTHON_INSTALL_DIR=\${STAGING_DIR}/Python/\${PYTHON_VERSION}
+    export PYTHON_INSTALL_DIR=\${STAGING_DIR}/python/\${PYTHON_VERSION}
     export PATH=\${PYTHON_INSTALL_DIR}/bin:\${PATH}
     export LD_LIBRARY_PATH=\${PYTHON_INSTALL_DIR}/lib:\${LD_LIBRARY_PATH}
     export PYTHONPATH=\${PYTHON_INSTALL_DIR}/lib/python\${PYTHON_MAINVERSION}/site-packages:\${PYTHONPATH}
     export PKG_CONFIG_PATH=\${PYTHON_INSTALL_DIR}/lib/pkgconfig:\${PKG_CONFIG_PATH}
     export PYTHON_LIBRARIES=\${PYTHON_INSTALL_DIR}/lib
     export PYTHON_INCLUDE_DIRS=\${PYTHON_INSTALL_DIR}/include
+    echo "Environment for PYTHON_VERSION=\${PYTHON_VERSION} set"
 fi
 
 if [ -z \${PyQt_VERSION+x} ]; then
-    echo "PyQt_VERSION is unset, skipping settings"
+    :
 else
-    export PYTHONPATH=\${STAGING_DIR}/PyQt5/\${PyQt_VERSION}/lib/python\${PYTHON_MAINVERSION}/site-packages:\${PYTHONPATH}
+    export PYTHONPATH=\${STAGING_DIR}/pyqt5/\${PyQt_VERSION}/lib/python\${PYTHON_MAINVERSION}/site-packages:\${PYTHONPATH}
+    echo "Environment for PyQt_VERSION=\${PyQt_VERSION} set"
 fi
 
 if [ -z \${SIP_VERSION+x} ]; then
-    echo "SIP_VERSION is unset, skipping settings for sip"
+    :
 else
     export PATH=\${STAGING_DIR}/sip/\${SIP_VERSION}/bin:\${PATH}
     export PYTHONPATH=\${STAGING_DIR}/sip/\${SIP_VERSION}/lib/python\${PYTHON_MAINVERSION}/site-packages:\${PYTHONPATH}
     export SIP_INSTALL_DIR=\${STAGING_DIR}/sip/\${SIP_VERSION}
+    echo "Environment for SIP_VERSION=\${SIP_VERSION} set"
 fi
 
 if [ -z \${SAXON_VERSION+x} ]; then
-    echo "SAXON_VERSION is unset, skipping"
+    :
 else
     export CLASSPATH=\${STAGING_DIR}/saxon/\${SAXON_VERSION}/saxon9he.jar
 
     # A way to find JAVA_HOME
     export JAVA_HOME=\$(java -XshowSettings:properties -version 2>&1 > /dev/null | grep 'java.home' | tr -d ' ' | sed -e 's|java.home=||' -e 's|/jre||')
+    echo "Environment for SAXON_VERSION=\${SAXON_VERSION} set"
 fi
 
 if [ -z \${LIBXML2_VERSION} ]; then
-    echo "LIBXML2_VERSION is unset, skipping"
+    :
 else
     export LIBXML2_INSTALL_DIR=\${STAGING_DIR}/libxml2/\${LIBXML2_VERSION}
     export LD_LIBRARY_PATH=\${LIBXML2_INSTALL_DIR}/lib:\${LD_LIBRARY_PATH}
+    echo "Environment for LIBXML2_VERSION=\${LIBXML2_VERSION} set"
 fi
 
 if  [ -z \${OPENBLAS_VERSION+x} ]; then
-    echo "OPENBLAS_VERSION is unset, skipping"
+    :
 else
-    export OPENBLAS_INSTALL_DIR=\${STAGING_DIR}/OpenBLAS/\${OPENBLAS_VERSION}
+    export OPENBLAS_INSTALL_DIR=\${STAGING_DIR}/openblas/\${OPENBLAS_VERSION}
     export LD_LIBRARY_PATH=\${OPENBLAS_INSTALL_DIR}/lib:\${LD_LIBRARY_PATH}
     export OPENBLAS_ROOT=\${OPENBLAS_INSTALL_DIR}/lib
+    echo "Environment for OPENBLAS_VERSION=\${OPENBLAS_VERSION} set"
 fi
 
 if [ -z \${BLITZ_VERSION+x} ]; then
-    echo "BLITZ_VERSION is unset, skipping"
+    :
 else
     export PKG_CONFIG_PATH=\${STAGING_DIR}/blitz/\${BLITZ_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
+    export PKG_CONFIG_PATH=\${STAGING_DIR}/blitz/\${BLITZ_VERSION}/lib64/pkgconfig:\${PKG_CONFIG_PATH}
+    echo "Environment for BLITZ_VERSION=\${BLITZ_VERSION} set"
 fi
 
 if [ -z \${HDF5_VERSION+x} ]; then
-    echo "HDF5_VERSION is unset, skiping"
+    :
 else
     export PKG_CONFIG_PATH=\${STAGING_DIR}/hdf5/\${HDF5_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
-    export CPATH=\${STAGING_DIR}/hdf5/\${HDF5_VERSION}/include:\${CPATH}
+    #export CPATH=\${STAGING_DIR}/hdf5/\${HDF5_VERSION}/include:\${CPATH}
     export LD_LIBRARY_PATH=\${STAGING_DIR}/hdf5/\${HDF5_VERSION}/lib:\${LD_LIBRARY_PATH}
     export LIBRARY_PATH=\${STAGING_DIR}/hdf5/\${HDF5_VERSION}/lib:\${LIBRARY_PATH}
     export PATH=\${STAGING_DIR}/hdf5/\${HDF5_VERSION}/bin:\${PATH}
@@ -253,116 +329,129 @@ else
     export HDF5_HL_LIBRARY=\${STAGING_DIR}/hdf5/\${HDF5_VERSION}
     export HDF5_INCLUDE_DIR=\${STAGING_DIR}/hdf5/\${HDF5_VERSION}/include
     export H5DIR=\${STAGING_DIR}/hdf5/\${HDF5_VERSION}
+    echo "Environment for HDF5_VERSION=\${HDF5_VERSION} set"
 fi
 
 if [ -z \${CURL_VERSION+x} ]; then
-    echo "CURL_VERSION is unset, skiping"
+    :
 else
     export ODIR=\${STAGING_DIR}/curl/\${CURL_VERSION}
     export PKG_CONFIG_PATH=\${STAGING_DIR}/curl/\${CURL_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
-    export CPATH=\${STAGING_DIR}/curl/\${CURL_VERSION}/include:\${CPATH}
+    #export CPATH=\${STAGING_DIR}/curl/\${CURL_VERSION}/include:\${CPATH}
     export LD_LIBRARY_PATH=\${STAGING_DIR}/curl/\${CURL_VERSION}/lib:\${LD_LIBRARY_PATH}
     export LIBRARY_PATH=\${STAGING_DIR}/curl/\${CURL_VERSION}/lib:\${LIBRARY_PATH}
     export PATH=\${STAGING_DIR}/curl/\${CURL_VERSION}/bin:\${PATH}
     # export CPPFLAGS=\${CPPFLAGS}' -I\${STAGING_DIR}/curl/\${CURL_VERSION}/include'
     # export LDFLAGS=\${LDFLAGS}' -L\${STAGING_DIR}/curl/\${CURL_VERSION}/lib'
+    echo "Environment for CURL_VERSION=\${CURL_VERSION} set"
 fi
 
 if [ -z \${NETCDF_VERSION+x} ]; then
-    echo "NETCDF_VERSION is unset, skiping"
+    :
 else
     export PKG_CONFIG_PATH=\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
     export PKG_CONFIG_PATH=\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/lib64/pkgconfig:\${PKG_CONFIG_PATH}
-    export CPATH=\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/include:\${CPATH}
+    #export CPATH=\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/include:\${CPATH}
     export LD_LIBRARY_PATH=\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/lib:\${LD_LIBRARY_PATH}
     export LIBRARY_PATH=\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/lib:\${LIBRARY_PATH}
     export PATH=\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/bin:\${PATH}
     # export CPPFLAGS=\${CPPFLAGS}' -I\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/include'
     # export LDFLAGS=\${LDFLAGS}' -L\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}/lib'
     export NCDIR=\${STAGING_DIR}/netcdf/\${NETCDF_VERSION}
+    echo "Environment for NETCDF_VERSION=\${NETCDF_VERSION} set"
 fi
 
 # if [ -z \${NETCDF_FORTRAN_VERSION+x} ]; then
 #     echo "NETCDF_FORTRAN_VERSION is unset, skiping"
 # else
 #     export PKG_CONFIG_PATH=\${STAGING_DIR}/netcdf/\${NETCDF_FORTRAN_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
-#     export CPATH=\${STAGING_DIR}/netcdf/\${NETCDF_FORTRAN_VERSION}/include:\${CPATH}
+#     #export CPATH=\${STAGING_DIR}/netcdf/\${NETCDF_FORTRAN_VERSION}/include:\${CPATH}
 #     export LD_LIBRARY_PATH=\${STAGING_DIR}/netcdf/\${NETCDF_FORTRAN_VERSION}/lib:\${LD_LIBRARY_PATH}
 #     export LIBRARY_PATH=\${STAGING_DIR}/netcdf/\${NETCDF_FORTRAN_VERSION}/lib:\${LIBRARY_PATH}
 #     export PATH=\${STAGING_DIR}/netcdf/\${NETCDF_FORTRAN_VERSION}/bin:\${PATH}
 # fi
 
 if [ -z \${FLEX_VERSION+x} ]; then
-    echo "FLEX_VERSION is unset, skipping"
+    :
 else
-    export CPATH=\${STAGING_DIR}/flex/\${FLEX_VERSION}/include:\${CPATH}
+    #export CPATH=\${STAGING_DIR}/flex/\${FLEX_VERSION}/include:\${CPATH}
     export LD_LIBRARY_PATH=\${STAGING_DIR}/flex/\${FLEX_VERSION}/lib:\${LD_LIBRARY_PATH}
     export LIBRARY_PATH=\${STAGING_DIR}/flex/\${FLEX_VERSION}/lib:\${LIBRARY_PATH}
     export PATH=\${STAGING_DIR}/flex/\${FLEX_VERSION}/bin:\${PATH}
+    echo "Environment for FLEX_VERSION=\${FLEX_VERSION} set"
 fi
 
 if [ -z \${MOTIF_VERSION+x} ]; then
-    echo "MOTIF_VERSION is unset, skipping"
+    :
 else
     export CPATH=\${STAGING_DIR}/motif/\${MOTIF_VERSION}/include:\${CPATH}
     export LD_LIBRARY_PATH=\${STAGING_DIR}/motif/\${MOTIF_VERSION}/lib:\${LD_LIBRARY_PATH}
     export LIBRARY_PATH=\${STAGING_DIR}/motif/\${MOTIF_VERSION}/lib:\${LIBRARY_PATH}
     export PATH=\${STAGING_DIR}/motif/\${MOTIF_VERSION}/bin:\${PATH}
+    echo "Environment for MOTIF_VERSION=\${MOTIF_VERSION} set"
 fi
 
 if [ -z \${FREETYPE_VERSION+x} ]; then
-    echo "FREETYPE_VERSION is unset, skipping"
+    :
 else
     export CPATH=\${STAGING_DIR}/freetype/\${FREETYPE_VERSION}/include/freetype2:\${CPATH}
     export LD_LIBRARY_PATH=\${STAGING_DIR}/freetype/\${FREETYPE_VERSION}/lib:\${LD_LIBRARY_PATH}
     export LIBRARY_PATH=\${STAGING_DIR}/freetype/\${FREETYPE_VERSION}/lib:\${LIBRARY_PATH}
     export PATH=\${STAGING_DIR}/freetype/\${FREETYPE_VERSION}/bin:\${PATH}
+    echo "Environment for FREETYPE_VERSION=\${FREETYPE_VERSION} set"
 fi
 
 if [ -z \${OPENMPI_VERSION+x} ]; then
-    echo "OPENMPI_VERSION is unset, skipping"
+    :
 else
-    export CPATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/include:\${CPATH}
+    #export CPATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/include:\${CPATH}
     export LD_LIBRARY_PATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/lib:\${LD_LIBRARY_PATH}
     export LIBRARY_PATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/lib:\${LIBRARY_PATH}
     export PATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/bin:\${PATH}
     export PKG_CONFIG_PATH=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
     export MPDIR=\${STAGING_DIR}/openmpi/\${OPENMPI_VERSION}
+    echo "Environment for OPENMPI_VERSION=\${OPENMPI_VERSION} set"
 fi
 
 if [ -z \${GGD_VERSION+x} ]; then
-    echo "GGD_VERSION is unset, skipping"
+    :
 else
-    export CPATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/include:\${CPATH}
-    export LD_LIBRARY_PATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/lib:\${LD_LIBRARY_PATH}
-    export LIBRARY_PATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/lib:\${LIBRARY_PATH}
-    export PKG_CONFIG_PATH=\${STAGING_DIR}/GGD/\${GGD_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
+    #export CPATH=\${STAGING_DIR}/ggd/\${GGD_VERSION}/include:\${CPATH}
+    export LD_LIBRARY_PATH=\${STAGING_DIR}/ggd/\${GGD_VERSION}/lib:\${LD_LIBRARY_PATH}
+    export LIBRARY_PATH=\${STAGING_DIR}/ggd/\${GGD_VERSION}/lib:\${LIBRARY_PATH}
+    export PKG_CONFIG_PATH=\${STAGING_DIR}/ggd/\${GGD_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
     export EBVERSIONGGD=\${GGD_VERSION}
+    export GGD_VERSION=\${GGD_VERSION}
+    echo "Environment for GGD_VERSION=\${GGD_VERSION} set"
 fi
 
 if [ -z \${MSCL_VERSION+x} ]; then
-    echo "MSCL_VERSION is unset, skipping"
+    :
 else
     export PKG_CONFIG_PATH=\${STAGING_DIR}/mscl/\${MSCL_VERSION}/lib/pkgconfig:\${PKG_CONFIG_PATH}
     export MSCL_ROOT=\${STAGING_DIR}/mscl/\${MSCL_VERSION}
+    echo "Environment for MSCL_VERSION=\${MSCL_VERSION} set"
 fi
 
 if [ -z \${GLI_VERSION+x} ]; then
-    echo "GLI_VERSION is unset, skipping"
+    :
 else
-    export GLI_HOME=\${STAGING_DIR}/GLI/\${GLI_VERSION}
+    export GLI_HOME=\${STAGING_DIR}/gli/\${GLI_VERSION}
+    echo "Environment for GLI_VERSION=\${GLI_VERSION} set"
 fi
 
 if [ -z \${NCL_VERSION+x} ]; then
-    echo "NCL_VERSION is unset, skipping"
+    :
 else
     export NCARG_ROOT=\${STAGING_DIR}/ncl/\${NCL_VERSION}/lib
+    echo "Environment for NCARG_VERSION=\${NCARG_VERSION} set"
 fi
 
 if [ -z \${GR_VERSION+x} ]; then
-    echo "GR_VERSION is unset, skipping"
+    :
 else
-    export GR_ROOT=\${STAGING_DIR}/GR/\${GR_VERSION}
+    export GR_ROOT=\${STAGING_DIR}/gr/\${GR_VERSION}
+    echo "Environment for GR_VERSION=\${GR_VERSION} set"
 fi
 
 EOF

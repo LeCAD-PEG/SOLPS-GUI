@@ -1,9 +1,7 @@
 setupenv.sh
-modules
-download
-build
+3rd_packages
+LOGS
 staging
-logging
 *~
 my*.ui
 *.pyc

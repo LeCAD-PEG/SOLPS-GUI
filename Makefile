@@ -7,28 +7,33 @@ MODULE_DIR ?= ${BUILDROOT}/modules
 # SOLPS-GUI
 SOLPS_GUI_VERSION=1.5.0
 
-OPENBLAS_VERSION=0.3.10
-PYTHON_VERSION=3.8.3
-PYTHON_MAINVERSION=3.8
-NUMPY_VERSION=1.18.2
-SCIPY_VERSION=1.4.1
+OPENBLAS_VERSION=0.3.13
+PYTHON_VERSION=3.9.2
+FFI_VERSION=3.3
+PYTHON_MAINVERSION=3.9
+NUMPY_VERSION=1.20.1
+SCIPY_VERSION=1.5.2
 GNUPLOT_VERSION=5.2.8
-QT_VERSION=5.14.2
-PyQt_VERSION=5.13.2
-SIP_VERSION=4.19.22
+
+QT_VERSION=5.15.2
+# LLVM_VERSION=11.1.0
+# PYSIDE2_VERSION=5.15.2
+
+PyQt_VERSION=5.15.2
+SIP_VERSION=4.19.25
 # ParaView specific version
-PARAVIEW_VERSION=5.8.0
+PARAVIEW_VERSION=5.8.1
 CMAKE_VERSION=3.15.4
 
 # IMAS
-BLITZ_VERSION=1.0.1
-MDSPLUS_VERSION=stable_release-7-96-8
-LIBXML2_VERSION=2.9.1
+BLITZ_VERSION=1.0.2
+MDSPLUS_VERSION=7.96.8
+LIBXML2_VERSION=2.9.10
 SAXON_VERSION=HE9-8-0-12J
-IMASUAL_VERSION=4.8.0
-IMASDD_VERSION=3.28.1
+IMASUAL_VERSION=4.8.7
+IMASDD_VERSION=3.31.0
 # Minor version is used for compatibility compiling.
-IMAS_MINOR_VERSION=26
+IMAS_MINOR_VERSION=31
 
 # SOLPS-ITER
 GLI_VERSION=4.5.30
@@ -44,15 +49,14 @@ FREETYPE_VERSION=2.10.0
 NCL_VERSION=6.5.0
 MOTIF_VERSION=2.3.8
 OPENMPI_VERSION=4.0.0
-FLEX_VERSION=v2.6.3
+FLEX_VERSION=2.6.3
 
 SETUP_FILE="setupenv.sh"
-SOLPS_GUI_MOD=${MODULE_DIR}/solps-gui/1.5
 SOLPS_ITER_MOD=${MODULE_DIR}/solps-iter/${SOLPS_VERSION}
 
-.PHONY: gr gli OpenBLAS mscl ggd python libxml2 saxon blitz cmake mdsplus \
+.PHONY: gr gli openblas mscl ggd python libxml2 saxon blitz cmake mdsplus \
 	imas solps-iter pyqt solps-gui curl hdf5 netcdf openmpi motif \
-	solps-gui-mod paraview-plugin-iter
+	llvm paraview-plugin-iter
 
 all: solps-iter solps-gui
 
@@ -61,18 +65,26 @@ package/setup.sh: configure
 
 config: package/setup.sh
 
+${STAGING_DIR}/llvm/${LLVM_VERSION}:
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${LLVM_VERSION}}/" package/build-llvm.sh
+
+	CMAKE_VERSION=${CMAKE_VERSION} \
+	PYTHON_VERSION=${PYTHON_VERSION} \
+	./package/build-llvm.sh
+
+llvm : python cmake ${STAGING_DIR}/llvm/${LLVM_VERSION}
 
 ${STAGING_DIR}/GR/${GR_VERSION}:
-	sed -i -e "/^VERSION/s/:-[^}]*}/:-${GR_VERSION}}/" package/build-GR.sh
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${GR_VERSION}}/" package/build-gr.sh
 
-	./package/build-GR.sh
+	./package/build-gr.sh
 
 gr: ${STAGING_DIR}/GR/${GR_VERSION}
 
 ${STAGING_DIR}/GLI/${GLI_VERSION}:
-	sed -i -e "/^VERSION/s/:-[^}]*}/:-${GLI_VERSION}}/" package/build-GLI.sh
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${GLI_VERSION}}/" package/build-gli.sh
 
-	./package/build-GLI.sh
+	./package/build-gli.sh
 
 gli: ${STAGING_DIR}/GLI/${GLI_VERSION}
 
@@ -86,9 +98,10 @@ saxon: ${STAGING_DIR}/saxon/${SAXON_VERSION}
 ${STAGING_DIR}/blitz/${BLITZ_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${BLITZ_VERSION}}/" package/build-blitz.sh
 
+	CMAKE_VERSION=${CMAKE_VERSION} \
 	./package/build-blitz.sh
 
-blitz: ${STAGING_DIR}/blitz/${BLITZ_VERSION}
+blitz: cmake ${STAGING_DIR}/blitz/${BLITZ_VERSION}
 
 ${STAGING_DIR}/cmake/${CMAKE_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${CMAKE_VERSION}}/" package/build-cmake.sh
@@ -106,12 +119,12 @@ ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}:
 
 mdsplus: config motif libxml2 ${STAGING_DIR}/mdsplus/${MDSPLUS_VERSION}
 
-${STAGING_DIR}/OpenBLAS/${OPENBLAS_VERSION}:
-	sed -i -e "/^VERSION/s/:-[^}]*}/:-${OPENBLAS_VERSION}}/" package/build-OpenBLAS.sh
+${STAGING_DIR}/openblas/${OPENBLAS_VERSION}:
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${OPENBLAS_VERSION}}/" package/build-openblas.sh
 
-	./package/build-OpenBLAS.sh
+	./package/build-openblas.sh
 
-OpenBLAS: ${STAGING_DIR}/OpenBLAS/${OPENBLAS_VERSION}
+openblas: ${STAGING_DIR}/openblas/${OPENBLAS_VERSION}
 
 ${STAGING_DIR}/mscl/${MSCL_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${MSCL_VERSION}}/" package/build-mscl.sh
@@ -120,7 +133,13 @@ ${STAGING_DIR}/mscl/${MSCL_VERSION}:
 
 mscl: ${STAGING_DIR}/mscl/${MSCL_VERSION}
 
-${STAGING_DIR}/Python/${PYTHON_VERSION}:
+${STAGING_DIR}/libffi/${FFI_VERSION}:
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${FFI_VERSION}}/" package/build-ffi.sh
+	./package/build-ffi.sh
+
+ffi: config ${STAGING_DIR}/libffi/${FFI_VERSION}
+
+${STAGING_DIR}/python/${PYTHON_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${PYTHON_VERSION}}/" package/build-python.sh
 
 	PYTHON_VERSION=${PYTHON_VERSION} \
@@ -138,7 +157,7 @@ ${STAGING_DIR}/Python/${PYTHON_VERSION}:
 	OPENBLAS_VERSION=${OPENBLAS_VERSION} \
 	./package/build-scipy.sh
 
-python: config OpenBLAS ${STAGING_DIR}/Python/${PYTHON_VERSION}
+python: config openblas ${STAGING_DIR}/python/${PYTHON_VERSION}
 
 ${STAGING_DIR}/sip/${SIP_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${SIP_VERSION}}/" package/build-sip.sh
@@ -156,7 +175,19 @@ ${STAGING_DIR}/qt/${QT_VERSION}:
 
 qt5: config ${STAGING_DIR}/qt/${QT_VERSION}
 
-${STAGING_DIR}/PyQt5/${PyQt_VERSION}:
+${STAGING_DIR}/pyside2/${PYSIDE2_VERSION}:
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${PYSIDE2_VERSION}}/" package/build-pyside2.sh
+
+	LIBXML2_VERSION=${LIBXML2_VERSION} \
+	LLVM_VERSION=${LLVM_VERSION} \
+	PYTHON_VERSION=${PYTHON_VERSION} \
+	QT_VERSION=${QT_VERSION} \
+	CMAKE_VERSION=${CMAKE_VERSION} \
+	./package/build-pyside2.sh
+
+pyside2: config libxml2 python cmake llvm qt5 ${STAGING_DIR}/pyside2/${PYSIDE2_VERSION}
+
+${STAGING_DIR}/pyqt5/${PyQt_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${PyQt_VERSION}}/" package/build-pyqt.sh
 
 	PYTHON_VERSION=${PYTHON_VERSION} \
@@ -164,7 +195,7 @@ ${STAGING_DIR}/PyQt5/${PyQt_VERSION}:
 	SIP_VERSION=${SIP_VERSION} \
 	./package/build-pyqt.sh
 
-pyqt: config python qt5 sip ${STAGING_DIR}/PyQt5/${PyQt_VERSION}
+pyqt: config python qt5 sip ${STAGING_DIR}/pyqt5/${PyQt_VERSION}
 
 ${STAGING_DIR}/gnuplot/${GNUPLOT_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${GNUPLOT_VERSION}}/" package/build-gnuplot.sh
@@ -172,7 +203,7 @@ ${STAGING_DIR}/gnuplot/${GNUPLOT_VERSION}:
 	QT_VERSION=${QT_VERSION} \
 	./package/build-gnuplot.sh
 
-gnuplot: config pyqt ${STAGING_DIR}/gnuplot/${GNUPLOT_VERSION}
+gnuplot: config qt5 ${STAGING_DIR}/gnuplot/${GNUPLOT_VERSION}
 
 ${STAGING_DIR}/gnuplot-widget/python-${PYTHON_VERSION}-qt-${QT_VERSION}:
 
@@ -336,7 +367,7 @@ ${STAGING_DIR}/motif/${MOTIF_VERSION}:
 	FREETYPE_VERSION=${FREETYPE_VERSION} \
 	./package/build-motif.sh
 
-motif: config flex ${STAGING_DIR}/motif/${MOTIF_VERSION}
+motif: config freetype flex ${STAGING_DIR}/motif/${MOTIF_VERSION}
 
 ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}/.installed:
 	# Copy imasdb script for setting up IMAS MDSPLUS_TREE environment
@@ -365,22 +396,51 @@ ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}/.installed:
 
 solps-iter: config imas gr gli OpenBLAS mscl ggd python netcdf ncl openmpi motif ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}/.installed
 
-solps-gui-mod:
-	sed -i -e "/^VERSION/s/:-[^}]*}/:-${SOLPS_GUI_VERSION}}/" package/build-solps-gui.sh
-	VERSION=${SOLPS_GUI_VERSION} \
-	IMASDD_VERSION=${IMASDD_VERSION} \
-	PYTHON_VERSION=${PYTHON_VERSION} \
-	QT_VERSION=${QT_VERSION} \
-	PyQt_VERSION=${PyQt_VERSION} \
-	GNUPLOT_VERSION=${GNUPLOT_VERSION} \
-	./package/build-solps-gui.sh
-
-
-solps-gui: config imas pyqt gnuplot gnuplot-widget setupenv.sh solps-gui-mod
+solps-gui: config imas pyqt gnuplot setupenv.sh
 
 setupenv.sh: Makefile
 	@echo "Writing environemnt to ${BUILDROOT}/${SETUP_FILE}"
 	@echo "ROOT_DIR=${BUILDROOT}" > ${SETUP_FILE}
+	@echo "#Setting versions" >> ${SETUP_FILE}
+	@echo "if [ \$$# -eq 0 ]; then" >> ${SETUP_FILE}
+	@echo "    echo 'Skipping version setting!'" >> ${SETUP_FILE}
+	@echo "else" >> ${SETUP_FILE}
+	@echo "    export BUILDROOT=\$${ROOT_DIR}" >> ${SETUP_FILE}
+	@echo "    export STAGING_DIR=\$${ROOT_DIR}/staging" >> ${SETUP_FILE}
+	@echo "    export SOLPS_GUI_VERSION=${SOLPS_GUI_VERSION}" >> ${SETUP_FILE}
+	@echo "    export OPENBLAS_VERSION=${OPENBLAS_VERSION}" >> ${SETUP_FILE}
+	@echo "    export PYTHON_VERSION=${PYTHON_VERSION}" >> ${SETUP_FILE}
+	@echo "    export PYTHON_MAINVERSION=${PYTHON_MAINVERSION}" >> ${SETUP_FILE}
+	@echo "    export NUMPY_VERSION=${NUMPY_VERSION}" >> ${SETUP_FILE}
+	@echo "    export SCIPY_VERSION=${SCIPY_VERSION}" >> ${SETUP_FILE}
+	@echo "    export GNUPLOT_VERSION=${GNUPLOT_VERSION}" >> ${SETUP_FILE}
+	@echo "    export QT_VERSION=${QT_VERSION}" >> ${SETUP_FILE}
+	@echo "    export PyQt_VERSION=${PyQt_VERSION}" >> ${SETUP_FILE}
+	@echo "    export SIP_VERSION=${SIP_VERSION}" >> ${SETUP_FILE}
+	@echo "    export PARAVIEW_VERSION=${PARAVIEW_VERSION}" >> ${SETUP_FILE}
+	@echo "    export CMAKE_VERSION=${CMAKE_VERSION}" >> ${SETUP_FILE}
+	@echo "    export BLITZ_VERSION=${BLITZ_VERSION}" >> ${SETUP_FILE}
+	@echo "    export MDSPLUS_VERSION=${MDSPLUS_VERSION}" >> ${SETUP_FILE}
+	@echo "    export LIBXML2_VERSION=${LIBXML2_VERSION}" >> ${SETUP_FILE}
+	@echo "    export SAXON_VERSION=${SAXON_VERSION}" >> ${SETUP_FILE}
+	@echo "    export IMASUAL_VERSION=${IMASUAL_VERSION}" >> ${SETUP_FILE}
+	@echo "    export IMASDD_VERSION=${IMASDD_VERSION}" >> ${SETUP_FILE}
+	@echo "    export IMAS_MINOR_VERSION=${IMAS_MINOR_VERSION}" >> ${SETUP_FILE}
+	@echo "    export GLI_VERSION=${GLI_VERSION}" >> ${SETUP_FILE}
+	@echo "    export GR_VERSION=${GR_VERSION}" >> ${SETUP_FILE}
+	@echo "    export GGD_VERSION=${GGD_VERSION}" >> ${SETUP_FILE}
+	@echo "    export SOLPS_VERSION=${SOLPS_VERSION}" >> ${SETUP_FILE}
+	@echo "    export MSCL_VERSION=${MSCL_VERSION}" >> ${SETUP_FILE}
+	@echo "    export CURL_VERSION=${CURL_VERSION}" >> ${SETUP_FILE}
+	@echo "    export HDF5_VERSION=${HDF5_VERSION}" >> ${SETUP_FILE}
+	@echo "    export NETCDF_VERSION=${NETCDF_VERSION}" >> ${SETUP_FILE}
+	@echo "    export NETCDF_FORTRAN_VERSION=${NETCDF_FORTRAN_VERSION}" >> ${SETUP_FILE}
+	@echo "    export FREETYPE_VERSION=${FREETYPE_VERSION}" >> ${SETUP_FILE}
+	@echo "    export NCL_VERSION=${NCL_VERSION}" >> ${SETUP_FILE}
+	@echo "    export MOTIF_VERSION=${MOTIF_VERSION}" >> ${SETUP_FILE}
+	@echo "    export OPENMPI_VERSION=${OPENMPI_VERSION}" >> ${SETUP_FILE}
+	@echo "    export FLEX_VERSION=${FLEX_VERSION}" >> ${SETUP_FILE}
+	@echo "fi" >> ${SETUP_FILE}
 	@echo "source \$${ROOT_DIR}/package/setup.sh" >> ${SETUP_FILE}
 	@echo "INSTALL_DIR=\$${ROOT_DIR}/staging" >> ${SETUP_FILE}
 	@echo "" >> ${SETUP_FILE}
@@ -391,12 +451,13 @@ setupenv.sh: Makefile
 	@echo "PATH=\$${INSTALL_DIR}/cmake/${CMAKE_VERSION}/bin:\$${PATH}" >> ${SETUP_FILE}
 	@echo "PATH=\$${INSTALL_DIR}/paraview/${PARAVIEW_VERSION}/bin:\$${PATH}" >> ${SETUP_FILE}
 	@echo "PATH=\$${INSTALL_DIR}/openmpi/${OPENMPI_VERSION}/bin:\$${PATH}" >> ${SETUP_FILE}
+	@echo "PATH=\$${INSTALL_DIR}/gnuplot/${GNUPLOT_VERSION}/bin:\$${PATH}" >> ${SETUP_FILE}
 	@echo "" >> ${SETUP_FILE}
 	@echo "# Setting LD_LIBRARY_PATH:" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/Python/${PYTHON_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/blitz/${BLITZ_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/qt/${QT_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
-	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/PyQt5/${PyQt_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
+	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/pyqt5/${PyQt_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/mdsplus/${MDSPLUS_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/imas/${IMASDD_VERSION}/solps/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/libxml2/${LIBXML2_VERSION}/solps/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
@@ -412,8 +473,8 @@ setupenv.sh: Makefile
 	@echo "# Setting PYTHONPATH:" >> ${SETUP_FILE}
 	@echo "PYTHONPATH=\$${ROOT_DIR}/src/widgets:\$${PYTHONPATH}" >> ${SETUP_FILE}
 	@echo "PYTHONPATH=\$${INSTALL_DIR}/imas/${IMASDD_VERSION}/solps/python/lib.linux-x86_64-${PYTHON_MAINVERSION}:\$${PYTHONPATH}" >> ${SETUP_FILE}
-	@echo "PYTHONPATH=\$${INSTALL_DIR}/PyQt5/${PyQt_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages:\$${PYTHONPATH}" >> ${SETUP_FILE}
-	@echo "PYTHONPATH=\$${INSTALL_DIR}/sip/${SIP_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages:\$${PYTHONPATH}" >> ${SETUP_FILE}
+	@echo "PYTHONPATH=\$${INSTALL_DIR}/pyqt5/${PyQt_VERSION}/lib/python${PYTHON_MAINVERSION}/site-packages:\$${PYTHONPATH}" >> ${SETUP_FILE}
+	@echo "PYTHONPATH=\$${INSTALL_DIR}/sip/${SIP_VERSION}/lib:\$${PYTHONPATH}" >> ${SETUP_FILE}
 	@echo "PYTHONPATH=\$${INSTALL_DIR}/gnuplot-widget/python-${PYTHON_VERSION}-qt-${QT_VERSION}:\$${PYTHONPATH}" >> ${SETUP_FILE}
 	@echo "" >> ${SETUP_FILE}
 	@echo "# Exporting variables" >> ${SETUP_FILE}
@@ -437,42 +498,6 @@ setupenv.sh: Makefile
 	@echo "alias solps_help=\"assistant -collectionFile \$${ROOT_DIR}/doc/build/qthelp/SOLPSGUI.qhc\"" >> ${SETUP_FILE}
 	@echo "alias eirene=\"python3 \$${ROOT_DIR}/src/widgets/eirene.py\"" >> ${SETUP_FILE}
 	@echo "alias b2=\"python3 \$${ROOT_DIR}/src/widgets/b2.py\"" >> ${SETUP_FILE}
-
-# Solps GUI module file
-${SOLPS_GUI_MOD}:
-	@echo "Writing solps-gui module file to ${MODULE_DIR}/solps-gui/1.5"
-	@install -d ${MODULE_DIR}/solps-gui
-	@echo "#%Module1.0###################################################################" > ${SOLPS_GUI_MOD}
-	@echo "##" >> ${SOLPS_GUI_MOD}
-	@echo "## \$$name modulefile" >> ${SOLPS_GUI_MOD}
-	@echo "##" >> ${SOLPS_GUI_MOD}
-	@echo "proc ModulesHelp { } {" >> ${SOLPS_GUI_MOD}
-	@echo "puts stderr "\tThis module sets the environment for $name v$ver"" >> ${SOLPS_GUI_MOD}
-	@echo "}" >> ${SOLPS_GUI_MOD}
-	@echo "conflict solps-gui" >> ${SOLPS_GUI_MOD}
-	@echo "module-whatis "Graphical user interface for interacting with SOLPS-ITER and its output"" >> ${SOLPS_GUI_MOD}
-	@echo "if { ! [ is-loaded imas ] } {" >> ${SOLPS_GUI_MOD}
-	@echo "    module load imas/${IMASDD_VERSION}/solps" >> ${SOLPS_GUI_MOD}
-	@echo "}" >> ${SOLPS_GUI_MOD}
-	@echo "" >> ${SOLPS_GUI_MOD}
-	@echo "if { ![ is-loaded Python/${PYTHON_VERSION} ] } {" >> ${SOLPS_GUI_MOD}
-	@echo "    module load Python/${PYTHON_VERSION}" >> ${SOLPS_GUI_MOD}
-	@echo "}" >> ${SOLPS_GUI_MOD}
-	@echo "" >> ${SOLPS_GUI_MOD}
-	@echo "if { ![ is-loaded PyQt5/${PyQt_VERSION} ] } {" >> ${SOLPS_GUI_MOD}
-	@echo "    module load PyQt5/${PyQt_VERSION}" >> ${SOLPS_GUI_MOD}
-	@echo "}" >> ${SOLPS_GUI_MOD}
-	@echo "if { ![ is-loaded gnuplot-widget ] } {" >> ${SOLPS_GUI_MOD}
-	@echo "    module load gnuplot-widget" >> ${SOLPS_GUI_MOD}
-	@echo "}" >> ${SOLPS_GUI_MOD}
-	@echo "" >> ${SOLPS_GUI_MOD}
-	@echo "prepend-path PYTHONPATH         ${BUILDROOT}/src/widgets" >> ${SOLPS_GUI_MOD}
-	@echo "prepend-path PYQTDESIGNERPATH   ${BUILDROOT}/src/plugins/designer" >> ${SOLPS_GUI_MOD}
-	@echo "" >> ${SOLPS_GUI_MOD}
-	@echo "set-alias solps {python3 ${BUILDROOT}/src/gui/solps.py $*}" >> ${SOLPS_GUI_MOD}
-	@echo "set-alias solps_doc \"xdg-open ${BUILDROOT}/doc/build/html/index.html\"" >> ${SOLPS_GUI_MOD}
-	@echo "set-alias eirene \"python3 -m eirene $*\"" >> ${SOLPS_GUI_MOD}
-	@echo "set-alias b2 \"python3 -m b2 $*\"" >> ${SOLPS_GUI_MOD}
 
 query-%:
 	@echo $($(*))
