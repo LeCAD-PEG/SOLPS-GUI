@@ -217,6 +217,7 @@ function _cmake_bootstrap {
     # Arguments:
     # 1 - CMake options
     # 2 - PreCMake options
+    # 3 - Optional location of CMakeLists.txt
     _log "CMake bootrap for ${PACKAGE}. Log file: ${PACKAGE_LOG_DIR}/cmake"
     _log "$2" ${PACKAGE_SOURCE_DIR}/bootstrap --prefix=${PACKAGE_INSTALL_DIR} $1
     cd ${PACKAGE_BUILD_DIR}
@@ -231,11 +232,19 @@ function _cmake {
     # Arguments:
     # 1 - CMake options
     # 2 - PreCMake options
+    # 3 - Optional location of CMakeLists.txt
+
+    if [ -z "$1" ]; then
+        SOURCE_DIR=${PACKAGE_SOURCE_DIR}
+    else
+        SOURCE_DIR=${3}
+    fi
+
     _log "CMake configure for ${PACKAGE}. Log file: ${PACKAGE_LOG_DIR}/cmake"
     _log "$2" cmake $1 -DCMAKE_INSTALL_PREFIX=${PACKAGE_INSTALL_DIR}
     cd ${PACKAGE_BUILD_DIR}
     if [ ! -e ${PACKAGE_BUILD_DIR}/.configured ]; then
-        env -v $2 cmake ${PACKAGE_SOURCE_DIR} $1 -DCMAKE_INSTALL_PREFIX=${PACKAGE_INSTALL_DIR} &> ${PACKAGE_LOG_DIR}/cmake
+        env -v $2 cmake ${SOURCE_DIR} $1 -DCMAKE_INSTALL_PREFIX=${PACKAGE_INSTALL_DIR} &> ${PACKAGE_LOG_DIR}/cmake
         touch ${PACKAGE_BUILD_DIR}/.configured
     fi
 }

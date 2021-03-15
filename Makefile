@@ -24,7 +24,6 @@ SIP_VERSION=4.19.25
 # ParaView specific version
 PARAVIEW_VERSION=5.8.1
 CMAKE_VERSION=3.15.4
-
 # IMAS
 BLITZ_VERSION=1.0.2
 MDSPLUS_VERSION=7.96.8
@@ -34,6 +33,8 @@ IMASUAL_VERSION=4.8.7
 IMASDD_VERSION=3.31.0
 # Minor version is used for compatibility compiling.
 IMAS_MINOR_VERSION=31
+
+GGD_PLUGIN_VERSION=refactor_for_ParaView_5.8.0
 
 # SOLPS-ITER
 GLI_VERSION=4.5.30
@@ -248,6 +249,21 @@ ${STAGING_DIR}/ReadUALEdge-Plugin/1.5.0:
 
 paraview-plugin: config imas cmake paraview blitz ${STAGING_DIR}/ReadUALEdge-Plugin/1.5.0
 
+${STAGING_DIR}/ggd_plugin/${GGD_PLUGIN_VERSION}:
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${GGD_PLUGIN_VERSION}}/" package/build-ggd-plugin.sh
+
+	QT_VERSION=${QT_VERSION} \
+	PARAVIEW_VERSION=${PARAVIEW_VERSION} \
+	CMAKE_VERSION=${CMAKE_VERSION} \
+	IMASDD_VERSION=${IMASDD_VERSION} \
+	IMASUAL_VERSION=${IMASUAL_VERSION} \
+	BLITZ_VERSION=${BLITZ_VERSION} \
+	MDSPLUS_VERSION=${MDSPLUS_VERSION} \
+	PYTHON_VERSION=${PYTHON_VERSION} \
+	package/build-ggd-plugin.sh
+
+ggd-plugin: config imas cmake paraview ${STAGING_DIR}/ggd_plugin/${GGD_PLUGIN_VERSION}
+
 ${STAGING_DIR}/ReadUALEdge-Plugin/1.5.0-iter:
 	./package/build-paraview-plugin-iter.sh
 
@@ -280,7 +296,7 @@ ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps:
 
 imas: config python saxon mdsplus blitz libxml2 imasdd ${STAGING_DIR}/imas/${IMASDD_VERSION}/solps
 
-${STAGING_DIR}/GGD/${GGD_VERSION}:
+${STAGING_DIR}/ggd/${GGD_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${GGD_VERSION}}/" package/build-ggd.sh
 
 	IMASUAL_VERSION=${IMASUAL_VERSION} \
@@ -288,7 +304,7 @@ ${STAGING_DIR}/GGD/${GGD_VERSION}:
 	MDSPLUS_VERSION=${MDSPLUS_VERSION} \
 	./package/build-ggd.sh
 
-ggd: config imas ${STAGING_DIR}/GGD/${GGD_VERSION}
+ggd: config imas ${STAGING_DIR}/ggd/${GGD_VERSION}
 
 
 ${STAGING_DIR}/curl/${CURL_VERSION}:
@@ -396,7 +412,7 @@ ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}/.installed:
 
 solps-iter: config imas gr gli OpenBLAS mscl ggd python netcdf ncl openmpi motif ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}/.installed
 
-solps-gui: config imas pyqt gnuplot setupenv.sh
+solps-gui: config imas pyqt gnuplot paraview ggd-plugin setupenv.sh
 
 setupenv.sh: Makefile
 	@echo "Writing environemnt to ${BUILDROOT}/${SETUP_FILE}"
@@ -456,6 +472,7 @@ setupenv.sh: Makefile
 	@echo "# Setting LD_LIBRARY_PATH:" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/Python/${PYTHON_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/blitz/${BLITZ_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
+	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/blitz/${BLITZ_VERSION}/lib64:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/qt/${QT_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/pyqt5/${PyQt_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
 	@echo "LD_LIBRARY_PATH=\$${INSTALL_DIR}/mdsplus/${MDSPLUS_VERSION}/lib:\$${LD_LIBRARY_PATH}" >> ${SETUP_FILE}
@@ -490,7 +507,7 @@ setupenv.sh: Makefile
 	@echo "export PYQTDESIGNERPATH=${BUILDROOT}/src/plugins/designer:\$${PYQTDESIGNERPATH}" >> ${SETUP_FILE}
 	@echo "export IMAS_VERSION=${IMASDD_VERSION}" >> ${SETUP_FILE}
 	@echo "export UAL_VERSION=${IMASUAL_VERSION}" >> ${SETUP_FILE}
-	@echo "export PV_PLUGIN_PATH=\$${INSTALL_DIR}/ReadUALEdge-Plugin/1.5.0" >> ${SETUP_FILE}
+	@echo "export PV_PLUGIN_PATH=\$${INSTALL_DIR}/ggd_plugin/${GGD_PLUGIN_VERSION}/lib64/paraview-5.8/plugins/ReadUALGGD/" >> ${SETUP_FILE}
 	@echo "" >> ${SETUP_FILE}
 	@echo "# Setting aliases" >> ${SETUP_FILE}
 	@echo "alias solps=\"python3 \$${ROOT_DIR}/src/gui/solps.py\"" >> ${SETUP_FILE}
