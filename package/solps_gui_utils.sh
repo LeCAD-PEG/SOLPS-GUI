@@ -234,7 +234,7 @@ function _cmake {
     # 2 - PreCMake options
     # 3 - Optional location of CMakeLists.txt
 
-    if [ -z "$1" ]; then
+    if [ -z "${3}" ]; then
         SOURCE_DIR=${PACKAGE_SOURCE_DIR}
     else
         SOURCE_DIR=${3}
@@ -288,6 +288,19 @@ function _install {
     if [ ! -d ${PACKAGE_INSTALL_DIR} ]; then
         _log "make install ${1}"
         env -v ${2} make install ${1} &> ${PACKAGE_LOG_DIR}/install
+    fi
+}
+
+function _install_custom {
+    # Calls custom script to install.
+    # Arguments
+    # 1 - Path to executable
+    # 2 - Options for executable
+    # 3 - Pre-options
+    _log "Calling custom install for ${PACKAGE}. Log file: ${PACKAGE_LOG_DIR}/install_custom"
+    if [ ! -d ${PACKAGE_INSTALL_DIR} ]; then
+        _log "${3} ${1} ${2}"
+        env -v ${3} ${1} ${2} &> ${PACKAGE_LOG_DIR}/install_custom
     fi
 }
 
