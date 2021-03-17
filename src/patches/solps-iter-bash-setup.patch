@@ -3,7 +3,7 @@ new file mode 100644
 index 00000000..9d9aa8fc
 --- /dev/null
 +++ b/setup.sh
-@@ -0,0 +1,265 @@
+@@ -0,0 +1,267 @@
 +#!/bin/bash
 +
 +
@@ -120,7 +120,9 @@ index 00000000..9d9aa8fc
 +
 +# First, remove the old path to SOLPS if already set
 +# (avoid too long paths)
-+if [ -z ${SOLPS_PATH} ]; then
++if [ -z ${SOLPS_PATH+x} ]; then
++    :
++else
 +    export PATH=$(echo ${PATH} | sed "s|${SOLPS_PATH}:||")
 +fi
 +
@@ -261,7 +263,7 @@ index 00000000..9d9aa8fc
 +fi
 +
 +# Add any local settings if present
-+if [ -s ${SOLPSTOP}/SETUP/setup.sh.local]; then
++if [ -s ${SOLPSTOP}/SETUP/setup.sh.local ]; then
 +  echo "Loading SETUP/setup.sh.local."
 +  source ${SOLPSTOP}/SETUP/setup.sh.local
 +fi

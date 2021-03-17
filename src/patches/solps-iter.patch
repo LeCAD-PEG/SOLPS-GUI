@@ -24,13 +24,13 @@ index 00000000..b4925797
 +#
 +
 +    NODENAME ?= $(shell echo `hostname`)
-+        NCDIR ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
-+    MSCL_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
-+        H5DIR ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
-+      GR_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
-+     GLI_HOME ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
-+OPENBLAS_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
-+  MDSPLUS_DIR ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++#        NCDIR ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++#    MSCL_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++#        H5DIR ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++#      GR_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++#     GLI_HOME ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++#OPENBLAS_ROOT ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
++#  MDSPLUS_DIR ?= ${SOLPSLIB} # Provided by SOLPS-GUI build script
 +
 +# The library path when installing NCARG on Debian9 is
 +# /usr/lib/x86_64-linux-gnu/ncarg
@@ -298,16 +298,3 @@ index 00000000..7c233dff
 +#!!! mode: Makefile
 +#!!! End:
 +
-diff --git a/runs/Makefile b/runs/Makefile
-index f4674e03..c5df5d62 100644
---- a/runs/Makefile
-+++ b/runs/Makefile
-@@ -4,7 +4,7 @@
- #-----------------------------------------------------------------------
- # Variables.
-
--SHELL = /usr/bin/env sh
-+SHELL = /bin/tcsh
- TIME = time
- RUN_OPTIONS =
- BLANK =
