@@ -17,8 +17,9 @@ fi
 _downloadFileAndUnpack ${DOWNLOAD_LINK} ${FILENAME}
 
 cd ${PACKAGE_SOURCE_DIR}/src
-export CFLAGS="-I/usr/include/tirpc:${CFLAGS}"
-PRE_FLAGS="F77=gfortran CFLAGS=-DUSE_INTERP_RESULT LDFLAGS=-ltirpc"
+export CPATH="-I/usr/include/tirpc:${CPATH}"
+PRE_FLAGS="F77=gfortran CFLAGS=-DUSE_INTERP_RESULT LIBS=-ltirpc"
 _configure_custom "${PACKAGE_SOURCE_DIR}/src/configure" "" "${PRE_FLAGS}"
 _make
+mkdir -p ${STAGING_DIR}/${PACKAGE}
 _install "DESTDIR=${PACKAGE_INSTALL_DIR}"
