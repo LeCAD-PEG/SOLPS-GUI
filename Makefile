@@ -43,7 +43,7 @@ GGD_VERSION=1.9.1
 SOLPS_VERSION=develop
 MSCL_VERSION=1.1.1
 CURL_VERSION=7.64.1
-HDF5_VERSION=1.10.6
+HDF5_VERSION=1.12.0
 NETCDF_VERSION=4.7.4
 NETCDF_FORTRAN_VERSION=4.5.3
 FREETYPE_VERSION=2.10.0
@@ -324,6 +324,18 @@ ${STAGING_DIR}/hdf5/${HDF5_VERSION}:
 
 hdf5: config cmake ${STAGING_DIR}/hdf5/${HDF5_VERSION}
 
+${STAGING_DIR}/netcdf-fortran/${NETCDF_FORTRAN_VERSION}:
+	sed -i -e "/^VERSION/s/:-[^}]*}/:-${NETCDF_FORTRAN_VERSION}}/" package/build-netCDF-Fortran.sh
+
+	VERSION=${NETCDF_FORTRAN_VERSION} \
+	NETCDF_VERSION=${NETCDF_VERSION} \
+	CMAKE_VERSION=${CMAKE_VERSION}	\
+	HDF5_VERSION=${HDF5_VERSION} \
+	CURL_VERSION=${CURL_VERSION} \
+	./package/build-netCDF-Fortran.sh
+
+netcdf-fotran: config hdf5 curl netcdf ${STAGING_DIR}/netcdf-fortran/${NETCDF_FORTRAN_VERSION}
+
 ${STAGING_DIR}/netcdf/${NETCDF_VERSION}:
 	sed -i -e "/^VERSION/s/:-[^}]*}/:-${NETCDF_VERSION}}/" package/build-netCDF.sh
 
@@ -333,14 +345,6 @@ ${STAGING_DIR}/netcdf/${NETCDF_VERSION}:
 	CMAKE_VERSION=${CMAKE_VERSION} \
 	./package/build-netCDF.sh
 
-	sed -i -e "/^VERSION/s/:-[^}]*}/:-${NETCDF_FORTRAN_VERSION}}/" package/build-netCDF-Fortran.sh
-
-	VERSION=${NETCDF_FORTRAN_VERSION} \
-	NETCDF_VERSION=${NETCDF_VERSION} \
-	CMAKE_VERSION=${CMAKE_VERSION}	\
-	HDF5_VERSION=${HDF5_VERSION} \
-	CURL_VERSION=${CURL_VERSION} \
-	./package/build-netCDF-Fortran.sh
 
 netcdf: config hdf5 curl ${STAGING_DIR}/netcdf/${NETCDF_VERSION}
 
@@ -410,7 +414,7 @@ ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}/.installed:
 	PYTHON=${PYTHON_VERSION} \
 	./package/build-solps-iter.sh
 
-solps-iter: config imas gr gli OpenBLAS mscl ggd python netcdf ncl openmpi motif ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}/.installed
+solps-iter: config imas gr gli openblas mscl ggd python netcdf ncl openmpi motif ${STAGING_DIR}/solps-iter/${SOLPS_VERSION}/.installed
 
 solps-gui: config imas pyqt gnuplot paraview ggd-plugin setupenv.sh
 

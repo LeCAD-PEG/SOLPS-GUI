@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 BUILDROOT=${BUILDROOT:-$( cd "$( dirname "${BASH_SOURCE[0]:-$0}" )" &> /dev/null && echo ${PWD%/package} )}
-PACKAGE="mcsl"
+PACKAGE="mscl"
 VERSION=${VERSION:-1.1.1}
 GIT_LINK="ssh://git@git.iter.org/lib/mscl.git"
 

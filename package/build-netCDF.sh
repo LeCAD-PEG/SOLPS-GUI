@@ -16,10 +16,12 @@ fi
 
 _downloadFileAndUnpack ${DOWNLOAD_LINK} ${FILENAME}
 
-PRE_FLAGS="CPPFLAGS=\"-I${H5DIR}/include -L${ODIR}/include\" LDFLAGS=\"-L${H5DIR}/lib -L${ODIR}/lib\""
-CONFIGURE_FLAGS="--enable-netcdf-4 --with-CURL=${ODIR} --with-HDF5=${H5DIR}"
+# PRE_FLAGS="CPPFLAGS=\"-I${H5DIR}/include\\\ -L${ODIR}/include\" LDFLAGS=\"-L${H5DIR}/lib\\\ -L${ODIR}/lib\""
+CONFIGURE_FLAGS="--enable-netcdf-4"
+# --with-CURL=${ODIR} --with-HDF5=${H5DIR}"
 
-
-_configure ${CONFIGURE_FLAGS} ${PRE_FLAGS}
+export CPPFLAGS="-I${H5DIR}/include -I${ODIR}/include"
+export LDFLAGS="-L${H5DIR}/lib -L${ODIR}/lib"
+_configure "${CONFIGURE_FLAGS}"
 _make "-j${MAKE_JOBS}"
 _install

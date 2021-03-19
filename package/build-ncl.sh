@@ -1,9 +1,11 @@
+
 #!/bin/sh
 set -e
 BUILDROOT=${BUILDROOT:-$( cd "$( dirname "${BASH_SOURCE[0]:-$0}" )" &> /dev/null && echo ${PWD%/package} )}
 PACKAGE="ncl"
 VERSION=${VERSION:-6.5.0}
-GIT_LINK="https://github.com/NCAR/ncl.git"
+DOWNLOAD_LINK="https://github.com/NCAR/ncl/archive/refs/tags/${VERSION}.tar.gz"
+FILENAME="${PACKAGE}-${VERSION}.tar.gz"
 
 if  [ -e ${BUILDROOT}/package/solps_gui_utils.sh ]; then
     source ${BUILDROOT}/package/solps_gui_utils.sh
@@ -12,7 +14,7 @@ if  [ -e ${BUILDROOT}/package/setup.sh ]; then
     source ${BUILDROOT}/package/setup.sh
 fi
 
-_gitCloneSingleBranch ${GIT_LINK} ${VERSION}
+_downloadFileAndUnpack ${DOWNLOAD_LINK} ${FILENAME}
 
 cd ${PACKAGE_SOURCE_DIR}
 cd config
