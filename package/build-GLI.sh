@@ -47,7 +47,7 @@ cd ${SRC_DIR}
 if [ ! -e ${SRC_DIR}/.configured ]; then
     rm -rf ${INSTALL_DIR}
     cd ${SRC_DIR}/src
-    ./configure CFLAGS="-DUSE_INTERP_RESULT"
+    ./configure CFLAGS="-DUSE_INTERP_RESULT -I/usr/include/tirpc" LIBS=-ltirpc # -with-tcllib=$EBROOTTCL/lib --with-tklib=$EBROOTTK/lib 
     touch ${SRC_DIR}/.configured
 fi
 
