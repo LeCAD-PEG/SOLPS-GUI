@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION="${VERSION:-1.0.1}" # Apparently this is the same as 0.10.0
+VERSION="${VERSION:-1.0.2}" # Apparently this is the same as 0.10.0
 SOURCE="blitz-${VERSION}.tar.gz"
 DOWNLOAD="https://github.com/blitzpp/blitz/archive/${VERSION}.tar.gz"
 SRC_DIR="${BUILD_DIR}/blitz-${VERSION}"
