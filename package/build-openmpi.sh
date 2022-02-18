@@ -13,7 +13,7 @@ STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
 DOWNLOAD_DIR=${BUILDROOT}/download
 
 # Package variables
-VERSION=${VERSION:-4.0.0}
+VERSION=${VERSION:-4.1.0}
 GIT="https://github.com/open-mpi/ompi.git"
 SRC_DIR="${BUILD_DIR}/openmpi-${VERSION}"
 INSTALL_DIR=${STAGING_DIR}/openmpi/${VERSION}
@@ -45,7 +45,7 @@ if [ ! -e ${SRC_DIR}/.configured ]; then
     if [ ! -e ${SRC_DIR}/configure ]; then
         ./autogen.pl
     fi
-    ./configure --prefix=${INSTALL_DIR}
+    ./configure --without-lustre --prefix=${INSTALL_DIR}
     touch ${SRC_DIR}/.configured
 fi
 
