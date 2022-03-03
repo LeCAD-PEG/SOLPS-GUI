@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+
 BUILDROOT=${BUILDROOT:-$( cd "$( dirname "${BASH_SOURCE[0]:-$0}" )" &> /dev/null && echo ${PWD%/package} )}
 PACKAGE="openmpi"
 VERSION=${VERSION:-4.0.0}
