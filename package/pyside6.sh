@@ -11,14 +11,18 @@ source $(cd ${0%/*} && echo ${PWD})/functions.sh $*
 
 _gitCloneSingleBranch ${GIT_URL} ${VERSION}
 
+_prerequisites cmake ninja python libclang qt6
+
 QT_DIR=$(${PACKAGE_DIR}/qt6.sh --prefix)
 
 eval $(${PACKAGE_DIR}/cmake.sh --env)
 eval $(${PACKAGE_DIR}/libclang.sh --env)
 eval $(${PACKAGE_DIR}/qt6.sh --env)
 eval $(${PACKAGE_DIR}/python.sh --env)
+eval $(${PACKAGE_DIR}/ninja.sh --env)
 
 cd ${PACKAGE_SOURCE_DIR}
+
 
 # Build
 if [ ! -e ${PACKAGE_SOURCE_DIR}/.built ]; then

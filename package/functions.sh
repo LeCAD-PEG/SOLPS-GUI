@@ -1,5 +1,7 @@
 #!/bin/bash
 
+trap 'ec=$?; ((ec != 0)) && echo -e "\e[31mExited with failure: $ec\e[m"' EXIT
+
 BUILDROOT=${BUILDROOT:-$(cd ${0%/*} && echo ${PWD%/package})}
 
 if [ -z ${PACKAGE+x} ]; then
@@ -7,12 +9,10 @@ if [ -z ${PACKAGE+x} ]; then
     return
 fi
 
-export STAGING_DIR=${BUILDROOT}/staging
-
-PKG_DIRS=${PKG_DIRS:-apps}
-export BUILD_DIR=${BUILDROOT}/${PKG_DIRS}/build
-export SOURCE_DIR=${BUILDROOT}/${PKG_DIRS}/source
-export DOWNLOAD_DIR=${BUILDROOT}/${PKG_DIRS}/download
+export STAGING_DIR=${STAGING_DIR:-${BUILDROOT}/staging}
+export BUILD_DIR=${BUILD_DIR:-${BUILDROOT}/build}
+export SOURCE_DIR=${BUILD_DIR}/source
+export DOWNLOAD_DIR=${BUILDROOT}/download
 export PACKAGE_DIR=${BUILDROOT}/package
 LOG_DIR=${BUILDROOT}/LOGS
 
@@ -33,8 +33,10 @@ test "$1" == "--clean" && rm -rf ${PACKAGE_SOURCE_DIR} \
 if test "$1" == "--env" ; then # e.g. eval $(build/python.sh --env)
   echo "export PATH=${PACKAGE_INSTALL_DIR}/bin:\${PATH}"
   echo "export LD_LIBRARY_PATH=${PACKAGE_INSTALL_DIR}/lib:\${LD_LIBRARY_PATH}"
-  exit
+  test "$2" == "--pkg" && echo "export PKG_CONFIG_PATH=${PACKAGE_INSTALL_DIR}/lib/pkgconfig:\${PKG_CONFIG_PATH}"
+  exit 0
 fi
+    
 
 if test "$1" == "--help"
    then cat <<EOF
@@ -44,11 +46,14 @@ Usage: [env [VERSION=version]] $0 [options]
      --clean   Removes source, build, and install directory
      --env     Echoes instalation environment variables for PATH and LD_LIBRARY_PATH
                Example usage: eval \$($0 --env)
+     --env --pkg  Echoes PKG_CONFIG_PATH export in addition
      --version Echoes package build version
      --prefix  Echoes package installation prefix 
 EOF
-   exit
+   exit 0
 fi
+
+test -d ${PACKAGE_INSTALL_DIR} && echo Using ${PACKAGE}@${VERSION} && exit 0
 
 DOWNLOAD_CMD=${DOWNLOAD_CMD:-wget -q --show-progress}
 EXTRACT_COMMAND=${EXTRACT_COMMAND:-tar xf}
@@ -440,6 +445,12 @@ function _python_install {
     cd ${PACKAGE_SOURCE_DIR}
     env -v python setup.py build install $1 &> ${PACKAGE_LOG_DIR}/python_install
     test $? == 0 && echo Installed OK || echo Build failed
+}
+
+function _prerequisites {
+    for package in $*
+    do ${PACKAGE_DIR}/${package}.sh
+    done 
 }
 
 function _createDirs {

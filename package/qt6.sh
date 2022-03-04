@@ -4,8 +4,8 @@ PACKAGE=qt6
 VERSION=${VERSION:-6.2.3}
 BUILD_TYPE=${BUILD_TYPE:-release}
 MAJOR_VERSION=${VERSION%.*}
-DOWNLOAD_LINK=https://download.qt.io/official_releases/qt/${MAJOR_VERSION}/${VERSION}/single/qt-everywhere-src-${VERSION}.tar.xz
 FILENAME=qt-everywhere-src-${VERSION}.tar.xz
+DOWNLOAD_LINK=https://download.qt.io/official_releases/qt/${MAJOR_VERSION}/${VERSION}/single/${FILENAME}
 
 source $(cd ${0%/*} && echo ${PWD})/functions.sh $*
 
@@ -18,16 +18,13 @@ if [ ${BUILD_TYPE} == release ]; then
 else
 	# Debug version
 	CONFIGURE_FLAG="-debug -platform linux-g++"
-	CONFIGURE_FLAG="${CONFIGURE_FLAG} -force-debug-info"
-	CONFIGURE_FLAG="${CONFIGURE_FLAG} -no-separate-debug-info"
+	CONFIGURE_FLAG+=" -force-debug-info"
+	CONFIGURE_FLAG+=" -no-separate-debug-info"
 fi
 
-CONFIGURE_FLAG="${CONFIGURE_FLAG} -nomake tests -nomake examples -bundled-xcb-xinput"
-CONFIGURE_FLAG="${CONFIGURE_FLAG} -xcb"
+CONFIGURE_FLAG+=" -nomake tests -nomake examples -bundled-xcb-xinput -xcb"
 
-# qmake fails if the following variables are set... https://bugreports.qt.io/browse/QTBUG-78729
-unset CPLUS_INCLUDE_PATH
-unset CPATH
+${PACKAGE_DIR}/cmake.sh
 
 _configure_cmake "${CONFIGURE_FLAG}"  
 #_cmake_build --verbose

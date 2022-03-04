@@ -1,5 +1,7 @@
 setupenv.sh
-3rd_packages
+build
+download
+install
 LOGS
 staging
 *~

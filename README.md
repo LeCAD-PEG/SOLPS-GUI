@@ -3,16 +3,7 @@ SOLPS-ITER GUI
 
 ## Build environment
 
-First run ./configure
-
-    $ ./configure
-
-
-Prepare Python 3, PyQt and ParaView with GCC 4.8+
-
-    $ ./configure
-    $ make python
-    $ make paraview
+   make
 
 One can modify the following environment variables to change the installation
 location:
@@ -22,15 +13,16 @@ location:
     $ # Example
     $ STAGING_DIR=/path/to/install make
 
+When having at least 100GB free memory then building can be done in memory
+
+     BUILD_DIR=/dev/shm/$USER make
+     rm -rf /dev/shm/$USER
+
 Source the setupenv.sh for locally built PyQt with
 
     $ make setupenv.sh
     $ source setupenv.sh
 
-Or use the modules generated after the building of PyQt
-
-    $ module use modules
-    $ module load ParaView
 
 Optionally after building  PyQt you can build gnuplot 5.2 and embedded gnuplot
 in Qt with the following commands:
@@ -212,3 +204,13 @@ To start building the packages, run the following command:
     cd solps-gui
     ./configure
     make solps-iter
+
+CentOS 8:
+    yum install ncl-devel cairo-devel fontconfig-devel libXrender-devel \
+    libX11-devel freetype-devel ksh libxslt java-1.8.0-openjdk-devel \
+    readline-devel libxslt motif-devel netcdf-devel \
+    netcdf-fortran-devel ctags-etags texlive texlive-latex \
+    texlive-latex-bin-bin texlive-collection-latexrecommended \
+    environment-modules openssl-devel \
+    libtirpc-devel ksh
+
