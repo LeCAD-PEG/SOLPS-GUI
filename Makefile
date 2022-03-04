@@ -29,6 +29,6 @@ query-%:
 	@echo $($(*))
 
 deep-clean:
-	chmod -R a+rw staging/imas
+	-chmod -R a+rw staging/imas
 	rm -rf build staging
 

@@ -9,6 +9,8 @@ DOWNLOAD_LINK=https://download.qt.io/official_releases/qt/${MAJOR_VERSION}/${VER
 
 source $(cd ${0%/*} && echo ${PWD})/functions.sh $*
 
+_prerequsites cmake ninja
+
 _downloadFileAndUnpack ${DOWNLOAD_LINK} ${FILENAME}
 
 # Set compile version
@@ -24,7 +26,7 @@ fi
 
 CONFIGURE_FLAG+=" -nomake tests -nomake examples -bundled-xcb-xinput -xcb"
 
-${PACKAGE_DIR}/cmake.sh
+eval $(${PACKAGE_DIR}/ninja.sh --env)
 
 _configure_cmake "${CONFIGURE_FLAG}"  
 #_cmake_build --verbose
