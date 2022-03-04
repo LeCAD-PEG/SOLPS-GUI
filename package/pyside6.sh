@@ -25,12 +25,13 @@ cd ${PACKAGE_SOURCE_DIR}
 
 
 # Build
-if [ ! -e ${PACKAGE_SOURCE_DIR}/.built ]; then
+if [ ! -e ${PACKAGE_INSTALL_DIR}/.built ]; then
     python3.9 setup.py install \
           --qmake=${QT_DIR}/bin/qmake --cmake=$(which cmake) \
           --module-subset=Core,Gui,Widgets --skip-docs \
           --ignore-git --parallel=${MAKE_JOBS}
-    touch ${PACKAGE_SOURCE_DIR}/.built
+    mkdir -p ${PACKAGE_INSTALL_DIR}
+    touch ${PACKAGE_INSTALL_DIR}/.built
 fi
 
 
