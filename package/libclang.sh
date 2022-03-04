@@ -9,6 +9,8 @@ FILENAME=llvm-${VERSION}.src.tar.xz
 
 source $(cd ${0%/*} && echo ${PWD})/functions.sh $*
 
+_prerequisites cmake
+
 _downloadFileAndUnpack ${DOWNLOAD_LINK}/${FILENAME} ${FILENAME}
 LLVM_DIR=${PACKAGE_SOURCE_DIR}
 

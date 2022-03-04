@@ -29,6 +29,6 @@ query-%:
 	@echo $($(*))
 
 deep-clean:
-	chmod -R a+rw ${STAGING_DIR}/imas
-	rm -rf  ${BUILDROOT}/build ${STAGING_DIR}
+	chmod -R a+rw staging/imas
+	rm -rf build staging
 
