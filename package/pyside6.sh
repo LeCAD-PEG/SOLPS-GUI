@@ -9,9 +9,9 @@ GIT_URL=https://code.qt.io/pyside/pyside-setup.git
 
 source $(cd ${0%/*} && echo ${PWD})/functions.sh $*
 
-_gitCloneSingleBranch ${GIT_URL} ${VERSION}
-
 _prerequisites cmake ninja python libclang qt6
+
+_gitCloneSingleBranch ${GIT_URL} ${VERSION}
 
 QT_DIR=$(${PACKAGE_DIR}/qt6.sh --prefix)
 
