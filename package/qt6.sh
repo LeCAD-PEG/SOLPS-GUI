@@ -9,7 +9,7 @@ DOWNLOAD_LINK=https://download.qt.io/official_releases/qt/${MAJOR_VERSION}/${VER
 
 source $(cd ${0%/*} && echo ${PWD})/functions.sh $*
 
-_prerequsites cmake ninja
+_prerequisites cmake ninja
 
 _downloadFileAndUnpack ${DOWNLOAD_LINK} ${FILENAME}
 
