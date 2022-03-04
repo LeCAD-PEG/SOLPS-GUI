@@ -22,6 +22,7 @@ CONFIGURE_FLAG+=" --sip=${SIP_INSTALL_DIR}/bin/sip"
 CONFIGURE_FLAG+=" --destdir=${PACKAGE_INSTALL_DIR}/lib/python${PYTHON_MAINVERSION}/site-packages"
 
 eval $(${PACKAGE_DIR}/python.sh --env)
+eval $(${PACKAGE_DIR}/qt5.sh --env --pkg)
 
 cd ${PACKAGE_SOURCE_DIR}
 _python_configure_custom "${PACKAGE_SOURCE_DIR}/configure.py" "${CONFIGURE_FLAG}"
