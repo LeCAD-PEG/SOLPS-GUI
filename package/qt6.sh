@@ -25,6 +25,7 @@ else
 fi
 
 CONFIGURE_FLAG+=" -nomake tests -nomake examples -bundled-xcb-xinput -xcb"
+CONFIGURE_FLAG+=" -qt-libpng -qt-libjpeg"
 
 eval $(${PACKAGE_DIR}/ninja.sh --env)
 
