@@ -8,7 +8,7 @@ ${PACKAGE_DIR}/python.sh --env
 ${PACKAGE_DIR}/pyqt.sh --env
 ${PACKAGE_DIR}/qt5.sh --env
 ${PACKAGE_DIR}/gnuplot.sh --env
-${PACKAGE_DIR}/pyside6.sh --env
+${PACKAGE_DIR}/pyside6.sh --env --pythonpath
 
 PYTHON_VERSION=$(${PACKAGE_DIR}/python.sh --version)
 PYTHON_MAINVERSION=${PYTHON_VERSION%.*}
