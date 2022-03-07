@@ -32,21 +32,28 @@ test "$1" == "--clean" && rm -rf ${PACKAGE_SOURCE_DIR} \
                                ${PACKAGE_BUILD_DIR} ${PACKAGE_INSTALL_DIR}
 if test "$1" == "--env" ; then # e.g. eval $(build/python.sh --env)
   echo "export PATH=${PACKAGE_INSTALL_DIR}/bin:\${PATH}"
-  echo "export LD_LIBRARY_PATH=${PACKAGE_INSTALL_DIR}/lib:\${LD_LIBRARY_PATH}"
   test "$2" == "--pkg" && echo "export PKG_CONFIG_PATH=${PACKAGE_INSTALL_DIR}/lib/pkgconfig:\${PKG_CONFIG_PATH}"
+  if test "$2" == "--pythonpath" ;then 
+    pyver=$(${PACKAGE_DIR}/python.sh --version)
+    pymajor=${pyver%.*} 
+    echo "export PYTHONPATH=${PACKAGE_INSTALL_DIR}/lib/python${pymajor}/site-packages:\${PYTHONPATH}"
+  else
+    echo "export LD_LIBRARY_PATH=${PACKAGE_INSTALL_DIR}/lib:\${LD_LIBRARY_PATH}"
+  fi
   exit 0
 fi
     
 
 if test "$1" == "--help"
    then cat <<EOF
-Usage: [env [VERSION=version]] $0 [options]
+Usage: [env [VERSION=version ...]] $0 [options]
    Options:
      --rebuild Clears source, build, install directory and builds from scratch
      --clean   Removes source, build, and install directory
      --env     Echoes instalation environment variables for PATH and LD_LIBRARY_PATH
                Example usage: eval \$($0 --env)
      --env --pkg  Echoes PKG_CONFIG_PATH export in addition
+     --env --pythonpath  Echoes PYTHONPATH export instead of LD_LIBRARY_PATH
      --version Echoes package build version
      --prefix  Echoes package installation prefix 
 EOF

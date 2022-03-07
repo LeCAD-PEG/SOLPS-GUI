@@ -16,22 +16,26 @@ _gitCloneSingleBranch ${GIT_URL} ${VERSION}
 QT_DIR=$(${PACKAGE_DIR}/qt6.sh --prefix)
 
 eval $(${PACKAGE_DIR}/cmake.sh --env)
-eval $(${PACKAGE_DIR}/libclang.sh --env)
-eval $(${PACKAGE_DIR}/qt6.sh --env)
+eval $(${PACKAGE_DIR}/libclang.sh --env --pkg)
+eval $(${PACKAGE_DIR}/qt6.sh --env --pkg)
 eval $(${PACKAGE_DIR}/python.sh --env)
 eval $(${PACKAGE_DIR}/ninja.sh --env)
 
-cd ${PACKAGE_SOURCE_DIR}
 
 
 # Build
 if [ ! -e ${PACKAGE_INSTALL_DIR}/.built ]; then
-    python3.9 setup.py install \
-          --qmake=${QT_DIR}/bin/qmake --cmake=$(which cmake) --skip-docs \
-          --ignore-git --parallel=${MAKE_JOBS}
-    mkdir -p ${PACKAGE_INSTALL_DIR}
+    cd ${PACKAGE_SOURCE_DIR}
+#    mkdir -p ${PACKAGE_INSTALL_DIR}
+#    echo "Preparing Python buildenv. See ${PACKAGE_LOG_DIR}/buildenv"
+#    python -m venv buildenv
+#    buildenv/bin/pip install -r requirements.txt &> ${PACKAGE_LOG_DIR}/buildenv
+    echo "Building PySide6. See ${PACKAGE_LOG_DIR}/build"
+    python setup.py install --standalone --skip-docs --parallel=${MAKE_JOBS} \
+    	--ignore-git --prefix=${PACKAGE_INSTALL_DIR} &> ${PACKAGE_LOG_DIR}/build
     touch ${PACKAGE_INSTALL_DIR}/.built
 fi
+#_python_install "--skip-docs --ignore-git --prefix=${PACKAGE_INSTALL_DIR}"
 
 
 # set +e
