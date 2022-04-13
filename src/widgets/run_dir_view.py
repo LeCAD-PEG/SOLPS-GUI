@@ -324,11 +324,15 @@ class DirectoryScan(QThread):
                 mtime = os.stat(dir).st_mtime
                 date = timeStamp2Str(mtime)
                 data = [alias, dir, date, *[''] * 7]
-                parents[0].addChild(TreeItem(data, parent))
+                treeItem = TreeItem(data, parent)
+                parents[0].addChild(treeItem)
+                self.model.path2item[dir] = treeItem
                 continue
             position = len(dir.split(os.sep))
             if position > indentations[-1]:
                 if parents[-1].childCount() > 0:
+                    # So basically to the parent list append the previous 
+                    # 1 level higher directory.
                     parents.append(
                         parents[-1].child(parents[-1].childCount() - 1))
                     indentations.append(position)
@@ -339,7 +343,9 @@ class DirectoryScan(QThread):
 
             date = timeStamp2Str(os.path.getmtime(dir))
             data = [os.path.basename(dir), dir, date, *[''] * 7]
-            parents[-1].addChild(TreeItem(data, parents[-1]))
+            treeItem = TreeItem(data, parents[-1])
+            self.model.path2item[dir] = treeItem
+            parents[-1].addChild(treeItem)
 
         self.model.rootItem = parent
 
@@ -437,7 +443,9 @@ class RunsStatusServer(QUdpSocket):
         logging.info(f'RunsStatusServer reading data.')
         while self.hasPendingDatagrams():
             datagram = self.receiveDatagram()
-            logging.debug(f'Received datagram: {datagram}')
+            data = str(datagram.data(), "utf-8")
+            logging.debug(f'Received datagram: {data}')
+            self.jobStatusChanged.emit(data)
 
     def stop(self) -> None:
         if self.state() == QUdpSocket.BindMode:
@@ -456,8 +464,11 @@ class RunsModel(QAbstractItemModel):
     def __init__(self, style=None, parent=None):
         super(RunsModel, self).__init__(parent)
         self.style = style
-
+        # Root widget item, basically the header
         self.rootItem = TreeItem(Column.headerData)
+        # Path to widget item, using directory as hash and widget item as the
+        # value.
+        self.path2item = {}
 
         self.scanDirectoriesThread = DirectoryScan(self)
         self.scanDirectoriesThread.finished.connect(self.modelReset.emit)
@@ -688,7 +699,7 @@ class RunsModel(QAbstractItemModel):
         self.statusServerThread.jobStatusChanged.connect(self.jobStatusChanged)
 
     @pyqtSlot(str)
-    def jobStatusChanged(self, index: QModelIndex, message: str) -> None:
+    def jobStatusChanged(self, message: str) -> None:
         """
         Change the status column fields of the row, whose run was submitted.
 
@@ -697,18 +708,14 @@ class RunsModel(QAbstractItemModel):
             message (str): Message containing information of the run.
         """
 
-        if not index.isValid():
-            QMessageBox('Warning!', 'Please select a run!')
-            return
-        # item = index.internalPointer()
         try:
             name, path, status = message.split(maxsplit=2)
             try:
                 # dateIndex = self.index(index.row(), Column.date, QModelIndex())
-                item = index.internalPointer()
-
-                dateIndex = self.createIndex(index.row(), Column.date, item)
-                statusIndex = self.createIndex(index.row(), Column.status, item)
+                item = self.path2item[path]
+                item_row = item.row()
+                dateIndex = self.createIndex(item_row, Column.date, item)
+                statusIndex = self.createIndex(item_row, Column.status, item)
                 self.setData(dateIndex, timeStamp2Str(time.time()),
                              Qt.DisplayRole)
                 self.setData(statusIndex, status, Qt.DisplayRole)

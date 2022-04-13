@@ -825,11 +825,11 @@ class SOLPS_MainWindow(QMainWindow):
             msg = f'batch {rundir} {submit_command} {opts}'
 
             logging.info(msg)
-            model.jobStatusChanged(index, msg)
+            model.jobStatusChanged(msg)
         else:
             msg = f'batch {rundir} Not submitted!'
             msg += "Empty command or no run directory for MAIN TCSH"
-            model.jobStatusChanged(index, msg)
+            model.jobStatusChanged(msg)
             logging.warning(msg)
 
     @pyqtSlot()
