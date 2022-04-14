@@ -15,6 +15,8 @@ import time
 import os
 import sys
 
+from typing import Optional
+
 dateFormat = '%d/%m/%Y %I:%m %p'
 
 
@@ -101,12 +103,31 @@ class TreeItem(QTreeWidgetItem):
         return [self.child(i) for i in range(self.childCount())]
 
     def row(self):
+        """Basic concept of QTreeWidget counting.
+
+        To determine the row number of an item, the row is actually the 
+        distance of the item from it's parent. The distance is equivalent to 
+        the index of the item in the list of the parent's children.
+
+        Additionally, eveything is handled through QModelIndex, which confuses,
+        things as they do not posses the absolute position of an item in a 
+        tree structure, but it holds a reference to the item in the linked 
+        structure and it's row position.
+
+        Hence the calculation of the TreeItem row is actually the index of it
+        in it's parent children set.
+
+        For future reference check:
+        
+        https://doc.qt.io/qt-6/model-view-programming.html#basic-concepts
+
+        """
         # Get the number of level
         row = 0
-        if self.parent():
-            row = 1 + self.parent().row()
+        parent_item = self.parent()
+        if parent_item:
+            row = parent_item.indexOfChild(self)
         return row
-
 
 class TextElideLeftDelegate(QStyledItemDelegate):
     """ Elide text of the first column to the left (... at start).
@@ -167,7 +188,6 @@ class RetrieveRunsStatus(QThread):
     """
     progress = pyqtSignal(str)
     currentDirectory = pyqtSignal(str)
-    statusChanged = pyqtSignal(QModelIndex, QModelIndex, int)
 
     def __init__(self, model, parent=None):
         super(RetrieveRunsStatus, self).__init__(parent)
@@ -458,7 +478,7 @@ class RunsStatusServer(QUdpSocket):
 
 class RunsModel(QAbstractItemModel):
     statusServerThread = None
-    scanDirectoriesThread = None
+    scanDirectoriesThread: Optional[DirectoryScan] = None
     columnIndex = {}
 
     def __init__(self, style=None, parent=None):
@@ -476,8 +496,6 @@ class RunsModel(QAbstractItemModel):
         self.scanDirectoriesThread.start()
 
         self.retRunsFolderInfoThread = RetrieveRunsStatus(self)
-        self.retRunsFolderInfoThread.statusChanged.connect(
-            self.dataChanged.emit)
         self.scanDirectoriesThread.finished.connect(
             self.retRunsFolderInfoThread.start)
         self.retRunsFolderInfoThread.finished.connect(self.endResetModel)
@@ -501,17 +519,19 @@ class RunsModel(QAbstractItemModel):
         else:
             return self.rootItem.columnCount()
 
-    def rowCount(self, parent):
-        if parent.column() > 0:
+    def rowCount(self, index: QModelIndex):
+        """Return the number of children for a given item.
+        """
+        if index.column() > 0:
+            # Do not return the row number when selected index has a column
+            # value higher than 0.
             return 0
-
-        if not parent.isValid():
+        if not index.isValid():
             parentItem = self.rootItem
         else:
-            parentItem = parent.internalPointer()
-
-        return parentItem.childCount()
-
+            parentItem = index.internalPointer()
+        item_row = parentItem.childCount()
+        return item_row
     def getItem(self, index: QModelIndex) -> TreeItem:
         if index.isValid():
             item = index.internalPointer()
@@ -585,16 +605,16 @@ class RunsModel(QAbstractItemModel):
         Otherwise, if some columns were to be changed, i.e. the part to the
         run directories etc... the changes will be rejected.
         """
-        logging.info('SetData called')
+        logging.debug('SetData called')
         row = index.row()
 
         # Accept only edits and display changes
-        logging.info(role != Qt.EditRole and role != Qt.DisplayRole)
+        logging.debug(role != Qt.EditRole and role != Qt.DisplayRole)
         if role != Qt.EditRole and role != Qt.DisplayRole:
             return False
 
         column = index.column()
-        logging.info(f"setData row: {row} column: {column} value: {value}")
+        logging.debug(f"setData row: {row} column: {column} value: {value}")
 
         # Disallow changing date by hand
         if role == Qt.EditRole and column == Column.date:
@@ -609,16 +629,14 @@ class RunsModel(QAbstractItemModel):
             return False
 
         item = self.getItem(index)
-        logging.info(f'item {item}')
-        preresult = item.setData(column, role, value)
-        logging.info(preresult)
-        # result = False if preresult is None else True
-        result = True
-        logging.info(f'result {result}')
-        if result:
-            self.dataChanged.emit(index, index)
+        # The QTreeWidgetItem setData is void by default.
+        item.setData(column, role, value)
+        # DATA changed does NOT help. I.e., to actually refresh view
+        # a repaint has to be called or moving the mouse... But still
+        # it has to be called so maybe that the QSortFilterProxy model
+        # does it magic.
+        self.dataChanged.emit(index, index)
 
-        file = 'b2mn.dat'
         if column == Column.run:
             switch_name = 'b2mndr_run_number'
         elif column == Column.shot:
@@ -634,43 +652,41 @@ class RunsModel(QAbstractItemModel):
 
         # LABEL to b2mn, USER, SHOT, RUN to b2md
 
-        if value:
-            # self.dataChanged.emit(index, index)
-            if switch_name:  # set the label in b2mn.dat
-                directory = item.data(Column.path, Qt.DisplayRole)
-                path = os.path.join(directory, 'b2mn.dat')
-                try:
-                    with open(path) as file:
-                        lines = file.read()  # whole file
-                    if switch_name in lines:
-                        lines = lines.split('\n')
-                        for i, line in enumerate(lines):
-                            if switch_name in line:
-                                if column == Column.label:
-                                    lines[i + 1] = " '" + value + "'"
-                                else:
-                                    value_to_replace =\
-                                        lines[i].split()[-1].strip("'")
-                                    lines[i] = \
-                                    lines[i].replace(value_to_replace, value)
-                                with open(path, 'w') as f:
-                                    f.write('\n'.join(lines))
-                                    logging.info(f'Written to {path}')
-                                break
-                    else:
-                        lines = lines.split('\n')
-                        for i, line in enumerate(lines):
-                            if line.startswith('*endphy'):
-                                new_line = f"'{switch_name}'     {value}"
-                                lines.insert(i + 1, new_line)
-                                with open(path, 'w') as f:
-                                    f.write('\n'.join(lines))
-                                    logging.info(f'Written to {path}')
+        if value and switch_name:
+            directory = item.data(Column.path, Qt.DisplayRole)
+            path = os.path.join(directory, 'b2mn.dat')
+            try:
+                with open(path) as file:
+                    lines = file.read()  # whole file
+                if switch_name in lines:
+                    lines = lines.split('\n')
+                    for i, line in enumerate(lines):
+                        if switch_name in line:
+                            if column == Column.label:
+                                lines[i + 1] = " '" + value + "'"
+                            else:
+                                value_to_replace =\
+                                    lines[i].split()[-1].strip("'")
+                                lines[i] = \
+                                lines[i].replace(value_to_replace, value)
+                            with open(path, 'w') as f:
+                                f.write('\n'.join(lines))
+                                logging.debug(f'Written to {path}')
+                            break
+                else:
+                    lines = lines.split('\n')
+                    for i, line in enumerate(lines):
+                        if line.startswith('*endphy'):
+                            new_line = f"'{switch_name}'     {value}"
+                            lines.insert(i + 1, new_line)
+                            with open(path, 'w') as f:
+                                f.write('\n'.join(lines))
+                                logging.debug(f'Written to {path}')
 
-                except OSError:
-                    QMessageBox.warning(None, "Permission problem",
-                                        "Can't update " + path)
-        return result
+            except OSError:
+                QMessageBox.warning(None, "Permission problem",
+                                    "Can't update " + path)
+        return True
 
     def startRunsStatusServer(self) -> None:
         self.statusServerThread = RunsStatusServer()
@@ -710,20 +726,18 @@ class RunsModel(QAbstractItemModel):
 
         try:
             name, path, status = message.split(maxsplit=2)
+            status = status.rstrip() # Remove the newline.
             try:
                 # dateIndex = self.index(index.row(), Column.date, QModelIndex())
                 item = self.path2item[path]
                 item_row = item.row()
                 dateIndex = self.createIndex(item_row, Column.date, item)
                 statusIndex = self.createIndex(item_row, Column.status, item)
+                # Sets the data. Sadly it does not trigger a repaint.
                 self.setData(dateIndex, timeStamp2Str(time.time()),
                              Qt.DisplayRole)
                 self.setData(statusIndex, status, Qt.DisplayRole)
 
-                # item.setData(Column.date, Qt.DisplayRole,
-                #              timeStamp2Str(time.time()))
-                # item.setData(Column.status, Qt.DisplayRole, status)
-                # self.dataChanged.emit(index, index, [Qt.DisplayRole])
             except KeyError:  # TODO insert non monitored message anyway
                 msg = name + ':' + path + " not monitored "
                 msg += 'Skipping "' + status + '" update.'
@@ -768,27 +782,6 @@ class RunsSortFilterProxyModel(QSortFilterProxyModel):
             return True
         return self.hasAcceptedChildren(index)
 
-    @pyqtSlot(QModelIndex, QModelIndex)
-    def onSourceModelDataChange(self, leftI: QModelIndex, rightI: QModelIndex):
-        """
-        Called on source model data change. Map from source to proxy, otherwise
-        the treeview will not refresh
-
-        Args:
-            leftI (QModelIndex): Leftmost QModelIndex
-            rightI (QModelIndex): RightmostQModelIndex
-        """
-
-        mappedLeft = self.mapFromSource(leftI)
-        mappedRight = self.mapFromSource(rightI)
-
-        if mappedLeft.isValid() and mappedRight.isValid():
-            logging.debug('Emitting Proxy dataChange')
-            # DataChanged does NOT help...
-            # self.dataChanged.emit(mappedLeft, mappedRight)
-            self.layoutAboutToBeChanged.emit()
-            self.layoutChanged.emit()
-
 
 class RunDirView(QTreeView):
     archiveDirSet = pyqtSignal(str)
@@ -823,8 +816,6 @@ class RunDirView(QTreeView):
         proxyModel.setFilterKeyColumn(Column.path)
         proxyModel.setSourceModel(self._model)
 
-        # Way to force update of value changes on items.
-        self._model.dataChanged.connect(proxyModel.onSourceModelDataChange)
         self.setModel(proxyModel)
         # else:
             # self.setModel(self.model)
