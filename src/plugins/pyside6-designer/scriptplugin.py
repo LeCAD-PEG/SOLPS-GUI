@@ -63,7 +63,7 @@ class ScriptWidgetPlugin(QDesignerCustomWidgetInterface):
 
     # Returns a short description of the custom widget for use in a tool tip.
     def toolTip(self):
-        return ""
+        return "Python script widget"
 
     # Returns a short description of the custom widget for use in a "What's
     # This?" help message for the widget.
@@ -81,7 +81,17 @@ class ScriptWidgetPlugin(QDesignerCustomWidgetInterface):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="Script" name="script" />\n'
+        return '<ui language="c++" displayname="Script">\n' \
+               ' <widget class="Script" name="script">\n' \
+               '  <property name="toolTip" >\n' \
+               '   <string>Python script widget</string>\n' \
+               '  </property>\n' \
+               '  <property name="whatsThis" >\n' \
+               '   <string>Python script widget</string>' \
+               '  </property>\n' \
+               '  <property name="text"><string>Script</string></property>' \
+               ' </widget>\n' \
+               '</ui>'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.

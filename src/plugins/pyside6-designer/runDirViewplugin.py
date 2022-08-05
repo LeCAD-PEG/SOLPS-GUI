@@ -82,7 +82,17 @@ class RunDirViewPlugin(QDesignerCustomWidgetInterface):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="RunDirView" name="treeViewRuns" />\n'
+        return '<ui language="c++" displayname="Run Dir View">\n' \
+               ' <widget class="RunDirView" name="treeViewRuns">\n' \
+               '  <property name="toolTip" >\n' \
+               '   <string>Run directory view for SOLPS-ITER runs</string>\n' \
+               '  </property>\n' \
+               '  <property name="whatsThis" >\n' \
+               '   <string>Run directory view for SOLPS-ITER runs</string>' \
+               '  </property>\n' \
+               '  <property name="text"><string>RunDirView</string></property>' \
+               ' </widget>\n' \
+               '</ui>'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.

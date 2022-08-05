@@ -13,9 +13,9 @@ from PySide6.QtDesigner import (QDesignerCustomWidgetInterface,
                               QExtensionFactory,
                               QDesignerFormWindowInterface,
                               QDesignerTaskMenuExtension)
-from PySide6.QtWidgets import (QAction, QDialog, QDialogButtonBox, QSpinBox,
+from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QSpinBox,
                              QLabel, QGridLayout)
-from PySide6.QtCore import QVariant
+from PySide6.QtCore import QVariantAnimation
 
 from gnuplot import Gnuplot
 
@@ -156,7 +156,7 @@ class GnuplotPlugin(QDesignerCustomWidgetInterface):
     # Returns a short description of the custom widget for use in a "What's
     # This?" help message for the widget.
     def whatsThis(self):
-        return ""
+        return "Gnuplot plugin with TCSH for SOLPS plots"
 
     # Returns True if the custom widget acts as a container for other widgets;
     # otherwise returns False. Note that plugins for custom containers also
@@ -169,7 +169,17 @@ class GnuplotPlugin(QDesignerCustomWidgetInterface):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="Gnuplot" name="gnuplot" />\n'
+        return '<ui language="c++" displayname="Gnuplot">\n' \
+               ' <widget class="Gnuplot" name="gnuplot">\n' \
+               '  <property name="toolTip" >\n' \
+               '   <string>Gnuplot plugin with TCSH for SOLPS plots</string>\n' \
+               '  </property>\n' \
+               '  <property name="whatsThis" >\n' \
+               '   <string>Gnuplot plugin with TCSH for SOLPS plots</string>' \
+               '  </property>\n' \
+               '  <property name="text"><string>Gnuplot</string></property>' \
+               ' </widget>\n' \
+               '</ui>'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.

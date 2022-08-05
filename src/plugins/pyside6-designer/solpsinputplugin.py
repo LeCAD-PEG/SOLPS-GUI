@@ -67,7 +67,7 @@ class SolpsInputPlugin(QDesignerCustomWidgetInterface):
     # Returns a short description of the custom widget for use in a "What's
     # This?" help message for the widget.
     def whatsThis(self):
-        return ""
+        return "Tabed editor for SOLPS input configuration files"
 
     # Returns True if the custom widget acts as a container for other widgets;
     # otherwise returns False. Note that plugins for custom containers also
@@ -80,9 +80,17 @@ class SolpsInputPlugin(QDesignerCustomWidgetInterface):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return ('<widget class="SolpsInput" name="solpsinput">'
-                #  ' <widget class="QPlainTextEdit" name="input_file" />'
-                '</widget>')
+        return '<ui language="c++" displayname="Solps Input">\n' \
+               ' <widget class="SolpsInput" name="solpsinput">\n' \
+               '  <property name="toolTip" >\n' \
+               '   <string>Tabed editor for SOLPS input configuration files</string>\n' \
+               '  </property>\n' \
+               '  <property name="whatsThis" >\n' \
+               '   <string>Tabed editor for SOLPS input configuration files</string>'\
+               '  </property>\n' \
+               '  <property name="text"><string>SolpsInput</string></property>' \
+               ' </widget>\n' \
+               '</ui>'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.

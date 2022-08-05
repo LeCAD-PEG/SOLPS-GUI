@@ -73,7 +73,7 @@ class DivGeoPlugin(QDesignerCustomWidgetInterface):
     # Returns a short description of the custom widget for use in a "What's
     # This?" help message for the widget.
     def whatsThis(self):
-        return ""
+        return "DivGeo plugin with TCSH for SOLPS plots"
 
     # Returns True if the custom widget acts as a container for other widgets;
     # otherwise returns False. Note that plugins for custom containers also
@@ -86,7 +86,11 @@ class DivGeoPlugin(QDesignerCustomWidgetInterface):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="DivGeo" name="divgeo" />\n'
+        return '<ui language="c++" displayname="DivGeo">\n' \
+               ' <widget class="DivGeo" name="divgeo" >\n' \
+               ' </widget>\n' \
+               '</ui>'
+
 
     # Returns the module containing the custom widget class. It may include
     # a module path.

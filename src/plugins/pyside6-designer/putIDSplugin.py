@@ -33,13 +33,22 @@ class putIDSplugin(QDesignerCustomWidgetInterface):
         return "Push button for putting data to IDS data entry."
 
     def whatsThis(self):
-        return ""
+        return "Push button for putting data to IDS data entry"
 
     def isContainer(self):
         return False
 
     def domXml(self):
-        return '<widget class="PutIDS" name="put_edge_ids">\n</widget>'
+        return '<ui language="c++" displayname="Put IDS">\n' \
+               ' <widget class="PutIDS" name="put_edge_ids">\n' \
+               '  <property name="toolTip" >\n' \
+               '   <string>Push button for putting data to IDS data entry</string>\n' \
+               '  </property>\n' \
+               '  <property name="whatsThis" >\n' \
+               '   <string>Push button for putting data to IDS data entry</string>' \
+               '  </property>\n' \
+               ' </widget>\n' \
+               '</ui>'
 
     def includeFile(self):
         return "put_edge_ids"

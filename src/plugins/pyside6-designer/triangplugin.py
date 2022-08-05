@@ -71,7 +71,7 @@ class TriangPlugin(QDesignerCustomWidgetInterface):
     # Returns a short description of the custom widget for use in a "What's
     # This?" help message for the widget.
     def whatsThis(self):
-        return ""
+        return "Triang plugin with TCSH for starting triang in baserun"
 
     # Returns True if the custom widget acts as a container for other widgets;
     # otherwise returns False. Note that plugins for custom containers also
@@ -84,7 +84,17 @@ class TriangPlugin(QDesignerCustomWidgetInterface):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="Triang" name="triang" />\n'
+        return '<ui language="c++" displayname="Triang">\n' \
+               ' <widget class="Triang" name="triang">\n' \
+               '  <property name="toolTip" >\n' \
+               '   <string>Triang plugin with TCSH for starting triang in baserun</string>\n' \
+               '  </property>\n' \
+               '  <property name="whatsThis" >\n' \
+               '   <string>Triang plugin with TCSH for starting triang in baserun</string>' \
+               '  </property>\n' \
+               '  <property name="text"><string>Triang</string></property>' \
+               ' </widget>\n' \
+               '</ui>'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.

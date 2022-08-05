@@ -68,7 +68,7 @@ class SolpsPlotsPlugin(QDesignerCustomWidgetInterface):
     # Returns a short description of the custom widget for use in a "What's
     # This?" help message for the widget.
     def whatsThis(self):
-        return ""
+        return "Combo box with a list of all SOLPS plot scripts"
 
     # Returns True if the custom widget acts as a container for other widgets;
     # otherwise returns False. Note that plugins for custom containers also
@@ -81,8 +81,17 @@ class SolpsPlotsPlugin(QDesignerCustomWidgetInterface):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="SolpsPlots" name="solpsplots">\n' \
-        '</widget>'
+        return '<ui language="c++" displayname="Solps Plots">\n' \
+               ' <widget class="SolpsPlots" name="solpsplots">\n' \
+               '  <property name="toolTip" >\n' \
+               '   <string>Combo box with a list of all SOLPS plot scripts</string>\n' \
+               '  </property>\n' \
+               '  <property name="whatsThis" >\n' \
+               '   <string>Combo box with a list of all SOLPS plot scripts</string>' \
+               '  </property>\n' \
+               '  <property name="text"><string>SolpsPlots</string></property>' \
+               ' </widget>\n' \
+               '</ui>'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.

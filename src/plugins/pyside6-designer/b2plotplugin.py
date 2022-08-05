@@ -69,7 +69,7 @@ class B2plotPlugin(QDesignerCustomWidgetInterface):
     # Returns a short description of the custom widget for use in a "What's
     # This?" help message for the widget.
     def whatsThis(self):
-        return ""
+        return "B2plot plugin with TCSH for b2plots"
 
     # Returns True if the custom widget acts as a container for other widgets;
     # otherwise returns False. Note that plugins for custom containers also
@@ -82,7 +82,11 @@ class B2plotPlugin(QDesignerCustomWidgetInterface):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="B2plot" name="b2plot" />\n'
+        return '<ui language="c++" displayname="B2plot">\n' \
+               ' <widget class="B2plot" name="b2plot">\n' \
+               ' </widget>\n' \
+               '</ui>'
+
 
     # Returns the module containing the custom widget class. It may include
     # a module path.

@@ -39,7 +39,17 @@ class getIDSplugin(QDesignerCustomWidgetInterface):
         return False
 
     def domXml(self):
-        return '<widget class="GetIDS" name="get_edge_ids">\n</widget>'
+        return '<ui language="c++" displayname="GetIDS">\n' \
+               ' <widget class="GetIDS" name="get_edge_ids">\n' \
+               '  <property name="toolTip" >\n' \
+               '   <string>Push button for putting data to IDS data entry</string>\n' \
+               '  </property>\n' \
+               '  <property name="whatsThis" >\n' \
+               '   <string>Push button for putting data to IDS data entry</string>' \
+               '  </property>\n' \
+               '  <property name="text"><string>GetIDS</string></property>' \
+               ' </widget>\n' \
+               '</ui>'
 
     def includeFile(self):
         return "get_edge_ids"

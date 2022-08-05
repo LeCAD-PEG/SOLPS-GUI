@@ -77,7 +77,17 @@ class LogPlugin(QDesignerCustomWidgetInterface):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="Log" name="log" />\n'
+        return '<ui language="c++" displayname="Log">\n' \
+               ' <widget class="Log" name="log">\n' \
+               '  <property name="toolTip" >\n' \
+               '   <string>Log plugin</string>\n' \
+               '  </property>\n' \
+               '  <property name="whatsThis" >\n' \
+               '   <string>Log plugin</string>' \
+               '  </property>\n' \
+               '  <property name="text"><string>Log</string></property>' \
+               ' </widget>\n' \
+               '</ui>'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.

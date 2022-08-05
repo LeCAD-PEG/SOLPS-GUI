@@ -63,7 +63,7 @@ class TcshWidgetPlugin(QDesignerCustomWidgetInterface):
 
     # Returns a short description of the custom widget for use in a tool tip.
     def toolTip(self):
-        return ""
+        return "TCSH shell with SOLPSTOP environment"
 
     # Returns a short description of the custom widget for use in a "What's
     # This?" help message for the widget.
@@ -81,7 +81,17 @@ class TcshWidgetPlugin(QDesignerCustomWidgetInterface):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="TcshEdit" name="tcsh" />\n'
+        return '<ui language="c++" displayname="Tcsh">\n' \
+               ' <widget class="TcshEdit" name="tcsh">\n' \
+               '  <property name="toolTip" >\n' \
+               '   <string>TCSH shell with SOLPSTOP environment</string>\n' \
+               '  </property>\n' \
+               '  <property name="whatsThis" >\n' \
+               '   <string>TCSH shell with SOLPSTOP environment</string>' \
+               '  </property>\n' \
+               '  <property name="text"><string>Tcsh</string></property>' \
+               ' </widget>\n' \
+               '</ui>'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.

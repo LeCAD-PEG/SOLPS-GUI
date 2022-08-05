@@ -12,7 +12,6 @@ from PySide6.QtDesigner import QDesignerCustomWidgetInterface
 
 from archive_run_dir_view import treeArchiveView
 
-
 class archiveRunDirViewPlugin(QDesignerCustomWidgetInterface):
     """archiveRunDirViewPlugin(QDesignerCustomWidgetInterface)
 
@@ -69,7 +68,7 @@ class archiveRunDirViewPlugin(QDesignerCustomWidgetInterface):
     # Returns a short description of the custom widget for use in a "What's
     # This?" help message for the widget.
     def whatsThis(self):
-        return ""
+        return "Archive run directory view for SOLPS-ITER runs"
 
     # Returns True if the custom widget acts as a container for other widgets;
     # otherwise returns False. Note that plugins for custom containers also
@@ -82,7 +81,17 @@ class archiveRunDirViewPlugin(QDesignerCustomWidgetInterface):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="treeArchiveView" name="treeViewArchive" />\n'
+        return '<ui language="c++" displayname="Tree Archive View">\n' \
+               ' <widget class="treeArchiveView" name="treeViewArchive">\n' \
+               '  <property name="toolTip" >\n' \
+               '   <string>Archive run directory view for SOLPS-ITER runs</string>\n' \
+               '  </property>\n' \
+               '  <property name="whatsThis" >\n' \
+               '   <string>Archive run directory view for SOLPS-ITER runs</string>' \
+               '  </property>\n' \
+               '  <property name="text"><string>treeArchiveView</string></property>' \
+               ' </widget>\n' \
+               '</ui>'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.

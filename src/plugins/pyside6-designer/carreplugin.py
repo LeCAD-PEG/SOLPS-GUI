@@ -71,7 +71,7 @@ class CarrePlugin(QDesignerCustomWidgetInterface):
     # Returns a short description of the custom widget for use in a "What's
     # This?" help message for the widget.
     def whatsThis(self):
-        return ""
+        return "Carre plugin with TCSH for running carre"
 
     # Returns True if the custom widget acts as a container for other widgets;
     # otherwise returns False. Note that plugins for custom containers also
@@ -84,7 +84,10 @@ class CarrePlugin(QDesignerCustomWidgetInterface):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="Carre" name="carre" />\n'
+        return '<ui language="c++" displayname="Carre">\n' \
+               ' <widget class="Carre" name="carre" >\n' \
+               ' </widget>\n' \
+               '</ui>'
 
     # Returns the module containing the custom widget class. It may include
     # a module path.

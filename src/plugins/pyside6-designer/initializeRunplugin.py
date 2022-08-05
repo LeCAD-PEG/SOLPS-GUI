@@ -13,7 +13,7 @@ from PySide6.QtDesigner import QDesignerCustomWidgetInterface
 from initialize_run import InitializeRun
 
 
-class TriangPlugin(QDesignerCustomWidgetInterface):
+class RunPlugin(QDesignerCustomWidgetInterface):
     """TriangPlugin(QDesignerCustomWidgetInterface)
 
     Provides a Python custom plugin for Qt Designer by implementing the
@@ -24,7 +24,7 @@ class TriangPlugin(QDesignerCustomWidgetInterface):
     # initialized variable.
     def __init__(self, parent=None):
 
-        super(TriangPlugin, self).__init__(parent)
+        super(RunPlugin, self).__init__(parent)
 
         self.initialized = False
 
@@ -69,7 +69,7 @@ class TriangPlugin(QDesignerCustomWidgetInterface):
     # Returns a short description of the custom widget for use in a "What's
     # This?" help message for the widget.
     def whatsThis(self):
-        return ""
+        return "Plugin that initilizes a run directory"
 
     # Returns True if the custom widget acts as a container for other widgets;
     # otherwise returns False. Note that plugins for custom containers also
@@ -82,7 +82,17 @@ class TriangPlugin(QDesignerCustomWidgetInterface):
     # default values for its properties. Each custom widget created by this
     # plugin will be configured using this description.
     def domXml(self):
-        return '<widget class="InitializeRun" name="initialize_run" />\n'
+        return '<ui language="c++" displayname="Initialize Run">\n' \
+               ' <widget class="InitializeRun" name="initialize_run">\n' \
+               '  <property name="toolTip" >\n' \
+               '   <string>Plugin that initilizes a run directory</string>\n' \
+               '  </property>\n' \
+               '  <property name="whatsThis" >\n' \
+               '   <string>Plugin that initilizes a run directory</string>' \
+               '  </property>\n' \
+               '  <property name="text"><string>InitializeRun</string></property>' \
+               ' </widget>\n' \
+               '</ui>'    
 
     # Returns the module containing the custom widget class. It may include
     # a module path.
