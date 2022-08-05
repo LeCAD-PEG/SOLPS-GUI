@@ -164,14 +164,14 @@ class Triang(TcshProcess):
             for j in range(_n):
                 # Creating checkboxes for
                 x = QCheckBox(TriangVars.Name[i * _n + j])
-                x.setCheckState(0)
+                x.setCheckState(Qt.Unchecked)
                 x.stateChanged.connect(self.setVarsFromClickedGroup)
                 groupLayout.addWidget(x, j, i)
         leftOver = TriangVars.NumOfVars - (TriangVars.NumOfVars // _n) * _n
         if leftOver > 0:
             for k in range(leftOver):
                 x = QCheckBox(TriangVars.Name[(i + 1) * _n + k])
-                x.setCheckState(0)
+                x.setCheckState(Qt.Unchecked)
                 x.stateChanged.connect(self.setVarsFromClickedGroup)
                 groupLayout.addWidget(x, k, i + 1)
         groupBox1.setLayout(groupLayout)
@@ -181,7 +181,7 @@ class Triang(TcshProcess):
         upperGridLayout.addWidget(groupBox1, 0, 0)
 
         upperGridLayout.addItem(QSpacerItem(20, 40,
-                                            hPolicy=QSizePolicy.Expanding),
+                                            hData=QSizePolicy.Expanding),
                                 0, 2)
 
         #############
@@ -200,7 +200,7 @@ class Triang(TcshProcess):
             x.clicked.connect(self.runStep)
             x.setText(TriangVars.Name[i])
             groupLayout.addWidget(x)
-        groupLayout.addItem(QSpacerItem(40, 20, vPolicy=QSizePolicy.Expanding))
+        groupLayout.addItem(QSpacerItem(40, 20, vData=QSizePolicy.Expanding))
         groupBox2.setLayout(groupLayout)
         # Group Box 2
         #############
@@ -221,7 +221,7 @@ class Triang(TcshProcess):
         groupLayout.setSpacing(0)
         groupLayout.addWidget(self.textDisplay, 0, 0, 1, -1)
 
-        groupLayout.addItem(QSpacerItem(40, 20, hPolicy=QSizePolicy.Expanding),
+        groupLayout.addItem(QSpacerItem(40, 20, hData=QSizePolicy.Expanding),
                             1, 0)
         editB2ag = QPushButton('Edit b2ag.dat')
         editB2ag.clicked.connect(self.editB2ag)

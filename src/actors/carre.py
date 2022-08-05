@@ -150,7 +150,7 @@ class Carre(TcshProcess):
             for j in range(_n):
                 # Creating checkboxes for
                 x = QCheckBox(CarreVars.Name[i * _n + j])
-                # LK TODO x.setCheckState(0)
+                # LK TODO x.setCheckState(Qt.Unchecked)
                 x.stateChanged.connect(self.setVarsFromClickedGroup)
                 groupLayout.addWidget(x, j, i)
         _N = CarreVars.NumOfVars - 1
@@ -158,7 +158,7 @@ class Carre(TcshProcess):
         if leftOver > 0:
             for k in range(leftOver):
                 x = QCheckBox(CarreVars.Name[(i + 1) * _n + k])
-                x.setCheckState(0)
+                x.setCheckState(Qt.Unchecked)
                 x.stateChanged.connect(self.setVarsFromClickedGroup)
                 groupLayout.addWidget(x, k, i + 1)
         groupBox1.setLayout(groupLayout)
@@ -186,7 +186,7 @@ class Carre(TcshProcess):
 
         upperGridLayout.addWidget(groupBox2, 0, 1)
         # LK upperGridLayout.addItem(QSpacerItem(20, 40,
-        #                                    hPolicy=QSizePolicy.Expanding),
+        #                                    hData=QSizePolicy.Expanding),
         #                        0, 2)
 
         #############
@@ -206,7 +206,7 @@ class Carre(TcshProcess):
             x.clicked.connect(self.runStep)
             x.setText(CarreVars.Name[i])
             groupLayout.addWidget(x)
-        # LK groupLayout.addItem(QSpacerItem(40, 20, vPolicy=QSizePolicy.Expanding))
+        # LK groupLayout.addItem(QSpacerItem(40, 20, vData=QSizePolicy.Expanding))
         groupBox3.setLayout(groupLayout)
         # Group Box 3
         #############
@@ -227,7 +227,7 @@ class Carre(TcshProcess):
         groupLayout.setSpacing(0)
         groupLayout.addWidget(self.textDisplay, 0, 0, 1, -1)
 
-        # LK groupLayout.addItem(QSpacerItem(40, 20, hPolicy=QSizePolicy.Expanding),
+        # LK groupLayout.addItem(QSpacerItem(40, 20, hData=QSizePolicy.Expanding),
         #                    1, 0)
         manualInput = QPushButton('Terminal input')
         manualInput.clicked.connect(self.manualInput)

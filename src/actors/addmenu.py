@@ -3,7 +3,7 @@
 """
 
 from PySide6.QtCore import Signal, Slot
-from PySide6.QtWidgets import QMenu, QAction
+from PySide6.QtWidgets import QMenu, QWidgetAction
 
 import textwrap
 import functools
@@ -141,7 +141,7 @@ class AddMenu(QMenu):
                             a.setEnabled(True)
                         else:
                             a.setEnabled(False)
-                            if not isinstance(a, QAction):
+                            if not isinstance(a, QWidgetAction):
                                 for a_ in a.actions():
                                     a_.setEnabled(True)
                 else:

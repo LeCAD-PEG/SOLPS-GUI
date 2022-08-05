@@ -74,7 +74,7 @@ class InitializeRun(TcshProcess):
 
         upperGridLayout.addWidget(groupBox1)
         upperGridLayout.addItem(QSpacerItem(40, 20,
-                                            hPolicy=QSizePolicy.Expanding),
+                                            hData=QSizePolicy.Expanding),
                                 0, 2)
 
         #############
@@ -106,7 +106,7 @@ class InitializeRun(TcshProcess):
         groupLayout.addWidget(clearLog)
         groupLayout.addWidget(stopB2mn)
 
-        groupLayout.addItem(QSpacerItem(40, 20, vPolicy=QSizePolicy.Expanding))
+        groupLayout.addItem(QSpacerItem(40, 20, vData=QSizePolicy.Expanding))
         groupBox2.setLayout(groupLayout)
         # Group Box 2
         #############
@@ -128,7 +128,7 @@ class InitializeRun(TcshProcess):
         self.textDisplay.setReadOnly(True)
         groupLayout.addWidget(self.textDisplay, 0, 0, 1, -1)
 
-        groupLayout.addItem(QSpacerItem(40, 20, hPolicy=QSizePolicy.Expanding),
+        groupLayout.addItem(QSpacerItem(40, 20, hData=QSizePolicy.Expanding),
                             1, 0)
         manualInput = QPushButton('Terminal input')
         manualInput.clicked.connect(self.manualInput)

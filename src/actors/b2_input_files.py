@@ -73,14 +73,14 @@ class B2InputFiles(TcshProcess):
             for j in range(_n):
                 # Creating checkboxes for
                 x = QCheckBox(B2Vars.Name[i * _n + j])
-                x.setCheckState(0)
+                x.setCheckState(Qt.Unchecked)
                 x.stateChanged.connect(self.setVarsFromClickedGroup)
                 groupLayout.addWidget(x, j, i)
         leftOver = B2Vars.NumOfVars % _n
         if leftOver > 0:
             for k in range(leftOver):
                 x = QCheckBox(B2Vars.Name[(i + 1) * _n + k])
-                x.setCheckState(0)
+                x.setCheckState(Qt.Unchecked)
                 x.stateChanged.connect(self.setVarsFromClickedGroup)
                 groupLayout.addWidget(x, k, i + 1)
         groupBox1.setLayout(groupLayout)
@@ -90,7 +90,7 @@ class B2InputFiles(TcshProcess):
         upperGridLayout.addWidget(groupBox1, 0, 0)
 
         upperGridLayout.addItem(QSpacerItem(20, 40,
-                                            hPolicy=QSizePolicy.Expanding),
+                                            hData=QSizePolicy.Expanding),
                                 0, 2)
 
         #############
@@ -106,7 +106,7 @@ class B2InputFiles(TcshProcess):
             x.clicked.connect(self.runStep)
             x.setText(B2Vars.Name[i])
             groupLayout.addWidget(x)
-        groupLayout.addItem(QSpacerItem(40, 20, vPolicy=QSizePolicy.Expanding))
+        groupLayout.addItem(QSpacerItem(40, 20, vData=QSizePolicy.Expanding))
         groupBox2.setLayout(groupLayout)
         # Group Box 2
         #############
@@ -127,7 +127,7 @@ class B2InputFiles(TcshProcess):
         groupLayout.setSpacing(0)
         groupLayout.addWidget(self.textDisplay, 0, 0, 1, -1)
 
-        groupLayout.addItem(QSpacerItem(40, 20, hPolicy=QSizePolicy.Expanding),
+        groupLayout.addItem(QSpacerItem(40, 20, hData=QSizePolicy.Expanding),
                             1, 0)
 
         manualInput = QPushButton('Terminal input')
