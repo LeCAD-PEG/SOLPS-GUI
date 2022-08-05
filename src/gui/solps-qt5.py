@@ -9,7 +9,7 @@ framework for in-line analysis and run re-launch, including input file editing
 beforehand.
 
 Example:
-  Running the GUI requires Python3 and PySide6 to be installed::
+  Running the GUI requires Python3 and PyQt5 to be installed::
 
     $ python3 solps.py
 
@@ -36,13 +36,13 @@ import shutil
 import sys
 import time
 
-from PySide6.QtCore import (Slot, QModelIndex, Qt, QSettings, Signal,
-                           QRegularExpression, QProcess)
-from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
-                             QFileDialog, QLineEdit, QToolButton, QGridLayout)
-
-from PySide6.QtNetwork import QHostAddress
-from PySide6.QtUiTools import loadUiType
+from PyQt5.QtCore import (pyqtSlot, QModelIndex, Qt, QSettings, pyqtSignal,
+                          QRegExp, QProcess)
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
+                             QFileDialog, QLineEdit, QToolButton, QGridLayout,
+                             QLabel, QDialogButtonBox)
+from PyQt5.QtNetwork import QHostAddress
+from PyQt5.uic import loadUi
 
 
 from addmenu import AddMenu
@@ -126,7 +126,7 @@ class RunsSettings(QDialog):
         self.main_layout.addWidget(dialog_button_box, 6, 1)
         self.setLayout(self.main_layout)
 
-    @Slot()
+    @pyqtSlot()
     def dialog_action(self):
         """ When the tool button is clicked a directory browser is opened. If
         a new directory is opened, the new value is then assigned to the
@@ -297,17 +297,17 @@ class SOLPS_MainWindow(QMainWindow):
         log_receiver(LogReceiver) : Receiving messages from logging thread.
         stdout_thread(QThread) : Redirected sys.stdout to Log tab.
         stdout_receiver(LogReceiver): Receiver for stdout thread.
-        b2_user (Signal(str)): Emits the string for user value
-        b2_run_number (Signal(str)): Emits the string for run value
-        b2_shot_number (Signal(str)): Emits the string for shot value
-        b2_device (Signal(str)): Emits the string for device value
+        b2_user (pyqtSignal(str)): Emits the string for user value
+        b2_run_number (pyqtSignal(str)): Emits the string for run value
+        b2_shot_number (pyqtSignal(str)): Emits the string for shot value
+        b2_device (pyqtSignal(str)): Emits the string for device value
     """
 
-    runSelected = Signal(str)
-    b2_user = Signal(str)
-    b2_run_number = Signal(str)
-    b2_shot_number = Signal(str)
-    b2_device = Signal(str)
+    runSelected = pyqtSignal(str)
+    b2_user = pyqtSignal(str)
+    b2_run_number = pyqtSignal(str)
+    b2_shot_number = pyqtSignal(str)
+    b2_device = pyqtSignal(str)
 
     def __init__(self, *args):
         super(SOLPS_MainWindow, self).__init__(*args)
@@ -333,8 +333,7 @@ class SOLPS_MainWindow(QMainWindow):
         if os.path.exists(ui_path):
             ui_filename, ui_extension = os.path.splitext(ui_path)
             if ui_extension == '.ui':
-                loadUiType(ui_path)
-                #loadUi(ui_path, self)
+                loadUi(ui_path, self)
             else:
                 print(ui_path + ' should have .ui extension')
                 sys.exit(2)
@@ -419,7 +418,7 @@ class SOLPS_MainWindow(QMainWindow):
         self.b2_run_number.connect(self.put_edge_ids.setRun)
         self.b2_shot_number.connect(self.put_edge_ids.setShot)
 
-    # @Slot()
+    # @pyqtSlot()
     # def on_pushButton_Archive_clicked(self):
     #     """ Selecting directory and pressing Archive will add
     #     selected directory to filtered set and will not be shown in Runs.
@@ -435,7 +434,7 @@ class SOLPS_MainWindow(QMainWindow):
     #     self.archiveProxyModel.invalidateFilter()
     #     self.updateArchiveDirSettings()
 
-    # @Slot()
+    # @pyqtSlot()
     # def on_pushButton_Restore_clicked(self):
     #     index = self.treeViewArchive.selectionModel().currentIndex()
     #     arModel = self.archiveProxyModel
@@ -461,7 +460,7 @@ class SOLPS_MainWindow(QMainWindow):
     #     settings.endArray()
     #     settings.endGroup()
 
-    @Slot(int)
+    @pyqtSlot(int)
     def on_tabWidget_currentChanged(self, tab_index):
         """ Signal is received when tab on main window is changed.
             We check if the Edit tab lost its focus and save modified files.
@@ -474,7 +473,7 @@ class SOLPS_MainWindow(QMainWindow):
             self.solpsinput.save_modified_input_files()
         self.previous_tab_index = tab_index
 
-    @Slot()
+    @pyqtSlot()
     def on_pushButton_Edit_clicked(self):
         """ For selected run and Edit button pressed Input tab is focused
             with all SOLPS input files modifiable with simple text editor.
@@ -490,7 +489,7 @@ class SOLPS_MainWindow(QMainWindow):
         self.solpsinput.editor_tab_changed(self.solpsinput.currentIndex())
         self.tab_Input.setEnabled(True)
 
-    @Slot()
+    @pyqtSlot()
     def run_selected(self):
         """ Whenever an item in Runs is selected this function is run.
 
@@ -536,7 +535,7 @@ class SOLPS_MainWindow(QMainWindow):
 
             self.runSelected.emit(path)
 
-    @Slot()
+    @pyqtSlot()
     def enable_restore_button(self):
         valid = self.treeViewArchive.selectionModel().currentIndex().isValid()
         self.pushButton_Restore.setEnabled(valid)
@@ -554,7 +553,7 @@ class SOLPS_MainWindow(QMainWindow):
         regExp = QRegExp(self.lineEditRunFilter.text(), case_sense, syntax)
         self.treeViewRuns.model().setFilterRegExp(regExp)
 
-    @Slot()
+    @pyqtSlot()
     def show_runs_dialog(self):
         dialog = RunsSettings()
         if dialog.exec_():
@@ -572,7 +571,7 @@ class SOLPS_MainWindow(QMainWindow):
             # TODO(kosl) self.treeViewRuns.model.retRunsFolderInfoThread.quit()
             # self.treeViewRuns.model.scanDirectoriesThread.start()
 
-    @Slot()
+    @pyqtSlot()
     def show_preferences_dialog(self):
         dialog = PreferencesDialog(self.preferences)
         if dialog.exec_():
@@ -644,11 +643,11 @@ class SOLPS_MainWindow(QMainWindow):
         self.expandAll()
         self.expanded()
 
-    @Slot()
+    @pyqtSlot()
     def on_pushButton_Filter_clicked(self):
         self.textFilterChanged()
 
-    @Slot()
+    @pyqtSlot()
     def on_pushButton_Stop_clicked(self):
         """ Signals garceful stop inside b2mn.exe.dir with .quit file.
         """
@@ -675,7 +674,7 @@ class SOLPS_MainWindow(QMainWindow):
             QMessageBox.warning(None, "Permission problem",
                                 "Can't create " + path)
 
-    @Slot()
+    @pyqtSlot()
     def on_pushButton_Run_clicked(self):
         """ Submits the selected Run
         """
@@ -686,7 +685,7 @@ class SOLPS_MainWindow(QMainWindow):
         # TODO check b2fstate_OK before you submit
         self.submit(model.mapToSource(index), rundir)
 
-    @Slot()
+    @pyqtSlot()
     def on_pushButton_Continue_clicked(self):
         """ Continues the run by firstly copying the the plasma state output
             to input (b2fstate->b2fstati)
@@ -723,7 +722,7 @@ class SOLPS_MainWindow(QMainWindow):
             solps_top = solps_top.rsplit('/', 1)[0]
         return None
 
-    @Slot()
+    @pyqtSlot()
     def read_main_tcsh(self):
         data = self.main_tcsh.readAllStandardOutput()
         text = str(bytearray(data).decode('utf-8'))
@@ -833,7 +832,7 @@ class SOLPS_MainWindow(QMainWindow):
             model.jobStatusChanged(msg)
             logging.warning(msg)
 
-    @Slot()
+    @pyqtSlot()
     def on_pushButton_Import_clicked(self):
         """ Imports the run or a tree of runs from somewhere into
             the selected tree position. If baserun is imported
@@ -882,7 +881,7 @@ class SOLPS_MainWindow(QMainWindow):
                         self.execute_tcsh_command_in_rundir(cmd, directory)
             model.startThreads()  # rescan the model
 
-    @Slot()
+    @pyqtSlot()
     def on_actionAbout_triggered(self):
         msg = "GUI will enable users to monitor multiple simultaneously " \
               "running cases, which requires defining the working directory " \

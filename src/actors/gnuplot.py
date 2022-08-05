@@ -20,8 +20,6 @@ try:
 except ImportError as e:
     GNUPLOT_WIDGET = False
 
-from QtGnuplot import QtGnuplotWidget
-
 
 def cleanTempFiles(*files):
     for file in files:
@@ -83,7 +81,7 @@ class Gnuplot(TcshProcess):
 
             self.gnuplot.finished.connect(self.showPlot)
             self.gnuplot.started.connect(self.writeCommandsToGnuplot)
-            self.gnuplot.error.connect(self.showError)
+            self.gnuplot.errorOccurred.connect(self.showError)
 
             self.label = QLabel(self)
 
