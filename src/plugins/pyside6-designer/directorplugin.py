@@ -1,0 +1,130 @@
+"""
+directorplugin.py
+
+A Director custom widget plugin for Qt Designer.
+"""
+
+from director import Director
+
+from PySide6.QtGui import QIcon, QPixmap
+from PySide6.QtDesigner import (QExtensionManager,
+    QDesignerCustomWidgetInterface)
+
+
+class DirectorPlugin(QDesignerCustomWidgetInterface):
+    """DirectorPlugin(QDesignerCustomWidgetInterface)
+
+    Provides a Python custom plugin for Qt Designer by implementing the
+    QDesignerCustomWidgetPlugin via a PyQt-specific custom plugin class.
+    """
+
+    # The __init__() method is only used to set up the plugin and define its
+    # initialized variable.
+    def __init__(self, parent=None):
+
+        super(DirectorPlugin, self).__init__(parent)
+
+        self.initialized = False
+
+    # The initialize() and isInitialized() methods allow the plugin to set up
+    # any required resources, ensuring that this can only happen once for each
+    # plugin.
+    def initialize(self, core):
+
+        if self.initialized:
+            return
+
+        self.initialized = True
+
+    def isInitialized(self):
+
+        return self.initialized
+
+    # This factory method creates new instances of our custom widget with the
+    # appropriate parent.
+    def createWidget(self, parent):
+        return Director(parent)
+
+    # This method returns the name of the custom widget class that is provided
+    # by this plugin.
+    def name(self):
+        return "Director"
+
+    # Returns the name of the group in Qt Designer's widget box that this
+    # widget belongs to.
+    def group(self):
+        return "SOLPS"
+
+    # Returns the icon used to represent the custom widget in Qt Designer's
+    # widget box.
+    def icon(self):
+        return QIcon(_logo_pixmap)
+
+    # Returns a short description of the custom widget for use in a tool tip.
+    def toolTip(self):
+        return "Director for emiting selected run"
+
+    # Returns a short description of the custom widget for use in a "What's
+    # This?" help message for the widget.
+    def whatsThis(self):
+        return "This widget receives a selected run and directs' \
+               ' it further in various ways depending on the Check state"
+
+    # Returns True if the custom widget acts as a container for other widgets;
+    # otherwise returns False. Note that plugins for custom containers also
+    # need to provide an implementation of the QDesignerContainerExtension
+    # interface if they need to add custom editing support to Qt Designer.
+    def isContainer(self):
+        return False
+
+    # Returns an XML description of a custom widget instance that describes
+    # default values for its properties. Each custom widget created by this
+    # plugin will be configured using this description.
+    def domXml(self):
+        return '<ui language="c++" displayname="Director">\n' \
+               ' <widget class="Director" name="director">\n' \
+               '  <property name="toolTip" >\n' \
+               '   <string>Director for emiting selected run</string>\n' \
+               '  </property>\n' \
+               '  <property name="whatsThis" >\n' \
+               '   <string>This widget receives a selected run and directs' \
+               '     it further in various ways depending on the Check state.' \
+               '    </string>' \
+               '  </property>\n' \
+               '  <property name="text"><string>Director</string></property>' \
+               ' </widget>\n' \
+               '</ui>'
+
+    # Returns the module containing the custom widget class. It may include
+    # a module path.
+    def includeFile(self):
+        return "director"
+
+
+# Define the image used for the icon.
+_logo_16x16_xpm = [
+    "16 16 6 1",
+    "   c None",
+    ".  c #FFFFFF",
+    "a  c #000000",
+    "b  c #808080",
+    "c  c #C0C0C0",
+    "d  c #404040",
+    "................",
+    "................",
+    "................",
+    ".aa..aa..aa.....",
+    "..aa..aa..aa....",
+    "...aa..aa..aa...",
+    "....aa..aa..aa..",
+    ".....aa..aa..aa.",
+    ".....aa..aa..aa.",
+    "....aa..aa..aa..",
+    "...aa..aa..aa...",
+    "..aa..aa..aa....",
+    ".aa..aa..aa.....",
+    "................",
+    "................",
+    "................"]
+
+_logo_pixmap = QPixmap(_logo_16x16_xpm)

@@ -137,4 +137,4 @@ if __name__ == "__main__":
     logging.info('Testing info')
     logging.error('Testing error')
     logging.critical('Testing critical')
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

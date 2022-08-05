@@ -397,4 +397,4 @@ if __name__ == '__main__':
     main.setCentralWidget(w)
     main.show()
 
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

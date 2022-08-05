@@ -6,4 +6,4 @@ app = QApplication()
 w = QLabel("test")
 w.show()
 
-sys.exit(app.exec_())
+sys.exit(app.exec())

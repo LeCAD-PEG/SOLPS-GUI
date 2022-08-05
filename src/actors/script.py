@@ -60,4 +60,4 @@ for i in range(10):
     widget.setPlainText(script)
     widget.show()
     widget.run()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

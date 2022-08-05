@@ -334,4 +334,4 @@ if __name__ == "__main__":
     main_window.setCentralWidget(w)
     main_window.show()
     divgeo.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

@@ -299,6 +299,6 @@ if __name__ == "__main__":
     widget.setLayout(layout)
     main.setCentralWidget(widget)
     main.show()
-    code = app.exec_()
+    code = app.exec()
     app.quit()
     sys.exit(code)

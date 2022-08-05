@@ -341,11 +341,11 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = SolpsInput()
     window.setRundir(os.path.expanduser("~")+
-      '/solps-iter/runs/tutorial/ITER_535_D+He+Ar/baserun')
-    # '/solps-iter/runs/tutorial/AUG_16151_D/run_for_GUI_demo')
+      '/solps-iter/runs/examples/ITER_2298_Honly_20MW/baserun')
+    # '/solps-iter/runs/examples/ITER_2298_Honly_20MW/run_for_GUI_demo')
     window.read_input_files()
     #window.read_input_files()  # should be resistant to multiple calls
     window.show()
     window.output = Signal(str)
     #window.output.emit("test line")
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

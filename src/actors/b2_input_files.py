@@ -404,4 +404,4 @@ if __name__ == '__main__':
     main.setCentralWidget(b2InputFiles)
     main.show()
 
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

@@ -48,4 +48,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = LineInput()
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

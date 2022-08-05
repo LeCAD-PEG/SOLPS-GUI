@@ -663,6 +663,6 @@ if __name__ == '__main__':
     main.setCentralWidget(window)
     main.show()
 
-    res = app.exec_()
+    res = app.exec()
     app.quit()
     sys.exit(res)

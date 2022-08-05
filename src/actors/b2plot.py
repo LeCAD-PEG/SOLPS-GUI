@@ -184,8 +184,8 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = B2plot()
     window.show()
-    rundir = "/local/work/simicg/solps-gui/staging/solps-iter/develop/runs/examples/AUG_16151_D+C+He/16151_1.6MW_2.0e19_D=0.4_chi=1.6_standalone"
+    rundir = "/local/work/simicg/solps-gui/staging/solps-iter/develop/runs/examples/ITER_2298_Honly_20MW+C+He/16151_1.6MW_2.0e19_D=0.4_chi=1.6_standalone"
     window.setRunDir(os.path.expanduser(rundir))
     window.setB2plotCommand("echo phys a4p ti te m/ surf | b2plot")
     window.executeB2plotCommand()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

@@ -180,4 +180,4 @@ if __name__ == "__main__":
     menubar.setGeometry(QRect(0, 0, 800, 19))
     menu = AddMenu(menubar)
     main_window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

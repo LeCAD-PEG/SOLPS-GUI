@@ -5132,4 +5132,4 @@ if __name__ == "__main__":
     mainwindow = Standalone()
     mainwindow.eirene.tree.readInput(os.path.expanduser(input_dat))
     mainwindow.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

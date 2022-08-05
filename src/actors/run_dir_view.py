@@ -894,7 +894,7 @@ if __name__ == '__main__':
     view = RunDirView()
 
     view.show()
-    code = app.exec_()
+    code = app.exec()
     import resource
     print(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     sys.exit(code)

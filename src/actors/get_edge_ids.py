@@ -461,4 +461,4 @@ python3 get_edge_ids.py --shot=1001 --run=1001 --user=%s \
     t.setParameters(Vars)
     t.finished.connect(app.exit)
     t.start()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

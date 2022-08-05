@@ -79,10 +79,10 @@ if __name__ == "__main__":
     tcsh_widget.show()
     tcsh_widget.setTcshPath('/bin/tcsh')
     tcsh_widget.setRunDir(os.path.expanduser("~") +
-                          '/solps-iter/runs/examples/AUG_16151_D+C+He')
+                          '/solps-iter/runs/examples/ITER_2298_Honly_20MW+C+He')
     tcsh_widget.setTcshCommand('ls')
     tcsh_widget.executeTcshCommand()
     tcsh_widget.setTcshCommand('ls -l')
     tcsh_widget.executeTcshCommand()
 
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

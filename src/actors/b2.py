@@ -417,7 +417,7 @@ if __name__ == '__main__':
         mainwindow.setWindowTitle(title_name)
         mainwindow.read_and_set_text(input_filename)
         mainwindow.show()
-        sys.exit(app.exec_())
+        sys.exit(app.exec())
 
     else:
         print("Provide path to B2 input file.")

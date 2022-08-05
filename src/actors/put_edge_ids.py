@@ -506,7 +506,7 @@ In order to run put_edge run directory path, shot, run, user, device and \
 version must be defined: Example (terminal):
 
 python3 put_edge_ids.py \
---dirpath=/home/ITER/simicg/solps-iter/runs/examples/AUG_16151_D+C+He\
+--dirpath=/home/ITER/simicg/solps-iter/runs/examples/ITER_2298_Honly_20MW+C+He\
 /16151_1.6MW_2.0e19_D=0.4_chi=1.6_standalone \
 --shot=1001 --run=1001 --user=%s --device=solps-iter --version=3"""
 
@@ -564,4 +564,4 @@ python3 put_edge_ids.py \
     t.setParameters(Vars)
     t.finished.connect(app.exit)
     t.start()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

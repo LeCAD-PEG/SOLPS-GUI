@@ -191,5 +191,5 @@ if __name__ == '__main__':
     archiveView.show()
 
 
-    code = app.exec_()
+    code = app.exec()
     sys.exit(code)
