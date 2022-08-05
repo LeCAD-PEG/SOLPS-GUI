@@ -393,7 +393,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     main = QMainWindow()
     w = InitializeRun()
-    w.setRunDir('/home/ITER/simicg/solps-iter/runs/examples/baserun')
+    w.setRunDir('/home/ivasileska/solps-iter/runs/examples/ITER_2298_Honly_20MW/baserun')
     main.setCentralWidget(w)
     main.show()
 

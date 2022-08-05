@@ -52,7 +52,7 @@ class B2plot(TcshProcess):
         self.convert = QProcess()
 
         self.convert.finished.connect(self.show_plot)
-        self.convert.error.connect(self.show_error)
+       # self.convert.error.connect(self.show_error)
         self.tcsh.stdOutput.connect(self.read_tcsh_stdout)
         self.tcsh.stdErrOutput.connect(self.print_tcsh_stderr)
 
@@ -184,7 +184,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = B2plot()
     window.show()
-    rundir = "/local/work/simicg/solps-gui/staging/solps-iter/develop/runs/examples/ITER_2298_Honly_20MW+C+He/16151_1.6MW_2.0e19_D=0.4_chi=1.6_standalone"
+    rundir = '/solps-iter/runs/examples/ITER_2298_Honly_20MW/baserun'
     window.setRunDir(os.path.expanduser(rundir))
     window.setB2plotCommand("echo phys a4p ti te m/ surf | b2plot")
     window.executeB2plotCommand()

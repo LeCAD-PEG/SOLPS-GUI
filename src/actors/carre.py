@@ -630,7 +630,7 @@ if __name__ == '__main__':
     logging.getLogger().setLevel(logging.DEBUG)
     carreM.activateDebugging()
     carreM.setTcshPath('/bin/tcsh')
-    path = os.path.expanduser('~/solps-iter/runs/test_run/baserun')
+    path = os.path.expanduser('/solps-iter/runs/examples/ITER_2298_Honly_20MW/baserun')
     carreM.setRunDir(path)
 
     layout = QVBoxLayout()

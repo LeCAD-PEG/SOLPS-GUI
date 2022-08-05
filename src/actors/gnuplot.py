@@ -6,6 +6,7 @@ from PySide6.QtCore import (Qt, QProcess, QSize, Signal,
                           QSettings, Slot, Property, QTemporaryDir,
                           QProcessEnvironment)
 from PySide6.QtGui import QImage, QPixmap
+from PySide6.QtWidgets import QApplication, QMainWindow, QLineEdit
 from PySide6.QtWidgets import QLabel, QFrame, QVBoxLayout, QWidget, QGridLayout
 from tcsh_process import TcshProcess
 
@@ -248,7 +249,7 @@ class Gnuplot(TcshProcess):
 
 if __name__ == "__main__":
     import sys
-    from PySide6.QtWidgets import QApplication, QMainWindow, QLineEdit
+
 
     class CmdInput(QLineEdit):
         sendCmd = Signal(str)
