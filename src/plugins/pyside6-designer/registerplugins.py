@@ -6,7 +6,7 @@ from b2plotplugin import B2plotPlugin
 from carreplugin import CarrePlugin
 from divgeoplugin import DivGeoPlugin
 from getIDSplugin import getIDSplugin
-#from gnuplotplugin import GnuplotPlugin
+from gnuplotplugin import GnuplotPlugin
 from initializeRunplugin import RunPlugin
 from logplugin import LogPlugin
 from putIDSplugin import putIDSplugin
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     QPyDesignerCustomWidgetCollection.addCustomWidget(CarrePlugin())
     QPyDesignerCustomWidgetCollection.addCustomWidget(DivGeoPlugin())
     QPyDesignerCustomWidgetCollection.addCustomWidget(getIDSplugin())  
-  #  QPyDesignerCustomWidgetCollection.addCustomWidget(GnuplotPlugin())  
+    QPyDesignerCustomWidgetCollection.addCustomWidget(GnuplotPlugin())  
     QPyDesignerCustomWidgetCollection.addCustomWidget(RunPlugin())
     QPyDesignerCustomWidgetCollection.addCustomWidget(LogPlugin())
     QPyDesignerCustomWidgetCollection.addCustomWidget(putIDSplugin())
