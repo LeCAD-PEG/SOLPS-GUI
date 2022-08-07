@@ -385,10 +385,10 @@ if __name__ == '__main__':
             self.actionAbout_Qt.triggered.connect(QApplication.instance().aboutQt)
 
             # TODO
-            #self.comboBoxRunFilterType.addItem("Regular expression",
-            #                                   QRegularExpression.RegExp)
-            #self.comboBoxRunFilterType.addItem("Wildcard", QRegExp.Wildcard)
-            #self.comboBoxRunFilterType.addItem("Fixed string", QRegExp.FixedString)
+            self.comboBoxRunFilterType.addItem("Regular expression",
+                                               QRegularExpression)
+            self.comboBoxRunFilterType.addItem("Wildcard", QRegularExpression.WildcardConversionOption)
+            self.comboBoxRunFilterType.addItem("Fixed string", QRegularExpression.escape)
 
             self.filterCaseSensitivityCheckBox.setChecked(True)
 
