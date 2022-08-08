@@ -557,17 +557,25 @@ if __name__ == '__main__':
             self.pushButton_Restore.setEnabled(valid)
 
         def textFilterChanged(self):
-            filter_index = self.comboBoxRunFilterType.currentIndex()
-            filter_syntax = self.comboBoxRunFilterType.itemData(filter_index)
-            syntax = QRegExp.PatternSyntax(filter_syntax)
-            case_sense = (self.filterCaseSensitivityCheckBox.isChecked() and
-                          Qt.CaseSensitive or Qt.CaseInsensitive)
+            # filter_index = self.comboBoxRunFilterType.currentIndex()
+            # To do, see QRegularExpression documentation for options and syntaxes.
+            # filter_syntax = self.comboBoxRunFilterType.itemData(filter_index)
+            # syntax = QRegExp.PatternSyntax(filter_syntax)
+            # case_sense = (self.filterCaseSensitivityCheckBox.isChecked() and
+                          # QRegularExpression.CaseSensitive or Qt.CaseInsensitive)
+            case_sense = 0 if self.filterCaseSensitivityCheckBox.isChecked() else \
+                         QRegularExpression.CaseInsensitiveOption
             text = self.lineEditRunFilter.text()
             if text == '':
                 # If no filter is provided, then obviously show all.
                 text = '.'
-            regExp = QRegExp(self.lineEditRunFilter.text(), case_sense, syntax)
-            self.treeViewRuns.model().setFilterRegExp(regExp)
+            regExp = QRegularExpression(self.lineEditRunFilter.text())#, case_sense)#, syntax)
+            if self.filterCaseSensitivityCheckBox.isChecked():
+                regExp.setPatternOptions(QRegularExpression.NoPatternOption)
+            else:
+                regExp.setPatternOptions(QRegularExpression.CaseInsensitiveOption)
+
+            self.treeViewRuns.model().setFilterRegularExpression(regExp)
 
         @Slot()
         def show_runs_dialog(self):
