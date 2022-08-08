@@ -764,8 +764,8 @@ class RunsSortFilterProxyModel(QSortFilterProxyModel):
             child = items.pop()
 
             path = child.data(Column.path, Qt.DisplayRole)
-            if self.filterRegularExpression().indexIn(path) >= 0 and \
-               path not in self.archiveDirs:
+            match = self.filterRegularExpression().match(path)
+            if match.hasMatch() and path not in self.archiveDirs:
                 return True
 
             children = child.children()
@@ -773,14 +773,19 @@ class RunsSortFilterProxyModel(QSortFilterProxyModel):
                 items += children
         return False
 
-    #def filterAcceptsRow(self, sourceRow, sourceParent):
-    #    index = self.sourceModel().index(sourceRow, Column.path, sourceParent)
-    #    path = self.sourceModel().data(index, Qt.DisplayRole)
-    #    if path in self.archiveDirs:
-    #        return False
-    #    if self.filterRegExp().indexIn(path) >= 0:
-    #        return True
-    #    return self.hasAcceptedChildren(index)    
+
+    def filterAcceptsRow(self, sourceRow, sourceParent):
+        index = self.sourceModel().index(sourceRow, Column.path, sourceParent)
+        path = self.sourceModel().data(index, Qt.DisplayRole)
+        if path in self.archiveDirs:
+            return False
+        match = self.filterRegularExpression().match(path)
+        if match.hasMatch():
+            # Row with string returns true
+            return True
+        # Row with child that has the string in itself ralso returns true,
+        flag = self.hasAcceptedChildren(index)
+        return flag
 
 
 class RunDirView(QTreeView):
