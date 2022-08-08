@@ -188,6 +188,12 @@ class Preferences():
         self.debugger = 'totalview'
         self.compress_log = 0
         self.dry_run = 0
+        self.use_openmp = 0
+        self.threads = '1'
+        self.time = '0'
+        self.partition = 'set partition name'
+        self.nodes = '1'
+        self.memory = '1'
         self.device_environment = 'ITER'
         self.compiler_environment = 'gfortran'
 
@@ -211,6 +217,12 @@ class Preferences():
         self.debugger = settings.value('debugger', self.debugger)
         self.compress_log = int(settings.value('compress_log', self.compress_log))
         self.dry_run = int(settings.value('dry_run', self.dry_run))
+        self.use_openmp = int(settings.value('use_openmp', self.use_openmp))
+        self.threads = settings.value('threads', self.threads)
+        self.time = settings.value('time', self.time)
+        self.partition = settings.value('partition', self.partition)
+        self.nodes = settings.value('nodes', self.nodes)
+        self.memory = settings.value('memory', self.memory)
         self.device_environment = settings.value('device_environment', self.device_environment)
         self.compiler_environment = settings.value('compiler_environment', self.compiler_environment)
 
@@ -234,6 +246,11 @@ class Preferences():
         settings.setValue('debugger', self.debugger)
         settings.setValue('compress_log', self.compress_log)
         settings.setValue('dry_run', str(self.dry_run))
+        settings.setValue('use_openmp', str(self.use_openmp))
+        settings.setValue('threads', self.threads)
+        settings.setValue('time', self.time)
+        settings.setValue('partition', self.partition)
+        settings.setValue('nodes', self.nodes)
         settings.setValue('device_environment', str(self.device_environment))
         settings.setValue('compiler_environment', str(self.compiler_environment))
 
@@ -269,6 +286,12 @@ class PreferencesDialog(QDialog):
         self.form.lineEdit_debugger.setText(preferences.debugger)
         self.form.checkBox_compress_log.setChecked(int(preferences.compress_log))
         self.form.checkBox_dry_run.setChecked(int(preferences.dry_run))
+        self.form.checkBox_use_openmp.setChecked(int(preferences.use_openmp))
+        self.form.lineEdit_threads.setText(preferences.threads)
+        self.form.lineEdit_time.setText(preferences.time)
+        self.form.lineEdit_partition.setText(preferences.partition)
+        self.form.lineEdit_nodes.setText(preferences.nodes)
+        self.form.lineEdit_memory.setText(preferences.memory)
         self.form.comboBox_device_environment.setCurrentText(preferences.device_environment)
         self.form.comboBox_compiler_environment.setCurrentText(preferences.compiler_environment)
 
@@ -290,6 +313,12 @@ class PreferencesDialog(QDialog):
         self.preferences.debugger = self.form.lineEdit_debugger.text()
         self.preferences.compress_log = int(self.form.checkBox_compress_log.checkState())
         self.preferences.dry_run = int(self.form.checkBox_dry_run.checkState())
+        self.preferences.use_openmp = int(self.form.checkBox_use_openmp.checkState())
+        self.preferences.threads = self.form.lineEdit_threads.text()
+        self.preferences.time = self.form.lineEdit_time.text()
+        self.preferences.partition = self.form.lineEdit_partition.text()
+        self.preferences.nodes = self.form.lineEdit_nodes.text()
+        self.preferences.memory = self.form.lineEdit_memory.text()
         self.preferences.device_environment = self.form.comboBox_device_environment.currentText()
         self.preferences.compiler_environment = self.form.comboBox_compiler_environment.currentText()
 
@@ -841,6 +870,16 @@ if __name__ == '__main__':
                     opts += ' -z'
                 if self.preferences.dry_run:
                     opts += ' -n'
+                if self.preferences.use_openmp:
+                    opts += f'-t "{self.preferences.threads}"'
+                if self.preferences.partition:
+                    opts += f' -Q {self.preferences.partition}'
+                if self.preferences.time:
+                    opts += f' -T {self.preferences.time}'    
+                if self.preferences.nodes:
+                    opts += f' -N {self.preferences.nodes}'  
+                if self.preferences.memory:
+                    opts += f' -M {self.preferences.memory}'             
 
                 if submit_command == 'local run':
                     submit_command = 'b2run b2mn'
