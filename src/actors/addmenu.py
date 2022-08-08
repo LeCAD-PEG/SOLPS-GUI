@@ -46,7 +46,7 @@ class AddMenu(QMenu):
             for parameter in b2menu.b2mn_menu[category][1:]:
                 (name, param_type, data, description) = parameter
                 if param_type == 'switchgroup':
-                    switchgroup = QMenu(category_menu)
+                    switchgroup = QMenu(category_menu) 
                     switchgroup.setTitle(name)
                     action = category_menu.addAction(switchgroup.menuAction())
                     for parameter in data:
@@ -126,8 +126,9 @@ class AddMenu(QMenu):
                 else:
                     action.setEnabled(True)
                     enable = 1
-                    for a in action.menu().actions():
-                        a.setEnabled(True)
+                    if isinstance(action, QMenu):
+                        for a in action.actions():
+                            a.setEnabled(True)
 
         elif filename == 'input.dat':
             [action.setEnabled(False) for action in self.actions()]
@@ -136,14 +137,15 @@ class AddMenu(QMenu):
             for action in self.actions():
                 if action.text() == 'Atomic Physics':
                     action.setEnabled(True)
-                    for a in action.menu().actions():
-                        if a.text().startswith('b2ar'):
-                            a.setEnabled(True)
-                        else:
-                            a.setEnabled(False)
-                            if not isinstance(a, QWidgetAction):
-                                for a_ in a.actions():
-                                    a_.setEnabled(True)
+                    if isinstance(action, QMenu):
+                        for a in action.actions():
+                            if a.text().startswith('b2ar'):
+                                a.setEnabled(True)
+                            else:
+                                a.setEnabled(False)
+                                if not isinstance(a, QWidgetAction):
+                                    for a_ in a.actions():
+                                        a_.setEnabled(True)
                 else:
                     action.setEnabled(False)
         else:
@@ -153,14 +155,15 @@ class AddMenu(QMenu):
                 for action in self.actions():
                     action.setEnabled(False)
                     enable = 1
-                    for a in action.menu().actions():
-                        if a.text().startswith(strip):
-                            if enable:
-                                action.setEnabled(True)
-                                enable = 0
-                            a.setEnabled(True)
-                        else:
-                            a.setEnabled(False)
+                    if isinstance(action, QMenu):
+                        for a in action.actions():
+                            if a.text().startswith(strip):
+                                if enable:
+                                    action.setEnabled(True)
+                                    enable = 0
+                                a.setEnabled(True)
+                            else:
+                                a.setEnabled(False)
             else:
                 for action in actions:
                     if filename[:-4] in action.text():
