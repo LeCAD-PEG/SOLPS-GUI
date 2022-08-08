@@ -21,8 +21,8 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../../src/gui'))
-sys.path.insert(0, os.path.abspath('../../src/widgets'))
-sys.path.insert(0, os.path.abspath('../../src/plugins/designer'))
+sys.path.insert(0, os.path.abspath('../../src/actors'))
+sys.path.insert(0, os.path.abspath('../../src/plugins/pyside6-designer'))
 # sys.path.append(os.path.abspath('exts'))
 
 # -- General configuration ------------------------------------------------
@@ -222,9 +222,9 @@ latex_elements = {
 # The font size ('10pt', '11pt' or '12pt').
 'pointsize': '11pt',
 
-# Additional stuff for the LaTeX preamble.
+# Additional stuff for the LaTeX preamble. TODO
 # See http://tex.stackexchange.com/questions/83020/set-standard-default-scaling-of-includegraphics
-'preamble': b'\usepackage{graphicx}\n\setkeys{Gin}{width=.60\csname Gin@nat@width\endcsname,keepaspectratio}\n',
+# 'preamble': b'\usepackage{graphicx}\n\setkeys{Gin}{width=.60\csname Gin@nat@width\endcsname,keepaspectratio}\n',
 
 # Latex figure (float) alignment
 #'figure_align': 'htbp',
