@@ -187,6 +187,12 @@ class Preferences():
         self.debugger = 'totalview'
         self.compress_log = 0
         self.dry_run = 0
+        self.use_openmp = 0
+        self.threads = '1'
+        self.time = '0'
+        self.partition = 'set partition name'
+        self.nodes = '1'
+        self.memory = '1'
         self.device_environment = 'ITER'
         self.compiler_environment = 'gfortran'
 
@@ -210,6 +216,12 @@ class Preferences():
         self.debugger = settings.value('debugger', self.debugger)
         self.compress_log = int(settings.value('compress_log', self.compress_log))
         self.dry_run = int(settings.value('dry_run', self.dry_run))
+        self.use_openmp = int(settings.value('use_openmp', self.use_openmp))
+        self.threads = settings.value('threads', self.threads)
+        self.time = settings.value('time', self.time)
+        self.partition = settings.value('partition', self.partition)
+        self.nodes = settings.value('nodes', self.nodes)
+        self.memory = settings.value('memory', self.memory)
         self.device_environment = settings.value('device_environment', self.device_environment)
         self.compiler_environment = settings.value('compiler_environment', self.compiler_environment)
 
@@ -233,6 +245,11 @@ class Preferences():
         settings.setValue('debugger', self.debugger)
         settings.setValue('compress_log', self.compress_log)
         settings.setValue('dry_run', str(self.dry_run))
+        settings.setValue('use_openmp', str(self.use_openmp))
+        settings.setValue('threads', self.threads)
+        settings.setValue('time', self.time)
+        settings.setValue('partition', self.partition)
+        settings.setValue('nodes', self.nodes)
         settings.setValue('device_environment', str(self.device_environment))
         settings.setValue('compiler_environment', str(self.compiler_environment))
 
@@ -257,13 +274,19 @@ class PreferencesDialog(QDialog):
         self.comboBox_log_level.setCurrentIndex(preferences.log_level)
         self.comboBox_submit_script.setCurrentText(preferences.submit_script)
         self.lineEdit_job_name.setText(preferences.job_name)
-        self.checkBox_standalone.setCheckState(int(preferences.standalone))
-        self.checkBox_use_mpi.setCheckState(int(preferences.use_mpi))
+        self.checkBox_standalone.setChecked(int(preferences.standalone))
+        self.checkBox_use_mpi.setChecked(int(preferences.use_mpi))
         self.lineEdit_mpi_options.setText(preferences.mpi_options)
-        self.checkBox_use_debugger.setCheckState(int(preferences.use_debugger))
+        self.checkBox_use_debugger.setChecked(int(preferences.use_debugger))
         self.lineEdit_debugger.setText(preferences.debugger)
-        self.checkBox_compress_log.setCheckState(int(preferences.compress_log))
-        self.checkBox_dry_run.setCheckState(int(preferences.dry_run))
+        self.checkBox_compress_log.setChecked(int(preferences.compress_log))
+        self.checkBox_dry_run.setChecked(int(preferences.dry_run))
+        self.checkBox_use_openmp.setChecked(int(preferences.use_openmp))
+        self.lineEdit_threads.setText(preferences.threads)
+        self.lineEdit_time.setText(preferences.time)
+        self.lineEdit_partition.setText(preferences.partition)
+        self.lineEdit_nodes.setText(preferences.nodes)
+        self.lineEdit_memory.setText(preferences.memory)
         self.comboBox_device_environment.setCurrentText(preferences.device_environment)
         self.comboBox_compiler_environment.setCurrentText(preferences.compiler_environment)
 
@@ -285,9 +308,14 @@ class PreferencesDialog(QDialog):
         self.preferences.debugger = self.lineEdit_debugger.text()
         self.preferences.compress_log = int(self.checkBox_compress_log.checkState())
         self.preferences.dry_run = int(self.checkBox_dry_run.checkState())
+        self.preferences.use_openmp = int(self.checkBox_use_openmp.checkState())
+        self.preferences.threads = self.lineEdit_threads.text()
+        self.preferences.time = self.lineEdit_time.text()
+        self.preferences.partition = self.lineEdit_partition.text()
+        self.preferences.nodes = self.lineEdit_nodes.text()
+        self.preferences.memory = self.lineEdit_memory.text()
         self.preferences.device_environment = self.comboBox_device_environment.currentText()
         self.preferences.compiler_environment = self.comboBox_compiler_environment.currentText()
-
 
 class SOLPS_MainWindow(QMainWindow):
     """Main window of the SOLPS GUI
@@ -817,6 +845,16 @@ class SOLPS_MainWindow(QMainWindow):
                 opts += ' -z'
             if self.preferences.dry_run:
                 opts += ' -n'
+            if self.preferences.use_openmp:
+                opts += f'-t "{self.preferences.threads}"'
+            if self.preferences.partition:
+                opts += f' -Q {self.preferences.partition}'
+            if self.preferences.time:
+                opts += f' -T {self.preferences.time}'    
+            if self.preferences.nodes:
+                opts += f' -N {self.preferences.nodes}'  
+            if self.preferences.memory:
+                opts += f' -M {self.preferences.memory}'
 
             if submit_command == 'local run':
                 submit_command = 'b2run b2mn'
