@@ -187,7 +187,7 @@
        <string>Command line options to MPI</string>
       </property>
       <property name="text">
-       <string>-n 16</string>
+       <string>-np 16</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_use_debugger">
