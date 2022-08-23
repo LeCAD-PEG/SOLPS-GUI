@@ -178,24 +178,25 @@ class Preferences():
         self.tcsh_path = '/bin/tcsh'
         self.gnuplot_path = '/usr/bin/gnuplot'
         self.convert_path = '/usr/bin/convert'
+        self.browser_path = '/usr/bin/firefox'
         self.log_level = 1  # info
         self.submit_script = 'localsubmit'
         self.job_name = 'SOLPS-ITER'
         self.standalone = 0
         self.use_mpi = 0
-        self.mpi_options = '-n 16'
+        self.mpi_options = '-np 16'
         self.use_debugger = 0
         self.debugger = 'totalview'
         self.compress_log = 0
         self.dry_run = 0
         self.use_openmp = 0
-        self.threads = '1'
-        self.time = '0'
-        self.partition = 'set partition name'
-        self.nodes = '1'
-        self.memory = '1'
+        self.threads = ''
+        self.time = ''
+        self.partition = ''
+        self.nodes = ''
+        self.memory = ''
         self.device_environment = 'ITER'
-        self.compiler_environment = 'gfortran'
+        self.compiler_environment = 'ifort64'
 
     def read(self):
         """  Reads Preferences from QSettings()
@@ -207,6 +208,7 @@ class Preferences():
         self.tcsh_path = settings.value('tcsh_path', self.tcsh_path)
         self.gnuplot_path = settings.value('gnuplot_path', self.gnuplot_path)
         self.convert_path = settings.value('convert_path', self.convert_path)
+        self.browser_path = settings.value('browser_path', self.browser_path)
         self.log_level = int(settings.value('log_level', self.log_level))
         self.submit_script = settings.value('submit_script', self.submit_script)
         self.job_name = settings.value('job_name', self.job_name)
@@ -236,6 +238,7 @@ class Preferences():
         settings.setValue('tcsh_path', self.tcsh_path)
         settings.setValue('gnuplot_path', self.gnuplot_path)
         settings.setValue('convert_path', self.convert_path)
+        settings.setValue('browser_path', self.browser_path)
         settings.setValue('log_level', str(self.log_level))
         settings.setValue('submit_script', self.submit_script)
         settings.setValue('job_name', self.job_name)
@@ -276,6 +279,7 @@ class PreferencesDialog(QDialog):
         self.form.lineEdit_tcsh_path.setText(preferences.tcsh_path)
         self.form.lineEdit_gnuplot_path.setText(preferences.gnuplot_path)
         self.form.lineEdit_convert_path.setText(preferences.convert_path)
+        self.form.lineEdit_browser_path.setText(preferences.browser_path)
         self.form.comboBox_log_level.setCurrentIndex(preferences.log_level)
         self.form.comboBox_submit_script.setCurrentText(preferences.submit_script)
         self.form.lineEdit_job_name.setText(preferences.job_name)
@@ -303,6 +307,7 @@ class PreferencesDialog(QDialog):
         self.preferences.tcsh_path = self.form.lineEdit_tcsh_path.text()
         self.preferences.gnuplot_path = self.form.lineEdit_gnuplot_path.text()
         self.preferences.convert_path = self.form.lineEdit_convert_path.text()
+        self.preferences.browser_path = self.form.lineEdit_browser_path.text()
         self.preferences.log_level = self.form.comboBox_log_level.currentIndex()
         self.preferences.submit_script = self.form.comboBox_submit_script.currentText()
         self.preferences.job_name = self.form.lineEdit_job_name.text()
