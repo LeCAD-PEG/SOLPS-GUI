@@ -130,6 +130,10 @@ class EdgeProfiles(QWidget):
     def getGGDVars(self):
         return self.ggdVars
 
+    @Slot(str)
+    def SetRunPath(self, path: str):
+        print(path)
+
     @Slot()
     def plotData(self):
         """Populate (plot) the canvas.

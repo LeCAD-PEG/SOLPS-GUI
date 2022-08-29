@@ -34,7 +34,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -553,6 +553,46 @@ should eventually stop the run.</string>
        <zorder>label_7</zorder>
        <zorder>tcsh</zorder>
       </widget>
+      <widget class="QWidget" name="tab_19">
+       <attribute name="title">
+        <string>Edge Profiles</string>
+       </attribute>
+       <widget class="EdgeProfiles" name="edgeprofiles">
+        <property name="geometry">
+         <rect>
+          <x>230</x>
+          <y>20</y>
+          <width>381</width>
+          <height>341</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Draws various edge profiles from SOLPS</string>
+        </property>
+        <property name="whatsThis">
+         <string>This actor is part of SOLPS-ITER GUI</string>
+        </property>
+        <property name="pulse" stdset="0">
+         <string notr="true" comment="(shot, run, usename, database, backend)" extracomment="Tuple of IDS parameters">(130012, 2, &quot;public&quot;, &quot;ITER&quot;, 12)</string>
+        </property>
+        <property name="text" stdset="0">
+         <string>EdgeProfiles</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton">
+        <property name="geometry">
+         <rect>
+          <x>50</x>
+          <y>140</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Select value</string>
+        </property>
+       </widget>
+      </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
         <string>View</string>
@@ -676,7 +716,7 @@ should eventually stop the run.</string>
      <x>0</x>
      <y>0</y>
      <width>662</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -734,6 +774,17 @@ should eventually stop the run.</string>
  </widget>
  <customwidgets>
   <customwidget>
+   <class>Director</class>
+   <extends>QCheckBox</extends>
+   <header>director</header>
+  </customwidget>
+  <customwidget>
+   <class>SolpsInput</class>
+   <extends>QTabWidget</extends>
+   <header>solpsinput</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>treeArchiveView</class>
    <extends>QTreeView</extends>
    <header>archive_run_dir_view</header>
@@ -742,11 +793,6 @@ should eventually stop the run.</string>
    <class>Carre</class>
    <extends>QWidget</extends>
    <header>carre</header>
-  </customwidget>
-  <customwidget>
-   <class>Director</class>
-   <extends>QCheckBox</extends>
-   <header>director</header>
   </customwidget>
   <customwidget>
    <class>DivGeo</class>
@@ -785,12 +831,6 @@ should eventually stop the run.</string>
    <header>run_dir_view</header>
   </customwidget>
   <customwidget>
-   <class>SolpsInput</class>
-   <extends>QTabWidget</extends>
-   <header>solpsinput</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>SolpsPlots</class>
    <extends>QComboBox</extends>
    <header>solpsplots</header>
@@ -804,6 +844,11 @@ should eventually stop the run.</string>
    <class>Triang</class>
    <extends>QWidget</extends>
    <header>triang</header>
+  </customwidget>
+  <customwidget>
+   <class>EdgeProfiles</class>
+   <extends>QWidget</extends>
+   <header>edgeprofiles</header>
   </customwidget>
   <customwidget>
    <class>B2InputFiles</class>
@@ -932,8 +977,8 @@ should eventually stop the run.</string>
    <slot>executeTcshCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>307</x>
-     <y>396</y>
+     <x>230</x>
+     <y>397</y>
     </hint>
     <hint type="destinationlabel">
      <x>83</x>
@@ -1081,7 +1126,7 @@ should eventually stop the run.</string>
     </hint>
     <hint type="destinationlabel">
      <x>112</x>
-     <y>87</y>
+     <y>85</y>
     </hint>
    </hints>
   </connection>
@@ -1113,7 +1158,7 @@ should eventually stop the run.</string>
     </hint>
     <hint type="destinationlabel">
      <x>112</x>
-     <y>87</y>
+     <y>85</y>
     </hint>
    </hints>
   </connection>
@@ -1194,6 +1239,38 @@ should eventually stop the run.</string>
     <hint type="destinationlabel">
      <x>187</x>
      <y>165</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>edgeprofiles</receiver>
+   <slot>setGGDdata()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>154</x>
+     <y>121</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>253</x>
+     <y>125</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_passthrough(QString)</signal>
+   <receiver>edgeprofiles</receiver>
+   <slot>SetRunPath(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>82</x>
+     <y>413</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>431</x>
+     <y>244</y>
     </hint>
    </hints>
   </connection>
