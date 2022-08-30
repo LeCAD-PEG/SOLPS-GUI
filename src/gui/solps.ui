@@ -613,7 +613,7 @@ should eventually stop the run.</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_16">
         <item row="0" column="0">
-         <widget class="QPushButton" name="pushButton_3">
+         <widget class="QPushButton" name="pushButton_get_IDS">
           <property name="text">
            <string>Get IDS</string>
           </property>
@@ -642,14 +642,14 @@ should eventually stop the run.</string>
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="pushButton_set_GGD_settings">
           <property name="text">
            <string>Set GGD settings</string>
           </property>
          </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="pushButton_plot_edge_profiles">
           <property name="text">
            <string>Plot</string>
           </property>
@@ -1293,7 +1293,7 @@ should eventually stop the run.</string>
    </hints>
   </connection>
   <connection>
-   <sender>pushButton</sender>
+   <sender>pushButton_set_GGD_settings</sender>
    <signal>clicked()</signal>
    <receiver>edgeprofiles</receiver>
    <slot>setGGDdata()</slot>
@@ -1305,22 +1305,6 @@ should eventually stop the run.</string>
     <hint type="destinationlabel">
      <x>253</x>
      <y>125</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>director</sender>
-   <signal>rundir_passthrough(QString)</signal>
-   <receiver>edgeprofiles</receiver>
-   <slot>SetRunPath(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>431</x>
-     <y>244</y>
     </hint>
    </hints>
   </connection>
@@ -1453,7 +1437,7 @@ should eventually stop the run.</string>
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_2</sender>
+   <sender>pushButton_plot_edge_profiles</sender>
    <signal>clicked()</signal>
    <receiver>edgeprofiles</receiver>
    <slot>plotData()</slot>
@@ -1469,7 +1453,7 @@ should eventually stop the run.</string>
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_3</sender>
+   <sender>pushButton_get_IDS</sender>
    <signal>clicked()</signal>
    <receiver>edgeprofiles</receiver>
    <slot>setEPIDS()</slot>
