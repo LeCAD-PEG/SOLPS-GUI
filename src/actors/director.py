@@ -30,6 +30,11 @@ class Director(QCheckBox):
     rundir_passtrigger = Signal()
     rundir_checktrigger = Signal()
 
+    b2_user = Signal(str)
+    b2_run_number = Signal(str)
+    b2_shot_number = Signal(str)
+    b2_device = Signal(str)
+
     def __init__(self, parent=None):
         super(Director, self).__init__(parent)
 

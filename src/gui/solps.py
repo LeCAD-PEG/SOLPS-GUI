@@ -453,6 +453,10 @@ if __name__ == '__main__':
             # self.gnuplot.plot("sin(3*x)/x")
             # self.runSelected.connect(self.label_7.setText)
             self.runSelected.connect(self.director.setRundir)
+            self.b2_device.connect(self.director.b2_device)
+            self.b2_user.connect(self.director.b2_user)
+            self.b2_run_number.connect(self.director.b2_run_number)
+            self.b2_shot_number.connect(self.director.b2_shot_number)
             # self.runSelected.connect(self.tcsh.setRundir)
             # self.tcsh.setTcshCommand(self.lineEdit.text())
             #  self.gnuplot.setText("Started")
@@ -463,10 +467,10 @@ if __name__ == '__main__':
             # self.divgeo.activateDebugging()
 
             # Connect id signals to put_edge_ids object (solps.ui)
-            self.b2_device.connect(self.put_edge_ids.setDevice)
-            self.b2_user.connect(self.put_edge_ids.setUser)
-            self.b2_run_number.connect(self.put_edge_ids.setRun)
-            self.b2_shot_number.connect(self.put_edge_ids.setShot)
+            # self.b2_device.connect(self.put_edge_ids.setDevice)
+            # self.b2_user.connect(self.put_edge_ids.setUser)
+            # self.b2_run_number.connect(self.put_edge_ids.setRun)
+            # self.b2_shot_number.connect(self.put_edge_ids.setShot)
 
         # @Slot()
         # def on_pushButton_Archive_clicked(self):

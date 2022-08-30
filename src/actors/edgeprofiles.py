@@ -40,6 +40,7 @@ class EdgeProfiles(QWidget):
             self.ggdVars[i] = ''
 
         # Set IDS object
+        self.idsVars = {"user": os.getenv('USER')}
         self.ids = ids
 
         # Set layout
@@ -57,6 +58,22 @@ class EdgeProfiles(QWidget):
         self.ids = ids
 
     @Slot()
+    def setRun(self, run: str):
+        self.idsVars["run"] = run
+
+    @Slot()
+    def setShot(self, shot: str):
+        self.idsVars["shot"] = shot
+
+    @Slot()
+    def setUser(self, user: str):
+        self.idsVars["user"] = user
+
+    @Slot()
+    def setDevice(self, device: str):
+        self.idsVars["device"] = device
+
+    @Slot()
     def setEPIDS(self):
         """Set and read edge_profiles IDS.
         Check if either:
@@ -67,30 +84,47 @@ class EdgeProfiles(QWidget):
         3. If neither condition from the above is satisfied, run the plugin in
            standalone mode using Dialog for IDS parameters specification.
         """
-        self.vars = {}
-        # If IDS object is not provided, display dialog window where the IDS
-        # parameters can be specified. Then open the specified IDS
-        if self.ids != None:
+        # self.vars = {}
+        # # If IDS object is not provided, display dialog window where the IDS
+        # # parameters can be specified. Then open the specified IDS
+        # if self.ids != None:
+        #     return
+        # else:
+        #     from ids.getIDS import GetIDSWrapper, GetIDSDialog, GetIDSVars
+        #     for i in range(GetIDSVars.numOfParams):
+        #         # At the beginning clear all parameters
+        #         self.vars[i] = ''
+
+        #     dialog = GetIDSDialog(self)
+        #     # Set note
+        #     note = 'Note: this plugin should be used \nonly with IDSs which ' \
+        #            + 'contain \npopulated edge_profiles IDS!'
+        #     dialog.prepareWidgets(self.vars, note=note)
+        #     if dialog.exec():
+        #         self.vars = dialog.on_close()
+        #     else:
+        #         # Canceled!
+        #         return self.ids == None
+        #     # Set IDS with wrapper
+        #     self.ids = GetIDSWrapper(self.vars).getIDS()
+        # Check if all parameters are there.
+        for el in ["shot", "run", "device", "user"]:
+            if el not in self.idsVars:
+                return
+
+        # Get the IDS object
+        import imas
+
+        ids = imas.ids(int(self.idsVars["shot"]), int(self.idsVars["run"]))
+
+        # Open the data entry
+        ids.open_env(self.idsVars["user"], self.idsVars["device"], "3")
+
+        if not ids.isConnected():
+            logging.info("ids not connected")
+            self.ids = None
             return
-        else:
-            from ids.getIDS import GetIDSWrapper, GetIDSDialog, GetIDSVars
-            for i in range(GetIDSVars.numOfParams):
-                # At the beginning clear all parameters
-                self.vars[i] = ''
-
-            dialog = GetIDSDialog(self)
-            # Set note
-            note = 'Note: this plugin should be used \nonly with IDSs which ' \
-                   + 'contain \npopulated edge_profiles IDS!'
-            dialog.prepareWidgets(self.vars, note=note)
-            if dialog.exec():
-                self.vars = dialog.on_close()
-            else:
-                # Canceled!
-                return self.ids == None
-            # Set IDS with wrapper
-            self.ids = GetIDSWrapper(self.vars).getIDS()
-
+        self.ids = ids
         logging.info('Getting IDS')
         # Read edge_profiles IDS
         self.ids.edge_profiles.get()
@@ -114,23 +148,18 @@ class EdgeProfiles(QWidget):
             # Canceled!
             return False
 
-    @Slot()
     def getQuantityValues(self):
         return self.ggdVars['quantityValues']
 
-    @Slot()
     def getQuantityLabel(self):
         return self.ggdVars['quantityLabel']
 
-    @Slot()
     def getGridSubsetID(self):
         return self.ggdVars['gridSubsetId']
 
-    @Slot()
     def getGGDVars(self):
         return self.ggdVars
 
-    @Slot(str)
     def SetRunPath(self, path: str):
         print(path)
 
