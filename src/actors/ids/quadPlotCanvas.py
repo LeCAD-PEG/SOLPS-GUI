@@ -91,7 +91,7 @@ class QuadPlotCanvas(FigureCanvasQTAgg):
         self.ax.set_aspect('equal')
 
         pc = quadplot(y,z, np.asarray(elements), values, ax=self.ax,
-                      cmap="plasma")
+                      cmap="inferno")
         self.figure.colorbar(pc, ax=self.ax)
         # self.ax.plot(y,z, marker="o", ls="", color="crimson")
         self.ax.plot(y,z, ls="", color="crimson")

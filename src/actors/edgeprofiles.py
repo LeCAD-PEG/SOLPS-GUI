@@ -57,19 +57,19 @@ class EdgeProfiles(QWidget):
     def setIDS(self, ids):
         self.ids = ids
 
-    @Slot()
+    @Slot(str)
     def setRun(self, run: str):
         self.idsVars["run"] = run
 
-    @Slot()
+    @Slot(str)
     def setShot(self, shot: str):
         self.idsVars["shot"] = shot
 
-    @Slot()
+    @Slot(str)
     def setUser(self, user: str):
         self.idsVars["user"] = user
 
-    @Slot()
+    @Slot(str)
     def setDevice(self, device: str):
         self.idsVars["device"] = device
 
@@ -159,9 +159,6 @@ class EdgeProfiles(QWidget):
 
     def getGGDVars(self):
         return self.ggdVars
-
-    def SetRunPath(self, path: str):
-        print(path)
 
     @Slot()
     def plotData(self):
