@@ -254,6 +254,7 @@ class Preferences():
         settings.setValue('time', self.time)
         settings.setValue('partition', self.partition)
         settings.setValue('nodes', self.nodes)
+        settings.setValue('memory', self.memory)
         settings.setValue('device_environment', str(self.device_environment))
         settings.setValue('compiler_environment', str(self.compiler_environment))
 
