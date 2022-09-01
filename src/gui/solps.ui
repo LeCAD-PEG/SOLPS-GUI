@@ -34,7 +34,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>6</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -732,6 +732,12 @@ should eventually stop the run.</string>
           <height>381</height>
          </rect>
         </property>
+        <property name="b2plotCommand" stdset="0">
+         <string>echo phys a4p ti te m/ surf | b2plot</string>
+        </property>
+        <property name="b2plotPage" stdset="0">
+         <number>1</number>
+        </property>
        </widget>
        <widget class="QPushButton" name="pushButton">
         <property name="geometry">
@@ -987,11 +993,11 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>202</x>
-     <y>436</y>
+     <x>101</x>
+     <y>74</y>
     </hint>
    </hints>
   </connection>
@@ -1003,11 +1009,11 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>247</x>
-     <y>413</y>
+     <x>157</x>
+     <y>84</y>
     </hint>
    </hints>
   </connection>
@@ -1019,7 +1025,7 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
@@ -1051,11 +1057,11 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>72</x>
-     <y>63</y>
+     <y>62</y>
     </hint>
    </hints>
   </connection>
@@ -1067,11 +1073,11 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>408</y>
+     <y>68</y>
     </hint>
     <hint type="destinationlabel">
      <x>72</x>
-     <y>63</y>
+     <y>62</y>
     </hint>
    </hints>
   </connection>
@@ -1082,12 +1088,12 @@ should eventually stop the run.</string>
    <slot>executeTcshCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>173</x>
-     <y>408</y>
+     <x>72</x>
+     <y>68</y>
     </hint>
     <hint type="destinationlabel">
      <x>72</x>
-     <y>63</y>
+     <y>62</y>
     </hint>
    </hints>
   </connection>
@@ -1098,12 +1104,12 @@ should eventually stop the run.</string>
    <slot>setSolpsPlotCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>247</x>
-     <y>413</y>
+     <x>157</x>
+     <y>84</y>
     </hint>
     <hint type="destinationlabel">
-     <x>259</x>
-     <y>64</y>
+     <x>178</x>
+     <y>92</y>
     </hint>
    </hints>
   </connection>
@@ -1114,12 +1120,12 @@ should eventually stop the run.</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>247</x>
-     <y>413</y>
+     <x>157</x>
+     <y>84</y>
     </hint>
     <hint type="destinationlabel">
-     <x>259</x>
-     <y>64</y>
+     <x>178</x>
+     <y>92</y>
     </hint>
    </hints>
   </connection>
@@ -1130,12 +1136,12 @@ should eventually stop the run.</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>677</x>
-     <y>413</y>
+     <x>178</x>
+     <y>92</y>
     </hint>
     <hint type="destinationlabel">
-     <x>259</x>
-     <y>64</y>
+     <x>178</x>
+     <y>92</y>
     </hint>
    </hints>
   </connection>
@@ -1147,11 +1153,11 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>259</x>
-     <y>64</y>
+     <x>178</x>
+     <y>92</y>
     </hint>
    </hints>
   </connection>
@@ -1163,7 +1169,7 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -1179,11 +1185,11 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>665</x>
-     <y>75</y>
+     <x>98</x>
+     <y>63</y>
     </hint>
    </hints>
   </connection>
@@ -1195,11 +1201,11 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>759</x>
-     <y>75</y>
+     <x>110</x>
+     <y>63</y>
     </hint>
    </hints>
   </connection>
@@ -1211,7 +1217,7 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -1227,7 +1233,7 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -1243,7 +1249,7 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -1259,7 +1265,7 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -1275,7 +1281,7 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
@@ -1290,12 +1296,12 @@ should eventually stop the run.</string>
    <slot>addToArchiveDirs(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>330</x>
-     <y>267</y>
+     <x>110</x>
+     <y>83</y>
     </hint>
     <hint type="destinationlabel">
-     <x>71</x>
-     <y>93</y>
+     <x>82</x>
+     <y>74</y>
     </hint>
    </hints>
   </connection>
@@ -1306,12 +1312,12 @@ should eventually stop the run.</string>
    <slot>removeFromArchiveDirs(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>71</x>
-     <y>93</y>
+     <x>82</x>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>330</x>
-     <y>267</y>
+     <x>110</x>
+     <y>83</y>
     </hint>
    </hints>
   </connection>
@@ -1327,7 +1333,7 @@ should eventually stop the run.</string>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
-     <y>93</y>
+     <y>74</y>
     </hint>
    </hints>
   </connection>
@@ -1338,12 +1344,12 @@ should eventually stop the run.</string>
    <slot>addToArchiveDirs()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>123</x>
-     <y>70</y>
+     <x>35</x>
+     <y>63</y>
     </hint>
     <hint type="destinationlabel">
-     <x>187</x>
-     <y>165</y>
+     <x>110</x>
+     <y>83</y>
     </hint>
    </hints>
   </connection>
@@ -1354,8 +1360,8 @@ should eventually stop the run.</string>
    <slot>setGGDdata()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>130</x>
-     <y>112</y>
+     <x>57</x>
+     <y>66</y>
     </hint>
     <hint type="destinationlabel">
      <x>253</x>
@@ -1371,11 +1377,11 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>665</x>
-     <y>75</y>
+     <x>98</x>
+     <y>63</y>
     </hint>
    </hints>
   </connection>
@@ -1387,11 +1393,11 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>665</x>
-     <y>75</y>
+     <x>98</x>
+     <y>63</y>
     </hint>
    </hints>
   </connection>
@@ -1403,11 +1409,11 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>665</x>
-     <y>75</y>
+     <x>98</x>
+     <y>63</y>
     </hint>
    </hints>
   </connection>
@@ -1419,11 +1425,11 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>665</x>
-     <y>75</y>
+     <x>98</x>
+     <y>63</y>
     </hint>
    </hints>
   </connection>
@@ -1435,7 +1441,7 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>431</x>
@@ -1451,7 +1457,7 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>431</x>
@@ -1467,7 +1473,7 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>431</x>
@@ -1483,7 +1489,7 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>431</x>
@@ -1498,8 +1504,8 @@ should eventually stop the run.</string>
    <slot>plotData()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>99</x>
-     <y>140</y>
+     <x>57</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
      <x>267</x>
@@ -1514,8 +1520,8 @@ should eventually stop the run.</string>
    <slot>setEPIDS()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>99</x>
-     <y>84</y>
+     <x>57</x>
+     <y>62</y>
     </hint>
     <hint type="destinationlabel">
      <x>306</x>
@@ -1531,11 +1537,11 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>123</x>
-     <y>253</y>
+     <x>119</x>
+     <y>104</y>
     </hint>
    </hints>
   </connection>
@@ -1547,11 +1553,11 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>123</x>
-     <y>225</y>
+     <x>119</x>
+     <y>104</y>
     </hint>
    </hints>
   </connection>
@@ -1563,11 +1569,11 @@ should eventually stop the run.</string>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
-     <y>436</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>100</x>
-     <y>197</y>
+     <x>111</x>
+     <y>104</y>
     </hint>
    </hints>
   </connection>
@@ -1578,8 +1584,8 @@ should eventually stop the run.</string>
    <slot>setShot(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>116</x>
-     <y>188</y>
+     <x>119</x>
+     <y>104</y>
     </hint>
     <hint type="destinationlabel">
      <x>159</x>
@@ -1594,8 +1600,8 @@ should eventually stop the run.</string>
    <slot>setRun(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>121</x>
-     <y>225</y>
+     <x>119</x>
+     <y>104</y>
     </hint>
     <hint type="destinationlabel">
      <x>202</x>
@@ -1610,12 +1616,12 @@ should eventually stop the run.</string>
    <slot>setUser(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>272</y>
+     <x>119</x>
+     <y>104</y>
     </hint>
     <hint type="destinationlabel">
-     <x>171</x>
-     <y>271</y>
+     <x>182</x>
+     <y>262</y>
     </hint>
    </hints>
   </connection>
@@ -1626,12 +1632,12 @@ should eventually stop the run.</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>436</y>
+     <x>43</x>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>79</x>
-     <y>270</y>
+     <x>90</x>
+     <y>104</y>
     </hint>
    </hints>
   </connection>
@@ -1642,8 +1648,8 @@ should eventually stop the run.</string>
    <slot>setDevice(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>99</x>
-     <y>245</y>
+     <x>110</x>
+     <y>104</y>
     </hint>
     <hint type="destinationlabel">
      <x>357</x>
@@ -1658,8 +1664,8 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>82</x>
-     <y>445</y>
+     <x>43</x>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>430</x>
@@ -1674,8 +1680,8 @@ should eventually stop the run.</string>
    <slot>executeB2plotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>130</x>
-     <y>109</y>
+     <x>100</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>270</x>
