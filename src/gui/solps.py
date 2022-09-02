@@ -686,8 +686,16 @@ if __name__ == '__main__':
             settings.beginGroup("TreeViewRuns")
             settings.setValue("ColumnWidth",
                               self.treeViewRuns.header().saveState())
+            tree_view_model = self.treeViewRuns.model()
+            expanded_indexes = self.treeViewRuns.model().persistentIndexList()
+            expanded_paths = []
+            for index in expanded_indexes:
+                path_index = tree_view_model.index(index.row(), Column.path, index.parent())
+                expanded_path = tree_view_model.data(path_index, Qt.DisplayRole)
+                expanded_paths.append(expanded_path)
+            settings.setValue("ExpandedPaths", expanded_paths)
+            print(expanded_paths)
             settings.endGroup()
-
             settings.beginGroup("TreeViewArchive")
             settings.setValue("ColumnWidth",
                               self.treeViewArchive.header().saveState())

@@ -809,6 +809,7 @@ class RunDirView(QTreeView):
         treeViewColumnWidget = settings.value("ColumnWidgh")
         if treeViewColumnWidget:
             self.header().restoreState(treeViewColumnWidget)
+        expandedPaths = settings.value("ExpandedPaths")
         settings.endGroup()
 
         # Default model
