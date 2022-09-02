@@ -73,7 +73,7 @@ class B2plot(TcshProcess):
     @Slot(int)
     def show_plot(self, exit_status):
         self.convertFinished.emit()
-        if exit_status == 0:
+        if exit_status == 0 or exit_status == 6:
             data = self.convert.readAll()
             image = QImage()
             image.loadFromData(data)
@@ -132,7 +132,7 @@ class B2plot(TcshProcess):
     @Slot(str)
     def read_tcsh_stdout(self, text):
         if 'B2PLOT FINISHED' in text:
-            b2plot_ps_file = self.runDir + '/b2plot.ps'
+            b2plot_ps_file = os.path.join(self.runDir, 'b2plot.ps')
             if os.path.exists(b2plot_ps_file):
                 self.convert_args =  ['+antialias', '-resize', str(self.width())
                                       + 'x' + str(self.height()), 'b2plot.ps[' +
@@ -140,7 +140,7 @@ class B2plot(TcshProcess):
                 self.convert.setWorkingDirectory(self.runDir)
                 self.convert.start(self.convert_path, self.convert_args)
             else:
-                msg ="b2plot.ps file not created from " + self.b2plot_command
+                msg =f"{b2plot_ps_file} file not created from " + self.b2plot_command
                 logging.error(msg)
                 self.label.setText(msg)
                 self.convertFinished.emit()
@@ -184,7 +184,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = B2plot()
     window.show()
-    rundir = '/solps-iter/runs/examples/ITER_2298_Honly_20MW/baserun'
+    rundir = '/home/ITER/vasilei/solps-iter/runs/examples/ITER_2298_Honly_20MW/run_restart'
     window.setRunDir(os.path.expanduser(rundir))
     window.setB2plotCommand("echo phys a4p ti te m/ surf | b2plot")
     window.executeB2plotCommand()
