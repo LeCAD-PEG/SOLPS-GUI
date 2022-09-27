@@ -469,7 +469,6 @@ class RunsStatusServer(QUdpSocket):
 
     def stop(self) -> None:
         if self.state() == QUdpSocket.BindMode:
-            stop = b"STOP"
             self.writeData(b"STOP")
             self.close()
             # self.waitForDisconnected()
@@ -477,8 +476,8 @@ class RunsStatusServer(QUdpSocket):
 
 
 class RunsModel(QAbstractItemModel):
-    statusServerThread = None
-    scanDirectoriesThread: Optional[DirectoryScan] = None
+    # statusServerThread = None
+    # scanDirectoriesThread: Optional[DirectoryScan] = None
     columnIndex = {}
 
     def __init__(self, style=None, parent=None):
@@ -689,7 +688,7 @@ class RunsModel(QAbstractItemModel):
         return True
 
     def startRunsStatusServer(self) -> None:
-        self.statusServerThread = RunsStatusServer()
+        self.statusServerThread = RunsStatusServer(self)
         settings = QSettings("ITER", "solps-gui")
         defaultPort = 0xCAFE + os.getuid() % 13566
         address = settings.value("SOLPS_GUI_BIND", "0.0.0.0")

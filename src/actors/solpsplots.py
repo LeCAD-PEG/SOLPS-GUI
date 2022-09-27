@@ -22,7 +22,7 @@ class SolpsPlots(QComboBox):
     def __init__(self, parent=None):
         super(SolpsPlots, self).__init__(parent)
 
-        self.process = QProcess()
+        self.process = QProcess(self)
         self.setEditable(True)
         for i, (plot, tooltip) in enumerate(_tcsh_solps_scripts):
             self.addItem(plot)

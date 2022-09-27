@@ -25,6 +25,9 @@ class QtGnuplotInstance(QObject):
 
         self.setWidget(widget)
 
+        # Necessary for cleanups
+        self.destroyed.connect(self.deleteLater)
+
     @Slot()
     def deleteLater(self):
         self.m_gnuplot.close()
