@@ -79,7 +79,7 @@ class Log(QPlainTextEdit):
             self.initiate()
 
     def initiate(self):
-        self.logThread = QThread()
+        self.logThread = QThread(self)
         logQueue = queue.Queue()
         logStream = WriteStream(logQueue)
 

@@ -694,7 +694,6 @@ if __name__ == '__main__':
                 expanded_path = tree_view_model.data(path_index, Qt.DisplayRole)
                 expanded_paths.append(expanded_path)
             settings.setValue("ExpandedPaths", expanded_paths)
-            print(expanded_paths)
             settings.endGroup()
             settings.beginGroup("TreeViewArchive")
             settings.setValue("ColumnWidth",

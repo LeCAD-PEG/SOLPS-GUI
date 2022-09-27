@@ -11,7 +11,7 @@ class PyGnuplot(QLabel):
     def __init__(self, parent = None):
         super(PyGnuplot, self).__init__(parent)
         self.setAlignment(Qt.AlignCenter)
-        self.process = QProcess()
+        self.process = QProcess(parent=self)
         self.process.finished.connect(self.show_plot)
         self.process.errorOccurred.connect(self.show_error)
 

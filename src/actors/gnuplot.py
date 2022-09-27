@@ -66,8 +66,8 @@ class Gnuplot(TcshProcess):
         layout.setContentsMargins(1, 1, 1, 1)
 
         if GNUPLOT_WIDGET:
-            self.gp = QtGnuplotInstance()
-            self.gnuplot = QtGnuplotWidget(self)
+            self.gp = QtGnuplotInstance(parent=self)
+            self.gnuplot = QtGnuplotWidget(parent=self)
             self.gp.setWidget(self.gnuplot)
             self.gnuplotBar = QtGnuplotBar(self, m_widget=self.gnuplot)
             # self.send_command.connect(self.gnuplot.cmd)
@@ -76,7 +76,7 @@ class Gnuplot(TcshProcess):
             layout.addWidget(self.gnuplotBar, 1, 0)
         else:
 
-            self.gnuplot = QProcess()
+            self.gnuplot = QProcess(self)
             # self.gnuplot.setWorkingDirectory(self.temp_dir.path())
 
             self.gnuplot.finished.connect(self.showPlot)
