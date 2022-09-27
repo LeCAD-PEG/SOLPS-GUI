@@ -59,12 +59,14 @@ class LogReceiver(QObject):
     def __init__(self, queue, *args, **kwargs):
         QObject.__init__(self, *args, **kwargs)
         self.queue = queue
+        self.run_condition = True
 
     @Slot()
     def run(self):
-        while True:
+        while self.run_condition:
             text = self.queue.get()
-            self.logSignal.emit(text)
+            if isinstance(text, str):
+                self.logSignal.emit(text)
 
 
 class Log(QPlainTextEdit):
@@ -118,6 +120,15 @@ class Log(QPlainTextEdit):
             self.stdOutReceiver.moveToThread(self.stdOutThread)
             self.stdOutThread.started.connect(self.stdOutReceiver.run)
             self.stdOutThread.start()
+
+    def finish(self):
+        """Gracefully stop queue.Queue!
+        """
+        self.logReceiver.run_condition = False
+        self.logReceiver.queue.put(None)
+        self.logThread.quit()
+        self.logThread.wait()
+        self.logThread.exit()
 
 
 if __name__ == "__main__":
