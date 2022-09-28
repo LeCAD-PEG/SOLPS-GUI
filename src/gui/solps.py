@@ -628,7 +628,9 @@ if __name__ == '__main__':
                         "Directories cannot be changed. Try settings later."
                     QMessageBox.critical(self, "Restart required", msg)
                 else:
+                    self.treeViewRuns.expandOnStart = True
                     model.startThreads()
+                    # Also remember which directories were open from before.
                     # model.beginResetModel()
                     # model.scanDirectoriesThread.start()
                 # TODO(kosl) self.treeViewRuns.model.retRunsFolderInfoThread.quit()
