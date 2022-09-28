@@ -1,11 +1,11 @@
-from PySide6.QtCore import (Qt, QModelIndex, QThread, QSettings, QDateTime,
-                          QAbstractItemModel, Signal, Slot, QSize,
-                          QRect, QSortFilterProxyModel)
-from PySide6.QtWidgets import (QTreeView, QTreeWidgetItem, QStyle, QHeaderView,
-                             QStyledItemDelegate, QMessageBox,
-                             QStyleOptionViewItem, QAbstractItemView)
-from PySide6.QtNetwork import QUdpSocket, QHostAddress, QAbstractSocket
-from PySide6.QtGui import QPen, QFontMetrics, QPainter
+from PySide6.QtCore import (Qt, QModelIndex, QThread, QSettings,
+                            QAbstractItemModel, Signal, Slot,
+                            QSortFilterProxyModel, QTimer)
+from PySide6.QtWidgets import (QTreeView, QTreeWidgetItem, QStyle,
+                               QStyledItemDelegate, QMessageBox,
+                               QStyleOptionViewItem)
+from PySide6.QtNetwork import QUdpSocket, QHostAddress
+from PySide6.QtGui import QPainter
 
 from solps import Column
 
@@ -15,7 +15,7 @@ import time
 import os
 import sys
 
-from typing import Optional
+# from typing import Optional
 
 dateFormat = '%d/%m/%Y %I:%m %p'
 
@@ -105,20 +105,20 @@ class TreeItem(QTreeWidgetItem):
     def row(self):
         """Basic concept of QTreeWidget counting.
 
-        To determine the row number of an item, the row is actually the 
-        distance of the item from it's parent. The distance is equivalent to 
+        To determine the row number of an item, the row is actually the
+        distance of the item from it's parent. The distance is equivalent to
         the index of the item in the list of the parent's children.
 
         Additionally, eveything is handled through QModelIndex, which confuses,
-        things as they do not posses the absolute position of an item in a 
-        tree structure, but it holds a reference to the item in the linked 
+        things as they do not posses the absolute position of an item in a
+        tree structure, but it holds a reference to the item in the linked
         structure and it's row position.
 
         Hence the calculation of the TreeItem row is actually the index of it
         in it's parent children set.
 
         For future reference check:
-        
+
         https://doc.qt.io/qt-6/model-view-programming.html#basic-concepts
 
         """
@@ -351,7 +351,7 @@ class DirectoryScan(QThread):
             position = len(dir.split(os.sep))
             if position > indentations[-1]:
                 if parents[-1].childCount() > 0:
-                    # So basically to the parent list append the previous 
+                    # So basically to the parent list append the previous
                     # 1 level higher directory.
                     parents.append(
                         parents[-1].child(parents[-1].childCount() - 1))
@@ -364,6 +364,7 @@ class DirectoryScan(QThread):
             date = timeStamp2Str(os.path.getmtime(dir))
             data = [os.path.basename(dir), dir, date, *[''] * 7]
             treeItem = TreeItem(data, parents[-1])
+
             self.model.path2item[dir] = treeItem
             parents[-1].addChild(treeItem)
 
@@ -539,7 +540,7 @@ class RunsModel(QAbstractItemModel):
 
         return self.rootItem
 
-    def index(self, row: int, column: int, parentIndex: QModelIndex):
+    def index(self, row: int, column: int, parentIndex: QModelIndex=QModelIndex()):
         if not self.hasIndex(row, column, parentIndex):
             return QModelIndex()
 
@@ -805,28 +806,77 @@ class RunDirView(QTreeView):
         settings = QSettings("ITER", "solps-gui")
 
         settings.beginGroup("TreeViewRuns")
-        treeViewColumnWidget = settings.value("ColumnWidgh")
+        treeViewColumnWidget = settings.value("ColumnWidth")
         if treeViewColumnWidget:
             self.header().restoreState(treeViewColumnWidget)
-        expandedPaths = settings.value("ExpandedPaths")
+        self.expandedPaths = settings.value("ExpandedPaths")
+        self.expandOnStart = True
         settings.endGroup()
 
         # Default model
         self._model = RunsModel(self.style())
         self._model.retRunsFolderInfoThread.finished.connect(self.update)
 
-        # if True: # use filter if True
+        # Try using the model reset for remembering the opened items
+        self._model.retRunsFolderInfoThread.finished.connect(self.loadExpandedStateOnStart)
+        # self._model.modelReset.connect(self.loadExpandedState)
+
         proxyModel = RunsSortFilterProxyModel(self.readArchiveDir())
         proxyModel.setDynamicSortFilter(True)
         proxyModel.setFilterKeyColumn(Column.path)
         proxyModel.setSourceModel(self._model)
 
         self.setModel(proxyModel)
-        # else:
-            # self.setModel(self.model)
-
         self.setRootIsDecorated(True)
         self.setSortingEnabled(True)
+
+    @Slot()
+    def loadExpandedStateOnStart(self):
+        """Expand from previous state. Thanks
+        https://stackoverflow.com/questions/47596847/how-to-expand-top-level-qtreeview-items
+
+        In case of proxy models, you have to first parse the source model and
+        then CORRECTLY map the index to the proxy model indexing so that the
+        QTreeView can expand it correctly.
+        """
+
+        if not self.expandedPaths:
+            return
+
+        if self.expandOnStart:
+            self.expandOnStart = False
+        else:
+            return # Do this only once on start!
+
+        # Iterate through it's items.
+        proxy = self.model()
+        model = proxy.sourceModel()
+
+        indexes = [model.index(i, 0) for i in range(model.rowCount(QModelIndex()))]
+
+        while indexes:
+            index = indexes.pop(0)
+            item = index.internalPointer()
+            # Do nothing if there are no children
+            childCount = item.childCount()
+            if childCount == 0:
+                continue
+
+            path = item.data(1, Qt.DisplayRole)
+            if path in self.expandedPaths:
+                # The important part is to get the Proxy QModelIndex for the
+                # item, otherwise QTreeView can't expand it.
+                self.setExpanded(proxy.mapFromSource(index), True)
+
+                # Since the current path is valid, then probably the child
+                # paths will be too. For that we need to collect the indexes.
+                for i in range(childCount):
+                    # Remember, there are no global rows. The QModelIndex
+                    # points relative to the parent index, which can be any
+                    # item but more importantly always starts with the root
+                    # index.
+                    indexes.append(model.index(i, 0, index))
+
 
     @Slot()
     def addToArchiveDirs(self) -> None:
@@ -901,5 +951,4 @@ if __name__ == '__main__':
     view.show()
     code = app.exec()
     import resource
-    print(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     sys.exit(code)
