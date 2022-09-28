@@ -185,9 +185,8 @@ class Carre(TcshProcess):
         #############
 
         upperGridLayout.addWidget(groupBox2, 0, 1)
-        # LK upperGridLayout.addItem(QSpacerItem(20, 40,
-        #                                    hData=QSizePolicy.Expanding),
-        #                        0, 2)
+        upperGridLayout.addItem(
+            QSpacerItem(20, 40, hData=QSizePolicy.Expanding), 0, 2)
 
         #############
         # Group Box 3
@@ -206,7 +205,7 @@ class Carre(TcshProcess):
             x.clicked.connect(self.runStep)
             x.setText(CarreVars.Name[i])
             groupLayout.addWidget(x)
-        # LK groupLayout.addItem(QSpacerItem(40, 20, vData=QSizePolicy.Expanding))
+        groupLayout.addItem(QSpacerItem(40, 20, vData=QSizePolicy.Expanding))
         groupBox3.setLayout(groupLayout)
         # Group Box 3
         #############
@@ -227,8 +226,8 @@ class Carre(TcshProcess):
         groupLayout.setSpacing(0)
         groupLayout.addWidget(self.textDisplay, 0, 0, 1, -1)
 
-        # LK groupLayout.addItem(QSpacerItem(40, 20, hData=QSizePolicy.Expanding),
-        #                    1, 0)
+        groupLayout.addItem(QSpacerItem(40, 20, hData=QSizePolicy.Expanding),
+                            1, 0)
         manualInput = QPushButton('Terminal input')
         manualInput.clicked.connect(self.manualInput)
 
