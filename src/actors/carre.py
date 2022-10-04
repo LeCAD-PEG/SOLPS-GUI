@@ -75,17 +75,6 @@ class CarreState:
     notRunning, starting, waiting, stepRunning = range(4)
 
 
-class StepPush(QPushButton):
-    """Modified :class:`QtWidgets.QPushButton` that contains the command for
-    the step it represents, i.e., if the :class:`StepPush` represents the
-    **store** step of carre script, the value stored in :attr:`StepPush.value`
-    corresponds to the command to run the step: ``t``.
-    """
-    def __init__(self, parent=None, value=None):
-        super(StepPush, self).__init__(parent)
-        self.value = value
-
-
 class Carre(TcshProcess):
     """ Widget for the grid generation tool Carre.
 
@@ -145,25 +134,30 @@ class Carre(TcshProcess):
         self.clickedGroup = groupBox1
         groupLayout = QGridLayout()
         groupBox1.setTitle('Baserun .status')
-        _n = 2  # Number of widgets per column
-        for i in range((CarreVars.NumOfVars - 1) // _n):
-            for j in range(_n):
-                # Creating checkboxes for
-                x = QCheckBox(CarreVars.Name[i * _n + j])
-                # LK TODO x.setCheckState(Qt.Unchecked)
-                x.stateChanged.connect(self.setVarsFromClickedGroup)
-                groupLayout.addWidget(x, j, i)
-        _N = CarreVars.NumOfVars - 1
-        leftOver = _N - (_N // _n) * _n
-        if leftOver > 0:
-            for k in range(leftOver):
-                x = QCheckBox(CarreVars.Name[(i + 1) * _n + k])
-                x.setCheckState(Qt.Unchecked)
-                x.stateChanged.connect(self.setVarsFromClickedGroup)
-                groupLayout.addWidget(x, k, i + 1)
+
+        # Manually add the QCheckBoxes
+        x = QCheckBox("Prepare")
+        x.stateChanged.connect(self.setVarsFromClickedGroup)
+        groupLayout.addWidget(x, 0, 0)
+        x = QCheckBox("Grid")
+        x.stateChanged.connect(self.setVarsFromClickedGroup)
+        groupLayout.addWidget(x, 1, 0)
+        x = QCheckBox("SaveChoice")
+        x.stateChanged.connect(self.setVarsFromClickedGroup)
+        groupLayout.addWidget(x, 0, 1)
+        x = QCheckBox("Convert")
+        x.stateChanged.connect(self.setVarsFromClickedGroup)
+        groupLayout.addWidget(x, 1, 1)
+        x = QCheckBox("Store")
+        x.stateChanged.connect(self.setVarsFromClickedGroup)
+        groupLayout.addWidget(x, 0, 2)
+        x = QCheckBox("lns")
+        x.stateChanged.connect(self.setVarsFromClickedGroup)
+        groupLayout.addWidget(x, 1, 2)
+        x = QCheckBox("dgModel")
+        x.stateChanged.connect(self.setVarsFromClickedGroup)
+        groupLayout.addWidget(x, 0, 3)
         groupBox1.setLayout(groupLayout)
-        # Group Box 1
-        #############
 
         upperGridLayout.addWidget(groupBox1, 0, 0)
 
@@ -200,11 +194,28 @@ class Carre(TcshProcess):
         start = QPushButton('Start Carre')
         start.clicked.connect(self.startCarre)
         groupLayout.addWidget(start)
-        for i in range(CarreVars.NumOfVars - 2):
-            x = StepPush(value=CarreVars.command[i])
-            x.clicked.connect(self.runStep)
-            x.setText(CarreVars.Name[i])
-            groupLayout.addWidget(x)
+
+        # Manually put the QPushButtons
+        p = QPushButton("Prepare")
+        p.clicked.connect(self.runPrepare)
+        groupLayout.addWidget(p)
+
+        p = QPushButton("Grid")
+        p.clicked.connect(self.runGrid)
+        groupLayout.addWidget(p)
+
+        p = QPushButton("SaveChoice")
+        p.clicked.connect(self.runSaveChoice)
+        groupLayout.addWidget(p)
+
+        p = QPushButton("Convert")
+        p.clicked.connect(self.runConvert)
+        groupLayout.addWidget(p)
+
+        p = QPushButton("Store")
+        p.clicked.connect(self.runStore)
+        groupLayout.addWidget(p)
+
         groupLayout.addItem(QSpacerItem(40, 20, vData=QSizePolicy.Expanding))
         groupBox3.setLayout(groupLayout)
         # Group Box 3
@@ -233,13 +244,11 @@ class Carre(TcshProcess):
 
         groupLayout.addWidget(manualInput, 1, 1)
 
-        yes = StepPush(value='y')
-        yes.setText('Yes')
-        yes.clicked.connect(self.runStep)
+        yes = QPushButton('Yes')
+        yes.clicked.connect(self.pressY)
 
-        no = StepPush(value='n')
-        no.setText('No')
-        no.clicked.connect(self.runStep)
+        no = QPushButton('No')
+        no.clicked.connect(self.pressN)
 
         groupLayout.addWidget(yes, 1, 2)
         groupLayout.addWidget(no, 1, 3)
@@ -437,18 +446,93 @@ class Carre(TcshProcess):
             self.tcsh.write(msg + '\n')
             self.insertTextAtBottom(msg)
 
+    # The following doesn't work anymore since for some reason in pyside6
+    # the sender is returning None...
+    # @Slot()
+    # def runStep(self):
+    #     """Custom PushButtons emits signal to this function. They contain
+    #     attribute value which is then passed to tcsh if it is running.
+    #     """
+    #     if not self.tcsh.state():
+    #         return
+    #     if self.STATE == CarreState.waiting:
+    #         sender = self.sender()
+    #         print(sender)
+    #         if sender is not None:
+    #             self.appendToStatus(sender.text())
+    #             msg = sender.value + '\n'
+    #             self.tcsh.write(msg)
+
     @Slot()
-    def runStep(self):
-        """Custom PushButtons emits signal to this function. They contain
-        attribute value which is then passed to tcsh if it is running.
+    def runPrepare(self):
+        """Command prepare or value 'p'
         """
         if not self.tcsh.state():
             return
         if self.STATE == CarreState.waiting:
-            sender = self.sender()
-            self.appendToStatus(sender.text())
-            msg = sender.value + '\n'
+            msg = "p\n"
             self.tcsh.write(msg)
+
+    @Slot()
+    def runGrid(self):
+        """Command grid or value 'g'
+        """
+        if not self.tcsh.state():
+            return
+        if self.STATE == CarreState.waiting:
+            msg = "g\n"
+            self.tcsh.write(msg)
+
+    @Slot()
+    def runSaveChoice(self):
+        """Command SaveChoice or value 's'
+        """
+        if not self.tcsh.state():
+            return
+        if self.STATE == CarreState.waiting:
+            msg = "s\n"
+            self.tcsh.write(msg)
+
+    @Slot()
+    def runConvert(self):
+        """Command Convert or value 'c'
+        """
+        if not self.tcsh.state():
+            return
+        if self.STATE == CarreState.waiting:
+            msg = "c\n"
+            self.tcsh.write(msg)
+
+    @Slot()
+    def runStore(self):
+        """Command Store or value 't'
+        """
+        if not self.tcsh.state():
+            return
+        if self.STATE == CarreState.waiting:
+            msg = "t\n"
+            self.tcsh.write(msg)
+
+    @Slot()
+    def pressY(self):
+        """Command Store or value 't'
+        """
+        if not self.tcsh.state():
+            return
+        if self.STATE == CarreState.waiting:
+            msg = "y\n"
+            self.tcsh.write(msg)
+
+    @Slot()
+    def pressN(self):
+        """Command Store or value 't'
+        """
+        if not self.tcsh.state():
+            return
+        if self.STATE == CarreState.waiting:
+            msg = "n\n"
+            self.tcsh.write(msg)
+
 
     def processText(self, text):
         """Process the output of the ``carre`` script so the user gets notified
