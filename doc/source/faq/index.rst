@@ -50,14 +50,14 @@ there, after sourcing setupenv, it works fine. If you do::
 before launching then solps-gui works.
 
 
-A: PyQt uses system fontconfig libraries. SOLPS modules implants their own
+A: PPySide uses system fontconfig libraries. SOLPS modules implants their own
 to the ``LD_LIBRARY_PATH``.
 
 Workaround may be::
 
   $ (setenv LD_PRELOAD /usr/lib64/libfontconfig.so.1 && python3 src/gui/solps.py)
 
-Other ways are using the same compilers/libraries for Qt, pyqt and SOLPS-ITER
+Other ways are using the same compilers/libraries for Qt, PySide and SOLPS-ITER
 or simply adding an alias or a GUI run script that removes offending libraries.
 Note that SOLPS-GUI doesn't require any SOLPS-ITER environment for its
 operation as it sources setup.csh and login shell setup for each group

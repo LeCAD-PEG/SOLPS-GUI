@@ -108,7 +108,7 @@ specialized plotting scripts (e.g. *b2plot*) that cannot easily be
 replaced with "modern" visualization tools. However, the aim of the GUI
 is to encapsulate those utilities and provide user-friendly interface
 for new users and attract SOLPS experts to simplify daily use and share
-*dashboards* among them. The SOLPS-ITER GUI is written with PyQt5
+*dashboards* among them. The SOLPS-ITER GUI is written with the PySide6
 application programming interface (API) that brings Python portability
 and scripting to advanced users. Applicability of the SOLPS GUI is
 therefore wide and is proven to run on many clusters as well as on
@@ -173,17 +173,17 @@ The Dashboard Designer
 ----------------------
 
 
-The PyQt5 framework  provides *Qt designer* application that is normally
+The PySide6 framework  provides *Qt designer* application that is normally
 used for graphically designing Qt  applications and generate
 corresponding widget-layout code. *PyQt* can compile and interpret with
 Python designed ``.ui`` XML files on-the-fly and that means that the
-whole GUI is read at the application startup. The PyQt5 plugin for *Qt
+whole GUI is read at the application startup. The PySide6 plugin for *Qt
 designer* extends standard set of Qt GUI widgets with the possibility for
 developers and users to create "custom" widgets for use inside the
 designer and then within the SOLPS GUI application.
 
 .. _fig-dashboard-9:
-.. figure:: dashboard_9-annotated.*
+.. figure:: dashboard_9-annotated.png
    :alt: The SOLPS Dashboard designer with custom widgets (a);
          default user interface (b) and customised dashboard in (c).
          Widget hierarchy (d) can contain custom widgets that have custom

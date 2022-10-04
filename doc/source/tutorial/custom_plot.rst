@@ -37,7 +37,7 @@ Now the environment is loaded and we can start Qt ``designer`` and edit the
 
 .. code-block:: bash
 
-    designer src/gui/solps.ui
+    pyside6-designer src/gui/solps.ui
 
 This will open a window similar to the following image.
 

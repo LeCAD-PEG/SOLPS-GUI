@@ -57,7 +57,7 @@ directory for SOLPS-ITER to work correctly. Moreover, the top directory
    :align: center
 
 Next select the correct device for environment variable ``DEVICE``. To do this
-click on :menuselection:`&Settings --> Preferences`. You will see a group
+click on :menuselection:`&Settings --> Preferences --> Settings`. You will see a group
 called **Environment variables** and in it *DEVICE*. There is a dropdown widget
 in which you can either select or add the device variable. In this case either
 select *iter* or write *iter* inside the edit area.
@@ -66,7 +66,7 @@ select *iter* or write *iter* inside the edit area.
    :align: center
 
 Now select your ``baserun`` folder in :menuselection:`&Runs` tab and click
-ont the :guilabel:`&Populate Baserun` tab. Click inside the DivGeo area to
+on the :guilabel:`&Populate Baserun` tab. Click inside the DivGeo area to
 start DivGeo. If you wish to dock it into SOLPS GUI, click once again inside
 DivGeo area after DivGeo appears in standalone window, as was done previously
 at the C-mod tokamak case.
@@ -88,7 +88,7 @@ Import the ITER template
 The ITER template geometry file is located in the ``baserun`` directory. We
 will load the template file with
 :menuselection:`&File --> &Import --> &Template`. Because the template
-extenstion is ``.tpl``, we have to chang the filter in the DivGeo import dialog
+extenstion is ``.tpl``, we have to change the filter in the DivGeo import dialog
 from ``*.ogr`` to ``*.tpl``.
 
 .. image:: divgeo_ITER_pre_1.png
@@ -163,8 +163,8 @@ Import ITER baseline scenario geometry
 --------------------------------------
 
 The geometry files are located in the ``baserun`` directory.
-First open the prepared geometry file:
-:menuselection: `&File --> &Import --> &Template --> ITER.ogr`
+First open the prepared geometry file: 
+:menuselection:`&File --> &Import --> &Template --> ITER.ogr`
 Then import the equilibrium file by opening
 :menuselection:`&File --> &Import --> &Equilibrium` and load the
 ``Baseline2008-li0.70.x4.equ``, which should be listed in the
@@ -208,7 +208,7 @@ The target definitions need to satisfy the following rules:
     4. the plasma-wetted part of the target must consist of at least two (2)
        wall elements.
 
-In ITER case all the conditions are satisfied except the second. In which we
+In ITER case all the conditions are satisfied except the second, in which we
 have to have closed polygons for the targets.
 
 Select the **middle mouse** to connect points and connect the points as shown
@@ -466,7 +466,7 @@ amount of core radiation (in `MW`).
 Click :menuselection:`Variables --> Add --> Radiation sources`
 
 Enter in the "Radiated Power" field the amount of core
-radiation (in "MW") then need to specify the location from where this core
+radiation (in "MW") then specify the location from where this core
 radiation is emitted.
 
 This is done by providing a set of point sources. The radiated power will be

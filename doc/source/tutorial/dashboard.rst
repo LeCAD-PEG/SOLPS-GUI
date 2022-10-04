@@ -10,7 +10,7 @@ Designing Dashboard
 With this tutorial we'll show the ease of graphical programming of the SOLPS-GUI
 Dashboard with a set of custom PyQt widgets and standard Qt widgets.
 
-.. note::   A short video tutorial on the **Desinig dashboard** is
+.. note::   A short video tutorial on the **Designer dashboard** is
             available `here <https://youtu.be/V6_ohI7TQQc>`_.
 
 We will start from existing user SOLPS-GUI interface description (UI) saved
@@ -22,7 +22,7 @@ To start designing with *Qt Designer* from default (system provided)
 ``solps.ui`` that should be at the same location (`$SOLPSGUI`) as ``solps.py``
 enter the following::
 
-    $ designer $SOLPSGUI/solps.ui
+    $ pyside6-designer $SOLPSGUI/solps.ui
 
 You should see the following window to open with some resizing and opening
 the *Dashboard* tab.
@@ -51,7 +51,7 @@ In a command line shell start your custom SOLPS GUI with::
 You can continue to work in designer. If you prefer the designer in some other
 language you may start in BASH with the command line::
 
-   $ LANG=fr designer ~/mysolps.ui
+   $ LANG=fr pyside6-designer ~/mysolps.ui
 
 Starting the Dashboard from scratch
 ===================================
@@ -131,7 +131,7 @@ Adding a new tab with file view
 -------------------------------
 
 With this tutorial we will be extending the GUI with new a new tab that will
-insted of :guilabel:`Input` show user defined files in the ``SolpsInput``
+instead of :guilabel:`Input` show user defined files in the ``SolpsInput``
 widget.
 
 1. We start with the default ``solps.ui`` and at :guilabel:`Dashboard` tab

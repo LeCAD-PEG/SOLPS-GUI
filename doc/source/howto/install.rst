@@ -11,9 +11,9 @@ SOLPS GUI Installation
 
 SOLPS GUI consist of the following components:
 
- 1. GUI writen in Python3 using PyQt5 library
+ 1. GUI writen in Python3 using PySide6 library
  2. ParaView with Catalyst and IMAS plugin (optional)
- 3. Gnuplot5 with Qt5 terminal and PyQt5 widget (optional)
+ 3. Gnuplot5 with Qt terminal and PySide6 widget (optional)
 
 Essentially, only the first component is needed for running SOLPS GUI and
 in principle does not need to be compiled at all if the system provides
@@ -75,12 +75,12 @@ system:
      - sphinx
      - sphinx_rtd_theme
      - matplotlib
-     - PyQt5
+     - PySide6
  2. ParaView 5.x compiled with Catalyst including
      - IMAS library for ParaView plugin
      - CMake 3.5+
  3. Gnuplot 5.x with
-     - PyQt5 Gnuplot widget for better user experience under SOLPS GUI
+     - PySide6 Gnuplot widget for better user experience under SOLPS GUI
 
 Minimum GCC compiler version is 4.8.x to build above tools and libraries.
 It is recommended that single GCC compiler toolchain is used for providing
@@ -91,7 +91,7 @@ above runtime software.
    We strongly suggest to build the required SOLPS GUI software components
    by build scripts provided in SOLPS GUI top directory as they were tested
    many times and guarantee compatibility when compiling GUI widget
-   and PyQt5 Gnuplot plugin.
+   and PySide6 Gnuplot plugin.
 
 =======================
 SOLPS ITER installation

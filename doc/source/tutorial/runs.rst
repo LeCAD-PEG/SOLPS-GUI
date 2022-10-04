@@ -107,15 +107,15 @@ We can import the runs from other users and then modify them by
 simple configuration editor later on.
 
 Please do the following steps to import the
-``/work/projects/solps-iter/bonninx/AUG_16151_D`` run:
+``/work/projects/solps-iter/runs/examples/ITER_2297_Honly_20MW`` run:
 
- 1. Click on the top-most runs tree (``local_1``). This is destination of
+ 1. Click on the top-most runs tree (``solps``). This is destination of
     the imported run(s). You may select some other directory residing
-    under ``local_1`` or elsewhere. :guilabel:`Import` button should be
+    under ``solps`` or elsewhere. :guilabel:`Import` button should be
     enabled at the destination selected. User needs to take care that
     the same directory should not already exist at the *import destination*.
  2. Click the :guilabel:`Import` button and :guilabel:`Choose` with
-    directory dialog the ``/work/projects/solps-iter/bonninx/AUG_16151_D``
+    directory dialog the ``/work/projects/solps-iter/runs/examples/ITER_2297_Honly_20MW``
     directory. Shortly after *import* will copy complete tree, traverse
     though the tree by fixing *baserun timestamps* and recreate links
     to neigboring *baserun*.
@@ -126,7 +126,7 @@ Please do the following steps to import the
 Editing configuration
 ---------------------
 
-You may edit newly imported run by selecting ``run_for_GUI_demo`` directory
+You may edit newly imported run by selecting ``run_restart`` directory
 and presing :guilabel:`Edit` button that will load all available files.
 Current edit folder is written in the status bar below. There is no save
 button. Modifications are saved automatically when selecting other tabs.
@@ -144,7 +144,7 @@ the tooltip help extracted from the SOLPS manual.
 Starting the run
 ----------------
 
-As ``AUG_16151_D/run_for_GUI_demo`` is ready to run case one can simply
+As ``ITER_2297_Honly_20MW/run_restart`` is ready to run case one can simply
 select it by clicking on tree-view as highlighted in the following image
 and then pressing the :guilabel:`Run` button.
 
@@ -152,9 +152,9 @@ and then pressing the :guilabel:`Run` button.
    :align: center
 
 Immediately, in the *status* column there should appear submission command
-which is ``localsubmit`` in this case. If there is no *batch* queue GUI
+which is ``itersubmit`` in this case. If there is no *batch* queue GUI
 should receive from background task over the network to the localhost
-(127.0.0.1) notification ``Started on ...`` with timestamp in status.
+(127.0.0.1) notification ``Submited at ...`` with timestamp in status.
 
 This case runs 5 minutes for single-user or longer depending
 on system load. We need to have results to proceed with the analysis.
@@ -200,7 +200,7 @@ Log
 
 Log tab collects messages that may appear on the status bar and messages
 from several processes and runs during the operation. User may, depending
-on the log level selected in :menuselection:`Settings --> Preferences`.
+on the logging level selected in :menuselection:`Settings --> Preferences --> Tools`.
 Different levels are colored for easier spotting of higher importance
 messages.
 
@@ -229,13 +229,13 @@ Director may operate in *pass-through* or *checked* way enabling users
 to block signals to selected widgets and therefore freezing some plots
 for comparison.
 
-By pressing the :guilabel:`Plot` button the following *energy* analysis
+By selecting an option from the dropdown menu, for example ``resall_D``, and then pressing the :guilabel:`Plot` button the following *energy* analysis
 appears:
 
 .. image:: runs_9.png
    :align: center
 
-User may select or type the commands in *solpsplots* widget or entering
+(This energy analysis is a bit messy to look at, but we can zoom in by holding the right mouse key and selecting an area!) User may select or type the commands in *solpsplots* widget or enter
 TCSH administrative commands without requiring *regular* terminal and
 moving to directories quickly.
 

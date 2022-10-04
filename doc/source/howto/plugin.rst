@@ -24,9 +24,9 @@ used to monitor and analyze simulation runs. Dashboard configuration should be
 extensible and easy enough for regular user to create own layout for the scope
 of the work that dashboard can cover. SOLPS-GUI uses
 `Qt widgets <http://www.qt.io>`_ for user interface programmed in Python and
-`PyQt5 <http://sourceforge.net/projects/pyqt>`_  bindings that are easy enough
+`PySide6 <http://sourceforge.net/projects/pyqt>`_  bindings that are easy enough
 when using *standard* Qt widgets. SOLPS-GUI is designed with Qt tool
-`designer <http://doc.qt.io/qt-5/qtdesigner-manual.html>`_. With the
+`designer <http://doc.qt.io/qt-6/qtdesigner-manual.html>`_. With the
 ** Qt designer** user can configure its own functionality and write appropriate
 actions by extending Python code. Therefore, no GUI programming is needed for
 simple tasks or look-and-feel reconfiguration. Simple tasks are adding a button
@@ -93,9 +93,9 @@ C++ binding for PyQt
 ====================
 
 For Qt display widgets or other processing in C++ one needs to prepare Python
-bindings for C++ library that can be included in PyQt5 code. Although there are
+bindings for C++ library that can be included in PySide6 code. Although there are
 general purpose language wrappers such as `SWIG <http://www.swig.org>`_ that
-allow C and C++ code to Python, PyQt uses SIP [4]_ that provides binding of Qt
+allow C and C++ code to Python, PySide6 uses SIP [4]_ that provides binding of Qt
 signal/slot mechanism not available with other "wrappers". Process of creating
 Python module that allows inclusion of C++ code consists of the following
 steps:
@@ -223,8 +223,8 @@ Finally, one can run the following :file:`hello_test.py` that shows the
 .. code-block:: python
    :caption: hello_test.py
 
-   from PyQt5.QtWidgets import QApplication
-   from PyQt5.hello import Hello
+   from PySide6.QtWidgets import QApplication
+   from PySide6.hello import Hello
 
    if __name__ == '__main__':
 
@@ -241,7 +241,7 @@ Finally, one can run the following :file:`hello_test.py` that shows the
 
 .. [1] http://www.mail-archive.com/pyqt@riverbankcomputing.com/msg17893.html
 .. [2] http://wiki.python.org/moin/PyQt/Using_Python_Custom_Widgets_in_Qt_Designer
-.. [3] http://pyqt.sourceforge.net/Docs/PyQt5/designer.html#writing-qt-designer-plugins
+.. [3] http://pyqt.sourceforge.net/Docs/PyQt6/designer.html#writing-qt-designer-plugins
 .. [4] http://www.riverbankcomputing.com/software/sip
 .. [5] http://pyqt.sourceforge.net/Docs/sip4/using.html#a-more-complex-c-example
 

@@ -21,9 +21,9 @@ of the Dashboard by graphical programming by users.
 Gnuplot
 -------
 
-This widget is an embedded gnuplot inside Qt5, written in C++. With the help of
-SIP a simple python wrapper has been made so we can use the embedded gnuplot
-inside python.
+This widget is an embedded gnuplot inside PySide6, written in Python. With the help of
+a simple python wrapper has been made so we can use the embedded gnuplot
+inside GUI.
 
 .. automodule:: gnuplot
    :members:
