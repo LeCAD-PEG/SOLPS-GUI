@@ -216,8 +216,8 @@ class DivGeo(TcshProcess):
         self._container = QWidget.createWindowContainer(self._window,
                                                         self.parent(),
                                                         Qt.FramelessWindowHint)
-        self._container.show()
         self.Layout.addWidget(self._container)
+        self._container.show()
         self.show()
 
     @Slot()

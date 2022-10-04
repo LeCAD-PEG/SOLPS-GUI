@@ -9,11 +9,11 @@ class QtGnuplotInstance(QObject):
     gnuplotOutput = Signal(str)
 
     def __init__(self, widget: QtGnuplotWidget = None,
-                 gnuplotPath: str = "gnuplot"):
-        super(QtGnuplotInstance, self).__init__(None)
+                 gnuplotPath: str = "gnuplot", parent=None):
+        super(QtGnuplotInstance, self).__init__(parent=parent)
 
         self.m_widget = widget
-        self.m_gnuplot = QProcess()
+        self.m_gnuplot = QProcess(parent=self)
 
         self.m_gnuplot.setProcessChannelMode(QProcess.MergedChannels)
         self.m_gnuplot.start(gnuplotPath)
@@ -24,6 +24,9 @@ class QtGnuplotInstance(QObject):
             logging.error(f'Error starting gnuplot with command {gnuplotPath}')
 
         self.setWidget(widget)
+
+        # Necessary for cleanups
+        self.destroyed.connect(self.deleteLater)
 
     @Slot()
     def deleteLater(self):

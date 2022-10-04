@@ -74,15 +74,6 @@ class TriangState:
     notRunning, starting, waiting, stepRunning = range(4)
 
 
-class StepPush(QPushButton):
-    """Overloaded QPushButton that contains an additional value, that holds
-    the command for the step it represents.
-    """
-    def __init__(self, parent=None, value=None):
-        super(StepPush, self).__init__(parent)
-        self.value = value
-
-
 class Triang(TcshProcess):
     """Widget for running triang in a baserun directory.
 
@@ -195,11 +186,36 @@ class Triang(TcshProcess):
         start = QPushButton('Start Triang')
         start.clicked.connect(self.startTriang)
         groupLayout.addWidget(start)
-        for i in range(TriangVars.NumOfVars):
-            x = StepPush(value=TriangVars.command[i])
-            x.clicked.connect(self.runStep)
-            x.setText(TriangVars.Name[i])
-            groupLayout.addWidget(x)
+
+        # Manually set the QPushButton
+        p = QPushButton("Uinp(U)")
+        p.clicked.connect(self.runUinpU)
+        groupLayout.addWidget(p)
+        p = QPushButton("Uinp(u)")
+        p.clicked.connect(self.runUinpu)
+        groupLayout.addWidget(p)
+        p = QPushButton("B2ag")
+        p.clicked.connect(self.runB2ag)
+        groupLayout.addWidget(p)
+        p = QPushButton("Eirene")
+        p.clicked.connect(self.runEirene)
+        groupLayout.addWidget(p)
+        p = QPushButton("Tria")
+        p.clicked.connect(self.runTria)
+        groupLayout.addWidget(p)
+        p = QPushButton("triaGeom")
+        p.clicked.connect(self.runtriaGeom)
+        groupLayout.addWidget(p)
+        p = QPushButton("Store")
+        p.clicked.connect(self.runStore)
+        groupLayout.addWidget(p)
+        p = QPushButton("Conv2Out (c)")
+        p.clicked.connect(self.runConv2Out)
+        groupLayout.addWidget(p)
+        p = QPushButton("Conv2Grid (C)")
+        p.clicked.connect(self.runConv2Grid)
+        groupLayout.addWidget(p)
+
         groupLayout.addItem(QSpacerItem(40, 20, vData=QSizePolicy.Expanding))
         groupBox2.setLayout(groupLayout)
         # Group Box 2
@@ -233,13 +249,11 @@ class Triang(TcshProcess):
 
         groupLayout.addWidget(manualInput, 1, 2)
 
-        yes = StepPush(value='y')
-        yes.setText('Yes')
-        yes.clicked.connect(self.runStep)
+        yes = QPushButton('Yes')
+        yes.clicked.connect(self.pressY)
 
-        no = StepPush(value='n')
-        no.setText('No')
-        no.clicked.connect(self.runStep)
+        no = QPushButton('No')
+        no.clicked.connect(self.pressN)
 
         groupLayout.addWidget(yes, 1, 3)
         groupLayout.addWidget(no, 1, 4)
@@ -495,6 +509,89 @@ class Triang(TcshProcess):
             sender = self.sender()
             self.appendToStatus(sender.text())
             msg = sender.value + '\n'
+            self.tcsh.write(msg)
+    @Slot()
+    def runUinpU(self):
+        if not self.tcsh.state():
+            return
+        if self.STATE == TriangState.waiting:
+            msg = "U\n"
+            self.tcsh.write(msg)
+    @Slot()
+    def runUinpu(self):
+        if not self.tcsh.state():
+            return
+        if self.STATE == TriangState.waiting:
+            msg = "u\n"
+            self.tcsh.write(msg)
+    @Slot()
+    def runB2ag(self):
+        if not self.tcsh.state():
+            return
+        if self.STATE == TriangState.waiting:
+            msg = "b\n"
+            self.tcsh.write(msg)
+    @Slot()
+    def runEirene(self):
+        if not self.tcsh.state():
+            return
+        if self.STATE == TriangState.waiting:
+            msg = "e\n"
+            self.tcsh.write(msg)
+    @Slot()
+    def runTria(self):
+        if not self.tcsh.state():
+            return
+        if self.STATE == TriangState.waiting:
+            msg = "t\n"
+            self.tcsh.write(msg)
+    @Slot()
+    def runtriaGeom(self):
+        if not self.tcsh.state():
+            return
+        if self.STATE == TriangState.waiting:
+            msg = "g\n"
+            self.tcsh.write(msg)
+    @Slot()
+    def runStore(self):
+        if not self.tcsh.state():
+            return
+        if self.STATE == TriangState.waiting:
+            msg = "s\n"
+            self.tcsh.write(msg)
+    @Slot()
+    def runConv2Out(self):
+        if not self.tcsh.state():
+            return
+        if self.STATE == TriangState.waiting:
+            msg = "c\n"
+            self.tcsh.write(msg)
+    @Slot()
+    def runConv2Grid(self):
+        if not self.tcsh.state():
+            return
+        if self.STATE == TriangState.waiting:
+            msg = "C\n"
+            self.tcsh.write(msg)
+
+    @Slot()
+    def pressY(self):
+        """Command Store or value 't'
+        """
+        if not self.tcsh.state():
+            return
+        if self.STATE == TriangState.waiting:
+            msg = "y\n"
+            self.tcsh.write(msg)
+
+    @Slot()
+    def pressN(self):
+        """Command Store or value 't'
+        """
+        if not self.tcsh.state():
+            return
+        if self.STATE == TriangState.waiting:
+            msg = "n\n"
             self.tcsh.write(msg)
 
     def processText(self, text):

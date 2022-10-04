@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>779</width>
-    <height>498</height>
+    <width>915</width>
+    <height>639</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,12 +20,18 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777</width>
+    <height>16777215</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>SOLPS-ITER</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_8">
-    <item row="0" column="0">
+    <item row="0" column="0" rowspan="2">
      <widget class="QTabWidget" name="tabWidget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -723,35 +729,161 @@ should eventually stop the run.</string>
        <attribute name="title">
         <string>B2 plot</string>
        </attribute>
-       <widget class="B2plot" name="b2plot">
-        <property name="geometry">
-         <rect>
-          <x>130</x>
-          <y>10</y>
-          <width>601</width>
-          <height>381</height>
-         </rect>
-        </property>
-        <property name="b2plotCommand" stdset="0">
-         <string>echo phys a4p ti te m/ surf | b2plot</string>
-        </property>
-        <property name="b2plotPage" stdset="0">
-         <number>1</number>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>20</y>
-          <width>80</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>B2 plot</string>
-        </property>
-       </widget>
+       <layout class="QGridLayout" name="gridLayout_17">
+        <item row="0" column="0">
+         <widget class="B2plot" name="b2plot">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="b2plotCommand" stdset="0">
+           <string>echo phys a4p ne surf | b2plot</string>
+          </property>
+          <property name="b2plotPage" stdset="0">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="B2plot" name="b2plot_2">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="b2plotCommand" stdset="0">
+           <string>echo comp a4p ne surf | b2plot</string>
+          </property>
+          <property name="b2plotPage" stdset="0">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QComboBox" name="comboBox">
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+          <property name="currentText">
+           <string>echo phys a4p ne surf | b2plot</string>
+          </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
+          </property>
+          <item>
+           <property name="text">
+            <string>echo phys a4p ne surf | b2plot</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>echo phys a4p ni surf | b2plot</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>echo phys a4p te surf | b2plot</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>echo phys a4p ti  surf | b2plot </string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>echo phys s4p fmox  surf | b2plot</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>echo phys a4p sep vesl po surf | b2plot</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>echo phys a4p grid fchy surf | b2plot  </string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>echo phys a4p mesh surf | b2plot      </string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>echo phys a4p vesl sep outl 70 1 70 36 1000 0 1 1 traj | b2plot</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string/>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="pushButton">
+          <property name="maximumSize">
+           <size>
+            <width>60</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>B2 plot</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QComboBox" name="comboBox_2">
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+          <property name="currentText">
+           <string>echo comp a4p ne surf | b2plot</string>
+          </property>
+          <item>
+           <property name="text">
+            <string>echo comp a4p ne surf | b2plot</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>echo comp a4p ni surf | b2plot</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>echo comp a4p te surf | b2plot</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>echo comp a4p ti surf | b2plot</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>echo comp a4p po surf | b2plot</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>echo comp a4p sep vesl ne surf | b2plot</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>echo comp a4p sep vesl grid fmox surf | b2plot   </string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_5">
        <attribute name="title">
@@ -821,7 +953,7 @@ should eventually stop the run.</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>779</width>
+     <width>915</width>
      <height>19</height>
     </rect>
    </property>
@@ -992,12 +1124,12 @@ should eventually stop the run.</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>101</x>
-     <y>74</y>
+     <x>390</x>
+     <y>596</y>
     </hint>
    </hints>
   </connection>
@@ -1008,12 +1140,12 @@ should eventually stop the run.</string>
    <slot>triggerTextChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>157</x>
-     <y>84</y>
+     <x>564</x>
+     <y>567</y>
     </hint>
    </hints>
   </connection>
@@ -1024,8 +1156,8 @@ should eventually stop the run.</string>
    <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
@@ -1056,12 +1188,12 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>72</x>
-     <y>62</y>
+     <x>83</x>
+     <y>116</y>
     </hint>
    </hints>
   </connection>
@@ -1072,12 +1204,12 @@ should eventually stop the run.</string>
    <slot>setTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>68</y>
+     <x>65</x>
+     <y>570</y>
     </hint>
     <hint type="destinationlabel">
-     <x>72</x>
-     <y>62</y>
+     <x>83</x>
+     <y>116</y>
     </hint>
    </hints>
   </connection>
@@ -1088,12 +1220,12 @@ should eventually stop the run.</string>
    <slot>executeTcshCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>72</x>
-     <y>68</y>
+     <x>295</x>
+     <y>570</y>
     </hint>
     <hint type="destinationlabel">
-     <x>72</x>
-     <y>62</y>
+     <x>83</x>
+     <y>116</y>
     </hint>
    </hints>
   </connection>
@@ -1104,12 +1236,12 @@ should eventually stop the run.</string>
    <slot>setSolpsPlotCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>157</x>
-     <y>84</y>
+     <x>564</x>
+     <y>567</y>
     </hint>
     <hint type="destinationlabel">
-     <x>178</x>
-     <y>92</y>
+     <x>348</x>
+     <y>147</y>
     </hint>
    </hints>
   </connection>
@@ -1120,12 +1252,12 @@ should eventually stop the run.</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>157</x>
-     <y>84</y>
+     <x>564</x>
+     <y>567</y>
     </hint>
     <hint type="destinationlabel">
-     <x>178</x>
-     <y>92</y>
+     <x>348</x>
+     <y>147</y>
     </hint>
    </hints>
   </connection>
@@ -1136,12 +1268,12 @@ should eventually stop the run.</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>178</x>
-     <y>92</y>
+     <x>892</x>
+     <y>568</y>
     </hint>
     <hint type="destinationlabel">
-     <x>178</x>
-     <y>92</y>
+     <x>348</x>
+     <y>147</y>
     </hint>
    </hints>
   </connection>
@@ -1152,12 +1284,12 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>178</x>
-     <y>92</y>
+     <x>348</x>
+     <y>147</y>
     </hint>
    </hints>
   </connection>
@@ -1168,8 +1300,8 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -1184,12 +1316,12 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>98</x>
-     <y>63</y>
+     <x>691</x>
+     <y>75</y>
     </hint>
    </hints>
   </connection>
@@ -1200,12 +1332,12 @@ should eventually stop the run.</string>
    <slot>setDirPath(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>110</x>
-     <y>63</y>
+     <x>888</x>
+     <y>75</y>
     </hint>
    </hints>
   </connection>
@@ -1216,8 +1348,8 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -1232,8 +1364,8 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -1248,12 +1380,12 @@ should eventually stop the run.</string>
    <slot>showMessage(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
-     <y>497</y>
+     <y>624</y>
     </hint>
    </hints>
   </connection>
@@ -1264,8 +1396,8 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -1280,8 +1412,8 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
@@ -1296,12 +1428,12 @@ should eventually stop the run.</string>
    <slot>addToArchiveDirs(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>110</x>
-     <y>83</y>
+     <x>121</x>
+     <y>161</y>
     </hint>
     <hint type="destinationlabel">
-     <x>82</x>
-     <y>74</y>
+     <x>93</x>
+     <y>147</y>
     </hint>
    </hints>
   </connection>
@@ -1312,12 +1444,12 @@ should eventually stop the run.</string>
    <slot>removeFromArchiveDirs(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>82</x>
-     <y>74</y>
+     <x>93</x>
+     <y>147</y>
     </hint>
     <hint type="destinationlabel">
-     <x>110</x>
-     <y>83</y>
+     <x>121</x>
+     <y>161</y>
     </hint>
    </hints>
   </connection>
@@ -1332,8 +1464,8 @@ should eventually stop the run.</string>
      <y>65</y>
     </hint>
     <hint type="destinationlabel">
-     <x>101</x>
-     <y>74</y>
+     <x>112</x>
+     <y>147</y>
     </hint>
    </hints>
   </connection>
@@ -1344,12 +1476,12 @@ should eventually stop the run.</string>
    <slot>addToArchiveDirs()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>35</x>
-     <y>63</y>
+     <x>128</x>
+     <y>75</y>
     </hint>
     <hint type="destinationlabel">
-     <x>110</x>
-     <y>83</y>
+     <x>121</x>
+     <y>161</y>
     </hint>
    </hints>
   </connection>
@@ -1360,8 +1492,8 @@ should eventually stop the run.</string>
    <slot>setGGDdata()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>57</x>
-     <y>66</y>
+     <x>68</x>
+     <y>112</y>
     </hint>
     <hint type="destinationlabel">
      <x>253</x>
@@ -1376,12 +1508,12 @@ should eventually stop the run.</string>
    <slot>setDevice(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>98</x>
-     <y>63</y>
+     <x>691</x>
+     <y>75</y>
     </hint>
    </hints>
   </connection>
@@ -1392,12 +1524,12 @@ should eventually stop the run.</string>
    <slot>setRun(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>98</x>
-     <y>63</y>
+     <x>691</x>
+     <y>75</y>
     </hint>
    </hints>
   </connection>
@@ -1408,12 +1540,12 @@ should eventually stop the run.</string>
    <slot>setShot(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>98</x>
-     <y>63</y>
+     <x>691</x>
+     <y>75</y>
     </hint>
    </hints>
   </connection>
@@ -1424,12 +1556,12 @@ should eventually stop the run.</string>
    <slot>setUser(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>98</x>
-     <y>63</y>
+     <x>691</x>
+     <y>75</y>
     </hint>
    </hints>
   </connection>
@@ -1440,8 +1572,8 @@ should eventually stop the run.</string>
    <slot>setDevice()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
      <x>431</x>
@@ -1456,8 +1588,8 @@ should eventually stop the run.</string>
    <slot>setRun()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
      <x>431</x>
@@ -1472,8 +1604,8 @@ should eventually stop the run.</string>
    <slot>setShot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
      <x>431</x>
@@ -1488,8 +1620,8 @@ should eventually stop the run.</string>
    <slot>setUser()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
      <x>431</x>
@@ -1504,8 +1636,8 @@ should eventually stop the run.</string>
    <slot>plotData()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>57</x>
-     <y>70</y>
+     <x>68</x>
+     <y>140</y>
     </hint>
     <hint type="destinationlabel">
      <x>267</x>
@@ -1520,8 +1652,8 @@ should eventually stop the run.</string>
    <slot>setEPIDS()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>57</x>
-     <y>62</y>
+     <x>68</x>
+     <y>84</y>
     </hint>
     <hint type="destinationlabel">
      <x>306</x>
@@ -1536,12 +1668,12 @@ should eventually stop the run.</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>119</x>
-     <y>104</y>
+     <x>127</x>
+     <y>253</y>
     </hint>
    </hints>
   </connection>
@@ -1552,12 +1684,12 @@ should eventually stop the run.</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>119</x>
-     <y>104</y>
+     <x>127</x>
+     <y>225</y>
     </hint>
    </hints>
   </connection>
@@ -1568,12 +1700,12 @@ should eventually stop the run.</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>111</x>
-     <y>104</y>
+     <x>127</x>
+     <y>197</y>
     </hint>
    </hints>
   </connection>
@@ -1584,8 +1716,8 @@ should eventually stop the run.</string>
    <slot>setShot(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>119</x>
-     <y>104</y>
+     <x>127</x>
+     <y>197</y>
     </hint>
     <hint type="destinationlabel">
      <x>159</x>
@@ -1600,8 +1732,8 @@ should eventually stop the run.</string>
    <slot>setRun(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>119</x>
-     <y>104</y>
+     <x>127</x>
+     <y>225</y>
     </hint>
     <hint type="destinationlabel">
      <x>202</x>
@@ -1616,8 +1748,8 @@ should eventually stop the run.</string>
    <slot>setUser(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>119</x>
-     <y>104</y>
+     <x>127</x>
+     <y>281</y>
     </hint>
     <hint type="destinationlabel">
      <x>182</x>
@@ -1632,12 +1764,12 @@ should eventually stop the run.</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>90</x>
-     <y>104</y>
+     <x>113</x>
+     <y>281</y>
     </hint>
    </hints>
   </connection>
@@ -1648,8 +1780,8 @@ should eventually stop the run.</string>
    <slot>setDevice(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>110</x>
-     <y>104</y>
+     <x>127</x>
+     <y>253</y>
     </hint>
     <hint type="destinationlabel">
      <x>357</x>
@@ -1664,11 +1796,11 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>74</y>
+     <x>65</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>430</x>
+     <x>417</x>
      <y>239</y>
     </hint>
    </hints>
@@ -1680,12 +1812,76 @@ should eventually stop the run.</string>
    <slot>executeB2plotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>100</x>
-     <y>95</y>
+     <x>483</x>
+     <y>582</y>
     </hint>
     <hint type="destinationlabel">
      <x>270</x>
      <y>220</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>b2plot</receiver>
+   <slot>setB2plotCommand(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>376</x>
+     <y>582</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>340</x>
+     <y>313</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b2plot</sender>
+   <signal>convertFinished()</signal>
+   <receiver>b2plot_2</receiver>
+   <slot>executeB2plotCommand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>302</x>
+     <y>271</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>696</x>
+     <y>295</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>director</sender>
+   <signal>rundir_checked(QString)</signal>
+   <receiver>b2plot_2</receiver>
+   <slot>setRunDir(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>114</x>
+     <y>586</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>694</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox_2</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>b2plot_2</receiver>
+   <slot>setB2plotCommand(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>704</x>
+     <y>582</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>703</x>
+     <y>463</y>
     </hint>
    </hints>
   </connection>

@@ -399,7 +399,7 @@ if __name__ == '__main__':
             self.preferences = Preferences()
             self.preferences.read()
 
-            self.main_tcsh = QProcess()  # for job submission and scripting
+            self.main_tcsh = QProcess(self)  # for job submission and scripting
             self.main_tcsh.setProcessChannelMode(self.main_tcsh.MergedChannels)
             self.main_tcsh.readyReadStandardOutput.connect(self.read_main_tcsh)
             self.solps_top = None  # Current active ${SOLPSTOP} for tcsh
@@ -628,7 +628,9 @@ if __name__ == '__main__':
                         "Directories cannot be changed. Try settings later."
                     QMessageBox.critical(self, "Restart required", msg)
                 else:
+                    self.treeViewRuns.expandOnStart = True
                     model.startThreads()
+                    # Also remember which directories were open from before.
                     # model.beginResetModel()
                     # model.scanDirectoriesThread.start()
                 # TODO(kosl) self.treeViewRuns.model.retRunsFolderInfoThread.quit()
@@ -686,14 +688,27 @@ if __name__ == '__main__':
             settings.beginGroup("TreeViewRuns")
             settings.setValue("ColumnWidth",
                               self.treeViewRuns.header().saveState())
+            tree_view_model = self.treeViewRuns.model()
+            expanded_indexes = self.treeViewRuns.model().persistentIndexList()
+            expanded_paths = []
+            for index in expanded_indexes:
+                path_index = tree_view_model.index(index.row(), Column.path, index.parent())
+                expanded_path = tree_view_model.data(path_index, Qt.DisplayRole)
+                expanded_paths.append(expanded_path)
+            settings.setValue("ExpandedPaths", expanded_paths)
             settings.endGroup()
-
             settings.beginGroup("TreeViewArchive")
             settings.setValue("ColumnWidth",
                               self.treeViewArchive.header().saveState())
             settings.endGroup()
             # TODO write settings at exit
             # self.preferences.write()
+
+            # Kill the Log gracefully.
+            try:
+                self.log.finish()
+            except:
+                pass
 
             QMainWindow.closeEvent(self, event)
 
