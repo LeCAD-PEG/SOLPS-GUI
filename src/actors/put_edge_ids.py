@@ -195,7 +195,8 @@ class PutIDS(TcshProcess):
     def getUser(self):
         return self.vars[PutVars.user]
 
-    user = Property(str, getUser, setUser)
+    user = Property(str, getUser, setUser,
+        doc="Database user (can be public)")
 
     @Slot(str)
     def setDevice(self, device):
@@ -204,7 +205,7 @@ class PutIDS(TcshProcess):
     def getDevice(self):
         return self.vars[PutVars.device]
 
-    device = Property(str, getDevice, setDevice)
+    device = Property(str, getDevice, setDevice, doc="Database")
 
     @Slot(str)
     def setVersion(self, version):
@@ -213,7 +214,8 @@ class PutIDS(TcshProcess):
     def getVersion(self):
         return self.vars[PutVars.version]
 
-    version = Property(str, getVersion, setVersion)
+    version = Property(str, getVersion, setVersion, 
+        doc="DB version")
 
     @Slot(str)
     def setRun(self, run):
@@ -222,7 +224,7 @@ class PutIDS(TcshProcess):
     def getRun(self):
         return self.vars[PutVars.run]
 
-    runNumber = Property(str, getRun, setRun)
+    runNumber = Property(str, getRun, setRun, doc="Pulse")
 
     @Slot(str)
     def setShot(self, shot):
@@ -231,7 +233,7 @@ class PutIDS(TcshProcess):
     def getShot(self):
         return self.vars[PutVars.shot]
 
-    shotNumber = Property(str, getShot, setShot)
+    shotNumber = Property(str, getShot, setShot, doc="Shot")
 
     def checkParameters(self):
         """Function that checks if all parameter are defined to open an IDS.

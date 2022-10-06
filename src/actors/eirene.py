@@ -3806,7 +3806,7 @@ class EireneEdit(QTreeWidget):
 
     def block_1(self):
         """Function for setting help desc. parameters for block 1:
-        *** 1. Data for operating mode
+           ``*** 1. Data for operating mode``
         """
         self.getline(['I', 'NMACH', 'NMODE', 'NTCPU', 'NFILE', 'NITER0',
                       'NITER', 'NTIME0', 'NTIME', 'DUMMY'])
@@ -3832,7 +3832,7 @@ class EireneEdit(QTreeWidget):
 
     def block_2(self):
         """Function for setting help desc. parameters for block 2:
-        *** 2. Data for standard mesh
+        ``*** 2. Data for standard mesh``
         """
 
         self.getline(['I', 'INGRD(1)', 'INGRD(2)', 'INGRD(3)'])
@@ -3923,7 +3923,7 @@ class EireneEdit(QTreeWidget):
 
     def block_3a(self):
         """Function for setting help desc. parameters for block 3a:
-        *** 3a. Data for non default standard surfaces
+        ``*** 3a. Data for non default standard surfaces``
         """
         self.getline(['I', 'NSTSI'])
 
@@ -3949,7 +3949,7 @@ class EireneEdit(QTreeWidget):
 
     def block_3b(self):
         """Function for setting help desc. parameters for block 3b:
-        *** 3b. Data for additional surfaces
+        ``*** 3b. Data for additional surfaces``
 
         For this block there is a problem in certain cases: when real RLBND
         parameter is negative, I have found no way to determine the -KL ine-

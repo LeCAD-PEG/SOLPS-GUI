@@ -5,8 +5,17 @@ pyside6 := $(shell package/pyside6.sh --prefix)
 gnuplot-widget := $(shell package/gnuplot-widget.sh --prefix)
 gnuplot := $(shell package/gnuplot.sh --prefix)
 
-solps-gui: $(pyqt) $(pyside6) setupenv.sh # imas paraview ggd-plugin
+.PHONY: doc gnuplot-widget gnuplot
 
+solps-gui: doc # $(pyqt) $(pyside6) setupenv.sh # imas paraview ggd-plugin
+
+
+doc:
+	make -C doc latexpdf 
+	make -C doc html
+
+clean:
+	make -C doc clean
 
 $(pyqt):
 	package/pyqt.sh --rebuild

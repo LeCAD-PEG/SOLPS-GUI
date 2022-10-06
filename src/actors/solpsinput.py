@@ -273,7 +273,8 @@ class SolpsInput(QTabWidget):
     def getRundir(self):
         return self.rundir
 
-    runDir = Property(str, getRundir, setRundir)
+    runDir = Property(str, getRundir, setRundir,
+        doc="Absolute path to SOLPS directory with run data")
 
 solps_input_files = [ # filename and its description for a tooltip [b2cdcn.F]
     ('b2mn.dat',

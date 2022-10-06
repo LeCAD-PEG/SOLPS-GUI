@@ -25,8 +25,10 @@ Notes:
 .. _Google Python Style Guide:
    http://google-styleguide.googlecode.com/svn/trunk/pyguide.html
    http://sphinx-doc.org/ext/example_google.html#example-google
+   https://www.sphinx-doc.org/en/master/usage/extensions/example_google.html#example-google
    http://sphinx-doc.org/ext/napoleon.html#module-sphinx.ext.napoleon
    Author: Leon Kos, University of Ljubljana
+  
 """
 
 import getopt

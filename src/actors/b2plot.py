@@ -95,7 +95,8 @@ class B2plot(TcshProcess):
     def getConvertPath(self):
         return self.convert_path
 
-    convertPath = Property(str, getConvertPath, setConvertPath)
+    convertPath = Property(str, getConvertPath, setConvertPath, 
+        doc="Executable requires absolute path. e.g. /usr/bin/convert")
 
     @Slot(str)
     def setB2plotCommand(self, command):
@@ -110,7 +111,8 @@ class B2plot(TcshProcess):
     def getB2plot_pltcmd(self):
         return self.b2plot_command
 
-    b2plotCommand = Property(str, getB2plot_pltcmd, setB2plotCommand)
+    b2plotCommand = Property(str, getB2plot_pltcmd, setB2plotCommand,
+        doc="b2plot command for later execution")
 
     def setB2plotPage(self, page):
         """ Sets the page for conversion into final image.
@@ -123,7 +125,8 @@ class B2plot(TcshProcess):
     def getB2plotPage(self):
         return self.b2plot_page
 
-    b2plotPage = Property(int, getB2plotPage, setB2plotPage)
+    b2plotPage = Property(int, getB2plotPage, setB2plotPage,
+        doc="Page for conversion into final image")
 
     @Slot(str)
     def print_tcsh_stderr(self, error_text):

@@ -238,7 +238,7 @@ class TcshProcess(QWidget):
         """
         return self.runDir
 
-    run_dir = Property(str, getRunDir, setRunDir)
+    run_dir = Property(str, getRunDir, setRunDir, doc="Run directory")
 
     @Slot(str)
     def setTcshPath(self, tcshPath):
@@ -256,7 +256,8 @@ class TcshProcess(QWidget):
         """
         return self.tcshPath
 
-    tcsh_path = Property(str, getTcshPath, setTcshPath)
+    tcsh_path = Property(str, getTcshPath, setTcshPath, 
+        doc="Path to tcsh binary")
 
     @Slot(str)
     def setTcshCommand(self, command):
@@ -270,7 +271,8 @@ class TcshProcess(QWidget):
     def getTcshCommand(self):
         return self.tcshCommand
 
-    tcsh_command = Property(str, getTcshCommand, setTcshCommand)
+    tcsh_command = Property(str, getTcshCommand, setTcshCommand, 
+        doc="Command for tcsh to execute")
 
     def startTcsh(self):
         """Starts the TCSH terminal by first setting the run directory variable

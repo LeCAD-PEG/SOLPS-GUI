@@ -89,7 +89,6 @@ class ScriptWidgetPlugin(QDesignerCustomWidgetInterface):
                '  <property name="whatsThis" >\n' \
                '   <string>Python script widget</string>' \
                '  </property>\n' \
-               '  <property name="text"><string>Script</string></property>' \
                ' </widget>\n' \
                '</ui>'
 

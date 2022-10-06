@@ -10,6 +10,7 @@ Main program solps.py
 
 .. automodule:: solps
    :members:
+   :noindex:
 
 Custom widgets and plugins for the Dashboard
 ============================================
@@ -27,6 +28,7 @@ inside GUI.
 
 .. automodule:: gnuplot
    :members:
+   :undoc-members:
 
 -----------
 SOLPS Plots
@@ -34,6 +36,8 @@ SOLPS Plots
 
 .. automodule:: solpsplots
    :members:
+   :undoc-members:
+   :private-members:
 
 ----------
 Line input
@@ -41,6 +45,8 @@ Line input
 
 .. automodule:: lineinput
    :members:
+   :undoc-members:
+   :private-members:
 
 ------------
 Tcsh scripts
@@ -48,6 +54,8 @@ Tcsh scripts
 
 .. automodule:: tcsh
    :members:
+   :undoc-members:
+   :private-members:
 
 --------
 Director
@@ -55,6 +63,8 @@ Director
 
 .. automodule:: director
    :members:
+   :undoc-members:
+   :private-members:
 
 ------
 Script
@@ -62,6 +72,8 @@ Script
 
 .. automodule:: script
    :members:
+   :undoc-members:
+   :private-members:
 
 
 ------
@@ -70,6 +82,8 @@ B2plot
 
 .. automodule:: b2plot
    :members:
+   :undoc-members:
+   :private-members:
 
 ----------------------------
 Input file editor and viewer
@@ -77,6 +91,8 @@ Input file editor and viewer
 
 .. automodule:: solpsinput
    :members:
+   :undoc-members:
+   :private-members:
 
 -------------------
 Eirene input editor
@@ -84,6 +100,8 @@ Eirene input editor
 
 .. automodule:: eirene
    :members:
+   :undoc-members:
+   :private-members:
 
 ---------------
 B2 input editor
@@ -91,6 +109,8 @@ B2 input editor
 
 .. automodule:: b2
    :members:
+   :undoc-members:
+   :private-members:
 
 --------
 Add menu
@@ -98,6 +118,8 @@ Add menu
 
 .. automodule:: addmenu
    :members:
+   :undoc-members:
+   :private-members:
 
 ------------
 Put edge IDS
@@ -107,6 +129,8 @@ It can be used as a standalone tool too.
 
 .. automodule:: put_edge_ids
    :members:
+   :undoc-members:
+   :private-members:
 
 ------------
 Get edge IDS
@@ -117,6 +141,8 @@ run directory.
 
 .. automodule:: get_edge_ids
    :members:
+   :undoc-members:
+   :private-members:
 
 ------------
 TCSH process
@@ -128,6 +154,8 @@ contains signal/slot functions for easier integration inside Qt Designer
 
 .. automodule:: tcsh_process
    :members:
+   :undoc-members:
+   :private-members:
 
 ------
 Divgeo
@@ -138,6 +166,8 @@ inside the GUI.
 
 .. automodule:: divgeo
    :members:
+   :undoc-members:
+   :private-members:
 
 
 -----
@@ -168,3 +198,5 @@ This widget is used to initialize a run from a baserun directory.
 
 .. automodule:: initialize_run
    :members:
+   :undoc-members:
+   :private-members:

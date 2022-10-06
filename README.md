@@ -1,7 +1,14 @@
 SOLPS-ITER GUI
 ==============
 
+
 ## Build environment
+
+   module load PySide6/6.2.3-GCCcore-10.2.0 
+   module load Sphinx/3.5.2-GCCcore-10.2.0
+   module load texlive/20210216
+   module load matplotlib/3.5.2-foss-2020b
+   module load IMAS/3.37.0-4.11.0-foss-2020b
 
    make
 

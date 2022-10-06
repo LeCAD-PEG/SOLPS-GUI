@@ -935,7 +935,7 @@ Run
 
 ``b2mndr_density_rescale``    type: ``real``    default: ``1.0``
     Multiplier of all densities on the first timestep.
-    If set to a negative value, the rescaling (by |density\_rescale|) will only be applied to species with zn.eq.zn\_rescale.
+    If set to a negative value, the rescaling (by ``density\_rescale``) will only be applied to species with zn.eq.zn\_rescale.
     
 
 .. index:: b2mndr_zn_rescale
@@ -1620,7 +1620,7 @@ Physics
     The cutoff occurs at approximately sput\_chem\_cutoff\_alpha and the width is determined by sput\_chem\_cutoff\_beta (the larger the value, the narrower the width over which the transition from 0 to 1 occurs).
     For model 0, sput\_frc is a multiplier to the empirical formula, while for model 1, sput\_frc is the constant chemical sputtering yield.
     Sput\_frc is superseded by the chem\_sput array from b2.neutrals.namelist if the latter is used.
-    For neutrals species, we add a factor of α\*na\*vbar to the particle flux to the plate (used to compute chemical and RES sputtering), where vbar is the average neutral particle speed.
+    For neutrals species, we add a factor of :math:`\alpha`\*na\*vbar to the particle flux to the plate (used to compute chemical and RES sputtering), where vbar is the average neutral particle speed.
     Sput\_phys turns on physical sputtering when sput\_phys.gt.0.0 and contains a (real) multiplier for the physical sputtering rate looked up in the TRIM tables. It is superseded by the phys\_sput array in b2.neutrals.parameters if the latter is used.
     sput\_phys\_col indicates which column to use in the TRIM table; the default (3) corresponds to 30 degrees incidence. The columns are for
 
@@ -1632,13 +1632,13 @@ Physics
     Therm\_evap turns on thermal evaporation when .gt.0.0 and is a multiplier to the thermal evaporation rate.
     Redep\_alpha is the multiplier to the reduction of the sputtering yield due to prompt redeposition. The promptly redeposited species is counted as eroded-then-deposited species. If redep\_alpha is positive, the formula used for the prompt redeposition fraction is from R. Dux et al., Nucl. Fusion 51 (2011) 053002:
 
-    |  f\_{prompt} = 1/(1 + α\*(l\_{ion}/ρ\_W)^2).
+    |  f\_{prompt} = 1/(1 + :math:`\alpha\*(l\_{ion}/:math:`\rho`\_W)^2).
 
     If redep\_alpha is negative, the formula used is from D. Tskhakaya et al., JNM 463 (2015) 624:
 
-    |  f\_{prompt} = 1/(1 + abs(α)\*(l\_{ion}/ρ\_i)\*(T\_i/T\_e) ).
+    |  f\_{prompt} = 1/(1 + abs(:math:`\alpha`)\*(l\_{ion}/:math:`\rho`\_i)\*(T\_i/T\_e) ).
 
-    In this case, the recommended value is abs(redep\_alpha)=0.01. This formula is meant for tungsten when l\_{ion} is less than 5 \* ρ\_i.
+    In this case, the recommended value is abs(redep\_alpha)=0.01. This formula is meant for tungsten when l\_{ion} is less than 5 \* :math:`\rho`\_i.
     
 .. index::
    single: b2stbr_sputtering...; b2stbr_plate_model
@@ -1789,23 +1789,26 @@ Physics
 
 
     The last switch is subservient to b2tqna\_user\_transport, and only used if user\_transport.ne.0. When this is the case, the electron perpendicular heat diffusivity and anomalous perpendicular particle transport coefficient are scaled so as to maintain the required\_te\_gradient (in units of eV/m), at the location (ixref,iyref) on the basis mesh. The default position of the reference cell is on the outer midplane, sligthly inside the separatrix, as follows:
-    |Configuration|     ixref                    |     iyref
-    --------------+------------------------------+----------------------
-    |Single-null  | rightcut(1)-                 | 2\*topcut(1)/3
-    | (lower)     | (rightcut(1)-leftcut(1))/4   |
-    |             |                              |
-    |Single-null  | leftcut(1)+                  | 2\*topcut(1)/3
-    | (upper)     | (rightcut(1)-leftcut(1))/4   |
-    |             |                              |
-    |Stellarator  | leftcut(1)+                  | 2\*topcut(1)/3
-    | island      | (rightcut(1)-leftcut(1))/2   |
-    |             |                              |
-    |Double-null  | (rightcut(1)+rightcut(2))/2  | 2\*min(topcut(1),
-    |             |                              |       topcut(2))/3
-    |             |                              |
-    |Limiter      | nx/2                         | 2\*topcut(1)/3
-    |             |                              |
-    |Straight     | nx/2                         | ny/2
+
+    +---------------+------------------------------+---------------------+ 
+    | Configuration |     ixref                    |     iyref           |
+    +---------------+------------------------------+---------------------+
+    | Single-null   | rightcut(1)-                 | 2\*topcut(1)/3      |
+    |  (lower)      | (rightcut(1)-leftcut(1))/4   |                     |
+    |               |                              |                     |
+    | Single-null   | leftcut(1)+                  | 2\*topcut(1)/3      |
+    |  (upper)      | (rightcut(1)-leftcut(1))/4   |                     |
+    |               |                              |                     |
+    | Stellarator   | leftcut(1)+                  | 2\*topcut(1)/3      |
+    |  island       | (rightcut(1)-leftcut(1))/2   |                     |
+    |               |                              |                     |
+    | Double-null   | (rightcut(1)+rightcut(2))/2  | 2\*min(topcut(1),   |
+    |               |                              |       topcut(2))/3  |
+    |               |                              |                     |
+    | Limiter       | nx/2                         | 2\*topcut(1)/3      |
+    |               |                              |                     |
+    | Straight      | nx/2                         | ny/2                |
+    +---------------+------------------------------+---------------------+    
     
     The transport\_eta switches are activated when user\_transport.eq.3 and allow modifications of the electron heat conductivity according to a constant eta (Grad Te / Grad Ne) model. See routine set\_transport\_eta code for details.
     A model for disruption transport coefficients is available with user\_transport.eq.7. See routine set\_transport\_disruption code for details.
@@ -2023,9 +2026,9 @@ Physics
 
     Parameters for the flux limit to the convective neutral flow.
     Alpha is a multiplier to the classical flux limit value.
-    The larger α is, the weaker the flux limit is.
-    γ is the exponent used in the flux-limiting formula.
-    The smaller γ is, the stronger the flux limit is.
+    The larger :math:`\alpha` is, the weaker the flux limit is.
+    :math:`\gamma` is the exponent used in the flux-limiting formula.
+    The smaller :math:`\gamma` is, the stronger the flux limit is.
     If alpha.eq.0, no flux limit is applied.
     flux\_limit\_min\_ti specifies the minimum ti to be used (in eV).
     
@@ -2056,7 +2059,7 @@ Physics
 
     Parameters for the flux limit to dpa0 - pressure driven neutral diffusion.
     Alpha is a multiplier to the classical flux limit value.
-    γ is the exponent used in the flux-limiting formula. If alpha.eq.0, no flux limit is applied.
+    :math:`\gamma` is the exponent used in the flux-limiting formula. If alpha.eq.0, no flux limit is applied.
     
 .. index::
    single: b2tlc0_*; b2tlc0_alpha
@@ -2078,9 +2081,9 @@ Physics
 
 
     Parameters for the flux limit to the heat conductivity of the neutrals. Alpha is a multiplier to the classical flux limit value.
-    The larger α is, the weaker the flux limit is.
-    γ is the exponent used in the flux-limiting formula.
-    The smaller γ is, the stronger the flux limit is.
+    The larger :math:`\alpha` is, the weaker the flux limit is.
+    :math:`\gamma` is the exponent used in the flux-limiting formula.
+    The smaller :math:`\gamma` is, the stronger the flux limit is.
     If alpha.eq.0, no flux limit is applied.
     flux\_limit\_min\_ti specifies the minimum ti to be used (in eV).
     
@@ -3797,7 +3800,7 @@ Numerics
 
 ``b2trno_flux_limit_to_dpa``    type: ``integer``    default: ``1``
     If '1', flux limit to neutrals contribution to dpa0 - the diffusion coefficient is applied in b2tlc0.F. It is recommended '1'.
-    b2tlc0.F has the flux limit parameters α and γ which are given by 'b2tlc0\_alpha' and 'b2tlc0\_gamma'. 'b2tfnb\_alpha' and 'b2tlc0\_alpha' cannot be different from zero simultaneously.
+    b2tlc0.F has the flux limit parameters :math:`\alpha` and :math:`\gamma` which are given by 'b2tlc0\_alpha' and 'b2tlc0\_gamma'. 'b2tfnb\_alpha' and 'b2tlc0\_alpha' cannot be different from zero simultaneously.
     'b2tfnb\_alpha' gives another form of flux limit which is applied to the whole particle flux.
     
 
@@ -5525,7 +5528,7 @@ b2.boundary.parameters
     |	 7 : prescribe the density as a function of other plasma parameters [not yet available]
     |	 8 : prescribe the total particle flux with constant flux density, CONPAR(,,1) specifies the particle flux in s^-1`
     |	 9 : prescribe the decay length for the density, CONPAR(,,1) specifies the gradient length in metres (should use type 15 instead when drifts are turned on)
-    |	10 : leakage option for density, recommended for cases with drifts, CONPAR(,,1) specifies the leakage factor, α in Γ`_loss` = α C`_s` n`_a`
+    |	10 : leakage option for density, recommended for cases with drifts, CONPAR(,,1) specifies the leakage factor, :math:`\alpha` in :math:`\Gamma``_loss` = :math:`\alpha` C`_s` n`_a`
     |	11 : particle flux feedback boundary condition, CONPAR(,,1) not used, derived from CBSNA(0,IS,IREG). For feedback schemes not specified via b2.feedback\_control.parameters, the species used must be declared using the 'b2stbc\_isfeedback' switch.
     |	12 : particle density feedback boundary condition, as above, CONPAR(,,1) not used, derived from CBSNA(0,IS,IREG). The species used must be declared using the 'b2stbc\_isfeedback' switch.
     |	13 : particle density to achieve specified total flux,
@@ -5576,10 +5579,10 @@ b2.boundary.parameters
     |	14 : condition from b2stbc\_spb for the parallel momentum
     |	15 : prescribe the value of the parallel velocity, scaled with B\_average/B\_local
     |	16 : prescribe the average value of the parallel velocity MOMPAR(,,1) specifies the parallel velocity in m.s^-1`
-    |	17 : leakage option for parallel momentum, MOMPAR(,,1) specifies the leakage factor, α in Γ`_loss` = α C`_s,a` m`_a` n`_a` u`_a`
+    |	17 : leakage option for parallel momentum, MOMPAR(,,1) specifies the leakage factor, :math:`\alpha` in :math:`\Gamma``_loss` = :math:`\alpha` C`_s,a` m`_a` n`_a` u`_a`
     |	18 : reads parallel velocity profile in units of m.s^-1` from the specified file in MOM\_FN. If MOMPAR(,,2) > 0 the profile is scaled so the maximum parallel velocity is given by MOMPAR(,,1) in m.s^-1`.. Only available for E and W boundaries.
     |	19 : reads the momentum fllux profile from MOM\_FN in units of m^-2`.s.s^-1`.. This has to be used in combination with BCCON = 1, 28, 30 and BCENI = 15. Only available for E and W boundaries.
-    |	20 : reads the Mach number from the MOM\_FN file. Velocity is calculated with the temperature at the boundary and γ\_i = 1. Only available for E and W boundaries.
+    |	20 : reads the Mach number from the MOM\_FN file. Velocity is calculated with the temperature at the boundary and :math:`\gamma`\_i = 1. Only available for E and W boundaries.
     |	21 : reads the parallel velocity gradient from the MOM\_FN file in units of s^-1`..  If MOMPAR(,,2) > 0 the profile is scaled so the maximum parallel velocity gradient is given by MOMPAR(,,1). Only available for E and W boundaries.
 
     
@@ -5601,9 +5604,9 @@ b2.boundary.parameters
     |	 9 : prescribe the decay length for the electron temperature, ENEPAR(,1) specifies the decay length in m (can also use type [19] instead)
     |	10 : feedback option for core, ENEPAR(,1) not used, derived from cbshe(0,coreregno)
     |	11 : not used
-    |	12 : sheath conditions, electron energy transmission coefficient, ENEPAR(,1) specifies an energy transmission factor, delta`_e` in Q`_e` = delta`_e` Γ`_e` T`_e`
+    |	12 : sheath conditions, electron energy transmission coefficient, ENEPAR(,1) specifies an energy transmission factor, delta`_e` in Q`_e` = delta`_e` :math:`\Gamma``_e` T`_e`
     |	13 : prescribe the electron energy flux per unit area proportional to temperature, ENEPAR(,1) specifies the energy flux density per temperature in W.m^-2`.J.J^-1` (the temperature here in J)
-    |	14 : leakage option for electron energy, ENEPAR(,1) specifies the leakage factor, α in Γ`_loss` = α C`_s`,, collective n`_e` T`_e`
+    |	14 : leakage option for electron energy, ENEPAR(,1) specifies the leakage factor, :math:`\alpha` in :math:`\Gamma``_loss` = :math:`\alpha` C`_s`,, collective n`_e` T`_e`
     |	15 : sheath boundary condition, from b2stbc\_spb, recommended when using drifts (see Section C.7.4 of manual for details). Linked to using BCCON=14 and BCMOM=13 for all ion species, BCENI=15, and BCPOT=11.
     |	16 : feedback boundary condition with constant temperature, ENEPAR(,1) specifies the power flux in W across the flux surface with index 'b2stbc\_type16\_ref' (default=-1), ENEPAR(,2) should be something like 0.1 and specifies the strength of the feedback. Also see type [17] below. Available if bcene\_16\_style=0 (default). If bcene\_16\_style=1, integrated electron heat flux with constant electron temperature, summed over all core boundaries with BCENE=16.
     |	17 : feedback boundary condition with constant shared temperature for both electrons and ions, with ENEPAR(,1) + ENIPAR(,1) giving the total power flux in W across the flux surface with index 'b2stbc\_type16\_ref' (default=-1), ENEPAR(,2) should be something like 0.1 and specifies the strength of the feedback. Replaces [16] for high densities and large values of 'b2stbc\_type16\_ref'.
@@ -5635,9 +5638,9 @@ b2.boundary.parameters
     |	 9 : prescribe the decay length for the ion temperature, ENIPAR(,1) specifies the decay length in m (can also use type [19] instead)
     |	10 : feedback option for core, ENIPAR(,1) not used, derived from cbshi(0,ISMAIN,coreregno)
     |	11 : sheath conditions, ion energy transmission coefficient, ENIPAR(,1) specifies an energy transmission factor, delta`_i` in Q`_i` = delta`_i` T`_i` sum`_a` n`_a` C`_s,a`
-    |	12 : sheath conditions, ion energy transmission coefficient, ENIPAR(,1) specifies an energy transmission factor, delta`_i` in Q`_i` = delta`_i` T`_i` sum`_a` Γ`_a`
+    |	12 : sheath conditions, ion energy transmission coefficient, ENIPAR(,1) specifies an energy transmission factor, delta`_i` in Q`_i` = delta`_i` T`_i` sum`_a` :math:`\Gamma``_a`
     |	13 : prescribe the ion energy flux per unit area proportional to temperature, ENIPAR(,1) specifies the energy flux density per temperature in W.m^-2`.J.J^-1` (the temperature here in J)
-    |	14 : leakage option for ion energy, ENIPAR(,1) specifies the leakage factor, α in Γ`_loss` = α C`_s`TT`_i`
+    |	14 : leakage option for ion energy, ENIPAR(,1) specifies the leakage factor, :math:`\alpha` in :math:`\Gamma``_loss` = :math:`\alpha` C`_s`TT`_i`
     |	15 : sheath boundary condition, from b2stbc\_spb, recommended when using drifts (see Section C.7.5 of manual for details). Linked to using BCCON=14 and BCMOM=13 for all ion species, along with BCENE=15 and BCPOT=11.
     |	16 : feedback boundary condition with constant temperature, ENIPAR(,1) specifies the power flux in W across the flux surface with index 'b2stbc\_type16\_ref' (default=-1), ENIPAR(,2) should be something like 0.1 and specifies the strength of the feedback. Also see type [17] below. Available if bceni\_16\_style=0 (default). If bceni\_16\_style=1, integrated ion heat flux with constant ion temperature, summed over all core boundaries with BCENI=16.
     |		ENIPAR(,1) specifies the power flux in W
@@ -5959,7 +5962,7 @@ b2.feedback_control.parameters
     |	1: Try to set a flux. Corr = (beta\*ave\_pressure - pressure)/temp \* alpha
     |	2: Try to set a density based on pressure equality.
 
-    Corr = α \* beta \* pressure / Ti
+    Corr = :math:`\alpha` \* beta \* pressure / Ti
     
 
 .. index:: VACUUM_COMMUNICATION_IY
@@ -6493,14 +6496,14 @@ b2.numerics.parameters
 .. index:: CORR_CORE_DN
 
 ``CORR_CORE_DN``    type: ``real*8 array of size (0:NS-1)``    default: ``1.0``
-    Pressure correction speed-up parameter α\_a, acting on the density contribution from species a. Will apply in the core region, except for the nrings outer surfaces. See nrings\_for\_no\_speedup\_averaging for details.
+    Pressure correction speed-up parameter :math:`\alpha`\_a, acting on the density contribution from species a. Will apply in the core region, except for the nrings outer surfaces. See nrings\_for\_no\_speedup\_averaging for details.
     See Pressure\_correction\_speed-up.pdf in $SOLPSTOP/doc for a full description. Should be roughly equal to corr\_core\_dt below. Does not apply to neutral species.
     
 
 .. index:: CORR_CORE_DT
 
 ``CORR_CORE_DT``    type: ``real*8``    default: ``1.0``
-    Pressure correction speed-up parameter α\_T, acting on the temperature contributions. Will apply in the core region, except for the nrings outer surfaces. See nrings\_for\_no\_speedup\_averaging for details.
+    Pressure correction speed-up parameter :math:`\alpha`\_T, acting on the temperature contributions. Will apply in the core region, except for the nrings outer surfaces. See nrings\_for\_no\_speedup\_averaging for details.
 
     |	See Pressure\_correction\_speed-up.pdf in $SOLPSTOP/doc for a full description. Should be roughly equal to corr\_core\_dn above.
 

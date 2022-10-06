@@ -153,7 +153,7 @@ class GetIDS(QWidget):
     def getUser(self):
         return self.vars[GetVars.user]
 
-    user = Property(str, getUser, setUser)
+    user = Property(str, getUser, setUser, doc="username or public")
 
     @Slot(str)
     def setDevice(self, device):
@@ -162,7 +162,7 @@ class GetIDS(QWidget):
     def getDevice(self):
         return self.vars[GetVars.device]
 
-    device = Property(str, getDevice, setDevice)
+    device = Property(str, getDevice, setDevice, doc="Database")
 
     @Slot(str)
     def setVersion(self, version):
@@ -171,7 +171,7 @@ class GetIDS(QWidget):
     def getVersion(self):
         return self.vars[GetVars.device]
 
-    version = Property(str, getVersion, setVersion)
+    version = Property(str, getVersion, setVersion, doc="DB version")
 
     @Slot(str)
     def setRun(self, run):
@@ -180,7 +180,7 @@ class GetIDS(QWidget):
     def getRun(self):
         return self.vars[GetVars.run]
 
-    runNumber = Property(str, getRun, setRun)
+    runNumber = Property(str, getRun, setRun, doc="Run number")
 
     @Slot(str)
     def setShot(self, shot):
@@ -189,7 +189,7 @@ class GetIDS(QWidget):
     def getShot(self):
         return self.vars[GetVars.shot]
 
-    shotNumber = Property(str, getShot, setShot)
+    shotNumber = Property(str, getShot, setShot, doc="Pulse ID")
 
     @Slot(str)
     def setDirPath(self, savedir):
@@ -198,7 +198,7 @@ class GetIDS(QWidget):
     def getDirPath(self):
         return self.vars[GetVars.dirPath]
 
-    dirPath = Property(str, getDirPath, setDirPath)
+    dirPath = Property(str, getDirPath, setDirPath, doc="Rundir")
 
     @Slot(str)
     def setRunName(self, name):
@@ -207,7 +207,7 @@ class GetIDS(QWidget):
     def getRunName(self):
         return self.vars[GetVars.runName]
 
-    runName = Property(str, getRunName, setRunName)
+    runName = Property(str, getRunName, setRunName, doc="Run name")
 
     def checkParameters(self):
         state = True

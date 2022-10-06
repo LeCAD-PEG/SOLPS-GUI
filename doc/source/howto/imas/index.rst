@@ -272,19 +272,42 @@ users, becomes gradually more difficult and time consuming until at some
 point it becomes too troublesome and impractical. Moreover, this data is
 often scattered in different locations and formats, resulting in greatly
 increased file handling difficulty and possibly also in troublesome or
-not straightforward data interpretation for other users. The other
+not straightforward data interpretation for other users. 
+
+.. _fig-node_simpleStructureNode:
+
+.. figure:: images/data_tree_simpleStructureNode.*
+   :width:  60%
+   :alt:    Simple structure node concept.
+
+   Simple structure node concept
+
+
+.. _fig-node_arrayOfStructuredNodes:
+
+.. figure:: images/data_tree_arrayOfStructuresNode.*
+   :width:  60%
+   :alt:    Array of structures node
+            concept (right), with structures running from ``1`` to ``n``,
+            where ``n`` is total number of structures.
+
+   Array of structures node
+   concept (right), with structures running from ``1`` to ``n``,
+   where ``n`` is total number of structures
+
+The other
 possible approach, suitable when dealing with hierarchical data and a
 higher number of users, and also currently used on ITER, is data storage
 in standardized hierarchical transferable databases or data structures,
 consisting of tree-like data structure units [2]_, as shown in
 :numref:`fig-data_unit_tree_structure`, with each element of a tree
 set to hold specified data in specified format. The data tree is
-described by (from Ref. [10]):
+described by (from Ref. [10]):            
 
 -  a **node**, the main building block of the data tree, referring to
    any element of the tree. There are two types of nodes [11], also
-   shown in :numref:`Figs. %s<fig-node_simpleStructureNode>` and
-   :numref:`%s<fig-node_arrayOfStructuredNodes>`:
+   shown in :numref:`Figs. {number}<fig-node_simpleStructureNode>` and
+   :numref:`{number}<fig-node_arrayOfStructuredNodes>`:
 
    -  **simple structure node**, being a regular single node, and
 
@@ -306,22 +329,6 @@ as shown in :numref:`fig-node_parentChildSibling`, with navigation
 through the tree nodes running from start-point nodes through
 lower-level nodes to the end-point leafs.
 
-.. _fig-node_simpleStructureNode:
-
-.. figure:: images/data_tree_simpleStructureNode.*
-   :width:  60%
-   :alt:    Simple structure node concept.
-
-   Simple structure node concept
-
-
-.. _fig-node_arrayOfStructuredNodes:
-
-.. figure:: images/data_tree_arrayOfStructuresNode.*
-   :width:  60%
-   :alt:    Array of structures node
-            concept (right), with structures running from ``1`` to ``n``,
-            where ``n`` is total number of structures.
 
 .. _fig-node_parentChildSibling:
 

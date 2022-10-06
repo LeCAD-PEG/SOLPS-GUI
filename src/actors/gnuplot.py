@@ -175,7 +175,8 @@ class Gnuplot(TcshProcess):
     def getGnuplotPath(self):
         return self.gnuplot_path
 
-    gnuplotPath = Property(str, getGnuplotPath, setGnuplotPath)
+    gnuplotPath = Property(str, getGnuplotPath, setGnuplotPath,
+        doc="Path to gnuplot binary")
 
     @Slot(str)
     def setSolpsPlotCommand(self, command):
@@ -185,7 +186,8 @@ class Gnuplot(TcshProcess):
         return self.solps_plot_command
 
     solpsPlotCommand = Property(str, getSolpsPlotCommand,
-                                    setSolpsPlotCommand)
+                                    setSolpsPlotCommand,
+                                    doc="SOLPS plot command")
 
     @Slot()
     def print_tcsh_stderr(self, error_text):

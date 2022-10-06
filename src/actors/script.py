@@ -14,7 +14,8 @@ class Script(QPlainTextEdit):
         can be entered and run.
     """
 
-    output = Signal(str)
+    output = Signal(str) #: String signal (e.g. for tcsh)
+    error = Signal(str) #: String signal of exec() error for Plain Text Edit
 
     def __init__(self, parent=None):
         super(Script, self).__init__(parent)
@@ -22,7 +23,7 @@ class Script(QPlainTextEdit):
         self.setFrameStyle(QFrame.StyledPanel)
         self.setMinimumSize(QSize(180, 50))
         self.setPlaceholderText("Python script widget. "
-                                "Use self.output.emit(command) to signal.")
+                                "Use self.output.emit(str) to signal.")
         font = QFont()
         font.setFamily('Monospace')
         self.setFont(font)
@@ -33,7 +34,12 @@ class Script(QPlainTextEdit):
     @Slot()
     def run(self):
         script = self.toPlainText()
-        exec(script)
+        try:
+            exec(script)
+        except Exception as e:
+            # print('Script error: '+str(e)) # TODO log
+            self.error.emit('Script error: '+str(e))
+
 
     @Slot(str)
     def setScript(self, script):
@@ -42,7 +48,8 @@ class Script(QPlainTextEdit):
     def getScript(self):
         return self.toPlainText()
 
-    script = Property(str, getScript, setScript)
+    script = Property(str, getScript, setScript, 
+        doc="Python script for exec()") #: Alias property for setPlainText
 
 
 if __name__ == "__main__":
