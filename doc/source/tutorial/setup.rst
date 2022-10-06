@@ -24,18 +24,24 @@ for running SOLPS-ITER.
 ITER setup
 ==========
 
-The latest version of the GUI is available on ITER HPC login nodes by::
+The latest version of the GUI is available on ITER SDCC login nodes by::
 
-   $ module load solps-gui
+   $ module load SOLPS-GUI
    $ solps #  and "solps -h" should work
    $ solps_doc # for the lastest HTML documentation in a browser
+
+
+Running under SOLPS-ITER `setup.csh` environment can be achieved 
+by loading `SOLPS-GUI` module or cloning SOLPS-GUI Git repository 
+under `${HOME}` or `solps-iter/modules/` directories.
+
 
 EUROFusion-IM setup
 ===================
 
-The latest version of the GUI is available on all *Gateway* login nodes by::
+The latest version of the GUI should be available on all *Gateway* login nodes by::
 
-   $ module load solps-gui
+   $ module load SOLPS-GUI
    $ solps #  and "solps -h" should work
    $ solps_doc # for the lastest HTML documentation in a browser
 
@@ -55,12 +61,13 @@ in :file:`README.md` after ``git clone``. Short instructions for building::
 
     $ git clone ssh://git@git.iter.org/bnd/solps-gui.git
     $ cd solps-gui
-    $ make solps-gui # It may take several hours to compile!
+    $ make staging # Builds PySide6 and other packages
+    $ make # Only documentation is built
 
 .. note::
 
-    You will need at least GCC version 4.7 with many development packages
-    to compile PyQt and Python 3+.
+    You will need at least GCC version 8.3 with many development packages
+    to compile PySide6 and Python 3+.
     Please read :file:`solps-gui/README.md` for further info on some systems.
 
 Starting the GUI::

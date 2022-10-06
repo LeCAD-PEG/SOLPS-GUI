@@ -94,12 +94,42 @@ above runtime software.
    and PySide6 Gnuplot plugin.
 
 =======================
-SOLPS ITER installation
+SOLPS-ITER installation
 =======================
 
-We now also provides scripts for building the SOLPS-ITER suite along with it's
-required packages. Some of the requirements are written in the README.md. For
-others, scripts are written that download, compile and install the code. At the
+For destop compilation SOLPS-ITER provides `SETUP/easbuild-local.sh` script
+that allows easy building of required SOLPS-ITER module replicating ITER
+cluster environment including SLURM submission scripts.
+
+.. code-block:: 
+
+    SETUP/easybuild-local.sh [OPTION... | easybuild_command...]
+
+      --help                prints and opens this manual, then EasyBuild help
+      --imas-foss           builds IMAS with foss-2020b toolchain
+      --imas-foss install   installs IMAS and module
+      --intel               build INTEL modules and toolchain
+      --imas-intel clean    cleans IMAS repository before rebuilding
+      --imas-intel          builds IMAS with INTEL toolchain
+      --imas-intel install  installs IMAS and module built with INTEL
+      --imas                builds default CentOS-8 IMAS built with GCC and INTEL
+      --imas install        installs IMAS CentOS-8 module built with GCC and INTEL
+      --imas-apps           builds all IMAS applications
+
+    ENVIRONMENT variables:
+
+      TAG_DD                   IMAS data dictionary version
+      TAG_AL                   IMAS access layer version
+      EASYBUILD_PREFIX         Software installation directory prefix
+      EASYBUILD_MODULES_TOOL   Modules tool (Lmod, EnvironmentModules)
+      EASYBUILD_MODULE_SYNTAX  Tcl or Lua syntax for modulefiles generated
+      HTTP_AUTH_BEARER         Personal token for downloading of ITER GIT sources
+
+
+
+We also provide scripts under ``package/`` for building the SOLPS-ITER suite along 
+with it's required packages. Some of the requirements are written in the :file:`README.md`. 
+For others, scripts are written that download, compile and install the code. At the
 end of each package compilation, module files are generated and are, by
 default, written into ``solps-gui/modules`` directory.
 
@@ -109,24 +139,4 @@ folder::
     cd solps-gui
     make solps-iter # It may take several hours
 
-When it finishes compiling, the environment-module application can be used for
-loading the SOLPS-ITER environment::
-
-    cd solps-gui
-    module use modules
-    module av
-    --------------------- /local/work/solps-gui/modules ---------------------
-    blitz/1.0.0                           OpenBLAS/0.3.5
-    cmake/3.10.1                          paraview-plugin-edge/1.5
-    GGD/1.8.3                             ParaView/5.4.1
-    GLI/4.5.30                            PyQt5/5.9.1
-    gnuplot-widget/python-3.6.8-qt-5.9.1  Python/3.6.8
-    gnuplot/5.2.2-qt-5.9.1                Qt4/4.8.7
-    GR/0.0.94                             Qt5/5.9.1
-    imas/3.21.0/solps                     saxon/HE9-8-0-12J
-    libxml2/2.9.1                         SIP/4.19.13
-    MDSplus/stable_release-7-7-8          solps-gui/1.5
-    mscl/1.1.1                            solps-iter/3.0.7
-
-    module load solps-iter/3.0.7 # Current version
 
