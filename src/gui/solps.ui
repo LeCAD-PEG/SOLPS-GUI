@@ -974,6 +974,7 @@ should eventually stop the run.</string>
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <addaction name="actionDocumentation"/>
     <addaction name="actionAbout"/>
     <addaction name="actionAbout_Qt"/>
    </widget>
@@ -1007,6 +1008,11 @@ should eventually stop the run.</string>
   <action name="actionPreferences">
    <property name="text">
     <string>Preferences</string>
+   </property>
+  </action>
+  <action name="actionDocumentation">
+   <property name="text">
+    <string>Documentation</string>
    </property>
   </action>
  </widget>
