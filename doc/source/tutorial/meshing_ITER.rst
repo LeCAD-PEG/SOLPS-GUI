@@ -10,11 +10,11 @@ Meshing ITER Baseline scenario
 DivGeo
 ======
 
-As was done in C-mod tokamak tutorial, firstly we will use *DivGeo* and *Carre*
-to prepare the ITER tokamak geometry. The model will be later used for
-creating a mesh. Each input file used for creating the DivGeo model should be
-located in the ``baserun`` run directory. The following commands repare the
-``baserun`` input data needed for his tutorial::
+As in the C-mod tokamak tutorial, we will first use *DivGeo* and
+*Carre* to prepare the ITER tokamak geometry. The model will be used
+later to create a mesh. Any input file used to create the DivGeo model
+should be in the run directory :file:`baserun`. The following commands
+prepare the :file:`baserun` input data needed for this tutorial::
 
      $ stop
      $ cd runs/examples
@@ -23,9 +23,9 @@ located in the ``baserun`` run directory. The following commands repare the
 
 The list of files are:
 
- - ITER.org : Template file for the ITER
- - Baseline2008-li0.70.x4.equ: Equilibrium file
- - ITER\_*.dg : Prepared DivGeo files
+ - :file:`ITER.org` : Template file for the ITER
+ - :file:`Baseline2008-li0.70.x4.equ`: Equilibrium file
+ - :file:`ITER\_*.dg` : Prepared DivGeo files
 
 
 The EFIT equilibrium file  which describes ITER tokamak in this case is
@@ -41,26 +41,28 @@ us some problems when the fluid grid is generated::
 
     $ d2d baserun/Baseline2008-li0.70.x4.equ
 
-*DivGeo* can be started inside SOLPS GUI. The procedure is as follows. First
-start SOLPS GUI. SOLPS GUI will open with the **runs** tab.
+*DivGeo* can be started inside SOLPS GUI. The procedure is as follows.
+First start SOLPS GUI. SOLPS GUI will open with the **runs** tab.
 
 .. image:: divgeo_ITER_1a.png
    :align: center
 
 The ``baserun`` directory must be located under the
 ``${SOLPSTOP}/runs/examples/tutorial-DivGeo_ITER_baseline_scenario/``
-directory for SOLPS-ITER to work correctly. Moreover, the top directory
-``${SOLPSTOP}/runs`` needs to be listed in the
-:menuselection:`&Settings --> &Runs`, such as shown in the following image:
+directory for SOLPS-ITER to work correctly. Moreover, the top
+directory ``${SOLPSTOP}/runs`` needs to be listed in the
+:menuselection:`&Settings --> &Runs`, such as shown in the following
+image:
 
 .. image:: divgeo_ITER_1b.png
    :align: center
 
-Next select the correct device for environment variable ``DEVICE``. To do this
-click on :menuselection:`&Settings --> Preferences --> Settings`. You will see a group
-called **Environment variables** and in it *DEVICE*. There is a dropdown widget
-in which you can either select or add the device variable. In this case either
-select *iter* or write *iter* inside the edit area.
+Next select the correct device for environment variable ``DEVICE``. To
+do this click on :menuselection:`&Settings --> Preferences -->
+Settings`. You will see a group called **Environment variables** and
+in it *DEVICE*. There is a dropdown widget in which you can either
+select or add the device variable. In this case either select *iter*
+or write *iter* inside the edit area.
 
 .. image:: divgeo_ITER_1c.png
    :align: center
@@ -85,10 +87,10 @@ it to the ``baserun`` directory, alongside the equilibrium file.
 Import the ITER template
 ------------------------
 
-The ITER template geometry file is located in the ``baserun`` directory. We
-will load the template file with
-:menuselection:`&File --> &Import --> &Template`. Because the template
-extenstion is ``.tpl``, we have to change the filter in the DivGeo import dialog
+The ITER template geometry file is located in the ``baserun``
+directory. We will load the template file with :menuselection:`&File
+--> &Import --> &Template`. Because the template extenstion is
+``.tpl``, we have to change the filter in the DivGeo import dialog
 from ``*.ogr`` to ``*.tpl``.
 
 .. image:: divgeo_ITER_pre_1.png
@@ -126,7 +128,20 @@ new points:
    - ``(5130.15, -3828.01)``
 
 These are just points, now we have to connect them as shown in the following
-figures. Select the **middle mouse** function to ``Connect Points``.
+figures. Select the **middle mouse** function to :guilabel:`Connect Points`.
+
+.. note::
+
+   Functions of the buttons are governed by top list of selection
+   boxes maked with :guilabel:`L:`, :guilabel:`M:` and :guilabel:`R:`
+   that means left, middle and right mouse buttons respectively. If
+   you don't see :guilabel:`Connect Points` in the middle then you
+   need to select it from drop down. If you have a single mouse button
+   then you will need to change :guilabel:`L:` :guilabel:`Connect
+   Points` to and use just that. For using :guilabel:`Zoom/Pan` the
+   modifiers are with :kbd:`shift+click` to unzoom and
+   :kbd:`shift+drag` to pan.
+
 
 The external ports.
 
