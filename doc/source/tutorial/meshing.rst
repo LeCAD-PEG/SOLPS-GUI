@@ -976,9 +976,22 @@ The result is that there are no more magenta grids.
 .. image:: carre_19.png
    :align: center
 
-Bear in mind however that you are only
-modifying the \*.sno grid file. You will need to save your modifications by
-exporting the mesh :menuselection:`File --> Export --> Mesh`.
+Bear in mind however that you are only modifying the \*.sno grid file.
+You will need to save your modifications by exporting the mesh
+:menuselection:`File --> Export --> Mesh`. The export file is the
+correct mesh file, which must overwrite the mesh file with the same
+name in the :file:`baserun/` directory and not under
+:file:`~/solps-iter/modules/DivGeo/device/cmod/` as DivGeo always
+suggests.
+
+.. note:: Remember that there is another unmodified :file:`.sno` file
+   of the same name, which is saved by the *Convert* step (traduit)
+   under :file:`~/solps-iter/modules/DivGeo/device/cmod/` and will not
+   be used by *Triang* later on because the same filename will exists
+   under :file:`baserun/` that takes priority when running Uinp. That
+   is why modified mesh needs to be saved under :file:`baserun/`
+   directory.
+         
 
 Triang
 ======

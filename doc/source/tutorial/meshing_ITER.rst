@@ -23,7 +23,7 @@ prepare the :file:`baserun` input data needed for this tutorial::
 
 The list of files are:
 
- - :file:`ITER.org` : Template file for the ITER
+ - :file:`ITER.ogr` : DivGeo template file for the ITER tokamak 
  - :file:`Baseline2008-li0.70.x4.equ`: Equilibrium file
  - :file:`ITER\_*.dg` : Prepared DivGeo files
 
@@ -40,6 +40,15 @@ resolution of the equilibrium data. Using higher resolution equilibrium avoids
 us some problems when the fluid grid is generated::
 
     $ d2d baserun/Baseline2008-li0.70.x4.equ
+
+.. note:: Note that all DivGeo files saved as steps below have
+          hardcoded paths to other files. To be reused at next step
+          they need to be edited and under the :file:`baserun/`
+          directory. The easiest way to continue from specific step is
+          to open the :file:`ITER_step_x_*.dg` in DivGeo and save it
+          as :file:`ITER_baseline2008.dg` or similar under
+          :file:`baserun/` and should not change in next steps unless
+          used for achive saved elsewhere.
 
 *DivGeo* can be started inside SOLPS GUI. The procedure is as follows.
 First start SOLPS GUI. SOLPS GUI will open with the **runs** tab.
@@ -71,9 +80,22 @@ Now select your ``baserun`` folder in :menuselection:`&Runs` tab and click
 on the :guilabel:`&Populate Baserun` tab. Click inside the DivGeo area to
 start DivGeo. If you wish to dock it into SOLPS GUI, click once again inside
 DivGeo area after DivGeo appears in standalone window, as was done previously
-at the C-mod tokamak case.
+at the C-mod tokamak case. DivGeo window is not redrawn after tab change.
+Clicking inside docked area shows DivGeo window again.
 
-.. image:: divgeo_1d.png
+.. note::
+
+   Functions of the buttons are governed by top list of selection
+   boxes maked with :guilabel:`L:`, :guilabel:`M:` and :guilabel:`R:`
+   that means left, middle and right mouse buttons respectively. If
+   you don't see :guilabel:`Connect Points` in the middle then you
+   need to select it from drop down. If you have a single mouse button
+   then you will need to change :guilabel:`L:` :guilabel:`Connect
+   Points` to and use just that. For using :guilabel:`Zoom/Pan` the
+   modifiers are with :kbd:`shift+click` to unzoom and
+   :kbd:`shift+drag` to pan.
+
+.. image:: divgeo_ITER_1d.png
    :align: center
 
 Additionally the ``tutorial-DivGeo_ITER_baseline_scenario/`` contains DivGeo
@@ -123,25 +145,12 @@ new points:
  - The following points describe the middle external port
     - ``(8998.42, 1668.53)``
     - ``(8998.4, -425.311)``
- - User defined ports to mark the plot area on the divertor dome.
-   - ``(4750.31, -3712.12)``
-   - ``(5130.15, -3828.01)``
+ - User defined ports to mark the plot area on the divertor dome
+    - ``(4750.31, -3712.12)``
+    - ``(5130.15, -3828.01)``
 
 These are just points, now we have to connect them as shown in the following
 figures. Select the **middle mouse** function to :guilabel:`Connect Points`.
-
-.. note::
-
-   Functions of the buttons are governed by top list of selection
-   boxes maked with :guilabel:`L:`, :guilabel:`M:` and :guilabel:`R:`
-   that means left, middle and right mouse buttons respectively. If
-   you don't see :guilabel:`Connect Points` in the middle then you
-   need to select it from drop down. If you have a single mouse button
-   then you will need to change :guilabel:`L:` :guilabel:`Connect
-   Points` to and use just that. For using :guilabel:`Zoom/Pan` the
-   modifiers are with :kbd:`shift+click` to unzoom and
-   :kbd:`shift+drag` to pan.
-
 
 The external ports.
 
@@ -155,8 +164,11 @@ Now on the divertor area, the location what to connect is marked with squares.
 .. image:: divgeo_ITER_4.png
    :align: center
 
-.. note::
-   This step is available in ``ITER_step_1_template.dg``
+.. note:: At this point a copy of :file:`ITER_baseline2008.dg` was saved as
+   :file:`ITER_step_1_template.dg` only for archival purposes outside
+   :file:`baserun/` directory. If you want to save your DG file use
+   :file:`ITER_baseline2008.dg` as filename saved under
+   :file:`baserun/` directory at any time.
 
 It is very important that all surface normals are pointing away from the
 plasma. This convention is required by later steps in the grid triangulation
@@ -166,13 +178,22 @@ button) somewhere on the vessel wall and all of the normals should flip.
 
 .. image:: divgeo_ITER_5.png
    :align: center
+      
+Do not be alarmed if you see normals in the bottom area facing
+"towards" the plasma. If you ``zoom`` into that area, you will see
+that the normals are facing away from plasma. :numref:`divgeo_ITER_5a`
+shows details how the normals should be directed.
 
-Do not be alarmed if you see normals in the bottom area facing "towards" the
-plasma. If you ``zoom`` into that area, you will see that the normals are
-facing away from plasma.
+.. figure:: divgeo_ITER_5a.*
+   :name: divgeo_ITER_5a
+   :align: center
+
+   Detail view of normals in divertor area.
+      
 
 .. note::
-   This step is available in ``ITER_step_2_revesre_normals.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_2_reverse_normals.dg`
+
 
 Import ITER baseline scenario geometry
 --------------------------------------
@@ -191,6 +212,10 @@ and make sure that the :guilabel:`Equilibrium` radio button is pressed.
 
 .. image:: divgeo_ITER_6.png
    :align: center
+      
+.. note::
+   To show or hide (equilibrium, grid, external points, ...), just go
+     to the :menuselection: '&View -- > &Display -- > &Equilibrium',
 
 Setting the magnetic topology
 -----------------------------
@@ -208,7 +233,7 @@ modelling grid should have. You can choose it by opening
 For ITER baseline scenario case select SN.
 
 .. note::
-   This step is available in ``ITER_step_3_equilibrium_and_topology.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_3_equilibrium_and_topology.dg`
 
 Defining the extent of the targets
 ----------------------------------
@@ -234,7 +259,7 @@ facing inwards the polygon.
    :align: center
 
 .. note::
-   This step is available in ``ITER_ste_4_defining_the_extent_of_targets.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_4_defining_the_extent_of_targets.dg`
 
 Setting the "Structure" variable for "Structure"
 ------------------------------------------------
@@ -251,8 +276,12 @@ segment will un-select it. When the highlighting is complete, left-click on
 .. image:: divgeo_ITER_9.png
    :align: center
 
-And with a more detail shown what is selected in the bottom area. Note that the
-marked elements with rectangles are **not** included.
+And with a more detail shown what is selected in the bottom area.
+
+.. note::
+   Note that the marked elements with rectangles are **not**
+   included. Pay attention to the two small lines on the divertor area
+   and make sure they are selected.
 
 .. image:: divgeo_ITER_10.png
    :align: center
@@ -273,7 +302,7 @@ The same steps are used for setting the outer target.
    :align: center
 
 .. note::
-   This step is available in ``ITER_step_5_structure.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_5_structure.dg`
 
 
 Setting elements that are to be ignored by EIRENE
@@ -294,25 +323,27 @@ Setting the elements that are used by B2plot
 
 Defining the wall surfaces that will be written to the mesh.extra file, that
 defines the wall specification in B2plot, can be done opening the
-:menuselection:`&Variables --> &Add --> &Input to b2plot`
+:menuselection:`&Variables --> &Add --> &Input for b2plot`
 
 Select everything in the core region. Select the targets without the element
 behind the target.
 
-In the divertor area, there are elements that are grouped in two or three.
-
-.. todo::
-
-   Better description of what to do in the divertor area
-
 .. image:: divgeo_ITER_14.png
    :align: center
+      
+In the Divertor area there are elements grouped into two or three, as
+can be seen in the next image. The two small lines circled red
+in :numref:`divgeo_ITER_15` must not NOT be marked (selected).
 
-.. image:: divgeo_ITER_15.png
+.. figure:: divgeo_ITER_15.*
+   :name: divgeo_ITER_15
    :align: center
 
+   Details of selected lines. Yellow circles zoomed on the right show
+   which segments should be marked.
+
 .. note::
-   This step is available in ``ITER_step_6_not_for_Eirene_and_b2plot.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_6_not_for_Eirene_and_b2plot.dg`
 
 Setting the target specifications
 ---------------------------------
@@ -377,7 +408,7 @@ divertor knee.
    :align: center
 
 .. note::
-   This step is available in ``ITER_step_7_target_specification.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_7_target_specification.dg`
 
 Poloidal grid points
 --------------------
@@ -388,10 +419,10 @@ divertor legs and the SOL.
 
 Click :menuselection:`&Edit --> &Create --> &Grid points`.
 
-Set the Zone to Inner divertor and Cells to 18. The distribution of the cells
+Set the Zone to Inner divertor and Cells to 20. The distribution of the cells
 can be adjusted by left-clicking and dragging the black line on the plot.
 Then click Create to update the workspace. Repeat for the outer divertor. Set
-48 points in the SOL, with a roughly uniform distribution of points. The
+50 points in the SOL, with a roughly uniform distribution of points. The
 spacing of the grid points around the x-point should be symmetric.
 
 .. image:: divgeo_ITER_20.png
@@ -399,18 +430,18 @@ spacing of the grid points around the x-point should be symmetric.
 
 Repeat for the outer divertor.
 
-Set 48 points in the SOL, with a roughly uniform distribution of points
+Set 50 points in the SOL, with a roughly uniform distribution of points
 (a straight line on the grid point distribution plot).
 
 The spacing of the grid points around the x-point should be symmetric. Meaning
 that set the grid points for SOL, click the :guilabel:`Reset` button and assign
-48 cells.
+50 cells.
 
 .. image:: divgeo_ITER_21.png
    :align: center
 
 .. note::
-   This step is available in ``ITER_step_8_grid_points.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_8_grid_points.dg`
 
 Radial surfaces
 ---------------
@@ -419,7 +450,7 @@ The radial surfaces in DG define the boundaries between rings on the Carre
 grid.
 Click :menuselection:`&Edit --> &Create --> &Surfaces...`
 
-Set 18 surfaces in the SOL.
+Set 24 surfaces in the SOL.
 
 Adjust the radial distribution to give higher spatial resolution near the
 separatrix.
@@ -427,14 +458,18 @@ separatrix.
 .. image:: divgeo_ITER_22.png
    :align: center
 
-Set 18 surfaces in the PFR.
+Set 12 surfaces in the PFR.
 
 .. image:: divgeo_ITER_23.png
    :align: center
 
+.. note::
+   If the step Radial surfaces do not work and get message
+   `"Iregullar point"`, check all normals of the model that are directed
+   in the right direction as those of the previously saved model.
 
-For the core region it is necessary to add a surface which will define the
-extent to which the grid penetrates into the core.
+For the core region it is necessary to add a surface which will define
+the extent to which the grid penetrates into the core.
 
 Assign "Add surface" to the middle mouse button.
 
@@ -445,13 +480,17 @@ happy with the location of the inner radial boundary.
    :align: center
 
 The number of radial surfaces in the core must be the same as for the PFR, i.e.
-18 in this case, using :menuselection:`&Edit --> &Create --> &Surface(s)...`
+12 in this case, using :menuselection:`&Edit --> &Create --> &Surface(s)...`
 
 .. image:: divgeo_ITER_25.png
    :align: center
 
 .. note::
-   This step is available in  ``ITER_step_9_radial_surfaces.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_9_radial_surfaces.dg`
+
+
+If you want to close yellow lines that are surfaces click on
+:menuselection:`&View -- > &Display -- > &Surfaces`
 
 
 Setting the shadowing structure
@@ -461,12 +500,13 @@ The shadowing structure is the set of physical wall elements that can receive
 light from the plasma (or its reflections). It is used to compute the radiative
 contribution to the wall heat loads.
 
-Click :menuselection:`V&ariables --> &Add --> Shadowing structure`
+Click :menuselection:`V&ariables --> &Add --> &Shadowing structure`
 
 First unselect everything with :kbd:`Ctrl + U`
 
 Mark all the segments likely to receive light from the plasma. The shadowing
 structure must be continuous and closed.
+In the area where there are 3 lines, choose the outer line.
 
 .. image:: divgeo_ITER_26.png
    :align: center
@@ -478,7 +518,7 @@ Adding some core radiation
 To include core radiation in the wall heat loads, one needs to specify the
 amount of core radiation (in `MW`).
 
-Click :menuselection:`Variables --> Add --> Radiation sources`
+Click :menuselection:`&Variables --> &Add --> &Radiation sources`
 
 Enter in the "Radiated Power" field the amount of core
 radiation (in "MW") then specify the location from where this core
@@ -495,7 +535,7 @@ display them) are shown as white asterisks in the DG model.
    :align: center
 
 .. note::
-   This step is available in  ``ITER_step_10_radiation.sources.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_10_radiation.sources.dg`
 
 Defining "plot zones"
 ---------------------
@@ -505,14 +545,12 @@ contrabutions from the plasma particles, Eirene neutrals and radiation can
 be computed by b2plot. You add them by clicking
 :menuselection:`&Variables --> &Add --> &Plot zone`
 
-Unselect everythin with :kbd:`Ctrl + U`
-
-and mark the set of elements that you want to include in the plot zone.
-Mark the "Starting element", i.e. the first element of the plot zone set, such
-that, as you travel along the plot zone set, the plasma is to your LEFT.
-Give the zone a label (`Zone-label`) that will be used in
-the files created by b2plot (8 characters maximum, no spaces, stars or
-ellipses).
+Unselect everything with :kbd:`Ctrl + U` and mark the set of elements
+that you want to include in the plot zone. Mark the "Starting
+element", i.e. the first element of the plot zone set, such that, as
+you travel along the plot zone set, the plasma is to your LEFT. Give
+the zone a label (`Zone-label`) that will be used in the files created
+by b2plot (8 characters maximum, no spaces, stars or ellipses).
 
 We will make 6 plots:
 
@@ -523,8 +561,8 @@ We will make 6 plots:
  - PFR region
  - First wall
 
-The figures will show what are are selected for the plots and a rectangle
-showing which is the starting element
+The following figures show what is selected for the plots and the green rectangles
+are showing the starting element.
 
 .. figure:: divgeo_ITER_28.png
    :align: center
@@ -546,18 +584,25 @@ showing which is the starting element
 
    Full divertor
 
+In the divertor aread, where three lines are close together, choose the outer line.
+
 .. figure:: divgeo_ITER_32.png
    :align: center
 
    PFR region
+
+Where two lines are together choose the inner line.
 
 .. figure:: divgeo_ITER_33.png
    :align: center
 
    First wall
 
+Check all defined plot zones with :menuselection: '&Variables -- > &Plot-Zone'.
+
 .. note::
-   This step is available in  ``ITER_step_11_plots.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_11_plots.dg`
+
 
 Configuring the plasma species to be included in the simulations
 ----------------------------------------------------------------
@@ -580,7 +625,7 @@ instead choose to load the reactions from an AMDS file, using:
 and giving the name of the AMDS file requested. The number of AMDS files to
 be loaded is not limited. These files are to be found in the::
 
-    $SOLPSTOP/modules/AMDS directory.
+    $SOLPSTOP/modules/amds directory.
 
 
 In this case we will use the species as shown in the following figure. Set the
@@ -594,8 +639,7 @@ We will set a "Reference to AMDS" with
 ``AMDS file`` set the value to ``ALL-He_el.amds``.
 
 .. note::
-   This step is available in
-   ``ITER_step_12_plasma_species_and_AMDS_reference.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_12_plasma_species_and_AMDS_reference.dg`
 
 Gass puff
 ---------
@@ -607,7 +651,7 @@ Click on :menuselection:`V&ariables --> &Add --> Gass puff`.
 For **D2** we will set the the puffed flux to ``2.70e22``, minimum history to
 500 and initialisation at 6001.
 
-For **Ne** we will set the the puffed flux to ``3.e20``, minimum history to
+For **Ne** we will set the the puffed flux to ``3.e22``, minimum history to
 500 and initialisation at 6001.
 
 For both of these we select the same area.
@@ -616,7 +660,7 @@ For both of these we select the same area.
    :align: center
 
 .. note::
-   This step is available in ``ITER_step_13_gass_puff.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_13_gass_puff.dg`
 
 Surface special
 ---------------
@@ -629,7 +673,7 @@ can change it easily from B2 input data.
 We will set "Surface special" with
 :menuselection:`&Variables --> &Add --> &Surface special`. First we wil create
 the pump **Surface special**.Set the values and mark the areas as shown in the
-following image.
+following image. Mark the outer line.
 
 .. image:: divgeo_ITER_36.png
    :align: center
@@ -653,7 +697,7 @@ should have 32 elements marked.
    :align: center
 
 .. note::
-   This step is available in ``ITER_step_14_surface_special.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_14_surface_special.dg`
 
 PFR surface group
 -----------------
@@ -662,10 +706,10 @@ The purpose of "PFR surface group" is the same as "Surface special".
 
 We will create three "PFR surface groups" for the PFR region.
 
-Click on :menuselection`&Variables --> &Add --> PFR surface group`. In this
+Click on :menuselection:`&Variables --> &Add --> PFR surface group`. In this
 case. First set the middle mouse to `Mark`. Then when you select the areas,
 click with :kbd:`Shift + Middle Mouse` in the inner are of the PFR region
-(that is under the divertor dome). In all cases, 8 elements will be marked.
+that is under the divertor dome). In all cases, 8 elements will be marked.
 
 .. image:: divgeo_ITER_39.png
    :align: center
@@ -701,7 +745,7 @@ following image.
    :align: center
 
 .. note::
-   This step is available in ``ITER_step_15_special_groups.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_15_special_groups.dg`
 
 Grid Edge default
 -----------------
@@ -728,9 +772,11 @@ to 10.0, which will generate large triangles.
 .. image:: divgeo_ITER_45.png
    :align: center
 
-Press kbd:`Ctrl + U` to unmark everything.
+To display the index values, right-click in the index field and select Show Values.
 
-Mark the the wall segments in the PFR, including the "PFR edge" elements. Set
+Press :kbd:`Ctrl + U` to unmark everything.
+
+Mark the wall segments in the PFR, including the "PFR edge" elements. Set
 index to ``-2`` in the dialogue box, and "General Triangle size" to 10.0.
 
 .. image:: divgeo_ITER_46.png
@@ -739,7 +785,7 @@ index to ``-2`` in the dialogue box, and "General Triangle size" to 10.0.
 .. image:: divgeo_ITER_47.png
    :align: center
 
-Press kbd:`Ctrl + U` to unmark everything.
+Press :kbd:`Ctrl + U` to unmark everything.
 
 Mark the divertor dome. Set the index to ``3`` in the dialogue box, and
 "General Triangle size" to 10.0.
@@ -748,7 +794,7 @@ Mark the divertor dome. Set the index to ``3`` in the dialogue box, and
    :align: center
 
 .. note::
-   This step is available in ``ITER_step_16_void_regions.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_16_void_regions.dg`
 
 Local refinement of the EIRENE triangle grid
 --------------------------------------------
@@ -779,11 +825,15 @@ In this case set the values as shown in the following image
    :align: center
 
 .. note::
-   This step is available in ``ITER_step_17_global_settings.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_17_global_settings.dg`
 
 
 Write the output data files that are needed by later steps
 ----------------------------------------------------------
+
+Save your DivGeo work as :file:`ITER_baseline2008.dg` filename saved
+under :file:`baserun/` directory.
+
 
 With the :menuselection:`Commands --> Check variables` you can check if all
 variables have valid values.
@@ -798,13 +848,16 @@ Then click on:
   2. :menuselection:`File --> Save`
   3. :menuselection:`File --> Output`
 
-The last command will create three files:
+The last command will create three files, where <DG_model_name> will
+be :file:`ITER_baseline2008`:
 
   - **<DG_model_name>.dgo**, the DG "output" file
   - **<DG_model_name>.str**, the "structure" file (used by Carre)
   - **<DG_model_name>.trg**, the "targets" file (used by Carre)
 
+  
 And you are set to go to the next part of tutorial.
+
 
 Carre
 =====
@@ -814,49 +867,62 @@ plasma grid using Carre.
 
 Switch to Carre tab in SOLPS-GUI.
 
-.. image:: carre_1.png
+.. figure:: carre_ITER_1.png
    :align: center
+   :name: fig:carre_1
+   
+   Initial Carre tab with selected "baserun" shown in the status line.
 
-This tab is grouped into two sections, upper and lower half. The upper half
-is self assessment of Carre for the current baserun. Checkboxes, which are
-clickable tells the user which steps were already run and the *DG model* drop
-down button tells us which DivGeo model has been used to create the plasma
-grid.
+This tab is grouped into two sections (see :numref:`fig:carre_1`),
+upper and lower half. The upper half is a self assessment of Carre for
+the current baserun. Checkboxes, which are clickable tells the user
+which steps were already run and the *DG model* drop down button tells
+us which DivGeo model has been used to create the plasma grid. This
+self assesed checkboxes are then saved in the :file:`baserun/.status`
+file and can be information only or can be used by Carre to do some
+actions. For example, if :guilabel:`lns` is checked then
+:command:`lns` script will not be run when you press :guilabel:`Start
+Carre`.
 
 .. note::
 
   If the list does not contain a DG model, you have to rescan the baserun dir
   with clicking the :guilabel:`Update DG list`.
 
-The lower half is the interface to the Carre. On the left side are control
-buttons and on the right we have a log window which shows us the output of
-Carre. Underneath the log window we have the response widgets for Carre. The
-manual input button spawns an **input dialog** in which we will write the
-parameters value when needed and the *Yes* and *No* button are used for yes/no
-(y/n) questions, given by Carre.
+The lower half is the interface to the Carre. On the left side are
+control buttons and on the right we have a log window which shows us
+the output of Carre. Underneath the log window we have the response
+widgets for Carre. The manual input button spawns an **input dialog**
+in which we will write the parameters value when needed and the
+:guilabel:`Yes` and :guilabel:`No` button are used for yes/no (y/n)
+questions, given by Carre.
 
 Starting Carre
 --------------
 
-Before starting carre we must first select our *DivGeo model*, we created
-previously. Simply click on the drop down button under ``DG model`` and there
-should be the name of our *DivGeo model*.
-Click on it so it is selected.
+Before starting Carre we must first select our *DivGeo model*, we
+created previously. Simply click on the drop down button under ``DG
+model`` and there should be the name of our *DivGeo model*. Click on
+:file:`ITER_baseline2008.dg`, so it is selected. 
 
-The reason why this must be done is that for the first time a linking
-has to be made against the *DivGeo model*, so that the proper files and their
-formats are copied to the correct locations.
+The reason why this must be done is that for the first time a symbolic
+linking (using :command:`ln -s` with the script named ``lns``) has to
+be made against the *DivGeo model*, so that the proper files and their
+formats are copied to the correct locations. Before you press
+:guilabel:`Start Carre`, make sure that the checkbox for
+:command:`lns` is not ticked.
 
-For more information search the ``solps-iter/scripts`` folder and run the
-``lns`` script.
+For more information search run the ``lns`` script that can be found
+under the :file:`solps-iter/scripts` directory.
 
 Now we can click the button :guilabel:`Start Carre` to start Carre. This will
 take a while since the environemnt of *SOLPS-ITER* has to be loaded to a TCSH
 shell before Carre can be started.
 
-Notice that the ``lns`` check box was ticked. Whenever you will want to redo
-the linking with ``lns`` just untick it before clicking
-:guilabel:`Start Carre`.
+.. note::
+   Note that the checkbox ''lns'' and ''dgModel'' has been automatically
+   activated. Whenever you will want to redo the linking with ``lns``
+   just untick it before clicking :guilabel:`Start Carre`.
 
 After a while the following output should be shown in the log window.
 
@@ -869,7 +935,7 @@ Prepare
 This step reads the DG files and translates them into the format needed by
 Carre.
 
-Click on widget :guilabel:`Prepare`. If there is no error the output should be
+Click on button :guilabel:`Prepare`. If there is no error the output should be
 as in the following figure
 
 .. image:: carre_ITER_1.png
@@ -883,7 +949,7 @@ Now we click on the checkbox :guilabel:`Prepare`.
 Gridding step
 -------------
 
-Click the :guilabel:`Grid`. Soon a first question will appear, whether the *X-*
+Click the button :guilabel:`Grid`. Soon a first question will appear, whether the *X-*
 and *O-* points identified by Carre are correct (they usually are). If they are
 not, then, you refuse the selection and indicate yourself which of the extrema
 are *X-* and *O-* points.
@@ -900,27 +966,35 @@ From the log window the following output should be seen
 
 .. image:: carre_ITER_3.png
    :align: center
-
-The are more parameters printed if you scroll up, but no errors were reported.
+      
+There are more parameters printed if you scroll up, but no errors were reported.
 If you would accept them by pressing :guilabel:`Yes`, the following text would
 be displayed in the log window
 
 .. image:: carre_ITER_4.png
    :align: center
 
-As the error message says that the relaxation parameters are not correct. If
-you pressed :guilabel:`Yes`, then you would have to click on the
-:guilabel:`Grid` again to start the process again; that is saying
-yes to the *X-* and *O-* points.
+As the error message says that the relaxation parameters are not
+correct and asks do we wish to continue. Press :guilabel:`No` to quit
+the meshing.
 
-Now instead of pressing :guilabel:`Yes`, press :guilabel:`No`, then Carre will
-ask us for input, to change the grid parameters.
+.. note::
+
+  If you pressed :guilabel:`Yes`, then you would have to click on the
+  :guilabel:`Grid` again to start the process again; that is saying
+  yes to the *X-* and *O-* points.
+
+Click on the :guilabel:`Grid` again to restart the meshing process and
+accept the selection again with :guilabel:`Yes`.
+
+Now instead of pressing :guilabel:`Yes` for accepting values, press :guilabel:`No`.
+Carre will ask us for input to change the grid parameters.
 
 .. image:: carre_ITER_5.png
    :align: center
 
 So now we click on :guilabel:`Terminal input`, which shows a dialog in which
-we will write:
+we will write (copy and paste):
 
  | tgarde(1)=0.8
  | tgarde(2)=0.8
@@ -932,8 +1006,10 @@ we will write:
 .. image:: carre_ITER_6.png
    :align: center
 
-And click on ``Ok``. Then Carre again asks us if we wish to accept the values.
-We Click on the widget :guilabel:`Yes`.
+And click on :guilabel:`OK`.
+
+.. Then Carre again asks us if we wish to accept the values once again.
+.. We Click on the button :guilabel:`Yes`.
 
 Now we will get no error message but instead the following output
 
@@ -948,10 +1024,11 @@ Now we check the check box for *Grid*, as we have completed this step.
 Saving the grid parameters
 --------------------------
 
-If you wish to remember the settings change you made, click the
-:guilabel:`SaveChoice` button. The grid parameters are then written in the
-**carre.dat** file. If you wish to re-use these parameters, skip the
-``Prepare`` step in your next invocation of the carre script.
+If you want to save the changes you have made to the settings, click
+on the button :guilabel:`SaveChoice`. The grid parameters are
+then written to the **carre.dat** file. If you want to reuse these
+parameters, skip the step ``Prepare`` the next time you call the carre
+script.
 
 It is good to also check the :guilabel:`SaveChoice` check box, so it is noted
 that the grid parameters were changed.
@@ -988,9 +1065,10 @@ Sometimes you will get an error message saying:
 
   No traduit.out. Convert the grid first.
 
-Even though we did Convert the grid successfully. In this case sometimes
-convert doesn't work, even though it produces a normal output. Run it again and
-try to store the grid files again.
+Even though we did Convert the grid successfully. In this case
+sometimes convert doesn't work, even though it produces a normal
+output. Run it again from the Convert step and try to store the grid
+files again.
 
 And check the checkbox for *Store*.
 
@@ -1003,10 +1081,11 @@ Inspecting the mesh
 Now we will check the generated mesh. Switch over to the DivGeo tab and if you
 have closed DivGeo, reopen it and if you wish dock it.
 
-Load the DivGeo file.
+:menuselection:`File --> Open` the last DivGeo file
+:file:`baserun/ITER_baseline2008.dg`.
 
-In DivGeo click on :menuselection:`File --> Import --> Mesh` and open
-``*.dg.sno`` file. Note that DG can only read files in the
+Then in DivGeo click on :menuselection:`File --> Import --> Mesh` and open
+last generated :file:`*.sno` file. Note that DG can only read files in the
 Sonnet format (\*.sno).
 
 .. image:: carre_ITER_10.png
@@ -1016,14 +1095,16 @@ You may see some grid cells that are outlined in magenta. These are concave
 cells that will yield errors when running Eirene and should be corrected before
 proceeding. Two methods are available.
 
-Changing grid parameters in Carre
----------------------------------
+Changing the grid parameters in Carre
+-------------------------------------
 
 The first is to go back to Carre and chose a different set of gridding
 parameters and try your luck or smarts against an ill-posed mathematical
 problem. This is where the Save option comes in handy!
 
 An easier way is the next method.
+
+.. _manualy_change_mesh_points:
 
 Manually change mesh points in DivGeo
 -------------------------------------
@@ -1039,13 +1120,32 @@ The result is that there are no more magenta grids.
 .. image:: carre_ITER_11.png
    :align: center
 
-Bear in mind however that you are only
-modifying the \*.sno grid file. You will need to save your modifications by
-exporting the mesh :menuselection:`File --> Export --> Mesh`.
+Note, however that you are only modifying the \*.sno grid file. You
+will need to save your modifications by exporting the mesh
+:menuselection:`File --> Export --> Mesh`. The export file is the
+correct mesh file, which must overwrite the mesh file with the same
+name in the :file:`baserun/` directory and not under
+:file:`~/solps-iter/modules/DivGeo/device/iter/` as DivGeo always
+suggests. You will need to dig up with :guilabel:`Direcories` using
+:file:`..` and then back down to
+:file:`runs/examples/tutorial-DivGeo_ITER_baseline_scenario/baserun`
+such as in the following dialog.
 
+.. image:: carre_ITER_11a.png
+   :align: center
+      
+.. note:: Remember that there is another unmodified :file:`.sno` file
+   of the same name, which is saved by the *Convert* step (traduit)
+   under :file:`~/solps-iter/modules/DivGeo/device/iter/` and will not
+   be used by *Triang* later on because the same filename will exists
+   under :file:`baserun/` that takes priority when running Uinp. That
+   is why modified mesh needs to be saved under :file:`baserun/`
+   directory.
+         
 .. note::
-   This step is available in ``ITER_18_mesh.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_18_mesh.dg`
 
+.. _He_pumping_data:
 
 He pumping data
 ---------------
@@ -1071,10 +1171,14 @@ Also set the other values in the dialog as shown in the image.
 
 .. note::
 
-   This step is available in ``ITER_19_he_pumping_data.dg``
+   At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_19_he_pumping_data.dg`
 
 Now we have to rebuild the DivGeo output files with
 :menuselection:`&File --> Out&put...`
+
+.. note:: If Carre step is repeated new mesh version is generated the
+   :ref:`manualy_change_mesh_points` and :ref:`He_pumping_data` steps
+   must be repeated too before we run Triang.
 
 Triang
 ======
@@ -1159,9 +1263,10 @@ mesh geometry used by Eirene.
 .. image:: triang_ITER_4.png
    :align: center
 
-This step will be skipped if a **fort.30** file is already present. If you are
-re-running triang to obtain a new geometry in an already populated directory,
-make sure you have removed the older b2ag.dat and fort.30 files beforehand.
+.. note::
+        This step will be skipped if a **fort.30** file is already present. If you are
+        re-running triang to obtain a new geometry in an already populated directory,
+        make sure you have removed the older b2ag.dat and fort.30 files beforehand.
 
 Eirene triangulation preparation run
 ------------------------------------
@@ -1280,5 +1385,4 @@ Head back to DivGeo tab and import the resulting templates with
 .. image:: triang_ITER_11.png
    :align: center
 
-.. note::
-   This step is available in ``ITER_step_20_final_grids.dg``
+.. note:: At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_20_final_grids.dg`
