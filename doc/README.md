@@ -4,7 +4,7 @@ Installing local packages at HPC-FS cluster
 ~~~ bash
 echo $0 # should print /bin/bash
 module use /opt/pkg/ITER/modules/all/
-module load PySide6/6.3.0-GCCcore-10.2.0
+module load PySide6/6.2.3-GCCcore-10.2.0
 module load double-conversion/3.1.5-GCCcore-10.2.0
 python3 -m venv local
 local/bin/pip3 install sphinx_rtd_theme
@@ -23,6 +23,7 @@ LATeX documentation in addition needs
 module load texlive/20210216-GCCcore-10.2.0
 make latexpdf
 firefox build/latex/SOLPS-GUI.pdf
+env --unset LD_LIBRARY_PATH okular build/latex/SOLPS-GUI.pdf
 ~~~
 
 
