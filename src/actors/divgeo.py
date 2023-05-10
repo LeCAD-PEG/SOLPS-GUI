@@ -30,9 +30,6 @@ class DivGeo(TcshProcess):
     the help of window Container (QWidget.createWindowContainer), which is
     a QWidget object.
 
-    In Qt5 there is no official x11 support, because it was dropped and
-    so far this is the only way to achieve embedding of external
-    applications.
 
     Furthermore, if we wish to embed an external application we need to get
     it's Window ID. It is used in the function QWindow.fromWinId(int WinId)
@@ -41,10 +38,8 @@ class DivGeo(TcshProcess):
 
        Embedding DivGeo is not always successful. It's hard to figure what
        is causing problems (Either QProcess or x11 window manager?).
-
-    TODO: Run solps-iter/scripts/dg directly to set environment
-          variables such as ``DEVICE, DG_IMPORT_TOPOLOGY_MASK``, ...
-
+       DivGeo window is not redrawn after tab change. Clicking inside docked 
+       area shows DivGeo window again.
 
     Attributes:
         _embedDivGeo (Signal): Signal used to run the function for
@@ -210,15 +205,15 @@ class DivGeo(TcshProcess):
         # Clean the layout first!
         self.clearLayout()
 
-        self.hide()
+        #self.hide()
         self._window = QWindow.fromWinId(self.DivGeoWID)
 
         self._container = QWidget.createWindowContainer(self._window,
                                                         self.parent(),
                                                         Qt.FramelessWindowHint)
-        self.Layout.addWidget(self._container)
-        self._container.show()
-        self.show()
+        self.layout().addWidget(self._container)
+        #self._container.show()
+        #self.show()
 
     @Slot()
     def startDivGeo(self):
@@ -301,6 +296,13 @@ class DivGeo(TcshProcess):
 
         return super(DivGeo, self).mousePressEvent(e)
 
+    #def showEvent(self, e):
+    #    if self._window is not None:
+    #        print("TEST"+str(e))
+    #
+    #        self._window.resize(500, 400)
+    #    super(DivGeo, self).showEvent(e)
+    # TODO: Force redraw after docking
 
 if __name__ == "__main__":
     @Slot()

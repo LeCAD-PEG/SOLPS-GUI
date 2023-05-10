@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """ A PyQt widget for Carre process.
 """
+# TODO Carre process is not killed when stopping the GUI and remains in
+# the list of processes.
 
 from PySide6.QtWidgets import (QPlainTextEdit, QVBoxLayout, QPushButton,
                              QGridLayout, QInputDialog, QComboBox, QSpacerItem,
@@ -107,6 +109,7 @@ class Carre(TcshProcess):
         self.tcsh.prcError.connect(self.updateError)
         self.tcsh.stdOutput.connect(self.updateText)
         self.tcsh.stdErrOutput.connect(self.updateError)
+        self.destroyed.connect(self.tcsh.close)
 
         self.currentRunDir = ''
         self.STATE = CarreState.notRunning
@@ -357,7 +360,7 @@ class Carre(TcshProcess):
                                       "in baserun: " + baserunDir)
                         break
         if self.vars[CarreVars.dgModel]:
-            self.selectDgModel.setCurrentText(self.vars[CarreVars.dgModel])
+            self.selectDgModel.setCurrentText(str(self.vars[CarreVars.dgModel]))
 
         self.setClickedGroupFromVars()
 
@@ -445,23 +448,6 @@ class Carre(TcshProcess):
         if ok:
             self.tcsh.write(msg + '\n')
             self.insertTextAtBottom(msg)
-
-    # The following doesn't work anymore since for some reason in pyside6
-    # the sender is returning None...
-    # @Slot()
-    # def runStep(self):
-    #     """Custom PushButtons emits signal to this function. They contain
-    #     attribute value which is then passed to tcsh if it is running.
-    #     """
-    #     if not self.tcsh.state():
-    #         return
-    #     if self.STATE == CarreState.waiting:
-    #         sender = self.sender()
-    #         print(sender)
-    #         if sender is not None:
-    #             self.appendToStatus(sender.text())
-    #             msg = sender.value + '\n'
-    #             self.tcsh.write(msg)
 
     @Slot()
     def runPrepare(self):
@@ -701,6 +687,7 @@ class Carre(TcshProcess):
             self.STATE = CarreState.notRunning
             msg = "Switched to another baserun, therefore stopped carre."
             self.textDisplay.appendPlainText(msg)
+   
 
 
 if __name__ == '__main__':

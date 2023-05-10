@@ -137,7 +137,9 @@ class Tcsh(QProcess):
         device = env.value('device_environment', 'iter')
         compiler = env.value('compiler_environment', 'ifort64')
         cmd = f'setenv DEVICE {device}\n'
-        cmd += f'source setup.csh {compiler}\necho TCSH READY\n'
+        cmd +=  'echo Using DEVICE=${DEVICE}\n' \
+               f'source setup.csh {compiler}\n' \
+                'echo TCSH READY\n'
         self.cwd = self.solpsTop
         self.write(cmd)
 
@@ -164,6 +166,15 @@ class Tcsh(QProcess):
                       ' the run is inside of a solps-iter?')
         return None
 
+    def close_process(self):
+        """Stop the QProcess gracefuly.
+        """
+
+        if self.state() == self.Running:
+            # Close the QProcess
+            self.kill()
+            self.waitForFinished()
+            self.close()            
 
 class TcshProcess(QWidget):
     """QWidget for creating custom widgets that requires TCSH terminal for
@@ -187,7 +198,7 @@ class TcshProcess(QWidget):
         self.tcshCommand = ''
         self.tcshCwd = ''
         self.tcsh = Tcsh(self)
-        self.destroyed.connect(self.tcsh.close)
+        self.destroyed.connect(self.tcsh.close_process)
         self.activateDebugging()
 
     def activateDebugging(self):
