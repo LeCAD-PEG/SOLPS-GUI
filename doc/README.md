@@ -12,6 +12,10 @@ local/bin/pip3 install sphinx_rtd_theme
 
 Subsequent runs under BASH
 ~~~ bash
+module use /opt/pkg/ITER/modules/all/
+module load PySide6/6.2.3-GCCcore-10.2.0
+module load double-conversion/3.1.5-GCCcore-10.2.0
+python3 -m venv local
 source local/bin/activate
 make html
 firefox build/html/index.html

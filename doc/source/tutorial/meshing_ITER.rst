@@ -214,8 +214,9 @@ and make sure that the :guilabel:`Equilibrium` radio button is pressed.
    :align: center
       
 .. note::
-   To show or hide (equilibrium, grid, external points, ...), just go
-     to the :menuselection: '&View -- > &Display -- > &Equilibrium',
+   To show or hide (equilibrium, grid, external points, ...),
+   just go to the :menuselection:`&View -- > &Display -- >
+   &Equilibrium`.
 
 Setting the magnetic topology
 -----------------------------
@@ -333,7 +334,7 @@ behind the target.
       
 In the Divertor area there are elements grouped into two or three, as
 can be seen in the next image. The two small lines circled red
-in :numref:`divgeo_ITER_15` must not NOT be marked (selected).
+in :numref:`divgeo_ITER_15` must NOT be marked (selected).
 
 .. figure:: divgeo_ITER_15.*
    :name: divgeo_ITER_15
@@ -598,7 +599,7 @@ Where two lines are together choose the inner line.
 
    First wall
 
-Check all defined plot zones with :menuselection: '&Variables -- > &Plot-Zone'.
+Check all defined plot zones with :menuselection:`&Variables -- > &Plot-Zone`.
 
 .. note::
    At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_11_plots.dg`
@@ -690,7 +691,7 @@ are elements in three lines cluttered together.
 .. image:: divgeo_ITER_37.png
    :align: center
 
-Mark the two outermost lines. Do the same on the other side. All in all you
+Mark the two outermost lines. Do the same on the other side. All you
 should have 32 elements marked.
 
 .. image:: divgeo_ITER_38.png
@@ -938,7 +939,7 @@ Carre.
 Click on button :guilabel:`Prepare`. If there is no error the output should be
 as in the following figure
 
-.. image:: carre_ITER_1.png
+.. image:: carre_ITER_1a.png
    :align: center
 
 Now we click on the checkbox :guilabel:`Prepare`.

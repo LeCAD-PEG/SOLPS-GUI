@@ -171,7 +171,7 @@ class Carre(TcshProcess):
         groupLayout = QVBoxLayout()
         self.selectDgModel = QComboBox()
         self.selectDgModel.addItem('')
-        self.selectDgModel.setSizePolicy(QSizePolicy(QSizePolicy.Preferred,
+        self.selectDgModel.setSizePolicy(QSizePolicy(QSizePolicy.Expanding,
                                                      QSizePolicy.Fixed))
         x = QPushButton('Update DG list')
         x.clicked.connect(self.updateDivGeoModel)
