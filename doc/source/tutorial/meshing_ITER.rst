@@ -122,6 +122,7 @@ Click on load and the geometry is now loaded.
 
 .. image:: divgeo_ITER_pre_2.png
    :align: center
+   :scale: 70%
 
 Converting the wall segments to geometry elements
 -------------------------------------------------
@@ -132,6 +133,7 @@ lines, which indicate the normal surfaces, will appear.
 
 .. image:: divgeo_ITER_2.png
    :align: center
+   :scale: 70% 
 
 Now we will add extra elements to define external ports and other user defined
 areas in the divertor area.
@@ -156,7 +158,8 @@ The external ports.
 
 .. image:: divgeo_ITER_3.png
    :align: center
-
+   :scale: 70%
+ 
 Now on the divertor area, the location what to connect is marked with squares.
 
 .. _divertorPoints:
@@ -178,7 +181,8 @@ button) somewhere on the vessel wall and all of the normals should flip.
 
 .. image:: divgeo_ITER_5.png
    :align: center
-      
+   :scale: 80%
+
 Do not be alarmed if you see normals in the bottom area facing
 "towards" the plasma. If you ``zoom`` into that area, you will see
 that the normals are facing away from plasma. :numref:`divgeo_ITER_5a`
@@ -212,6 +216,7 @@ and make sure that the :guilabel:`Equilibrium` radio button is pressed.
 
 .. image:: divgeo_ITER_6.png
    :align: center
+   :scale: 70%   
       
 .. note::
    To show or hide (equilibrium, grid, external points, ...),
@@ -258,7 +263,8 @@ facing inwards the polygon.
 
 .. image:: divgeo_ITER_8.png
    :align: center
-
+   :scale: 60%
+      
 .. note::
    At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_4_defining_the_extent_of_targets.dg`
 
@@ -276,7 +282,8 @@ segment will un-select it. When the highlighting is complete, left-click on
 
 .. image:: divgeo_ITER_9.png
    :align: center
-
+   :scale: 70%
+      
 And with a more detail shown what is selected in the bottom area.
 
 .. note::
@@ -286,7 +293,7 @@ And with a more detail shown what is selected in the bottom area.
 
 .. image:: divgeo_ITER_10.png
    :align: center
-
+   :scale: 70%
 
 :kbd:`CTRL+U` to unmark everything.
 
@@ -296,12 +303,14 @@ segments that are behind the target.
 
 .. image:: divgeo_ITER_11.png
    :align: center
-
+   :scale: 80%
+      
 The same steps are used for setting the outer target.
 
 .. image:: divgeo_ITER_12.png
    :align: center
-
+   :scale: 80%
+      
 .. note::
    At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_5_structure.dg`
 
@@ -315,7 +324,8 @@ the elements behind the targets and click `"Set”`.
 
 .. image:: divgeo_ITER_13.png
    :align: center
-
+   :scale: 80%
+      
 Only 6 elements are visible, but the two other are the small elements we
 created in :ref:`the divertor area <divertorPoints>`
 
@@ -331,6 +341,7 @@ behind the target.
 
 .. image:: divgeo_ITER_14.png
    :align: center
+   :scale: 70%
       
 In the Divertor area there are elements grouped into two or three, as
 can be seen in the next image. The two small lines circled red
@@ -440,6 +451,7 @@ that set the grid points for SOL, click the :guilabel:`Reset` button and assign
 
 .. image:: divgeo_ITER_21.png
    :align: center
+   :scale: 70%
 
 .. note::
    At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_8_grid_points.dg`
@@ -458,12 +470,14 @@ separatrix.
 
 .. image:: divgeo_ITER_22.png
    :align: center
-
+   :scale: 70%
+      
 Set 12 surfaces in the PFR.
 
 .. image:: divgeo_ITER_23.png
    :align: center
-
+   :scale: 70%
+      
 .. note::
    If the step Radial surfaces do not work and get message
    `"Iregullar point"`, check all normals of the model that are directed
@@ -479,13 +493,15 @@ happy with the location of the inner radial boundary.
 
 .. image:: divgeo_ITER_24.png
    :align: center
-
+   :scale: 80%
+      
 The number of radial surfaces in the core must be the same as for the PFR, i.e.
 12 in this case, using :menuselection:`&Edit --> &Create --> &Surface(s)...`
 
 .. image:: divgeo_ITER_25.png
    :align: center
-
+   :scale: 80%
+      
 .. note::
    At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_9_radial_surfaces.dg`
 
@@ -534,7 +550,8 @@ display them) are shown as white asterisks in the DG model.
 
 .. image:: divgeo_ITER_27.png
    :align: center
-
+   :scale: 80%
+      
 .. note::
    At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_10_radiation.sources.dg`
 
@@ -678,7 +695,8 @@ following image. Mark the outer line.
 
 .. image:: divgeo_ITER_36.png
    :align: center
-
+   :scale: 80%
+      
 Next is the PFR **Surface special**. Set the values as showing in the following
 image.
 
@@ -690,7 +708,8 @@ are elements in three lines cluttered together.
 
 .. image:: divgeo_ITER_37.png
    :align: center
-
+   :scale: 90%
+      
 Mark the two outermost lines. Do the same on the other side. All you
 should have 32 elements marked.
 
@@ -714,12 +733,15 @@ that is under the divertor dome). In all cases, 8 elements will be marked.
 
 .. image:: divgeo_ITER_39.png
    :align: center
-
+   :scale: 80%
+      
 .. image:: divgeo_ITER_40.png
    :align: center
+   :scale: 80%
 
 .. image:: divgeo_ITER_41.png
    :align: center
+   :scale: 80%
 
 Now the important part is to set the ``Surface type`` of the marked elements to
 -3.
@@ -1385,5 +1407,6 @@ Head back to DivGeo tab and import the resulting templates with
 
 .. image:: triang_ITER_11.png
    :align: center
+   :scale: 70%
 
 .. note:: At this point a copy of :file:`ITER_baseline2008.dg` was saved as :file:`ITER_step_20_final_grids.dg`
