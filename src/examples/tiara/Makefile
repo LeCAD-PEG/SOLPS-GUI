@@ -14,8 +14,8 @@ $(TARGETS) &: plot_traduit_out_b2us_or_b2fgmtry_examples.tar.gz
 
 local: ## Use: source local/bin/activate or local/bin/jupyter-notebook plot_traduit_out_b2us_or_b2fgmtry.ipynb
 	python3 -m venv local
-	local/bin/pip install --upgrade pip
-	local/bin/pip install jupyter matplotlib numpy
+	python3 -m pip install --upgrade pip
+	python3 -m pip install matplotlib>=3.5.0 jupyter numpy pyside6
 	local/bin/jupyter-notebook $(NOTEBOOK)
 
 run: $(TARGETS) local ## Unpacks and runs notebook example
@@ -23,7 +23,8 @@ run: $(TARGETS) local ## Unpacks and runs notebook example
 
 
 clean: ## Removes example files from Downloads and local environment
-	rm -fr $(TARGETS) local
+	mv local local.old
+	rm -fr $(TARGETS) local.old local
 	 
 
 help : # https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
