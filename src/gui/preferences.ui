@@ -613,6 +613,11 @@ Use 127.0.0.1 only for localsubmit.</string>
               <string>cmod</string>
              </property>
             </item>
+             <item>
+             <property name="text">
+              <string>compass</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item row="0" column="0">
