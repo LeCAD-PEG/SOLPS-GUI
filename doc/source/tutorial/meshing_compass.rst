@@ -166,7 +166,7 @@ too many wall elements (the maximum default value is 300).
 
 
 .. note::
-   At this point a copy of :file:`compass.dg` was saved as :file:`Compass_step_2_reduce_normals.dg`
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_2_reduce_normals.dg`
 
 
 Setting the magnetic topology
@@ -188,6 +188,8 @@ For COMPASS case select SN.
    :align: center
 
 
+.. note::
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_3_topology.dg`
 
 Defining the extent of the targets
 ----------------------------------
@@ -245,7 +247,7 @@ Connect the point with the points:
   
       
 .. note::
-   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_3_defining_targets.dg`
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_4_defining_targets.dg`
 
 Setting the "Structure" variable for "Structure"
 ------------------------------------------------
@@ -279,7 +281,7 @@ The same steps are used for setting the outer target.
 
       
 .. note::
-   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_4_structure.dg`
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_5_structure.dg`
 
 
 Setting elements that are to be ignored by EIRENE
@@ -292,6 +294,8 @@ the elements behind the targets and click `"Set”`.
 .. image:: Divgeo_compass_11.png
    :align: center
 
+.. note::
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_4_not_for_EIRENE.dg`
       
 Setting the target specifications
 ---------------------------------
@@ -356,7 +360,7 @@ divertor knee.
    :align: center
 
 .. note::
-   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_5_target_specification.dg`
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_7_target_specification.dg`
 
 Poloidal grid points
 --------------------
@@ -388,7 +392,7 @@ that set the grid points for SOL, click the :guilabel:`Reset` button and assign
 
 
 .. note::
-   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_6_grid_points.dg`
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_8_grid_points.dg`
 
 Radial surfaces
 ---------------
@@ -407,7 +411,7 @@ Then click :kbd:`Shift + Reverse normals` (middle button) and click on the norma
    If the normals are not correct will get message `"Iregullar point"`.
 
 .. note::
-   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_7_reverse_normals.dg`
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_9_reverse_normals.dg`
 
 The radial surfaces in DG define the boundaries between rings on the Carre.
 Click :menuselection:`&Edit --> &Create --> &Surfaces.`
@@ -422,7 +426,7 @@ separatrix.
 
 
 .. note::
-   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_8_radial_surfaces_a.dg`
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_10_radial_surfaces_a.dg`
 
 There is an issue in the PFR for this particular case: the flux surface which
 is tangent to the "knee" will miss the bottom of the outer target and cross the
@@ -471,7 +475,7 @@ At the inner target
 
 
 .. note::
-   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_8_radial_surfaces_b.dg`
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_10_radial_surfaces_b.dg`
 
 
 Add the new surfaces to the `"Elements not for Eirene"` variable – there should
@@ -497,7 +501,7 @@ Set 18 surfaces in the PFR.
       
       
 .. note::
-   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_8_radial_surfaces_c_pfr.dg`
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_10_radial_surfaces_c.dg`
 
 
 For the core region it is necessary to add a surface which will define
@@ -520,7 +524,7 @@ The number of radial surfaces in the core must be the same as for the PFR, i.e.
 
 
 .. note::
-   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_8_radial_surfaces_d_core.dg`
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_10_radial_surfaces_d.dg`
 
 To refresh the radial surfaces at the virtual structure up of the inner target once again add new radial surfaces
 (:menuselection:`&Edit --> &Create --> &Surfaces.`) and set the same values
@@ -530,7 +534,7 @@ To refresh the radial surfaces at the virtual structure up of the inner target o
 
 
 .. note::
-   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_8_radial_surfaces_e_new_surface.dg`
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_10_radial_surfaces_e.dg`
 
 If you want to close yellow lines that are surfaces click on
 :menuselection:`&View -- > &Display -- > &Surfaces`
@@ -568,7 +572,7 @@ values as written in the fields.
 
 
 .. note::
-   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_9_plasma_species.dg`
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_11_plasma_species.dg`
 
 General Surface parameters
 --------------------------
@@ -581,7 +585,7 @@ Set the values as written in the fields.
    :align: center
 
 .. note::
-   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_11_general_data.dg`
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_12_general_data.dg`
 
 
 EIRENE setup of the "void" regions outside the Carre grid
@@ -619,7 +623,7 @@ to 5.0.
    :align: center
 
 .. note::
-   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_12_tria-eirene_parameters.dg`
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_13_tria-eirene_parameters.dg`
 
 
 Choose the toroidal approximation
@@ -637,7 +641,7 @@ In this case set the values as shown in the following image
    :align: center
 
 .. note::
-   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_13_tria-eirene_parameters.dg`
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_14_global_settings.dg`
 
 
 Write the output data files that are needed by later steps
@@ -880,6 +884,9 @@ Sonnet format (\*.sno).
 You may see some that the grid cells are correct and can contuonue with the next
 step. 
 
+.. note::
+   At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_15_mesh.dg`
+
 Triang
 ======
 
@@ -1079,4 +1086,4 @@ Head back to DivGeo tab and import the resulting templates with
    :align: center
 
 
-.. note:: At this point a copy of :file:`ITER_compass.dg` was saved as :file:`COMPASS_step_14_final_grids.dg`
+.. note:: At this point a copy of :file:`compass.dg` was saved as :file:`COMPASS_step_16_final_grids.dg`
