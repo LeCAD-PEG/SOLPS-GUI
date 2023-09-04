@@ -11,14 +11,15 @@ be multi-user machine with several users and multi-core processors
 running several SOLPS runs at once and in the queue if the system is
 properly configured (see :ref:`submission-howto`).
 
-For this tutorial we will be using a simple, already fully converged
-reference case: ASDEX-Upgrade, D-only, B2.5 stand-alone, 1000 iterations
-that resides in ``/work/projects/solps-iter/bonninx/AUG_16151_D``.
-Normally this case runs about 5 minutes to finish.
+..
+   For this tutorial we will be using a simple, already fully converged
+   reference case: ASDEX-Upgrade, D-only, B2.5 stand-alone, 1000 iterations
+   that resides in ``/work/projects/solps-iter/bonninx/AUG_16151_D``.
+   Normally this case runs about 5 minutes to finish.
 
 .. note::
 
-   For running ``AUG_16151_D`` case you will need a compiled standalone
+   For running B2.5 standalone case you will need a compiled standalone
    version of the SOLPS-ITER which is non-default. To get B2.5 compiled you
    need to::
 
@@ -34,6 +35,7 @@ configuration.
 .. image:: runs_1.png
    :align: center
 
+.. _run_directories:
 
 Configure the runs directories
 ------------------------------
@@ -80,8 +82,11 @@ For demonstration only please resize the columns in the following manner:
    4. Enter AUG nearby the :guilabel:`Filter` and press :guilabel:`Filter`
    5. Optionally, clear the filter and resize again
 
+ITER run case
+-------------
+
 Setting Preferences
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 For this tutorial we will be using ``localsubmit`` script which is
 default submission procedure. Provisionally, nothing needs to be changed
@@ -100,8 +105,10 @@ and should not cause a problem unless some wierd UID assigments policy is
 used on the system. In that case users are advised to use next available
 port for their local server.
 
+.. _import_run:
+
 Importing the run
------------------
+~~~~~~~~~~~~~~~~~
 
 We can import the runs from other users and then modify them by
 simple configuration editor later on.
@@ -124,7 +131,7 @@ Please do the following steps to import the
    :align: center
 
 Editing configuration
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 You may edit newly imported run by selecting ``run_restart`` directory
 and presing :guilabel:`Edit` button that will load all available files.
@@ -142,7 +149,7 @@ For this case no editing is needed. One may hover the parameters to get
 the tooltip help extracted from the SOLPS manual.
 
 Starting the run
-----------------
+~~~~~~~~~~~~~~~~
 
 As ``ITER_2297_Honly_20MW/run_restart`` is ready to run case one can simply
 select it by clicking on tree-view as highlighted in the following image
@@ -174,7 +181,7 @@ copying end plasma state ``b2fstate`` to ``b2fstati`` and submitting in
 the usual :guilabel:`Run` way.
 
 Archive
--------
+~~~~~~~
 
 To simplify overall work within the *Runs tree-view* there is a possibility
 to (re)move selected trees for *Archive* tab. As usual we select the
@@ -196,7 +203,7 @@ tree and the archive the tree completely. However, as metioned before,
 restoring means filtering and tree hierarchy rules here.
 
 Log
----
+~~~
 
 Log tab collects messages that may appear on the status bar and messages
 from several processes and runs during the operation. User may, depending
@@ -206,7 +213,7 @@ messages.
 
 
 Analysis with the Dashboard
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Many SOLPS plots are available from the command line and shoud be issued
 under each directory. SOLPS GUI provides plots available for gnuplot within
@@ -242,81 +249,116 @@ moving to directories quickly.
 How to customize the *Dashboard* is described in the :ref:`dashboard`
 tutorial.
 
-ITER case 2171
---------------
+COMPASS case for AD optimization
+--------------------------------
 
-The ITER 2171 case located under ``/work/projects/solps-iter/bonninx/ITER``
-is larger than the default case, so you need to redimension your arrays
-and recompile SOLPS-ITER. This is done in the
-``$SOLPSTOP/modules/B2.5/src/include/DIMENSIONS.F`` file, which should
-be copied to ``$SOLPSTOP/modules/B2.5/src/include.local/DIMENSIONS.F``,
-then you would need to increase ``DEF_NATM`` to at least 4, ``DEF_NFL``
-to at least 21, and ``DEF_NPLS`` to at least 17. Then::
+The case is an unstructured, coarse grid (48x24) pure D COMPASS case with drifts
+and Advanced Fluid Neutrals, and kinetic neutrals without drifts. 
+This run case was produced as an example for the input parameter sensitivities 
+and optimization strategies in B2.5 using Algorithmic Differentiation (AD). For 
+a more detailed explanation of what is AD and how the optimization in B2.5 were done,
+see Sec. in the SOLPS-ITER manual
 
-  cd $SOLPSTOP ; gmake depend ; gmake
+Setting Preferences for COMPASS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The following ``diff`` output between original (<) and inceased (>) values
-describes necessary changes to
-``$SOLPSTOP/modules/B2.5/src/include.local/DIMENSIONS.F``.
+After configuring the run directory (see :ref:`run_directories`), 
+we have adjusted the preferences  :menuselection:`Settings --> Preferences` 
+for the COMPASS reactor. In this case, we will be using the ``itersubmit`` script
+with 1 node (:menuselection:`Preferences --> Run`.)
 
-.. code-block:: diff
-
-   19,21c19,21
-   < #define DEF_NFL 9
-   < #define DEF_NPLS 9
-   < #define DEF_NATM 3
-   ---
-   > #define DEF_NFL 21
-   > #define DEF_NPLS 17
-   > #define DEF_NATM 5
-   35c35
-   < #define DEF_NSRFS 2
-   ---
-   > #define DEF_NSRFS 4
-
-For running the case:
-
-1. :guilabel:`Import` the ``/work/projects/solps-iter/bonninx/ITER/2171``
-    case.
-
-2. Select the case and press :guilabel:`Edit` to change:
-    a) ``b2mn.dat`` :
-
-      .. code-block:: diff
-
-         45c45
-         > 'b2stbc_feedback'     '0'
-         ---
-         < 'b2stbc_feedback'     '1'
-
-    b) and in ``b2.boundary.parameters``:
-
-      .. code-block:: diff
-
-         18c18
-         <  BCCON(0, 6)=  10,   9,  10,   9,   9,  10,   9,   9,   9,   9,  11,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,
-         ---
-         >  BCCON(0, 6)=  10,   9,  10,   9,   9,  10,   9,   9,   9,   9,   8,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,
-         42c42
-         <  LBNDUSR=F, LFEEDBACK=T,
-         ---
-         >  LBNDUSR=F, LFEEDBACK=F,
-
-3. Open :menuselection:`Settings --> Preferences` and
-
-   a) change submission script from ``localsubmit`` to ``intersubmit``.
-   b) Change IP address of the GUI from localhost ``127.0.0.1`` to
-      ``hostname -i`` IP address from where you are submitting the jobs
-      (monitoring).
-      For example: Use 10.153.0.52 if you are submitting from
-      *hpc-app1.iter.org* and 10.153.0.16 for GUI running at
-      *hpc-login4.iter.org*.
-
-4. Press :guilabel:`Run` and observe if the case will run for 4 minutes. You
-   may use ``qstat`` or equvalent job scheduler command to observe your job
-   placement in the cluster. At start and end you should receive job status
-   updates directly to the GUI running runs status server at the port
-   specified. Finally, you should receive status:
-
-.. image:: runs_10.png
+.. image:: runs_11.png
    :align: center
+
+In :menuselection:`Preferences --> Settings` the name device should be chnage in compass.
+The monitoring port number is same. 
+
+.. image:: runs_12.png
+   :align: center
+
+Importing the run
+~~~~~~~~~~~~~~~~~
+
+The run case ``/work/projects/solps-iter/runs/examples/COMPASS_16515_1150ms_D_drift_AFN`` 
+can be imported using the same steps as were done for ITER (see :ref:`import_run`) 
+or can be selected from the run directory. 
+
+.. image:: runs_13.png
+   :align: center
+
+
+Editing configuration
+~~~~~~~~~~~~~~~~~~~~~
+
+``COMPASS_16515_1150ms_D_drift_AFN`` has two different run cases:
+
+- ``run_AFN_drifts``: fluid case with drifts and Advanced Fluid Neutrals
+
+- ``run_kin``: kinetic case without drifts
+
+
+The examples for optimization, are based on ``run_AFN_drifts`` but without drifts.
+There are different case setups depending of the cost functions:
+
+- example_optim_MAP_radial_dna_hce: case setup for running a Bayesian MAP estimation. It will optimize radially dependent particle and electron heat diffusion coefficients (6 points each), to match electron density n_e and temperature T_e at the OMP as well as their radial gradient at the OMP as cost function. The standard deviation SIGMA for n_e, T_e, and grad(T_e) cost functions is also optimized, while sigma of grad (n_e) is assumed to be known for this example. Optimization will run for 20 iterations.
+
+- example_optim_reg_dna_hce_necore: case setup for running a nonlinear regression estimation. It will optimize a constant particle and electron heat diffusion coefficient together with the core density BC for D+ ions, to match electron density n_e and temperature T_e at the OMP and at the target. Optimization will run for 15 iterations.
+
+- example_optim_map_dna_hce_gauss_prior: a simplified MAP estimation case based on reference_reg, using Gussian priors. Useful for testing MAP estimation for both tangent adn adjoint.
+
+- reference_map: reference case for the MAP estimation. Used to extract the synthetic cost function data and for plotting results.
+
+- reference_reg: reference case for the regression estimation. Used to extract the synthetic cost function data and for plotting results.
+
+.. image:: runs_14.png
+   :align: center
+
+In this tutorial we will use ``example_optim_reg_dna_hce_necore``. 
+
+To edit the input files we click on :guilabel:`Edit` button that will 
+load all available files. There is no save button. Modifications are saved 
+automatically when selecting other tabs. 
+
+.. image:: runs_15.png
+   :align: center
+
+If you want to understand the meaning of each input parameter, simply hover 
+the cursor over the parameter.
+
+
+Starting the run
+~~~~~~~~~~~~~~~~
+
+The case can be run by clicking :guilabel:`Run` button.
+
+.. image:: runs_16.png
+   :align: center
+
+Right away, in the status column, you should see the submission 
+command, which is ``itersubmit`` in this particular case. If there is no *batch* queue, 
+the GUI will receive a notification over the network from a background task to the localhost, 
+saying ``Submitted at ...`` along with a timestamp in the status.
+
+:guilabel:`Stop` button, stop method that reguest with
+the `b2mn.exe.dir/.quit` to exit after the current iteration completes.
+The :guilabel:`Continue` button permits the restart of previously stopped runs by copying the last plasma 
+state from b2fstate to b2fstati and then submitting it in the usual :guilabel:`Run` way.
+
+
+Analysis with the Dashboard
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When the case is ended 
+
+
+the ouput results can be analyzed with *dashboard*. By clicking the 
+:guilabel:`Dashboard` and selecting an option from the dropdown menu, 
+for example ``resall_D``, and then pressing the :guilabel:`Plot` button 
+the following *energy* analysis appears:
+
+
+.. image:: runs_17.png
+   :align: center
+
+How to customize the *Dashboard* is described in the :ref:`dashboard`
+tutorial.
