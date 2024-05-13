@@ -1,18 +1,18 @@
 # Extracts and shows some meshing examples from ITER, AUG and COMPASS
 
-EXAMPLES = traduit.out.b2us.standard b2fgmtry_st b2fgmtry traduit.out.b2us_iter traduit.out.b2us.target
+EXAMPLES = traduit.out.b2us.standard traduit.out.b2us_ITER traduit.out.b2us.target tiara.122408_4_b2us
 TARGETS = $(EXAMPLES:%=${HOME}/Downloads/%)
-NOTEBOOK = plot_traduit_out_b2us_or_b2fgmtry.ipynb
+NOTEBOOK = plot_traduit_out_b2us.ipynb
 
 all: $(TARGETS) local ## Unpacks example files under $HOME/Downloads and creates local environment
 
 query-%: ## For Makefile debugging. Example: make query-TARGETS
 	@echo $($(*))
 
-$(TARGETS) &: plot_traduit_out_b2us_or_b2fgmtry_examples.tar.gz
+$(TARGETS) &: plot_traduit_out_b2us_examples.tar.gz
 	tar xvmz -C ${HOME}/Downloads/ -f $^
 
-local: ## Use: source local/bin/activate or local/bin/jupyter-notebook plot_traduit_out_b2us_or_b2fgmtry.ipynb
+local: ## Use: source local/bin/activate or local/bin/jupyter-notebook plot_traduit_out_b2us.ipynb
 	python3 -m venv local
 	python3 -m pip install --upgrade pip
 	python3 -m pip install matplotlib>=3.5.0 jupyter numpy pyside6
