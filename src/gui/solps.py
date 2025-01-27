@@ -402,7 +402,7 @@ if __name__ == '__main__':
             self.preferences.read()
 
             self.main_tcsh = QProcess(self)  # for job submission and scripting
-            self.main_tcsh.setProcessChannelMode(self.main_tcsh.MergedChannels)
+            self.main_tcsh.setProcessChannelMode(QProcess.MergedChannels)
             self.main_tcsh.readyReadStandardOutput.connect(self.read_main_tcsh)
             self.solps_top = None  # Current active ${SOLPSTOP} for tcsh
 

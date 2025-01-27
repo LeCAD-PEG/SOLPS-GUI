@@ -170,7 +170,7 @@ class Tcsh(QProcess):
         """Stop the QProcess gracefuly.
         """
 
-        if self.state() == self.Running:
+        if self.state() == QProcess.Running:
             # Close the QProcess
             self.kill()
             self.waitForFinished()
