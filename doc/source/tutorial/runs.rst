@@ -249,8 +249,8 @@ moving to directories quickly.
 How to customize the *Dashboard* is described in the :ref:`dashboard`
 tutorial.
 
-COMPASS case for AD optimization
---------------------------------
+COMPASS case for Algorithmic Differentiation optimization
+---------------------------------------------------------
 
 The case is an unstructured, coarse grid (48x24) pure D COMPASS case with drifts
 and Advanced Fluid Neutrals, and kinetic neutrals without drifts. 
