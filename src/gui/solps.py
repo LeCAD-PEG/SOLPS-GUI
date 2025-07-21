@@ -983,7 +983,7 @@ if __name__ == '__main__':
         @Slot()
         def on_actionDocumentation_triggered(self):
             from subprocess import Popen
-            p = Popen("xdg-open ${HOME}/solps-gui/doc/build/html/index.html", shell=True, env=os.environ).wait()
+            p = Popen("env --unset LD_LIBRARY_PATH xdg-open ${HOME}/solps-gui/doc/build/html/index.html", shell=True, env=os.environ).wait()
 
     main_window = SOLPS_MainWindow()
     main_window.show()

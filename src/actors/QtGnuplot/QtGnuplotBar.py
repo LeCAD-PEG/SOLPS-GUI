@@ -200,9 +200,9 @@ class QtGnuplotBar(QToolBar):
         settings.setValue('statusBarActive', self.m_statusBarActive)
 
     def showSettingsDialog(self) -> None:
-        self.m_ui.antialiasCheckbox.setCheckState(2 if self.m_widget.antialias() else 0)
-        self.m_ui.roundedCheckBox.setCheckState(2 if self.m_widget.rounded() else 0)
-        self.m_ui.replotOnResizeCheckBox.setCheckState(2 if self.m_widget.replotOnResize() else 0)
+        self.m_ui.antialiasCheckbox.setCheckState(Qt.Checked if self.m_widget.antialias() else Qt.Unchecked)
+        self.m_ui.roundedCheckBox.setCheckState(Qt.Checked if self.m_widget.rounded() else Qt.Unchecked)
+        self.m_ui.replotOnResizeCheckBox.setCheckState(Qt.Checked if self.m_widget.replotOnResize() else Qt.Unchecked)
 
         if self.m_widget.statusLabelActive:
             self.m_ui.mouseLabelComboBox.setCurrentIndex(0)
