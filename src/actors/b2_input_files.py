@@ -287,7 +287,7 @@ class B2InputFiles(TcshProcess):
 
     @Slot()
     def runStep(self):
-        if not self.tcsh.state():
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             return
         if self.STATE == B2State.waiting:
             sender = self.sender()
@@ -297,7 +297,7 @@ class B2InputFiles(TcshProcess):
 
     @Slot()
     def manualInput(self):
-        if not self.tcsh.state():
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             return
         if not self.STATE >= B2State.waiting:
             return
@@ -321,7 +321,7 @@ class B2InputFiles(TcshProcess):
             self.textDisplay.appendPlainText('No baserun selected.')
             return
 
-        if self.tcsh.state():
+        if self.tcsh.state() != QProcess.ProcessState.NotRunning:
             self.tcsh.terminate()
             self.tcsh.close()
 
@@ -379,7 +379,7 @@ class B2InputFiles(TcshProcess):
         if oldSolpsTop != newSolpsTop:
             self.startTerminal()
         else:
-            if self.tcsh.state():
+            if self.tcsh.state() != QProcess.ProcessState.NotRunning:
                 self.STATE = B2State.notRunning
                 cmd = 'cd ' + runDir + '\n'
                 self.tcsh.write(cmd)

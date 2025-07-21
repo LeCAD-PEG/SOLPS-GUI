@@ -253,7 +253,7 @@ class DivGeo(TcshProcess):
 
     @Slot()
     def stopDivGeo(self):
-        if not self.tcsh.state():
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             message = "DivGeo not running."
             return
 

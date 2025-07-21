@@ -197,7 +197,7 @@ class InitializeRun(TcshProcess):
         return runDir
 
     def executeCommand(self, info, cmd):
-        if self.tcsh.state():
+        if self.tcsh.state() != QProcess.ProcessState.NotRunning:
             runDirectory = self.enterRunDirectory()
             if not runDirectory:
                 return
@@ -288,7 +288,7 @@ class InitializeRun(TcshProcess):
         a TCSH terminal or the expected input the ``carre`` scripts expect from
         the user.
         """
-        if not self.tcsh.state():
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             return
 
         runDirectory = self.enterRunDirectory()
@@ -345,7 +345,7 @@ class InitializeRun(TcshProcess):
 
         # TCSH terminal is running
         RUN = 1
-        if self.tcsh.state():
+        if self.tcsh.state() != QProcess.ProcessState.NotRunning:
             oldSOLPSTOP = self.tcsh.findSolpsTop(oldBaserunDir)
             newSOLPSTOP = self.tcsh.findSolpsTop(newRunDir)
             if oldSOLPSTOP == newSOLPSTOP:
@@ -380,7 +380,7 @@ class InitializeRun(TcshProcess):
     def stopB2mn(self):
         """Stops the :meth:`tcsh_process.Tcsh` and restarts it.
         """
-        if self.tcsh.state():
+        if self.tcsh.state() != QProcess.ProcessState.NotRunning:
             self.tcsh.kill()
             self.tcsh.terminate()
         self.textDisplay.appendPlainText('Stoped TCSH')

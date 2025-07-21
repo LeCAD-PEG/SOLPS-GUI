@@ -273,7 +273,7 @@ class PutIDS(TcshProcess):
 
         # Start the :attr:`tcsh` in the run directory
         self.startTcsh()  # Tcsh started in run directory
-        if not self.tcsh.state():
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             # Failed to start
             self.cleanUp()
 
