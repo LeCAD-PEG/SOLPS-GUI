@@ -2,7 +2,7 @@
 """ A PyQt custom DivGeo widget for Qt Designer.
 """
 
-from PySide6.QtCore import Qt, Signal, Slot, QSettings
+from PySide6.QtCore import Qt, Signal, Slot, QSettings, QProcess
 from PySide6.QtGui import QWindow
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QWidgetItem, QLabel, QFrame
 
@@ -221,7 +221,8 @@ class DivGeo(TcshProcess):
         coordinates, width and height for starting divgeo.
         """
 
-        if self.tcsh.state():
+        
+        if self.tcsh.state() != QProcess.ProcessState.NotRunning:
             return
 
         self.labelContainer = QLabel()
@@ -287,13 +288,13 @@ class DivGeo(TcshProcess):
 
     def mousePressEvent(self, e):
         press = e.button()
-        if press == Qt.LeftButton:
+        if press == Qt.MouseButton.LeftButton:
             if self.STATE == State.notRunning:
                 self.startDivGeo()
             elif self.STATE >= State.running:
                 # Meaning that DivGeo is either running or runningDocked
                 self.embedDivGeo()
-
+                
         return super(DivGeo, self).mousePressEvent(e)
 
     #def showEvent(self, e):
@@ -302,7 +303,7 @@ class DivGeo(TcshProcess):
     #
     #        self._window.resize(500, 400)
     #    super(DivGeo, self).showEvent(e)
-    # TODO: Force redraw after docking
+    ## TODO: Force redraw after docking
 
 if __name__ == "__main__":
     @Slot()
