@@ -16,7 +16,7 @@
 # $ imasdb solps-iter
 # -----------------------------------------------------------------------------
 
-from PySide6.QtCore import Slot, QThread, Property, Signal
+from PySide6.QtCore import Slot, QThread, Property, Signal, QProcess
 from PySide6.QtWidgets import (QDialog, QLineEdit, QGridLayout, QDialogButtonBox,
                              QPushButton, QFormLayout)
 from PySide6.QtGui import QIntValidator

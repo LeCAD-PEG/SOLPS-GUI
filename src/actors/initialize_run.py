@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (QVBoxLayout, QGridLayout, QGroupBox, QComboBox,
                              QPushButton, QPlainTextEdit, QFileDialog,
                              QMessageBox, QInputDialog, QCheckBox)
 from PySide6.QtGui import QTextCursor
-from PySide6.QtCore import Slot, QSettings, Qt
+from PySide6.QtCore import Slot, QSettings, Qt, QProcess
 from tcsh_process import TcshProcess
 import os
 
