@@ -693,7 +693,7 @@ class Carre(TcshProcess):
 if __name__ == '__main__':
     from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget)
     env = QSettings('ITER', 'solps-gui')
-    env.setValue('device_environment', 'cmod')
+    env.setValue('device_environment', 'iter')
     app = QApplication(sys.argv)
     main = QMainWindow()
     carreM = Carre()

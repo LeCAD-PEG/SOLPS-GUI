@@ -64,18 +64,19 @@ For a single workstation ``localsubmit`` can be::
    update_solps_run_status \${msg}
    __EOF__
 
-Described script uses ``batch`` command that submits the job to local ``atd``.
-Make sure that you increase default 0.8 load average when configuring
-``atd -l <load>`` to <load> = n-1 cores of your system. Otherwise,
-just one job will start at the moment. Instead of piping commands to ``batch``
-one can replace with ``at now`` and simply ignore the ``atd`` limit and
-maintain the system load manually. Although ``localsubmit`` is primarily
-intended for single users, it can handle multi-users without significantly
-impact regular work as it will not go over the "system" specified load.
-Results of the ``localsubmit`` diagnostic output can be read by system
-``mail``. If *mail* is not desired then all ``b2mn`` output should be
-redirected with ``>&!`` instead of just ``>!`` and then empty mails will
-not be sent.
+Described script uses ``batch`` command that submits the job to local
+``atd``.  Make sure that you increase default 0.8 load average when
+configuring ``atd -l <load>`` to <load> = n-1 cores of your system
+(see :file:`/etc/sysconfig/atd`). Otherwise, just one job will start
+at the moment. Instead of piping commands to ``batch`` one can replace
+with ``at now`` and simply ignore the ``atd`` limit and maintain the
+system load manually. Although ``localsubmit`` is primarily intended
+for single users, it can handle multi-users without significantly
+impact regular work as it will not go over the "system" specified
+load.  Results of the ``localsubmit`` diagnostic output can be read by
+system ``mail``. If *mail* is not desired then all ``b2mn`` output
+should be redirected with ``>&!`` instead of just ``>!`` and then
+empty mails will not be sent.
 
 Two environment variables, ``${SOLPS_GUI_IP}`` and ``${SOLPS_GUI_PORT}``
 from *Settings* are injected by the GUI before the job is submitted
