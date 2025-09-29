@@ -11,11 +11,20 @@ import imas
 import multiprocessing
 import traceback
 import sys
+import enum
 import xml.etree.ElementTree as ET
 import numpy as np
 
 #  IMAS Database reader and writer
 
+class Backend(enum.Enum):
+    MDSPLUS = imas.imasdef.MDSPLUS_BACKEND
+    HDF5    = imas.imasdef.HDF5_BACKEND
+    MEMORY  = imas.imasdef.MEMORY_BACKEND
+    UDA     = imas.imasdef.UDA_BACKEND
+    NO      = imas.imasdef.NO_BACKEND
+# Backend["MDSPLUS"].value
+# Backend(imas.imasdef.MDSPLUS_BACKEND).name
 
 backend_mapping = {
     'MDSPLUS': imas.imasdef.MDSPLUS_BACKEND,
@@ -137,16 +146,14 @@ def put_ids_process(uri: str, occurrence: int,  mode: str, ids_queue: multiproce
         ids_queue (multiprocessing.Queue): Queue of IDS objects to be put into
                                            database.
     """
-    #uri = imas.DBEntry.build_uri_from_legacy_parameters(backend,shot,run,database,data_version)
-
     print(f"Creating IMAS {uri} database {'with occurrence ' + str(occurrence) if occurrence else ''}")
 
-    dbentry = imas.DBEntry(uri, mode='w')
+    dbentry = imas.DBEntry(uri=uri, mode=mode)
 
-    #try:
-    #    status, idx = dbentry.create()
-    #except Exception as e:
-    #    print(f'ERROR: {e}')
+    try:
+        status, idx = dbentry.create()
+    except Exception as e:
+        print(f'ERROR: {e}')
 
     received_ids_types_occurrences = set()
     while True:
@@ -828,24 +835,35 @@ class IMASDB(QWidget):
         """ |Slot| for closing the IMAS database in a worker thread 
              if opened by :class:`imasdb.put_ids_process`.
         """
-        if self._checkbox_enable.isChecked():
-            if self.put_ids_process:
-                self.ids_queue.put((None, None))
-                if QApplication.platformName()=='offscreen':
-                    # Calling process.join() method in thread causes issues
-                    # with --no-gui so calling in main thread instead
-                    self.put_ids_process.join()
-                    self.emit_database_closed()
-                else:
-                    # # multiprocess.Process in QRunnable does not
-                    # # return cleanly ?
-                    task = Worker(self.put_ids_process.join)
-                    task.signals.finished.connect(self.emit_database_closed)
-                    self._threads.append(task)
-                    QThreadPool.globalInstance().start(task)
-                    # or
-                    #self.put_ids_process.join()
-                    #self.emit_database_closed()
+        if not self._checkbox_enable.isChecked():
+            return
+        if not self.put_ids_process:
+            return
+
+        self.ids_queue.put((None, None)) # Ask child to exit
+
+        try: # Close parent's Queue end and wait for its feeder thread to end
+            self.ids_queue.close()
+            self.ids_queue.cancel_join_thread()
+        except Exception:
+            pass
+
+        if QApplication.platformName()=='offscreen':
+            # Calling process.join() method in thread causes issues
+            # with --no-gui so calling in main thread instead
+            self.put_ids_process.join()
+            self.emit_database_closed()
+        else:
+            # # multiprocess.Process in QRunnable does not
+            # # return cleanly ?
+            task = Worker(self.put_ids_process.join)
+            task.signals.finished.connect(self.emit_database_closed)
+            self._threads.append(task)
+            QThreadPool.globalInstance().start(task)
+            # or
+            #self.put_ids_process.join()
+            #self.emit_database_closed()
+
 
     @Slot()
     def emit_database_closed(self):
@@ -854,8 +872,8 @@ class IMASDB(QWidget):
         """
         self._title.setStyleSheet("")
         self._title.setAutoFillBackground(False)
-        self.put_ids_process = None
         self.ids_queue = None
+        self.put_ids_process = None
         self.emit_pulse.emit(str(self._eval_pulse()))
         self.finished.emit()
         self._running_state = 2
