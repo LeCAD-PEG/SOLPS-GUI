@@ -7,10 +7,8 @@
 from argparse import ArgumentParser, RawTextHelpFormatter
 import sys
 
-from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtWidgets import QApplication
-from PySide6.QtUiTools import QUiLoader
-
+from PySide6.QtUiTools import loadUiType
 
 if __name__ == '__main__':
     arg_parser = ArgumentParser(description="QUiLoader example",
@@ -20,16 +18,13 @@ if __name__ == '__main__':
     ui_file_name = args.file
 
     app = QApplication(sys.argv)
-    ui_file = QFile(ui_file_name)
-    if not ui_file.open(QIODevice.ReadOnly):
-        reason = ui_file.errorString()
-        print(f"Cannot open {ui_file_name}: {reason}")
-        sys.exit(-1)
-    loader = QUiLoader()
-    widget = loader.load(ui_file, None)
-    ui_file.close()
-    if not widget:
-        print(loader.errorString())
-        sys.exit(-1)
-    widget.show()
+    uiclass, baseclass = loadUiType(ui_file_name)
+
+    class MainWindow(uiclass, baseclass):
+        def __init__(self, parent=None):
+            super().__init__(parent)
+            self.setupUi(self)
+
+    window = MainWindow()
+    window.show()
     sys.exit(app.exec())
