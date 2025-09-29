@@ -16,7 +16,7 @@
 # $ imasdb solps-iter
 # -----------------------------------------------------------------------------
 
-from PySide6.QtCore import Slot, QThread, Property, Signal
+from PySide6.QtCore import Slot, QThread, Property, Signal, QProcess
 from PySide6.QtWidgets import (QDialog, QLineEdit, QGridLayout, QDialogButtonBox,
                              QPushButton, QFormLayout)
 from PySide6.QtGui import QIntValidator
@@ -273,7 +273,7 @@ class PutIDS(TcshProcess):
 
         # Start the :attr:`tcsh` in the run directory
         self.startTcsh()  # Tcsh started in run directory
-        if not self.tcsh.state():
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             # Failed to start
             self.cleanUp()
 

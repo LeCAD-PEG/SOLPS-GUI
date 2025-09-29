@@ -871,7 +871,8 @@ class QtGnuplotScene(QGraphicsScene, QtGnuplotEventReceiver):
         self.m_plot_group = []
 
     def updateModifiers(self) -> None:
-        modifierMask = int(QApplication.keyboardModifiers()) >> 25
+        keyboard_modifiers = QApplication.keyboardModifiers().value
+        modifierMask = QApplication.keyboardModifiers().value >> 25
         if modifierMask != self.m_lastModifierMask:
             self.m_lastModifierMask = modifierMask
             self.m_eventHandler.postTermEvent(GE_modifier, 0, 0, modifierMask,

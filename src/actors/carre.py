@@ -440,7 +440,7 @@ class Carre(TcshProcess):
         a TCSH terminal or the expected input the ``carre`` scripts expect from
         the user.
         """
-        if self.tcsh.state() != QProcess.NotRunning:
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             return
 
         msg, ok = QInputDialog.getMultiLineText(self, 'Input dialog',
@@ -453,7 +453,7 @@ class Carre(TcshProcess):
     def runPrepare(self):
         """Command prepare or value 'p'
         """
-        if self.tcsh.state() != QProcess.NotRunning:
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             return
         if self.STATE == CarreState.waiting:
             msg = "p\n"
@@ -463,7 +463,7 @@ class Carre(TcshProcess):
     def runGrid(self):
         """Command grid or value 'g'
         """
-        if self.tcsh.state() != QProcess.NotRunning:
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             return
         if self.STATE == CarreState.waiting:
             msg = "g\n"
@@ -473,7 +473,7 @@ class Carre(TcshProcess):
     def runSaveChoice(self):
         """Command SaveChoice or value 's'
         """
-        if self.tcsh.state() != QProcess.NotRunning:
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             return
         if self.STATE == CarreState.waiting:
             msg = "s\n"
@@ -483,7 +483,7 @@ class Carre(TcshProcess):
     def runConvert(self):
         """Command Convert or value 'c'
         """
-        if self.tcsh.state() != QProcess.NotRunning:
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             return
         if self.STATE == CarreState.waiting:
             msg = "c\n"
@@ -493,7 +493,7 @@ class Carre(TcshProcess):
     def runStore(self):
         """Command Store or value 't'
         """
-        if self.tcsh.state() != QProcess.NotRunning:
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             return
         if self.STATE == CarreState.waiting:
             msg = "t\n"
@@ -503,7 +503,7 @@ class Carre(TcshProcess):
     def pressY(self):
         """Command Store or value 't'
         """
-        if self.tcsh.state() != QProcess.NotRunning:
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             return
         if self.STATE == CarreState.waiting:
             msg = "y\n"
@@ -513,7 +513,7 @@ class Carre(TcshProcess):
     def pressN(self):
         """Command Store or value 't'
         """
-        if self.tcsh.state() != QProcess.NotRunning:
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             return
         if self.STATE == CarreState.waiting:
             msg = "n\n"
@@ -638,7 +638,7 @@ class Carre(TcshProcess):
 
         self.textDisplay.clear()
 
-        if self.tcsh.state() != QProcess.NotRunning:
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             # Get DG model from combo box
             if self.vars[CarreVars.dgModel]:
                 dgModel = self.vars[CarreVars.dgModel]
@@ -680,7 +680,7 @@ class Carre(TcshProcess):
         self.tcsh.write(cmd)
 
     def stopCarre(self):
-        if self.tcsh.state():
+        if self.tcsh.state() != QProcess.ProcessState.NotRunning:
             self.textDisplay.clear()
             self.tcsh.terminate()
             self.tcsh.close()
@@ -693,7 +693,7 @@ class Carre(TcshProcess):
 if __name__ == '__main__':
     from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget)
     env = QSettings('ITER', 'solps-gui')
-    env.setValue('device_environment', 'cmod')
+    env.setValue('device_environment', 'iter')
     app = QApplication(sys.argv)
     main = QMainWindow()
     carreM = Carre()

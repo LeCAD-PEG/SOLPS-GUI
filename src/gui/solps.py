@@ -39,11 +39,11 @@ import sys
 import time
 
 from PySide6.QtCore import (Slot, QModelIndex, Qt, QSettings, Signal,
-                           QRegularExpression, QProcess)
+                            QRegularExpression, QProcess)
 from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QFileDialog, QLineEdit, QToolButton, QGridLayout,
                              QDialogButtonBox)
-
+from PySide6.QtNetwork import QUdpSocket
 from PySide6.QtNetwork import QHostAddress
 from PySide6.QtUiTools import loadUiType
 
@@ -314,14 +314,14 @@ class PreferencesDialog(QDialog):
         self.preferences.log_level = self.form.comboBox_log_level.currentIndex()
         self.preferences.submit_script = self.form.comboBox_submit_script.currentText()
         self.preferences.job_name = self.form.lineEdit_job_name.text()
-        self.preferences.standalone = int(self.form.checkBox_standalone.checkState().value)
-        self.preferences.use_mpi = int(self.form.checkBox_use_mpi.checkState().value)
+        self.preferences.standalone = int(self.form.checkBox_standalone.isChecked())
+        self.preferences.use_mpi = int(self.form.checkBox_use_mpi.isChecked())
         self.preferences.mpi_options = self.form.lineEdit_mpi_options.text()
-        self.preferences.use_debugger = int(self.form.checkBox_use_debugger.checkState().value)
+        self.preferences.use_debugger = int(self.form.checkBox_use_debugger.isChecked())
         self.preferences.debugger = self.form.lineEdit_debugger.text()
-        self.preferences.compress_log = int(self.form.checkBox_compress_log.checkState().value)
-        self.preferences.dry_run = int(self.form.checkBox_dry_run.checkState().value)
-        self.preferences.use_openmp = int(self.form.checkBox_use_openmp.checkState().value)
+        self.preferences.compress_log = int(self.form.checkBox_compress_log.isChecked())
+        self.preferences.dry_run = int(self.form.checkBox_dry_run.isChecked())
+        self.preferences.use_openmp = int(self.form.checkBox_use_openmp.isChecked())
         self.preferences.threads = self.form.lineEdit_threads.text()
         self.preferences.time = self.form.lineEdit_time.text()
         self.preferences.partition = self.form.lineEdit_partition.text()
@@ -650,7 +650,7 @@ if __name__ == '__main__':
                 address = QHostAddress(self.preferences.bind_address)
                 port = self.preferences.port
                 if model.statusServerThread.state() == \
-                   model.statusServerThread.BoundState:
+                   QUdpSocket.BoundState:
                    model.statusServerThread.close()
                 ok = model.statusServerThread.bind(address, port)
 
@@ -982,8 +982,12 @@ if __name__ == '__main__':
 
         @Slot()
         def on_actionDocumentation_triggered(self):
-            from subprocess import Popen
-            p = Popen("xdg-open ${HOME}/solps-gui/doc/build/html/index.html", shell=True, env=os.environ).wait()
+            process = QProcess(self)
+            solps_gui_home = os.getenv('SOLPS_GUI_HOME',
+                                       os.path.expanduser('~/solps-gui'))
+            doc_path = os.path.join(solps_gui_home, "doc/build/html/index.html")
+            process.startDetached("env", ["--unset", "LD_LIBRARY_PATH",
+                                          "xdg-open", doc_path])
 
     main_window = SOLPS_MainWindow()
     main_window.show()

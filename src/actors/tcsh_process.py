@@ -89,7 +89,7 @@ class Tcsh(QProcess):
     @Slot(int, QProcess.ExitStatus)
     def finishedProcess(self, exitCode, exitStatus):
         exits = ['Normal exit', 'Crashed exit']
-        msg = f'Process {self.program()} exited: {exits[exitStatus]}'
+        msg = f'Process {self.program()} exited: {exits[exitStatus.value]}'
         self.prcFinished.emit(msg)
 
     @Slot(QProcess.ProcessError)
@@ -99,7 +99,7 @@ class Tcsh(QProcess):
         """
         errors = ['Failed to Start', 'Crashed', 'Timed out', 'WriteError',
                   'ReadError', 'UnknownError']
-        msg = f'ProcessError: {errors[error]}\n{self.errorString()}'
+        msg = f'ProcessError: {errors[error.value]}\n{self.errorString()}'
         logging.error(msg)
         self.prcError.emit(msg)
 

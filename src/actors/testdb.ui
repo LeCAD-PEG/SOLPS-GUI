@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>640</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="IMASDB" name="imasdb">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>120</y>
+     <width>200</width>
+     <height>270</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Opens or creates IMAS database and sends/receives QObject IDSs (get/put)</string>
+   </property>
+   <property name="whatsThis">
+    <string>This actor is part of PDS-WF workflow</string>
+   </property>
+   <property name="uri" stdset="0">
+    <string>imas:mdsplus?user=public;pulse=130012;run=2;database=ITER;version=4</string>
+   </property>
+   <property name="pulse" stdset="0">
+    <string>(130012, 2, 0, 'public', 'ITER', 12, '4')</string>
+   </property>
+   <property name="title" stdset="0">
+    <string notr="true" comment="Text for widget title." extracomment="Add this to widget title">IMAS DB</string>
+   </property>
+   <property name="button" stdset="0">
+    <string notr="true" comment="Title for Start button" extracomment="Add this to button">Read IMAS DB</string>
+   </property>
+   <property name="start_counter" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="show_pulse" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="show_uri" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="show_log" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="show_button" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="show_title" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="show_enable" stdset="0">
+    <bool>false</bool>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>IMASDB</class>
+   <extends>QWidget</extends>
+   <header>imasdb</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

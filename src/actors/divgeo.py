@@ -219,7 +219,7 @@ class DivGeo(TcshProcess):
         """ Starts divgeo process inside the qwidget. We provide geometry
         coordinates, width and height for starting divgeo.
         """
-        if self.tcsh.state() != QProcess.NotRunning:
+        if self.tcsh.state() != QProcess.ProcessState.NotRunning:
             return
 
         self.labelContainer = QLabel()
@@ -249,7 +249,7 @@ class DivGeo(TcshProcess):
 
     @Slot()
     def stopDivGeo(self):
-        if not self.tcsh.state():
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             message = "DivGeo not running."
             return
 
@@ -284,13 +284,13 @@ class DivGeo(TcshProcess):
 
     def mousePressEvent(self, e):
         press = e.button()
-        if press == Qt.LeftButton:
+        if press == Qt.MouseButton.LeftButton:
             if self.STATE == State.notRunning:
                 self.startDivGeo()
             elif self.STATE >= State.running:
                 # Meaning that DivGeo is either running or runningDocked
                 self.embedDivGeo()
-
+                
         return super(DivGeo, self).mousePressEvent(e)
 
     #def showEvent(self, e):
@@ -299,7 +299,7 @@ class DivGeo(TcshProcess):
     #
     #        self._window.resize(500, 400)
     #    super(DivGeo, self).showEvent(e)
-    # TODO: Force redraw after docking
+    ## TODO: Force redraw after docking
 
 if __name__ == "__main__":
     @Slot()

@@ -66,7 +66,7 @@ class B2plot(TcshProcess):
         """
         errors = ['Failed to Start', 'Crashed', 'Timedout', 'WriteError',
             'ReadError', 'UnknownError']
-        msg = 'B2plot process: ' + errors[error]
+        msg = 'B2plot process: ' + errors[error.value]
         logging.error(msg)
         self.setText(msg)
 
@@ -163,7 +163,7 @@ class B2plot(TcshProcess):
                   is empty or nonexistent.
         """
         cmd = ''
-        if self.tcsh.state() != QProcess.NotRunning:
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
             # cmd += 'module load libpng\n'
             cmd += 'setenv B2PLOT_DEV "ps"\n'
 
@@ -187,7 +187,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = B2plot()
     window.show()
-    rundir = '/home/ITER/vasilei/solps-iter/runs/examples/ITER_2298_Honly_20MW/run_restart'
+    rundir = '~/solps-iter/runs/DEMO_Donly_kin/run1'
     window.setRunDir(os.path.expanduser(rundir))
     window.setB2plotCommand("echo phys a4p ti te m/ surf | b2plot")
     window.executeB2plotCommand()

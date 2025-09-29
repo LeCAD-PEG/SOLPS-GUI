@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>404</width>
+    <height>478</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="IMASDB" name="imasdb">
+      <property name="toolTip">
+       <string>Opens or creates IMAS database and sends/receives QObject IDSs (get/put)</string>
+      </property>
+      <property name="whatsThis">
+       <string>This actor is part of PDS-WF workflow</string>
+      </property>
+      <property name="uri" stdset="0">
+       <string>imas:mdsplus?user=public;pulse=123347;run=1;database=ITER;version=4</string>
+      </property>
+      <property name="pulse" stdset="0">
+       <string>(123347, 1, 0, 'public', 'ITER', 12, '4')</string>
+      </property>
+      <property name="title" stdset="0">
+       <string notr="true" comment="Text for widget title." extracomment="Add this to widget title">IMAS DB</string>
+      </property>
+      <property name="button" stdset="0">
+       <string notr="true" comment="Title for Start button" extracomment="Add this to button">Read IMAS DB</string>
+      </property>
+      <property name="start_counter" stdset="0">
+       <bool>false</bool>
+      </property>
+      <property name="show_pulse" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="show_uri" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="show_log" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="show_button" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="show_title" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="show_enable" stdset="0">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="IMASDB" name="imasdb_2">
+      <property name="toolTip">
+       <string>Opens or creates IMAS database and sends/receives QObject IDSs (get/put)</string>
+      </property>
+      <property name="whatsThis">
+       <string>This actor is part of PDS-WF workflow</string>
+      </property>
+      <property name="uri" stdset="0">
+       <string>imas:hdf5?user=$USER;pulse=123347;run=1;database=ITER;version=4</string>
+      </property>
+      <property name="pulse" stdset="0">
+       <string>(123347, 1, 0, '$USER', 'ITER', 13, '4')</string>
+      </property>
+      <property name="title" stdset="0">
+       <string notr="true" comment="Text for widget title." extracomment="Add this to widget title">IMAS DB</string>
+      </property>
+      <property name="button" stdset="0">
+       <string notr="true" comment="Title for Start button" extracomment="Add this to button">Read IMAS DB</string>
+      </property>
+      <property name="start_counter" stdset="0">
+       <bool>false</bool>
+      </property>
+      <property name="show_pulse" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="show_uri" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="show_log" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="show_button" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="show_title" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="show_enable" stdset="0">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>404</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuPulse">
+    <property name="title">
+     <string>Pulse</string>
+    </property>
+    <addaction name="actionLoad"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuDesign">
+    <property name="title">
+     <string>Design</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuSimulator">
+    <property name="title">
+     <string>Simulator</string>
+    </property>
+   </widget>
+   <addaction name="menuPulse"/>
+   <addaction name="menuDesign"/>
+   <addaction name="menuSimulator"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionLoad">
+   <property name="text">
+    <string>Load</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>IMASDB</class>
+   <extends>QWidget</extends>
+   <header>imasdb</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>282</x>
+     <y>129</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>imasdb</sender>
+   <signal>summary(PyObject)</signal>
+   <receiver>imasdb_2</receiver>
+   <slot>put(PyObject)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>166</x>
+     <y>101</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>255</x>
+     <y>100</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>imasdb</sender>
+   <signal>dataset_description(PyObject)</signal>
+   <receiver>imasdb_2</receiver>
+   <slot>put(PyObject)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>117</x>
+     <y>161</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>256</x>
+     <y>163</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>imasdb</sender>
+   <signal>finished()</signal>
+   <receiver>imasdb_2</receiver>
+   <slot>closedb()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>200</x>
+     <y>71</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>278</x>
+     <y>78</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

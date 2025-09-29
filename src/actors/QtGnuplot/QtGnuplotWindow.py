@@ -239,14 +239,14 @@ class QtGnuplotWindow(QMainWindow, QtGnuplotEventReceiver):
                           self.m_mouseToolBar.toggleViewAction().isChecked())
 
     def showSettingsDialog(self) -> None:
-        self.m_ui.antialiasCheckbox.setCheckState(2 if
+        self.m_ui.antialiasCheckbox.setCheckState(Qt.Checked if
                                                   self.m_widget.antialias()
-                                                  else 0)
-        self.m_ui.roundedCheckBox.setCheckState(2 if self.m_widget.rounded()
-                                                else 0)
-        self.m_ui.replotOnResizeCheckBox.setCheckState(2 if
+                                                  else Qt.Unchecked)
+        self.m_ui.roundedCheckBox.setCheckState(Qt.Checked if self.m_widget.rounded()
+                                                else Qt.Unchecked)
+        self.m_ui.replotOnResizeCheckBox.setCheckState(Qt.Checked if
                                                 self.m_widget.replotOnResize()
-                                                else 0)
+                                                       else Qt.Unchecked)
 
         if self.m_statusBar.isVisible():
             self.m_ui.mouseLabelComboBox.setCurrentIndex(0)
