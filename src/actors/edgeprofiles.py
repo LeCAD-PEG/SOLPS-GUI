@@ -55,7 +55,6 @@ class EdgeProfiles(QWidget):
     @Slot(object)
     def input_edge_profiles(self, edge_profiles):
         """Set edge_profiles IDS."""
-        print('Edge profiles received.', flush=True)
         self.ep = edge_profiles
 
 
@@ -73,7 +72,6 @@ class EdgeProfiles(QWidget):
         if dialog.exec():
             # Get GGD variables on dialog close
             self.ggdVars = dialog.on_close()
-            print(self.ggdVars)
             return True
         else:
             # Canceled!
@@ -97,8 +95,6 @@ class EdgeProfiles(QWidget):
         """
         if self.ep == None:
             return
-
-        print('Plotting...')
         # Clear canvas figure if it already exists (to avoid plot overlapping)
         # if self.canvas.figure != None:
         #     self.canvas.figure.clear()
