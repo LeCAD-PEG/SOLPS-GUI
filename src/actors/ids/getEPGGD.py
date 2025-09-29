@@ -116,9 +116,10 @@ class getEPGGD():
 
         # Reading IDS grid geometry and physics quantities array
         nodes = np.zeros(shape=(self.num_obj_0D, 2))
-        # quad_conn_array = np.zeros(shape=(self.num_obj_2D, 4), dtype=np.int)
+        # quad_conn_array = np.zeros(shape=(self.num_obj_2D, 4), dtype=np)
         nElements = len(self.ep.grid_ggd[gg].grid_subset[gs_id].element)
-        quad_conn_array = np.zeros(shape=(nElements, 4), dtype=np.int)
+        quad_conn_array = np.zeros(shape=(nElements, 4), dtype=int)
+        quad_conn_array[:] = -1
 
         # List of nodes and corresponding coordinates (2D spade - x and y)
         for i in range(self.num_obj_0D):
@@ -136,10 +137,9 @@ class getEPGGD():
             s = object.space - 1
             d = object.dimension - 1
 
-            for j in range(0,4):
-                quad_conn_array[i][j] = \
-                    self.ep.grid_ggd[gg].space[s].objects_per_dimension[
-                        d].object[ind].nodes[j] - 1
+            cell = self.ep.grid_ggd[gg].space[s].objects_per_dimension[d].object[ind]
+            for j in range(cell.nodes.size):
+                quad_conn_array[i][j] = cell.nodes[j] - 1
 
         return nodes, quad_conn_array
 
@@ -163,10 +163,10 @@ class getEPGGD():
         # Include ion array of structure
         for i in range(len(ggd.ion)):
             # Get label
-            if ggd.ion[i].label != '':
-                ionLabel = ggd.ion[i].label
+            if ggd.ion[i].name != '':
+                ionLabel = ggd.ion[i].name
             else:
-                ionLabel = ggd.ion[i].state[0].label
+                ionLabel = ggd.ion[i].state[0].name
             # Ion density
             for j in range(len(ggd.ion[i].density)):
                 # Check if there is actually an array
@@ -179,10 +179,10 @@ class getEPGGD():
         # Ion temperature
         for i in range(len(ggd.ion)):
             # Get label
-            if ggd.ion[i].label != '':
-                ionLabel = ggd.ion[i].label
+            if ggd.ion[i].name != '':
+                ionLabel = ggd.ion[i].name
             else:
-                ionLabel = ggd.ion[i].state[0].label
+                ionLabel = ggd.ion[i].state[0].name
             for j in range(len(ggd.ion[i].temperature)):
                 # Check if there is actually an array
                 if len(ggd.ion[i].temperature[j].values) > 0:

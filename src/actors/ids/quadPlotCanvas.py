@@ -31,6 +31,7 @@ class QuadPlotCanvas(FigureCanvasQTAgg):
         self.parent = parent
 
         self.figure = Figure(figsize=(width, height), dpi=dpi)
+        self.ax = self.figure.add_subplot(111)
         super().__init__(self.figure)
 
         self.setParent(parent)
@@ -71,13 +72,19 @@ class QuadPlotCanvas(FigureCanvasQTAgg):
         y = nodes[:,0]
         z = nodes[:,1]
 
-        def quadplot(y,z, quatrangles, values, ax=None, **kwargs):
+        def cells_plot(y,z, quatrangles, values, ax=None, **kwargs):
 
             if not ax: ax=plt.gca()
-            yz = np.c_[y,z]
-            verts= yz[quatrangles]
+            # yz = np.c_[y,z]
+            # verts= yz[quatrangles]
+            cells = []
+            for cell in quatrangles:
+                cell_points = [[y[ind], z[ind]] for ind in cell if ind != -1]
+                if len(cell_points):
+                    cells.append(cell_points)
+
             white = (1,1,1,1)
-            pc = matplotlib.collections.PolyCollection(verts,
+            pc = matplotlib.collections.PolyCollection(cells,
                                                        edgecolor=white,
                                                        linewidths=(0.1,),
                                                        **kwargs)
@@ -86,11 +93,11 @@ class QuadPlotCanvas(FigureCanvasQTAgg):
             ax.autoscale()
             return pc
 
-        self.ax = self.figure.add_subplot(111)
+        # self.ax = self.figure.add_subplot(111)
         self.figure.subplots_adjust(right=0.85)
         self.ax.set_aspect('equal')
 
-        pc = quadplot(y,z, np.asarray(elements), values, ax=self.ax,
+        pc = cells_plot(y,z, np.asarray(elements), values, ax=self.ax,
                       cmap="inferno")
         self.figure.colorbar(pc, ax=self.ax)
         # self.ax.plot(y,z, marker="o", ls="", color="crimson")

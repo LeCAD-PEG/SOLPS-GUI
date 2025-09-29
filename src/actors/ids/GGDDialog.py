@@ -16,15 +16,15 @@ class GetGGDDialog(QDialog):
         super(GetGGDDialog, self).__init__(parent)
 
         # Set IDS object (from parent)
-        self.ids = parent.ids
+        # self.ids = parent.ids
 
-        if self.ids == None:
-            return
+        # if self.ids == None:
+            # return
         # Set empty dictionaries
         self.gridSubsetDict = {}
         self.quantityDict = {}
         # Set edge_profiles object
-        self.ep = self.ids.edge_profiles
+        self.ep = parent.ep
         self.getGGD = getEPGGD(self.ep)
 
         # Get GGD properties

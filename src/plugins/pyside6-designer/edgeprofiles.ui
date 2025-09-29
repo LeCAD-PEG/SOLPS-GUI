@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>478</width>
-    <height>397</height>
+    <width>663</width>
+    <height>539</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,70 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0" colspan="3">
+    <item row="1" column="0">
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="text">
+       <string>Values ...</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="IMASDB" name="imasdb">
+      <property name="maximumSize">
+       <size>
+        <width>222</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Opens or creates IMAS database and sends/receives QObject IDSs (get/put)</string>
+      </property>
+      <property name="whatsThis">
+       <string>This actor is part of PDS-WF workflow</string>
+      </property>
+      <property name="uri" stdset="0">
+       <string>imas:hdf5?user=public;pulse=123347;run=1;database=ITER;version=4</string>
+      </property>
+      <property name="pulse" stdset="0">
+       <string>(123347, 1, 0, 'public', 'ITER', 13, '4')</string>
+      </property>
+      <property name="title" stdset="0">
+       <string notr="true" comment="Text for widget title." extracomment="Add this to widget title">IMAS DB</string>
+      </property>
+      <property name="button" stdset="0">
+       <string notr="true" comment="Title for Start button" extracomment="Add this to button">Read IMAS DB</string>
+      </property>
+      <property name="start_counter" stdset="0">
+       <bool>false</bool>
+      </property>
+      <property name="show_pulse" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="show_uri" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="show_log" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="show_button" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="show_title" stdset="0">
+       <bool>true</bool>
+      </property>
+      <property name="show_enable" stdset="0">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>Plot</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" rowspan="5">
      <widget class="EdgeProfiles" name="edgeprofiles">
       <property name="toolTip">
        <string>Draws various edge profiles from SOLPS</string>
@@ -31,24 +94,10 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
-     <widget class="QPushButton" name="pushButton">
-      <property name="text">
-       <string>Set IDS</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QPushButton" name="pushButton_2">
-      <property name="text">
-       <string>Set GGD Data</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="2">
+    <item row="2" column="0">
      <widget class="QPushButton" name="pushButton_3">
       <property name="text">
-       <string>Plot Data</string>
+       <string>Clear</string>
       </property>
      </widget>
     </item>
@@ -59,7 +108,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>478</width>
+     <width>663</width>
      <height>19</height>
     </rect>
    </property>
@@ -67,6 +116,11 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>IMASDB</class>
+   <extends>QWidget</extends>
+   <header>imasdb</header>
+  </customwidget>
   <customwidget>
    <class>EdgeProfiles</class>
    <extends>QWidget</extends>
@@ -76,18 +130,18 @@
  <resources/>
  <connections>
   <connection>
-   <sender>pushButton_2</sender>
-   <signal>clicked()</signal>
+   <sender>imasdb</sender>
+   <signal>edge_profiles(PyObject)</signal>
    <receiver>edgeprofiles</receiver>
-   <slot>setGGDdata()</slot>
+   <slot>input_edge_profiles(PyObject)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>267</x>
-     <y>357</y>
+     <x>150</x>
+     <y>243</y>
     </hint>
     <hint type="destinationlabel">
-     <x>248</x>
-     <y>271</y>
+     <x>291</x>
+     <y>243</y>
     </hint>
    </hints>
   </connection>
@@ -95,15 +149,31 @@
    <sender>pushButton</sender>
    <signal>clicked()</signal>
    <receiver>edgeprofiles</receiver>
-   <slot>setEPIDS()</slot>
+   <slot>plotData()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>106</x>
-     <y>351</y>
+     <x>115</x>
+     <y>36</y>
     </hint>
     <hint type="destinationlabel">
-     <x>107</x>
-     <y>292</y>
+     <x>291</x>
+     <y>78</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>edgeprofiles</receiver>
+   <slot>setGGDdata()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>140</x>
+     <y>66</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>291</x>
+     <y>64</y>
     </hint>
    </hints>
   </connection>
@@ -111,15 +181,15 @@
    <sender>pushButton_3</sender>
    <signal>clicked()</signal>
    <receiver>edgeprofiles</receiver>
-   <slot>plotData()</slot>
+   <slot>clearPlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>404</x>
-     <y>351</y>
+     <x>208</x>
+     <y>93</y>
     </hint>
     <hint type="destinationlabel">
-     <x>403</x>
-     <y>311</y>
+     <x>275</x>
+     <y>98</y>
     </hint>
    </hints>
   </connection>

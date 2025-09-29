@@ -67,10 +67,10 @@
        <string>This actor is part of PDS-WF workflow</string>
       </property>
       <property name="uri" stdset="0">
-       <string>imas:hdf5?user=$USER;pulse=123347;run=2;database=ITER;version=4</string>
+       <string>imas:hdf5?user=$USER;pulse=123347;run=4;database=ITER;version=4</string>
       </property>
       <property name="pulse" stdset="0">
-       <string>(123347, 2, 0, '$USER', 'ITER', 13, '4')</string>
+       <string>(123347, 4, 0, '$USER', 'ITER', 13, '4')</string>
       </property>
       <property name="title" stdset="0">
        <string notr="true" comment="Text for widget title." extracomment="Add this to widget title">IMAS Put</string>
@@ -82,7 +82,7 @@
        <bool>true</bool>
       </property>
       <property name="show_pulse" stdset="0">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="show_uri" stdset="0">
        <bool>true</bool>
@@ -218,12 +218,28 @@
    <slot>closedb()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>200</x>
-     <y>71</y>
+     <x>198</x>
+     <y>99</y>
     </hint>
     <hint type="destinationlabel">
      <x>278</x>
      <y>78</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>imasdb</sender>
+   <signal>edge_profiles(PyObject)</signal>
+   <receiver>imasdb_2</receiver>
+   <slot>put(PyObject)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>132</x>
+     <y>279</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>238</x>
+     <y>279</y>
     </hint>
    </hints>
   </connection>

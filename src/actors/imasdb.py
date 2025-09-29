@@ -271,7 +271,7 @@ class IMASDB(QWidget):
         self.put_ids_process = None
         self.ids_queue = None 
         """multiprocessing.Queue: IDS queue to put IDS objects."""
-        self.occurrence = None  #: IDS occurence for put.
+        self.occurrence = 0  #: IDS occurence for put.
         self.signal_names = [] 
         """list (str): List of signal names as a queue for emitting."""
         self._threads = [] # List hold thread objects
