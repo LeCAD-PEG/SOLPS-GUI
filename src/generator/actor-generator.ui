@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>662</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>662</width>
+    <height>500</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>662</width>
+    <height>500</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Actor Generator</string>
+  </property>
+  <property name="toolTip">
+   <string comment="Generating actors for Pyside designer" extracomment="by LECAD"/>
+  </property>
+  <property name="toolTipDuration">
+   <number>50</number>
+  </property>
+  <property name="statusTip">
+   <string/>
+  </property>
+  <property name="whatsThis">
+   <string/>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QComboBox" name="comboBox_base_class">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>70</y>
+      <width>201</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+    <item>
+     <property name="text">
+      <string>QWidget</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>FigureCanvasQTAgg</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>QPlainTextEdit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>PlotWidget</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>QtMatplotlibCanvas</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QPlainTextEdit" name="plainTextEdit_dom_xml">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>150</y>
+      <width>441</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Monospace</family>
+     </font>
+    </property>
+    <property name="plainText">
+     <string>&lt;ui language='c++' displayname='{{ display_name }}'&gt;
+    &lt;widget class='{{ class_name }}' name='{{ name }}'&gt;
+        &lt;property name='geometry'&gt;
+            &lt;rect&gt;
+                &lt;width&gt;300&lt;/width&gt;
+                &lt;height&gt;200&lt;/height&gt;
+            &lt;/rect&gt;
+        &lt;/property&gt;
+        &lt;property name='pulse'&gt;
+            &lt;string notr='true' comment='(shot, run, usename, database, backend)'
+            extracomment='Tuple of IDS parameters'&gt;(130012, 2, 'public', 'ITER', 12)&lt;/string&gt;
+        &lt;/property&gt;
+        &lt;property name='title'&gt;
+            &lt;string notr='true' comment='Text for widget title.'
+            extracomment='Add this to widget title'&gt;{{ display_name }}&lt;/string&gt;
+        &lt;/property&gt;
+        &lt;property name='button'&gt;
+            &lt;string notr='true' comment='Title for Start button'
+            extracomment='Add this to button'&gt;START&lt;/string&gt;
+        &lt;/property&gt;
+        &lt;property name=&quot;show_log&quot;&gt;
+            &lt;bool&gt;true&lt;/bool&gt;
+        &lt;/property&gt;
+        &lt;property name=&quot;show_button&quot;&gt;
+            &lt;bool&gt;true&lt;/bool&gt;
+        &lt;/property&gt;
+        &lt;property name=&quot;show_title&quot;&gt;
+            &lt;bool&gt;true&lt;/bool&gt;
+        &lt;/property&gt;
+        &lt;property name='toolTip'&gt;	
+                &lt;string&gt;{{ toolTip }}&lt;/string&gt;
+        &lt;/property&gt;
+        &lt;property name='whatsThis'&gt;	
+                &lt;string&gt;{{ whatsThis }}&lt;/string&gt;
+        &lt;/property&gt;
+    &lt;/widget&gt;
+&lt;/ui&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_actor_display_name">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>10</y>
+      <width>241</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>My Actor</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_include_menu">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>30</y>
+      <width>171</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Include Task Menu GUI for configuring the actor with dialog box.</string>
+    </property>
+    <property name="whatsThis">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'monospace';&quot;&gt;Generate actor-menu.ui&lt;/span&gt; and code in actorplugin.py for &lt;span style=&quot; font-style:italic;&quot;&gt;Task Menu&lt;/span&gt; that is UI file shown at design-time with&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="text">
+     <string>Include Actor menu UI</string>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_7">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>350</y>
+      <width>71</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>whatsThis (Shift+F1) help</string>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_class_name">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>40</y>
+      <width>201</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>MyActor</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>130</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>DOM_XML</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>40</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Class name (CamelCase)</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="plainTextEdit_whatsThis">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>350</y>
+      <width>561</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="plainText">
+     <string>This actor is part of SOLPS workflow</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_toolTip">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>320</y>
+      <width>561</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_9">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>100</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Group</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>70</y>
+      <width>151</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Base class template</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>121</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Actor display name</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>320</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>toolTip</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_state">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>50</y>
+      <width>171</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Include state signal/slots for connection to StudyExplorer.</string>
+    </property>
+    <property name="whatsThis">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="text">
+     <string>State Signal/Slots</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_size_hints">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>70</y>
+      <width>171</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Inlude minimumSizeHint(self) and sizeHint(self) in the actor.</string>
+    </property>
+    <property name="whatsThis">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The following overloaded functions are used as a hint for the size and are&lt;/p&gt;&lt;p&gt;not enforced. Therefore, the hints are used only when used under ``QLayout``&lt;/p&gt;&lt;p&gt;with resizable windows in a grid, vertical horizontal horizontal layouts.&lt;/p&gt;&lt;p&gt;def minimumSizeHint(self):&lt;/p&gt;&lt;p&gt;&amp;quot;&amp;quot;&amp;quot; This property holds the recommended minimum size for the widget&lt;/p&gt;&lt;p&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/p&gt;&lt;p&gt;return QSize(200, 100)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;def sizeHint(self):&lt;/p&gt;&lt;p&gt;&amp;quot;&amp;quot;&amp;quot; This property holds the recommended size for the widget&lt;/p&gt;&lt;p&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/p&gt;&lt;p&gt;return QSize(200, 270)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If the hint functions are missing in actor.py, then default sizing is used for the actor. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="text">
+     <string>Size hints</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_simple_actor">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>10</y>
+      <width>131</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Actor without menu UI or plugin&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="whatsThis">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;At minimum two files are needed for a simple actor:&lt;/p&gt;&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:12px; margin-left:30px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'monospace';&quot;&gt;actor.py&lt;/span&gt; that should be included in &lt;a name=&quot;index-0&quot;/&gt;&lt;span style=&quot; font-family:'monospace';&quot;&gt;P&lt;/span&gt;&lt;span style=&quot; font-family:'monospace';&quot;&gt;YTHONPATH&lt;/span&gt;, and&lt;/li&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:12px; margin-left:30px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'monospace';&quot;&gt;registeractor.py&lt;/span&gt; that is only used in &lt;span style=&quot; font-style:italic;&quot;&gt;QT Designer&lt;/span&gt; and will be searched for in &lt;a name=&quot;index-1&quot;/&gt;&lt;span style=&quot; font-family:'monospace';&quot;&gt;P&lt;/span&gt;&lt;span style=&quot; font-family:'monospace';&quot;&gt;YSIDE_DESIGNER_PLUGINS&lt;/span&gt; environment variable directories.d will be searched for in PYSIDE_DESIGNER_PLUGINS environment variable directories. &lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="text">
+     <string>Simple actor</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_pulse">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>90</y>
+      <width>171</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Include IMAS pulse</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_log">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>110</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Log </string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox_group">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>100</y>
+      <width>281</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+    <item>
+     <property name="text">
+      <string>Custom</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>SOLPS</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>IMAS</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>IMAS Plot</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Workflow</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="IconTree" name="icontree">
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>150</y>
+      <width>191</width>
+      <height>141</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_icon_path">
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>290</y>
+      <width>191</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>:/iter.org/pds/icons/pds.png</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>400</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Actor directory</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_8">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>430</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Plugin directory</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_actor_directory">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>400</y>
+      <width>511</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>../actors</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_plugin_directory">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>430</y>
+      <width>511</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>../plugins/pyside6-designer</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="buttonActorDir">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>400</y>
+      <width>20</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>...</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="buttonPluginDir">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>430</y>
+      <width>20</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>...</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>662</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionSave"/>
+    <addaction name="actionDelete"/>
+    <addaction name="actionGit"/>
+    <addaction name="actionSaveIcon"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="help"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionLoad">
+   <property name="text">
+    <string>Load Icon</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save Actor</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionPreview">
+   <property name="text">
+    <string>Preview Menu</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="text">
+    <string>Delete Actor</string>
+   </property>
+  </action>
+  <action name="actionGit">
+   <property name="text">
+    <string>Git Add</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
+   </property>
+  </action>
+  <action name="help">
+   <property name="text">
+    <string>Help</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+F1</string>
+   </property>
+  </action>
+  <action name="actionSaveIcon">
+   <property name="text">
+    <string>Save Icon As...</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>IconTree</class>
+   <extends>QTreeView</extends>
+   <header>icontree.h</header>
+   <slots>
+    <signal>icon_path(QString)</signal>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>actionQuit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>321</x>
+     <y>245</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_simple_actor</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>checkBox_include_menu</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>429</x>
+     <y>32</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>68</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>icontree</sender>
+   <signal>icon_path(QString)</signal>
+   <receiver>lineEdit_icon_path</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>626</x>
+     <y>175</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>623</x>
+     <y>109</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_simple_actor</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>checkBox_include_menu</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>475</x>
+     <y>38</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>495</x>
+     <y>58</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_simple_actor</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>checkBox_include_menu</receiver>
+   <slot>toggle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>475</x>
+     <y>38</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>495</x>
+     <y>58</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

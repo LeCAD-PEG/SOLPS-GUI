@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>730</width>
+    <height>554</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="toolTip">
+   <string comment="dsafsda a lkglda" extracomment="dafgggfs"/>
+  </property>
+  <property name="toolTipDuration">
+   <number>50</number>
+  </property>
+  <property name="statusTip">
+   <string>rqfa</string>
+  </property>
+  <property name="whatsThis">
+   <string/>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="0">
+     <widget class="Graph" name="graph_2">
+      <property name="toolTip">
+       <string>Coil current or voltage over time</string>
+      </property>
+      <property name="whatsThis">
+       <string>Plots current, voltage or other values over time</string>
+      </property>
+      <property name="column_name" stdset="0">
+       <string>n~P</string>
+      </property>
+      <property name="units" stdset="0">
+       <string>V</string>
+      </property>
+      <property name="unitPrefix" stdset="0">
+       <string/>
+      </property>
+      <property name="dat_input_filename" stdset="0">
+       <string>../../transmak/work/j.dat</string>
+      </property>
+      <property name="plot_function" stdset="0">
+       <string>np.sin(3*x)/(x+0.1)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="Graph" name="graph">
+      <property name="toolTip">
+       <string>Coil current or voltage over time</string>
+      </property>
+      <property name="whatsThis">
+       <string>Plots current, voltage or other values over time. 
+ For j.dat the following columns are used:
+  'times', 'ICS3U', 'ICS2U', 'ICS1', 'ICS2L', 'ICS3L', 
+  'IPF1', 'IPF2', 'IPF3', 'IPF4', 'IPF5', 'IPF6', 
+  'IBS', 'IBu', 'IBd', 'IP'
+ For v.dat 
+  'times', 'VCS3U', 'VCS2U', 'VCS1', 'VCS2L', 'VCS3L', 
+  'VPF1', 'VPF2', 'VPF3', 'VPF4', 'VPF5', 'VPF6', 'VBS',
+   'VBu', 'VBd', 'VP'
+            </string>
+      </property>
+      <property name="dat_input_filename" stdset="0">
+       <string>../../transmak/work/j.dat</string>
+      </property>
+      <property name="plot_function" stdset="0">
+       <string>np.sin(3*x)/(x+0.1)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>PushButton</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>730</width>
+     <height>19</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Graph</class>
+   <extends>QWidget</extends>
+   <header>graph</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>graph_2</receiver>
+   <slot>plot_function()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>74</x>
+     <y>39</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>162</x>
+     <y>175</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>graph_2</sender>
+   <signal>link(QObject*)</signal>
+   <receiver>graph</receiver>
+   <slot>linkXAxis(QObject*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>230</x>
+     <y>177</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>235</x>
+     <y>290</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>graph</receiver>
+   <slot>plot_sample_signal()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>21</x>
+     <y>43</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>97</x>
+     <y>322</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
