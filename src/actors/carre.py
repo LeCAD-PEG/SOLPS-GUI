@@ -7,7 +7,7 @@
 from PySide6.QtWidgets import (QPlainTextEdit, QVBoxLayout, QPushButton,
                              QGridLayout, QInputDialog, QComboBox, QSpacerItem,
                              QSizePolicy, QGroupBox, QCheckBox)
-from PySide6.QtCore import Slot, QSettings, Qt, QDateTime
+from PySide6.QtCore import Slot, QSettings, Qt, QDateTime, QProcess
 from PySide6.QtGui import QTextCursor
 from tcsh_process import TcshProcess
 import logging
@@ -440,7 +440,7 @@ class Carre(TcshProcess):
         a TCSH terminal or the expected input the ``carre`` scripts expect from
         the user.
         """
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
 
         msg, ok = QInputDialog.getMultiLineText(self, 'Input dialog',
@@ -453,7 +453,7 @@ class Carre(TcshProcess):
     def runPrepare(self):
         """Command prepare or value 'p'
         """
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == CarreState.waiting:
             msg = "p\n"
@@ -463,7 +463,7 @@ class Carre(TcshProcess):
     def runGrid(self):
         """Command grid or value 'g'
         """
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == CarreState.waiting:
             msg = "g\n"
@@ -473,7 +473,7 @@ class Carre(TcshProcess):
     def runSaveChoice(self):
         """Command SaveChoice or value 's'
         """
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == CarreState.waiting:
             msg = "s\n"
@@ -483,7 +483,7 @@ class Carre(TcshProcess):
     def runConvert(self):
         """Command Convert or value 'c'
         """
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == CarreState.waiting:
             msg = "c\n"
@@ -493,7 +493,7 @@ class Carre(TcshProcess):
     def runStore(self):
         """Command Store or value 't'
         """
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == CarreState.waiting:
             msg = "t\n"
@@ -503,7 +503,7 @@ class Carre(TcshProcess):
     def pressY(self):
         """Command Store or value 't'
         """
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == CarreState.waiting:
             msg = "y\n"
@@ -513,7 +513,7 @@ class Carre(TcshProcess):
     def pressN(self):
         """Command Store or value 't'
         """
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == CarreState.waiting:
             msg = "n\n"
@@ -638,7 +638,7 @@ class Carre(TcshProcess):
 
         self.textDisplay.clear()
 
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             # Get DG model from combo box
             if self.vars[CarreVars.dgModel]:
                 dgModel = self.vars[CarreVars.dgModel]

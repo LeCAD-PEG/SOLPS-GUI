@@ -2,7 +2,7 @@
 """ A PyQt custom DivGeo widget for Qt Designer.
 """
 
-from PySide6.QtCore import Qt, Signal, Slot, QSettings
+from PySide6.QtCore import Qt, Signal, Slot, QSettings, QProcess
 from PySide6.QtGui import QWindow
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QWidgetItem, QLabel, QFrame
 
@@ -126,7 +126,6 @@ class DivGeo(TcshProcess):
         When the Window ID is received the signal _embedDivGeo emits to start
         the embedding function.
         """
-
         logging.debug(text)
         for line in text.splitlines():
             if "DivGeo WID: " in line:
@@ -220,8 +219,7 @@ class DivGeo(TcshProcess):
         """ Starts divgeo process inside the qwidget. We provide geometry
         coordinates, width and height for starting divgeo.
         """
-
-        if self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
 
         self.labelContainer = QLabel()
@@ -240,7 +238,6 @@ class DivGeo(TcshProcess):
                                     "please wait...)")
 
         DivGeo = 'dg'
-
         self.startTcsh()
         cmd = 'cd ' + self.getRunDir() + '\n'
         cmd += 'echo STARTING DIVGEO\n'
@@ -312,6 +309,7 @@ if __name__ == "__main__":
     import sys
     import os
     from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton
+    import logging
 
     logging.getLogger().setLevel(logging.DEBUG)
 

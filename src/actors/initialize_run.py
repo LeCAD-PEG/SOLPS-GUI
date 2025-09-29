@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (QVBoxLayout, QGridLayout, QGroupBox, QComboBox,
                              QPushButton, QPlainTextEdit, QFileDialog,
                              QMessageBox, QInputDialog, QCheckBox)
 from PySide6.QtGui import QTextCursor
-from PySide6.QtCore import Slot, QSettings, Qt
+from PySide6.QtCore import Slot, QSettings, Qt, QProcess
 from tcsh_process import TcshProcess
 import os
 
@@ -288,7 +288,7 @@ class InitializeRun(TcshProcess):
         a TCSH terminal or the expected input the ``carre`` scripts expect from
         the user.
         """
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
 
         runDirectory = self.enterRunDirectory()

@@ -5,7 +5,7 @@
 from PySide6.QtWidgets import (QPushButton, QVBoxLayout, QGridLayout, QGroupBox,
                              QCheckBox, QSpacerItem, QSizePolicy,
                              QPlainTextEdit, QInputDialog)
-from PySide6.QtCore import Slot, Qt, QDateTime
+from PySide6.QtCore import Slot, Qt, QDateTime, QProcess
 from PySide6.QtGui import QTextCursor
 from tcsh_process import TcshProcess
 import logging
@@ -287,7 +287,7 @@ class B2InputFiles(TcshProcess):
 
     @Slot()
     def runStep(self):
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == B2State.waiting:
             sender = self.sender()
@@ -297,7 +297,7 @@ class B2InputFiles(TcshProcess):
 
     @Slot()
     def manualInput(self):
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if not self.STATE >= B2State.waiting:
             return

@@ -42,6 +42,6 @@ class Director(QCheckBox):
     def setRundir(self, rundir):
         self.rundir_passthrough.emit(rundir)
         self.rundir_passtrigger.emit()
-        if self.checkState():
+        if self.checkState().value:
             self.rundir_checked.emit(rundir)
             self.rundir_checktrigger.emit()

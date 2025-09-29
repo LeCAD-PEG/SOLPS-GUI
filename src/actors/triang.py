@@ -5,7 +5,7 @@
 from PySide6.QtWidgets import (QPlainTextEdit, QVBoxLayout, QGridLayout,
                              QInputDialog, QSpacerItem, QSizePolicy,
                              QPushButton, QGroupBox, QCheckBox, QMessageBox)
-from PySide6.QtCore import Slot, QSettings, Qt, QDateTime
+from PySide6.QtCore import Slot, QSettings, Qt, QDateTime, QProcess
 from PySide6.QtGui import QTextCursor
 from tcsh_process import TcshProcess
 import logging
@@ -444,7 +444,7 @@ class Triang(TcshProcess):
         """Opens a dialog window into which the user can write text, which is
         then provided to the TCSH terminal.
         """
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
 
         msg, ok = QInputDialog.getMultiLineText(self, 'Input dialog',
@@ -503,7 +503,7 @@ class Triang(TcshProcess):
         """Custom PushButtons emits signal to this function. They contain
         attribute value which is then passed to tcsh if it is running.
         """
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == TriangState.waiting:
             sender = self.sender()
@@ -512,63 +512,63 @@ class Triang(TcshProcess):
             self.tcsh.write(msg)
     @Slot()
     def runUinpU(self):
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == TriangState.waiting:
             msg = "U\n"
             self.tcsh.write(msg)
     @Slot()
     def runUinpu(self):
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == TriangState.waiting:
             msg = "u\n"
             self.tcsh.write(msg)
     @Slot()
     def runB2ag(self):
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == TriangState.waiting:
             msg = "b\n"
             self.tcsh.write(msg)
     @Slot()
     def runEirene(self):
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == TriangState.waiting:
             msg = "e\n"
             self.tcsh.write(msg)
     @Slot()
     def runTria(self):
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == TriangState.waiting:
             msg = "t\n"
             self.tcsh.write(msg)
     @Slot()
     def runtriaGeom(self):
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == TriangState.waiting:
             msg = "g\n"
             self.tcsh.write(msg)
     @Slot()
     def runStore(self):
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == TriangState.waiting:
             msg = "s\n"
             self.tcsh.write(msg)
     @Slot()
     def runConv2Out(self):
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == TriangState.waiting:
             msg = "c\n"
             self.tcsh.write(msg)
     @Slot()
     def runConv2Grid(self):
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == TriangState.waiting:
             msg = "C\n"
@@ -578,7 +578,7 @@ class Triang(TcshProcess):
     def pressY(self):
         """Command Store or value 't'
         """
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == TriangState.waiting:
             msg = "y\n"
@@ -588,7 +588,7 @@ class Triang(TcshProcess):
     def pressN(self):
         """Command Store or value 't'
         """
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             return
         if self.STATE == TriangState.waiting:
             msg = "n\n"
@@ -693,7 +693,7 @@ class Triang(TcshProcess):
             logging.info(msg)
             self.currentRunDir = runDir
 
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             # Get DG model from combo box
 
             self.startTcsh()

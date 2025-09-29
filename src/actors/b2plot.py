@@ -163,7 +163,7 @@ class B2plot(TcshProcess):
                   is empty or nonexistent.
         """
         cmd = ''
-        if not self.tcsh.state():
+        if self.tcsh.state() != QProcess.NotRunning:
             # cmd += 'module load libpng\n'
             cmd += 'setenv B2PLOT_DEV "ps"\n'
 

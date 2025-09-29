@@ -77,7 +77,12 @@ class Tcsh(QProcess):
     def processStateChanged(self, newState):
         states = ['Not Running', 'Starting', 'Running']
 
-        msg = f'Process {self.program()} state changed: {states[newState]}'
+        try:
+            val = int(newState)
+        except Exception as e:
+            val = newState.value
+
+        msg = f'Process {self.program()} state changed: {states[val]}'
         logging.info(msg)
         self.prcStateChanged.emit(msg)
 
