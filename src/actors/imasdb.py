@@ -25,6 +25,14 @@ backend_mapping = {
     'NO': imas.imasdef.NO_BACKEND,
 }
 
+backend_name_mapping = {
+    imas.imasdef.MDSPLUS_BACKEND: "MDSPLUS",
+    imas.imasdef.HDF5_BACKEND: "HDF5",
+    imas.imasdef.MEMORY_BACKEND: "MEMORY",
+    imas.imasdef.UDA_BACKEND: "UDA",
+    imas.imasdef.NO_BACKEND: "NO",
+}
+
 class StdRedirector:
     """Redirects stdout to a custom output stream.
     """
@@ -545,6 +553,12 @@ class IMASDB(QWidget):
         _pulse = (shot, run, occurrence, username, database, backend, data_version)
         self._set_pulse_layout(_pulse)
         self.setProperty('pulse', f'{_pulse}')
+        backend_name = backend_name_mapping[backend].lower()
+        uri = f'imas:{backend_name}?user={username};pulse={shot};run={run};database={database};version={data_version}'
+        self._uri.setPlainText(uri)
+        self.setProperty('uri', uri)
+
+
         
     def _eval_pulse(self) -> tuple:
         """ Evaluate pulse property and return tuple.
