@@ -67,22 +67,22 @@
        <string>This actor is part of PDS-WF workflow</string>
       </property>
       <property name="uri" stdset="0">
-       <string>imas:hdf5?user=$USER;pulse=123347;run=1;database=ITER;version=4</string>
+       <string>imas:hdf5?user=$USER;pulse=123347;run=2;database=ITER;version=4</string>
       </property>
       <property name="pulse" stdset="0">
-       <string>(123347, 1, 0, '$USER', 'ITER', 13, '4')</string>
+       <string>(123347, 2, 0, '$USER', 'ITER', 13, '4')</string>
       </property>
       <property name="title" stdset="0">
-       <string notr="true" comment="Text for widget title." extracomment="Add this to widget title">IMAS DB</string>
+       <string notr="true" comment="Text for widget title." extracomment="Add this to widget title">IMAS Put</string>
       </property>
       <property name="button" stdset="0">
        <string notr="true" comment="Title for Start button" extracomment="Add this to button">Read IMAS DB</string>
       </property>
       <property name="start_counter" stdset="0">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="show_pulse" stdset="0">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <property name="show_uri" stdset="0">
        <bool>true</bool>
@@ -91,13 +91,13 @@
        <bool>true</bool>
       </property>
       <property name="show_button" stdset="0">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <property name="show_title" stdset="0">
        <bool>true</bool>
       </property>
       <property name="show_enable" stdset="0">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
      </widget>
     </item>
@@ -114,7 +114,7 @@
    </property>
    <widget class="QMenu" name="menuPulse">
     <property name="title">
-     <string>Pulse</string>
+     <string>IMAS</string>
     </property>
     <addaction name="actionLoad"/>
     <addaction name="actionSave"/>
@@ -122,12 +122,12 @@
    </widget>
    <widget class="QMenu" name="menuDesign">
     <property name="title">
-     <string>Design</string>
+     <string>DBentry</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuSimulator">
     <property name="title">
-     <string>Simulator</string>
+     <string>Demo</string>
     </property>
    </widget>
    <addaction name="menuPulse"/>

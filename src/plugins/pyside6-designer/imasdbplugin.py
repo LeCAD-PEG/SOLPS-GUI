@@ -70,10 +70,8 @@ class IMASDBTaskMenu(QPyDesignerTaskMenuExtension):
 
             @Slot()
             def update_uri(self):
-                if len(dialog.lineEdit_shot.text()): 
-                    pulse = int(dialog.lineEdit_shot.text())
-                if len(dialog.lineEdit_run.text()): 
-                    run = int(dialog.lineEdit_run.text())
+                pulse = dialog.lineEdit_shot.text()
+                run = dialog.lineEdit_run.text()
                 user = dialog.lineEdit_username.text()
                 database = dialog.lineEdit_database.text()
                 backend = dialog.comboBox_backend.currentText().lower()
