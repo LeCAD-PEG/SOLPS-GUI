@@ -1,4 +1,4 @@
-from imasdb import IMASDB, backend_mapping
+from imasdb import IMASDB, Backend
 
 from PySide6.QtGui import QAction, QIcon
 from PySide6.QtDesigner import (QExtensionManager, QExtensionFactory, 
@@ -37,8 +37,8 @@ class IMASDBTaskMenu(QPyDesignerTaskMenuExtension):
                 self.setupUi(self)
 
             def setupVars(self, actor):
-                if actor.property('pulse'):
-                    (shot, run, occurrence, username, database, backend, data_version) = eval(actor.property('pulse'))
+                if pulse := actor.property('pulse'):
+                    (shot, run, occurrence, username, database, backend, data_version) = eval(pulse)
                     self.lineEdit_shot.setText(str(shot))
                     self.lineEdit_shot.textChanged.connect(self.update_uri)
                     self.lineEdit_run.setText(str(run))
@@ -48,18 +48,11 @@ class IMASDBTaskMenu(QPyDesignerTaskMenuExtension):
                     self.lineEdit_username.textChanged.connect(self.update_uri)
                     self.lineEdit_database.setText(str(database))
                     self.lineEdit_database.textChanged.connect(self.update_uri)
-                    self.lineEdit_data_version.setText(str(data_version))
+                    self.lineEdit_data_version.setText(data_version)
                     self.lineEdit_data_version.textChanged.connect(self.update_uri)
-                    if backend == imas.ids_defs.MDSPLUS_BACKEND:
-                        backend = 'MDSPLUS'
-                    elif backend == imas.ids_defs.MEMORY_BACKEND:
-                        backend = 'MEMORY'
-                    elif backend == imas.ids_defs.HDF5_BACKEND:
-                        backend = 'HDF5'
-                    elif backend == imas.ids_defs.UDA_BACKEND:
-                        backend =  'UDA'
+                    backend_name = Backend(backend).name
                     for i in range(self.comboBox_backend.count()):
-                        if backend == self.comboBox_backend.itemText(i):
+                        if backend_name == self.comboBox_backend.itemText(i):
                             self.comboBox_backend.setCurrentIndex(i)
                             break
                     self.comboBox_backend.currentIndexChanged.connect(self.update_uri)
@@ -75,6 +68,7 @@ class IMASDBTaskMenu(QPyDesignerTaskMenuExtension):
                 backend = dialog.comboBox_backend.currentText().lower()
                 version = dialog.lineEdit_data_version.text()
                 uri = f'imas:{backend}?user={user};pulse={pulse};run={run};database={database};version={version}'
+                print('Updated URI', uri)
                 self.plainTextEdit_uri.setPlainText(uri)
 
 
@@ -92,15 +86,16 @@ class IMASDBTaskMenu(QPyDesignerTaskMenuExtension):
                 database = dialog.lineEdit_database.text()
                 backend = dialog.comboBox_backend.currentText()
                 data_version = dialog.lineEdit_data_version.text()
-                backend = backend_mapping[backend]
+                backend = Backend[backend].value
                 pulse = (shot, run, occurrence, username, database, backend, data_version)
                 uri = dialog.plainTextEdit_uri.toPlainText()
                 form = QDesignerFormWindowInterface.findFormWindow(self._actor)
                 form.cursor().setProperty('pulse', f'{pulse}')
                 form.cursor().setProperty('uri', uri)
                 self._actor.setProperty('pulse', f'{pulse}')
-                self._actor._set_pulse_layout(self._actor._eval_pulse())
+                self._actor._set_pulse_layout(self._actor._eval_pulse_property())
                 self._actor.setProperty('uri', uri)
+                self._actor._uri.setPlainText(uri)
                 form.emitSelectionChanged()
 
 
@@ -140,7 +135,7 @@ DOM_XML = """
         </property>
         <property name='uri'>
             <string notr='true' comment='IMAS URI for the data entry it used in DBEntry'
-            extracomment='URI starts with imas:'>imas:</string>
+            extracomment='URI starts with imas:'>imas:hdf5?user=public;pulse=123347;run=1;database=ITER;version=4</string>
         </property>
         <property name='pulse'>
             <string notr='true' comment='(pulse, run, occurrence, usename, database, backend, data_version)'

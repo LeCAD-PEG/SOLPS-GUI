@@ -1,5 +1,5 @@
 from PySide6.QtCore import  (QObject, QSize, Property, Slot, Signal, 
-    QMetaMethod, QRunnable, QThreadPool, QTimer, QRect, Qt, QEvent)
+    QMetaMethod, QRunnable, QThreadPool, QTimer, QRect, Qt, QEvent, QSignalBlocker)
 from PySide6.QtWidgets import (QWidget,QVBoxLayout, QPushButton, QPlainTextEdit,
     QComboBox, QGridLayout, QGroupBox, QLabel, QLineEdit, QSplitter, QFrame,
     QCheckBox, QApplication, QScrollArea)
@@ -24,20 +24,6 @@ class Backend(enum.Enum):
     UDA     = imas.ids_defs.UDA_BACKEND
 # Backend["MDSPLUS"].value
 # Backend(imas.ids_defs.MDSPLUS_BACKEND).name
-
-backend_mapping = {
-    'MDSPLUS': imas.ids_defs.MDSPLUS_BACKEND,
-    'HDF5': imas.ids_defs.HDF5_BACKEND,
-    'MEMORY': imas.ids_defs.MEMORY_BACKEND,
-    'UDA': imas.ids_defs.UDA_BACKEND,
-}
-
-backend_name_mapping = {
-    imas.ids_defs.MDSPLUS_BACKEND: "MDSPLUS",
-    imas.ids_defs.HDF5_BACKEND: "HDF5",
-    imas.ids_defs.MEMORY_BACKEND: "MEMORY",
-    imas.ids_defs.UDA_BACKEND: "UDA"
-}
 
 class StdRedirector:
     """Redirects stdout to a custom output stream.
@@ -229,7 +215,7 @@ class IMASDB(QWidget):
         self._title.setFrameStyle(QFrame.Box|QFrame.Sunken)
         self._title.setAlignment(Qt.AlignCenter)
         self._layout.addWidget(self._title)
-        self._pulse_layout = self._get_pulse_layout() 
+        self._pulse_layout = self._create_pulse_layout() 
         self._layout.addWidget(self._pulse_layout)
         self._uri = QPlainTextEdit()
         self._uri.setMinimumHeight(100)
@@ -261,7 +247,7 @@ class IMASDB(QWidget):
 
         self._default_pulse: tuple = None
         """ tuple: Pulse default information in the form of 
-        *(shot, run, occurrence, username, database, backend)* """
+        *(shot, run, occurrence, username, database, backend, data_version)* """
         self.dbentry = None
         """ imas.DBEntry: Database object."""
         self.put_ids_process = None
@@ -325,10 +311,10 @@ class IMASDB(QWidget):
                 return True
             if name == 'pulse':
                 if not self._default_pulse:
-                    self._default_pulse = self._eval_pulse()
+                    self._default_pulse = self._eval_pulse_property()
                     self._set_pulse_layout(self._default_pulse)
                 else:
-                    self._set_pulse_layout(self._eval_pulse())
+                    self._set_pulse_layout(self._eval_pulse_property())
                 return True
             if name == 'uri':
                 self._uri.setPlainText(self.property('uri'))
@@ -357,90 +343,87 @@ class IMASDB(QWidget):
         return self.superclass.event(received)
 
 
-    def _get_pulse_layout(self): 
+    def _create_pulse_layout(self):
+        """Creates initial QGroupBox for pulse entry"""  
 
-        groupBox_ids = QGroupBox()
+        groupBox_pulse = QGroupBox()
         
-        gridLayout = QGridLayout(groupBox_ids)
+        gridLayout = QGridLayout(groupBox_pulse)
         gridLayout.setVerticalSpacing(1)
         gridLayout.setContentsMargins(0, 0, 0, 0)
 
-        label = QLabel(groupBox_ids)
-        label.setText("Shot")
-        label.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        gridLayout.addWidget(label, 0, 0, 1, 1)
-        lineEdit_shot = QLineEdit(groupBox_ids)
+        label_1 = QLabel(groupBox_pulse)
+        label_1.setText("Shot")
+        label_1.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        gridLayout.addWidget(label_1, 0, 0, 1, 1)
+        lineEdit_shot = QLineEdit(groupBox_pulse)
         lineEdit_shot.setObjectName(u"lineEdit_shot")
         lineEdit_shot.setValidator(QIntValidator(1,99999999))
-        lineEdit_shot.editingFinished.connect(self._update_pulse)
+        lineEdit_shot.textEdited.connect(self._update_pulse_and_uri_property)
         gridLayout.addWidget(lineEdit_shot, 0, 1, 1, 1)
 
-        label_2 = QLabel(groupBox_ids)
+        label_2 = QLabel(groupBox_pulse)
         label_2.setText("Run")
         label_2.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         gridLayout.addWidget(label_2, 1, 0, 1, 1)
-        lineEdit_run = QLineEdit(groupBox_ids)
+        lineEdit_run = QLineEdit(groupBox_pulse)
         lineEdit_run.setObjectName(u"lineEdit_run")
         lineEdit_run.setValidator(QIntValidator(1,99999999))
-        lineEdit_run.editingFinished.connect(self._update_pulse)
+        lineEdit_run.textEdited.connect(self._update_pulse_and_uri_property)
         gridLayout.addWidget(lineEdit_run, 1, 1, 1, 1)
         
-        label_6 = QLabel(groupBox_ids)
-        label_6.setText("Occurrence")
-        label_6.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        gridLayout.addWidget(label_6, 2, 0, 1, 1)
-        lineEdit_occurrence = QLineEdit(groupBox_ids)
+        label_3 = QLabel(groupBox_pulse)
+        label_3.setText("Occurrence")
+        label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        gridLayout.addWidget(label_3, 2, 0, 1, 1)
+        lineEdit_occurrence = QLineEdit(groupBox_pulse)
         lineEdit_occurrence.setObjectName(u"lineEdit_occurrence")
         lineEdit_occurrence.setValidator(QIntValidator(0,20))
-        lineEdit_occurrence.editingFinished.connect(self._update_pulse)
+        lineEdit_occurrence.textEdited.connect(self._update_pulse_and_uri_property)
         gridLayout.addWidget(lineEdit_occurrence, 2, 1, 1, 1)
 
-        label_3 = QLabel(groupBox_ids)
-        label_3.setText("Username")
-        label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        gridLayout.addWidget(label_3, 3, 0, 1, 1)
-        lineEdit_username = QLineEdit(groupBox_ids)
+        label_4 = QLabel(groupBox_pulse)
+        label_4.setText("Username")
+        label_4.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        gridLayout.addWidget(label_4, 3, 0, 1, 1)
+        lineEdit_username = QLineEdit(groupBox_pulse)
         lineEdit_username.setObjectName(u"lineEdit_username")
-        lineEdit_username.editingFinished.connect(self._update_pulse)
+        lineEdit_username.textEdited.connect(self._update_pulse_and_uri_property)
         gridLayout.addWidget(lineEdit_username, 3, 1, 1, 1)
 
-        label_4 = QLabel(groupBox_ids)
-        label_4.setText("Database")
-        label_4.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        gridLayout.addWidget(label_4, 4, 0, 1, 1)
-        lineEdit_database = QLineEdit(groupBox_ids)
+        label_5 = QLabel(groupBox_pulse)
+        label_5.setText("Database")
+        label_5.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        gridLayout.addWidget(label_5, 4, 0, 1, 1)
+        lineEdit_database = QLineEdit(groupBox_pulse)
         lineEdit_database.setObjectName(u"lineEdit_database")
-        lineEdit_database.editingFinished.connect(self._update_pulse)
+        lineEdit_database.textEdited.connect(self._update_pulse_and_uri_property)
         gridLayout.addWidget(lineEdit_database, 4, 1, 1, 1)
 
-        label_5 = QLabel(groupBox_ids)
-        label_5.setText("Backend")
-        label_5.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        gridLayout.addWidget(label_5, 5, 0, 1, 1)
-        comboBox_backend = QComboBox(groupBox_ids)
+        label_6 = QLabel(groupBox_pulse)
+        label_6.setText("Backend")
+        label_6.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        gridLayout.addWidget(label_6, 5, 0, 1, 1)
+        comboBox_backend = QComboBox(groupBox_pulse)
         comboBox_backend.setObjectName(u"comboBox_backend")
-        comboBox_backend.addItem("MDSPLUS")
-        comboBox_backend.addItem("HDF5")
-        comboBox_backend.addItem("MEMORY")
-        comboBox_backend.addItem("ASCII")
-        comboBox_backend.addItem("UDA")
-        comboBox_backend.addItem("NO")
-        comboBox_backend.currentIndexChanged.connect(self._update_pulse)
+        for member in Backend:
+            comboBox_backend.addItem(member.name)
+        comboBox_backend.currentIndexChanged.connect(self._update_pulse_and_uri_property)
         gridLayout.addWidget(comboBox_backend, 5, 1, 1, 1)
 
-        label_6 = QLabel(groupBox_ids)
-        label_6.setText("Data Version")
-        label_6.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        gridLayout.addWidget(label_6, 6, 0, 1, 1)
-        lineEdit_data_version = QLineEdit(groupBox_ids)
+        label_7 = QLabel(groupBox_pulse)
+        label_7.setText("Data Version")
+        label_7.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        gridLayout.addWidget(label_7, 6, 0, 1, 1)
+        lineEdit_data_version = QLineEdit(groupBox_pulse)
         lineEdit_data_version.setObjectName(u"lineEdit_data_version")
-        lineEdit_data_version.editingFinished.connect(self._update_pulse)
+        lineEdit_data_version.textEdited.connect(self._update_pulse_and_uri_property)
         gridLayout.addWidget(lineEdit_data_version, 6, 1, 1, 1)
 
         font_size = 9
         height = font_size+7
         font = QFont("Arial",font_size)
-        for child in groupBox_ids.children():
+        for child in groupBox_pulse.children():
             try:
                 child.setFont(font)
             except:
@@ -450,76 +433,68 @@ class IMASDB(QWidget):
             except:
                 pass
 
-        box_height = height*6
-        groupBox_ids.setGeometry(QRect(0, 0, 150, box_height))
+        box_height = height*7
+        groupBox_pulse.setGeometry(QRect(0, 0, 150, box_height))
 
-        return groupBox_ids
+        return groupBox_pulse
 
 
-    def _set_pulse_layout(self, source):
-        # Update layout information from pulse
-        (shot, run, occurrence, username, database, backend, data_version) = eval(str(source))
+    def _set_pulse_layout(self, pulse: tuple):
+        """Update pulse layout widgets from pulse tuple provided"""
+        (shot, run, occurrence, username, database, backend, data_version) = pulse
         (shot2, run2, occurrence2, username2, database2, backend2, data_version2) = self._default_pulse
-        pl = self._pulse_layout
-        for child in pl.children():
-            if child.objectName() == 'lineEdit_shot':    
-                if shot==shot2:
-                    child.clear()
-                    child.setPlaceholderText(str(shot2))
-                else:
-                    child.setText(str(shot))
-            elif child.objectName() == 'lineEdit_run':    
-                if run==run2:
-                    child.clear()
-                    child.setPlaceholderText(str(run2))
-                else:
-                    child.setText(str(run))
-            elif child.objectName() == 'lineEdit_occurrence':    
-                if occurrence==occurrence2:
-                    child.clear()
-                    child.setPlaceholderText(str(occurrence2))
-                else:
-                    child.setText(str(occurrence))
-            elif child.objectName() == 'lineEdit_username':  
-                if username==username2:
-                    child.clear()
-                    child.setPlaceholderText(username2)                     
-                else:
-                    child.setText(username)
-            elif child.objectName() == 'lineEdit_database': 
-                if database==database2:
-                    child.clear()
-                    child.setPlaceholderText(database2)                     
-                else:
-                    child.setText(database)
-            elif child.objectName() == 'comboBox_backend': 
-                if backend == imas.ids_defs.MEMORY_BACKEND:
-                    backend = 'MEMORY'
-                elif backend == imas.ids_defs.MDSPLUS_BACKEND:
-                    backend = 'MDSPLUS'
-                if backend2 == imas.ids_defs.MEMORY_BACKEND:
-                    backend2 = 'MEMORY'
-                elif backend2 == imas.ids_defs.MDSPLUS_BACKEND:
-                    backend2 = 'MDSPLUS'
-                for i in range(child.count()):
-                    if backend == child.itemText(i):
-                        child.setCurrentIndex(i)
-                        if backend==backend2:
-                            child.setStyleSheet("color: grey;  background-color: white")                    
-                        else:
-                            child.setStyleSheet("color: black;  background-color: white")
-                        break
-            elif child.objectName() == 'lineEdit_data_version': 
-                if data_version==data_version2:
-                    child.clear()
-                    child.setPlaceholderText(data_version2)                     
-                else:
-                    child.setText(data_version)
+        for child in self._pulse_layout.children():
+            with QSignalBlocker(child): # This won't re-emit signals such as currentIndexChanged()
+                if child.objectName() == 'lineEdit_shot':    
+                    if shot==shot2:
+                        child.clear()
+                        child.setPlaceholderText(str(shot2))
+                    else:
+                        child.setText(str(shot))
+                elif child.objectName() == 'lineEdit_run':    
+                    if run==run2:
+                        child.clear()
+                        child.setPlaceholderText(str(run2))
+                    else:
+                        child.setText(str(run))
+                elif child.objectName() == 'lineEdit_occurrence':    
+                    if occurrence==occurrence2:
+                        child.clear()
+                        child.setPlaceholderText(str(occurrence2))
+                    else:
+                        child.setText(str(occurrence))
+                elif child.objectName() == 'lineEdit_username':  
+                    if username==username2:
+                        child.clear()
+                        child.setPlaceholderText(username2)                     
+                    else:
+                        child.setText(username)
+                elif child.objectName() == 'lineEdit_database': 
+                    if database==database2:
+                        child.clear()
+                        child.setPlaceholderText(database2)                     
+                    else:
+                        child.setText(database)
+                elif child.objectName() == 'comboBox_backend':
+                    backend_name = Backend(backend).name
+                    for i in range(child.count()):
+                        if backend_name == child.itemText(i):
+                            child.setCurrentIndex(i)
+                            if backend_name == backend2:
+                                child.setStyleSheet("color: grey;  background-color: white")                    
+                            else:
+                                child.setStyleSheet("color: black;  background-color: white")
+                            break
+                elif child.objectName() == 'lineEdit_data_version': 
+                    if data_version == data_version2:
+                        child.clear()
+                        child.setPlaceholderText(data_version2)                     
+                    else:
+                        child.setText(data_version)
 
-    def _update_pulse(self):
-        # Update pulse information from window
-        pl = self._pulse_layout
-        for child in pl.children():
+    def _update_pulse_and_uri_property(self):
+        """Update pulse property from pulse layout widgets"""
+        for child in self._pulse_layout.children():
             if child.objectName() == 'lineEdit_shot': 
                 if child.text() != '':
                     shot = int(child.text()) 
@@ -546,35 +521,32 @@ class IMASDB(QWidget):
                 else: 
                     database = child.placeholderText()
             elif child.objectName() == 'comboBox_backend': 
-                backend = backend_mapping[child.currentText()]
-            elif child.objectName() == 'lineEdit_data_version': 
+                backend = Backend[child.currentText()].value
+            elif child.objectName() == 'lineEdit_data_version':
                 if child.text() != '':
                     data_version = child.text()
                 else: 
                     data_version = child.placeholderText()
 
         _pulse = (shot, run, occurrence, username, database, backend, data_version)
-        self._set_pulse_layout(_pulse)
-        self.setProperty('pulse', f'{_pulse}')
-        backend_name = backend_name_mapping[backend].lower()
-        uri = f'imas:{backend_name}?user={username};pulse={shot};run={run};database={database};version={data_version}'
-        self._uri.setPlainText(uri)
-        self.setProperty('uri', uri)
+        #self._set_pulse_layout(_pulse)
+       
+        with QSignalBlocker(self):
+            self.setProperty('pulse', f'{str(_pulse)}')
+            backend_name = Backend(backend).name.lower()
+            uri = f'imas:{backend_name}?user={username};pulse={shot};run={run};database={database};version={data_version}'
+            self._uri.setPlainText(uri)
+            self.setProperty('uri', uri)
 
 
         
-    def _eval_pulse(self) -> tuple:
-        """ Evaluate pulse property and return tuple.
-        """
+    def _eval_pulse_property(self) -> tuple:
+        """Evaluate pulse property and return tuple."""
         (shot, run, occurrence, username, database, backend, data_version) = eval(self.property('pulse'))
-        if backend == 'MEMORY':
-            backend = imas.ids_defs.MEMORY_BACKEND
-        elif backend == 'MDSPLUS':
-            backend = imas.ids_defs.MDSPLUS_BACKEND
-        elif backend == 'HDF5':
-            backend = imas.ids_defs.HDF5_BACKEND
-        elif backend == 'UDA':
-            backend = imas.ids_defs.UDA_BACKEND          
+        try:  # Convert name (e.g. 'HDF5' back to number
+            backend = Backend[backend].value
+        except:
+            pass          
         return (shot, run, occurrence, username, database, backend, data_version)
 
     def get_state(self) -> ET.Element:
@@ -582,7 +554,7 @@ class IMASDB(QWidget):
             into the study file.
         """
         _state = ET.Element(self.objectName())
-        _state.text = str(self._eval_pulse())
+        _state.text = str(self._eval_pulse_property())
         return _state
         
 
@@ -593,12 +565,8 @@ class IMASDB(QWidget):
             Args:
                 state(Element): |XML| study file
         """       
-        (shot, run, occurrence, username, database, backend) = eval(_state.text)
-        if backend == 'MEMORY':
-            backend = imas.ids_defs.MEMORY_BACKEND
-        elif backend == 'MDSPLUS':
-            backend = imas.ids_defs.MDSPLUS_BACKEND
-        _pulse = (shot, run, occurrence, username, database, backend)
+        (shot, run, occurrence, username, database, backend, data_version) = eval(_state.text)
+        _pulse = (shot, run, occurrence, username, database, backend, data_version)
         self.setProperty('pulse', f'{_pulse}')
         self._set_pulse_layout(_pulse)
         self._log.appendPlainText(f'State loaded.')
@@ -614,7 +582,6 @@ class IMASDB(QWidget):
         """
         h = 270
         if not self.property('show_pulse'): 
-            #print('Reducing size hint')
             h -= 160
         return QSize(200, h)
 
@@ -639,7 +606,7 @@ class IMASDB(QWidget):
         creating :class:`dbentry` for reading the database.
         """
         if self._checkbox_enable.isChecked():
-            #_pulse = self._eval_pulse()
+            #_pulse = self._eval_pulse_property()
             #(shot, run, occurrence, username, database, backend, data_version) = _pulse
             #if username == '$USER' : username = getpass.getuser()
             #uri = imas.DBEntry.build_uri_from_legacy_parameters(backend,shot,run,database,username,data_version)
@@ -786,9 +753,9 @@ class IMASDB(QWidget):
         metaObj = self.metaObject()
         for i in range(metaObj.methodCount()):      
             meta_method = metaObj.method(i)
-            if meta_method.methodType() == QMetaMethod.Signal:         
-                if meta_method.name().data().decode('utf8') == signal_name:
-                   print(self.isSignalConnected(meta_method))
+            #if meta_method.methodType() == QMetaMethod.Signal:         
+            #    if meta_method.name().data().decode('utf8') == signal_name:
+            #       print(self.isSignalConnected(meta_method))
 
     @Slot(int)
     def set_occurrence(self, occurrence:int):
@@ -868,7 +835,7 @@ class IMASDB(QWidget):
         self._title.setAutoFillBackground(False)
         self.ids_queue = None
         self.put_ids_process = None
-        self.emit_pulse.emit(str(self._eval_pulse()))
+        self.emit_pulse.emit(str(self._eval_pulse_property()))
         self.finished.emit()
         self._running_state = 2
 

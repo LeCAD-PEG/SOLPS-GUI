@@ -68,7 +68,7 @@
       <item row="0" column="1">
        <widget class="QLineEdit" name="lineEdit_shot">
         <property name="text">
-         <string>130012</string>
+         <string>123347</string>
         </property>
        </widget>
       </item>
@@ -85,7 +85,7 @@
       <item row="1" column="1">
        <widget class="QLineEdit" name="lineEdit_run">
         <property name="text">
-         <string>3</string>
+         <string>1</string>
         </property>
        </widget>
       </item>
@@ -113,12 +113,12 @@
        <widget class="QComboBox" name="comboBox_backend">
         <item>
          <property name="text">
-          <string>MDSPLUS</string>
+          <string>HDF5</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>HDF5</string>
+          <string>MDSPLUS</string>
          </property>
         </item>
         <item>
@@ -134,11 +134,6 @@
         <item>
          <property name="text">
           <string>UDA</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>NO</string>
          </property>
         </item>
        </widget>
@@ -173,7 +168,7 @@
    <item row="1" column="0">
     <widget class="QPlainTextEdit" name="plainTextEdit_uri">
      <property name="plainText">
-      <string>imas:mdsplus?</string>
+      <string>imas:hdf5?user=public;pulse=123347;run=1;database=ITER;version=4</string>
      </property>
     </widget>
    </item>
