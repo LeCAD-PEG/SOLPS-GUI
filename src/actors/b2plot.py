@@ -187,7 +187,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = B2plot()
     window.show()
-    rundir = '~/solps-iter/runs/DEMO_Donly_kin/run1'
+    rundir = '~/solps-iter-wg/runs/ITER/SRO_H_15MA_5.3T/001'
     window.setRunDir(os.path.expanduser(rundir))
     window.setB2plotCommand("echo phys a4p ti te m/ surf | b2plot")
     window.executeB2plotCommand()
