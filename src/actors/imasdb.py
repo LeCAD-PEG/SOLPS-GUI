@@ -1,3 +1,4 @@
+"""IMAS Database reader and writer"""
 from PySide6.QtCore import  (QObject, QSize, Property, Slot, Signal, 
     QMetaMethod, QRunnable, QThreadPool, QTimer, QRect, Qt, QEvent, QSignalBlocker)
 from PySide6.QtWidgets import (QWidget,QVBoxLayout, QPushButton, QPlainTextEdit,
@@ -7,7 +8,6 @@ from PySide6.QtUiTools import loadUiType
 from PySide6.QtGui import QIntValidator, QDoubleValidator, QFont
 
 import getpass
-import imas
 import multiprocessing
 import traceback
 import sys
@@ -15,15 +15,38 @@ import enum
 import xml.etree.ElementTree as ET
 import numpy as np
 
-#  IMAS Database reader and writer
+try:
+    import imas
+    class Backend(enum.Enum):
+        MDSPLUS = imas.ids_defs.MDSPLUS_BACKEND
+        HDF5    = imas.ids_defs.HDF5_BACKEND
+        MEMORY  = imas.ids_defs.MEMORY_BACKEND
+        UDA     = imas.ids_defs.UDA_BACKEND
+    # Backend["MDSPLUS"].value
+    # Backend(imas.ids_defs.MDSPLUS_BACKEND).name
+except ImportError:
+    print('IMAS not available!')
+    class Backend(enum.Enum):
+        NO = 0
+        @classmethod
+        def _missing_(cls, value):
+            """Return default when value is not found"""
+            return cls.NO 
 
-class Backend(enum.Enum):
-    MDSPLUS = imas.ids_defs.MDSPLUS_BACKEND
-    HDF5    = imas.ids_defs.HDF5_BACKEND
-    MEMORY  = imas.ids_defs.MEMORY_BACKEND
-    UDA     = imas.ids_defs.UDA_BACKEND
-# Backend["MDSPLUS"].value
-# Backend(imas.ids_defs.MDSPLUS_BACKEND).name
+    IDS_NAMES = ['amns_data', 'barometry', 'b_field_non_axisymmetric', 'bolometer', 'bremsstrahlung_visible', 'calorimetry',
+            'camera_ir', 'camera_visible', 'camera_x_rays', 'charge_exchange', 'coils_non_axisymmetric', 'controllers',
+            'core_instant_changes', 'core_profiles', 'core_sources', 'core_transport', 'cryostat', 'dataset_description',
+            'dataset_fair', 'disruption', 'distribution_sources', 'distributions', 'divertors', 'ec_launchers', 'ece', 'edge_profiles',
+            'edge_sources', 'edge_transport', 'em_coupling', 'equilibrium', 'ferritic', 'focs', 'gas_injection', 'gas_pumping',
+            'gyrokinetics_local', 'hard_x_rays', 'ic_antennas', 'interferometer', 'iron_core', 'langmuir_probes', 'lh_antennas',
+            'magnetics', 'operational_instrumentation', 'mhd', 'mhd_linear', 'mse', 'nbi', 'neutron_diagnostic', 'ntms',
+            'pellets', 'pf_active', 'pf_passive', 'pf_plasma', 'plasma_initiation', 'plasma_profiles', 'plasma_sources',
+            'plasma_transport', 'polarimeter', 'pulse_schedule', 'radiation', 'real_time_data', 'reflectometer_profile',
+            'reflectometer_fluctuation', 'refractometer', 'runaway_electrons', 'sawteeth', 'soft_x_rays', 'spectrometer_mass',
+            'spectrometer_uv', 'spectrometer_visible', 'spectrometer_x_ray_crystal', 'spi', 'summary', 'temporary', 'thomson_scattering',
+            'tf', 'transport_solver_numerics', 'turbulence', 'wall', 'waves', 'workflow']
+
+
 
 class StdRedirector:
     """Redirects stdout to a custom output stream.
@@ -204,9 +227,14 @@ class IMASDB(QWidget):
         super().__init__(parent)
         self.superclass = super()
         self._ids_names = []
-        for name in imas.IDSFactory():
-            self.add_signal(name, [object])
-            self._ids_names.append(name)
+        try:
+            for name in imas.IDSFactory():
+                self.add_signal(name, [object])
+                self._ids_names.append(name)
+        except:
+            self._ids_names = IDS_NAMES
+            for name in IDS_NAMES:
+                self.add_signal(name, [object])  
         self._layout = QVBoxLayout(self) #: Sample vertical layout 
         self._layout.setSpacing(2)
         self._checkbox_enable = QCheckBox("Enable")
@@ -406,9 +434,12 @@ class IMASDB(QWidget):
         gridLayout.addWidget(label_6, 5, 0, 1, 1)
         comboBox_backend = QComboBox(groupBox_pulse)
         comboBox_backend.setObjectName(u"comboBox_backend")
-        for member in Backend:
-            comboBox_backend.addItem(member.name)
-        comboBox_backend.currentIndexChanged.connect(self._update_pulse_and_uri_property)
+        try:
+            for member in Backend:
+                comboBox_backend.addItem(member.name)
+            comboBox_backend.currentIndexChanged.connect(self._update_pulse_and_uri_property)
+        except NameError:
+            pass
         gridLayout.addWidget(comboBox_backend, 5, 1, 1, 1)
 
         label_7 = QLabel(groupBox_pulse)
@@ -862,7 +893,10 @@ if __name__ == '__main__':
     class MainWindow(uiclass, baseclass):
         def __init__(self, parent=None):
             super().__init__(parent)
-            self.setupUi(self)
+            try:
+                self.setupUi(self)
+            except AttributeError as e:
+                print(f'Signal not available?: {e}')
 
     app = QApplication(sys.argv)
     window = MainWindow()
