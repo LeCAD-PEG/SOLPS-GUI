@@ -18,28 +18,25 @@ import numpy as np
 #  IMAS Database reader and writer
 
 class Backend(enum.Enum):
-    MDSPLUS = imas.imasdef.MDSPLUS_BACKEND
-    HDF5    = imas.imasdef.HDF5_BACKEND
-    MEMORY  = imas.imasdef.MEMORY_BACKEND
-    UDA     = imas.imasdef.UDA_BACKEND
-    NO      = imas.imasdef.NO_BACKEND
+    MDSPLUS = imas.ids_defs.MDSPLUS_BACKEND
+    HDF5    = imas.ids_defs.HDF5_BACKEND
+    MEMORY  = imas.ids_defs.MEMORY_BACKEND
+    UDA     = imas.ids_defs.UDA_BACKEND
 # Backend["MDSPLUS"].value
-# Backend(imas.imasdef.MDSPLUS_BACKEND).name
+# Backend(imas.ids_defs.MDSPLUS_BACKEND).name
 
 backend_mapping = {
-    'MDSPLUS': imas.imasdef.MDSPLUS_BACKEND,
-    'HDF5': imas.imasdef.HDF5_BACKEND,
-    'MEMORY': imas.imasdef.MEMORY_BACKEND,
-    'UDA': imas.imasdef.UDA_BACKEND,
-    'NO': imas.imasdef.NO_BACKEND,
+    'MDSPLUS': imas.ids_defs.MDSPLUS_BACKEND,
+    'HDF5': imas.ids_defs.HDF5_BACKEND,
+    'MEMORY': imas.ids_defs.MEMORY_BACKEND,
+    'UDA': imas.ids_defs.UDA_BACKEND,
 }
 
 backend_name_mapping = {
-    imas.imasdef.MDSPLUS_BACKEND: "MDSPLUS",
-    imas.imasdef.HDF5_BACKEND: "HDF5",
-    imas.imasdef.MEMORY_BACKEND: "MEMORY",
-    imas.imasdef.UDA_BACKEND: "UDA",
-    imas.imasdef.NO_BACKEND: "NO",
+    imas.ids_defs.MDSPLUS_BACKEND: "MDSPLUS",
+    imas.ids_defs.HDF5_BACKEND: "HDF5",
+    imas.ids_defs.MEMORY_BACKEND: "MEMORY",
+    imas.ids_defs.UDA_BACKEND: "UDA"
 }
 
 class StdRedirector:
@@ -148,12 +145,11 @@ def put_ids_process(uri: str, occurrence: int,  mode: str, ids_queue: multiproce
     """
     print(f"Creating IMAS {uri} database {'with occurrence ' + str(occurrence) if occurrence else ''}")
 
-    dbentry = imas.DBEntry(uri=uri, mode=mode)
 
     try:
-        status, idx = dbentry.create()
+        dbentry = imas.DBEntry(uri=uri, mode=mode)
     except Exception as e:
-        print(f'ERROR: {e}')
+        print(f'ERROR in put_ids_process: {e}')
 
     received_ids_types_occurrences = set()
     while True:
@@ -222,9 +218,9 @@ class IMASDB(QWidget):
         super().__init__(parent)
         self.superclass = super()
         self._ids_names = []
-        for name in imas.ids_names.IDSName:
-            self.add_signal(name.value, [object])
-            self._ids_names.append(name.value)
+        for name in imas.IDSFactory():
+            self.add_signal(name, [object])
+            self._ids_names.append(name)
         self._layout = QVBoxLayout(self) #: Sample vertical layout 
         self._layout.setSpacing(2)
         self._checkbox_enable = QCheckBox("Enable")
@@ -497,13 +493,13 @@ class IMASDB(QWidget):
                 else:
                     child.setText(database)
             elif child.objectName() == 'comboBox_backend': 
-                if backend == imas.imasdef.MEMORY_BACKEND:
+                if backend == imas.ids_defs.MEMORY_BACKEND:
                     backend = 'MEMORY'
-                elif backend == imas.imasdef.MDSPLUS_BACKEND:
+                elif backend == imas.ids_defs.MDSPLUS_BACKEND:
                     backend = 'MDSPLUS'
-                if backend2 == imas.imasdef.MEMORY_BACKEND:
+                if backend2 == imas.ids_defs.MEMORY_BACKEND:
                     backend2 = 'MEMORY'
-                elif backend2 == imas.imasdef.MDSPLUS_BACKEND:
+                elif backend2 == imas.ids_defs.MDSPLUS_BACKEND:
                     backend2 = 'MDSPLUS'
                 for i in range(child.count()):
                     if backend == child.itemText(i):
@@ -572,15 +568,13 @@ class IMASDB(QWidget):
         """
         (shot, run, occurrence, username, database, backend, data_version) = eval(self.property('pulse'))
         if backend == 'MEMORY':
-            backend = imas.imasdef.MEMORY_BACKEND
+            backend = imas.ids_defs.MEMORY_BACKEND
         elif backend == 'MDSPLUS':
-            backend = imas.imasdef.MDSPLUS_BACKEND
+            backend = imas.ids_defs.MDSPLUS_BACKEND
         elif backend == 'HDF5':
-            backend = imas.imasdef.HDF5_BACKEND
+            backend = imas.ids_defs.HDF5_BACKEND
         elif backend == 'UDA':
-            backend = imas.imasdef.UDA_BACKEND
-        elif backend == 'NO':
-            backend = imas.imasdef.NO_BACKEND            
+            backend = imas.ids_defs.UDA_BACKEND          
         return (shot, run, occurrence, username, database, backend, data_version)
 
     def get_state(self) -> ET.Element:
@@ -601,9 +595,9 @@ class IMASDB(QWidget):
         """       
         (shot, run, occurrence, username, database, backend) = eval(_state.text)
         if backend == 'MEMORY':
-            backend = imas.imasdef.MEMORY_BACKEND
+            backend = imas.ids_defs.MEMORY_BACKEND
         elif backend == 'MDSPLUS':
-            backend = imas.imasdef.MDSPLUS_BACKEND
+            backend = imas.ids_defs.MDSPLUS_BACKEND
         _pulse = (shot, run, occurrence, username, database, backend)
         self.setProperty('pulse', f'{_pulse}')
         self._set_pulse_layout(_pulse)
@@ -650,12 +644,13 @@ class IMASDB(QWidget):
             #if username == '$USER' : username = getpass.getuser()
             #uri = imas.DBEntry.build_uri_from_legacy_parameters(backend,shot,run,database,username,data_version)
             uri = self.property('uri')
-            self.dbentry = imas.DBEntry(uri, "r")
             try:
-                self._status, self.idx = self.dbentry.open()
+                self.dbentry = imas.DBEntry(uri, "r")
+                self._status = 0
             except Exception as e:
-                self._log.appendPlainText(f'{e}')
-            self._log.appendPlainText(f'Opening {uri} with status {self._status}')
+                self._status = -2
+                self._log.appendPlainText(f'Error: Opening pulse {e}')
+            self._log.appendPlainText(f'Opening {uri}')
 
     def createdb(self):
         """ |Slot| for calling :class:`imasdb.put_ids_process` in a separate 
@@ -745,16 +740,15 @@ class IMASDB(QWidget):
         Args:
             ids (object): IDS object to be emitted by the worker thread.
         """
-
-        signal = getattr(self, ids.__name__)
+        signal = getattr(self, ids.metadata.name)
         if self.property('time_requested'):
             if len(ids.time):
-                self._log.appendPlainText(f'Emitting {ids.__name__}'+' slice at time= '+
+                self._log.appendPlainText(f'Emitting {ids.metadata.name}'+' slice at time= '+
                                      str(ids.time[0]))
             else:
-                self._log.appendPlainText(f'Emitting {ids.__name__}'+' slice')     
+                self._log.appendPlainText(f'Emitting {ids.metadata.name}'+' slice')     
         else:
-            self._log.appendPlainText(f'Emitting {ids.__name__}')
+            self._log.appendPlainText(f'Emitting {ids.metadata.name}')
         signal.emit(ids)
         self.pop_get()
 
@@ -823,11 +817,11 @@ class IMASDB(QWidget):
             self.ids_queue.put((ids, self.occurrence))
             if ids is not None:
                 if hasattr(self, "time") and len(ids.time)==1:
-                    self._log.appendPlainText(f"IDS {ids.__name__}" +
+                    self._log.appendPlainText(f"IDS {ids.metadata.name}" +
                         f"({self.occurrence}) slice at time " +
                         f"{ids.time[0]} s written.")
                 else:
-                    self._log.appendPlainText(f"IDS {ids.__name__}" +
+                    self._log.appendPlainText(f"IDS {ids.metadata.name}" +
                             f"({self.occurrence}) written.")
 
     @Slot()

@@ -50,16 +50,14 @@ class IMASDBTaskMenu(QPyDesignerTaskMenuExtension):
                     self.lineEdit_database.textChanged.connect(self.update_uri)
                     self.lineEdit_data_version.setText(str(data_version))
                     self.lineEdit_data_version.textChanged.connect(self.update_uri)
-                    if backend == imas.imasdef.MDSPLUS_BACKEND:
+                    if backend == imas.ids_defs.MDSPLUS_BACKEND:
                         backend = 'MDSPLUS'
-                    elif backend == imas.imasdef.MEMORY_BACKEND:
+                    elif backend == imas.ids_defs.MEMORY_BACKEND:
                         backend = 'MEMORY'
-                    elif backend == imas.imasdef.HDF5_BACKEND:
+                    elif backend == imas.ids_defs.HDF5_BACKEND:
                         backend = 'HDF5'
-                    elif backend == imas.imasdef.UDA_BACKEND:
+                    elif backend == imas.ids_defs.UDA_BACKEND:
                         backend =  'UDA'
-                    elif backend == imas.imasdef.NO_BACKEND:
-                        backend = 'NO'
                     for i in range(self.comboBox_backend.count()):
                         if backend == self.comboBox_backend.itemText(i):
                             self.comboBox_backend.setCurrentIndex(i)
@@ -181,7 +179,7 @@ DOM_XML = """
                 <string>Opens or creates IMAS database and sends/receives QObject IDSs (get/put)</string>
         </property>
         <property name='whatsThis'>	
-                <string>This actor is part of PDS-WF workflow</string>
+                <string>This actor is part of IMAS workflow</string>
         </property>
     </widget>
 </ui>
