@@ -633,10 +633,10 @@ should eventually stop the run.</string>
            <string>This actor is part of PDS-WF workflow</string>
           </property>
           <property name="uri" stdset="0">
-           <string>imas:hdf5?user=public;pulse=123347;run=1;database=ITER;version=4</string>
+           <string>imas:mdsplus?user=public;pulse=123347;run=1;database=ITER;version=4</string>
           </property>
           <property name="pulse" stdset="0">
-           <string>(123347, 1, 0, 'public', 'ITER', 13, '4')</string>
+           <string>(123347, 1, 0, 'public', 'ITER', 12, '4')</string>
           </property>
           <property name="title" stdset="0">
            <string notr="true" comment="Text for widget title." extracomment="Add this to widget title">IMAS DB</string>

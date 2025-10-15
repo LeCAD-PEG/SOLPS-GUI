@@ -88,7 +88,7 @@ class getEPGGD():
             gsId (int) : Grid subset index
         """
         gs_obj = self.ep.grid_ggd[gridId].grid_subset[gsId]
-        return gs_obj.identifier.name
+        return gs_obj.identifier.name.value
 
     def getGridSubsetDim(self, gridId=0, gsId=0):
         """Return dimension of the grid subset (checks the dimension of the
@@ -163,10 +163,10 @@ class getEPGGD():
         # Include ion array of structure
         for i in range(len(ggd.ion)):
             # Get label
-            if ggd.ion[i].name != '':
-                ionLabel = ggd.ion[i].name
+            if ggd.ion[i].name.value != '':
+                ionLabel = ggd.ion[i].name.value
             else:
-                ionLabel = ggd.ion[i].state[0].name
+                ionLabel = ggd.ion[i].state[0].name.value
             # Ion density
             for j in range(len(ggd.ion[i].density)):
                 # Check if there is actually an array
@@ -179,10 +179,10 @@ class getEPGGD():
         # Ion temperature
         for i in range(len(ggd.ion)):
             # Get label
-            if ggd.ion[i].name != '':
-                ionLabel = ggd.ion[i].name
+            if ggd.ion[i].name.value != '':
+                ionLabel = ggd.ion[i].name.value
             else:
-                ionLabel = ggd.ion[i].state[0].name
+                ionLabel = ggd.ion[i].state[0].name.value
             for j in range(len(ggd.ion[i].temperature)):
                 # Check if there is actually an array
                 if len(ggd.ion[i].temperature[j].values) > 0:
