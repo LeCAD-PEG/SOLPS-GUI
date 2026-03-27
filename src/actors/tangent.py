@@ -1,0 +1,182 @@
+#!/usr/bin/env python3
+
+from PySide6.QtCore import Slot, QProcess
+from PySide6.QtGui import QTextCursor
+from PySide6.QtWidgets import (
+    QGridLayout,
+    QGroupBox,
+    QPushButton,
+    QPlainTextEdit,
+    QVBoxLayout,
+    QSpacerItem,
+    QSizePolicy,
+    QInputDialog,
+)
+
+from tcsh_process import TcshProcess
+
+
+class TangentActor(TcshProcess):
+    icon = ''
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.runDir = ''
+
+        self.prepareUserInterface()
+
+        self.tcsh.setTcshPath('/usr/bin/tcsh')
+
+        self.tcsh.stdOutput.connect(self.updateText)
+        self.tcsh.stdErrOutput.connect(self.updateText)
+        self.tcsh.prcStateChanged.connect(self.showProcessState)
+        self.tcsh.prcError.connect(self.showProcessState)
+
+    def prepareUserInterface(self):
+        mainLayout = QGridLayout(self)
+
+        commandBox = QGroupBox('Commands', self)
+        commandLayout = QVBoxLayout(commandBox)
+
+        self.compileButton = QPushButton('Compile tangent', commandBox)
+        self.compileButton.clicked.connect(self.compileTangent)
+        commandLayout.addWidget(self.compileButton)
+
+        self.runButton = QPushButton('Run tangent', commandBox)
+        self.runButton.clicked.connect(self.runTangent)
+        commandLayout.addWidget(self.runButton)
+
+        self.removePrtButton = QPushButton('rm b2mn.prt', commandBox)
+        self.removePrtButton.clicked.connect(self.removeB2mnPrt)
+        commandLayout.addWidget(self.removePrtButton)
+
+        self.stopButton = QPushButton('Stop run', commandBox)
+        self.stopButton.clicked.connect(self.stopRun)
+        commandLayout.addWidget(self.stopButton)
+
+        commandLayout.addItem(
+            QSpacerItem(
+                20,
+                20,
+                QSizePolicy.Policy.Minimum,
+                QSizePolicy.Policy.Expanding,
+            )
+        )
+
+        logBox = QGroupBox('Log window', self)
+        logLayout = QGridLayout(logBox)
+
+        self.textDisplay = QPlainTextEdit(logBox)
+        self.textDisplay.setReadOnly(True)
+        self.textDisplay.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
+        self.textDisplay.setPlaceholderText(
+            'SOLPS B25 tangent output will appear here.')
+        logLayout.addWidget(self.textDisplay, 0, 0, 1, 2)
+
+        self.manualButton = QPushButton('Terminal input', logBox)
+        self.manualButton.clicked.connect(self.manualInput)
+        logLayout.addWidget(self.manualButton, 1, 0)
+
+        self.clearButton = QPushButton('Clear log', logBox)
+        self.clearButton.clicked.connect(self.clearLog)
+        logLayout.addWidget(self.clearButton, 1, 1)
+
+        mainLayout.addWidget(commandBox, 0, 0)
+        mainLayout.addWidget(logBox, 0, 1)
+        mainLayout.setColumnStretch(1, 1)
+
+    @Slot(str)
+    def setSelectedRunDir(self, runDir):
+        self.runDir = runDir.strip() if runDir else ''
+        self.textDisplay.appendPlainText(f'Selected run directory: {self.runDir}')
+
+    def _ensureTcshReady(self):
+        self.textDisplay.appendPlainText(f'DEBUG runDir = {self.runDir}')
+        self.textDisplay.appendPlainText('DEBUG tcshPath = /usr/bin/tcsh')
+
+        if not self.runDir:
+            self.textDisplay.appendPlainText('No run directory selected.')
+            return False
+
+        self.tcsh.setRunDir(self.runDir)
+        self.tcsh.setTcshPath('/usr/bin/tcsh')
+
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
+            self.tcsh.start()
+
+        if self.tcsh.state() == QProcess.ProcessState.NotRunning:
+            self.textDisplay.appendPlainText('Failed to start tcsh process.')
+            return False
+
+        return True
+
+    def _executeCommand(self, command: str):
+        if not self._ensureTcshReady():
+            self.textDisplay.appendPlainText('Failed to start tcsh process.')
+            return
+
+        self.textDisplay.appendPlainText(f'$ {command}')
+
+        self.tcsh.write(f'cd {self.runDir}\n')
+        self.tcsh.write('setenv MAKE gmake\n')
+        self.tcsh.write(command + '\n')
+
+    @Slot()
+    def compileTangent(self):
+        self._executeCommand('gmake b25tgt')
+
+    @Slot()
+    def runTangent(self):
+        self._executeCommand('b2run -tgt b2mn')
+
+    @Slot()
+    def stopRun(self):
+        if self.tcsh.state() != QProcess.ProcessState.NotRunning:
+            self.textDisplay.appendPlainText('$ kill current process')
+        self.tcsh.close_process()
+
+    @Slot()
+    def removeB2mnPrt(self):
+        self._executeCommand('rm b2mn.prt')
+
+    @Slot()
+    def clearLog(self):
+        self.textDisplay.clear()
+
+    @Slot()
+    def manualInput(self):
+        if not self._ensureTcshReady():
+            return
+
+        text, ok = QInputDialog.getText(self, 'Terminal input', 'Command:')
+        if ok and text.strip():
+            command = text.strip()
+            self.textDisplay.appendPlainText(f'$ {command}')
+            self.tcsh.write(command + '\n')
+
+    @Slot(str)
+    def updateText(self, text):
+        if not text:
+            return
+        cursor = self.textDisplay.textCursor()
+        cursor.movePosition(QTextCursor.MoveOperation.End)
+        self.textDisplay.setTextCursor(cursor)
+        self.textDisplay.insertPlainText(text)
+        self.textDisplay.ensureCursorVisible()
+
+    @Slot(str)
+    def showProcessState(self, message):
+        if message:
+            self.textDisplay.appendPlainText(message)
+
+
+if __name__ == '__main__':
+    import sys
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication(sys.argv)
+    widget = TangentActor()
+    widget.resize(531, 821)
+    widget.show()
+    sys.exit(app.exec())
