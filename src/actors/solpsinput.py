@@ -331,6 +331,8 @@ solps_input_files = [ # filename and its description for a tooltip [b2cdcn.F]
     ('b2.atomic_physics_rescale.parameters',
      "Read if ’b2mndr_atomic_physics_rescale’ is set to 1.\n"
      "Contains rescaling multipliers for atomic physics rates."),
+    ('b2.optimization.parameters',
+     "Allows user to specify the cost functions for optimization"),
     ('untitled',
      'You will be asked for a file name once you start typing.')
 ]
