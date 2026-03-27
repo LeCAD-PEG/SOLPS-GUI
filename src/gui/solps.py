@@ -391,6 +391,13 @@ if __name__ == '__main__':
             super().__init__(*args)
             self.setupUi(self)
 
+            self.initialize_run.runDirCombo.currentTextChanged.connect(
+                self.updateTangentRunDir)
+            self.initialize_run.runDirCombo.currentTextChanged.connect(
+                self.updateAdjointRunDir)
+            self.initialize_run.runDirCombo.currentTextChanged.connect(
+                self.updateOptimizationRunDir)
+
             self.setAttribute(Qt.WA_DeleteOnClose, True)
 
             self.addMenu = AddMenu(self.menubar)
@@ -460,6 +467,7 @@ if __name__ == '__main__':
             self.b2_user.connect(self.director.b2_user)
             self.b2_run_number.connect(self.director.b2_run_number)
             self.b2_shot_number.connect(self.director.b2_shot_number)
+
             # self.runSelected.connect(self.tcsh.setRundir)
             # self.tcsh.setTcshCommand(self.lineEdit.text())
             #  self.gnuplot.setText("Started")
@@ -516,6 +524,40 @@ if __name__ == '__main__':
         #         settings.setValue("dir", directory)
         #     settings.endArray()
         #     settings.endGroup()
+
+        
+        def updateTangentRunDir(self):
+            try:
+                runDir = self.initialize_run.getSelectedRunDirectory()
+            except Exception:
+                runDir = ''
+
+            if not runDir:
+                runDir = ''
+
+            self.tangentActor.setSelectedRunDir(runDir)
+        def updateAdjointRunDir(self):
+            try:
+                runDir = self.initialize_run.getSelectedRunDirectory()
+            except Exception:
+                runDir = ''
+
+            if not runDir:
+                runDir = ''
+
+            self.adjointActor.setRunDir(runDir)
+
+
+        def updateOptimizationRunDir(self):
+            try:
+                runDir = self.initialize_run.getSelectedRunDirectory()
+            except Exception:
+                runDir = ''
+
+            if not runDir:
+                runDir = ''
+
+            self.optimizationActor.setRunDir(runDir)
 
         @Slot(int)
         def on_tabWidget_currentChanged(self, tab_index):
@@ -591,6 +633,9 @@ if __name__ == '__main__':
                     self.b2_shot_number.emit(shot)
 
                 self.runSelected.emit(path)
+                self.updateTangentRunDir()
+                self.updateAdjointRunDir()
+                self.updateOptimizationRunDir()
 
         @Slot()
         def enable_restore_button(self):

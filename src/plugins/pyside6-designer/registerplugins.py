@@ -16,6 +16,9 @@ from solpsplotsplugin import SolpsPlotsPlugin
 from tcshplugin import TcshWidgetPlugin
 from triangplugin import TriangPlugin
 from edgeprofilesplugin import EdgeProfilesPlugin
+from tangentplugin import TangentPlugin
+from adjointplugin import AdjointPlugin
+from optimizationplugin import OptimizationPlugin
 
 from PySide6.QtDesigner import QPyDesignerCustomWidgetCollection
 
@@ -38,3 +41,6 @@ if __name__ == '__main__':
     QPyDesignerCustomWidgetCollection.addCustomWidget(TcshWidgetPlugin())
     QPyDesignerCustomWidgetCollection.addCustomWidget(TriangPlugin())
     QPyDesignerCustomWidgetCollection.addCustomWidget(EdgeProfilesPlugin())
+    QPyDesignerCustomWidgetCollection.addCustomWidget(TangentPlugin())
+    QPyDesignerCustomWidgetCollection.addCustomWidget(AdjointPlugin())
+    QPyDesignerCustomWidgetCollection.addCustomWidget(OptimizationPlugin())

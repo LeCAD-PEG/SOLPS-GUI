@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>779</width>
-    <height>607</height>
+    <width>1076</width>
+    <height>943</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -31,7 +31,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_8">
-    <item row="0" column="0" rowspan="2">
+    <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -40,7 +40,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -87,7 +87,7 @@
            <enum>QTabWidget::Triangular</enum>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_16">
            <attribute name="title">
@@ -422,6 +422,69 @@ should eventually stop the run.</string>
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_tangent">
+       <attribute name="title">
+        <string>&amp;Tangent</string>
+       </attribute>
+       <widget class="TangentActor" name="tangentActor">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>1001</width>
+          <height>821</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>SOLPS tangent compile/run workflow.</string>
+        </property>
+        <property name="whatsThis">
+         <string>SOLPS tangent compile/run workflow.</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_adjoint">
+       <attribute name="title">
+        <string>&amp;Adjoint</string>
+       </attribute>
+       <widget class="AdjointActor" name="adjointActor">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>1001</width>
+          <height>821</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>SOLPS adjoint compile/run workflow.</string>
+        </property>
+        <property name="whatsThis">
+         <string>SOLPS adjoint compile/run workflow.</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_opt">
+       <attribute name="title">
+        <string>Optimization</string>
+       </attribute>
+       <widget class="OptimizationActor" name="optimizationActor">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>1001</width>
+          <height>821</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>SOLPS optimization workflow with set_tao, build, and opt runs.</string>
+        </property>
+        <property name="whatsThis">
+         <string>SOLPS optimization workflow with set_tao, build, and opt runs.</string>
+        </property>
+       </widget>
+      </widget>
       <widget class="QWidget" name="tab_Input">
        <attribute name="title">
         <string>I&amp;nput</string>
@@ -440,7 +503,7 @@ should eventually stop the run.</string>
         <item row="0" column="0">
          <widget class="SolpsInput" name="solpsview">
           <property name="currentIndex">
-           <number>2</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="tab_14">
            <attribute name="title">
@@ -934,7 +997,7 @@ should eventually stop the run.</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>779</width>
+     <width>1076</width>
      <height>19</height>
     </rect>
    </property>
@@ -1086,6 +1149,21 @@ should eventually stop the run.</string>
    <header>edgeprofiles</header>
   </customwidget>
   <customwidget>
+   <class>TangentActor</class>
+   <extends>QWidget</extends>
+   <header>tangent</header>
+  </customwidget>
+  <customwidget>
+   <class>AdjointActor</class>
+   <extends>QWidget</extends>
+   <header>adjoint</header>
+  </customwidget>
+  <customwidget>
+   <class>OptimizationActor</class>
+   <extends>QWidget</extends>
+   <header>optimization</header>
+  </customwidget>
+  <customwidget>
    <class>B2InputFiles</class>
    <extends>QWidget</extends>
    <header>b2_input_files</header>
@@ -1116,12 +1194,12 @@ should eventually stop the run.</string>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
-     <x>426</x>
-     <y>564</y>
+     <x>615</x>
+     <y>900</y>
     </hint>
    </hints>
   </connection>
@@ -1132,12 +1210,12 @@ should eventually stop the run.</string>
    <slot>triggerTextChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
-     <x>367</x>
-     <y>520</y>
+     <x>615</x>
+     <y>871</y>
     </hint>
    </hints>
   </connection>
@@ -1148,8 +1226,8 @@ should eventually stop the run.</string>
    <slot>setRundir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
@@ -1180,8 +1258,8 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
      <x>72</x>
@@ -1196,8 +1274,8 @@ should eventually stop the run.</string>
    <slot>setTcshCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>538</y>
+     <x>65</x>
+     <y>874</y>
     </hint>
     <hint type="destinationlabel">
      <x>72</x>
@@ -1212,8 +1290,8 @@ should eventually stop the run.</string>
    <slot>executeTcshCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>230</x>
-     <y>538</y>
+     <x>307</x>
+     <y>874</y>
     </hint>
     <hint type="destinationlabel">
      <x>72</x>
@@ -1228,8 +1306,8 @@ should eventually stop the run.</string>
    <slot>setSolpsPlotCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>367</x>
-     <y>520</y>
+     <x>615</x>
+     <y>871</y>
     </hint>
     <hint type="destinationlabel">
      <x>402</x>
@@ -1244,8 +1322,8 @@ should eventually stop the run.</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>367</x>
-     <y>520</y>
+     <x>615</x>
+     <y>871</y>
     </hint>
     <hint type="destinationlabel">
      <x>402</x>
@@ -1260,8 +1338,8 @@ should eventually stop the run.</string>
    <slot>executeSolpsPlotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>756</x>
-     <y>536</y>
+     <x>1053</x>
+     <y>872</y>
     </hint>
     <hint type="destinationlabel">
      <x>402</x>
@@ -1276,8 +1354,8 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
      <x>402</x>
@@ -1292,8 +1370,8 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -1308,11 +1386,11 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
-     <x>617</x>
+     <x>932</x>
      <y>75</y>
     </hint>
    </hints>
@@ -1324,11 +1402,11 @@ should eventually stop the run.</string>
    <slot>setDirPath(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
-     <x>767</x>
+     <x>1064</x>
      <y>75</y>
     </hint>
    </hints>
@@ -1340,8 +1418,8 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -1356,8 +1434,8 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -1372,12 +1450,12 @@ should eventually stop the run.</string>
    <slot>showMessage(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
-     <y>606</y>
+     <y>942</y>
     </hint>
    </hints>
   </connection>
@@ -1388,8 +1466,8 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -1404,8 +1482,8 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
      <x>101</x>
@@ -1468,7 +1546,7 @@ should eventually stop the run.</string>
    <slot>addToArchiveDirs()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>128</x>
+     <x>258</x>
      <y>75</y>
     </hint>
     <hint type="destinationlabel">
@@ -1484,11 +1562,11 @@ should eventually stop the run.</string>
    <slot>setDevice(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
-     <x>617</x>
+     <x>932</x>
      <y>75</y>
     </hint>
    </hints>
@@ -1500,11 +1578,11 @@ should eventually stop the run.</string>
    <slot>setRun(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
-     <x>617</x>
+     <x>932</x>
      <y>75</y>
     </hint>
    </hints>
@@ -1516,11 +1594,11 @@ should eventually stop the run.</string>
    <slot>setShot(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
-     <x>617</x>
+     <x>932</x>
      <y>75</y>
     </hint>
    </hints>
@@ -1532,11 +1610,11 @@ should eventually stop the run.</string>
    <slot>setUser(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
-     <x>617</x>
+     <x>932</x>
      <y>75</y>
     </hint>
    </hints>
@@ -1548,8 +1626,8 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
      <x>43</x>
@@ -1564,8 +1642,8 @@ should eventually stop the run.</string>
    <slot>executeB2plotCommand()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>419</x>
-     <y>563</y>
+     <x>567</x>
+     <y>899</y>
     </hint>
     <hint type="destinationlabel">
      <x>43</x>
@@ -1580,8 +1658,8 @@ should eventually stop the run.</string>
    <slot>setB2plotCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
      <x>43</x>
@@ -1600,8 +1678,8 @@ should eventually stop the run.</string>
      <y>65</y>
     </hint>
     <hint type="destinationlabel">
-     <x>516</x>
-     <y>65</y>
+     <x>1022</x>
+     <y>119</y>
     </hint>
    </hints>
   </connection>
@@ -1612,12 +1690,12 @@ should eventually stop the run.</string>
    <slot>setRunDir(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>54</x>
-     <y>564</y>
+     <x>65</x>
+     <y>900</y>
     </hint>
     <hint type="destinationlabel">
-     <x>516</x>
-     <y>65</y>
+     <x>1022</x>
+     <y>119</y>
     </hint>
    </hints>
   </connection>
@@ -1628,12 +1706,12 @@ should eventually stop the run.</string>
    <slot>setB2plotCommand(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>758</x>
-     <y>563</y>
+     <x>1055</x>
+     <y>899</y>
     </hint>
     <hint type="destinationlabel">
-     <x>516</x>
-     <y>65</y>
+     <x>1022</x>
+     <y>119</y>
     </hint>
    </hints>
   </connection>

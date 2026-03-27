@@ -178,16 +178,18 @@ class InitializeRun(TcshProcess):
                 self.runDirCombo.setCurrentIndex(i)
 
     def enterRunDirectory(self):
-        """Checks whether the run directory specified in the QComboBox
-        :attr:`InitializeRun.runDirCombo` exists.
-        """
-
         baserunDir = self.getRunDir()
-        runDir = baserunDir.rstrip('baserun') + \
-            self.runDirCombo.currentText()
-        if not runDir:
+
+        if not baserunDir:
+            self.textDisplay.appendPlainText('No baserun directory selected!')
+            return ''
+
+        runName = self.runDirCombo.currentText().strip()
+        if not runName:
             self.textDisplay.appendPlainText('No run directory specified!')
             return ''
+
+        runDir = os.path.join(os.path.dirname(baserunDir), runName)
 
         if not os.path.exists(runDir):
             self.textDisplay.appendPlainText('Run directory: ' + runDir +
@@ -195,6 +197,9 @@ class InitializeRun(TcshProcess):
             return ''
 
         return runDir
+
+    def getSelectedRunDirectory(self):
+        return self.enterRunDirectory()
 
     def executeCommand(self, info, cmd):
         if self.tcsh.state() != QProcess.ProcessState.NotRunning:
