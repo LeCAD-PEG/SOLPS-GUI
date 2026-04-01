@@ -39,10 +39,11 @@ import sys
 import time
 
 from PySide6.QtCore import (Slot, QModelIndex, Qt, QSettings, Signal,
-                            QRegularExpression, QProcess)
+                            QRegularExpression, QProcess, QTimer)
 from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QFileDialog, QLineEdit, QToolButton, QGridLayout,
-                             QDialogButtonBox, QLabel)
+                             QDialogButtonBox, QLabel, QWidget, QVBoxLayout,
+                             QHBoxLayout, QPushButton, QPlainTextEdit)
 from PySide6.QtNetwork import QUdpSocket
 from PySide6.QtNetwork import QHostAddress
 from PySide6.QtUiTools import loadUiType
@@ -570,6 +571,32 @@ if __name__ == '__main__':
             # self.b2_user.connect(self.put_edge_ids.setUser)
             # self.b2_run_number.connect(self.put_edge_ids.setRun)
             # self.b2_shot_number.connect(self.put_edge_ids.setShot)
+            self.sinfoTimer = QTimer(self)
+            self.sinfoTimer.setInterval(3000)
+
+            self.squeueTimer = QTimer(self)
+            self.squeueTimer.setInterval(3000)
+
+            self.sinfoProcess = QProcess(self)
+            self.squeueProcess = QProcess(self)
+            self.scancelProcess = QProcess(self)
+
+            self.sinfoProcess.setProcessChannelMode(QProcess.MergedChannels)
+            self.squeueProcess.setProcessChannelMode(QProcess.MergedChannels)
+            self.scancelProcess.setProcessChannelMode(QProcess.MergedChannels)
+
+            self.pushButtonStartSinfo.clicked.connect(self.start_sinfo_monitor)
+            self.pushButtonStopSinfo.clicked.connect(self.stop_sinfo_monitor)
+            self.pushButtonStartSqueue.clicked.connect(self.start_squeue_monitor)
+            self.pushButtonStopSqueue.clicked.connect(self.stop_squeue_monitor)
+            self.pushButtonScancel.clicked.connect(self.cancel_selected_job)
+
+            self.sinfoTimer.timeout.connect(self.run_sinfo_once)
+            self.squeueTimer.timeout.connect(self.run_squeue_once)
+
+            self.sinfoProcess.readyReadStandardOutput.connect(self.read_sinfo_output)
+            self.squeueProcess.readyReadStandardOutput.connect(self.read_squeue_output)
+            self.scancelProcess.readyReadStandardOutput.connect(self.read_scancel_output)
 
         # @Slot()
         # def on_pushButton_Archive_clicked(self):
@@ -979,6 +1006,72 @@ if __name__ == '__main__':
                 return self.optimizationActor
             else:
                 return self.initialize_run
+
+        @Slot()
+        def start_sinfo_monitor(self):
+            self.run_sinfo_once()
+            self.sinfoTimer.start()
+
+        @Slot()
+        def stop_sinfo_monitor(self):
+            self.sinfoTimer.stop()
+
+        @Slot()
+        def run_sinfo_once(self):
+            if self.sinfoProcess.state() == QProcess.NotRunning:
+                self.sinfoProcess.start(
+                    "bash",
+                    ["-lc", 'sinfo -o "%20P %10a %10l %10D %10T %N"']
+                )
+
+        @Slot()
+        def read_sinfo_output(self):
+            data = self.sinfoProcess.readAllStandardOutput()
+            text = bytes(data).decode("utf-8", errors="replace")
+            self.plainTextEditSinfo.setPlainText(text.rstrip())
+
+        @Slot()
+        def start_squeue_monitor(self):
+            self.run_squeue_once()
+            self.squeueTimer.start()
+
+        @Slot()
+        def stop_squeue_monitor(self):
+            self.squeueTimer.stop()
+
+        @Slot()
+        def run_squeue_once(self):
+            if self.squeueProcess.state() == QProcess.NotRunning:
+                self.squeueProcess.start(
+                    "bash",
+                    ["-lc", 'squeue -u $USER -o "%.18i %.9P %.20j %.8u %.8T %.10M %.6D %R"']
+                )
+
+        @Slot()
+        def read_squeue_output(self):
+            data = self.squeueProcess.readAllStandardOutput()
+            text = bytes(data).decode("utf-8", errors="replace")
+            self.plainTextEditSqueue.setPlainText(text.rstrip())
+
+        @Slot()
+        def cancel_selected_job(self):
+            job_id = self.lineEditCancelJob.text().strip()
+            if not job_id:
+                QMessageBox.warning(self, "Missing job id", "Please enter a job id.")
+                return
+
+            self.scancelProcess.start(
+                "bash",
+                ["-lc", f"scancel {job_id} && echo Cancelled {job_id}"]
+            )
+
+        @Slot()
+        def read_scancel_output(self):
+            data = self.scancelProcess.readAllStandardOutput()
+            text = bytes(data).decode("utf-8", errors="replace")
+            if text.strip():
+                QMessageBox.information(self, "scancel", text.strip())
+            self.run_squeue_once()
 
         def execute_tcsh_command_in_rundir(self, tcsh_command, rundir):
             """" Executes TCSH comand in run directory (e.g. submit)
