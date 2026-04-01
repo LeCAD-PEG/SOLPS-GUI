@@ -889,13 +889,17 @@ if __name__ == '__main__':
 
         @Slot()
         def on_pushButton_Run_clicked(self):
-            """ Submits the selected Run
-            """
+            try:
+                actor = self.get_active_output_actor()
+                if actor is not None and hasattr(actor, "clearOutput"):
+                    actor.clearOutput()
+            except Exception:
+                pass
+
             index = self.treeViewRuns.selectionModel().currentIndex()
             model = self.treeViewRuns.model()
             index_path = model.index(index.row(), Column.path, index.parent())
             rundir = model.data(index_path, Qt.DisplayRole)
-            # TODO check b2fstate_OK before you submit
             self.submit(model.mapToSource(index), rundir)
 
         @Slot()
@@ -938,9 +942,43 @@ if __name__ == '__main__':
         @Slot()
         def read_main_tcsh(self):
             data = self.main_tcsh.readAllStandardOutput()
-            text = str(bytearray(data).decode('utf-8'))
-            print(text)
-            logging.debug(text)
+            text = str(bytearray(data).decode('utf-8', errors='replace'))
+
+            print(text, end='')
+
+            try:
+                actor = self.get_active_output_actor()
+                if actor is not None and hasattr(actor, "appendOutput"):
+                    actor.appendOutput(text)
+            except Exception:
+                pass
+
+            try:
+                if hasattr(self, "log"):
+                    if hasattr(self.log, "appendPlainText"):
+                        self.log.appendPlainText(text.rstrip())
+                    elif hasattr(self.log, "append"):
+                        self.log.append(text.rstrip())
+                    elif hasattr(self.log, "textEdit"):
+                        self.log.textEdit.append(text.rstrip())
+                    elif hasattr(self.log, "plainTextEdit"):
+                        self.log.plainTextEdit.appendPlainText(text.rstrip())
+            except Exception:
+                pass
+
+            logging.info(text.rstrip())
+
+        def get_active_output_actor(self):
+            run_mode = self.preferences.run_mode.strip()
+
+            if run_mode == "tgt":
+                return self.tangentActor
+            elif run_mode == "adj":
+                return self.adjointActor
+            elif run_mode == "opt_tgt" or run_mode == "opt_adj":
+                return self.optimizationActor
+            else:
+                return self.initialize_run
 
         def execute_tcsh_command_in_rundir(self, tcsh_command, rundir):
             """" Executes TCSH comand in run directory (e.g. submit)

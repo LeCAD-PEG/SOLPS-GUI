@@ -141,6 +141,14 @@ class OptimizationActor(TcshProcess):
     @Slot()
     def clearLog(self):
         self.textDisplay.clear()
+        
+    def appendOutput(self, text):
+        """Append external output text to the actor log window."""
+        self.textDisplay.appendPlainText(text.rstrip())
+
+    def clearOutput(self):
+        """Clear external output text from the actor log window."""
+        self.textDisplay.clear()
 
     @Slot()
     def manualInput(self):

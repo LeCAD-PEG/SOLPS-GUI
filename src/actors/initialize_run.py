@@ -367,6 +367,14 @@ class InitializeRun(TcshProcess):
         if RUN:
             self.startTcsh()
 
+    def appendOutput(self, text):
+        """Append external output text to the actor log window."""
+        self.textDisplay.appendPlainText(text.rstrip())
+
+    def clearOutput(self):
+        """Clear external output text from the actor log window."""
+        self.textDisplay.clear()
+
     def updateText(self, msg):
         """Shows text in the QPlainTextEdit :attr:`textDisplay`.
 
