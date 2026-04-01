@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1076</width>
-    <height>943</height>
+    <width>968</width>
+    <height>873</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -997,7 +997,7 @@ should eventually stop the run.</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1076</width>
+     <width>968</width>
      <height>19</height>
     </rect>
    </property>

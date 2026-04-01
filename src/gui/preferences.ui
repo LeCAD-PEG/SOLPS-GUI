@@ -431,6 +431,58 @@ Switch -s will be added to the submission script</string>
          <string>1</string>
         </property>
        </widget>
+       <widget class="QRadioButton" name="radioButton_tgt">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>10</y>
+          <width>99</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>tgt</string>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="radioButton_adj">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>30</y>
+          <width>99</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>adj</string>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="radioButton_opt_tgt">
+        <property name="geometry">
+         <rect>
+          <x>310</x>
+          <y>10</y>
+          <width>99</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>opt_tgt</string>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="radioButton_opt_adj">
+        <property name="geometry">
+         <rect>
+          <x>310</x>
+          <y>30</y>
+          <width>99</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>opt_adj</string>
+        </property>
+       </widget>
       </widget>
      </widget>
      <widget class="QWidget" name="Settings">
@@ -613,7 +665,7 @@ Use 127.0.0.1 only for localsubmit.</string>
               <string>cmod</string>
              </property>
             </item>
-             <item>
+            <item>
              <property name="text">
               <string>compass</string>
              </property>

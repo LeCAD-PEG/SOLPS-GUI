@@ -2,16 +2,8 @@
 
 from PySide6.QtCore import Slot, QProcess
 from PySide6.QtGui import QTextCursor
-from PySide6.QtWidgets import (
-    QGridLayout,
-    QGroupBox,
-    QPushButton,
-    QPlainTextEdit,
-    QVBoxLayout,
-    QSpacerItem,
-    QSizePolicy,
-    QInputDialog,
-)
+from PySide6.QtWidgets import (QGridLayout, QGroupBox, QPushButton, QPlainTextEdit,
+                                QVBoxLayout, QSpacerItem, QSizePolicy, QInputDialog,)
 
 from tcsh_process import TcshProcess
 

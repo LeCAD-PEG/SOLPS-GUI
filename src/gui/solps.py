@@ -42,7 +42,7 @@ from PySide6.QtCore import (Slot, QModelIndex, Qt, QSettings, Signal,
                             QRegularExpression, QProcess)
 from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QFileDialog, QLineEdit, QToolButton, QGridLayout,
-                             QDialogButtonBox)
+                             QDialogButtonBox, QLabel)
 from PySide6.QtNetwork import QUdpSocket
 from PySide6.QtNetwork import QHostAddress
 from PySide6.QtUiTools import loadUiType
@@ -183,6 +183,7 @@ class Preferences():
         self.browser_path = '/usr/bin/firefox'
         self.log_level = 1  # info
         self.submit_script = 'localsubmit'
+        self.run_mode = ""
         self.job_name = 'SOLPS-ITER'
         self.standalone = 0
         self.use_mpi = 0
@@ -213,6 +214,7 @@ class Preferences():
         self.browser_path = settings.value('browser_path', self.browser_path)
         self.log_level = int(settings.value('log_level', self.log_level))
         self.submit_script = settings.value('submit_script', self.submit_script)
+        self.run_mode = settings.value("run_mode", "")
         self.job_name = settings.value('job_name', self.job_name)
         self.standalone = int(settings.value('standalone', self.standalone))
         self.use_mpi = int(settings.value('use_mpi', self.use_mpi))
@@ -243,6 +245,7 @@ class Preferences():
         settings.setValue('browser_path', self.browser_path)
         settings.setValue('log_level', str(self.log_level))
         settings.setValue('submit_script', self.submit_script)
+        settings.setValue("run_mode", self.run_mode)
         settings.setValue('job_name', self.job_name)
         settings.setValue('standalone', str(self.standalone))
         settings.setValue('use_mpi', str(self.use_mpi))
@@ -271,11 +274,20 @@ class PreferencesDialog(QDialog):
         uiclass, baseclass = loadUiType(prefix + '/preferences.ui')
         self.form = uiclass()
         self.form.setupUi(self)
-        #loadUi(prefix + '/preferences.ui', self)
 
         self.preferences = preferences
-        # get GUI settings
-        # settings = QSettings('ITER', 'solps-gui')
+
+        self._mode_buttons = [
+            self.form.radioButton_tgt,
+            self.form.radioButton_adj,
+            self.form.radioButton_opt_tgt,
+            self.form.radioButton_opt_adj,
+        ]
+
+        for button in self._mode_buttons:
+            button.setAutoExclusive(False)
+            button.clicked.connect(self.on_mode_button_clicked)
+
         self.form.lineEdit_monitor_interface.setText(preferences.bind_address)
         self.form.lineEdit_monitor_port.setText(str(preferences.port))
         self.form.lineEdit_monitor_ip.setText(preferences.solps_gui_ip)
@@ -285,6 +297,20 @@ class PreferencesDialog(QDialog):
         self.form.lineEdit_browser_path.setText(preferences.browser_path)
         self.form.comboBox_log_level.setCurrentIndex(preferences.log_level)
         self.form.comboBox_submit_script.setCurrentText(preferences.submit_script)
+
+        mode = preferences.run_mode
+        if mode == "tgt":
+            self.form.radioButton_tgt.setChecked(True)
+        elif mode == "adj":
+            self.form.radioButton_adj.setChecked(True)
+        elif mode == "opt_tgt":
+            self.form.radioButton_opt_tgt.setChecked(True)
+        elif mode == "opt_adj":
+            self.form.radioButton_opt_adj.setChecked(True)
+
+        for button in self._mode_buttons:
+            button._was_checked = button.isChecked()
+
         self.form.lineEdit_job_name.setText(preferences.job_name)
         self.form.checkBox_standalone.setChecked(int(preferences.standalone))
         self.form.checkBox_use_mpi.setChecked(int(preferences.use_mpi))
@@ -302,6 +328,58 @@ class PreferencesDialog(QDialog):
         self.form.comboBox_device_environment.setCurrentText(preferences.device_environment)
         self.form.comboBox_compiler_environment.setCurrentText(preferences.compiler_environment)
 
+    def on_mode_button_clicked(self):
+        clicked_button = self.sender()
+
+        if getattr(clicked_button, "_was_checked", False):
+            clicked_button.setChecked(False)
+            clicked_button._was_checked = False
+            return
+
+        for button in self._mode_buttons:
+            button.setChecked(button is clicked_button)
+            button._was_checked = (button is clicked_button)
+
+    def setPreferences(self):
+        self.preferences.bind_address = self.form.lineEdit_monitor_interface.text()
+        self.preferences.port = int(self.form.lineEdit_monitor_port.text())
+        self.preferences.solps_gui_ip = self.form.lineEdit_monitor_ip.text()
+        self.preferences.tcsh_path = self.form.lineEdit_tcsh_path.text()
+        self.preferences.gnuplot_path = self.form.lineEdit_gnuplot_path.text()
+        self.preferences.convert_path = self.form.lineEdit_convert_path.text()
+        self.preferences.browser_path = self.form.lineEdit_browser_path.text()
+        self.preferences.log_level = self.form.comboBox_log_level.currentIndex()
+        self.preferences.submit_script = self.form.comboBox_submit_script.currentText()
+
+        if self.form.radioButton_tgt.isChecked():
+            self.preferences.run_mode = "tgt"
+        elif self.form.radioButton_adj.isChecked():
+            self.preferences.run_mode = "adj"
+        elif self.form.radioButton_opt_tgt.isChecked():
+            self.preferences.run_mode = "opt_tgt"
+        elif self.form.radioButton_opt_adj.isChecked():
+            self.preferences.run_mode = "opt_adj"
+        else:
+            self.preferences.run_mode = ""
+
+        self.preferences.job_name = self.form.lineEdit_job_name.text()
+        self.preferences.standalone = int(self.form.checkBox_standalone.isChecked())
+        self.preferences.use_mpi = int(self.form.checkBox_use_mpi.isChecked())
+        self.preferences.mpi_options = self.form.lineEdit_mpi_options.text()
+        self.preferences.use_debugger = int(self.form.checkBox_use_debugger.isChecked())
+        self.preferences.debugger = self.form.lineEdit_debugger.text()
+        self.preferences.compress_log = int(self.form.checkBox_compress_log.isChecked())
+        self.preferences.dry_run = int(self.form.checkBox_dry_run.isChecked())
+        self.preferences.use_openmp = int(self.form.checkBox_use_openmp.isChecked())
+        self.preferences.threads = self.form.lineEdit_threads.text()
+        self.preferences.time = self.form.lineEdit_time.text()
+        self.preferences.partition = self.form.lineEdit_partition.text()
+        self.preferences.nodes = self.form.lineEdit_nodes.text()
+        self.preferences.memory = self.form.lineEdit_memory.text()
+        self.preferences.device_environment = self.form.comboBox_device_environment.currentText()
+        self.preferences.compiler_environment = self.form.comboBox_compiler_environment.currentText()
+
+
     def setPreferences(self):
         # s = QSettings('ITER', 'solps-gui')
         self.preferences.bind_address = self.form.lineEdit_monitor_interface.text()
@@ -313,6 +391,16 @@ class PreferencesDialog(QDialog):
         self.preferences.browser_path = self.form.lineEdit_browser_path.text()
         self.preferences.log_level = self.form.comboBox_log_level.currentIndex()
         self.preferences.submit_script = self.form.comboBox_submit_script.currentText()
+        if self.form.radioButton_tgt.isChecked():
+            self.preferences.run_mode = "tgt"
+        elif self.form.radioButton_adj.isChecked():
+            self.preferences.run_mode = "adj"
+        elif self.form.radioButton_opt_tgt.isChecked():
+            self.preferences.run_mode = "opt_tgt"
+        elif self.form.radioButton_opt_adj.isChecked():
+            self.preferences.run_mode = "opt_adj"
+        else:
+            self.preferences.run_mode = ""
         self.preferences.job_name = self.form.lineEdit_job_name.text()
         self.preferences.standalone = int(self.form.checkBox_standalone.isChecked())
         self.preferences.use_mpi = int(self.form.checkBox_use_mpi.isChecked())
@@ -910,62 +998,79 @@ if __name__ == '__main__':
             self.main_tcsh.write(bytearray(cmd, 'utf8'))  # TODO flush stdout
 
         def submit(self, index, rundir):
-            """ Submits the job in the rundir under its $SOLPSTOP environment
+            """Submits the job in the rundir under its $SOLPSTOP environment.
 
-            All ``*.prt`` files are removed befor submission command from
+            All ``*.prt`` files are removed before submission command from
             Preferences is issued.
-
-            Arguments:
-                 rundir (str): prepared run directory
             """
-            submit_command = self.preferences.submit_script
+            submit_command = self.preferences.submit_script.strip()
 
             cmd = ''
-            # Add scripts to path
             opts = ''
             model = self.treeViewRuns.model().sourceModel()
-            if submit_command:
-                if self.preferences.submit_script != 'localsubmit' \
-                   and self.preferences.submit_script != 'local run' \
-                        and len(self.preferences.job_name):
-                    if ' ' in self.preferences.job_name:
-                        opts += f' -j "{self.preferences.job_name}"'
-                    else:
-                        opts += f' -j {self.preferences.job_name}'
-                if self.preferences.standalone:
-                    opts += ' -s'
-                if self.preferences.use_mpi:
-                    opts += f' -m "{self.preferences.mpi_options}"'
-                if self.preferences.use_debugger:
-                    opts += f' -d "{self.preferences.debugger}"'
-                if self.preferences.compress_log:
-                    opts += ' -z'
-                if self.preferences.dry_run:
-                    opts += ' -n'
-                if self.preferences.use_openmp:
-                    opts += f'-t "{self.preferences.threads}"'
-                if self.preferences.partition:
-                    opts += f' -Q {self.preferences.partition}'
-                if self.preferences.time:
-                    opts += f' -T {self.preferences.time}'    
-                if self.preferences.nodes:
-                    opts += f' -N {self.preferences.nodes}'  
-                if self.preferences.memory:
-                    opts += f' -M {self.preferences.memory}'             
 
-                if submit_command == 'local run':
-                    submit_command = 'b2run b2mn'
-                cmd += f'rm -rf *.prt\n{submit_command} {opts}'
-                self.execute_tcsh_command_in_rundir(cmd, rundir)
-                msg = f'batch {rundir} {submit_command} {opts}'
-
-                logging.info(msg)
-                model.jobStatusChanged(msg)
-            else:
+            if not submit_command:
                 msg = f'batch {rundir} Not submitted!'
-                msg += "Empty command or no run directory for MAIN TCSH"
+                msg += " Empty command or no run directory for MAIN TCSH"
                 model.jobStatusChanged(msg)
                 logging.warning(msg)
+                return
+
+            # add run mode flag
+            run_mode = self.preferences.run_mode.strip()
+            if run_mode == "tgt":
+                opts += ' -tgt'
+            elif run_mode == "adj":
+                opts += ' -adj'
+            elif run_mode == "opt_tgt":
+                opts += ' -opt_tgt "tao"'
+            elif run_mode == "opt_adj":
+                opts += ' -opt_adj "tao"'
+
+            # add job name for batch submit scripts, but not for local run / localsubmit
+            if submit_command != 'localsubmit' and submit_command != 'local run' and len(self.preferences.job_name):
+                if ' ' in self.preferences.job_name:
+                    opts += f' -j "{self.preferences.job_name}"'
+                else:
+                    opts += f' -j {self.preferences.job_name}'
+
+            if self.preferences.standalone:
+                opts += ' -s'
+            if self.preferences.use_mpi:
+                opts += f' -m "{self.preferences.mpi_options}"'
+            if self.preferences.use_debugger:
+                opts += f' -d "{self.preferences.debugger}"'
+            if self.preferences.compress_log:
+                opts += ' -z'
+            if self.preferences.dry_run:
+                opts += ' -n'
+            if self.preferences.use_openmp:
+                opts += f' -t "{self.preferences.threads}"'
+            if self.preferences.partition:
+                opts += f' -Q {self.preferences.partition}'
+            if self.preferences.time:
+                opts += f' -T {self.preferences.time}'
+            if self.preferences.nodes:
+                opts += f' -N {self.preferences.nodes}'
+            if self.preferences.memory:
+                opts += f' -M {self.preferences.memory}'
+
+            cmd += 'rm -rf *.prt\n'
+
+            if submit_command == 'local run':
+                cmd += f'b2run{opts} b2mn'
+                msg = f'batch {rundir} b2run{opts} b2mn'
+            else:
+                cmd += f'{submit_command}{opts}'
+                msg = f'batch {rundir} {submit_command}{opts}'
+
+            print("FINAL SUBMIT COMMAND:")
+            print(cmd)
+            logging.info(f"run_mode={self.preferences.run_mode}")
+            logging.info(msg)
+
+            self.execute_tcsh_command_in_rundir(cmd, rundir)
+            model.jobStatusChanged(msg)        
 
         @Slot()
         def on_pushButton_Import_clicked(self):
