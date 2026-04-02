@@ -989,107 +989,21 @@ should eventually stop the run.</string>
       </widget>
       <widget class="QWidget" name="tab_sinfo">
        <attribute name="title">
-        <string>Cluster</string>
+        <string>Sinfo</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_sinfo">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <property name="spacing">
-         <number>0</number>
-        </property>
-        <item row="0" column="0" colspan="3">
-         <widget class="QPlainTextEdit" name="plainTextEditSinfo">
-          <property name="lineWrapMode">
-           <enum>QPlainTextEdit::NoWrap</enum>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="pushButtonStartSinfo">
-          <property name="text">
-           <string>Start</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="pushButtonStopSinfo">
-          <property name="text">
-           <string>Stop</string>
-          </property>
-         </widget>
+        <item row="0" column="0">
+         <widget class="SinfoActor" name="sinfoActor"/>
         </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tab_squeue">
        <attribute name="title">
-        <string>Jobs</string>
+        <string>Squeue</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_squeue">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <property name="spacing">
-         <number>0</number>
-        </property>
-        <item row="0" column="0" colspan="4">
-         <widget class="QPlainTextEdit" name="plainTextEditSqueue">
-          <property name="lineWrapMode">
-           <enum>QPlainTextEdit::NoWrap</enum>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="pushButtonStartSqueue">
-          <property name="text">
-           <string>Start</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="pushButtonStopSqueue">
-          <property name="text">
-           <string>Stop</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLineEdit" name="lineEditCancelJob">
-          <property name="placeholderText">
-           <string>Job ID</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QPushButton" name="pushButtonScancel">
-          <property name="text">
-           <string>scancel</string>
-          </property>
-         </widget>
+        <item row="0" column="0">
+         <widget class="SqueueActor" name="squeueActor"/>
         </item>
        </layout>
       </widget>
@@ -1273,6 +1187,16 @@ should eventually stop the run.</string>
    <class>B2InputFiles</class>
    <extends>QWidget</extends>
    <header>b2_input_files</header>
+  </customwidget>
+   <customwidget>
+   <class>SinfoActor</class>
+   <extends>QWidget</extends>
+   <header>sinfo_actor</header>
+  </customwidget>
+  <customwidget>
+   <class>SqueueActor</class>
+   <extends>QWidget</extends>
+   <header>squeue_actor</header>
   </customwidget>
  </customwidgets>
  <resources/>
