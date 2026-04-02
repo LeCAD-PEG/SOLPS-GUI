@@ -426,64 +426,115 @@ should eventually stop the run.</string>
        <attribute name="title">
         <string>&amp;Tangent</string>
        </attribute>
-       <widget class="TangentActor" name="tangentActor">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>20</y>
-          <width>1001</width>
-          <height>821</height>
-         </rect>
+       <layout class="QGridLayout" name="gridLayout_tangent">
+        <property name="leftMargin">
+         <number>0</number>
         </property>
-        <property name="toolTip">
-         <string>SOLPS tangent compile/run workflow.</string>
+        <property name="topMargin">
+         <number>0</number>
         </property>
-        <property name="whatsThis">
-         <string>SOLPS tangent compile/run workflow.</string>
+        <property name="rightMargin">
+         <number>0</number>
         </property>
-       </widget>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="TangentActor" name="tangentActor">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>SOLPS tangent compile/run workflow.</string>
+          </property>
+          <property name="whatsThis">
+           <string>SOLPS tangent compile/run workflow.</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
-      <widget class="QWidget" name="tab_adjoint">
+        <widget class="QWidget" name="tab_adjoint">
        <attribute name="title">
         <string>&amp;Adjoint</string>
        </attribute>
-       <widget class="AdjointActor" name="adjointActor">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>20</y>
-          <width>1001</width>
-          <height>821</height>
-         </rect>
+       <layout class="QGridLayout" name="gridLayout_adjoint">
+        <property name="leftMargin">
+         <number>0</number>
         </property>
-        <property name="toolTip">
-         <string>SOLPS adjoint compile/run workflow.</string>
+        <property name="topMargin">
+         <number>0</number>
         </property>
-        <property name="whatsThis">
-         <string>SOLPS adjoint compile/run workflow.</string>
+        <property name="rightMargin">
+         <number>0</number>
         </property>
-       </widget>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="AdjointActor" name="adjointActor">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>SOLPS adjoint compile/run workflow.</string>
+          </property>
+          <property name="whatsThis">
+           <string>SOLPS adjoint compile/run workflow.</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_opt">
        <attribute name="title">
         <string>Optimization</string>
        </attribute>
-       <widget class="OptimizationActor" name="optimizationActor">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>20</y>
-          <width>1001</width>
-          <height>821</height>
-         </rect>
+       <layout class="QGridLayout" name="gridLayout_opt">
+        <property name="leftMargin">
+         <number>0</number>
         </property>
-        <property name="toolTip">
-         <string>SOLPS optimization workflow with set_tao, build, and opt runs.</string>
+        <property name="topMargin">
+         <number>0</number>
         </property>
-        <property name="whatsThis">
-         <string>SOLPS optimization workflow with set_tao, build, and opt runs.</string>
+        <property name="rightMargin">
+         <number>0</number>
         </property>
-       </widget>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="OptimizationActor" name="optimizationActor">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>SOLPS optimization workflow with set_tao, build, and opt runs.</string>
+          </property>
+          <property name="whatsThis">
+           <string>SOLPS optimization workflow with set_tao, build, and opt runs.</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_Input">
        <attribute name="title">
