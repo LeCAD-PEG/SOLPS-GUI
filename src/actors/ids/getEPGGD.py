@@ -154,42 +154,13 @@ class getEPGGD():
         """
 
         # Dictionary of quantity labels ( = keys) and corresponding structure
-        # objects
-        quantityDict = \
-            {'Electron Density [n/m³]' : {'obj' : ggd.electrons.density},
-             'Electron Temperature [eV]' : {'obj' : ggd.electrons.temperature},
-             }
-
-        # Include ion array of structure
-        for i in range(len(ggd.ion)):
-            # Get label
-            if ggd.ion[i].name.value != '':
-                ionLabel = ggd.ion[i].name.value
-            else:
-                ionLabel = ggd.ion[i].state[0].name.value
-            # Ion density
-            for j in range(len(ggd.ion[i].density)):
-                # Check if there is actually an array
-                if len(ggd.ion[i].density[j].values) > 0:
-                    quantityDict['Ion density ' + ionLabel + ' [n/m³]'] = \
-                        {'obj': ggd.ion[i].density}
-                else:
-                    break
-
-        # Ion temperature
-        for i in range(len(ggd.ion)):
-            # Get label
-            if ggd.ion[i].name.value != '':
-                ionLabel = ggd.ion[i].name.value
-            else:
-                ionLabel = ggd.ion[i].state[0].name.value
-            for j in range(len(ggd.ion[i].temperature)):
-                # Check if there is actually an array
-                if len(ggd.ion[i].temperature[j].values) > 0:
-                    quantityDict['Ion temperature ' + ionLabel + ' [eV]'] = \
-                        {'obj' : ggd.ion[i].temperature}
-                else:
-                    break
+        # objects — exactly 3 quantities written to 2D GGD
+        quantityDict = {
+            'Electron Density [n/m³]':   {'obj': ggd.electrons.density},
+            'Electron Temperature [eV]': {'obj': ggd.electrons.temperature},
+        }
+        if len(ggd.ion) > 0:
+            quantityDict['Ion Temperature [eV]'] = {'obj': ggd.ion[0].temperature}
 
         # Go through quantity objects and add corresponding quantity array of
         # values

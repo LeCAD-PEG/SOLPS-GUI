@@ -3,9 +3,10 @@
 from PySide6.QtCore import Slot, QProcess
 from PySide6.QtGui import QTextCursor
 from PySide6.QtWidgets import (QGridLayout, QGroupBox, QPushButton, QPlainTextEdit,
-                                QVBoxLayout, QSpacerItem, QSizePolicy, QInputDialog,)
+                                QVBoxLayout, QSpacerItem, QSizePolicy, QInputDialog, QLabel, QMessageBox,)
 
 from tcsh_process import TcshProcess
+import os
 
 
 class AdjointActor(TcshProcess):
@@ -42,7 +43,7 @@ class AdjointActor(TcshProcess):
         self.stopButton = QPushButton('Stop run', commandBox)
         self.stopButton.clicked.connect(self.stopRun)
         commandLayout.addWidget(self.stopButton)
-
+        
         commandLayout.addItem(
             QSpacerItem(
                 20,
@@ -153,7 +154,7 @@ class AdjointActor(TcshProcess):
         self.textDisplay.setTextCursor(cursor)
         self.textDisplay.insertPlainText(text)
         self.textDisplay.ensureCursorVisible()
-
+    
     @Slot(str)
     def showProcessState(self, message):
         if message:

@@ -168,7 +168,7 @@
    <item row="1" column="0">
     <widget class="QPlainTextEdit" name="plainTextEdit_uri">
      <property name="plainText">
-      <string>imas:hdf5?user=public;pulse=123347;run=1;database=ITER;version=4</string>
+      <string>imas:hdf5?user=public;pulse=123347;run=1;database=ITER;version=3</string>
      </property>
     </widget>
    </item>

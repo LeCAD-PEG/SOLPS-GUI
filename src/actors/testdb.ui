@@ -29,7 +29,7 @@
     <string>This actor is part of PDS-WF workflow</string>
    </property>
    <property name="uri" stdset="0">
-    <string>imas:mdsplus?user=public;pulse=130012;run=2;database=ITER;version=4</string>
+    <string>imas:mdsplus?user=public;pulse=130012;run=2;database=ITER;version=3</string>
    </property>
    <property name="pulse" stdset="0">
     <string>(130012, 2, 0, 'public', 'ITER', 12, '4')</string>

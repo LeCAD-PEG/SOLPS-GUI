@@ -135,7 +135,7 @@ DOM_XML = """
         </property>
         <property name='uri'>
             <string notr='true' comment='IMAS URI for the data entry it used in DBEntry'
-            extracomment='URI starts with imas:'>imas:hdf5?user=public;pulse=123347;run=1;database=ITER;version=4</string>
+            extracomment='URI starts with imas:'>imas:hdf5?user=public;pulse=123347;run=1;database=ITER;version=3</string>
         </property>
         <property name='pulse'>
             <string notr='true' comment='(pulse, run, occurrence, usename, database, backend, data_version)'

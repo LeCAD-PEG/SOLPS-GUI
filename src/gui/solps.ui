@@ -732,7 +732,7 @@ should eventually stop the run.</string>
         <string>Edge Profiles</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_16">
-        <item row="3" column="0">
+        <item row="4" column="0">
          <widget class="IMASDB" name="imasdb">
           <property name="maximumSize">
            <size>
@@ -747,10 +747,10 @@ should eventually stop the run.</string>
            <string>This actor is part of PDS-WF workflow</string>
           </property>
           <property name="uri" stdset="0">
-           <string>imas:mdsplus?user=public;pulse=123347;run=1;database=ITER;version=4</string>
+           <string>imas:mdsplus?user=public;pulse=123347;run=1;database=ITER;version=3</string>
           </property>
           <property name="pulse" stdset="0">
-           <string>(123347, 1, 0, 'public', 'ITER', 12, '4')</string>
+           <string>(123347, 1, 0, 'public', 'ITER', 12, '3')</string>
           </property>
           <property name="title" stdset="0">
            <string notr="true" comment="Text for widget title." extracomment="Add this to widget title">IMAS DB</string>
@@ -812,6 +812,13 @@ should eventually stop the run.</string>
          </widget>
         </item>
         <item row="2" column="0">
+         <widget class="QPushButton" name="pushButton_plot_1d">
+          <property name="text">
+           <string>Plot optim results</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
          <widget class="QPushButton" name="pushButton_2">
           <property name="text">
            <string>Clear plot data</string>
@@ -1857,6 +1864,22 @@ should eventually stop the run.</string>
     <hint type="destinationlabel">
      <x>272</x>
      <y>131</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_plot_1d</sender>
+   <signal>clicked()</signal>
+   <receiver>edgeprofiles</receiver>
+   <slot>plotProfiles1D()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>210</x>
+     <y>160</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>272</x>
+     <y>160</y>
     </hint>
    </hints>
   </connection>

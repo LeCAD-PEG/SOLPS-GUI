@@ -37,10 +37,10 @@
        <string>This actor is part of PDS-WF workflow</string>
       </property>
       <property name="uri" stdset="0">
-       <string>imas:mdsplus?user=public;pulse=123347;run=1;database=ITER;version=4</string>
+       <string>imas:mdsplus?user=public;pulse=123347;run=1;database=ITER;version=3</string>
       </property>
       <property name="pulse" stdset="0">
-       <string>(123347, 1, 0, 'public', 'ITER', 12, '4')</string>
+       <string>(123347, 1, 0, 'public', 'ITER', 12, '3')</string>
       </property>
       <property name="title" stdset="0">
        <string notr="true" comment="Text for widget title." extracomment="Add this to widget title">IMAS DB</string>
@@ -98,6 +98,13 @@
      <widget class="QPushButton" name="pushButton_3">
       <property name="text">
        <string>Clear</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QPushButton" name="pushButton_4">
+      <property name="text">
+       <string>Plot 1D</string>
       </property>
      </widget>
     </item>
@@ -190,6 +197,22 @@
     <hint type="destinationlabel">
      <x>275</x>
      <y>98</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_4</sender>
+   <signal>clicked()</signal>
+   <receiver>edgeprofiles</receiver>
+   <slot>plotProfiles1D()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>115</x>
+     <y>120</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>291</x>
+     <y>120</y>
     </hint>
    </hints>
   </connection>

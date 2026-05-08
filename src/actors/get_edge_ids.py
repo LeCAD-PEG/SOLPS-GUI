@@ -316,7 +316,44 @@ class GetIDSWrapper:
     def __init__(self, parameters):
         self.vars = {}
         self.setParameters(parameters)
-        self.ids = imas.ids(self.vars[GetVars.shot], self.vars[GetVars.run])
+        self.new_api = False
+        self.ids = None
+        
+        # Try different IMAS API versions
+        try:
+            # Try new IMAS API with ids_defs (IMAS >= 3.30.0)
+            backend = imas.ids_defs.MDSPLUS_BACKEND
+            self.ids = imas.DBEntry(backend,
+                                    self.vars[GetVars.device],
+                                    self.vars[GetVars.shot],
+                                    self.vars[GetVars.run],
+                                    self.vars[GetVars.user],
+                                    data_version=str(self.vars[GetVars.version]))
+            self.new_api = True
+            logging.info('Using new IMAS API (DBEntry with ids_defs)')
+        except (AttributeError, NameError):
+            try:
+                # Try new IMAS API with imasdef
+                backend = imas.imasdef.MDSPLUS_BACKEND
+                self.ids = imas.DBEntry(backend,
+                                        self.vars[GetVars.device],
+                                        self.vars[GetVars.shot],
+                                        self.vars[GetVars.run],
+                                        self.vars[GetVars.user],
+                                        data_version=str(self.vars[GetVars.version]))
+                self.new_api = True
+                logging.info('Using new IMAS API (DBEntry with imasdef)')
+            except (AttributeError, NameError):
+                # Fall back to old IMAS API
+                try:
+                    self.ids = imas.ids(self.vars[GetVars.shot], self.vars[GetVars.run])
+                    self.new_api = False
+                    logging.info('Using old IMAS API (ids with 2 params)')
+                except (AttributeError, TypeError):
+                    logging.error('Could not create IMAS connection with any known API!')
+                    self.state = False
+                    return
+        
         self.state = self.openIDS()
 
     def setParameters(self, parameters):
@@ -325,21 +362,39 @@ class GetIDSWrapper:
 
     def openIDS(self):
         logging.info('Opening IDS')
-        self.ids.open_env(self.vars[GetVars.user],
-                          self.vars[GetVars.device],
-                          self.vars[GetVars.version])
-        if self.ids.isConnected():
-            logging.info('IDS opened OK!')
-            return True
+        if self.new_api:
+            # New API: DBEntry is already connected in constructor
+            try:
+                self.ids.open()
+                logging.info('IDS opened OK!')
+                return True
+            except Exception as e:
+                logging.error(f'IDS open failed: {e}')
+                return False
         else:
-            logging.error('IDS open failed!')
-            return False
+            # Old API
+            self.ids.open_env(self.vars[GetVars.user],
+                              self.vars[GetVars.device],
+                              self.vars[GetVars.version])
+            if self.ids.isConnected():
+                logging.info('IDS opened OK!')
+                return True
+            else:
+                logging.error('IDS open failed!')
+                return False
 
     def readCodeParameters(self):
-        self.ids.edge_profiles.get()
-        parameter_string = self.ids.edge_profiles.code.parameters
+        if self.new_api:
+            # New API: use get() method
+            edge_profiles = self.ids.get('edge_profiles')
+            parameter_string = edge_profiles.code.parameters
+        else:
+            # Old API: direct access
+            self.ids.edge_profiles.get()
+            parameter_string = self.ids.edge_profiles.code.parameters
         # print(self.ids.edge_profiles.ggd[0])
-        bstring = base64.b64decode(parameter_string)
+        # Convert IDSString0D or similar objects to plain string
+        bstring = base64.b64decode(str(parameter_string))
         return bstring
 
     def extractFiles(self):
@@ -360,7 +415,11 @@ class GetIDSWrapper:
             tar = self.extractFiles()
             for member in tar:
                 name = member.name
-                file = tar.extractfile(member).read().decode()
+                extracted = tar.extractfile(member)
+                if extracted is None:
+                    logging.warning(f'Skipping {name} (symlink or directory)')
+                    continue
+                file = extracted.read().decode()
                 logging.info("Writing to " + dir_path + '/' + name)
                 abs_path = dir_path + '/' + name
 

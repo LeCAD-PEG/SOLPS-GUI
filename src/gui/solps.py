@@ -45,7 +45,27 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QDialogButtonBox, QLabel)
 from PySide6.QtNetwork import QUdpSocket
 from PySide6.QtNetwork import QHostAddress
-from PySide6.QtUiTools import loadUiType
+from PySide6.QtUiTools import loadUiType as _loadUiType
+
+
+def loadUiType(ui_path):
+    """Wrapper around PySide6.QtUiTools.loadUiType that handles both the old
+    API (returns a (ui_class, base_class) tuple, PySide6 < 6.4) and the new
+    API (returns a single class whose bases already include the widget type,
+    PySide6 >= 6.4).  Always returns a (ui_class, base_class) tuple so that
+    callers can do ``ui_class, base_class = loadUiType(path)`` safely.
+    """
+    result = _loadUiType(ui_path)
+    if isinstance(result, tuple):
+        return result          # old API: already a 2-tuple
+    # New API: single class; derive base_class from its MRO
+    from PySide6.QtWidgets import QWidget
+    base_class = QWidget
+    for base in result.__mro__[1:]:
+        if base is not object and issubclass(base, QWidget):
+            base_class = base
+            break
+    return result, base_class
 
 
 from addmenu import AddMenu

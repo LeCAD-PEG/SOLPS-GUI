@@ -75,8 +75,6 @@ class QuadPlotCanvas(FigureCanvasQTAgg):
         def cells_plot(y,z, quatrangles, values, ax=None, **kwargs):
 
             if not ax: ax=plt.gca()
-            # yz = np.c_[y,z]
-            # verts= yz[quatrangles]
             cells = []
             for cell in quatrangles:
                 cell_points = [[y[ind], z[ind]] for ind in cell if ind != -1]
@@ -93,14 +91,16 @@ class QuadPlotCanvas(FigureCanvasQTAgg):
             ax.autoscale()
             return pc
 
-        # self.ax = self.figure.add_subplot(111)
+        # Clear figure completely before each new plot to avoid stacking
+        self.figure.clear()
+        self.ax = self.figure.add_subplot(111)
+
         self.figure.subplots_adjust(right=0.85)
         self.ax.set_aspect('equal')
 
         pc = cells_plot(y,z, np.asarray(elements), values, ax=self.ax,
                       cmap="inferno")
         self.figure.colorbar(pc, ax=self.ax)
-        # self.ax.plot(y,z, marker="o", ls="", color="crimson")
         self.ax.plot(y,z, ls="", color="crimson")
         # Set background
         self.ax.set_facecolor((0.75, 0.75, 0.75))
