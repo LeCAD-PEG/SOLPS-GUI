@@ -149,12 +149,20 @@ class AdjointActor(TcshProcess):
     def updateText(self, text):
         if not text:
             return
+        filtered = '\n'.join(
+            line for line in text.splitlines()
+            if 'no access to tty' not in line
+            and 'Inappropriate ioctl for device' not in line
+            and 'Thus no job control in this shell' not in line
+        )
+        if not filtered.strip():
+            return
         cursor = self.textDisplay.textCursor()
         cursor.movePosition(QTextCursor.MoveOperation.End)
         self.textDisplay.setTextCursor(cursor)
-        self.textDisplay.insertPlainText(text)
+        self.textDisplay.insertPlainText(filtered + '\n' if not filtered.endswith('\n') else filtered)
         self.textDisplay.ensureCursorVisible()
-    
+
     @Slot(str)
     def showProcessState(self, message):
         if message:

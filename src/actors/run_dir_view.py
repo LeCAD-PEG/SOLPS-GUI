@@ -214,7 +214,7 @@ class RetrieveRunsStatus(QThread):
         # logging.info(f"{staticData}")
 
         # Parse run.log
-        path = os.path.join('run.log')
+        path = os.path.join(directory, 'run.log')
 
         if os.access(path, os.F_OK | os.R_OK):
             mtime = os.path.getmtime(path)
@@ -252,7 +252,7 @@ class RetrieveRunsStatus(QThread):
             mtime = os.path.getmtime(path)
             mtimeStr = timeStamp2Str(mtime)
             if not os.access(path, os.R_OK):
-                return timeStamp2Str, '.status permission denied', staticData
+                return mtimeStr, '.status permission denied', staticData
 
             with open(path, 'r') as f:
                 lines = f.read().splitlines()

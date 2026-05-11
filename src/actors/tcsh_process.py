@@ -59,12 +59,20 @@ class Tcsh(QProcess):
     def readStdOut(self):
         data = self.readAllStandardOutput()
         text = str(bytearray(data).decode('utf8'))
+        # Suppress harmless tcsh tty warning that may appear on stdout
+        if 'no access to tty' in text or 'Inappropriate ioctl for device' in text:
+            logging.debug('Suppressed tcsh tty warning (stdout).')
+            return
         self.stdOutput.emit(text)
 
     @Slot()
     def readStdErr(self):
         data = self.readAllStandardError()
         text = str(bytearray(data).decode('utf8'))
+        # Suppress harmless tcsh warning about missing tty when running under QProcess
+        if 'no access to tty' in text or 'Inappropriate ioctl for device' in text:
+            logging.debug('Suppressed tcsh tty warning.')
+            return
         self.stdErrOutput.emit(text)
 
     @Slot()
