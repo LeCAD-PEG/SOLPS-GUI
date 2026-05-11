@@ -1,0 +1,51 @@
+#! /bin/tcsh
+
+#SBATCH  --nodes=#NODES#
+#SBATCH  --ntasks-per-node=#TASKS#
+#SBATCH  --cpus-per-task=#THREADS#
+#SBATCH  --time=#HOURS#:00:00
+#SBATCH  --mem-per-cpu=#MEM#G
+#SBATCH  --mail-user=#EMAIL#
+#SBATCH  --mail-type=END,FAIL
+#SBATCH  --job-name=#JOB#
+#SBATCH  --partition=#PART#
+#SBATCH  --no-requeue
+#SBATCH  --output=slurm-%j.out
+#SBATCH  --error=slurm-%j.err
+
+echo Using SOLPSTOP = #SOLPSTOP#
+
+set USE_MPI=""
+if ($?SOLPS_MPI) then
+  set MPI_OPTS=#MPIOPTS#
+  set MPI_EXEC=mpiexec
+  set USE_MPI="-m ${MPI_EXEC} ${MPI_OPTS}"
+  set USE_MPI=`echo $USE_MPI | sed -e 's:-m :-m ''":' -e 's:$:"'':'`
+endif
+
+set USE_OMP=""
+if ($?SOLPS_OPENMP) then
+  setenv KMP_AFFINITY disabled
+  set OMP_OPTS = #THREADS#
+  set USE_OMP = "-t ${OMP_OPTS}"
+endif
+
+set STANDALONE=""
+if ($?SOLPS_TGT) then
+  set STANDALONE=-${SOLPS_OPT}tgt
+endif
+
+if ($?SOLPS_ADJ) then
+  set STANDALONE=-${SOLPS_OPT}adj
+endif
+
+update_solps_run_status "Started on `hostname` at `date`"
+
+time b2run ${STANDALONE} ${USE_MPI} ${USE_OMP} b2mn >! run.log
+
+QSUB.postprocess
+
+preserve_scratch_to_work
+
+update_solps_run_status "Finished on `hostname` at `date`"
+b2fstate_OK_bool
