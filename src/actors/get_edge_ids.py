@@ -436,6 +436,20 @@ class GetIDSWrapper:
                         continue
                 with open(abs_path, 'w') as f:
                     f.write(file)
+            # --- Attach optimization history arrays to ep as a Python attribute for GUI use ---
+            try:
+                import numpy as np
+                ep = getattr(self, 'ep', None)
+                if ep is not None:
+                    ep.opt_history = {
+                        'parm_hist1': np.loadtxt(os.path.join(dir_path, 'parm_hist1.dat')).tolist() if os.path.exists(os.path.join(dir_path, 'parm_hist1.dat')) else None,
+                        'parm_hist2': np.loadtxt(os.path.join(dir_path, 'parm_hist2.dat')).tolist() if os.path.exists(os.path.join(dir_path, 'parm_hist2.dat')) else None,
+                        'parm_hist3': np.loadtxt(os.path.join(dir_path, 'parm_hist3.dat')).tolist() if os.path.exists(os.path.join(dir_path, 'parm_hist3.dat')) else None,
+                        'objval': np.loadtxt(os.path.join(dir_path, 'objval.dat')).tolist() if os.path.exists(os.path.join(dir_path, 'objval.dat')) else None,
+                        'grad': np.loadtxt(os.path.join(dir_path, 'grad.dat')).tolist() if os.path.exists(os.path.join(dir_path, 'grad.dat')) else None,
+                    }
+            except Exception as e:
+                logging.warning(f'Could not attach opt_history to ep: {e}')
         except PermissionError:
             logging.error('Warning!, No permission in the current directory!')
         except tarfile.ReadError as e:

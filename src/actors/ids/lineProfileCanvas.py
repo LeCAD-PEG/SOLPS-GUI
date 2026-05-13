@@ -109,3 +109,72 @@ class LineProfileCanvas(FigureCanvasQTAgg):
             )
 
         self.draw_idle()
+
+    def plotAllProfilesAndHistory(self, regression_data, opt_history_figs):
+        """Plot all 10 panels (6 regression + 4 optimization history) in a 2x5 grid."""
+        self.figure.clear()
+        axes = self.figure.subplots(2, 5)
+        # --- Regression/edge profile panels (first 6) ---
+        ocre = [255/255, 218/255, 38/255]
+        blue = [51/255, 153/255, 1.0]
+        specs = [
+            (axes[0, 0], regression_data['ds'], regression_data['ne_omp'], regression_data['ds'], regression_data['ne_omp_ref'], 'cf2', 'nₑ @ OMP', 'r−r_sep [mm]', 'nₑ [10¹⁹ m⁻³]', None, None, False),
+            (axes[0, 1], regression_data['ds'], regression_data['te_omp'], regression_data['ds'], regression_data['te_omp_ref'], 'cf3', 'Tₑ @ OMP', 'r−r_sep [mm]', 'Tₑ [eV]', None, None, False),
+            (axes[0, 2], regression_data['dstrg1'], regression_data['ne_trg'], regression_data.get('dstrg1_ref', regression_data['dstrg1']), regression_data['ne_trg_ref'], 'cf4', 'nₑ @ outer target', 's−s_sep [mm]', 'nₑ [10¹⁹ m⁻³]', None, None, False),
+            (axes[0, 3], regression_data['dstrg1'], regression_data['te_trg'], regression_data.get('dstrg1_ref', regression_data['dstrg1']), regression_data['te_trg_ref'], 'cf5', 'Tₑ @ outer target', 's−s_sep [mm]', 'Tₑ [eV]', None, None, False),
+            (axes[0, 4], regression_data['ds'], regression_data['dna_omp'], regression_data['ds'], regression_data['dna_omp_ref'], None, 'D⊥ @ OMP', 'r−r_sep [mm]', 'D⊥ [m²/s]', None, None, True),
+            (axes[1, 0], regression_data['ds'], regression_data['chie_omp'], regression_data['ds'], regression_data['chie_omp_ref'], None, 'χₑ⊥ @ OMP', 'r−r_sep [mm]', 'χₑ [m²/s]', None, None, True),
+        ]
+        for panel_idx, (ax, x_opt, y_opt, x_ref, y_ref, cf_key, title, xlabel, ylabel, ylim, xlim, transport) in enumerate(specs):
+            cf_x_min = None
+            if cf_key and regression_data.get(cf_key) is not None:
+                cf = regression_data[cf_key]
+                if cf is not None and hasattr(cf, 'ndim') and cf.ndim == 2 and cf.shape[1] >= 2:
+                    cf_x = cf[:, 0] * 1e3
+                    cf_x_min = cf_x.min()
+                    ax.plot(cf_x, cf[:, 1], 'o', color=ocre, label='cost fn data', markersize=4, linestyle='none')
+            def shift_curve(xarr, yarr):
+                xarr = np.asarray(xarr, dtype=float)
+                yarr = np.asarray(yarr, dtype=float)
+                if cf_key is None or cf_x_min is None or len(xarr) == 0:
+                    return xarr, yarr
+                return xarr + (cf_x_min - xarr.min()), yarr
+            if len(x_ref) and len(y_ref):
+                xr, yr = shift_curve(x_ref, y_ref)
+                ax.plot(xr, yr, '-', color=blue, label='reference', linewidth=2)
+            if len(x_opt) and len(y_opt):
+                xo, yo = shift_curve(x_opt, y_opt)
+                opt_color = ocre if transport else 'r'
+                opt_style = '--' if transport else '-.'
+                ax.plot(xo, yo, opt_style, color=opt_color, label='optimized', linewidth=2)
+            ax.set_title(title, fontsize=9)
+            ax.set_xlabel(xlabel, fontsize=8)
+            ax.set_ylabel(ylabel, fontsize=8)
+            if ylim:
+                ax.set_ylim(ylim)
+            if xlim is not None:
+                ax.set_xlim(left=xlim[0], right=xlim[1])
+            ax.legend(fontsize=7)
+            ax.grid(True, linestyle='--', alpha=0.5)
+        # --- Optimization history panels (last 4) ---
+        for i, fig in enumerate(opt_history_figs):
+            # Copy the axes from the generated figures into the grid
+            # Place in axes[1, 1+i] (i=0..3)
+            if i < 4:
+                src_ax = fig.axes[0] if hasattr(fig, 'axes') and len(fig.axes) > 0 else None
+                dest_ax = axes[1, 1+i]
+                if src_ax is not None:
+                    for line in src_ax.get_lines():
+                        dest_ax.plot(line.get_xdata(), line.get_ydata(), color=line.get_color(), linestyle=line.get_linestyle(), label=line.get_label())
+                    dest_ax.set_title(src_ax.get_title(), fontsize=9)
+                    dest_ax.set_xlabel(src_ax.get_xlabel(), fontsize=8)
+                    dest_ax.set_ylabel(src_ax.get_ylabel(), fontsize=8)
+                    dest_ax.set_yscale(src_ax.get_yscale())
+                    dest_ax.legend(fontsize=7)
+                    dest_ax.grid(True, linestyle='--', alpha=0.5)
+        try:
+            self.figure.tight_layout()
+        except Exception as e:
+            print(f'Warning: tight_layout failed: {e}')
+            self.figure.subplots_adjust(left=0.08, right=0.98, bottom=0.08, top=0.92, wspace=0.35, hspace=0.45)
+        self.draw_idle()

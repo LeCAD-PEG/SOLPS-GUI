@@ -52,6 +52,10 @@ class OptimizationActor(TcshProcess):
         self.removePrtButton.clicked.connect(self.removeB2mnPrt)
         commandLayout.addWidget(self.removePrtButton)
 
+        self.showTaoResultsButton = QPushButton('Show TAO Results', commandBox)
+        self.showTaoResultsButton.clicked.connect(self.showTaoResults)
+        commandLayout.addWidget(self.showTaoResultsButton)
+
         self.stopButton = QPushButton('Stop run', commandBox)
         self.stopButton.clicked.connect(self.stopRun)
         commandLayout.addWidget(self.stopButton)
@@ -174,11 +178,26 @@ class OptimizationActor(TcshProcess):
     def updateText(self, text):
         if not text:
             return
+        # Filter out unwanted startup messages
+        skip_phrases = [
+            'Welcome to SOLPS-ITER!',
+            'Documentation can be found at:',
+            'https://sharepoint.iter.org/departments/POP/CM/IMAS/SOLPS-ITER',
+            'https://user.iter.org/?uid=Q92BAQ',
+            'The full SOLPS-ITER manual can be found in $SOLPSTOP/doc/solps/solps.pdf',
+            'The Eirene manual is located at http://www.eirene.de/',
+            'Running at ITER.',
+            'Using DEVICE=',
+            'Using specified compiler',
+            'Loading cached SETUP/',
+            'TCSH READY',
+        ]
         filtered = '\n'.join(
             line for line in text.splitlines()
             if 'no access to tty' not in line
             and 'Inappropriate ioctl for device' not in line
             and 'Thus no job control in this shell' not in line
+            and not any(phrase in line for phrase in skip_phrases)
         )
         if not filtered.strip():
             return
@@ -193,6 +212,10 @@ class OptimizationActor(TcshProcess):
     def showProcessState(self, message):
         if message:
             self.textDisplay.appendPlainText(message)
+
+    @Slot()
+    def showTaoResults(self):
+        self._executeCommand('result_tao.sh')
 
 if __name__ == '__main__':
     import sys

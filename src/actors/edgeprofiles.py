@@ -10,6 +10,7 @@ from PySide6.QtWidgets import QWidget
 
 import logging
 from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 
 from ids.quadPlotCanvas import QuadPlotCanvas
 from ids.lineProfileCanvas import LineProfileCanvas
@@ -17,6 +18,7 @@ from ids.GGDDialog import GetGGDDialog
 from ids.getEPGGD import getEPGGD, GetGGDVars
 
 from PySide6.QtWidgets import QDialog, QComboBox, QDialogButtonBox, QFormLayout, QLabel
+from PySide6.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QSizePolicy, QScrollArea
 
 #from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 
@@ -48,21 +50,15 @@ class EdgeProfiles(QWidget):
         self.setLayout(QVBoxLayout())
         # Set empty matplotlib canvas (2D mesh plot)
         self.canvas = QuadPlotCanvas(self, width=1, height=6)
-        # Set matplotlib toolbar
         self.toolbar = NavigationToolbar(self.canvas, self)
-        # Add widgets to layout
+        # Only add 2D plot widgets at startup
         self.layout().addWidget(self.canvas)
         self.layout().addWidget(self.toolbar)
-
-        # 1D profile canvas (shown on demand via plotProfiles1D slot)
+        # 1D profile canvas (do NOT add to layout at startup)
         self.profileCanvas = LineProfileCanvas(self, width=5, height=4)
         self.profileToolbar = NavigationToolbar(self.profileCanvas, self)
-        self.layout().addWidget(self.profileCanvas)
-        self.layout().addWidget(self.profileToolbar)
-        # Hide by default — shown only when a 1D plot is requested
         self.profileCanvas.setVisible(False)
         self.profileToolbar.setVisible(False)
-
 
     @Slot(object)
     def input_edge_profiles(self, edge_profiles):
@@ -106,7 +102,12 @@ class EdgeProfiles(QWidget):
         """Populate (plot) the canvas."""
         if self.ep is None:
             return
-
+        # Remove 1D widgets if present, add 2D widgets if not present
+        self.layout().removeWidget(self.profileCanvas)
+        self.layout().removeWidget(self.profileToolbar)
+        if self.canvas not in [self.layout().itemAt(i).widget() for i in range(self.layout().count())]:
+            self.layout().addWidget(self.canvas)
+            self.layout().addWidget(self.toolbar)
         self.canvas.setVisible(True)
         self.toolbar.setVisible(True)
         self.profileCanvas.setVisible(False)
@@ -145,6 +146,9 @@ class EdgeProfiles(QWidget):
         self.toolbar.setVisible(True)
         self.profileCanvas.setVisible(False)
         self.profileToolbar.setVisible(False)
+
+    def clearTabs(self):
+        pass  # No-op, tabs widget removed
 
     @Slot()
     def plotProfiles1D(self):
@@ -462,12 +466,109 @@ class EdgeProfiles(QWidget):
             dna_omp_ref=dna_omp_ref, chie_omp_ref=chie_omp_ref,
             **cf
         )
-
-        self.canvas.setVisible(False)
-        self.toolbar.setVisible(False)
+        # Clear previous tabs
+        self.clearTabs()
+        # Remove 2D widgets if present, add 1D widgets if not present
+        self.layout().removeWidget(self.canvas)
+        self.layout().removeWidget(self.toolbar)
+        if self.profileCanvas not in [self.layout().itemAt(i).widget() for i in range(self.layout().count())]:
+            self.layout().addWidget(self.profileCanvas)
+            self.layout().addWidget(self.profileToolbar)
         self.profileCanvas.setVisible(True)
         self.profileToolbar.setVisible(True)
-        self.profileCanvas.plotRegression(plot_data)
+        self.canvas.setVisible(False)
+        self.toolbar.setVisible(False)
+        self.layout().invalidate()
+        self.layout().update()
+        # Plot regression results and optimization history in a single 2x5 grid
+        runDir = None
+        try:
+            runDir = str(self.ep.ids_properties.comment)
+        except Exception:
+            pass
+        if runDir and os.path.isdir(runDir):
+            opt_figs = self.getOptimizationHistoryFigures(runDir)
+        else:
+            opt_figs = []
+        self.profileCanvas.plotAllProfilesAndHistory(plot_data, opt_figs)
+
+    def getOptimizationHistoryFigures(self, runDir=None):
+        import numpy as np
+        import os
+        from matplotlib.figure import Figure
+        figs = []
+        # Try to get from IDS first
+        ep = getattr(self, 'ep', None)
+        opt_history = getattr(ep, 'opt_history', None) if ep is not None else None
+        # Helper to get array from IDS or file
+        def get_arr(key, fname):
+            if opt_history and key in opt_history and opt_history[key] is not None:
+                return np.array(opt_history[key])
+            if runDir and os.path.exists(os.path.join(runDir, fname)):
+                return np.loadtxt(os.path.join(runDir, fname))
+            return None
+        par1 = get_arr('parm_hist1', 'parm_hist1.dat')
+        par2 = get_arr('parm_hist2', 'parm_hist2.dat')
+        par3 = get_arr('parm_hist3', 'parm_hist3.dat')
+        objval = get_arr('objval', 'objval.dat')
+        grad = get_arr('grad', 'grad.dat')
+        dnaref_val = None
+        try:
+            refDir = os.path.normpath(os.path.join(runDir, '..', 'reference_reg')) if runDir else None
+            from put_edge_ids import readB2output
+            if refDir and os.path.exists(os.path.join(refDir, 'b2fplasmf')):
+                statref = readB2output(refDir, 'b2fplasmf', variables=['dna0'])
+                if 'dna0' in statref and len(statref['dna0']) > 1:
+                    n = len(statref['dna0']) // 2
+                    dnaref_val = statref['dna0'][n]
+        except Exception:
+            dnaref_val = None
+        # par1/par2
+        if par1 is not None and par2 is not None:
+            fig = Figure(figsize=(6, 4))
+            ax = fig.add_subplot(111)
+            x = np.arange(len(par1))
+            if dnaref_val is not None:
+                ax.plot([0, len(par1)-1], [dnaref_val, dnaref_val], color='gray', linestyle='-', label='reference')
+            ax.plot(x, par1, color='orange', linestyle='--', label='D_perp')
+            ax.plot(x, par2, color='blue', linestyle='--', label='chi_e_perp')
+            ax.set_xlabel('Optimization iterations')
+            ax.set_title('Parameter History (D_perp, chi_e_perp)')
+            ax.legend(loc='lower right')
+            figs.append(fig)
+        # par3
+        if par3 is not None:
+            fig = Figure(figsize=(6, 4))
+            ax = fig.add_subplot(111)
+            x = np.arange(len(par3))
+            ax.plot([0, len(par3)-1], [3.25, 3.25], color='gray', linestyle='-', label='reference')
+            ax.plot(x, par3/1e19, color='blue', linestyle='--', label='n_e,core')
+            ax.set_xlabel('Optimization iterations')
+            ax.set_title('Parameter History (n_e,core)')
+            ax.legend(loc='lower right')
+            figs.append(fig)
+        # objval
+        if objval is not None:
+            fig = Figure(figsize=(6, 4))
+            ax = fig.add_subplot(111)
+            ax.plot(objval, color='orange', linestyle='-')
+            ax.set_xlabel('Optimization iterations')
+            ax.set_title('Cost function value')
+            ax.set_yscale('log')
+            figs.append(fig)
+        # grad
+        if grad is not None and len(grad) > 0:
+            fig = Figure(figsize=(6, 4))
+            ax = fig.add_subplot(111)
+            ax.plot(grad/grad[0], color='orange', linestyle='-')
+            ax.set_xlabel('Optimization iterations')
+            ax.set_title('Cost function gradient')
+            ax.set_yscale('log')
+            figs.append(fig)
+        return figs
+
+# In your LineProfileCanvas, add a method getRegressionFigures(plot_data) that returns a list of 6 matplotlib Figure objects for the regression/edge profile plots.
+# ...existing code...
 
 if __name__ == '__main__':
     import sys

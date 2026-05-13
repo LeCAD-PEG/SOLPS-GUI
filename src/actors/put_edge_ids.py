@@ -1183,19 +1183,46 @@ class PutIDSwrapper:
         _write_slot(3, b2refAr,  trg_idx, ds_trg, False)  # reference target
 
     def save(self):
-        """Saves changes to IDS.edge_profiles with the put function.
-        """
-
+        """Saves changes to IDS.edge_profiles with the put function, including all optimization history arrays as files in code.parameters."""
+        import numpy as np
+        import os
+        import tarfile
+        ep = getattr(self, 'edge_profiles', None)
+        # --- Save all optimization history arrays as files to include in IDS tarball ---
+        opt_files = [
+            'objval.dat',
+            'grad.dat',
+            'parm_hist1.dat',
+            'parm_hist2.dat',
+            'parm_hist3.dat',
+            'parm_hist4.dat',
+            'parm_hist5.dat',
+            'cf2.dat',
+            'cf3.dat',
+            'cf4.dat',
+            'cf5.dat',
+            'cf6.dat',
+            'cf7.dat',
+            'cf8.dat',
+            'cf9.dat',
+            'PETSC-TAO.OUT',
+            'b2.optimization.parameters'
+        ]
+        tarball_path = 'code.parameters'
+        # Remove old tarball if present to avoid duplicates
+        if os.path.exists(tarball_path):
+            os.remove(tarball_path)
+        with tarfile.open(tarball_path, 'w') as tar:
+            for fname in opt_files:
+                if os.path.exists(fname):
+                    tar.add(fname)
+        # Now proceed with saving to IDS as before
         if self.state:
             if self.new_api:
                 try:
                     self.imas_obj.put(self.edge_profiles)
                     logging.info('edge_profiles saved with put().')
                 except Exception as e:
-                    # put() deletes existing data first; if the MDS+ tree was
-                    # created by b2_ual_write without ids_properties, delete
-                    # fails with "Node Not Found". Close and recreate the entry
-                    # so we get a clean tree, then put again.
                     logging.warning(f'put() failed ({e}). Recreating entry and retrying.')
                     try:
                         self.imas_obj.close()
