@@ -160,11 +160,26 @@ class TangentActor(TcshProcess):
     def updateText(self, text):
         if not text:
             return
+        # Filter out unwanted startup messages
+        skip_phrases = [
+            'Welcome to SOLPS-ITER!',
+            'Documentation can be found at:',
+            'https://sharepoint.iter.org/departments/POP/CM/IMAS/SOLPS-ITER',
+            'https://user.iter.org/?uid=Q92BAQ',
+            'The full SOLPS-ITER manual can be found in $SOLPSTOP/doc/solps/solps.pdf',
+            'The Eirene manual is located at http://www.eirene.de/',
+            'Running at ITER.',
+            'Using DEVICE=',
+            'Using specified compiler',
+            'Loading cached SETUP/',
+            'TCSH READY',
+        ]
         filtered = '\n'.join(
             line for line in text.splitlines()
             if 'no access to tty' not in line
             and 'Inappropriate ioctl for device' not in line
             and 'Thus no job control in this shell' not in line
+            and not any(phrase in line for phrase in skip_phrases)
         )
         if not filtered.strip():
             return
