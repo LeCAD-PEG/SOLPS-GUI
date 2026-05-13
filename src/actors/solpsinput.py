@@ -104,6 +104,30 @@ class SolpsInput(QTabWidget):
             logging.debug("Run directory not prescribed to view view files.")
             return
 
+        # Remove b2fplasmf tab if it exists and file is not present in rundir
+        b2fplasmf_path = os.path.join(self.rundir, 'b2fplasmf')
+        b2fplasmf_tab_index = None
+        for i in range(self.count()):
+            if self.tabText(i) == 'b2fplasmf':
+                b2fplasmf_tab_index = i
+                break
+        if b2fplasmf_tab_index is not None and not os.path.exists(b2fplasmf_path):
+            self.removeTab(b2fplasmf_tab_index)
+            if 'b2fplasmf' in self.editors:
+                del self.editors['b2fplasmf']
+
+        # Add b2fplasmf tab if present in rundir and not already present
+        if os.path.exists(b2fplasmf_path) and 'b2fplasmf' not in self.editors:
+            font = QFont()
+            font.setFamily('Monospace')
+            plainTextEdit = QPlainTextEdit(self)
+            plainTextEdit.setObjectName('b2fplasmf')
+            plainTextEdit.setFont(font)
+            plainTextEdit.setLineWrapMode(QPlainTextEdit.NoWrap)
+            tab_index = self.addTab(plainTextEdit, 'b2fplasmf')
+            self.editors['b2fplasmf'] = plainTextEdit
+            self.setTabToolTip(tab_index, 'b2fplasmf output file')
+
         if self.currently_viewing == self.rundir:
             return
 
@@ -141,7 +165,7 @@ class SolpsInput(QTabWidget):
                         except EOFError as e:
                             msg = "Couldn't read file " + filename + \
                                   "! File " + filename + " is corrupted!"
-                            plainTextEdit.setPlaceHolderText(msg)
+                            plainTextEdit.setPlaceholderText(msg)
                     else:
                         with open(path) as file:
                             plainTextEdit.setPlainText(file.read())
