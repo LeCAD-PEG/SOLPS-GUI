@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "solps-gui"
+version = "1.6.1"
+description = "Graphical User Interface for SOLPS-ITER"
+readme = "README.md"
+license = { text = "LGPL-3.0-or-later" }
+authors = [
+    { name = "Leon Kos", email = "leon.kos@lecad.fs.uni-lj.si" },
+]
+maintainers = [
+    { name = "LeCAD-PEG", email = "leon.kos@lecad.fs.uni-lj.si" },
+]
+keywords = [
+    "SOLPS-ITER",
+    "plasma",
+    "fusion",
+    "GUI",
+    "IMAS",
+    "B2.5",
+    "Eirene",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Visualization",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "PySide6>=6.2.0",
+    "matplotlib>=3.5.0",
+    "numpy",
+    "imas-python[netcdf] >= 2.3.0"
+]
+
+[project.optional-dependencies]
+docs = [
+    "Sphinx>=3.5.0",
+    "sphinx-rtd-theme",
+]
+dev = [
+    "Sphinx>=3.5.0",
+    "sphinx-rtd-theme",
+]
+
+[project.urls]
+Homepage = "https://github.com/iterorganization/SOLPS-GUI"
+Repository = "https://github.com/iterorganization/SOLPS-GUI.git"
+Issues = "https://github.com/iterorganization/SOLPS-GUI/issues"
+Documentation = "https://github.com/iterorganization/SOLPS-GUI"
+
+[project.scripts]
+solps = "gui.solps_launcher:main"
+solps-gui = "gui.solps_launcher:main"
+
+[tool.setuptools]
+# Source layout: Python modules live under src/
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = [
+    "gui*",
+    "actors*",
+    "plugins*",
+    "generator*",
+]
+namespaces = false
+
+[tool.setuptools.package-data]
+"*" = ["*.ui", "*.png", "*.svg", "*.qrc", "*.qm", "*.ts"]
+gui = ["*.ui", "*.png", "*.svg"]
+widgets = ["*.ui", "*.png", "*.svg"]
+
+[tool.setuptools.data-files]
+# Optional: ship license and readme with the install
+"" = ["LICENSE.txt", "README.md"]
