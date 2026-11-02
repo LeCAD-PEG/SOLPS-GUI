@@ -19,6 +19,7 @@ from edgeprofilesplugin import EdgeProfilesPlugin
 from tangentplugin import TangentPlugin
 from adjointplugin import AdjointPlugin
 from optimizationplugin import OptimizationPlugin
+from uqplugins import UQSetupPlugin, UQRunsPlugin, UQAnalysisPlugin, UQPlotPlugin
 
 from PySide6.QtDesigner import QPyDesignerCustomWidgetCollection
 
@@ -44,3 +45,7 @@ if __name__ == '__main__':
     QPyDesignerCustomWidgetCollection.addCustomWidget(TangentPlugin())
     QPyDesignerCustomWidgetCollection.addCustomWidget(AdjointPlugin())
     QPyDesignerCustomWidgetCollection.addCustomWidget(OptimizationPlugin())
+    QPyDesignerCustomWidgetCollection.addCustomWidget(UQSetupPlugin())
+    QPyDesignerCustomWidgetCollection.addCustomWidget(UQRunsPlugin())
+    QPyDesignerCustomWidgetCollection.addCustomWidget(UQAnalysisPlugin())
+    QPyDesignerCustomWidgetCollection.addCustomWidget(UQPlotPlugin())

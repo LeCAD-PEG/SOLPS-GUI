@@ -666,6 +666,7 @@ if __name__ == '__main__':
                 runDir = ''
 
             self.optimizationActor.setRunDir(runDir)
+            self.uqSetupActor.setRunDir(runDir)
 
         @Slot(int)
         def on_tabWidget_currentChanged(self, tab_index):

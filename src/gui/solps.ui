@@ -536,6 +536,60 @@ should eventually stop the run.</string>
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_uq">
+       <attribute name="title">
+        <string>&amp;UQ</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_uq" rowstretch="1,1,0" columnstretch="1,1">
+        <item row="0" column="0">
+         <widget class="UQSetupActor" name="uqSetupActor">
+          <property name="toolTip">
+           <string>Uncertain inputs and OpenTURNS sampling. Emits samplesReady(study).</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="UQAnalysisActor" name="uqAnalysisActor">
+          <property name="toolTip">
+           <string>QoIs, PCE/Kriging and Sobol' indices. Emits resultsReady(study).</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="UQRunsActor" name="uqRunsActor">
+          <property name="toolTip">
+           <string>Sample run directories, Slurm and b2fplasmf. Emits runsFinished(study).</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="UQPlotActor" name="uqPlotActor">
+          <property name="toolTip">
+           <string>Sobol' indices, histograms and scatter plots of a UQ study.</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <widget class="QPlainTextEdit" name="uqLog">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>130</height>
+           </size>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="lineWrapMode">
+           <enum>QPlainTextEdit::NoWrap</enum>
+          </property>
+          <property name="placeholderText">
+           <string>UQ log: messages of the four UQ actors (logMessage signals).</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tab_Input">
        <attribute name="title">
         <string>I&amp;nput</string>
@@ -1242,6 +1296,26 @@ should eventually stop the run.</string>
    <header>optimization</header>
   </customwidget>
   <customwidget>
+   <class>UQSetupActor</class>
+   <extends>QWidget</extends>
+   <header>uq_setup</header>
+  </customwidget>
+  <customwidget>
+   <class>UQRunsActor</class>
+   <extends>QWidget</extends>
+   <header>uq_runs</header>
+  </customwidget>
+  <customwidget>
+   <class>UQAnalysisActor</class>
+   <extends>QWidget</extends>
+   <header>uq_analysis</header>
+  </customwidget>
+  <customwidget>
+   <class>UQPlotActor</class>
+   <extends>QWidget</extends>
+   <header>uq_plot</header>
+  </customwidget>
+  <customwidget>
    <class>B2InputFiles</class>
    <extends>QWidget</extends>
    <header>b2_input_files</header>
@@ -1880,6 +1954,182 @@ should eventually stop the run.</string>
     <hint type="destinationlabel">
      <x>272</x>
      <y>160</y>
+    </hint>
+   </hints>
+  </connection>
+ <connection>
+   <sender>uqSetupActor</sender>
+   <signal>samplesReady(QString)</signal>
+   <receiver>uqRunsActor</receiver>
+   <slot>setStudy(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>250</x>
+     <y>470</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>250</x>
+     <y>540</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uqSetupActor</sender>
+   <signal>samplesReady(QString)</signal>
+   <receiver>uqAnalysisActor</receiver>
+   <slot>setStudy(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>470</x>
+     <y>230</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>560</x>
+     <y>230</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uqSetupActor</sender>
+   <signal>samplesReady(QString)</signal>
+   <receiver>uqPlotActor</receiver>
+   <slot>setStudy(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>470</x>
+     <y>400</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>720</x>
+     <y>560</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uqRunsActor</sender>
+   <signal>runsFinished(QString)</signal>
+   <receiver>uqAnalysisActor</receiver>
+   <slot>collect(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>470</x>
+     <y>620</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>720</x>
+     <y>420</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uqAnalysisActor</sender>
+   <signal>outputsCollected(QString)</signal>
+   <receiver>uqPlotActor</receiver>
+   <slot>setStudy(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>820</x>
+     <y>470</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>820</x>
+     <y>540</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uqAnalysisActor</sender>
+   <signal>resultsReady(QString)</signal>
+   <receiver>uqPlotActor</receiver>
+   <slot>setStudy(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>980</x>
+     <y>470</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>980</x>
+     <y>540</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uqSetupActor</sender>
+   <signal>logMessage(QString)</signal>
+   <receiver>uqLog</receiver>
+   <slot>appendPlainText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>120</x>
+     <y>470</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>200</x>
+     <y>900</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uqRunsActor</sender>
+   <signal>logMessage(QString)</signal>
+   <receiver>uqLog</receiver>
+   <slot>appendPlainText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>120</x>
+     <y>840</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>300</x>
+     <y>900</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uqAnalysisActor</sender>
+   <signal>logMessage(QString)</signal>
+   <receiver>uqLog</receiver>
+   <slot>appendPlainText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1180</x>
+     <y>470</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>900</x>
+     <y>900</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uqPlotActor</sender>
+   <signal>logMessage(QString)</signal>
+   <receiver>uqLog</receiver>
+   <slot>appendPlainText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1180</x>
+     <y>840</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1000</x>
+     <y>900</y>
+    </hint>
+   </hints>
+  </connection>
+ <connection>
+   <sender>uqRunsActor</sender>
+   <signal>runsFinished(QString)</signal>
+   <receiver>uqPlotActor</receiver>
+   <slot>setStudy(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>470</x>
+     <y>760</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>720</x>
+     <y>760</y>
     </hint>
    </hints>
   </connection>
