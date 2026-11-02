@@ -20,4 +20,5 @@
    initialize_run_ITER.rst
    meshing_compass.rst
    initialize_run_compass.rst
+   uq.rst
 
