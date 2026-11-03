@@ -60,6 +60,43 @@ electron density profile at the OMP of all 30 runs with their mean and
    :width: 100%
    :align: center
 
+Running a UQ study step by step
+-------------------------------
+
+1. In the :menuselection:`Runs` tab select the case and click its
+   ``baserun``.
+2. In the :menuselection:`Initialize Run` tab choose your case (for example
+   ``UQ_test``) in :menuselection:`Select run dir`. Open the
+   :menuselection:`UQ` tab; UQ Setup shows *Base run: UQ_test*.
+3. In UQ Setup check the uncertain inputs (add more with
+   :guilabel:`+ Add`) and click :guilabel:`Read nominal values`.
+4. Set :menuselection:`Method` to ``LHS``, :menuselection:`Samples` to
+   ``30`` and :menuselection:`Seed` to ``42``.
+5. In :menuselection:`Directory` enter the path of a new folder, for
+   example ``/scratch/users/vasilei/UQ_study_transport``, and click
+   :guilabel:`Generate samples`.
+6. In UQ Runs check the Slurm settings (:menuselection:`Partition` ``all``,
+   :menuselection:`Time limit` ``06:00:00``, :menuselection:`Memory`
+   ``8G``) and click :guilabel:`Create run dirs`. Click
+   :guilabel:`Submit to Slurm` and :guilabel:`Yes`. When all rows of the
+   runs table are green, click :guilabel:`Create b2fplasmf` and wait until
+   the :menuselection:`b2fplasmf` column shows ``yes`` for all runs.
+7. UQ Analysis then collects the outputs automatically and UQ Plot shows
+   the profiles. To add more quantities of interest click
+   :guilabel:`+ Add` and choose their :menuselection:`Location` and
+   :menuselection:`Rings`; after any change click
+   :guilabel:`Collect outputs`.
+8. Set :menuselection:`Metamodel` to ``PCE`` and
+   :menuselection:`PCE degree` to ``2`` and click
+   :guilabel:`Fit metamodel + Sobol`.
+9. In UQ Plot choose :menuselection:`Plot --> Profiles (all runs)`, then
+   the :menuselection:`Location` (``OMP``, ``Outer target`` or
+   ``Inner target``) and the :menuselection:`Variable` (``te``, ``ti``,
+   ``ne`` or ``ni``).
+10. To show the Sobol' indices choose
+    :menuselection:`Plot --> Sobol' indices` and the quantity of interest
+    in :menuselection:`QoI`.
+
 What ±10 % on the inputs does to the outputs
 --------------------------------------------
 
