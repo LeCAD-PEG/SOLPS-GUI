@@ -143,7 +143,7 @@ class GetGGDDialog(QDialog):
         ggd = self.ep.ggd[g]
 
         self.quantityDict = \
-            self.getGGD.getQuantityDict(ggd=ggd, gridSubsetId=gs_id)
+            self.getGGD.getQuantityDict(ggd=ggd, gridSubsetId=gs_id, gridId=gg)
 
         for qLabel in self.quantityDict:
             self.combobox_quantity.addItem(qLabel)

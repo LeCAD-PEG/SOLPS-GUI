@@ -140,6 +140,38 @@ class Worker(QRunnable):
             self.signals.finished.emit()  # Done
 
 
+def get_ids(uri: str, ids_name: str, time_requested: float = None,
+            interpolation_method: int = None):
+    """ Opens database and reads one IDS in the calling (worker) thread.
+        MDSplus backend keeps the opened tree per thread, so an IDS cannot be
+        read from a database opened in another thread.
+
+    Args:
+        uri (str): Name IMAS database.
+        ids_name (str): Name of IDS to be read.
+        time_requested (float): Slice time, if ``None`` the whole IDS is read.
+        interpolation_method (int): Interpolation method for slice.
+    """
+    with imas.DBEntry(uri, "r") as dbentry:
+        def _read(autoconvert=True):
+            if time_requested is None:
+                return dbentry.get(ids_name, autoconvert=autoconvert)
+            return dbentry.get_slice(ids_name, time_requested,
+                                     interpolation_method,
+                                     autoconvert=autoconvert)
+        try:
+            return _read()
+        except RuntimeError as e:
+            if 'different major version' not in str(e):
+                raise
+            # Data stored in other DD major version (e.g. DD3 data read with
+            # DD4): read it in on-disk version and convert explicitly
+            ids = _read(autoconvert=False)
+            print(f'Converting {ids_name} from DD {ids._dd_version} '
+                  f'to DD {dbentry.dd_version}')
+            return imas.convert_ids(ids, dbentry.dd_version)
+
+
 def put_ids_process(uri: str, occurrence: int,  mode: str, ids_queue: multiprocessing.Queue):
     """ Creates empty database, waits for IDSs to populate. 
         :class:`IMASDB.ids_queue` writes all IDSs from the queue into the 
@@ -711,11 +743,13 @@ class IMASDB(QWidget):
             if self.property('time_requested'):
                 time_requested = float(self.property('time_requested')) or 0
                 interpolation_method = self.property('interpolation_method') or 1
-                worker = Worker(self.dbentry.get_slice,self.signal_names.pop(0), time_requested, interpolation_method)
+                worker = Worker(get_ids, self.property('uri'), self.signal_names.pop(0), time_requested, interpolation_method)
             else:
-                worker = Worker(self.dbentry.get,self.signal_names.pop(0)) 
+                worker = Worker(get_ids, self.property('uri'), self.signal_names.pop(0))
                 # Any other args, kwargs are passed to the run function
             worker.signals.result.connect(self.emit_ids)
+            worker.signals.log.connect(self._log.appendPlainText)
+            worker.signals.error.connect(self._get_error)
             # Execute
             self._threads.append(worker)
             QThreadPool.globalInstance().start(worker)
@@ -729,6 +763,24 @@ class IMASDB(QWidget):
             self.finished.emit()
             self._running_state = 2
 
+
+    @Slot(tuple)
+    def _get_error(self, err: tuple):
+        """ |Slot| for reporting a failed IDS read from worker thread and
+        closing the database, so that reading can be retried.
+
+        Args:
+            err (tuple): *(exctype, value, traceback.format_exc())*.
+        """
+        self._log.appendPlainText(f'Error reading IDS: {err[1]}')
+        self.signal_names = []
+        if self.dbentry:
+            self.dbentry.close()
+            self.dbentry = None
+        self._title.setStyleSheet("")
+        self._title.setAutoFillBackground(False)
+        self.finished.emit()
+        self._running_state = 2
 
     @Slot(object)
     def emit_ids(self, ids: object):

@@ -99,6 +99,9 @@ class getEPGGD():
             gsId (int) : Grid subset index
         """
         gs_obj = self.ep.grid_ggd[gridId].grid_subset[gsId]
+        # Some grid subsets are empty (no elements or objects)
+        if len(gs_obj.element) < 1 or len(gs_obj.element[0].object) < 1:
+            return None
         return gs_obj.element[0].object[0].dimension
 
     def getGSGridGeometry(self, ggdVars):
@@ -143,15 +146,20 @@ class getEPGGD():
 
         return nodes, quad_conn_array
 
-    def getQuantityDict(self, ggd, gridSubsetId):
+    def getQuantityDict(self, ggd, gridSubsetId, gridId=0):
         """Get dictionary of available quantities and corresponding values
         for specified grid subset.
 
         Arguments:
             ggd (object) : GGD slice structure object (e.g.
                            ids.edge_profiles.ggd[0]
-            gridSubsetId (int) Grid subset index
+            gridSubsetId (int) Grid subset position (Fortran notation)
+            gridId (int) : grid_ggd slice index (array of structure index)
         """
+        # Quantities refer to the grid subset identifier index, which can
+        # differ from its position (e.g. negative indices for regions)
+        gs_obj = self.ep.grid_ggd[gridId].grid_subset[gridSubsetId - 1]
+        gridSubsetId = int(gs_obj.identifier.index)
 
         # Dictionary of quantity labels ( = keys) and corresponding structure
         # objects — exactly 3 quantities written to 2D GGD
@@ -170,6 +178,10 @@ class getEPGGD():
                 if structure[i].grid_subset_index == gridSubsetId:
                     quantityValues = structure[i].values
                     quantityDict[qLabel]['values'] = quantityValues
+
+        # Keep only quantities that have values on this grid subset
+        quantityDict = {k: v for k, v in quantityDict.items()
+                        if 'values' in v and len(v['values']) > 0}
 
         return quantityDict
 
