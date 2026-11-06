@@ -65,7 +65,7 @@ Running a UQ study step by step
 
 1. In the :menuselection:`Runs` tab select the case and click its
    ``baserun``.
-2. In the :menuselection:`Initialize Run` tab choose your case (for example
+2. In the :guilabel:`Initialize Run` tab choose your case (for example
    ``UQ_test``) in :menuselection:`Select run dir`. Open the
    :menuselection:`UQ` tab; UQ Setup shows *Base run: UQ_test*.
 3. In UQ Setup check the uncertain inputs (add more with
@@ -167,14 +167,76 @@ Generating Actor
 Select :menuselection:`SOL --> SOLPS --> Actor Generator` and do the
 following settings
 
-  1. Type `Uncertainty Quantification` in :menuselection:`Actor display name`
-  2. Select or type group :menuselection:`group` as `Workflow`
-  3. Add desctiprion under :menuselection:`toolTip`
-  2. Optionally remove pulse XML section from :menuselection:`XML_DOM`
-     since we will node be using it.
-  3. Select an icon in the list of icons
+1. Type `My UQ` in :guilabel:`Actor display name`
+2. Select or type group :guilabel:`group` as `Workflow`
+3. Add desctiprion under :guilabel:`toolTip`
+4. Optionally remove pulse XML section from :menuselection:`XML_DOM`
+   since we will node be using it.
+5. Select an icon in the list of icons
+6. Set :guilabel:`Actor Directory` to :file:`~/Documents/actors` and
+   :guilabel:`Plugin Diretcory` to :file:`~/Documents/plugins`
+   The directory settings can be also set before running the generator
+   with :menuselection:`File --> Preferences --> SOL`
+7. Use :kbd:`CTRL+S` or :menuselection:`File --> Save` to save all actor
+   files in the directories specified. 
 
-The actor generator should look like in the following figure.
+   The actor generator should look like in the following figure.
 
-.. image:: uq-actor1.png
-   :align: center
+   .. image:: uq-actor1.png
+      :align: center
+
+8. The generator already prepared a test workflow with :file:`myuq.ui`
+   file that can be stested by setting :menuselection:`File -->
+   Preferences --> SOL --> Workflow Load UI` to
+   :file:`~/Documents/plugins/myuq.ui` and :guilabel:`Apply` and
+   :guilabel:`OK`
+
+9. Test the default workflow by :menuselection:`SOL --> Workflow ->
+   Load workflow UI` and then :guilabel:`Start` or :guilabel:`Compute`
+   button.
+
+10. Edit :file:`~/Documents/actors/myuq.py` and add replace `compute()` slot
+    with the following
+
+.. code-block:: python
+
+   @Slot()
+   def compute(self):
+        self._running_state = 1
+        self._log.appendPlainText("Generating samples...")
+        try:
+            import openturns
+        except ImportError:
+            QMessageBox.critical(self, 'UQ', 'OpenTURNS is not available in this Python.')
+            return
+        import numpy
+
+        nominal = 1.5
+        spread = 0.1*nominal
+        marginal1 = openturns.Uniform(nominal-spread, nominal+spread)
+        marginal2 = openturns.Uniform(2.0, 3.0)
+        marginal3 = openturns.Uniform(2.5, 3.6)        
+        marginals = [marginal1, marginal2, marginal3]
+        distribution =  openturns.JointDistribution(marginals)
+        distribution.setDescription(["parm_dna", "parm_hci", "parm_hce"])
+        size = 30
+        experiment = openturns.LHSExperiment(distribution, size)
+        samples = numpy.array(experiment.generate())
+        self._log.appendPlainText(str(samples))
+        self.finished.emit()
+        self._running_state = 2       
+
+11. Restart the workflow by pressing :kbd:`ESC` and click in the
+    Workflow area to get new actor code reloaded. Repeating
+    :guilabel:`Compute` will list 30 samples of SOLPS parameters to be
+    changed in each :file:`b2.transport.parameters` sample run.
+
+
+With a help of Artificial Intelligence one may extend the initial
+actor to have a table of parameters to be used for UQ sampling,
+generate modified files and reference baseline case files in
+:file:`runs` directories creation.
+
+Additional actors for batch submission, group postprocessing and
+plotting may be created as shown in this tutorial *Introduction* and
+now found under :file:`solps.ui` worklow tab.

@@ -84,6 +84,8 @@ namespaces = false
 "*" = ["*.ui", "*.png", "*.svg", "*.qrc", "*.qm", "*.ts"]
 gui = ["*.ui", "*.png", "*.svg"]
 widgets = ["*.ui", "*.png", "*.svg"]
+# Jinja2 templates of the Actor Generator (templates is not a package)
+generator = ["*.ui", "templates/*"]
 
 [tool.setuptools.data-files]
 # Optional: ship license and readme with the install
