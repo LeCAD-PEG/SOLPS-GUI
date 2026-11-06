@@ -43,8 +43,6 @@ from PySide6.QtCore import (Slot, QModelIndex, Qt, QSettings, Signal,
 from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QDialog,
                              QFileDialog, QLineEdit, QToolButton, QGridLayout,
                              QDialogButtonBox, QLabel)
-from PySide6.QtNetwork import QUdpSocket
-from PySide6.QtNetwork import QHostAddress
 from PySide6.QtUiTools import loadUiType as _loadUiType
 
 
@@ -801,31 +799,18 @@ if __name__ == '__main__':
                 model = self.treeViewRuns.model().sourceModel()
                 model.statusServerThread.stop()
 
-                address = QHostAddress(self.preferences.bind_address)
-                port = self.preferences.port
-                if model.statusServerThread.state() == \
-                   QUdpSocket.BoundState:
-                   model.statusServerThread.close()
-                ok = model.statusServerThread.bind(address, port)
-
                 # Also set the log level for LOG widget
                 log_levels = [logging.DEBUG, logging.INFO, logging.WARNING,
                               logging.ERROR, logging.CRITICAL]
                 log_level = log_levels[self.preferences.log_level]
                 self.log.logHandler.setLevel(log_level)
 
-
-                if ok:
-                    # model.statusServerThread.start()
-                    logging.info('statusServerThread bind on port '
-                                 f'{self.preferences.port} and on address '
-                                 f'{self.preferences.bind_address}')
-                    pass
-                else:
-                    msg = "Failed to bind interface {0} to port {1}. " \
-                          "Job monitoring will not start unless you " \
-                          "setup a free port and restart! ".format(
-                           self.preferences.bind_address, self.preferences.port)
+                # Falls back to a private interface and the next free port,
+                # saved in QSettings, so they are read back into preferences.
+                msg = model.bindStatusServer(self.preferences.bind_address,
+                                             self.preferences.port)
+                self.preferences.read()
+                if msg:
                     QMessageBox.warning(None, "SOLPS-GUI Status server", msg,
                                         QMessageBox.Ok)
 
@@ -1022,7 +1007,6 @@ if __name__ == '__main__':
             solps_gui_ip = settings.value('SOLPS_GUI_IP', '127.0.0.1')
             default_port = str(0xCAFE + os.getuid() % 13566)
             solps_gui_port = settings.value('SOLPS_GUI_PORT', default_port)
-            settings.setValue('SOLPS_GUI_PORT', default_port)
 
             compiler = settings.value('compiler_environment', 'gfortran')
 

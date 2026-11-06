@@ -4,7 +4,8 @@ from PySide6.QtCore import (Qt, QModelIndex, QThread, QSettings,
 from PySide6.QtWidgets import (QTreeView, QTreeWidgetItem, QStyle,
                                QStyledItemDelegate, QMessageBox,
                                QStyleOptionViewItem)
-from PySide6.QtNetwork import QUdpSocket, QHostAddress
+from PySide6.QtNetwork import (QUdpSocket, QHostAddress, QNetworkInterface,
+                               QAbstractSocket)
 from PySide6.QtGui import QPainter
 
 from solps import Column
@@ -476,6 +477,67 @@ class RunsStatusServer(QUdpSocket):
             logging.info("RunsStatusServer stopped.")
 
 
+# Private IPv4 networks searched for the status server interface, in order
+# of preference: cluster networks first.
+privateNetworks = (('10.0.0.0', 8), ('192.168.0.0', 16), ('172.16.0.0', 12))
+# Number of ports tried, starting from the one in QSettings
+portSearchRange = 100
+
+
+def classfulPrefixLength(address: QHostAddress) -> int:
+    """Returns the network prefix length of the IP class of an IPv4 address:
+    8 for class A (10.x.x.x), 16 for class B and 24 for class C
+    (192.168.x.x)."""
+    first = address.toIPv4Address() >> 24
+    if first < 128:
+        return 8
+    if first < 192:
+        return 16
+    return 24
+
+
+def isLocalAddress(address: QHostAddress) -> bool:
+    """Returns True if address is a wildcard or an address of this host,
+    so that only the port can make binding to it fail."""
+    if address.isNull():
+        return False
+    if address in (QHostAddress.SpecialAddress.AnyIPv4,
+                   QHostAddress.SpecialAddress.AnyIPv6,
+                   QHostAddress.SpecialAddress.Any):
+        return True
+    return address in QNetworkInterface.allAddresses()
+
+
+def privateInterfaceAddresses(previous: QHostAddress) -> list:
+    """Returns the private IPv4 addresses of the running interfaces.
+
+    Addresses in the network of previous come first, with the network mask
+    of the interface, or of its IP class if the interface has none. They are
+    followed by the others in the order of privateNetworks.
+    """
+    candidates = []
+    for interface in QNetworkInterface.allInterfaces():
+        flags = interface.flags()
+        if not (flags & QNetworkInterface.IsUp) or \
+           not (flags & QNetworkInterface.IsRunning) or \
+           flags & QNetworkInterface.IsLoopBack:
+            continue
+        for entry in interface.addressEntries():
+            ip = entry.ip()
+            if ip.protocol() != QAbstractSocket.IPv4Protocol:
+                continue
+            for rank, (network, prefix) in enumerate(privateNetworks):
+                if ip.isInSubnet(QHostAddress(network), prefix):
+                    prefixLength = entry.prefixLength()
+                    if prefixLength <= 0:
+                        prefixLength = classfulPrefixLength(ip)
+                    sameNetwork = previous.isInSubnet(ip, prefixLength)
+                    candidates.append((not sameNetwork, rank, ip))
+                    break
+    candidates.sort(key=lambda candidate: candidate[:2])
+    return [ip for _, _, ip in candidates]
+
+
 class RunsModel(QAbstractItemModel):
     # statusServerThread = None
     # scanDirectoriesThread: Optional[DirectoryScan] = None
@@ -689,30 +751,84 @@ class RunsModel(QAbstractItemModel):
         return True
 
     def startRunsStatusServer(self) -> None:
+        """Starts the job status server on the interface and port in
+        QSettings, see bindStatusServer()."""
         self.statusServerThread = RunsStatusServer(self)
         settings = QSettings("ITER", "solps-gui")
         defaultPort = 0xCAFE + os.getuid() % 13566
         address = settings.value("SOLPS_GUI_BIND", "0.0.0.0")
         port = int(settings.value("SOLPS_GUI_PORT", defaultPort))
-
-        settings.setValue("SOLPS_GUI_BIND", address)
-        settings.setValue("SOLPS_GUI_PORT", port)
-        address = QHostAddress(address)
-        if address.isNull():
-            ok = False
-        else:
-            ok = self.statusServerThread.bind(address, port)
-        # self.statusServerThread.connectToHost(QHostAddress(address), port)
-        if not ok:
-            msg = f'Failed to bind interface {address.toString()}'
-            msg += f' to port {port}. '
-            msg += 'Job monitoring will not start unless you setup a free'
-            msg += ' port and restart! GUI will exit if you press Cancel.'
+        msg = self.bindStatusServer(address, port)
+        if msg:
+            msg += ' GUI will exit if you press Cancel.'
             ret = QMessageBox.warning(None, 'SOLPS-GUI Status server', msg,
                                       QMessageBox.Cancel | QMessageBox.Ok)
             if ret == QMessageBox.Cancel:
                 sys.exit(1)
         self.statusServerThread.jobStatusChanged.connect(self.jobStatusChanged)
+
+    def bindStatusServer(self, address: str, port: int) -> str:
+        """Binds the job status server to the interface address and port.
+
+        If the interface address is not one of this host, e.g. it was set on
+        another node, a private interface address (10.x.x.x, 192.168.x.x) is
+        used instead, preferably in the same network as the old one. If the
+        port is not free, the next free port is used. The address and port
+        that were bound are saved in QSettings, and an interface address found
+        here also as SOLPS_GUI_IP, to which the jobs send their status.
+
+        Returns:
+            str: Empty if bound, else why job monitoring will not start.
+        """
+        if self.statusServerThread.state() == QUdpSocket.BoundState:
+            self.statusServerThread.close()
+        settings = QSettings("ITER", "solps-gui")
+
+        # The socket error after a failed bind is not reliable for the next
+        # one, so the address is checked first and then the ports are tried.
+        previous = QHostAddress(address)
+        if isLocalAddress(previous):
+            candidates = [previous]
+        else:
+            candidates = privateInterfaceAddresses(previous)
+            logging.warning(f'Status server interface {address} is not on '
+                            'this host, trying private interfaces '
+                            f'{[c.toString() for c in candidates]}.')
+        lastPort = min(port + portSearchRange, 65536) - 1
+        ok = False
+        for candidate in candidates:
+            for candidatePort in range(port, lastPort + 1):
+                ok = self.statusServerThread.bind(candidate, candidatePort)
+                if ok:
+                    break
+            if ok:
+                break
+        if ok:
+            if candidate is not previous:
+                address = candidate.toString()
+                settings.setValue("SOLPS_GUI_IP", address)
+            boundPort = self.statusServerThread.localPort()
+            if boundPort != port:
+                logging.warning(f'Status server port {port} is not free, '
+                                f'using port {boundPort}.')
+                port = boundPort
+            logging.info(f'Status server listening on {address}:{port}')
+
+        settings.setValue("SOLPS_GUI_BIND", address)
+        settings.setValue("SOLPS_GUI_PORT", port)
+        # self.statusServerThread.connectToHost(QHostAddress(address), port)
+        if ok:
+            return ''
+        if candidates:
+            msg = 'Failed to bind interface '
+            msg += ', '.join(c.toString() for c in candidates)
+            msg += f' to ports {port}-{lastPort}. '
+        else:
+            msg = f'Interface {address} is not on this host and no'
+            msg += ' private interface was found. '
+        msg += 'Job monitoring will not start unless you setup a free'
+        msg += ' port and restart!'
+        return msg
 
     @Slot(str)
     def jobStatusChanged(self, message: str) -> None:
